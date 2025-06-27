@@ -1,0 +1,9 @@
+---
+- name: Stop Medialytics
+  docker_container:
+    name: "{{ medialytics_container_name }}"
+    state: absent
+  when: medialytics_enabled is false
+  listen:
+    - "stop medialytics"
+    - "stop disabled applications"

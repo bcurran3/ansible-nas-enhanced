@@ -1,0 +1,70 @@
+---
+- name: Start iDRAC6
+  block:
+    - name: Create iDRAC6 Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ idrac6_data_directory }}"
+        - "{{ idrac6_data_directory }}/app"
+        - "{{ idrac6_data_directory }}/vmedia"
+        - "{{ idrac6_data_directory }}/screenshots"
+
+    - name: Create iDRAC6 Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ idrac6_container_name }}"
+        hostname: "{{ idrac6_container_name }}"
+        image: domistyle/idrac6
+        pull: true
+        network_mode: "bridge"
+        ports:
+          - "{{ idrac6_port_web }}:5800"
+          - "{{ idrac6_port_vnc }}:5900"
+        volumes:
+          - "{{ idrac6_data_directory }}/app:/app"
+          - "{{ idrac6_data_directory }}/vmedia:/vmedia"
+          - "{{ idrac6_data_directory }}/screenshots:/screenshots"
+        env:
+          IDRAC_HOST: "{{ idrac6_ip }}"
+          IDRAC_USER: "{{ idrac6_username }}"
+          IDRAC_PASSWORD: "{{ idrac6_password }}"
+          USER_ID: "0"
+          GROUP_ID: "0"
+          VIRTUAL_ISO: "{{ idrac6_virtualmedia }}"
+          VNC_PASSWORD: "{{ idrac6_vnc_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ idrac6_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ idrac6_watchtower_monitor_only }}"
+          homepage.group: "{{ idrac6_homepage_group }}"
+          homepage.name: "iDRAC6"
+          homepage.href: "{{ idrac6_homepage_href }}"
+          homepage.icon: "{{ idrac6_homepage_icon }}"
+#         homepage.description: "iDRAC 6 web interface and VNC proxy"
+          homepage.server: "my-docker"
+          homepage.container: "{{ idrac6_container_name }}"
+          homepage.showStats: "{{ idrac6_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ idrac6_port_web }}"
+          traefik.enable: "{{ idrac6_available_externally | string }}"
+          traefik.http.routers.idrac6.rule: "Host(`{{ idrac6_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.idrac6.tls.certresolver: "letsencrypt"
+          traefik.http.routers.idrac6.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.idrac6.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ idrac6_hostname }}"
+          traefik.http.routers.idrac6.middlewares: "{{ idrac6_hostname }}@docker"
+          traefik.http.middlewares.idrac6.IPAllowList.sourcerange: "{{ idrac6_traefik_whitelist }}"
+          traefik.http.services.idrac6.loadbalancer.server.port: "5800"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/DomiStyle/docker-idrac6/releases/tag/$${major}.$${minor}.$${patch}"
+  when: idrac6_enabled is true
+
+- name: Stop iDRAC6
+  block:
+    - name: Stop iDRAC6
+      community.docker.docker_container:
+        name: "{{ idrac6_container_name }}"
+        state: absent
+  when: idrac6_enabled is false

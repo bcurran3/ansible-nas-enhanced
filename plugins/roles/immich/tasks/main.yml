@@ -1,0 +1,207 @@
+---
+- name: Start Immich
+  block:
+    - name: Create Immich Directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ immich_data_directory }}"
+        - "{{ immich_data_directory }}/cache"
+        - "{{ immich_upload_directory }}"
+
+    - name: Create Immich network
+      community.docker.docker_network:
+        name: "{{ immich_network_name }}"
+
+    - name: Immich Machine Learning Docker Container
+      community.docker.docker_container:
+        name: "{{ immich_machinelearning_container_name }}"
+        image: "{{ immich_machinelearning_image }}:{{ immich_machinelearning_tag }}"
+        pull: true
+        container_default_behavior: no_defaults
+    # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
+    # Example tag: ${IMMICH_VERSION:-release}-cuda
+    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+    #   file: hwaccel.ml.yml
+    #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+        volumes:
+          - "{{ immich_data_directory }}/cache:/cache"
+        networks:
+          - name: "{{ immich_network_name }}"
+        network_mode: "bridge"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "true"
+          homepage.group: "{{ immich_machinelearning_homepage_group }}"
+          homepage.name: "Immich Machine Learning"
+          homepage.icon: "{{ immich_machinelearning_homepage_icon }}"
+          homepage.href: "{{ immich_homepage_href }}"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "{{ immich_machinelearning_container_name }}"
+          homepage.showStats: "false"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/immich-app/immich/releases/tag/$${major}.$${minor}.$${patch}"
+        restart_policy: unless-stopped
+        memory: "{{ immich_machinelearning_memory }}"
+
+    - name: Immich Postgress Docker Container
+      community.docker.docker_container:
+        name: "{{ immich_postgres_container_name }}"
+        image: "{{ immich_postgres_image }}:{{ immich_postgres_tag }}"
+        pull: true
+        volumes:
+          - "{{ immich_data_directory }}/database:/var/lib/postgresql/data"
+          - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
+        networks:
+          - name: "{{ immich_network_name }}"
+        network_mode: "bridge"
+        networks_cli_compatible: "yes"
+        container_default_behavior: no_defaults
+        env:
+          POSTGRES_PASSWORD: "{{ immich_db_password }}"
+          POSTGRES_USER: "{{ immich_db_username }}"
+          POSTGRES_DB: "{{ immich_db_name }}"
+          POSTGRES_INITDB_ARGS: '--data-checksums'
+          PG_DATA: "/var/lib/postgresql/data"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "true"
+          homepage.group: "{{ immich_postgres_homepage_group }}"
+          homepage.name: "Immich PostgreSQL"
+          homepage.icon: "{{ immich_postgres_homepage_icon }}"
+          homepage.href: "{{ immich_homepage_href }}"
+#         homepage.description: "PostgrSQL"
+          homepage.server: "my-docker"
+          homepage.container: "{{ immich_postgres_container_name }}"
+          homepage.showStats: "false"
+          traefik.enable: "false"
+#          wud.tag.include: '^\d+\.\d+\.\d+$$'
+#          wud.link.template: ""
+        restart_policy: always
+        memory: "{{ immich_postgres_memory }}"
+#        healthcheck:
+#          test: ["CMD-SHELL", "pg_isready -d {{ immich_db_name }} -U {{ immich_db_username }}"]
+#          interval: 5m
+#          start_interval: 30s
+#          start_period: 5m
+#          retries: 5
+#          timeout: 5s
+
+    - name: Immich Redis Docker Container
+      community.docker.docker_container:
+        name: "{{ immich_redis_container_name }}"
+        image: "{{ immich_redis_image }}:{{ immich_redis_tag }}"
+        pull: true
+        container_default_behavior: no_defaults
+#        command: --save 60 1 --loglevel warning
+        networks:
+          - name: "{{ immich_network_name }}"
+        network_mode: "bridge"
+        networks_cli_compatible: "yes"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ immich_watchtower_monitor_only }}"
+          homepage.group: "{{ immich_redis_homepage_group }}"
+          homepage.name: "Immich Redis"
+          homepage.icon: "{{ immich_redis_homepage_icon }}"
+          homepage.href: "{{ immich_homepage_href }}"
+#         homepage.description: "Redis"
+          homepage.server: "my-docker"
+          homepage.container: "{{ immich_redis_container_name }}"
+          homepage.showStats: "{{ immich_redis_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
+        restart_policy: always
+        memory: "{{ immich_redis_memory }}"
+        healthcheck:
+          test: ["CMD-SHELL", "redis-cli ping || exit 1"]
+
+    - name: Immich Server Docker Container
+      community.docker.docker_container:
+        name: "{{ immich_server_container_name }}"
+        hostname: "{{ immich_server_container_name }}"
+        image: "{{ immich_server_image }}:{{ immich_server_tag }}"
+        pull: true
+        container_default_behavior: no_defaults
+#        entrypoint: ["/bin/sh", "./start-server.sh"]
+        volumes:
+          - "{{ immich_upload_directory }}:/usr/src/app/upload"
+        networks:
+          - name: "{{ immich_network_name }}"
+        network_mode: "bridge"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ immich_port }}:2283"
+        env:
+          REDIS_HOSTNAME: "{{ immich_redis_container_name }}"
+          DB_HOSTNAME: "{{ immich_postgres_container_name }}"
+          DB_USERNAME: "{{ immich_db_username }}"
+          DB_PASSWORD: "{{ immich_db_password }}"
+          DB_DATABASE_NAME: "{{ immich_db_name }}"
+          UPLOAD_LOCATION: "./library"
+          TZ: "{{ ansible_nas_timezone }}"
+#        links:
+#          - "{{ immich_machinelearning_container_name }}"
+#          - "{{ immich_postgres_container_name }}"
+#          - "{{ immich_redis_container_name }}"
+        memory: "{{ immich_server_memory }}"
+#        healthcheck:
+#          disable: "false"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "true"
+          homepage.name: "Immich"
+          homepage.group: "{{ immich_homepage_group }}"
+          homepage.icon: "{{ immich_homepage_icon }}"
+          homepage.href: "{{ immich_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port }}"
+#         homepage.description: "High performance self-hosted photo and video management solution"
+          homepage.server: "my-docker"
+          homepage.container: "{{ immich_server_container_name }}"
+          homepage.showStats: "{{ immich_homepage_showStats }}"
+          homepage.widget.type: "immich"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port }}"
+          homepage.widget.key: "{{ immich_homepage_widget_key }}"
+          homepage.widget.version: "2"
+          traefik.enable: "{{ immich_available_externally | string }}"
+          traefik.http.routers.immich.rule: "Host(`{{ immich_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.immich.tls.certresolver: "letsencrypt"
+          traefik.http.routers.immich.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.immich.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ immich_hostname }}"
+          traefik.http.routers.immich.middlewares: "{{ immich_hostname }}@docker"
+          traefik.http.middlewares.immich.IPAllowList.sourcerange: "{{ immich_traefik_whitelist }}"
+          traefik.http.services.immich.loadbalancer.server.port: "2283"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/immich-app/immich/releases/tag/$${major}.$${minor}.$${patch}"
+        restart_policy: unless-stopped
+  when: immich_enabled is true
+
+- name: Stop Immich
+  block:
+    - name: Stop Immich Server
+      community.docker.docker_container:
+        name: "{{ immich_server_container_name }}"
+        state: absent
+    - name: Stop Immich Machine Learning
+      community.docker.docker_container:
+        name: "{{ immich_machinelearning_container_name }}"
+        state: absent
+    - name: Stop Immich Redis
+      community.docker.docker_container:
+        name: "{{ immich_redis_container_name }}"
+        state: absent
+    - name: Stop Immich Postgres
+      community.docker.docker_container:
+        name: "{{ immich_postgres_container_name }}"
+        state: absent
+    - name: Delete Immich Network
+      community.docker.docker_network:
+        name: "{{ immich_network_name }}"
+        state: absent
+  when: immich_enabled is false

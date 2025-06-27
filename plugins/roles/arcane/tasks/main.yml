@@ -1,0 +1,62 @@
+---
+- name: Start arcane
+  block:
+    - name: Create Arcane Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ arcane_data_directory }}"
+
+    - name: Create Arcane Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ arcane_container_name }}"
+        hostname: "{{ arcane_container_name }}"
+        image: ghcr.io/ofkm/arcane:latest
+        pull: true
+        volumes:
+          - "{{ arcane_data_directory }}:/app/data"
+          - "{{ docker_home }}:/opt/my-docker-stacks:ro"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+          - "{{ arcane_port_http }}:3000"
+        env:
+          APP_ENV: "production"
+          PUID: "{{ arcane_puid }}"
+          PGID: "{{ arcane_pgid }}"
+          PUBLIC_SESSION_SECRET: "{{ arcane_public_session_secret }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ arcane_watchtower_monitor_only }}"
+          homepage.name: "Arcane"
+          homepage.group: "{{ arcane_homepage_group }}"
+          homepage.icon: "{{ arcane_homepage_icon }}"
+          homepage.href: "{{ arcane_homepage_href }}"
+#         homepage.description: "Modern Docker Management, Designed for Everyone"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ arcane_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ arcane_container_name }}"
+          homepage.showStats: "{{ arcane_homepage_showStats }}"
+          traefik.enable: "{{ arcane_available_externally | string }}"
+          traefik.http.routers.arcane.rule: "Host(`arcane.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.arcane.tls.certresolver: "letsencrypt"
+          traefik.http.routers.arcane.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.arcane.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ arcane_hostname }}"
+          traefik.http.routers.arcane.middlewares: "{{ arcane_hostname }}@docker"
+          traefik.http.middlewares.arcane.IPAllowList.sourcerange: "{{ arcane_traefik_whitelist }}"
+          traefik.http.services.arcane.loadbalancer.server.port: "3000"
+          arcane.tag.include: '^\d+\.\d+\.\d+$$'
+          arcane.link.template: "https://github.com/ofkm/arcane/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ arcane_memory }}"
+  when: arcane_enabled is true
+
+- name: Stop Arcane
+  block:
+    - name: Stop Arcane Docker Container
+      community.docker.docker_container:
+        name: "{{ arcane_container_name }}"
+        state: absent
+  when: arcane_enabled is false

@@ -1,0 +1,9 @@
+---
+- name: Stop MeshCentral
+  docker_container:
+    name: "{{ meshcentral_container_name }}"
+    state: absent
+  when: meshcentral_enabled is false
+  listen:
+    - "stop meshcentral"
+    - "stop disabled applications"

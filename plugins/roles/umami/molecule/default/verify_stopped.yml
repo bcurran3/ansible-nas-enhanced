@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove Umami
+      community.docker.docker_container:
+        name: "{{ umami_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Umami is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Try and stop and remove Umami DB
+      community.docker.docker_container:
+        name: "{{ umami_db_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Umami DB is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

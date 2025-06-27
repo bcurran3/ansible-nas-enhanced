@@ -1,0 +1,9 @@
+---
+- name: Stop Paperless-ngx
+  docker_container:
+    name: "{{ paperlessngx_container_name }}"
+    state: absent
+  when: paperlessngx_enabled is false
+  listen:
+    - "stop paperlessngx"
+    - "stop disabled applications"

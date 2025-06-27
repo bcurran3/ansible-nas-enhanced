@@ -1,0 +1,62 @@
+---
+- name: Start Sonarr
+  block:
+    - name: Create Sonarr Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ sonarr_data_directory }}"
+
+    - name: Sonarr
+      community.docker.docker_container:
+        name: "{{ sonarr_container_name }}"
+        hostname: "{{ sonarr_container_name }}"
+        image: "{{ sonarr_image_name }}:{{ sonarr_image_version }}"
+        pull: true
+        volumes:
+          - "{{ sonarr_tv_directory }}:/tv:rw"
+          - "{{ sonarr_anime_directory }}:/anime:rw"
+          - "{{ sonarr_download_directory }}:/downloads:rw"
+          - "{{ sonarr_data_directory }}:/config:rw"
+        ports:
+          - "{{ sonarr_port }}:8989"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ sonarr_user_id }}"
+          PGID: "{{ sonarr_group_id }}"
+#          DOCKER_MODS: "linuxserver/mods:radarr-striptracks"     # added
+#          DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:sonarr"
+        restart_policy: unless-stopped
+        memory: "{{ sonarr_memory }}"
+        labels:
+          homepage.group: "Media Management"
+          homepage.name: "Sonarr"
+          homepage.href: "https://{{ sonarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.siteMonitor: "https://{{ sonarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.icon: "sonarr.png"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "sonarr"
+          homepage.showStats: "false"
+          homepage.widget.type: "sonarr"
+          homepage.widget.url: "https://{{ sonarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.widget.key: "{{ sonarr_homepage_widget_key }}"
+          traefik.enable: "{{ sonarr_available_externally | string }}"
+          traefik.http.routers.sonarr.rule: "Host(`{{ sonarr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.sonarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.sonarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.sonarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ sonarr_hostname }}"
+          traefik.http.routers.sonarr.middlewares: "{{ sonarr_hostname }}@docker"
+          traefik.http.middlewares.sonarr.IPAllowList.sourcerange: "{{ sonarr_traefik_whitelist }}"
+          traefik.http.services.sonarr.loadbalancer.server.port: "8989"
+  when: sonarr_enabled is true
+
+- name: Stop Sonarr
+  block:
+    - name: Stop Sonarr
+      community.docker.docker_container:
+        name: "{{ sonarr_container_name }}"
+        state: absent
+  when: sonarr_enabled is false

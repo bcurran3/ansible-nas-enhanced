@@ -1,0 +1,60 @@
+---
+- name: Start Hammond
+  block:
+    - name: Create Hammond Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ hammond_data_directory }}"
+        - "{{ hammond_data_directory }}/assets"
+        - "{{ hammond_data_directory }}/config"
+
+    - name: Create Hammond Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ hammond_container_name }}"
+        hostname: "{{ hammond_container_name }}"
+        image: alfhou/hammond
+        pull: true
+        volumes:
+          - "{{ hammond_data_directory }}/assets:/assets"
+          - "{{ hammond_data_directory }}/config:/config"
+        ports:
+          - "{{ hammond_port_http }}:3000"
+        env:
+          JWT_SECRET: "{{ hammond_secret }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ hammond_watchtower_monitor_only }}"
+          homepage.name: "Hammond"
+          homepage.group: "{{ hammond_homepage_group }}"
+          homepage.icon: "{{ hammond_homepage_icon }}"
+          homepage.href: "{{ hammond_homepage_href }}"
+#         homepage.description: "Hammond is a self hosted vehicle management system to track fuel and other expenses related to all of your vehicles."
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hammond_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ hammond_container_name }}"
+          homepage.showStats: "{{ hammond_homepage_showStats }}"
+          traefik.enable: "{{ hammond_available_externally | string }}"
+          traefik.http.routers.hammond.rule: "Host(`hammond.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.hammond.tls.certresolver: "letsencrypt"
+          traefik.http.routers.hammond.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.hammond.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ hammond_hostname }}"
+          traefik.http.routers.hammond.middlewares: "{{ hammond_hostname }}@docker"
+          traefik.http.middlewares.hammond.IPAllowList.sourcerange: "{{ hammond_traefik_whitelist }}"
+          traefik.http.services.hammond.loadbalancer.server.port: "3000"
+          hammond.tag.include: '^\d+\.\d+\.\d+$$'
+          hammond.link.template: "https://github.com/AlfHou/hammond/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ hammond_memory }}"
+  when: hammond_enabled is true
+
+- name: Stop Hammond
+  block:
+    - name: Stop Hammond
+      community.docker.docker_container:
+        name: "{{ hammond_container_name }}"
+        state: absent
+  when: hammond_enabled is false

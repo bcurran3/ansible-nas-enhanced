@@ -1,0 +1,22 @@
+# 
+dashdot_enabled: false
+dashdot_available_externally: false
+dashdot_traefik_whitelist: "{{ lan }}"
+dashdot_data_directory: "{{ docker_home }}/dashdot"
+
+# network
+dashdot_hostname: "dashdot"
+dashdot_port_http: "3022"
+dashdot_memory_limit: "512m"
+
+# docker
+dashdot_container_name: "dashdot"
+
+# homepage
+dashdot_homepage_group: "Apps"
+dashdot_homepage_icon: "dashdot.png"
+dashdot_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dashdot_port_http }}"
+dashdot_homepage_showStats: "false"
+
+# watchtower
+dashdot_watchtower_monitor_only: "true"

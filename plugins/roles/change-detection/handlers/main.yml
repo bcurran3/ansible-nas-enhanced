@@ -1,0 +1,18 @@
+---
+- name: Stop Change Detection
+  docker_container:
+    name: "{{ change_detection_container_name }}"
+    state: absent
+  when: change_detection_enabled is false
+  listen:
+    - "stop change_detection"
+    - "stop disabled applications"
+
+- name: Stop Sock Puppet(eer) Browser
+  docker_container:
+    name: "{{ change_detection_sockpuppet_container_name }}"
+    state: absent
+  when: change_detection_enabled is false
+  listen:
+    - "stop change_detection"
+    - "stop disabled applications"

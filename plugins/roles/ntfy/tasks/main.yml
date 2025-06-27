@@ -1,0 +1,65 @@
+---
+- name: Start ntfy
+  block:
+    - name: Create ntfy Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ ntfy_data_directory }}"
+        - "{{ ntfy_data_directory }}/cache"
+
+    - name: Create ntfy Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ ntfy_container_name }}"
+        hostname: "{{ ntfy_container_name }}"
+        image: binwiederhier/ntfy
+        pull: true
+        command: "serve"
+        ports:
+          - "{{ ntfy_port_http }}:80"
+        volumes:
+          - "{{ ntfy_data_directory }}/cache:/var/cache/ntfy"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ ntfy_memory_limit }}"
+#        healthcheck: # optional: remember to adapt the host:port to your environment
+#            test: ["CMD-SHELL", "wget -q --tries=1 http://localhost:80/v1/health -O - | grep -Eo '\"healthy\"\\s*:\\s*true' || exit 1"]
+#            interval: 60s
+#            timeout: 10s
+#            retries: 3
+#            start_period: 40s
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ ntfy_watchtower_monitor_only }}"
+          homepage.name: "ntfy"
+          homepage.group: "{{ ntfy_homepage_group }}"
+          homepage.icon: "{{ ntfy_homepage_icon }}"
+          homepage.href: "{{ ntfy_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}"
+#         homepage.description: "Send push notifications to your phone or desktop using PUT/POST"
+          homepage.server: "my-docker"
+          homepage.container: "{{ ntfy_container_name }}"
+          homepage.showStats: "{{ ntfy_homepage_showStats }}"
+          traefik.enable: "{{ ntfy_available_externally | string }}"
+          traefik.http.routers.ntfy.rule: "Host(`{{ ntfy_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.ntfy.tls.certresolver: "letsencrypt"
+          traefik.http.routers.ntfy.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.ntfy.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ ntfy_hostname }}"
+          traefik.http.routers.ntfy.middlewares: "{{ ntfy_hostname }}@docker"
+          traefik.http.middlewares.ntfy.IPAllowList.sourcerange: "{{ ntfy_traefik_whitelist }}"
+          traefik.http.services.ntfy.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/binwiederhier/ntfy/releases/tag/$${major}.$${minor}.$${patch}"
+  when: ntfy_enabled is true
+
+- name: Stop ntfy
+  block:
+    - name: Stop ntfy Docker Container
+      community.docker.docker_container:
+        name: "{{ ntfy_container_name }}"
+        state: absent
+  when: ntfy_enabled is false

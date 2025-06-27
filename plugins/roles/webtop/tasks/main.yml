@@ -1,0 +1,64 @@
+---
+- name: Start Webtop
+  block:
+    - name: Create Webtop Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ webtop_data_directory }}"
+        - "{{ webtop_data_directory }}/config"
+
+    - name: Create Webtop Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ webtop_container_name }}"
+        hostname: "{{ webtop_container_name }}"
+        image: "lscr.io/linuxserver/webtop:{{ webtop_container_version }}"
+        pull: true
+        volumes:
+          - "{{ webtop_data_directory }}/config:/config"
+          - "/var/run/docker.sock:/var/run/docker.sock" #optional
+        env:
+          KEYBOARD: "en-us-qwerty" #optional
+          PUID: "{{ webtop_user_id }}"
+          PGID: "{{ webtop_group_id }}"
+          SUBFOLDER: "/" #optional
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ webtop_port_http }}:3000"
+        security_opts:
+          - seccomp:unconfined #optional
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ webtop_watchtower_monitor_only }}"
+          homepage.name: "Webtop"
+          homepage.group: "{{ webtop_homepage_group }}"
+          homepage.icon: "{{ webtop_homepage_icon }}"
+          homepage.href: "{{ webtop_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webtop_port_http }}"
+#         homepage.description: "Ubuntu, Alpine, Arch, and Fedora based Webtop images, Linux in a web browser supporting popular desktop environments."
+          homepage.server: "my-docker"
+          homepage.container: "{{ webtop_container_name }}"
+          homepage.showStats: "{{ webtop_homepage_showStats }}"
+          traefik.enable: "{{ webtop_available_externally | string }}"
+          traefik.http.routers.webtop.rule: "Host(`{{ webtop_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.webtop.tls.certresolver: "letsencrypt"
+          traefik.http.routers.webtop.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.webtop.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ webtop_hostname }}"
+          traefik.http.routers.webtop.middlewares: "{{ webtop_hostname }}@docker"
+          traefik.http.middlewares.webtop.IPAllowList.sourcerange: "{{ webtop_traefik_whitelist }}"
+          traefik.http.services.webtop.loadbalancer.server.port: "3000"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ webtop_memory_limit }}"
+  when: webtop_enabled is true
+
+- name: Stop Webtop
+  block:
+    - name: Stop Webtop
+      community.docker.docker_container:
+        name: "{{ webtop_container_name }}"
+        state: absent
+  when: webtop_enabled is false

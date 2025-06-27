@@ -1,0 +1,99 @@
+---
+stats_enabled: false
+stats_internet_speed_test_enabled: false
+stats_prometheus_available_externally: false
+stats_prometheus_traefik_whitelist: "{{ lan }}"
+stats_grafana_available_externally: false
+stats_grafana_traefik_whitelist: "{{ lan }}"
+
+# directories
+stats_telegraf_config_directory: "{{ docker_home }}/stats/telegraf/config"
+stats_prometheus_data_directory: "{{ docker_home }}/stats/prometheus/data"
+stats_prometheus_config_directory: "{{ docker_home }}/stats/prometheus/config"
+stats_grafana_data_directory: "{{ docker_home }}/stats/grafana/data"
+stats_grafana_config_directory: "{{ docker_home }}/stats/grafana/config"
+
+# network
+stats_prometheus_port: "9090"
+stats_telegraf_port: "9273"
+stats_telegraf_influxdb_port: "8086"
+stats_prometheus_smartctl_port: "9902"
+stats_speedtest_exporter_port: "9798"
+stats_hddtemp_port: "7634"
+stats_prometheus_hostname: "prometheus"
+stats_grafana_port: "3000"
+stats_grafana_hostname: "grafana"
+
+# docker:
+stats_grafana_container_name: "stats-grafana"
+stats_grafana_image_name: "grafana/grafana"
+stats_grafana_image_version: "latest"
+stats_prometheus_container_name: "stats-prometheus"
+stats_prometheus_image_name: "prom/prometheus"
+stats_prometheus_image_version: "latest"
+stats_telegraf_container_name: "stats-telegraf"
+stats_telegraf_image_name: "telegraf"
+stats_telegraf_image_version: "latest"
+stats_smartctl_container_name: "stats-smartctl"
+stats_smartctl_docker_image_name: "matusnovak/prometheus-smartctl"
+stats_smartctl_docker_image_version: "latest"
+stats_speedtest_container_name: "stats-speedtest"
+stats_speedtest_docker_image_name: "miguelndecarvalho/speedtest-exporter"
+stats_speedtest_docker_image_version: "latest"
+stats_hddtemp_docker_container_name: "stats-hddtemp"
+stats_hddtemp_docker_image_name: "modem7/hddtemp-docker"
+stats_hddtemp_docker_image_tag: "latest"
+
+
+# specs
+stats_telegraf_memory: 1g
+stats_prometheus_memory: 1g
+stats_prometheus_smartctl_memory: 1g
+stats_hddtemp_memory: 128m
+stats_speedtest_exporter_memory: 256m
+stats_grafana_memory: 1g
+
+# config
+stats_prometheus_retention_time: 365d
+stats_prometheus_retention_size: 30GB
+stats_collection_interval: 15s
+stats_speedtest_collection_interval: 1h
+
+# uncomment to scrape more hosts
+# stats_prometheus_additional_hosts:
+#  - 192.168.1.1:9100
+
+# uncomment to scrape metrics from HomeAssistant. You'll need to create a long lived access token.
+# stats_hass_long_lived_access_token: addfasdfasdf
+
+# homepage
+stats_grafana_homepage_group: "Apps"
+stats_grafana_homepage_icon: "grafana.png"
+stats_grafana_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_grafana_port }}"
+stats_grafana_homepage_showStats: "false"
+stats_hddtemp_homepage_group: "Misc"
+stats_hddtemp_homepage_icon: "mdi-harddisk"
+stats_hddtemp_homepage_showStats: "false"
+stats_prometheus_homepage_group: "Apps"
+stats_prometheus_homepage_icon: "prometheus.png"
+stats_prometheus_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_port }}"
+stats_prometheus_homepage_showStats: "false"
+stats_smartctl_homepage_group: "Misc"
+stats_smartctl_homepage_icon: "prometheus.png"
+stats_smartctl_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_port }}"
+stats_smartctl_homepage_showStats: "false"
+stats_speedtest_homepage_group: "Misc"
+stats_speedtest_homepage_icon: "si-speedtest"
+stats_speedtest_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_speedtest_exporter_port }}"
+stats_speedtest_homepage_showStats: "false"
+stats_telegraf_homepage_group: "Misc"
+stats_telegraf_homepage_icon: "telegraf.png"
+stats_telegraf_homepage_showStats: "false"
+
+# watchtower
+stats_grafana_watchtower_monitor_only: "true"
+stats_hddtemp_watchtower_monitor_only: "true"
+stats_prometheus_watchtower_monitor_only: "true"
+stats_smartctl_watchtower_monitor_only: "true"
+stats_speedtest_watchtower_monitor_only: "true"
+stats_telegraf_watchtower_monitor_only: "true"

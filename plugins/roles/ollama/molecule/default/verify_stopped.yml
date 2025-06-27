@@ -1,0 +1,32 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove Ollama
+      community.docker.docker_container:
+        name: "{{ ollama_container_name }}"
+        state: absent
+      register: result
+
+    - name: Try and stop and remove Ollama
+      community.docker.docker_container:
+        name: "{{ ollama_openedai_container_name }}"
+        state: absent
+      register: result_openedai
+
+    - name: Try and stop and remove Ollama
+      community.docker.docker_container:
+        name: "{{ ollama_openwebui_container_name }}"
+        state: absent
+      register: result_openwebui
+
+    - name: Check Ollama is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - not result_openedai.changed
+          - not result_openwebui.changed

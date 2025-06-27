@@ -1,0 +1,9 @@
+---
+- name: Stop Mastodon
+  docker_container:
+    name: "{{ mastadon_container_name }}"
+    state: absent
+  when: mastadon_enabled is false
+  listen:
+    - "stop mastadon"
+    - "stop disabled applications"

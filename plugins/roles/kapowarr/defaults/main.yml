@@ -1,0 +1,31 @@
+---
+# enable or disable the application
+kapowarr_enabled: false
+kapowarr_available_externally: false
+kapowarr_traefik_whitelist: "{{ lan }}"
+
+# directories
+kapowarr_data_directory: "{{ docker_home }}/kapowarr"
+kapowarr_comics_directory: "{{ comics_root }}"
+kapowarr_downloads_directory: "{{ downloads_root }}"
+
+# uid / gid
+kapowarr_user_id: "1000"
+kapowarr_group_id: "1000"
+
+# network
+kapowarr_hostname: "kapowarr"
+kapowarr_port_http: "5656"
+
+# docker
+kapowarr_container_name: "kapowarr"
+kapowarr_memory: "1g"
+
+# homepage
+kapowarr_homepage_group: "Apps"
+kapowarr_homepage_icon: "kapowarr.png"
+kapowarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kapowarr_port_http }}"
+kapowarr_homepage_showStats: "false"
+
+# watchtower
+kapowarr_watchtower_monitor_only: "true"

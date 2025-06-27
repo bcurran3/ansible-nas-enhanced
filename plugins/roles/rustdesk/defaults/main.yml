@@ -1,0 +1,22 @@
+#
+rustdesk_enabled: false
+rustdesk_available_externally: false
+rustdesk_traefik_whitelist: "{{ lan }}"
+rustdesk_data_directory: "{{ docker_home }}/rustdesk"
+
+# network
+rustdesk_hostname: "rustdesk"
+
+# docker
+rustdesk_container_name: "hbbs"
+rustdesk_container2_name: "hbbr"
+rustdesk_memory_limit: "1g"
+
+# homepage
+rustdesk_homepage_group: "Apps"
+rustdesk_homepage_icon: "rustdesk.png"
+rustdesk_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+rustdesk_homepage_showStats: "false"
+
+# watchtower
+rustdesk_watchtower_monitor_only: "true"

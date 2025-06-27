@@ -1,0 +1,63 @@
+---
+- name: Start Stirling PDF
+  block:
+    - name: Create Stirling PDF Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ stirling_pdf_data_directory }}"
+        - "{{ stirling_pdf_data_directory }}/extraConfigs"
+        - "{{ stirling_pdf_data_directory }}/trainingData"
+
+    - name: Create Stirling PDF Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ stirling_pdf_container_name }}"
+        image: stirlingtools/stirling-pdf:latest
+        pull: true
+        volumes:
+          - "{{ stirling_pdf_data_directory }}/extraConfigs:/configs"
+          - "{{ stirling_pdf_data_directory }}/trainingData:/usr/share/tessdata"
+        ports:
+          - "{{ stirling_pdf_port_http }}:8080"
+        env:
+          DOCKER_ENABLE_SECURITY: "false"
+          INSTALL_BOOK_AND_ADVANCED_HTML_OPS: "false"
+          LANGS: "en_US"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ stirling_pdf_watchtower_monitor_only }}"
+          homepage.name: "Stirling PDF"
+          homepage.group: "{{ stirling_pdf_homepage_group }}"
+          homepage.icon: "{{ stirling_pdf_homepage_icon }}"
+          homepage.href: "{{ stirling_pdf_homepage_href }}"
+#         homepage.description: "#1 Locally hosted web application that allows you to perform various operations on PDF files"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stirling_pdf_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ stirling_pdf_container_name }}"
+          homepage.showStats: "{[ stirling_pdf_homepage_showStats ]}"
+          homepage.widget.type: "stirling-pdf"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stirling_pdf_port_http }}"
+          traefik.enable: "{{ stirling_pdf_available_externally | string }}"
+          traefik.http.routers.stirling_pdf.rule: "Host(`{{ stirling_pdf_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.stirling_pdf.tls.certresolver: "letsencrypt"
+          traefik.http.routers.stirling_pdf.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.stirling_pdf.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ stirling_pdf_hostname }}"
+          traefik.http.routers.stirling_pdf.middlewares: "stirling_pdf@docker"
+          traefik.http.middlewares.stirling_pdf.IPAllowList.sourcerange: "{{ stirling_pdf_traefik_whitelist }}"
+          traefik.http.services.stirling_pdf.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ stirling_pdf_memory }}"
+  when: stirling_pdf_enabled is true
+
+- name: Stop Stirling PDF Docker
+  block:
+    - name: Stop Stirling PDF Docker
+      community.docker.docker_container:
+        name: "{{ stirling_pdf_container_name }}"
+        state: absent
+  when: stirling_pdf_enabled is false

@@ -1,0 +1,56 @@
+---
+- name: Start Shoutcast Server
+  block:
+    - name: Shoutcast Server Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ shoutcast_data_directory }}"
+
+    - name: Shoutcast Server Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ shoutcast_container_name}}"
+        image: luzifer/shoutcast
+        pull: true
+        volumes:
+          - "{{ shoutcast_media_directory }}:/media:ro"
+          - "{{ shoutcast_data_directory }}:/etc/shoutcast:rw"
+        ports:
+          - "{{ shoutcast_port_http }}:8001"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ shoutcast_watchtower_monitor_only }}"
+          homepage.name: "Shoutcast Server"
+          homepage.group: "{{ shoutcast_homepage_group }}"
+          homepage.icon: "{{ shoutcast_homepage_icon }}"
+          homepage.href: "{{ shoutcast_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ shoutcast_port_http }}"
+#         homepage.description: "Shoutcast Radio Media Streaming Server"
+          homepage.server: "my-docker"
+          homepage.container: "{{ shoutcast_container_name }}"
+          homepage.showStats: "{{ shoutcast_homepage_showStats }}"
+          traefik.enable: "{{ shoutcast_available_externally | string }}"
+          traefik.http.routers.shoutcast.rule: "Host(`shoutcast.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.shoutcast.tls.certresolver: "letsencrypt"
+          traefik.http.routers.shoutcast.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.shoutcast.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ shoutcast_hostname }}"
+          traefik.http.routers.shoutcast.middlewares: "{{ shoutcast_hostname }}@docker"
+          traefik.http.middlewares.shoutcast.IPAllowList.sourcerange: "{{ shoutcast_traefik_whitelist }}"
+          traefik.http.services.shoutcast.loadbalancer.server.port: "8001"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: 1g
+  when: shoutcast_enabled is true
+
+- name: Stop Shoutcast Server
+  block:
+    - name: Stop Shoutcast Server
+      community.docker.docker_container:
+        name: "{{ shoutcast_container_name }}"
+        state: absent
+  when: shoutcast_enabled is false

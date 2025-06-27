@@ -1,0 +1,62 @@
+---
+- name: Start Focalboard
+  block:
+    - name: Create focalboard Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: nobody
+        group: nogroup
+      with_items:
+        - "{{ focalboard_data_directory }}"
+        - "{{ focalboard_data_directory }}/data"
+
+    - name: Create Focalboard Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ focalboard_container_name }}"
+        hostname: "{{ focalboard_container_name }}"
+        image: mattermost/focalboard
+        pull: true
+        ports:
+          - "{{ focalboard_port_http }}:8000"
+        volumes:
+          - "{{ focalboard_data_directory }}/data:/opt/focalboard/data"
+        network_mode: bridge
+        env:
+          VIRTUAL_HOST: "focalboard.local"
+          VIRTUAL_PORT: "8000"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ focalboard_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ focalboard_watchtower_monitor_only }}"
+          homepage.name: "focalboard"
+          homepage.group: "{{ focalboard_homepage_group }}"
+          homepage.icon: "{{ focalboard_homepage_icon }}"
+          homepage.href: "{{ focalboard_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ focalboard_port_http }}"
+#         homepage.description: "Focalboard is an open source, self-hosted alternative to Trello, Notion, and Asana."
+          homepage.server: "my-docker"
+          homepage.container: "{{ focalboard_container_name }}"
+          homepage.showStats: "{{ focalboard_homepage_showStats }}"
+          traefik.enable: "{{ focalboard_available_externally | string }}"
+          traefik.http.routers.focalboard.rule: "Host(`{{ focalboard_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.focalboard.tls.certresolver: "letsencrypt"
+          traefik.http.routers.focalboard.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.focalboard.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ focalboard_hostname }}"
+          traefik.http.routers.focalboard.middlewares: "{{ focalboard_hostname }}@docker"
+          traefik.http.middlewares.focalboard.IPAllowList.sourcerange: "{{ focalboard_traefik_whitelist }}"
+          traefik.http.services.focalboard.loadbalancer.server.port: "8000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mattermost-community/focalboard/releases/tag/$${major}.$${minor}.$${patch}"
+  when: focalboard_enabled is true
+
+- name: Stop Focalboard
+  block:
+    - name: Stop focalboard Docker Container
+      community.docker.docker_container:
+        name: "{{ focalboard_container_name }}"
+        state: absent
+  when: focalboard_enabled is false

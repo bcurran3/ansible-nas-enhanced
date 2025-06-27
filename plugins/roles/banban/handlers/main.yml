@@ -1,0 +1,9 @@
+---
+- name: Stop BanBan
+  docker_container:
+    name: "{{ banban_container_name }}"
+    state: absent
+  when: banban_enabled is false
+  listen:
+    - "stop banban"
+    - "stop disabled applications"

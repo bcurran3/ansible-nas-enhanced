@@ -1,0 +1,60 @@
+---
+- name: Start Double Commander
+  block:
+    - name: Create Double Commander Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ doublecommander_data_directory }}"
+        - "{{ doublecommander_data_directory }}/config"
+
+    - name: Create Double Commander Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ doublecommander_container_name }}"
+        hostname: "{{ doublecommander_container_name }}"
+        image: lscr.io/linuxserver/doublecommander:latest
+        pull: true
+        volumes:
+        - "{{ doublecommander_data_directory }}/config:/config"
+        - "{{ doublecommander_browse_directory }}:/data"
+        ports:
+          - "{{ doublecommander_port_http }}:3000"
+        env:
+          PUID: "{{ doublecommander_user_id }}"
+          PGID: "{{ doublecommander_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ doublecommander_watchtower_monitor_only }}"
+          homepage.name: "Double Commander"
+          homepage.group: "{{ doublecommander_homepage_group }}"
+          homepage.icon: "{{ doublecommander_homepage_icon }}"
+          homepage.href: "{{ doublecommander_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doublecommander_port_http }}"
+#         homepage.description: "Double Commander is a free cross platform open source file manager with two panels side by side."
+          homepage.server: "my-docker"
+          homepage.container: "{{ doublecommander_container_name }}"
+          homepage.showStats: "{{ doublecommander_homepage_showStats }}"
+          traefik.enable: "{{ doublecommander_available_externally | string }}"
+          traefik.http.routers.doublecommander.rule: "Host(`doublecommander.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.doublecommander.tls.certresolver: "letsencrypt"
+          traefik.http.routers.doublecommander.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.doublecommander.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ doublecommander_hostname }}"
+          traefik.http.routers.doublecommander.middlewares: "{{ doublecommander_hostname }}@docker"
+          traefik.http.middlewares.doublecommander.IPAllowList.sourcerange: "{{ doublecommander_traefik_whitelist }}"
+          traefik.http.services.doublecommander.loadbalancer.server.port: "3000"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/linuxserver/docker-doublecommander/releases/tag/$${commit}"
+        memory: 512m
+  when: doublecommander_enabled is true
+
+- name: Stop Double Commander
+  block:
+    - name: Stop Double Commander
+      community.docker.docker_container:
+        name: "{{ doublecommander_container_name }}"
+        state: absent
+  when: doublecommander_enabled is false

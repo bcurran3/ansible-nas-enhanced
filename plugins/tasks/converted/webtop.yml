@@ -1,0 +1,68 @@
+---
+- name: Create webtop Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ webtop_data_directory }}"
+    - "{{ webtop_data_directory }}/config"
+
+- name: Create webtop Docker Container
+  docker_container:
+    name: webtop
+    image: lscr.io/linuxserver/webtop:ubuntu-kde
+    pull: true
+    volumes:
+      - "{{ webtop_data_directory }}/config:/config"
+      - "/var/run/docker.sock:/var/run/docker.sock" #optional
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "{{ webtop_user_id }}"
+      PGID: "{{ webtop_group_id }}"
+      SUBFOLDER: "/" #optional
+      KEYBOARD: "en-us-qwerty" #optional
+    ports:
+      - "{{ webtop_port_http }}:3000"
+#    dns_servers: "{{ ansible_nas_dns }}"
+    dns_servers: "192.168.69.11"
+    hostname: "webtop"
+    security_opts:
+      - seccomp:unconfined #optional
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{ webtop_available_externally | string }}"
+      traefik.http.routers.webtop.rule: "Host(`{{ webtop_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.webtop.tls.certresolver: "letsencrypt"
+      traefik.http.routers.webtop.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.webtop.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ webtop_hostname }}"
+      traefik.http.routers.webtop.middlewares: "{{ webtop_hostname }}@docker"
+      traefik.http.middlewares.webtop.IPAllowList.sourcerange: "{{ webtop_traefik_whitelist }}"
+      traefik.http.services.webtop.loadbalancer.server.port: "3000"
+    memory: "{{ webtop_memory }}"
+
+# Version tags
+# latest         XFCE Alpine
+# ubuntu-xfce	 XFCE Ubuntu
+# fedora-xfce	 XFCE Fedora
+# arch-xfce	 XFCE Arch
+# alpine-kde	 KDE Alpine
+# ubuntu-kde	 KDE Ubuntu
+# fedora-kde	 KDE Fedora
+# arch-kde	 KDE Arch
+# alpine-mate	 MATE Alpine
+# ubuntu-mate	 MATE Ubuntu
+# fedora-mate	 MATE Fedora
+# arch-mate	 MATE Arch
+# alpine-i3	 i3 Alpine
+# ubuntu-i3	 i3 Ubuntu
+# fedora-i3	 i3 Fedora
+# arch-i3        i3 Arch
+# alpine-openbox Openbox Alpine
+# ubuntu-openbox Openbox Ubuntu
+# fedora-openbox Openbox Fedora
+# arch-openbox	 Openbox Arch
+# alpine-icewm	 IceWM Alpine
+# ubuntu-icewm	 IceWM Ubuntu
+# fedora-icewm	 IceWM Fedora
+# arch-icewm	 IceWM Arch

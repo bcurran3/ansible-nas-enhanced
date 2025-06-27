@@ -1,0 +1,58 @@
+---
+- name: Start Grocy
+  block:
+    - name: Grocy Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ grocy_data_directory }}/config"
+
+    - name: Grocy Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ grocy_container_name }}"
+        hostname: "{{ grocy_container_name }}"
+        image: linuxserver/grocy:latest
+        pull: true
+        volumes:
+          - "{{ grocy_data_directory }}/config:/config:rw"
+        ports:
+          - "{{ grocy_port_http }}:80"
+        env:
+          PUID: "{{ grocy_user_id }}"
+          PGID: "{{ grocy_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ grocy_watchtower_monitor_only }}"
+          homepage.name: "Grocy"
+          homepage.group: "{{ grocy_homepage_group }}"
+          homepage.icon: "{{ grocy_homepage_icon }}"
+          homepage.href: "{{ grocy_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grocy_port_http }}"
+#         homepage.description: "ERP beyond your fridge - Grocy is a web-based self-hosted groceries & household management solution for your home"
+          homepage.server: "my-docker"
+          homepage.container: "{{ grocy_container_name }}"
+          homepage.showStats: "{{ grocy_homepage_showStats }}"
+          traefik.enable: "{{ grocy_available_externally | string }}"
+          traefik.http.routers.grocy.rule: "Host(`grocy.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.grocy.tls.certresolver: "letsencrypt"
+          traefik.http.routers.grocy.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.grocy.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ grocy_hostname }}"
+          traefik.http.routers.grocy.middlewares: "{{ grocy_hostname }}@docker"
+          traefik.http.middlewares.grocy.IPAllowList.sourcerange: "{{ grocy_traefik_whitelist }}"
+          traefik.http.services.grocy.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-grocy/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: 1g
+  when: grocy_enabled is true
+
+- name: Stop Grocy
+  block:
+    - name: Stop Grocy
+      community.docker.docker_container:
+        name: "{{ grocy_container_name }}"
+        state: absent
+  when: grocy_enabled is false

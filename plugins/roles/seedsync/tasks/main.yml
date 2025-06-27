@@ -1,0 +1,60 @@
+---
+- name: Start SeedSync
+  block:
+    - name: Create SeedSync Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ seedsync_data_directory }}"
+        - "{{ seedsync_data_directory }}/config"
+        - "{{ seedsync_data_directory }}/downloads"
+
+    - name: Create SeedSync Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ seedsync_container_name }}"
+        hostname: "{{ seedsync_container_name }}"
+        image: ipsingh06/seedsync
+        pull: true
+        ports:
+          - "{{ seedsync_port_http }}:8800"
+        volumes:
+          - "{{ seedsync_data_directory }}/config:/config"
+          - "{{ seedsync_data_directory }}/downloads:/downloads"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ seedsync_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ seedsync_watchtower_monitor_only }}"
+          homepage.name: "SeedSync"
+          homepage.group: "{{ seedsync_homepage_group }}"
+          homepage.icon: "{{ seedsync_homepage_icon }}"
+          homepage.href: "{{ seedsync_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ seedsync_port_http }}"
+#         homepage.description: "Sync your seedbox. Fast. And more."
+          homepage.server: "my-docker"
+          homepage.container: "{{ seedsync_container_name }}"
+          homepage.showStats: "{{ seedsync_homepage_showStats }}"
+          traefik.enable: "{{ seedsync_available_externally | string }}"
+          traefik.http.routers.seedsync.rule: "Host(`{{ seedsync_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.seedsync.tls.certresolver: "letsencrypt"
+          traefik.http.routers.seedsync.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.seedsync.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ seedsync_hostname }}"
+          traefik.http.routers.seedsync.middlewares: "{{ seedsync_hostname }}@docker"
+          traefik.http.middlewares.seedsync.IPAllowList.sourcerange: "{{ seedsync_traefik_whitelist }}"
+          traefik.http.services.seedsync.loadbalancer.server.port: "8800"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: seedsync_enabled is true
+
+- name: Stop SeedSync
+  block:
+    - name: Stop SeedSync Docker Container
+      community.docker.docker_container:
+        name: "{{ seedsync_container_name }}"
+        state: absent
+  when: seedsync_enabled is false

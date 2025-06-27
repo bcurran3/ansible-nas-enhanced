@@ -1,0 +1,22 @@
+#
+dozzle_enabled: false
+dozzle_available_externally: false
+dozzle_traefik_whitelist: "{{ lan }}"
+dozzle_data_directory: "{{ docker_home }}/dozzle"
+
+# network
+dozzle_hostname: "dozzle"
+dozzle_port_http: "9999"
+dozzle_memory_limit: "512M"
+
+# docker
+dozzle_container_name: "dozzle"
+
+# homepage
+dozzle_homepage_group: "Apps"
+dozzle_homepage_icon: "dozzle.png"
+dozzle_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dozzle_port_http }}"
+dozzle_homepage_showStats: "false"
+
+# watchtower
+dozzle_watchtower_monitor_only: "true"

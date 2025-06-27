@@ -1,0 +1,24 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove OsClass db
+      community.docker.docker_container:
+        name: "{{ osclass_container_db_name }}"
+        state: absent
+      register: result
+
+    - name: Try and stop and remove OsClass
+      community.docker.docker_container:
+        name: "{{ osclass_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check OsClass is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

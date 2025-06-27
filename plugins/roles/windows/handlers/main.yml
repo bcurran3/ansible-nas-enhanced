@@ -1,0 +1,9 @@
+---
+- name: Stop Windows
+  docker_container:
+    name: "{{ windows_container_name }}"
+    state: absent
+  when: windows_enabled is false
+  listen:
+    - "stop windows"
+    - "stop disabled applications"

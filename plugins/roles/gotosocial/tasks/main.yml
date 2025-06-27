@@ -1,0 +1,68 @@
+---
+- name: Start GoToSocial
+  block:
+    - name: Create GoToSocial Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+      with_items:
+        - "{{ gotosocial_data_directory }}"
+        - "{{ gotosocial_data_directory }}/data"
+
+    - name: Create GoToSocial Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ gotosocial_container_name }}"
+        hostname: "{{ gotosocial_container_name }}"
+#        image: superseriousbusiness/gotosocial:snapshot
+        image: superseriousbusiness/gotosocial:latest
+        pull: true
+        user: 1000:1000
+        ports:
+          - "{{ gotosocial_port_http }}:8080"
+        volumes:
+          - "{{ gotosocial_data_directory }}/data:/gotosocial/storage"
+        network_mode: bridge
+        env:
+          GTS_HOST: "{{ gotosocial_hostname }}.{{ ansible_nas_domain }}"
+          GTS_DB_TYPE: "sqlite"
+          GTS_DB_ADDRESS: "/gotosocial/storage/sqlite.db"
+          GTS_LETSENCRYPT_ENABLED: "false"
+          GTS_LETSENCRYPT_EMAIL_ADDRESS: ""
+          GTS_WAZERO_COMPILATION_CACHE: "/gotosocial/.cache"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ gotosocial_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ gotosocial_watchtower_monitor_only }}"
+          homepage.name: "GoToSocial"
+          homepage.group: "{{ gotosocial_homepage_group }}"
+          homepage.icon: "{{ gotosocial_homepage_icon }}"
+          homepage.href: "{{ gotosocial_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotosocial_port_http }}"
+#         homepage.description: "Fast, fun, small ActivityPub server."
+          homepage.server: "my-docker"
+          homepage.container: "{{ gotosocial_container_name }}"
+          homepage.showStats: "{{ gotosocial_homepage_showStats }}"
+          traefik.enable: "{{ gotosocial_available_externally | string }}"
+          traefik.http.routers.gotosocial.rule: "Host(`{{ gotosocial_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.gotosocial.tls.certresolver: "letsencrypt"
+          traefik.http.routers.gotosocial.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.gotosocial.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ gotosocial_hostname }}"
+          traefik.http.routers.gotosocial.middlewares: "{{ gotosocial_hostname }}@docker"
+          traefik.http.middlewares.gotosocial.IPAllowList.sourcerange: "{{ gotosocial_traefik_whitelist }}"
+          traefik.http.services.gotosocial.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/superseriousbusiness/gotosocial/releases/tag/$${major}.$${minor}.$${patch}"
+  when: gotosocial_enabled is true
+
+- name: Stop GoToSocial
+  block:
+    - name: Stop gotosocial Docker Container
+      community.docker.docker_container:
+        name: "{{ gotosocial_container_name }}"
+        state: absent
+  when: gotosocial_enabled is false

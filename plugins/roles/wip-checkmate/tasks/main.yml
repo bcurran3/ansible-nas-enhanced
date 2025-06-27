@@ -1,0 +1,195 @@
+---
+# WORK IN PROGRESS
+- name: Start Checkmate
+  block:
+    - name: Create Checkmate Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ checkmate_data_directory }}"
+        - "{{ checkmate_data_directory }}/redis"
+        - "{{ checkmate_data_directory }}/db"
+
+    - name: Create Checkmate network
+      community.docker.docker_network:
+        name: "{{ checkmate_network }}"
+
+    - name: Checkmate redis Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ checkmate_redis_container_name }}"
+        image: bluewaveuptime/uptime_redis:latest
+        pull: true
+        hostname: "{{ checkmate_redis_container_name }}"
+        networks:
+          - name: "{{ checkmate_network }}"
+        network_mode: "{{ checkmate_network }}"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ checkmate_redis_port_http }}:6379"
+        volumes:
+          - "{{ checkmate_data_directory }}/redis:/data"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+#        healthcheck:
+#          test: ["CMD", "redis-cli", "ping"]
+#          interval: 30s
+#          timeout: 10s
+#          retries: 5
+#          start_period: 5s
+        memory: "{{ checkmate_redis_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.enable: "false"
+          com.centurylinklabs.watchtower.monitor-only: "true"
+          traefik.enable: "false"
+
+    - name: Create Checkmate MongoDB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ checkmate_db_container_name }}"
+        hostname: "{{ checkmate_db_container_name }}"
+        image: bluewaveuptime/uptime_database_mongo:latest
+        pull: true
+        command: '["mongod", "--quiet"]'
+        networks:
+          - name: "{{ checkmate_network }}"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ checkmate_db_port_http }}:27017"
+        volumes:
+          - "{{ checkmate_data_directory }}/db:/data/db"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ checkmate_db_memory_limit }}"
+        labels:
+            com.centurylinklabs.watchtower.monitor-only: "{{ checkmate_db_watchtower_monitor_only }}"
+            homepage.name: "checkmate MongoDB"
+            homepage.group: "{{ checkmate_db_homepage_group }}"
+            homepage.icon: "{{ checkmate_db_homepage_icon }}"
+  #         homepage.href: "{{ checkmate_db_homepage_href }}"
+  #         homepage.description: ""
+  #         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_db_port_http }}"
+            homepage.server: "my-docker"
+            homepage.container: "{{ checkmate_db_container_name }}"
+            homepage.showStats: "{{ checkmate_db_homepage_showStats }}"
+            traefik.enable: "false"
+  #         wud.tag.include: '^\d+\.\d+\.\d+$$'
+  #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create Checkmate Server Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ checkmate_server_container_name }}"
+        hostname: "{{ checkmate_server_container_name }}"
+        image: bluewaveuptime/uptime_server:latest
+        pull: true
+        networks:
+          - name: "{{ checkmate_network }}"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ checkmate_server_port_http }}:5000"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        network_mode: bridge
+        env:
+          DB_CONNECTION_STRING: "mongodb://{{ checkmate_db_container_name }}:{{ checkmate_db_port_http }}/uptime_db"
+          REDIS_HOST: "{{ checkmate_redis_container_name }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ checkmate_server_memory_limit }}"
+        links:
+          - "{{ checkmate_db_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ checkmate_server_watchtower_monitor_only }}"
+          homepage.name: "checkmate"
+          homepage.group: "{{ checkmate_server_homepage_group }}"
+          homepage.icon: "{{ checkmate_server_homepage_icon }}"
+          homepage.href: "{{ checkmate_server_homepage_href }}"
+#         homepage.description: ""
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_server_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ checkmate_server_container_name }}"
+          homepage.showStats: "{{ checkmate_server_homepage_showStats }}"
+          traefik.enable: "{{ checkmate_available_externally | string }}"
+          traefik.http.routers.checkmate.rule: "Host(`{{ checkmate_server_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.checkmate.tls.certresolver: "letsencrypt"
+          traefik.http.routers.checkmate.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.checkmate.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ checkmate_server_hostname }}"
+          traefik.http.routers.checkmate.middlewares: "{{ checkmate_server_hostname }}@docker"
+          traefik.http.middlewares.checkmate.IPAllowList.sourcerange: "{{ checkmate_traefik_whitelist }}"
+          traefik.http.services.checkmate.loadbalancer.server.port: "5000"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create Checkmate Client Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ checkmate_client_container_name }}"
+        hostname: "{{ checkmate_client_container_name }}"
+        image: bluewaveuptime/uptime_client:latest
+        pull: true
+        networks:
+          - name: "{{ checkmate_network }}"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ checkmate_client_port_http }}:80"
+          - "{{ checkmate_client_port_http }}:443"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        network_mode: bridge
+        env:
+          UPTIME_APP_API_BASE_URL: "http://localhost:{{ checkmate_server_port_http }}/api/v1"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ checkmate_client_memory_limit }}"
+        links:
+          - "{{ checkmate_db_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ checkmate_client_watchtower_monitor_only }}"
+          homepage.name: "checkmate"
+          homepage.group: "{{ checkmate_client_homepage_group }}"
+          homepage.icon: "{{ checkmate_client_homepage_icon }}"
+          homepage.href: "{{ checkmate_client_homepage_href }}"
+#         homepage.description: ""
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_client_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ checkmate_client_container_name }}"
+          homepage.showStats: "{{ checkmate_client_homepage_showStats }}"
+          traefik.enable: "{{ checkmate_available_externally | string }}"
+          traefik.http.routers.checkmate.rule: "Host(`{{ checkmate_client_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.checkmate.tls.certresolver: "letsencrypt"
+          traefik.http.routers.checkmate.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.checkmate.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ checkmate_client_hostname }}"
+          traefik.http.routers.checkmate.middlewares: "{{ checkmate_client_hostname }}@docker"
+          traefik.http.middlewares.checkmate.IPAllowList.sourcerange: "{{ checkmate_traefik_whitelist }}"
+          traefik.http.services.checkmate.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: checkmate_enabled is true
+
+- name: Stop Checkmate
+  block:
+    - name: Stop Checkmate Client Docker Container
+      community.docker.docker_container:
+        name: "{{ checkmate_client_container_name }}"
+        state: absent
+    - name: Stop Checkmate Server Docker Container
+      community.docker.docker_container:
+        name: "{{ checkmate_server_container_name }}"
+        state: absent
+    - name: Stop Checkmate MongoDB Docker Container
+      community.docker.docker_container:
+        name: "{{ checkmate_db_container_name }}"
+        state: absent
+    - name: Stop Checkmate Redis Docker Container
+      community.docker.docker_container:
+        name: "{{ checkmate_redis_container_name }}"
+        state: absent
+  when: checkmate_enabled is false
+

@@ -1,0 +1,129 @@
+---
+- name: Start Rocket.Chat
+  block:
+    - name: Create Rocket.Chat Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ rocketchat_data_directory }}"
+        - "{{ rocketchat_data_directory }}/scripts"
+        - "{{ rocketchat_data_directory }}/uploads"
+
+    - name: Create Rocket.Chat MongoDB Directories
+      file:
+        path: "{{ item }}"
+        owner: "1001"
+        state: directory
+      with_items:
+        - "{{ rocketchat_data_directory }}"
+        - "{{ rocketchat_data_directory }}/mongodb"
+    #    - "{{ rocketchat_data_directory }}/mongodb/dump"
+
+    - name: Create Rocket.Chat network
+      community.docker.docker_network:
+        name: "{{ rocketchat_network_name }}"
+
+    - name: Create Rocket.Chat MongoDB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ rocketchat_db_container_name }}/db"
+        hostname: "{{ rocketchat_db_container_name }}"
+        image: docker.io/bitnami/mongodb:5.0
+        pull: true
+        network_mode: "bridge"
+        networks:
+          - name: "{{ rocketchat_network_name }}"
+        networks_cli_compatible: "yes"
+        env:
+          MONGODB_REPLICA_SET_MODE: "primary"
+          MONGODB_REPLICA_SET_NAME: "rs0"
+          MONGODB_PORT_NUMBER: "27017"
+          MONGODB_INITIAL_PRIMARY_HOST: "mongodb"
+          MONGODB_INITIAL_PRIMARY_PORT_NUMBER: "27017"
+          MONGODB_ADVERTISED_HOSTNAME: "mongodb"
+          MONGODB_ENABLE_JOURNAL: "true"
+          ALLOW_EMPTY_PASSWORD: "yes"
+          TZ: "{{ ansible_nas_timezone }}"
+        volumes:
+          - "{{ rocketchat_data_directory }}/mongodb:/bitnami/mongodb/data/db"
+#         - "{{ rocketchat_data_directory }}/mongodb:/bitnami/mongodb"
+#         - "{{ rocketchat_data_directory }}/mongodb/dump:/dump"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ rocketchat_db_watchtower_monitor_only }}"
+          homepage.name: "Rocket.Chat DB"
+          homepage.group: "{{ rocketchat_db_homepage_group }}"
+          homepage.icon: "{{ rocketchat_db_homepage_icon }}"
+          homepage.href: "{{ rocketchat_db_homepage_href }}"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "{{ rocketchat_db_container_name }}"
+          homepage.showStats: "{{ rocketchat_db_homepage_showStats }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create Rocket.Chat Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ rocketchat_container_name }}"
+        hostname: "{{ rocketchat_container_name }}"
+        image: rocketchat/rocket.chat:latest
+        pull: true
+        network_mode: "bridge"
+        networks:
+          - name: "{{ rocketchat_network_name }}"
+        networks_cli_compatible: "yes"
+        links:
+          - "{{ rocketchat_db_container_name }}"
+        ports:
+          - "{{ rocketchat_http_port }}:3000"
+        env:
+          MONGO_URL: "mongodb://mongodb:27017/rocketchat"
+          ROOT_URL: "https://{{ rocketchat_hostname }}.{{ ansible_nas_domain }}"
+          PORT: "3000"
+          DEPLOY_METHOD: "docker"
+          TZ: "{{ ansible_nas_timezone }}"
+          DEPLOY_PLATFORM: ""
+          REG_TOKEN: ""
+        volumes:
+          - "/etc/localtime:/etc/localtime:ro"
+          - "{{ rocketchat_data_directory }}/uploads:/app/uploads"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ rocketchat_watchtower_monitor_only }}"
+          homepage.name: "Rocket.Chat"
+          homepage.group: "{{ rocketchat_homepage_group }}"
+          homepage.icon: "{{ rocketchat_homepage_icon }}"
+          homepage.href: "{{ rocketchat_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocketchat_port_http }}"
+#         homepage.description: "The communications platform that puts data protection first."
+          homepage.server: "my-docker"
+          homepage.container: "{{ rocketchat_container_name }}"
+          homepage.showStats: "{{ rocketchat_homepage_showStats }}"
+          traefik.enable: "{{ rocketchat_available_externally | string }}"
+          traefik.http.routers.rocketchat.rule: "Host(`rocketchat.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.rocketchat.tls.certresolver: "letsencrypt"
+          traefik.http.routers.rocketchat.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.rocketchat.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ rocketchat_hostname }}"
+          traefik.http.routers.rocketchat.middlewares: "{{ rocketchat_hostname }}@docker"
+          traefik.http.middlewares.rocketchat.IPAllowList.sourcerange: "{{ rocketchat_traefik_whitelist }}"
+          traefik.http.services.rocketchat.loadbalancer.server.port: "3000"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: 1g
+  when: rocketchat_enabled is true
+
+- name: Stop Rocket.Chat
+  block:
+    - name: Stop Rocket.Chat  MongoDB Docker Container
+      community.docker.docker_container:
+        name: "{{ rocketchat_db_container_name }}"
+        state: absent
+    - name: Stop Rocket.Chat Docker Container
+      community.docker.docker_container:
+        name: "{{ rocketchat_container_name }}"
+        state: absent
+  when: rocketchat_enabled is false

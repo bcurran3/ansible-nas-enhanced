@@ -1,0 +1,54 @@
+# https://hub.docker.com/_/friendica
+# NEEDS A LOT OF SETUP WORK
+---
+- name: Create Friendica Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ friendica_data_directory }}/html"
+    - "{{ friendica_data_directory }}/mysql"
+
+- name: Create Friendica MariaDB Docker Container
+  docker_container:
+    image: mariadb
+    pull: true
+    volumes:
+      - "{{ friendica_data_directory }}/mysql:/var/lib/mysql"
+    env:
+      MYSQL_USER: "friendica"
+      MYSQL_PASSWORD: "friendicapass"
+      MYSQL_DATABASE: "friendica"
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+
+- name: Create Friendica Docker Container
+  docker_container:
+    name: friendica
+    image: jesec/friendica:latest
+    pull: true
+    volumes:
+      - "{{ friendica_data_directory }}/html:/var/www/html"
+    ports:
+      - "{{ friendica_port_http }}:80"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+      MYSQL_HOST: "db"
+      MYSQL_USER: "friendica"
+      MYSQL_PASSWORD: "friendicapass"
+      MYSQL_DATABASE: "friendica"
+      FRIENDICA_ADMIN_MAIL: "root@friendica.local"
+    restart_policy: unless-stopped
+# Link to db
+    labels:
+      traefik.enable: "{{ friendica_available_externally | string }}"
+      traefik.http.routers.friendica.rule: "Host(`friendica.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.friendica.tls.certresolver: "letsencrypt"
+      traefik.http.routers.friendica.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.friendica.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ friendica_hostname }}"
+      traefik.http.routers.friendica.middlewares: "{{ friendica_hostname }}@docker"
+      traefik.http.middlewares.friendica.IPAllowList.sourcerange: "{{ friendica_traefik_whitelist }}"
+      traefik.http.services.friendica.loadbalancer.server.port: "80"
+    memory: 1g

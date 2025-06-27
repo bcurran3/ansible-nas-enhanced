@@ -1,0 +1,82 @@
+---
+- name: Start Stash
+  block:
+    - name: Stash Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ stash_data_directory }}/cache"
+        - "{{ stash_data_directory }}/config"
+        - "{{ stash_data_directory }}/config/root"
+        - "{{ stash_data_directory }}/config/root/.stash"
+        - "{{ stash_data_directory }}/data"
+        - "{{ stash_data_directory }}/generated"
+        - "{{ stash_data_directory }}/metadata"
+
+    - name: Stash Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ stash_container_name }}"
+        hostname: "{{ stash_container_name }}"
+        image: stashapp/stash:latest
+        pull: true
+        log_driver: "json-file"
+        log_options:
+            max-size: "10m"
+            max-file: "10"
+        volumes:
+          - "{{ stash_data_directory }}/cache:/cache:rw"
+          - "{{ stash_data_directory }}/config:/root/.stash:rw"
+          - "{{ stash_data_directory }}/data:/data:rw"
+          - "{{ stash_data_directory }}/generated:/generated:rw"
+          - "{{ stash_data_directory }}/metadata:/metadata:rw"
+          - "{{ porn_root }}:/porn:ro"
+        ports:
+          - "{{ stash_http_port }}:9999"
+        dns_servers: "{{ ansible_nas_dns }}"
+        env:
+          PUID: "{{ stash_user_id }}"
+          PGID: "{{ stash_group_id }}"
+          STASH_STASH: "/data/"
+          STASH_GENERATED: "/generated/"
+          STASH_METADATA: "/metadata/"
+          STASH_CACHE: "/cache/"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ stash_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ stash_watchtower_monitor_only }}"
+          homepage.name: "Stash"
+          homepage.group: "{{ stash_homepage_group }}"
+          homepage.icon: "{{ stash_homepage_icon }}"
+          homepage.href: "{{ stash_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stash_port_http }}"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "{{ stash_container_name }}"
+          homepage.showStats: "{{ stash_homepage_showStats }}"
+          homepage.widget.type: "stash"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stash_port_http }}"
+          homepage.widget.key: "{{ stash_homepage_widget_key }}"
+          homepage.widget.fields: "{{ stash_homepage_widget_fields }}"
+          traefik.enable: "{{ stash_available_externally | string }}"
+          traefik.http.routers.stash.rule: "Host(`stash.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.stash.tls.certresolver: "letsencrypt"
+          traefik.http.routers.stash.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.stash.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ stash_hostname }}"
+          traefik.http.routers.stash.middlewares: "{{ stash_hostname }}@docker"
+          traefik.http.middlewares.stash.IPAllowList.sourcerange: "{{ stash_traefik_whitelist }}"
+          traefik.http.services.stash.loadbalancer.server.port: "9999"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: stash_enabled is true
+
+- name: Stop Stash
+  block:
+    - name: Stop Stash
+      community.docker.docker_container:
+        name: "{{ stash_container_name }}"
+        state: absent
+  when: stash_enabled is false

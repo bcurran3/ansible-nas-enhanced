@@ -1,0 +1,56 @@
+---
+- name: Start MeTube
+  block:
+    - name: Create MeTube Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ metube_data_directory }}"
+
+    - name: Create MeTube Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ metube_container_name }}"
+        hostname: "{{ metube_container_name }}"
+        image: ghcr.io/alexta69/metube
+        pull: true
+        volumes:
+          - "{{ metube_dl_directory }}:/downloads"
+        ports:
+          - "{{ metube_port_http }}:8081"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ metube_watchtower_monitor_only }}"
+          homepage.name: "MeTube"
+          homepage.group: "{{ metube_homepage_group }}"
+          homepage.icon: "{{ metube_homepage_icon }}"
+          homepage.href: "{{ metube_homepage_href }}"
+#         homepage.description: "Self-hosted YouTube downloader (web UI for youtube-dl / yt-dlp)"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ metube_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ metube_container_name }}"
+          homepage.showStats: "{{ metube_homepage_showStats }}"
+          traefik.enable: "{{ metube_available_externally | string }}"
+          traefik.http.routers.metube.rule: "Host(`metube.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.metube.tls.certresolver: "letsencrypt"
+          traefik.http.routers.metube.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.metube.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ metube_hostname }}"
+          traefik.http.routers.metube.middlewares: "{{ metube_hostname }}@docker"
+          traefik.http.middlewares.metube.IPAllowList.sourcerange: "{{ metube_traefik_whitelist }}"
+          traefik.http.services.metube.loadbalancer.server.port: "8081"
+#          wud.tag.include: '^\d+\.\d+\.\d+$$'
+#          wud.link.template: "https://hub.docker.com/r/alexta69/metube/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ metube_memory_limit }}"
+  when: metube_enabled is true
+
+- name: Stop MeTube
+  block:
+    - name: Stop MeTube Docker Container
+      community.docker.docker_container:
+        name: "{{ metube_container_name }}"
+        state: absent
+  when: metube_enabled is false

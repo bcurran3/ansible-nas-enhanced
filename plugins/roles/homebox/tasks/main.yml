@@ -1,0 +1,62 @@
+---
+- name: Start HomeBox
+  block:
+    - name: Create HomeBox Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ homebox_data_directory }}"
+        - "{{ homebox_data_directory }}/data"
+
+    - name: Create HomeBox Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ homebox_container_name }}"
+        hostname: "{{ homebox_container_name }}"
+        image: ghcr.io/sysadminsmedia/homebox:latest
+        pull: true
+        volumes:
+          - "{{ homebox_data_directory }}/data:/data"
+        ports:
+          - "{{ homebox_port_http }}:7745"
+        env:
+          HBOX_MAILER_HOST: "{{ homebox_mail_host }}"
+          HBOX_MAILER_PORT: "{{ homebox_mail_port }}"
+          HBOX_MAILER_USERNAME: "{{ homebox_mail_username }}"
+          HBOX_MAILER_PASSWORD: "{{ homebox_mail_password }}"
+          HBOX_MAILER_FROM: "{{ homebox_mail_from }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ homebox_watchtower_monitor_only }}"
+          homepage.name: "HomeBox"
+          homepage.group: "{{ homebox_homepage_group }}"
+          homepage.icon: "{{ homebox_homepage_icon }}"
+          homepage.href: "{{ homebox_homepage_href }}"
+#         homepage.description: "Homebox is the inventory and organization system built for the Home User!"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ homebox_container_name }}"
+          homepage.showStats: "{{ homebox_homepage_showStats }}"
+          traefik.enable: "{{ homebox_available_externally | string }}"
+          traefik.http.routers.homebox.rule: "Host(`homebox.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.homebox.tls.certresolver: "letsencrypt"
+          traefik.http.routers.homebox.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.homebox.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ homebox_hostname }}"
+          traefik.http.routers.homebox.middlewares: "{{ homebox_hostname }}@docker"
+          traefik.http.middlewares.homebox.IPAllowList.sourcerange: "{{ homebox_traefik_whitelist }}"
+          traefik.http.services.homebox.loadbalancer.server.port: "7745"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/hay-kot/homebox/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ homebox_memory }}"
+  when: homebox_enabled is true
+
+- name: Stop HomeBox
+  block:
+    - name: Stop HomeBox
+      community.docker.docker_container:
+        name: "{{ homebox_container_name }}"
+        state: absent
+  when: homebox_enabled is false

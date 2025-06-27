@@ -1,0 +1,60 @@
+---
+- name: Start Checkmk Raw Edition
+  block:
+    - name: Checkmk Raw Edition Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ checkmk_data_directory }}"
+        - "{{ checkmk_data_directory }}/omd"
+        - "{{ checkmk_data_directory }}/omd/sites"
+
+    - name: Checkmk Raw Edition Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ checkmk_container_name }}"
+        hostname: "{{ checkmk_container_name }}"
+        image: checkmk/check-mk-raw:2.4.0-latest
+        pull: true
+        network_mode: "bridge"
+        volumes:
+          -  "{{ checkmk_data_directory }}/omd/sites:/omd/sites"
+          - "/etc/localtime:/etc/localtime:ro"
+        ports:
+          - "{{ checkmk_port_http }}:5000"
+          - "{{ checkmk_port_api }}:8000"
+        dns_servers: "{{ ansible_nas_dns }}"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ checkmk_watchtower_monitor_only }}"
+          homepage.name: "Checkmk Raw Edition"
+          homepage.group: "{{ checkmk_homepage_group }}"
+          homepage.icon: "{{ checkmk_homepage_icon }}"
+          homepage.href: "{{ checkmk_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmk_port_http }}"
+#         homepage.description: "Checkmk - Best-in-class infrastructure & application monitoring"
+          homepage.server: "my-docker"
+          homepage.container: "{{ checkmk_container_name }}"
+          homepage.showStats: "{{ checkmk_homepage_showStats }}"
+          traefik.enable: "{{ checkmk_available_externally | string }}"
+          traefik.http.routers.checkmk.rule: "Host(`checkmk.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.checkmk.tls.certresolver: "letsencrypt"
+          traefik.http.routers.checkmk.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.checkmk.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.middlewares.checkmk.IPAllowList.sourcerange: "{{ checkmk_traefik_whitelist }}"
+          traefik.http.services.checkmk.loadbalancer.server.port: "5000"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+        memory: 1g
+  when: checkmk_enabled is true
+
+- name: Stop Checkmk Raw Edition
+  block:
+    - name: Stop Checkmk Raw Edition
+      community.docker.docker_container:
+        name: "{{ checkmk_container_name }}"
+        state: absent
+  when: checkmk_enabled is false

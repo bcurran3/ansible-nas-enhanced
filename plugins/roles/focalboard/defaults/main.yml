@@ -1,0 +1,24 @@
+#
+focalboard_enabled: false
+focalboard_available_externally: false
+focalboard_traefik_whitelist: "{{ lan }}"
+focalboard_data_directory: "{{ docker_home }}/focalboard"
+
+# network
+focalboard_hostname: "focalboard"
+focalboard_port_http: "3017"
+
+# specs
+focalboard_memory_limit: "1G"
+
+# docker
+focalboard_container_name: "focalboard"
+
+# homepage
+focalboard_homepage_group: "Apps"
+focalboard_homepage_icon: "focalboard.png"
+focalboard_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ focalboard_port_http }}"
+focalboard_homepage_showStats: "false"
+
+# watchtower
+focalboard_watchtower_monitor_only: "true"

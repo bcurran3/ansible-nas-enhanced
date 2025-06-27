@@ -1,0 +1,9 @@
+---
+- name: Stop Gramps Web
+  docker_container:
+    name: "{{ grampsweb_container_name }}"
+    state: absent
+  when: grampsweb_enabled is false
+  listen:
+    - "stop grampsweb"
+    - "stop disabled applications"

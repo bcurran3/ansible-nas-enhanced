@@ -1,0 +1,96 @@
+---
+# WORK IN PROGRESS
+- name: Start FileBot
+  block:
+    - name: Create FileBot Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ filebot_data_directory }}"
+
+    - name: FileBot
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ filebot_container_name }}"
+        image: rednoah/filebot:latest
+        pull: true
+        volumes:
+          - "{{ filebot_data_directory }}:/data:rw"
+          - "{{ filebot_download_directory }}:/downloads:rw"
+    #      - "{{ filebot_movies_directory }}:/movies:rw"
+    #      - "{{ filebot_music_directory }}:/music:rw"
+    #      - "{{ filebot_tv_directory }}:/tv:rw"
+        command: sysinfo
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ filebot_user_id }}"
+          PGID: "{{ filebot_group_id }}"
+        restart_policy: unless-stopped
+        memory: 1g # Probably can be tweaked
+        lables:
+          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+
+    - name: FileBot-node
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: filebot-node
+        image: rednoah/filebot:node
+        pull: true
+        ports:
+          - "5452:5452"
+        restart_policy: unless-stopped
+        volumes_from: filebot
+        memory: 1g # Probably can be tweaked
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+          homepage.name: "FileBot"
+          homepage.group: "{{ filebot_homepage_group }}"
+          homepage.icon: "{{ filebot_homepage_icon }}"
+          homepage.href: "{{ filebot_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebot_port_http }}"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "{{ filebot_container_name }}"
+          homepage.showStats: "{{ filebot_homepage_showStats }}"
+          traefik.enable: "{{ filebot_available_externally | string }}"
+          traefik.http.routers.filebot.rule: "Host(`filebot.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.filebot.tls.certresolver: "letsencrypt"
+          traefik.http.routers.filebot.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.filebot.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.middlewares.filebot.IPAllowList.sourcerange: "{{ filebot_traefik_whitelist }}"
+          traefik.http.services.filebot.loadbalancer.server.port: "5452"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+
+    - name: FileBot-watcher
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: filebot-watcher
+        image: rednoah/filebot:watcher
+        pull: true
+        restart_policy: unless-stopped
+        volumes_from: filebot
+        memory: 1g # Probably can be tweaked
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+
+- name: Stop FileBot
+  block:
+    - name: Stop FileBot Watcher
+      community.docker.docker_container:
+        name: "filebot-watcher"
+        state: absent
+    - name: Stop FileBot
+      community.docker.docker_container:
+        name: "{{ filebot_container_name }}"
+        state: absent
+    - name: Stop FileBot Node
+      community.docker.docker_container:
+        name: "filebot-node"
+        state: absent
+  when: filebot_enabled is false

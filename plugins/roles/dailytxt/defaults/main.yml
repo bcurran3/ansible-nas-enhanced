@@ -1,0 +1,32 @@
+---
+# enable or disable the application
+dailytxt_enabled: false
+dailytxt_available_externally: false
+dailytxt_traefik_whitelist: "{{ lan }}"
+
+# directories
+dailytxt_data_directory: "{{ docker_home }}/dailytxt"
+
+# network
+dailytxt_hostname: "dailytxt"
+dailytxt_port_http: "8766"
+
+# specs
+dailytxt_memory: "512MB"
+
+# configuration
+dailytxt_secret_key: "N2HnBPOjMbouxti1lx2iR5Uz40WyjBDVk1w2GLHM2aA="
+dailytxt_allow_registration: "true"
+dailytxt_jwt_exp_days: "30"
+
+# docker
+dailytxt_container_name: "dailytxt"
+
+# homepage
+dailytxt_homepage_group: "Apps"
+dailytxt_homepage_icon: "https://raw.githubusercontent.com/PhiTux/DailyTxT/master/client/public/favicon.png"
+dailytxt_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
+dailytxt_homepage_showStats: "false"
+
+# watchtower
+dailytxt_watchtower_monitor_only: "true"

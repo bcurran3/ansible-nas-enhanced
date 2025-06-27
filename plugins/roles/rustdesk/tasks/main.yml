@@ -1,0 +1,98 @@
+---
+### WORK IN PROGRESS
+- name: Start RustDesk
+  block:
+    - name: Create RustDesk Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ rustdesk_data_directory }}"
+        - "{{ rustdesk_data_directory }}/data"
+
+    - name: Create RustDesk ID/Rendezvous Server Docker Container
+      community.docker.docker_container:
+        name: "{{ rustdesk_container_name }}"
+        hostname: "{{ rustdesk_container_name }}"
+        image: rustdesk/rustdesk-server:latest
+        pull: true
+        ports:
+          - "21114:21114"
+          - "21115:21115"
+          - "21116:21116"
+          - "21116/udp:21116/udp"
+          - "21118:21118"
+        volumes:
+          - "{{ rustdesk_data_directory }}/data:/root"
+        container_default_behavior: no_defaults
+        command: "hbbs"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ rustdesk_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
+          homepage.name: "RustDesk"
+          homepage.group: "{{ rustdesk_homepage_group }}"
+          homepage.icon: "{{ rustdesk_homepage_icon }}"
+          homepage.href: "{{ rustdesk_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "{{ rustdesk_container_name }}"
+          homepage.showStats: "{{ rustdesk_homepage_showStats }}"
+          traefik.enable: "{{ rustdesk_available_externally | string }}"
+          traefik.http.routers.rustdesk.rule: "Host(`{{ rustdesk_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.rustdesk.tls.certresolver: "letsencrypt"
+          traefik.http.routers.rustdesk.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.rustdesk.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ rustdesk_hostname }}"
+          traefik.http.routers.rustdesk.middlewares: "{{ rustdesk_hostname }}@docker"
+          traefik.http.middlewares.rustdesk.IPAllowList.sourcerange: "{{ rustdesk_traefik_whitelist }}"
+          traefik.http.services.rustdesk.loadbalancer.server.port: "21114"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create RustDesk Relay Server Docker Container
+      community.docker.docker_container:
+        name: "{{ rustdesk_container2_name }}"
+        hostname: "{{ rustdesk_container2_name }}"
+        image: rustdesk/rustdesk-server:latest
+        pull: true
+        ports:
+          - "21117:21117"
+          - "21119:21119"
+        volumes:
+          - "{{ rustdesk_data_directory }}/data:/root"
+        container_default_behavior: no_defaults
+        command: "hbbr"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ rustdesk_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
+          homepage.name: "RustDesk Relay Server"
+          homepage.group: "{{ rustdesk_homepage_group }}"
+          homepage.icon: "{{ rustdesk_homepage_icon }}"
+          homepage.href: "{{ rustdesk_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "{{ rustdesk_container2_name }}"
+          homepage.showStats: "{{ rustdesk_homepage_showStats }}"
+          trafik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+- name: Stop RustDesk
+  block:
+    - name: Stop RustDesk ID/Rendezvous server Docker Container
+      community.docker.docker_container:
+        name: "{{ rustdesk_container_name }}"
+        state: absent
+    - name: Stop RustDesk Relay server Docker Container
+      community.docker.docker_container:
+        name: "{{ rustdesk_container2_name }}"
+        state: absent
+  when: rustdesk_enabled is false

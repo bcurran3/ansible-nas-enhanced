@@ -1,0 +1,9 @@
+---
+- name: Stop MKVToolNix
+  docker_container:
+    name: "{{ mkvtoolnix_container_name }}"
+    state: absent
+  when: mkvtoolnix_enabled is false
+  listen:
+    - "stop mkvtoolnix"
+    - "stop disabled applications"

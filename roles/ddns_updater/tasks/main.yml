@@ -1,0 +1,67 @@
+---
+- name: Start DDNS Updater
+  block:
+    - name: DDNS Updater Create Directories
+      ansible.builtin.file:
+        path: "{{ ddns_updater_data_directory }}"
+        state: directory
+
+    - name: DDNS Updater Check config is defined
+      ansible.builtin.fail:
+        msg: "Please configure DDNS Updater by setting ddns_updater_config in your inventory nas.yml."
+      when: ddns_updater_config is not defined
+
+    - name: DDNS Updater Generate config.json
+      ansible.builtin.copy:
+        content: "{{ ddns_updater_config | to_nice_json }}"
+        dest: "{{ ddns_updater_data_directory }}/config.json"
+      register: ddns_updater_config
+
+    - name: DDNS Updater Container
+      community.docker.docker_container:
+        name: "{{ ddns_updater_container_name }}"
+        hostname: "{{ ddns_updater_container_name }}"
+        image: qmcgaw/ddns-updater:latest
+        pull: true
+        ports:
+          - "{{ ddns_updater_port }}:{{ ddns_updater_port }}" # changed
+        volumes:
+          - "{{ ddns_updater_data_directory }}:/updater/data:rw"
+        env:
+          GOTIFY_TOKEN: "{{ ddns_updater_gotify_token | default('') }}"
+          GOTIFY_URL: "{{ gotify_url | default('') }}"
+          PERIOD: "{{ ddns_updater_period }}"
+          UPDATE_COOLDOWN_PERIOD: "{{ ddns_updater_cooldown_period }}"
+          HTTP_TIMEOUT: "{{ ddns_updater_http_timeout }}"
+          TZ: "{{ ansible_nas_timezone }}"
+          BACKUP_PERIOD: "24h" # added
+          LISTENING_PORT: "{{ ddns_updater_port }}" # added
+        restart_policy: unless-stopped
+        restart: "{{ ddns_updater_config is changed }}"
+        memory: "{{ ddns_updater_memory }}"
+        labels:
+          homepage.group: "Network"
+          homepage.name: "DDNS Updater"
+          homepage.icon: "/images/ddns_updater.png"
+    #     homepage.description: ""
+          homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port }}"
+          homepage.server: "my-docker"
+          homepage.container: "ddns-updater"
+          traefik.enable: "{{ ddns_updater_available_externally | string }}"
+          traefik.http.routers.ddns_updater.rule: "Host(`{{ ddns_updater_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.ddns_updater.tls.certresolver: "letsencrypt"
+          traefik.http.routers.ddns_updater.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.ddns_updater.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ ddns_updater_hostname }}"
+          traefik.http.routers.ddns_updater.middlewares: "ddns_updater@docker"
+          traefik.http.middlewares.ddns_updater.IPAllowList.sourcerange: "{{ ddns_updater_traefik_whitelist }}"
+          traefik.http.services.ddns_updater.loadbalancer.server.port: "{{ ddns_updater_port }}"
+  when: ddns_updater_enabled is true
+
+- name: Stop DDNS Updater
+  block:
+    - name: Stop DDNS Updater
+      community.docker.docker_container:
+        name: "{{ ddns_updater_container_name }}"
+        state: absent
+  when: ddns_updater_enabled is false

@@ -1,0 +1,37 @@
+---
+- name: Monitorr Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ monitorr_data_directory }}/app"
+
+- name: Monitorr Docker Container
+  docker_container:
+    name: monitorr
+    image: monitorr/monitorr:latest
+    pull: true
+    volumes:
+      - "{{ monitorr_data_directory }}/app:/app:rw"
+      - "{{ samba_shares_root }}:/shares:ro"
+      - "{{ samba_shares_other_root }}:/other:ro"
+    ports:
+      - "{{ monitorr_port_http }}:80"
+    dns_servers: "{{ ansible_nas_dns }}"
+    hostname: "monitorr"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "{{ monitorr_user_id }}"
+      PGID: "{{ monitorr_group_id }}"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{ monitorr_available_externally | string }}"
+      traefik.http.routers.monitorr.rule: "Host(`monitorr.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.monitorr.tls.certresolver: "letsencrypt"
+      traefik.http.routers.monitorr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.monitorr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ monitorr_hostname }}"
+      traefik.http.routers.monitorr.middlewares: "{{ monitorr_hostname }}@docker"
+      traefik.http.middlewares.monitorr.IPAllowList.sourcerange: "{{ monitorr_traefik_whitelist }}"
+      traefik.http.services.monitorr.loadbalancer.server.port: "80"
+    memory: 256m

@@ -1,0 +1,26 @@
+twofauth_enabled: false
+twofauth_available_externally: false
+twofauth_traefik_whitelist: "{{ lan }}"
+
+# directories
+twofauth_data_directory: "{{ docker_home }}/2fauth"
+
+# docker
+twofauth_container_name: 2fauth
+twofauth_memory_limit: "1G"
+
+# network
+twofauth_hostname: "2fauth"
+twofauth_port_http: "8001"
+
+# app
+twofauth_app_key: "php artisan key:generate"
+
+# homepage 
+twofauth_homepage_group: "Apps"
+twofauth_homepage_icon: "sh-2FAuth.png"
+twofauth_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ twofauth_port_http }}"
+twofauth_homepage_showStats: "false"
+
+# watchtower
+twofauth_watchtower_monitor_only: "true"

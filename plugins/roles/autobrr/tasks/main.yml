@@ -1,0 +1,50 @@
+---
+- name: Start autobrr
+  block:
+    - name: Create autobrr Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{autobrr_container_name }}"
+        image: ghcr.io/autobrr/autobrr:latest
+        pull: true
+        volumes:
+          - "{{ autobrr_data_directory }}/config:/config"
+        ports:
+          - "{{ autobrr_port_http }}:7474"
+        network_mode: "bridge"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          USER: "1000:1000"
+        restart_policy: unless-stopped
+        memory: "{{ autobrr_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ autobrr_watchtower_monitor_only }}"
+          homepage.name: "autobrr"
+          homepage.group: "{{ autobrr_homepage_group }}"
+          homepage.href: "{{ autobrr_homepage_href }}"
+          homepage.icon: "{{ autobrr_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ autobrr_port_http }}"
+#         homepage.description: "Modern, easy to use download automation for torrents and usenet."
+          homepage.server: "my-docker"
+          homepage.container: "{{ autobrr_container_name }}"
+          homepage.showStats: "{{ autobrr_homepage_showStats }}"
+          traefik.enable: "{{ autobrr_available_externally | string }}"
+          traefik.http.routers.autobrr.rule: "Host(`{{ autobrr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.autobrr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.autobrr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.autobrr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.services.autobrr.loadbalancer.server.port: "7474"
+          traefik.http.routers.frontend.middlewares: "{{ autobrr_hostname }}"
+          traefik.http.routers.autobrr.middlewares: "{{ autobrr_hostname }}@docker"
+          traefik.http.middlewares.autobrr.IPAllowList.sourcerange: "{{ autobrr_traefik_whitelist }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/autobrr/autobrr/releases/tag/$${major}.$${minor}.$${patch}"
+  when: autobrr_enabled is true
+
+- name: Stop autobrr
+  block:
+    - name: Stop autobrr
+      community.docker.docker_container:
+        name: "{{ autobrr_container_name }}"
+        state: absent
+  when: autobrr_enabled is false

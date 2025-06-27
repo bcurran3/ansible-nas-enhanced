@@ -1,0 +1,72 @@
+---
+- name: Start ONLYOFFICE
+  block:
+    - name: Create ONLYOFFICE Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ onlyoffice_data_directory }}/data"
+        - "{{ onlyoffice_data_directory }}/logs"
+
+    - name: Create ONLYOFFICE Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ onlyoffice_container_name }}"
+        hostname: "{{ onlyoffice_container_name }}"
+        image: onlyoffice/documentserver
+        pull: true
+        networks:
+          - name: "{{ nextcloud_network_name }}"
+        network_mode: "{{ nextcloud_network_name }}"
+        networks_cli_compatible: "yes"
+        volumes:
+          - "{{ onlyoffice_data_directory }}/data:/var/www/onlyoffice/Data"
+          - "{{ onlyoffice_data_directory }}/logs:/var/log/onlyoffice"
+        env:
+          JWT_SECRET: "nextcloud"
+          DOCUMENT_SERVER_PORT_80_TCP_ADDR: "{{ onlyoffice_container_ip }}"
+          # ^ needed?
+          USE_UNAUTHORIZED_STORAGE: "true"
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ onlyoffice_port_http }}:80"
+          - "5222:5222"                     
+          # ^ document what this is for
+        restart_policy: unless-stopped
+        memory: "{{ onlyoffice_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ onlyoffice_watchtower_monitor_only }}"
+          homepage.name: "OnlyOffice"
+          homepage.group: "{{ onlyoffice_homepage_group }}"
+          homepage.icon: "{{ onlyoffice_homepage_icon }}"
+          homepage.href: "{{ onlyoffice_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ onlyoffice_port_http }}"
+#         homepage.description: "A free and open source office and productivity suite"
+          homepage.server: "my-docker"
+          homepage.container: "{{ onlyoffice_container_name }}"
+          homepage.showStats: "{{ onlyoffice_homepage_showStats }}"
+          traefik.enable: "{{ onlyoffice_available_externally | string }}"
+          traefik.http.routers.onlyoffice.rule: "Host(`{{ onlyoffice_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.onlyoffice.tls.certresolver: "letsencrypt"
+          traefik.http.routers.onlyoffice.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.onlyoffice.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ onlyoffice_hostname }}"
+#         traefik.http.routers.onlyoffice.middlewares: "{{ onlyoffice_hostname }}@docker"
+          traefik.http.routers.onlyoffice.middlewares: "onlyoffice-headers"
+          traefik.http.middlewares.onlyoffice-headers.headers.customrequestheaders.X-Forwarded-Proto: "https"
+          traefik.http.middlewares.onlyoffice-headers.headers.accessControlAllowOriginList: "*"
+          traefik.http.middlewares.onlyoffice.IPAllowList.sourcerange: "{{ onlyoffice_traefik_whitelist }}"
+          traefik.http.services.onlyoffice.loadbalancer.passhostheader: "true"
+          traefik.http.services.onlyoffice.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/ONLYOFFICE/DocumentServer/releases/tag/$${major}.$${minor}.$${patch}"
+  when: onlyoffice_enabled is true
+
+- name: Stop ONLYOFFICE
+  block:
+    - name: Stop ONLYOFFICE
+      community.docker.docker_container:
+        name: "{{ onlyoffice_container_name }}"
+        state: absent
+  when: onlyoffice_enabled is false

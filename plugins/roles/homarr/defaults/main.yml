@@ -1,0 +1,24 @@
+#
+homarr_enabled: false
+homarr_available_externally: true
+homarr_traefik_whitelist: "{{ lan }}"
+homarr_data_directory: "{{ docker_home }}/homarr"
+
+homarr_secret_encryption_key: "create using openssl rand -hex 32"
+
+# network
+homarr_hostname: "homarr"
+homarr_port_http: "7575"
+
+# docker
+homarr_container_name: "homarr"
+homarr_memory: "512m"
+
+# homepage
+homarr_homepage_group: "Apps"
+homarr_homepage_icon: "homarr.png"
+homarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homarr_port_http }}"
+homarr_homepage_showStats: "false"
+
+# watchtower
+homarr_watchtower_monitor_only: "true"

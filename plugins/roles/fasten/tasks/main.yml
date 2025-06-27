@@ -1,0 +1,59 @@
+---
+- name: Start Fasten
+  block:
+    - name: Create Fasten Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ fasten_data_directory }}"
+        - "{{ fasten_data_directory }}/cache"
+        - "{{ fasten_data_directory }}/db"
+
+    - name: Create Fasten Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ fasten_container_name }}"
+        hostname: "{{ fasten_container_name }}"
+        image: ghcr.io/fastenhealth/fasten-onprem:main
+        pull: true
+        ports:
+          - "{{ fasten_port_http }}:8080"
+        volumes:
+          - "{{ fasten_data_directory }}/cache:/opt/fasten/cache"
+          - "{{ fasten_porn_directory }}/db:/opt/fasten/db"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ fasten_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ fasten_watchtower_monitor_only }}"
+          homepage.name: "Fasten"
+          homepage.group: "{{ fasten_homepage_group }}"
+          homepage.icon: "{{ fasten_homepage_icon }}"
+          homepage.href: "{{ fasten_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fasten_port_http }}"
+#         homepage.description: "Fasten is an open-source, self-hosted, personal/family electronic medical record aggregator, designed to integrate with 100,000's of insurances/hospitals/clinic"
+          homepage.server: "my-docker"
+          homepage.container: "{{ fasten_container_name }}"
+          homepage.showStats: "{{ fasten_homepage_showStats }}"
+          traefik.enable: "{{ fasten_available_externally | string }}"
+          traefik.http.routers.fasten.rule: "Host(`{{ fasten_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.fasten.tls.certresolver: "letsencrypt"
+          traefik.http.routers.fasten.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.fasten.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ fasten_hostname }}"
+          traefik.http.routers.fasten.middlewares: "{{ fasten_hostname }}@docker"
+          traefik.http.middlewares.fasten.IPAllowList.sourcerange: "{{ fasten_traefik_whitelist }}"
+          traefik.http.services.fasten.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/fastenhealth/fasten-onprem/releases/tag/$${major}.$${minor}.$${patch}"
+  when: fasten_enabled is true
+
+- name: Stop Fasten
+  block:
+    - name: Stop Fasten
+      community.docker.docker_container:
+        name: "{{ fasten_container_name }}"
+        state: absent
+  when: fasten_enabled is false

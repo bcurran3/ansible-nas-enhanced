@@ -1,0 +1,61 @@
+---
+- name: Start LANCommander
+  block:
+    - name: Create LANCommander Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ lancommander_data_directory }}"
+        - "{{ lancommander_data_directory }}/config"
+
+    - name: Create LANCommander Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ lancommander_container_name }}"
+        hostname: "{{ lancommander_container_name }}"
+        image: lancommander/lancommander:latest
+        pull: true
+        ports:
+          - "{{ lancommander_port_http }}:1337"
+          - "35891:35891/udp"
+        volumes:
+          - "{{ lancommander_data_directory }}/config:/config"
+        network_mode: bridge
+        env:
+          PUID: "{{ lancommander_puid }}"
+          PGID: "{{ lancommander_pgid }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ lancommander_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ lancommander_watchtower_monitor_only }}"
+          homepage.name: "LANCommander"
+          homepage.group: "{{ lancommander_homepage_group }}"
+          homepage.icon: "{{ lancommander_homepage_icon }}"
+          homepage.href: "{{ lancommander_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lancommander_port_http }}"
+#         homepage.description: "LANCommander is an open-source digital game platform."
+          homepage.server: "my-docker"
+          homepage.container: "{{ lancommander_container_name }}"
+          homepage.showStats: "{{ lancommander_homepage_showStats }}"
+          traefik.enable: "{{ lancommander_available_externally | string }}"
+          traefik.http.routers.lancommander.rule: "Host(`{{ lancommander_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.lancommander.tls.certresolver: "letsencrypt"
+          traefik.http.routers.lancommander.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.lancommander.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ lancommander_hostname }}"
+          traefik.http.routers.lancommander.middlewares: "{{ lancommander_hostname }}@docker"
+          traefik.http.middlewares.lancommander.IPAllowList.sourcerange: "{{ lancommander_traefik_whitelist }}"
+          traefik.http.services.lancommander.loadbalancer.server.port: "1337"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/LANCommander/LANCommander/releases/tag/$${major}.$${minor}.$${patch}"
+  when: lancommander_enabled is true
+
+- name: Stop LANCommander
+  block:
+    - name: Stop LANCommander
+      community.docker.docker_container:
+        name: "{{ lancommander_container_name }}"
+        state: absent
+  when: lancommander_enabled is false

@@ -1,0 +1,155 @@
+---
+- name: Start Diskover
+  block:
+    - name: Create Diskover Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ diskover_data_directory }}/"
+        - "{{ diskover_data_directory }}/config"
+
+    - name: Create Diskover Elasticsearch Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1000"
+        group: "0"
+      with_items:
+        - "{{ diskover_data_directory }}/elasticsearch"
+        - "{{ diskover_data_directory }}/elasticsearch/data"
+
+    - name: Create Diskover network
+      community.docker.docker_network:
+        name: "{{ diskover_network_name }}"
+
+    - name: Create Diskover Elasticsearch Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ diskover_elasticsearch_container_name }}"
+        hostname: "{{ diskover_elasticsearch_hostname }}"
+        image: public.ecr.aws/elastic/elasticsearch:8.16.2
+        pull: true
+        networks:
+          - name: "{{ diskover_network_name }}"
+        networks_cli_compatible: "yes"
+        network_mode: "bridge"
+        volumes:
+          - "{{ diskover_data_directory }}/elasticsearch/data:/usr/share/elasticsearch/data:rw"
+          - "/etc/timezone:/etc/timezone:ro"
+        ports:
+          - "{{ diskover_elasticsearch_port_http }}:9200"
+        env:
+          discovery.type: 'single-node'
+          xpack.security.enabled: 'true'
+          bootstrap.memory_lock: 'true'
+          ES_JAVA_OPTS: '-Xms1g -Xmx1g'
+          ELASTIC_PASSWORD: "topsecret"
+    #    ulimits:
+    #      - 'memlock:-1:-1'
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ diskover_elasticsearch_watchtower_monitor_only }}"
+          homepage.group: "{{ diskover_elasticsearch_homepage_group }}"
+          homepage.name: "Elasticsearch"
+          homepage.icon: "{{ diskover_elasticsearch_homepage_icon }}"
+          homepage.href: "{{ diskover_elasticsearch_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_elasticsearch_port_http }}"
+#         homepage.description: "Free and Open Source, Distributed, RESTful Search Engine"
+          homepage.server: "my-docker"
+          homepage.container: "{{ diskover_elasticsearch_container_name }}"
+          homepage.showStats: "{{ diskover_elasticsearch_homepage_showStats }}"
+          traefik.enable: "{{ diskover_available_externally | string }}"
+          traefik.http.routers.elasticsearch.rule: "Host(`{{ diskover_elasticsearch_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.elasticsearch.tls.certresolver: "letsencrypt"
+          traefik.http.routers.elasticsearch.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.elasticsearch.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ diskover_elasticsearch_hostname }}"
+          traefik.http.routers.elasticsearch.middlewares: "{{ diskover_elasticsearch_hostname }}@docker"
+          traefik.http.middlewares.elasticsearch.IPAllowList.sourcerange: "{{ diskover_traefik_whitelist }}"
+          traefik.http.services.elasticsearch.loadbalancer.server.port: "9200"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://gallery.ecr.aws/elastic/elasticsearch/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Diskover Elasticsearch-helper Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: elasticsearch-helper
+        hostname: elasticsearch-helper
+        image: alpine:latest
+        pull: true
+        networks:
+          - name: "{{ diskover_network_name }}"
+        networks_cli_compatible: "yes"
+        network_mode: "bridge"
+        command: sh -c "sysctl -w vm.max_map_count=262144"
+        privileged: true
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ diskover_elasticsearch_watchtower_monitor_only }}"
+          traefik.enable: "false"
+
+    - name: Create Diskover Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ diskover_container_name }}"
+        hostname: "{{ diskover_container_name }}"
+        image: lscr.io/linuxserver/diskover:latest
+        pull: true
+#        links:
+#          - "{{ diskover_elasticsearch_container_name }}"
+#          - elasticsearch-helper
+        networks:
+          - name: "{{ diskover_network_name }}"
+        networks_cli_compatible: "yes"
+        network_mode: "bridge"
+        volumes:
+          - "{{ samba_shares_root }}:/data:ro"
+          - "{{ samba_shares_other_root }}:/data2:ro"
+          - "{{ diskover_data_directory }}/config:/config"
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          ES_USER: "elastic"
+          ES_PORT: "9200"
+          ES_PASS: "topsecret"
+          ES_HOST: "elasticsearch"
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ diskover_port_http }}:80"
+        restart_policy: unless-stopped
+        memory: "{{ diskover_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ diskover_watchtower_monitor_only }}"
+          homepage.name: "Diskover"
+          homepage.group: "{{ diskover_homepage_group }}"
+          homepage.href: "{{ diskover_homepage_href }}"
+          homepage.icon: "{{ diskover_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_port_http }}"
+#         homepage.description: "Open source file indexer, file search engine and data management and analytics powered by Elasticsearch"
+          homepage.server: "my-docker"
+          homepage.container: "{{ diskover_container_name }}"
+          homepage.showStats: "{{ diskover_homepage_showStats }}"
+          traefik.enable: "{{ diskover_available_externally | string }}"
+          traefik.http.routers.diskover.rule: "Host(`{{ diskover_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.diskover.tls.certresolver: "letsencrypt"
+          traefik.http.routers.diskover.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.diskover.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ diskover_hostname }}"
+          traefik.http.routers.diskover.middlewares: "{{ diskover_hostname }}@docker"
+          traefik.http.middlewares.diskover.IPAllowList.sourcerange: "{{ diskover_traefik_whitelist }}"
+          traefik.http.services.diskover.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-diskover/releases/tag/$${major}.$${minor}.$${patch}"
+  when: diskover_enabled is true
+
+- name: Stop Diskover
+  block:
+    - name: Stop Diskover Docker Container
+      community.docker.docker_container:
+        name: "{{ diskover_container_name }}"
+        state: absent
+    - name: Stop Diskover Elasticsearch Docker Container
+      community.docker.docker_container:
+        name: "{{ diskover_elasticsearch_container_name }}"
+        state: absent
+  when: diskover_enabled is false

@@ -1,0 +1,61 @@
+---
+- name: Start File Browser
+  block:
+    - name: Create File Browser Data Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ filebrowser_data_directory }}"
+
+    - name: Create File Browser Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ filebrowser_container_name }}"
+        hostname: "{{ filebrowser_container_name }}"
+        image: filebrowser/filebrowser:latest
+        pull: true
+        volumes:
+          - "{{ filebrowser_root_dir }}:/srv"
+          - "{{ filebrowser_data_directory }}/filebrowser.db:/database/filebrowser.db"
+          - "{{ filebrowser_data_directory }}/settings.json:/config/settings.json"
+        ports:
+          - "{{ filebrowser_port }}:80"
+        network_mode: bridge
+        env:
+          PUID: "{{ filebrowser_user_id }}"
+          PGID: "{{ filebrowser_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ filebrowser_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ filebrowser_watchtower_monitor_only }}"
+          homepage.name: "File Browser"
+          homepage.group: "{{ filebrowser_homepage_group }}"
+          homepage.icon: "{{ filebrowser_homepage_icon }}"
+          homepage.href: "{{ filebrowser_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebrowser_port_http }}"
+#         homepage.description: "Web File Browser"
+          homepage.server: "my-docker"
+          homepage.container: "{{ filebrowser_container_name }}"
+          homepage.showStats: "{{ filebrowser_homepage_showStats }}"
+          traefik.enable: "{{ filebrowser_available_externally | string }}"
+          traefik.http.routers.filebrowser.rule: "Host(`{{ filebrowser_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.filebrowser.tls.certresolver: "letsencrypt"
+          traefik.http.routers.filebrowser.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.filebrowser.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ filebrowser_hostname }}"
+          traefik.http.routers.filebrowser.middlewares: "{{ filebrowser_hostname }}@docker"
+          traefik.http.middlewares.filebrowser.IPAllowList.sourcerange: "{{ filebrowser_traefik_whitelist }}"      
+          traefik.http.services.filebrowser.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/filebrowser/filebrowser/releases/tag/$${major}.$${minor}.$${patch}"
+  when: filebrowser_enabled is true
+
+- name: Stop File Browser
+  block:
+    - name: Stop File Browser
+      community.docker.docker_container:
+        name: "{{ filebrowser_container_name }}"
+        state: absent
+  when: filebrowser_enabled is false

@@ -1,0 +1,22 @@
+# specs
+checkmk_enabled: false
+checkmk_available_externally: false
+checkmk_traefik_whitelist: "{{ lan }}"
+checkmk_data_directory: "{{ docker_home }}/checkmk"
+
+# network
+checkmk_hostname: "checkmk"
+checkmk_port_http: "5000"
+checkmk_port_api: "8000"
+
+# docker
+checkmk_container_name: "checkmk"
+
+# homepage
+checkmk_homepage_group: "Apps"
+checkmk_homepage_icon: "checkmk.png"
+checkmk_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmk_port_http }}"
+checkmk_homepage_showStats: "false"
+
+# watchtower
+checkmk_watchtower_monitor_only: "true"

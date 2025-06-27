@@ -1,0 +1,53 @@
+---
+- name: Start IDrive
+  block:
+    - name: Create IDrive Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ idrive_data_directory }}"
+        - "{{ idrive_data_directory }}/config"
+
+    - name: Create IDrive Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ idrive_container_name }}"
+        hostname: "{{ idrive_container_name }}"
+        image: renofischa/idrive:latest
+#        image: ghcr.io/snorre-k/idrive-docker:latest
+        pull: true
+        volumes:
+          - "{{ idrive_data_directory }}/config:/opt/IDriveForLinux/idriveIt"
+          - "/:/mnt/backup:ro"
+#          - "/:/source/1:ro"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ idrive_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ idrive_watchtower_monitor_only }}"
+          homepage.name: "IDrive"
+          homepage.group: "{{ idrive_homepage_group }}"
+          homepage.href: "{{ idrive_homepage_href }}"
+          homepage.icon: "{{ idrive_homepage_icon }}"
+#         homepage.description: "Run IDrive Linux Client in a docker container"
+          homepage.server: "my-docker"
+          homepage.container: "{{ idrive_container_name }}"
+          homepage.showStats: "{{ idrive_homepage_showStats }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/RenoFischa/idrive/releases/tag/$${major}.$${minor}.$${patch}"
+  when: idrive_enabled is true
+
+- name: Stop IDrive
+  block:
+    - name: Stop IDrive
+      community.docker.docker_container:
+        name: "{{ idrive_container_name }}"
+        state: absent
+  when: idrive_enabled is false
+
+# TDL:
+# switch to https://github.com/snorre-k/idrive-docker
+# ^^ change image and volume now commented out
+# (/mnt/backup to /source change will cause everything to re-upload)

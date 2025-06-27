@@ -1,0 +1,39 @@
+---
+- set_fact:
+     container_name: "ghost"
+
+- name: Create {{ container_name }} Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ ghost_data_directory }}"
+    - "{{ ghost_data_directory }}/content"
+#    - "{{ ('container_name') + _data_directory }}/test"
+
+- name: Ghost Docker Container
+  docker_container:
+    name: ghost
+    image: ghost:alpine
+    pull: true
+    ports:
+      - "{{ ghost_port_http }}:2368"
+    volumes:
+      - "{{ ghost_data_directory }}/content:/var/lib/ghost/content:rw"
+    network_mode: bridge
+    hostname: "ghost"
+    env:
+      URL: "ghost.{{ ansible_nas_domain }}"
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    memory: "{{ ghost_memory_limit }}"
+    labels:
+      traefik.enable: "{{ ghost_available_externally | string }}"
+      traefik.http.routers.ghost.rule: "Host(`ghost.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.ghost.tls.certresolver: "letsencrypt"
+      traefik.http.routers.ghost.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.ghost.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ ghost_hostname }}"
+      traefik.http.routers.ghost.middlewares: "{{ ghost_hostname }}@docker"
+      traefik.http.middlewares.ghost.IPAllowList.sourcerange: "{{ ghost_traefik_whitelist }}"
+      traefik.http.services.ghost.loadbalancer.server.port: "2368"

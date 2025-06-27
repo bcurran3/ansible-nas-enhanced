@@ -1,0 +1,61 @@
+---
+- name: Start Netdata
+  block:
+    - name: Get docker group id
+      ansible.builtin.group:
+        name: docker
+      register: docker_group
+
+    - name: Netdata Docker Container
+      community.docker.docker_container:
+        name: "{{ netdata_container_name }}"
+        hostname: "{{ netdata_container_name }}"
+        image: "{{ netdata_image_name }}:{{ netdata_image_version }}"
+        state: started
+        pull: true
+        ports:
+          - "{{ netdata_port }}:19999"
+        volumes:
+          - "/proc:/host/proc:ro"
+          - "/sys:/host/sys:ro"
+        env:
+          PGID: "{{ docker_group.gid }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        capabilities:
+          - SYS_PTRACE
+        security_opts:
+          - apparmor:unconfined
+        restart_policy: unless-stopped
+        memory: "{{ netdata_memory }}"
+        labels:
+          homepage.group: "{{ netdata_homepage_group }}"
+          homepage.name: "Netdata"
+          homepage.icon: "{{ netdata_homepage_icon }}"
+          homepage.href: "{{ netdata_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netdata_port }}"
+#         homepage.description: "The fastest path to AI-powered full stack observability, even for lean teams."
+          homepage.server: "my-docker"
+          homepage.container: "{{ netdata_container_name }}"
+          homepage.showStats: "{{ netdata_homepage_showStats }}"
+          homepage.widget.type: "netdata"
+          homepage.widget.url: "https://{{ netdata_hostname }}.{{ ansible_nas_domain }}"
+          traefik.enable: "{{ netdata_available_externally | string }}"
+          traefik.http.routers.netdata.rule: "Host(`{{ netdata_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.netdata.tls.certresolver: "letsencrypt"
+          traefik.http.routers.netdata.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.netdata.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ netdata_hostname }}"
+          traefik.http.routers.netdata.middlewares: "{{ netdata_hostname }}@docker"
+          traefik.http.middlewares.netdata.IPAllowList.sourcerange: "{{ netdata_traefik_whitelist }}"
+          traefik.http.services.netdata.loadbalancer.server.port: "19999"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/netdata/netdata/releases/tag/$${major}.$${minor}.$${patch}"
+  when: netdata_enabled is true
+
+- name: Stop Netdata
+  block:
+    - name: Stop Netdata
+      community.docker.docker_container:
+        name: "{{ netdata_container_name }}"
+        state: absent
+  when: netdata_enabled is false

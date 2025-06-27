@@ -1,0 +1,62 @@
+---
+- name: Start Plex Rewind
+  block:
+    - name: Create Plex Rewind Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1001"
+      with_items:
+        - "{{ plexrewind_data_directory }}"
+        - "{{ plexrewind_data_directory }}/config"
+
+    - name: Create Plex Rewind Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ plexrewind_container_name }}"
+        image: ghcr.io/raunot/plex-rewind:latest
+        pull: true
+        ports:
+          - "{{ plexrewind_port_http }}:8383"
+        volumes:
+          - "{{ plexrewind_data_directory }}/config:/app/config"
+        network_mode: bridge
+        env:
+          NEXTAUTH_SECRET: "{{ plexrewind_nextauth_secret }}"
+          NEXTAUTH_URL: "{{ plexrewind_nextauth_url }}"
+          NEXT_PUBLIC_SITE_URL: "{{ plexrewind_next_public_site_url }}"
+          NEXT_PUBLIC_STATISTICS_START_DATE: "{{ plexrewind_next_public_statistics_start_date }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ plexrewind_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ plexrewind_watchtower_monitor_only }}"
+          homepage.name: "Plex Rewind"
+          homepage.group: "{{ plexrewind_homepage_group }}"
+          homepage.icon: "{{ plexrewind_homepage_icon }}"
+          homepage.href: "{{ plexrewind_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plexrewind_port_http }}"
+#         homepage.description: "Present Plex user statistics and habits in a beautiful and organized manner."
+          homepage.server: "my-docker"
+          homepage.container: "{{ plexrewind_container_name }}"
+          homepage.showStats: "{{ plexrewind_homepage_showStats }}"
+          traefik.enable: "{{ plexrewind_available_externally | string }}"
+          traefik.http.routers.plexrewind.rule: "Host(`{{ plexrewind_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.plexrewind.tls.certresolver: "letsencrypt"
+          traefik.http.routers.plexrewind.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.plexrewind.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ plexrewind_hostname }}"
+          traefik.http.routers.plexrewind.middlewares: "{{ plexrewind_hostname }}@docker"
+          traefik.http.middlewares.plexrewind.IPAllowList.sourcerange: "{{ plexrewind_traefik_whitelist }}"
+          traefik.http.services.plexrewind.loadbalancer.server.port: "8383"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: plexrewind_enabled is true
+
+- name: Stop Plex Rewind Docker Container
+  block:
+    - name: Stop plexrewind
+      community.docker.docker_container:
+        name: "{{ plexrewind_container_name }}"
+        state: absent
+  when: plexrewind_enabled is false

@@ -1,0 +1,41 @@
+# Ansible-NAS
+osclass_enabled: false
+osclass_available_externally: false
+osclass_traefik_whitelist: "{{ lan }}"
+osclass_data_directory: "{{ docker_home }}/osclass"
+osclass_hostname: "classifieds"
+
+# app
+osclass_admin_username: "admin"
+osclass_admin_password: "topsecret"
+osclass_email: ""
+osclass_smtp_host: ""
+osclass_smtp_port: ""
+osclass_smtp_user: ""
+osclass_smtp_password: ""
+
+# database
+osclass_database_hostname: "osclass-db"
+osclass_database_user: "osclass"
+osclass_database_password: "bitnami"
+
+# network
+osclass_port_http: "8091"
+
+# docker
+osclass_container_name: "osclass"
+osclass_db_container_name: "osclass-db"
+osclass_memory_limit: "1G"
+
+# homepage
+osclass_homepage_group: "Apps"
+osclass_homepage_icon: "https://upload.wikimedia.org/wikipedia/commons/a/a8/Osclass.png"
+osclass_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osclass_port_http }}"
+osclass_homepage_showStats: "false"
+osclass_db_homepage_group: "DBs"
+osclass_db_homepage_icon: "mariadb.png"
+osclass_db_homepage_showStats: "false"
+
+# watchtower
+osclass_watchtower_monitor_only: "true"
+osclass_db_watchtower_monitor_only: "true"

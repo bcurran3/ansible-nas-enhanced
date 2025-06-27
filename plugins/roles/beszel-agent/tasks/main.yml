@@ -1,0 +1,45 @@
+---
+- name: Start Beszel Agent
+  block:
+    - name: Create Beszel Agent Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ beszel_agent_container_name }}"
+        hostname: "{{ beszel_agent_container_name }}"
+        image: henrygd/beszel-agent
+        pull: true
+#        ports:
+#          - "{{ beszel_agent_port_http }}:45876"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#           monitor other disks / partitions by mounting a folder in /extra-filesystems
+#         - /mnt/disk/.beszel:/extra-filesystems/sda1:ro
+        network_mode: host
+        env:
+          PORT: "45876"
+          KEY: "{{ beszel_agent_key }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ beszel_agent_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ beszel_agent_watchtower_monitor_only }}"
+          homepage.name: "Beszel Agent"
+          homepage.group: "{{ beszel_agent_homepage_group }}"
+          homepage.icon: "{{ beszel_agent_homepage_icon }}"
+          homepage.href: "{{ beszel_agent_homepage_href }}"
+#         homepage.description: "Lightweight server monitoring hub with historical data, docker stats, and alerts."
+          homepage.server: "my-docker"
+          homepage.container: "{{ beszel_agent_container_name }}"
+          homepage.showStats: "{{ beszel_agent_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/henrygd/beszel/releases/tag/$${major}.$${minor}.$${patch}"
+  when: beszel_agent_enabled is true
+
+- name: Stop Beszel Agent
+  block:
+    - name: Stop Beszel Agent Docker Container
+      community.docker.docker_container:
+        name: "{{ beszel_agent_container_name }}"
+        state: absent
+  when: beszel_agent_enabled is false

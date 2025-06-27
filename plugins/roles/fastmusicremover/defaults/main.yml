@@ -1,0 +1,22 @@
+fastmusicremover_enabled: false
+fastmusicremover_available_externally: false
+fastmusicremover_traefik_whitelist: "{{ lan }}"
+
+# network
+fastmusicremover_hostname: "fastmusicremover"
+fastmusicremover_port_http: "3014"
+
+# specs
+fastmusicremover_memory_limit: "4G"
+
+# homepage 
+fastmusicremover_homepage_group: "Apps"
+fastmusicremover_homepage_icon: "fastmusicremover.png"
+fastmusicremover_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fastmusicremover_port_http }}"
+fastmusicremover_homepage_showStats: "false"
+
+# docker
+fastmusicremover_container_name: fast-music-remover
+
+# watchtower
+fastmusicremover_watchtower_monitor_only: "true"

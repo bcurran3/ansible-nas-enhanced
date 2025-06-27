@@ -1,0 +1,48 @@
+#
+windows_enabled: false
+windows_available_externally: false
+windows_traefik_whitelist: "{{ lan }}"
+windows_data_directory: "{{ docker_home }}/windows"
+
+# network
+windows_hostname: "windows"
+windows_port_http: "8006"
+windows_port_rdp: "3388"
+
+# app
+windows_version: "win11"
+
+# docker
+windows_container_name: "windows"
+windows_cpu_cores: "2"
+windows_disk_size: "50G"
+windows_memory_size: "4G"
+
+# homepage
+windows_homepage_group: "Apps"
+windows_homepage_icon: "Windows.png"
+windows_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ windows_port_http }}"
+windows_homepage_showStats: "false"
+
+# watchtower
+windows_watchtower_monitor_only: "true"
+
+# Available Windows versions:
+# win11	 - Windows 11 Pro	6.4 GB
+# win11e - Windows 11 Enterprise	5.8 GB
+# win10	 - Windows 10 Pro	5.8 GB
+# ltsc10 - Windows 10 LTSC	4.6 GB
+# win10e - Windows 10 Enterprise	5.2 GB
+# win81	 - Windows 8.1 Pro	4.2 GB
+# win81e - Windows 8.1 Enterprise	3.8 GB
+# win7   - Windows 7 Enterprise	3.0 GB
+# vista  - Windows Vista Enterprise	3.0 GB
+# winxp  - Windows XP Professional	0.6 GB
+# 2022   - Windows Server 2022	4.7 GB
+# 2019   - Windows Server 2019	5.3 GB
+# 2016   - Windows Server 2016	6.5 GB
+# 2012   - Windows Server 2012	4.3 GB
+# 2008   - Windows Server 2008	3.0 GB
+# core11 - Tiny 11 Core	2.1 GB
+# tiny11 - Tiny 11	3.8 GB
+# tiny10 - Tiny 10	3.6 GB

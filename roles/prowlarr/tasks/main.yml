@@ -1,0 +1,57 @@
+---
+- name: Start Prowlarr
+  block:
+    - name: Create Prowlarr Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ prowlarr_data_directory }}"
+
+    - name: Create Prowlarr Docker Container
+      community.docker.docker_container:
+        name: "{{ prowlarr_container_name }}"
+        image: "{{ prowlarr_image_name }}:{{ prowlarr_image_version }}"
+        pull: true
+        volumes:
+          - "{{ prowlarr_data_directory }}:/config:rw"
+        ports:
+          - "{{ prowlarr_port }}:9696"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ prowlarr_user_id }}"
+          PGID: "{{ prowlarr_group_id }}"
+#         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:prowlarr"
+        restart_policy: unless-stopped
+        memory: "{{ prowlarr_memory }}"
+        labels:
+          homepage.group: "Media Downloading"
+          homepage.name: "Prowlarr"
+          homepage.href: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.siteMonitor: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.icon: "prowlarr.png"
+#         homepage.description: "Indexer Proxy"
+          homepage.server: "my-docker"
+          homepage.container: "prowlarr"
+          homepage.showStats: "false"
+          homepage.widget.type: "prowlarr"
+          homepage.widget.url: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.widget.key: "{{ prowlarr_homepage_widget_key }}"
+          traefik.enable: "{{ prowlarr_available_externally | string }}"
+          traefik.http.routers.prowlarr.rule: "Host(`{{ prowlarr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.prowlarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.prowlarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.prowlarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ prowlarr_hostname }}"
+          traefik.http.routers.prowlarr.middlewares: "{{ prowlarr_hostname }}@docker"
+          traefik.http.middlewares.prowlarr.IPAllowList.sourcerange: "{{ prowlarr_traefik_whitelist }}"
+          traefik.http.services.prowlarr.loadbalancer.server.port: "9696"
+  when: prowlarr_enabled is true
+
+- name: Stop Prowlarr
+  block:
+    - name: Stop Prowlarr
+      community.docker.docker_container:
+        name: "{{ prowlarr_container_name }}"
+        state: absent
+  when: prowlarr_enabled is false

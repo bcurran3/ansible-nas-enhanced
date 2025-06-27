@@ -1,0 +1,31 @@
+#
+koillection_enabled: false
+koillection_available_externally: false
+koillection_traefik_whitelist: "{{ lan }}"
+
+# network
+koillection_port_http: "3030"
+koillection_hostname: "koillection"
+koillection_data_directory: "{{ docker_home }}/koillection"
+
+# docker
+koillection_container_name: "koillection"
+koillection_memory: "1g"
+koillection_db_container_name: "koillection-db"
+koillection_db_memory: "1g"
+
+koillection_app_secret: "topsecret"
+
+# homepage
+koillection_homepage_group: "Apps"
+koillection_homepage_icon: "koillection.png"
+koillection_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koillection_port_http }}"
+koillection_homepage_showStats: "false"
+koillection_db_homepage_group: "DBs"
+koillection_db_homepage_icon: "postgres.png"
+koillection_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koillection_port_http }}"
+koillection_db_homepage_showStats: "false"
+
+# watchtower
+koillection_watchtower_monitor_only: "true"
+koillection_db_watchtower_monitor_only: "true"

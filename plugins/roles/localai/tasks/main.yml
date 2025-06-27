@@ -1,0 +1,62 @@
+---
+# WIP: should have persistant model save dir and nvidia true/false
+
+#- name: Create LocalAI Directories
+#  file:
+#    path: "{{ item }}"
+#    state: directory
+#  with_items:
+#    - "{{ localai_data_directory }}"
+#    - "{{ localai_data_directory }}/some path to models"
+
+- name: Start LocalAI
+  block:
+    - name: Create LocalAI Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ localai_container_name }}"
+        hostname: "{{ localai_container_name }}"
+        image: localai/localai:latest  # CPU and GPU combined image
+        pull: true
+        ports:
+          - "{{ localai_port_http }}:8080"
+        runtime: "nvidia" # needs nvidia option configured
+        volumes:
+        network_mode: bridge
+        env:
+          NVIDIA_VISIBLE_DEVICES: "all"
+          NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ localai_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ localai_watchtower_monitor_only }}"
+          homepage.name: "LocalAI"
+          homepage.group: "{{ localai_homepage_group }}"
+          homepage.icon: "{{ localai_homepage_icon }}"
+          homepage.href: "{{ localai_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ localai_port_http }}"
+#         homepage.description: "LocalAI is the free, Open Source OpenAI alternative."
+          homepage.server: "my-docker"
+          homepage.container: "{{ localai_container_name }}"
+          homepage.showStats: "{{ localai_homepage_showStats }}"
+          traefik.enable: "{{ localai_available_externally | string }}"
+          traefik.http.routers.localai.rule: "Host(`{{ localai_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.localai.tls.certresolver: "letsencrypt"
+          traefik.http.routers.localai.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.localai.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ localai_hostname }}"
+          traefik.http.routers.localai.middlewares: "{{ localai_hostname }}@docker"
+          traefik.http.middlewares.localai.IPAllowList.sourcerange: "{{ localai_traefik_whitelist }}"
+          traefik.http.services.localai.loadbalancer.server.port: "8080"
+#          wud.tag.include: '^\d+\.\d+\.\d+$$'
+#          wud.link.template: "https://github.com/mudler/LocalAI/releases/tag/$${major}.$${minor}.$${patch}"
+  when: localai_enabled is true
+
+- name: Stop LocalAI
+  block:
+    - name: Stop LocalAI
+      community.docker.docker_container:
+        name: "{{ localai_container_name }}"
+        state: absent
+  when: localai_enabled is false

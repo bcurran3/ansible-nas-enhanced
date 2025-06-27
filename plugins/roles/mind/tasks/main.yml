@@ -1,0 +1,57 @@
+---
+- name: Start MIND
+  block:
+    - name: Create MIND Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ mind_data_directory }}"
+        - "{{ mind_data_directory }}/db"
+
+    - name: Create MIND Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ mind_container_name }}"
+        hostname: "{{ mind_container_name }}"
+        image: mrcas/mind:latest
+        pull: true
+        volumes:
+          - "{{ mind_data_directory }}/db:/app/db"
+        ports:
+          - "{{ mind_port_http }}:8080"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ mind_watchtower_monitor_only }}"
+          homepage.name: "MIND"
+          homepage.group: "{{ mind_homepage_group }}"
+          homepage.icon: "{{ mind_homepage_icon }}"
+          homepage.href: "{{ mind_homepage_href }}"
+    #     homepage.description: "A simple self hosted reminder application that can send push notifications to your device. Set the reminder and forget about it!"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mind_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ mind_container_name }}"
+          homepage.showStats: "{{ mind_homepage_showStats }}"
+          traefik.enable: "{{ mind_available_externally | string }}"
+          traefik.http.routers.mind.rule: "Host(`mind.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.mind.tls.certresolver: "letsencrypt"
+          traefik.http.routers.mind.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.mind.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ mind_hostname }}"
+          traefik.http.routers.mind.middlewares: "{{ mind_hostname }}@docker"
+          traefik.http.middlewares.mind.IPAllowList.sourcerange: "{{ mind_traefik_whitelist }}"
+          traefik.http.services.mind.loadbalancer.server.port: "8080"
+          mind.tag.include: '^\d+\.\d+\.\d+$$'
+          mind.link.template: "https://github.com/Casvt/MIND/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ mind_memory }}"
+  when: mind_enabled is true
+
+- name: Stop MIND
+  block:
+    - name: Stop MIND
+      community.docker.docker_container:
+        name: "{{ mind_container_name }}"
+        state: absent
+  when: mind_enabled is false

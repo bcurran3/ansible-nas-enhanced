@@ -1,0 +1,79 @@
+---
+- name: Start HandBrake
+  block:
+    - name: Create HandBrake Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ handbrake_data_directory }}"
+        - "{{ handbrake_data_directory }}/config"
+        - "{{ handbrake_output_directory }}"
+        - "{{ handbrake_watch_directory }}"
+
+    - name: Create HandBrake Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ handbrake_container_name }}"
+        hostname: "{{ handbrake_container_name }}"
+        image: jlesage/handbrake
+        pull: true
+        volumes:
+          - "{{ handbrake_data_directory }}/config:/config:rw"
+          - "{{ handbrake_storage_directory }}:/storage:ro"
+          - "{{ handbrake_watch_directory }}:/watch:rw"
+          - "{{ handbrake_output_directory }}:/output:rw"
+        ports:
+          - "{{ handbrake_port_http }}:5800"
+        cpu_shares: 512
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          USER_ID: "{{ handbrake_user_id }}"
+          GROUP_ID: "{{ handbrake_group_id }}"
+          KEEP_APP_RUNNING: "{{ handbrake_keep_app_running }}"
+          AUTOMATED_CONVERSION_PRESET: "{{ handbrake_automated_conversion_preset }}"
+          AUTOMATED_CONVERSION_FORMAT: "{{ handbrake_automated_conversion_format }}"
+          AUTOMATED_CONVERSION_KEEP_SOURCE: "{{ handbrake_automated_conversion_keep_source }}"
+          AUTOMATED_CONVERSION_NON_VIDEO_FILE_EXTENSIONS: "{{ handbrake_automated_conversion_non_video_file_extensions }}"
+          AUTOMATED_CONVERSION_NON_VIDEO_FILE_ACTION: "{{ handbrake_automated_conversion_non_video_file_action }}"
+          AUTOMATED_CONVERSION_OUTPUT_SUBDIR: "{{ handbrake_automated_conversion_output_subdir }}"
+          AUTOMATED_CONVERSION_SOURCE_STABLE_TIME: "{{ handbrake_automated_conversion_source_stable_time }}"
+          AUTOMATED_CONVERSION_CHECK_INTERVAL: "{{ handbrake_automated_conversion_check_interval }}"
+          AUTOMATED_CONVERSION_INSTALL_PKGS: "{{ handbrake_automated_conversion_install_pkgs }}"
+          APP_NICENESS: "{{ handbrake_app_niceness }}"
+          CLEAN_TMP_DIR: "{{ handbrake_clean_tmp_dir }}"
+          DARK_MODE: " {{ handbrake_dark_mode }}"
+          UMASK: "{{ handbrake_converted_files_umask }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ handbrake_watchtower_monitor_only }}"
+          homepage.name: "HandBrake"
+          homepage.group: "{{ handbrake_homepage_group }}"
+          homepage.href: "{{ handbrake_homepage_href }}"
+          homepage.icon: "{{ handbrake_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ handbrake_port_http }}"
+#         homepage.description: "HandBrake is an open-source, GPL-licensed, multiplatform video transcoder."
+          homepage.server: "my-docker"
+          homepage.container: "{{ handbrake_container_name }}"
+          homepage.showStats: "{{ handbrake_homepage_showStats }}"
+          traefik.enable: "{{ handbrake_available_externally | string }}"
+          traefik.http.routers.handbrake.rule: "Host(`{{ handbrake_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.handbrake.tls.certresolver: "letsencrypt"
+          traefik.http.routers.handbrake.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.handbrake.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ handbrake_hostname }}"
+          traefik.http.routers.handbrake.middlewares: "{{ handbrake_hostname }}@docker"
+          traefik.http.middlewares.handbrake.IPAllowList.sourcerange: "{{ handbrake_traefik_whitelist }}"
+          traefik.http.services.handbrake.loadbalancer.server.port: "5800"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/jlesage/docker-handbrake/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ handbrake_memory }}"
+  when: handbrake_enabled is true
+
+- name: Stop HandBrake
+  block:
+    - name: Stop HandBrake
+      community.docker.docker_container:
+        name: "{{ handbrake_container_name }}"
+        state: absent
+  when: handbrake_enabled is false

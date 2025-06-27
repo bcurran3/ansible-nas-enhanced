@@ -1,0 +1,73 @@
+---
+- name: Start Netbootxyz
+  block:
+    - name: Netbootxyz Directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ netbootxyz_config_directory }}"
+        - "{{ netbootxyz_assets_directory }}"
+
+    - name: Netbootxyz Docker Container
+      community.docker.docker_container:
+        name: "{{ netbootxyz_container_name }}"
+        hostname: "{{ netbootxyz_container_name }}"
+        image: "{{ netbootxyz_image_name }}:{{ netbootxyz_image_version }}"
+        pull: true
+        volumes:
+          - "{{ netbootxyz_config_directory }}:/config:rw"
+          - "{{ netbootxyz_assets_directory }}:/assets:rw"
+        ports:
+          - "{{ netbootxyz_port_http }}:{{ netbootxyz_port_http }}" # changed
+          - "{{ netbootxyz_port_http2 }}:{{ netbootxyz_port_http2 }}"
+          - "{{ netbootxyz_port_tftp }}:69/udp"
+        memory: "{{ netbootxyz_memory }}"
+        env:
+          NGINX_PORT: "{{ netbootxyz_port_http2 }}"
+          PUID: "{{ netbootxyz_user_id }}"
+          PGID: "{{ netbootxyz_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+          WEB_APP_PORT: "{{ netbootxyz_port_http }}" # added
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ netbootxyz_watchtower_monitor_only }}"
+          homepage.group: "{{ netbootxyz_homepage_group }}"
+          homepage.name: "netboot.xyz"
+          homepage.icon: "{{ netbootxyz_homepage_icon }}"
+          homepage.href: "{{ netbootxyz_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbootxyz_port_http }}"
+#         homepage.description: "Your favorite operating systems in one place. A network-based bootable operating system installer based on iPXE."
+          homepage.server: "my-docker"
+          homepage.container: "netbootxyz"
+          homepage.showStats: "{{ netbootxyz_homepage_showStats }}"
+          traefik.enable: "{{ netbootxyz_available_externally | string }}"
+
+#          traefik.http.routers.netbootxyz2.rule: "Host(`{{ netbootxyz_hostname2 }}.{{ ansible_nas_domain }}`)"
+#          traefik.http.routers.netbootxyz2.tls.certresolver: "letsencrypt"
+#          traefik.http.routers.netbootxyz2.tls.domains[0].main: "{{ ansible_nas_domain }}"
+#          traefik.http.routers.netbootxyz2.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+##          traefik.http.routers.frontend.middlewares: "{{ netbootxyz_hostname2 }}"
+#          traefik.http.routers.netbootxyz2.middlewares: "{{ netbootxyz_hostname2 }}@docker"
+#          traefik.http.middlewares.netbootxyz2.IPAllowList.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
+#          traefik.http.services.netbootxyz2.loadbalancer.server.port: "{{ netbootxyz_port_http2 }}"
+
+          traefik.http.routers.netbootxyz.rule: "Host(`{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.netbootxyz.tls.certresolver: "letsencrypt"
+          traefik.http.routers.netbootxyz.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.netbootxyz.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ netbootxyz_hostname }}"
+          traefik.http.routers.netbootxyz.middlewares: "{{ netbootxyz_hostname }}@docker"
+          traefik.http.middlewares.netbootxyz.IPAllowList.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
+          traefik.http.services.netbootxyz.loadbalancer.server.port: "{{ netbootxyz_port_http }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/netbootxyz/docker-netbootxyz/releases/tag/$${major}.$${minor}.$${patch}"
+  when: netbootxyz_enabled is true
+
+- name: Stop Netbootxyz
+  block:
+    - name: Stop Netbootxyz
+      community.docker.docker_container:
+        name: "{{ netbootxyz_container_name }}"
+        state: absent
+  when: netbootxyz_enabled is false

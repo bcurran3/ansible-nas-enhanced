@@ -1,0 +1,28 @@
+---
+# enable or disable the application
+ssm_enabled: false
+ssm_available_externally: false
+ssm_traefik_whitelist: "{{ lan }}"
+
+# directories
+ssm_data_directory: "{{ docker_home }}/ssm"
+
+# network
+ssm_port_http: "3015"
+ssm_hostname: "ssm"
+
+# docker
+ssm_container_name: "ssm"
+ssm_memory_limit: "1g"
+ssm_client_container_name: "client-ssm"
+ssm_client_memory_limit: "1g"
+ssm_db_container_name: "mongo-ssm"
+ssm_db_memory_limit: "1g"
+ssm_redis_container_name: "cache-ssm"
+ssm_redis_memory_limit: "1g"
+ssm_network_name: "squirrel"
+
+# watchtower
+ssm_watchtower_monitor_only: "true"
+ssm_db_watchtower_monitor_only: "true"
+ssm_redis_watchtower_monitor_only: "true"

@@ -1,0 +1,28 @@
+#
+kasm_enabled: false
+kasm_available_externally: false
+kasm_traefik_whitelist: "{{ lan }}"
+kasm_data_directory: "{{ docker_home }}/kasm"
+
+# network
+kasm_hostname: "kasm"
+kasm_port_http: "3025"
+kasm_port_install_https: "3026"
+
+# app
+kasm_docker_hub_username: ""
+kasm_docker_hub_password: ""
+
+# docker
+kasm_container_name: "kasm"
+kasm_memory_limit: "2g"
+kasm_container_version: "latest"
+
+# homepage
+kasm_homepage_group: "Apps"
+kasm_homepage_icon: "kasm.png"
+kasm_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kasm_port_http }}"
+kasm_homepage_showStats: "false"
+
+# watchtower
+kasm_watchtower_monitor_only: "true"

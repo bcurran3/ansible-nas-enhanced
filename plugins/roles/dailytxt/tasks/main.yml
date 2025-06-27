@@ -1,0 +1,61 @@
+---
+- name: Start DailyTxT
+  block:
+    - name: Create DailyTxT Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ dailytxt_data_directory }}"
+        - "{{ dailytxt_data_directory }}/data"
+
+    - name: Create DailyTxT Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dailytxt_container_name }}"
+        image: phitux/dailytxt:latest
+        pull: true
+        volumes:
+          - "{{ dailytxt_data_directory }}/data:/app/data:rw"
+        ports:
+          - "{{ dailytxt_port_http }}:{{ dailytxt_port_http }}"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          ALLOW_REGISTRATION: "{{ dailytxt_allow_registration }}"
+          DATA_INDENT: "2"
+          JWT_EXP_DAYS: "{{ dailytxt_jwt_exp_days }}"
+          PORT: "{{ dailytxt_port_http }}"
+          SECRET_KEY: "{{ dailytxt_secret_key }}"
+        restart_policy: unless-stopped
+        memory: "{{ dailytxt_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ dailytxt_watchtower_monitor_only }}"
+          homepage.name: "DailyTxT"
+          homepage.group: "{{ dailytxt_homepage_group }}"
+          homepage.href: "{{ dailytxt_homepage_href }}"
+          homepage.icon: "{{ dailytxt_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
+#         homepage.description: "Encrypted Diary Web-App"
+          homepage.server: "my-docker"
+          homepage.container: "dailytxt"
+          homepage.showStats: "{{ dailytxt_homepage_showStats }}"
+          traefik.enable: "{{ dailytxt_available_externally | string }}"
+          traefik.http.routers.dailytxt.rule: "Host(`{{ dailytxt_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.dailytxt.tls.certresolver: "letsencrypt"
+          traefik.http.routers.dailytxt.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.dailytxt.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ dailytxt_hostname }}"
+          traefik.http.routers.dailytxt.middlewares: "{{ dailytxt_hostname }}@docker"
+          traefik.http.middlewares.dailytxt.IPAllowList.sourcerange: "{{ dailytxt_traefik_whitelist }}"
+          traefik.http.services.dailytxt.loadbalancer.server.port: "8766"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/r/phitux/dailytxt/tags/$${major}.$${minor}.$${patch}"
+  when: dailytxt_enabled is true
+
+- name: Stop DailyTxT
+  block:
+    - name: Stop DailyTxT
+      community.docker.docker_container:
+        name: "{{ dailytxt_container_name }}"
+        state: absent
+  when: dailytxt_enabled is false

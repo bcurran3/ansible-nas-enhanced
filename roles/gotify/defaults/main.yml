@@ -1,0 +1,28 @@
+---
+gotify_enabled: false
+gotify_available_externally: false
+gotify_traefik_whitelist: "{{ lan }}"
+
+# data directory
+gotify_data_directory: "{{ docker_home }}/gotify"
+
+# network
+gotify_port: "2346"
+gotify_hostname: "gotify"
+
+# docker
+gotify_container_name: "gotify"
+gotify_image_name: "gotify/server"
+gotify_image_version: "latest"
+gotify_user_id: "0"
+gotify_group_id: "0"
+
+# specs
+gotify_memory: 200m
+
+# homepage
+gotify_homepage_group: "Apps"
+gotify_homepage_name: "Gotify"
+gotify_homepage_icon: "gotify.png"
+gotify_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}"
+gotify_homepage_widget_key: "your key"

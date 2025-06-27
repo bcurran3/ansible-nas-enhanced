@@ -1,0 +1,35 @@
+---
+# enable or disable the application
+komga_enabled: false
+komga_available_externally: false
+komga_traefik_whitelist: "{{ lan }}"
+
+# directories
+komga_data_directory: "{{ docker_home }}/komga"
+komga_books_directory: "{{ books_root }}"
+komga_comics_directory: "{{ comics_root }}"
+
+# uid / gid
+komga_user_id: "1000"
+komga_group_id: "1000"
+
+# network
+komga_hostname: "komga"
+komga_port_http: "8088"
+
+# docker
+komga_container_name: "komga"
+komga_image_name: "gotson/komga"
+komga_image_version: "latest"
+
+# specs
+komga_memory: "1g"
+
+# homepage
+komga_homepage_group: "Media Servers"
+komga_homepage_name: "Komga"
+komga_homepage_icon: "komga"
+komga_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
+komga_widget_username: "your username"
+komga_widget_password: "your password"
+komga_widget_key: ""

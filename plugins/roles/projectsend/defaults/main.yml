@@ -1,0 +1,35 @@
+#
+projectsend_enabled: false
+projectsend_available_externally: false
+projectsend_traefik_whitelist: "{{ lan }}"
+projectsend_data_directory: "{{ docker_home }}/projectsend"
+
+# app
+projectsend_max_upload: "5000"
+
+# network
+projectsend_hostname: "projectsend"
+projectsend_port_http: "3006"
+projectsend_user_id: "1000"
+projectsend_group_id: "1000"
+
+# docker
+projectsend_container_name: "projectsend"
+projectsend_network_name: "projectsend"
+projectsend_memory_limit: "512m"
+projectsend_db_container_name: "projectsend-db"
+projectsend_db_memory_limit: "1g"
+
+# homepage
+projectsend_homepage_group: "Apps"
+projectsend_homepage_icon: "projectsend.png"
+projectsend_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
+projectsend_homepage_showStats: "false"
+projectsend_db_homepage_group: "DBs"
+projectsend_db_homepage_icon: "mariadb.png"
+projectsend_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
+projectsend_db_homepage_showStats: "false"
+
+# watchtower
+projectsend_watchtower_monitor_only: "true"
+projectsend_db_watchtower_monitor_only: "true"

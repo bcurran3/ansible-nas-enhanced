@@ -1,0 +1,37 @@
+#
+grampsweb_enabled: false
+grampsweb_available_externally: false
+grampsweb_traefik_whitelist: "{{ lan }}"
+
+# network
+grampsweb_port_http: "3031"
+grampsweb_hostname: "grampsweb"
+
+grampsweb_data_directory: "{{ docker_home }}/grampsweb"
+
+# docker
+grampsweb_container_name: "grampsweb"
+grampsweb_memory_limit: "1G"
+grampsweb_celery_container_name: "grampsweb-celery"
+grampsweb_celery_memory_limit: "1G"
+grampsweb_redis_container_name: "grampsweb-redis"
+grampsweb_redis_memory_limit: "1G"
+
+# homepage
+grampsweb_homepage_group: "Apps"
+grampsweb_homepage_icon: "grampsweb.png"
+grampsweb_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
+grampsweb_homepage_showStats: "false"
+grampsweb_celery_homepage_group: "Apps"
+grampsweb_celery_homepage_icon: "celery.png"
+grampsweb_celery_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
+grampsweb_celery_homepage_showStats: "false"
+grampsweb_redis_homepage_group: "Apps"
+grampsweb_redis_homepage_icon: "redis.png"
+grampsweb_redis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
+grampsweb_redis_homepage_showStats: "false"
+
+# watchtower
+grampsweb_watchtower_monitor_only: "true"
+grampsweb_celery_watchtower_monitor_only: "true"
+grampsweb_redis_watchtower_monitor_only: "true"

@@ -1,0 +1,24 @@
+#
+glance_enabled: false
+glance_available_externally: false
+glance_traefik_whitelist: "{{ lan }}"
+glance_data_directory: "{{ docker_home }}/glance"
+
+# network
+glance_hostname: "glance"
+glance_port_http: "8082"
+
+# specs
+glance_memory_limit: "1G"
+
+# docker
+glance_container_name: "glance"
+
+# homepage
+glance_homepage_group: "Apps"
+glance_homepage_icon: "https://raw.githubusercontent.com/glanceapp/glance/main/internal/assets/static/app-icon.png"
+glance_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glance_port_http }}"
+glance_homepage_showStats: "false"
+
+# watchtower
+glance_watchtower_monitor_only: "true"

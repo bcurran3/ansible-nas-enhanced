@@ -1,0 +1,25 @@
+#
+cup_enabled: false
+cup_available_externally: false
+cup_traefik_whitelist: "{{ lan }}"
+cup_data_directory: "{{ docker_home }}/cup"
+
+# network
+cup_hostname: "cup"
+cup_port_http: "3017"
+
+# specs
+cup_memory_limit: "1G"
+
+# docker
+cup_container_name: "cup"
+
+# homepage
+cup_homepage_group: "Apps"
+cup_homepage_icon: "https://raw.githubusercontent.com/sergi0g/cup/refs/heads/main/web/public/apple-touch-icon.png"
+cup_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cup_port_http }}"
+cup_homepage_showStats: "false"
+cup_homepage_widget_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cup_port_http }}/json"
+
+# watchtower
+cup_watchtower_monitor_only: "true"

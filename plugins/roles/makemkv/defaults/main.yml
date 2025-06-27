@@ -1,0 +1,27 @@
+#
+makemkv_enabled: false
+makemkv_available_externally: false
+makemkv_traefik_whitelist: "{{ lan }}"
+
+makemkv_hostname: "makemkv"
+makemkv_data_directory: "{{ docker_home }}/makemkv/config"
+# If your Ansible-NAS has an optical drive you want to use for ripping:
+# Uncomment the line below (edit the device if necessary) and uncomment the cooresponding line in tasks/makemkv.yml
+# makemkv_optical_drive: "/dev/sr0"
+makemkv_storage_directory: "{{ samba_shares_other_root }}/dump/rip"
+makemkv_output_directory: "{{ samba_shares_other_root }}/dump/ripped"
+makemkv_port_http: "5804"
+makemkv_user_id: "0"
+makemkv_group_id: "1001"
+
+# docker
+makemkv_container_name: "makemkv"
+
+# homepage
+makemkv_homepage_group: "Apps"
+makemkv_homepage_icon: "makemkv.png"
+makemkv_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ makemkv_port_http }}"
+makemkv_homepage_showStats: "false"
+
+# watchtower
+makemkv_watchtower_monitor_only: "true"

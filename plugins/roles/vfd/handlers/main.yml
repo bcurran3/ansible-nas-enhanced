@@ -1,0 +1,9 @@
+---
+- name: Stop VFD
+  docker_container:
+    name: "{{ vfd_container_name }}"
+    state: absent
+  when: vfd_enabled is false
+  listen:
+    - "stop vfd"
+    - "stop disabled applications"

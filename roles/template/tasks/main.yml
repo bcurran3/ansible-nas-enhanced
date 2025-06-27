@@ -1,0 +1,62 @@
+############################## comments ##############################
+# REF: https://docs.ansible.com/ansible/2.5/modules/docker_module.html
+# All comments here
+#
+############################## comments ##############################
+---
+- name: Start AppName
+  block:
+    - name: Create AppName Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ appname_data_directory }}"
+
+    - name: Create AppName Docker Container
+      docker_container:
+        name: "{{ appname_container_name }}"
+        hostname: "{{ appname_container_name }}"
+        image: "{{ appname_image_name }}:{{ appname_image_version }}"
+        pull: true
+        volumes:
+          - "{{ appname_data_directory }}:/"
+        ports:
+          - "{{ appname_port }}:80"
+        env:
+          PUID: "{{ appname_user_id }}"
+          PGID: "{{ appname_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ appname_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ appname_watchtower_monitor_only }}"
+          homepage.name: "appname"
+          homepage.group: "{{ appname_homepage_group }}"
+          homepage.icon: "{{ appname_homepage_icon }}"
+          homepage.href: "{{ appname_homepage_href }}"
+          homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "appname"
+          homepage.showStats: "{{ appname_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ appname_port }}"
+          traefik.enable: "{{ appname_available_externally | string }}"
+          traefik.http.routers.appname.rule: "Host(`{{ appname_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.appname.tls.certresolver: "letsencrypt"
+          traefik.http.routers.appname.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.appname.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ appname_hostname }}"
+          traefik.http.routers.appname.middlewares: "{{ appname_hostname }}@docker"
+          traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ appname_traefik_whitelist }}"
+          traefik.http.services.appname.loadbalancer.server.port: "80"
+  when: appname_enabled is true
+
+- name: Stop AppName
+  block:
+    - name: Stop AppName Docker Container
+      community.docker.docker_container:
+        name: "{{ appname_container_name }}"
+        state: absent
+  when: appname_enabled is false
+
+# NOTE: consider adding common database setups to the template

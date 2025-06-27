@@ -1,0 +1,77 @@
+---
+# WIP - traefik headers need work
+- name: Start Kasm
+  block:
+    - name: Create kasm Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ kasm_data_directory }}"
+        - "{{ kasm_data_directory }}/opt"
+        - "{{ kasm_data_directory }}/profiles"
+
+    - name: Create Kasm Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ kasm_container_name }}"
+        hostname: "{{ kasm_container_name }}"
+        image: lscr.io/linuxserver/kasm:latest
+        # https://hub.docker.com/r/linuxserver/kasm
+        pull: true
+        network_mode: "bridge"
+        volumes:
+          - "{{ kasm_data_directory }}/opt:/opt"
+          - "{{ kasm_data_directory }}/profiles:/profiles" #optional
+          - /dev/input:/dev/input #optional
+          - /run/udev/data:/run/udev/data #optional
+        env:
+          KASM_PORT: "{{ kasm_port_http }}"
+          DOCKER_HUB_USERNAME: "{{ kasm_docker_hub_username }}" #optional
+          DOCKER_HUB_PASSWORD: "{{ kasm_docker_hub_password }}" #optional
+          DOCKER_MTU: "1500" #optional
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ kasm_port_http }}:{{ kasm_port_http }}" # user access
+          - "{{ kasm_port_install_https }}:3000" # admin/installation
+        privileged: true
+#       security_opts:
+#         - apparmor:rootlesskit #optional
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ kasm_watchtower_monitor_only }}"
+          homepage.name: "Kasm"
+          homepage.group: "{{ kasm_homepage_group }}"
+          homepage.icon: "{{ kasm_homepage_icon }}"
+          homepage.href: "{{ kasm_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kasm_port_http }}"
+#         homepage.description: "Kasm⁠ Workspaces is a docker container streaming platform for delivering browser-based access to desktops, applications, and web services."
+          homepage.server: "my-docker"
+          homepage.container: "{{ kasm_container_name }}"
+          homepage.showStats: "{{ kasm_homepage_showStats }}"
+          traefik.enable: "{{ kasm_available_externally | string }}"
+          traefik.http.routers.kasm.rule: "Host(`{{ kasm_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.kasm.tls.certresolver: "letsencrypt"
+          traefik.http.routers.kasm.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.kasm.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ kasm_hostname }}"
+#         traefik.http.routers.kasm.middlewares: "{{ kasm_hostname }}@docker"
+          traefik.http.routers.kasm.middlewares: "kasm-headers"
+          traefik.http.middlewares.kasm-headers.headers.customrequestheaders.X-Forwarded-Proto: "https"
+          traefik.http.middlewares.kasm-headers.headers.accessControlAllowOriginList: "*"
+          traefik.http.middlewares.kasm.IPAllowList.sourcerange: "{{ kasm_traefik_whitelist }}"
+          traefik.http.services.kasm.loadbalancer.passhostheader: "true"
+          traefik.http.services.kasm.loadbalancer.server.port: "{{ kasm_port_http }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/r/linuxserver/kasm/tags/$${major}.$${minor}.$${patch}"
+# NOTE: Traefik labels need work to make kasm.server.tld work; i.e. pass https header to kasm instead of http
+        memory: "{{ kasm_memory_limit }}"
+  when: kasm_enabled is true
+
+- name: Stop Kasm
+  block:
+    - name: Stop Kasm
+      community.docker.docker_container:
+        name: "{{ kasm_container_name }}"
+        state: absent
+  when: kasm_enabled is false

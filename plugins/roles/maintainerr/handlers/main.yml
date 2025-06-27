@@ -1,0 +1,9 @@
+---
+- name: Stop Maintainerr
+  docker_container:
+    name: "{{ maintainerr_container_name }}"
+    state: absent
+  when: maintainerr_enabled is false
+  listen:
+    - "stop maintainerr"
+    - "stop disabled applications"

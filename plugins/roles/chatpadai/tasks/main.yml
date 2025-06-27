@@ -1,0 +1,48 @@
+---
+- name: Start Chatpad AI
+  block:
+    - name: Create Chatpad AI Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ chatpadai_container_name }}"
+        image: ghcr.io/deiucanta/chatpad:latest
+        pull: true
+        network_mode: "bridge"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ chatpadai_port_http }}: 80"
+        restart_policy: unless-stopped
+        memory: "{{ chatpadai_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ chatpadai_watchtower_monitor_only }}"
+          homepage.name: "Chatpad AI"
+          homepage.group: "{{ chatpadai_homepage_group }}"
+          homepage.icon: "{{ chatpadai_homepage_icon }}"
+          homepage.href: "{{ chatpadai_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chatpadai_port_http }}"
+#         homepage.description: "Not just another ChatGPT user-interface!"
+          homepage.server: "my-docker"
+          homepage.container: "{{ chatpadai_container_name }}"
+          homepage.showStats: "{{ chatpadai_homepage_showStats }}"
+          traefik.enable: "{{ chatpadai_available_externally | string }}"
+          traefik.http.routers.chatpad.rule: "Host(`{{ chatpadai_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.chatpad.tls.certresolver: "letsencrypt"
+          traefik.http.routers.chatpad.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.chatpad.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ chatpadai_hostname }}"
+          traefik.http.routers.chatpad.middlewares: "{{ chatpadai_hostname }}@docker"
+          traefik.http.middlewares.chatpad.IPAllowList.sourcerange: "{{ chatpadai_traefik_whitelist }}"
+          traefik.http.services.chatpad.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/deiucanta/chatpad/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ no releases listed
+  when: chatpadai_enabled is true
+
+- name: Stop Chatpad AI
+  block:
+    - name: Stop Chatpad AI
+      community.docker.docker_container:
+        name: "{{ chatpadai_container_name }}"
+        state: absent
+  when: chatpadai_enabled is false

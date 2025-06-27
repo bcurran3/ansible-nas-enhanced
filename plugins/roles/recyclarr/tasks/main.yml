@@ -1,0 +1,45 @@
+---
+- name: Start Recyclarr
+  block:
+    - name: Create Recyclarr Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ recyclarr_data_directory }}"
+        - "{{ recyclarr_data_directory }}/config"
+
+    - name: Create Recyclarr Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ recyclarr_container_name }}"
+        hostname: "{{ recyclarr_container_name }}"
+        image: ghcr.io/recyclarr/recyclarr
+        pull: true
+        volumes:
+          - "{{ recyclarr_data_directory }}/config:/config"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ recyclarr_watchtower_monitor_only }}"
+          homepage.name: "Recyclarr"
+          homepage.group: "{{ recyclarr_homepage_group }}"
+          homepage.icon: "{{ recyclarr_homepage_icon }}"
+#         homepage.description: "Automatically sync TRaSH Guides to your Sonarr and Radarr instances"
+          homepage.server: "my-docker"
+          homepage.container: "{{ recyclarr_container_name }}"
+          homepage.showStats: "{{ recyclarr_homepage_showStats }}"
+          traefik.enable: "false"
+          recyclarr.tag.include: '^\d+\.\d+\.\d+$$'
+          recyclarr.link.template: https://github.com/recyclarr/recyclarr/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ recyclarr_memory }}"
+  when: recyclarr_enabled is true
+
+- name: Stop Recyclarr
+  block:
+    - name: Stop Recyclarr
+      community.docker.docker_container:
+        name: "{{ recyclarr_container_name }}"
+        state: absent
+  when: recyclarr_enabled is false

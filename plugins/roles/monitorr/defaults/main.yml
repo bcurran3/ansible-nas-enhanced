@@ -1,0 +1,25 @@
+#
+monitorr_enabled: false
+monitorr_available_externally: false
+monitorr_traefik_whitelist: "{{ lan }}"
+
+# network
+monitorr_hostname: "monitorr"
+
+monitorr_data_directory: "{{ docker_home }}/monitorr"
+
+monitorr_port_http: "5806"
+monitorr_user_id: "999"
+monitorr_group_id: "1001"
+
+# docker
+monitorr_container_name: "monitorr"
+
+# homepage
+monitorr_homepage_group: "Apps"
+monitorr_homepage_icon: "monitorr.png"
+monitorr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ monitorr_port_http }}"
+monitorr_homepage_showStats: "false"
+
+# watchtower
+monitorr_watchtower_monitor_only: "true"

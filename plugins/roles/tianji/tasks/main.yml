@@ -1,0 +1,96 @@
+---
+- name: Start Tianji
+  block:
+    - name: Create Tianji Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ tianji_data_directory }}"
+        - "{{ tianji_data_directory }}/db"
+
+    - name: Create Tianji DB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tianji_db_container_name }}"
+        hostname: "{{ tianji_db_container_name }}"
+        image: postgres:16-alpine
+        pull: true
+        volumes:
+          - "{{ tianji_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "tianji"
+          POSTGRES_PASSWORD: "tianji"
+          POSTGRES_DB: "tianji"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+          interval: "5s"
+          timeout: "5s"
+          retries: "5"
+        restart_policy: unless-stopped
+        memory: "{{ tianji_db_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ tianji_db_watchtower_monitor_only }}"
+          homepage.name: "tianji PostGreSQL"
+          homepage.group: "{{ tianji_db_homepage_group }}"
+          homepage.icon: "{{ tianji_db_homepage_icon }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create Tianji Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tianji_container_name }}"
+        hostname: "{{ tianji_container_name }}"
+        image: moonrailgun/tianji
+        pull: true
+        links:
+          - "{{ tianji_db_container_name }}"
+        ports:
+          - "{{ tianji_port_http }}:12345"
+        env:
+          DATABASE_URL: "postgresql://tianji:tianji@{{ tianji_db_container_name }}:5432/tianji"
+          JWT_SECRET: "{{ tianji_jwt_secret }}"
+          ALLOW_REGISTER: "{{ tianji_openapi_key }}"
+          ALLOW_OPENAPI: "{{ tianji_allow_openapi }}"
+          OPENAI_API_KEY: "{{ tianji_openapi_key }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ tianji_watchtower_monitor_only }}"
+          homepage.name: "tianji"
+          homepage.group: "{{ tianji_homepage_group }}"
+          homepage.icon: "{{ tianji_homepage_icon }}"
+          homepage.href: "{{ tianji_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tianji_port_http }}"
+#         homepage.description: "Tianji: Insight into everything, Website Analytics + Uptime Monitor + Server Status. not only another GA alternatives"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tianji_container_name }}"
+          homepage.showStats: "{{ tianji_homepage_showStats }}"
+          traefik.enable: "{{ tianji_available_externally | string }}"
+          traefik.http.routers.tianji.rule: "Host(`{{ tianji_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.tianji.tls.certresolver: "letsencrypt"
+          traefik.http.routers.tianji.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.tianji.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ tianji_hostname }}"
+          traefik.http.routers.tianji.middlewares: "{{ tianji_hostname }}@docker"
+          traefik.http.middlewares.tianji.IPAllowList.sourcerange: "{{ tianji_traefik_whitelist }}"
+          traefik.http.services.tianji.loadbalancer.server.port: "12345"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/msgbyte/tianji/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ tianji_memory }}"
+  when: tianji_enabled is true
+
+- name: Stop Tianji
+  block:
+    - name: Stop Tianji Docker Container
+      community.docker.docker_container:
+        name: "{{ tianji_container_name }}"
+        state: absent
+    - name: Stop Tianji DB Docker Container
+      community.docker.docker_container:
+        name: "{{ tianji_db_container_name }}"
+        state: absent
+  when: tianji_enabled is false

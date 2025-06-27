@@ -1,0 +1,54 @@
+---
+- name: Start Karaoke-Forever
+  block:
+    - name:  Karaoke-Forever Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ karaokeforever_container_name }}"
+        hostname: "{{ karaokeforever_container_name }}"
+        image: david510c/karaoke-forever:latest
+        pull: true
+        volumes:
+          - "{{ karaokeforever_cdgfiles }}:/cdgfiles:ro"
+        ports:
+          - "{{ karaokeforever_port_http }}:80"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ karaokeforever_watchtower_monitor_only }}"
+          homepage.name: "Karaoke-Forever"
+          homepage.group: "{{ karaokeforever_homepage_group }}"
+          homepage.icon: "{{ karaokeforever_homepage_icon }}"
+          homepage.href: "{{ karaokeforever_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaokeforever_port_http }}"
+#         homepage.description: "Open karaoke party system"
+          homepage.server: "my-docker"
+          homepage.container: "{{ karaokeforever_container_name }}"
+          homepage.showStats: "{{ karaokeforever_homepage_showStats }}"
+          traefik.enable: "{{ karaokeforever_available_externally | string }}"
+          traefik.http.routers.karaokeforever.rule: "Host(`karaokeforever.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.karaokeforever.tls.certresolver: "letsencrypt"
+          traefik.http.routers.karaokeforever.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.karaokeforever.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ karaokeforever_hostname }}"
+          traefik.http.routers.karaokeforever.middlewares: "{{ karaokeforever_hostname }}@docker"
+          traefik.http.middlewares.karaokeforever.IPAllowList.sourcerange: "{{ karaokeforever_traefik_whitelist }}"
+          traefik.http.services.karaokeforever.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/david510c/Karaoke-Forever/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ no release or tag information published
+        memory: "{{ karaokeforever_memory_limit }}"
+  when: karaokeforever_enabled is true
+
+- name: Stop Karaoke-Forever
+  block:
+    - name: Stop Karaoke-Forever
+      community.docker.docker_container:
+        name: "{{ karaokeforever_container_name }}"
+        state: absent
+  when: karaokeforever_enabled is false
+
+# NOTE:
+# probably not up-to-date with source
+# https://github.com/bhj/KaraokeEternal

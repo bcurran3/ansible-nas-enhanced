@@ -1,0 +1,59 @@
+---
+- name: Start Gokapi
+  block:
+    - name: Create Gokapi Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ gokapi_data_directory }}"
+        - "{{ gokapi_data_directory }}/config"
+        - "{{ gokapi_data_directory }}/data"
+
+    - name: Create Gokapi Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ gokapi_container_name }}"
+        hostname: "{{ gokapi_container_name }}"
+        image: f0rc3/gokapi:latest
+        pull: true
+        volumes:
+          - "{{ gokapi_data_directory }}/config:/app/config"
+          - "{{ gokapi_data_directory }}/data:/app/data"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ gokapi_port_http }}:53842"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ gokapi_watchtower_monitor_only }}"
+          homepage.name: "Gokapi"
+          homepage.group: "{{ gokapi_homepage_group }}"
+          homepage.icon: "{{ gokapi_homepage_icon }}"
+          homepage.href: "{{ gokapi_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gokapi_port_http }}"
+#         homepage.description: "Lightweight selfhosted Firefox Send alternative without public upload. AWS S3 supported."
+          homepage.server: "my-docker"
+          homepage.container: "{{ gokapi_container_name }}"
+          homepage.showStats: "{{ gokapi_homepage_showStats }}"
+          traefik.enable: "{{ gokapi_available_externally | string }}"
+          traefik.http.routers.gokapi.rule: "Host(`{{ gokapi_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.gokapi.tls.certresolver: "letsencrypt"
+          traefik.http.routers.gokapi.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.gokapi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ gokapi_hostname }}"
+          traefik.http.routers.gokapi.middlewares: "{{ gokapi_hostname }}@docker"
+          traefik.http.middlewares.gokapi.IPAllowList.sourcerange: "{{ gokapi_traefik_whitelist }}"
+          traefik.http.services.gokapi.loadbalancer.server.port: "53842"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/Forceu/Gokapi/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ gokapi_memory }}"
+  when: gokapi_enabled is true
+
+- name: Stop Gokapi
+  block:
+    - name: Stop Gokapi
+      community.docker.docker_container:
+        name: "{{ gokapi_container_name }}"
+        state: absent
+  when: gokapi_enabled is false

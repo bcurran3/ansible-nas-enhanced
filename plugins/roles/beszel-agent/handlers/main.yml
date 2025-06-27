@@ -1,0 +1,9 @@
+---
+- name: Stop Beszel Agent
+  docker_container:
+    name: "{{ beszel_container_name }}"
+    state: absent
+  when: beszel_agent_enabled is false
+  listen:
+    - "stop beszel agent"
+    - "stop disabled applications"

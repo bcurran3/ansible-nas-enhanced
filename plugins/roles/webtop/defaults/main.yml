@@ -1,0 +1,53 @@
+#
+webtop_enabled: false
+webtop_available_externally: false
+webtop_traefik_whitelist: "{{ lan }}"
+webtop_data_directory: "{{ docker_home }}/webtop"
+
+# network
+webtop_hostname: "webtop"
+
+webtop_user_id: "0"
+webtop_group_id: "0"
+
+webtop_port_http: "3000"
+
+# docker
+webtop_container_name: "webtop"
+webtop_memory_limit: "2g"
+webtop_container_version: "latest"
+
+# homepage
+webtop_homepage_group: "Apps"
+webtop_homepage_icon: "webtop.png"
+webtop_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webtop_port_http }}"
+webtop_homepage_showStats: "false"
+
+# watchtower
+webtop_watchtower_monitor_only: "true"
+
+# Version tags
+# latest         XFCE Alpine
+# ubuntu-xfce	   XFCE Ubuntu
+# fedora-xfce	   XFCE Fedora
+# arch-xfce	     XFCE Arch
+# alpine-kde	   KDE Alpine
+# ubuntu-kde	   KDE Ubuntu
+# fedora-kde	   KDE Fedora
+# arch-kde	     KDE Arch
+# alpine-mate	   MATE Alpine
+# ubuntu-mate	   MATE Ubuntu
+# fedora-mate	   MATE Fedora
+# arch-mate	     MATE Arch
+# alpine-i3	     i3 Alpine
+# ubuntu-i3	     i3 Ubuntu
+# fedora-i3	     i3 Fedora
+# arch-i3        i3 Arch
+# alpine-openbox Openbox Alpine
+# ubuntu-openbox Openbox Ubuntu
+# fedora-openbox Openbox Fedora
+# arch-openbox	 Openbox Arch
+# alpine-icewm	 IceWM Alpine
+# ubuntu-icewm	 IceWM Ubuntu
+# fedora-icewm	 IceWM Fedora
+# arch-icewm	   IceWM Arch

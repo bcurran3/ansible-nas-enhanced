@@ -1,0 +1,56 @@
+---
+- name: Create FileBot Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ filebot_data_directory }}"
+
+- name: FileBot
+  docker_container:
+    name: filebot
+    image: rednoah/filebot:latest
+    pull: true
+    volumes:
+      - "{{ filebot_data_directory }}:/data:rw"
+      - "{{ filebot_download_directory }}:/downloads:rw"
+#      - "{{ filebot_movies_directory }}:/movies:rw"
+#      - "{{ filebot_music_directory }}:/music:rw"
+#      - "{{ filebot_tv_directory }}:/tv:rw"
+    command: sysinfo
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "{{ filebot_user_id }}"
+      PGID: "{{ filebot_group_id }}"
+    restart_policy: unless-stopped
+    memory: 1g # Probably can be tweaked
+
+- name: FileBot-node
+  docker_container:
+    name: filebot-node
+    image: rednoah/filebot:node
+    pull: true
+    ports:
+      - "5452:5452"
+    restart_policy: unless-stopped
+    volumes_from: filebot
+    memory: 1g # Probably can be tweaked
+    labels:
+      traefik.enable: "{{ filebot_available_externally | string }}"
+      traefik.http.middlewares.filebot.IPAllowList.sourcerange: "{{ filebot_traefik_whitelist }}"
+      traefik.http.routers.filebot.rule: "Host(`filebot.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.filebot.tls.certresolver: "letsencrypt"
+      traefik.http.routers.filebot.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.filebot.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.filebot.loadbalancer.server.port: "5452"
+
+- name: FileBot-watcher
+  docker_container:
+    name: filebot-watcher
+    image: rednoah/filebot:watcher
+    pull: true
+    restart_policy: unless-stopped
+    volumes_from: filebot
+    memory: 1g # Probably can be tweaked
+
+

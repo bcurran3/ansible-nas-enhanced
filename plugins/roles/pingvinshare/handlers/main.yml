@@ -1,0 +1,9 @@
+---
+- name: Stop Pingvin Share
+  docker_container:
+    name: "{{ pingvinshare_container_name }}"
+    state: absent
+  when: pingvinshare_enabled is false
+  listen:
+    - "stop pingvinshare"
+    - "stop disabled applications"

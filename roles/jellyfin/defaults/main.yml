@@ -1,0 +1,48 @@
+---
+# enable or disable the application
+jellyfin_enabled: false
+jellyfin_available_externally: false
+jellyfin_traefik_whitelist: "{{ lan }}"
+
+# directories
+jellyfin_config_directory: "{{ docker_home }}/jellyfin/config"
+jellyfin_movies_directory: "{{ movies_root }}"
+jellyfin_music_directory: "{{ music_root }}"
+jellyfin_photos_directory: "{{ photos_root }}"
+jellyfin_tv_directory: "{{ tv_root }}"
+jellyfin_books_directory: "{{ books_root }}"
+jellyfin_audiobooks_directory: "{{ audiobooks_root }}"
+
+# permissions
+jellyfin_movies_permissions: "rw"
+jellyfin_music_permissions: "rw"
+jellyfin_photos_permissions: "rw"
+jellyfin_tv_permissions: "rw"
+jellyfin_books_permissions: "rw"
+jellyfin_audiobooks_permissions: "rw"
+
+# uid / gid
+jellyfin_user_id: "0"
+jellyfin_group_id: "0"
+
+# network
+jellyfin_hostname: "jellyfin"
+jellyfin_port_http: "8096"
+
+# docker
+jellyfin_container_name: "jellyfin"
+jellyfin_image_name: "linuxserver/jellyfin"
+jellyfin_image_version: "latest"
+
+# specs
+jellyfin_memory: "1g"
+
+# homepage 
+jellyfin_homepage_group: "Media Servers"
+jellyfin_homepage_icon: "jellyfin.png"
+jellyfin_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyfin_port_http }}"
+jellyfin_homepage_showStats: "false"
+jellyfin_homepage_widget_key: "your api key"
+
+# watchtower
+jellyfin_watchtower_monitor_only: "true"

@@ -1,0 +1,9 @@
+---
+- name: Stop bitmagnet
+  docker_container:
+    name: "{{ joplin_container_name }}"
+    state: absent
+  when: bitmagnet_enabled is false
+  listen:
+    - "stop bitmagnet"
+    - "stop disabled applications"

@@ -1,0 +1,60 @@
+---
+- name: Start Chowdown
+  block:
+    - name: Chowdown Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ chowdown_data_directory }}/config"
+
+    - name: Chowdown Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ chowdown_container_name }}"
+        hostname: "{{ chowdown_container_name }}"
+        image: gregyankovoy/chowdown:latest
+        pull: true
+        network_mode: "bridge"
+        volumes:
+          - "{{ chowdown_data_directory }}/config:/config:rw"
+        ports:
+          - "{{ chowdown_port_http }}:4000"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+#         PUID: "{{ chowdown_user_id }}"
+#         PGID: "{{ chowdown_group_id }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ chowdown_watchtower_monitor_only }}"
+          homepage.name: "Chowdown"
+          homepage.group: "{{ chowdown_homepage_group }}"
+          homepage.icon: "{{ chowdown_homepage_icon }}"
+          homepage.href: "{{ chowdown_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chowdown_port_http }}"
+#         homepage.description: "Simple recipes in Markdown format"
+          homepage.server: "my-docker"
+          homepage.container: "{{ chowdown_container_name }}"
+          homepage.showStats: "{{ chowdown_homepage_showStats }}"
+          traefik.http.routers.chowdown.rule: "Host(`chowdown.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.chowdown.tls.certresolver: "letsencrypt"
+          traefik.http.routers.chowdown.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.chowdown.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.middlewares.chowdown.IPAllowList.sourcerange: "{{ chowdown_traefik_whitelist }}"
+          traefik.http.services.chowdown.loadbalancer.server.port: "4000"
+          traefik.frontend.rule: "Host:chowdown.{{ ansible_nas_domain }}"
+          traefik.enable: "{{ chowdown_available_externally | string }}"
+          traefik.port: "4000"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/GregYankovoy/docker-chowdown/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ no releases or tags available
+        memory: 1g
+  when: chowdown_enabled is true
+
+- name: Stop Chowdown
+  block:
+    - name: Stop Chowdown
+      community.docker.docker_container:
+        name: "{{ chowdown_container_name }}"
+        state: absent
+  when: chowdown_enabled is false

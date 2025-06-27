@@ -1,0 +1,64 @@
+---
+- name: Start MakeMKV
+  block:
+    - name: Create MakeMKV Config Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ makemkv_data_directory }}"
+        - "{{ makemkv_output_directory }}"
+
+    - name: MakeMKV Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ makemkv_container_name }}"
+        hostname: "{{ makemkv_container_name }}"
+        image: jlesage/makemkv
+        pull: true
+        volumes:
+          - "{{ makemkv_data_directory }}:/config:rw"
+    #      - "{{ makemkv_optical_drive }}: /dev/sr0:ro"
+          - "{{ makemkv_storage_directory }}:/storage:ro"
+    #      - "{{ makemkv_storagealt_directory }}:/storagealt:rw"
+          - "{{ makemkv_output_directory }}:/output:rw"
+        ports:
+          - "{{ makemkv_port_http }}:5800"
+        dns_servers: "{{ ansible_nas_dns }}"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          USER_ID: "{{ makemkv_user_id }}"
+          GROUP_ID: "{{ makemkv_group_id }}"
+        restart_policy: unless-stopped
+        memory: 1g
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ makemkv_watchtower_monitor_only }}"
+          homepage.name: "MakeMKV"
+          homepage.group: "{{ makemkv_homepage_group }}"
+          homepage.icon: "{{ makemkv_homepage_icon }}"
+          homepage.href: "{{ makemkv_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ makemkv_port_http }}"
+    #     homepage.description: "Backup your Bluray and DVD discs"
+          homepage.server: "my-docker"
+          homepage.container: "{{ makemkv_container_name }}"
+          homepage.showStats: "{{ makemkv_homepage_showStats }}"
+          traefik.enable: "{{ makemkv_available_externally | string }}"
+          traefik.http.routers.makemkv.rule: "Host(`makemkv.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.makemkv.tls.certresolver: "letsencrypt"
+          traefik.http.routers.makemkv.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.makemkv.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ makemkv_hostname }}"
+          traefik.http.routers.makemkv.middlewares: "{{ makemkv_hostname }}@docker"
+          traefik.http.middlewares.makemkv.IPAllowList.sourcerange: "{{ makemkv_traefik_whitelist }}"
+          traefik.http.services.makemkv.loadbalancer.server.port: "5800"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: makemkv_enabled is true
+
+- name: Stop MakeMKV
+  block:
+    - name: Stop MakeMKV
+      community.docker.docker_container:
+        name: "{{ makemkv_container_name }}"
+        state: absent
+  when: makemkv_enabled is false

@@ -1,0 +1,21 @@
+codeserver_enabled: false
+codeserver_available_externally: false
+codeserver_traefik_whitelist: "{{ lan }}"
+codeserver_data_directory: "{{ docker_home }}/codeserver"
+
+# network
+codeserver_hostname: "codeserver"
+codeserver_port_http: "3009"
+codeserver_memory_limit: "1G"
+
+# config
+codeserver_password: "topsecret"
+
+# homepage
+codeserver_homepage_group: "Apps"
+codeserver_homepgae_icon: "code-server.png"
+codeserver_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ codeserver_port_http }}"
+codeserver_homepage_showStats: "false"
+
+# watchtower
+codeserver_watchtower_monitor_only: "true"

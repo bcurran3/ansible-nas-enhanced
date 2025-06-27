@@ -1,0 +1,73 @@
+---
+- name: Start qBittorrent
+  block:
+    - name: Create qBittorrent Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ qbittorrent_data_directory }}"
+        - "{{ qbittorrent_data_directory }}/config"
+        - "{{ qbittorrent_data_directory }}/custom-cont-init.d"
+        - "{{ qbittorrent_download_directory }}"
+
+    - name: Create qBittorrent Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ qbittorrent_container_name }}"
+        hostname: "{{ qbittorrent_container_name }}"
+        image: linuxserver/qbittorrent:latest
+        pull: true
+        volumes:
+          - "{{ qbittorrent_data_directory }}/config:/config:rw"
+          - "{{ qbittorrent_data_directory }}/custom-cont-init.d:/custom-cont-init.d:ro"
+          - "{{ qbittorrent_download_directory }}:/downloads:rw"
+          - "{{ qbittorrent_watch_directory }}:/torrents"
+          - "{{ porn_root }}:/porn:rw"   #### check if needed
+        ports:
+          - "{{ qbittorrent_port_http }}:8113"
+          - "{{ qbittorrent_port_bt }}:6881"
+          - "{{ qbittorrent_port_bt }}:6881/udp"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ qbittorrent_user_id }}"
+          PGID: "{{ qbittorrent_group_id }}"
+          UMASK_SET: "{{ qbittorrent_umask }}"
+          WEBUI_PORT: "{{ qbittorrent_port_http }}"
+        restart_policy: unless-stopped
+        memory: "{{ qbittorrent_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ qbittorrent_watchtower_monitor_only }}"
+          homepage.name: "qBittorrent"
+          homepage.group: "{{ qbittorrent_homepage_group }}"
+          homepage.href: "{{ qbittorrent_homepage_href }}"
+          homepage.icon: "{{ qbittorrent_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qbittorrent_port_http }}"
+#         homepage.description: "qBittorrent BitTorrent client"
+          homepage.server: "my-docker"
+          homepage.container: "{{ qbittorrent_container_name }}"
+          homepage.showStats: "{{ qbittorrent_homepage_showStats }}"
+          homepage.widget.type: "qbittorrent"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qbittorrent_port_http }}"
+          homepage.widget.username: "{{ qbittorrent_homepage_widget_username }}"
+          homepage.widget.password: "{{ qbittorrent_homepage_widget_password }}"
+          traefik.enable: "{{ qbittorrent_available_externally | string }}"
+          traefik.http.routers.qbittorrent.rule: "Host(`{{ qbittorrent_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.qbittorrent.tls.certresolver: "letsencrypt"
+          traefik.http.routers.qbittorrent.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.qbittorrent.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ qbittorrent_hostname }}"
+          traefik.http.routers.qbittorrent.middlewares: "{{ qbittorrent_hostname }}@docker"
+          traefik.http.middlewares.qbittorrent.IPAllowList.sourcerange: "{{ qbittorrent_traefik_whitelist }}"
+          traefik.http.services.qbittorrent.loadbalancer.server.port: "8113"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-qbittorrent/releases/tags/$${major}.$${minor}.$${patch}"
+  when: qbittorrent_enabled is true
+
+- name: Stop qBittorrent
+  block:
+    - name: Stop qBittorrent
+      community.docker.docker_container:
+        name: "{{ qbittorrent_container_name }}"
+        state: absent
+  when: qbittorrent_enabled is false

@@ -1,0 +1,37 @@
+ghost_enabled: false
+ghost_available_externally: false
+ghost_traefik_whitelist: "{{ lan }}"
+ghost_data_directory: "{{ docker_home }}/ghost"
+ghost_hostname: "ghost"
+ghost_port_http: "2368"
+ghost_network: "ghost"
+ghost_memory_limit: "1G"
+
+# mysql
+ghost_db_password: "topsecret"
+ghost_db_memory_limit: "1G"
+
+# docker
+ghost_container_name: "ghost"
+ghost_db_container_name: "ghost-db"
+
+# app
+ghost_mail_from: "'MyDomain' <postmaster@{{ ansible_nas_domain }}>"
+ghost_mail_transport: "SMTP"
+ghost_mail_options_host: "smtp.{{ ansible_nas_domain }}"
+ghost_mail_options_port: "465"
+
+# homepage
+ghost_homepage_group: "Apps"
+ghost_homepage_icon: "ghost.png"
+ghost_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
+ghost_homepage_showStats: "false"
+ghost_homepage_siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
+ghost_db_homepage_group: "DBs"
+ghost_db_homepage_icon: "mysql.png"
+ghost_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
+ghost_db_homepage_showStats: "false"
+
+# watchtower
+ghost_watchtower_monitor_only: "true"
+ghost_db_watchtower_monitor_only: "true"

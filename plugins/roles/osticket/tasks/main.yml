@@ -1,0 +1,112 @@
+---
+- name: Start osTicket
+  block:
+    - name: Create osTicket Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1001"
+        group: "1001"
+      with_items:
+        - "{{ osticket_data_directory }}/osticket"
+        - "{{ osticket_data_directory }}/db"
+
+    - name: Create osTicket network
+      community.docker.docker_network:
+        name: "{{ osticket_network_name }}"
+
+    - name: Create osTicket MariaDB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ osticket_container_db_name }}"
+        hostname: "{{ osticket_container_db_name }}"
+        image: bitnami/mariadb:latest
+        pull: true
+        network_mode: "bridge"
+        networks:
+          - name: "{{ osticket_network_name }}"
+        networks_cli_compatible: "yes"
+        volumes:
+          - "{{ osticket_data_directory }}/db:/bitnami/mariadb"
+        env:
+          ALLOW_EMPTY_PASSWORD: "yes"
+          MARIADB_USER: "osticket"
+          MARIADB_PASSWORD: "topsecret"
+          MARIADB_DATABASE: "osticket_db"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ osticket_db_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ osticket_db_watchtower_monitor_only }}"
+          homepage.name: "osTicket-DB"
+          homepage.group: "{{ osticket_db_homepage_group }}"
+          homepage.icon: "{{ osticket_db_homepage_icon }}"
+#         homepage.description: "osticket"
+          homepage.server: "my-docker"
+          homepage.container: "{{ osticket_db_container_name }}"
+          homepage.showStats: "{{ osticket_homepage_showStats }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create osTicket Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ osticket_container_name }}"
+        image: devinsolutions/osticket
+        pull: true
+        networks:
+          - name: "{{ osticket_network_name }}"
+        networks_cli_compatible: "yes"
+        network_mode: "bridge"
+        ports:
+          - "{{ osticket_port_http }}:80"
+        env:
+          ADMIN_USERNAME: "admin"
+          ADMIN_PASSWORD: "topsecret"
+          MYSQL_ROOT_PASSWORD: new_root_password
+          MYSQL_USER: "osticket"
+          MYSQL_PASSWORD: "topsecret"
+          MYSQL_DATABASE: "osticket_db"
+          MYSQL_HOST: "{{ osticket_container_db_name }}"
+          ALLOW_EMPTY_PASSWORD: "yes"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ osticket_memory_limit }}"
+        links:
+          - "{{ osticket_container_db_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ osticket_watchtower_monitor_only }}"
+          homepage.name: "osTicket"
+          homepage.group: "{{ osticket_homepage_group }}"
+          homepage.icon: "{{ osticket_homepage_icon }}"
+          homepage.href: "{{ osticket_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osticket_port_http }}"
+#         homepage.description: "osticket"
+          homepage.server: "my-docker"
+          homepage.container: "{{ osticket_container_name }}"
+          homepage.showStats: "{{ osticket_homepage_showStats }}"
+          traefik.enable: "{{ osticket_available_externally | string }}"
+          traefik.http.routers.osticket.rule: "Host(`{{ osticket_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.osticket.tls.certresolver: "letsencrypt"
+          traefik.http.routers.osticket.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.osticket.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ osticket_hostname }}"
+          traefik.http.routers.osticket.middlewares: "{{ osticket_hostname }}@docker"
+          traefik.http.middlewares.osticket.IPAllowList.sourcerange: "{{ osticket_traefik_whitelist }}"
+          traefik.http.services.osticket.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: osticket_enabled is true
+
+- name: Stop osTicket
+  block:
+    - name: Stop osTicket Docker Container
+      community.docker.docker_container:
+        name: "{{ osticket_container_name }}"
+        state: absent
+    - name: Stop osTicket MariaDb Docker Container
+      community.docker.docker_container:
+        name: "{{ osticket_container_db_name }}"
+        state: absent
+  when: osticket_enabled is false

@@ -1,0 +1,21 @@
+#
+shaarli_enabled: false
+shaarli_available_externally: false
+shaarli_traefik_whitelist: "{{ lan }}"
+shaarli_data_directory: "{{ docker_home }}/shaarli"
+
+shaarli_hostname: "shaarli"
+shaarli_port_http: "5804"
+shaarli_port_https: "5443"
+
+# docker
+shaarli_container_name: "shaarli"
+
+# homepage
+shaarli_homepage_group: "Apps"
+shaarli_homepage_icon: "shaarli.png"
+shaarli_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ shaarli_port_http }}"
+shaarli_homepage_showStats: "false"
+
+# watchtower
+shaarli_watchtower_monitor_only: "true"

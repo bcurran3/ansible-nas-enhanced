@@ -1,0 +1,61 @@
+---
+- name: Start Uptime Kuma
+  block:
+    - name: Create Uptime Kuma Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ uptimekuma_data_directory }}"
+        - "{{ uptimekuma_data_directory }}/data"
+
+    - name: Create Uptime Kuma Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ uptimekuma_container_name }}"
+        hostname: "{{ uptimekuma_container_name }}"
+        image: louislam/uptime-kuma:latest
+        pull: true
+        volumes:
+          - "{{ uptimekuma_data_directory }}/data:/app/data"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+          - "{{ uptimekuma_port_http }}:3001"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ uptimekuma_watchtower_monitor_only }}"
+          homepage.name: "Uptime Kuma"
+          homepage.group: "{{ uptimekuma_homepage_group }}"
+          homepage.href: "{{ uptimekuma_homepage_href }}"
+          homepage.icon: "{{ uptimekuma_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptimekuma_port_http }}"
+#         homepage.description: "A fancy self-hosted monitoring tool"
+          homepage.server: "my-docker"
+          homepage.container: "{{ uptimekuma_container_name }}"
+          homepage.showStats: "{{ uptimekuma_homepage_showStats }}"
+          homepage.widget.type: "uptimekuma"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptimekuma_port_http }}"
+          homepage.widget.slug: "{{ uptimekuma_homepage_widget_slug }}"
+          traefik.enable: "{{ uptimekuma_available_externally | string }}"
+          traefik.http.routers.uptimekuma.rule: "Host(`uptimekuma.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.uptimekuma.tls.certresolver: "letsencrypt"
+          traefik.http.routers.uptimekuma.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.uptimekuma.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ uptimekuma_hostname }}"
+          traefik.http.routers.uptimekuma.middlewares: "{{ uptimekuma_hostname }}@docker"
+          traefik.http.middlewares.uptimekuma.IPAllowList.sourcerange: "{{ uptimekuma_traefik_whitelist }}"
+          traefik.http.services.uptimekuma.loadbalancer.server.port: "3001"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/louislam/uptime-kuma/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ uptimekuma_memory }}"
+  when: uptimekuma_enabled is true
+
+- name: Stop Uptime Kuma
+  block:
+    - name: Stop Uptime Kuma
+      community.docker.docker_container:
+        name: "{{ uptimekuma_container_name }}"
+        state: absent
+  when: uptimekuma_enabled is false

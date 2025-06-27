@@ -1,0 +1,9 @@
+---
+- name: Stop Peppermint
+  docker_container:
+    name: "{{ peppermint_container_name }}"
+    state: absent
+  when: peppermint_enabled is false
+  listen:
+    - "stop peppermint"
+    - "stop disabled applications"

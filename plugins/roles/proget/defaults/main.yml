@@ -1,0 +1,34 @@
+#
+proget_enabled: false
+proget_available_externally: false
+proget_traefik_whitelist: "{{ lan }}"
+proget_data_directory: "{{ docker_home }}/proget"
+
+# config
+proget_db_password: "U'(3QWs9(K!0PLh1"
+
+# network
+proget_hostname: "proget"
+proget_network_name: "proget"
+proget_port_http: "3334"
+
+# docker
+proget_container_name: "proget"
+proget_memory_limit: "1g"
+proget_db_container_name: "proget-db"
+proget_db_memory_limit: "1g"
+
+# homepage
+proget_homepage_group: "Apps"
+proget_homepage_icon: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Inedo_ProGet_Logo.png"
+proget_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proget_port_http }}"
+proget_homepage_showStats: "false"
+proget_db_homepage_group: "DBs"
+proget_db_homepage_icon: "mysql.png"
+proget_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proget_port_http }}"
+proget_db_homepage_showStats: "false"
+
+# watchtower
+proget_watchtower_monitor_only: "true"
+# watchtower
+proget_db_watchtower_monitor_only: "true"

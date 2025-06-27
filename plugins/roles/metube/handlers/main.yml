@@ -1,0 +1,9 @@
+---
+- name: Stop MeTube
+  docker_container:
+    name: "{{ wetube_container_name }}"
+    state: absent
+  when: metube_enabled is false
+  listen:
+    - "stop metube"
+    - "stop disabled applications"

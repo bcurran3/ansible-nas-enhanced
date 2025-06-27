@@ -1,0 +1,31 @@
+---
+- name: Create Flood Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ flood_data_directory }}/config"
+
+- name: Create Flood Docker Container
+  docker_container:
+    name: flood
+    image: jesec/flood:latest
+    pull: true
+    volumes:
+      - "{{ flood_data_directory }}/date:/date:rw"
+    ports:
+      - "{{ flood_port_http }}:3000"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{ flood_available_externally | string }}"
+      traefik.http.routers.flood.rule: "Host(`flood.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.flood.tls.certresolver: "letsencrypt"
+      traefik.http.routers.flood.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.flood.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ flood_hostname }}"
+      traefik.http.routers.flood.middlewares: "{{ flood_hostname }}@docker"
+      traefik.http.middlewares.flood.IPAllowList.sourcerange: "{{ flood_traefik_whitelist }}"
+      traefik.http.services.flood.loadbalancer.server.port: "3000"
+    memory: 1g

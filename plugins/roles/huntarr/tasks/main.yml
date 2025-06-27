@@ -1,0 +1,58 @@
+---
+- name: Start Huntarr
+  block:
+    - name: Create Huntarr Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ huntarr_data_directory }}"
+        - "{{ huntarr_data_directory }}/config"
+
+    - name: Create Huntarr Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ huntarr_container_name }}"
+        hostname: "{{ huntarr_container_name }}"
+        image: "{{ huntarr_image_name }}:{{ huntarr_image_version }}"
+        pull: true
+        ports:
+          - "{{ huntarr_port_http }}:9705"
+        volumes:
+          - "{{ huntarr_data_directory }}/config:/config"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ huntarr_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ huntarr_watchtower_monitor_only }}"
+          homepage.name: "Huntarr"
+          homepage.group: "{{ huntarr_homepage_group }}"
+          homepage.icon: "{{ huntarr_homepage_icon }}"
+          homepage.href: "{{ huntarr_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ huntarr_port_http }}"
+#         homepage.description: "A specialized utility that automates discovering missing and upgrading your media collection!"
+          homepage.server: "my-docker"
+          homepage.container: "{{ huntarr_container_name }}"
+          homepage.showStats: "{{ huntarr_homepage_showStats }}"
+          traefik.enable: "{{ huntarr_available_externally | string }}"
+          traefik.http.routers.huntarr.rule: "Host(`{{ huntarr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.huntarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.huntarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.huntarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ huntarr_hostname }}"
+          traefik.http.routers.huntarr.middlewares: "{{ huntarr_hostname }}@docker"
+          traefik.http.middlewares.huntarr.IPAllowList.sourcerange: "{{ huntarr_traefik_whitelist }}"
+          traefik.http.services.huntarr.loadbalancer.server.port: "9705"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/plexguide/Huntarr.io/releases/tag/$${major}.$${minor}.$${patch}"
+  when: huntarr_enabled is true
+
+- name: Stop Huntarr
+  block:
+    - name: Stop huntarr
+      community.docker.docker_container:
+        name: "{{ huntarr_container_name }}"
+        state: absent
+  when: huntarr_enabled is false

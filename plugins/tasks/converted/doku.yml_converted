@@ -1,0 +1,30 @@
+---
+- name: Doku Docker Container
+  docker_container:
+    name: doku
+    image: amerkurev/doku:latest
+    pull: true
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "/:/hostroot:ro"
+    ports:
+      - "{{ doku_port_http }}:9090"
+    dns_servers: "{{ ansible_nas_dns }}"
+    hostname: "doku"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{doku_available_externally | string }}"
+      traefik.http.middlewares.doku.ipwhitelist.sourcerange: "{{ doku_traefik_whitelist }}"
+      traefik.http.routers.doku.rule: "Host(`doku.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.doku.tls.certresolver: "letsencrypt"
+      traefik.http.routers.doku.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.doku.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.doku.loadbalancer.server.port: "9090"
+#      traefik.backend: "doku"
+#      traefik.frontend.rule: "Host:doku.{{ ansible_nas_domain }}"
+#      traefik.enable: "{{ doku_available_externally }}"
+#      traefik.frontend.whiteList.sourceRange: "{{ doku_traefik_whitelist }}"
+#      traefik.port: "9090"
+    memory: 256m

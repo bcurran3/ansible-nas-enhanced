@@ -1,0 +1,37 @@
+---
+# enable or disable the application
+bitmagnet_enabled: false
+bitmagnet_available_externally: false
+bitmagnet_traefik_whitelist: "{{ lan }}"
+
+# directories
+bitmagnet_data_directory: "{{ docker_home }}/bitmagnet"
+
+# network
+bitmagnet_hostname: "bitmagnet"
+bitmagnet_port_http: "3333"
+bitmagnet_port_http2: "3334"
+
+# specs
+bitmagnet_memory: "1g"
+bitmagnet_db_memory: "1g"
+
+# docker
+bitmagnet_container_name: "bitmagnet"
+bitmagnet_db_container_name: "bitmagnet-db"
+
+# app
+bitmagnet_tmdb_api_key: "your_api_key"
+
+# homepage
+bitmagnet_homepage_group: "Apps"
+bitmagnet_homepage_icon: "https://avatars.githubusercontent.com/u/146768397"
+bitmagnet_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
+bitmagnet_homepage_showStats: "false"
+bitmagnet_db_homepage_group: "DBs"
+bitmagnet_db_homepage_icon: "postgres.png"
+bitmagnet_db_homepage_showStats: "false"
+
+# watchtower
+bitmagnet_watchtower_monitor_only: "true"
+bitmagnet_db_watchtower_monitor_only: "true"

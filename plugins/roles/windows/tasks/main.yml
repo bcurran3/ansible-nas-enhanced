@@ -1,0 +1,69 @@
+---
+- name: Start Windows
+  block:
+    - name: Create Windows Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ windows_data_directory }}"
+
+    - name: Create Windows Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ windows_container_name }}"
+        image: dockurr/windows
+        pull: true
+        capabilities:
+          - NET_ADMIN
+        devices:
+          - /dev/kvm
+        ports:
+          - "{{ windows_port_http }}:8006"
+          - "{{ windows_port_rdp }}:3389"
+          - "{{ windows_port_rdp }}:3389/udp"
+        volumes:
+          - "{{ windows_data_directory }}:/storage"
+    #      - "{{ samba_shares_root }}/public:/shared"
+          - "{{ samba_shares_other_root }}/public:/shared"
+        network_mode: bridge
+        env:
+          CPU_CORES: "{{ windows_cpu_cores }}"
+          DISK_SIZE: "{{ windows_disk_size }}"
+          RAM_SIZE: "{{ windows_memory_size }}"
+          VERSION: "{{ windows_version }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        stop_timeout: 120
+        memory: "{{ windows_memory_size }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ windows_watchtower_monitor_only }}"
+          homepage.name: "Windows"
+          homepage.group: "{{ windows_homepage_group }}"
+          homepage.icon: "{{ windows_homepage_icon }}"
+          homepage.href: "{{ windows_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ windows_port_http }}"
+#         homepage.description: "Windows inside a Docker container."
+          homepage.server: "my-docker"
+          homepage.container: "{{ windows_container_name }}"
+          homepage.showStats: "{{ windows_homepage_showStats }}"
+          traefik.enable: "{{ windows_available_externally | string }}"
+          traefik.http.routers.windows.rule: "Host(`{{ windows_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.windows.tls.certresolver: "letsencrypt"
+          traefik.http.routers.windows.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.windows.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ windows_hostname }}"
+          traefik.http.routers.windows.middlewares: "{{ windows_hostname }}@docker"
+          traefik.http.middlewares.windows.IPAllowList.sourcerange: "{{ windows_traefik_whitelist }}"
+          traefik.http.services.windows.loadbalancer.server.port: "8006"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: windows_enabled is true
+
+- name: Stop Windows
+  block:
+    - name: Stop Windows Docker Container
+      community.docker.docker_container:
+        name: "{{ windows_container_name }}"
+        state: absent
+  when: windows_enabled is false

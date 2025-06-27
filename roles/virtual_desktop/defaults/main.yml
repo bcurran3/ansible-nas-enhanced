@@ -1,0 +1,25 @@
+---
+virtual_desktop_enabled: false
+
+virtual_desktop_traefik_whitelist: "{{ lan }}"
+
+virtual_desktop_users:
+  - username: "{{ ansible_nas_user }}"
+    password: "topsecret"
+    sudo: "Y"
+
+# uid / gid
+virtual_desktop_user_id: "0"
+virtual_desktop_group_id: "0"
+
+# Directories
+virtual_desktop_data_directory: "{{ docker_home }}/virtual_desktop"
+
+# Networking
+virtual_desktop_rdp_port: 3389
+
+# Container
+virtual_desktop_memory: 2g
+virtual_desktop_container_name: "virtual_desktop"
+virtual_desktop_image_name: "rattydave/docker-ubuntu-xrdp-mate-custom"
+virtual_desktop_image_version: "20.04-tools"

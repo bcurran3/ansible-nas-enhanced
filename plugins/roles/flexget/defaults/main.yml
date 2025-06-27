@@ -1,0 +1,26 @@
+#
+flexget_enabled: false
+flexget_available_externally: false
+flexget_traefik_whitelist: "{{ lan }}"
+
+# network
+flexget_hostname: "flexget"
+
+flexget_data_directory: "{{ docker_home }}/flexget"
+flexget_FG_WEBUI_PASSWD: "topsecret"
+flexget_port_http: "3539"
+
+flexget_user_id: "0"
+flexget_group_id: "0"
+
+# docker
+flexget_container_name: "flexget"
+
+# homepage
+flexget_homepage_group: "Apps"
+flexget_homepage_icon: "flexget.png"
+flexget_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flexget_port_http }}"
+flexget_homepage_showStats: "false"
+
+# watchtower
+flexget_watchtower_monitor_only: "true"

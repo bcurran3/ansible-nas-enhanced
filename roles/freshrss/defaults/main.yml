@@ -1,0 +1,24 @@
+---
+freshrss_enabled: false
+freshrss_available_externally: false
+freshrss_traefik_whitelist: "{{ lan }}"
+
+# directories
+freshrss_data_directory: "{{ docker_home }}/freshrss"
+
+# docker
+freshrss_container_name: freshrss
+freshrss_image_name: "freshrss/freshrss"
+freshrss_image_version: latest
+
+# network
+freshrss_port: "8089"
+freshrss_hostname: "freshrss"
+
+# homepage
+freshrss_homepage_widget_username: "your username"
+freshrss_homepage_widget_password: "your password"
+freshrss_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
+
+# specs
+freshrss_memory: 1g

@@ -1,0 +1,54 @@
+---
+- name: Start Homeassistant
+  block:
+    - name: Home Assistant Create Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ homeassistant_data_directory }}/config"
+
+    - name: Home Assistant Docker Container
+      community.docker.docker_container:
+        name: "{{ homeassistant_container_name }}"
+        image: "{{ homeassistant_image_name }}:{{ homeassistant_image_version }}"
+        pull: true
+        volumes:
+          - "{{ homeassistant_data_directory }}/config:/config:rw"
+        network_mode: host
+        restart_policy: unless-stopped
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          homepage.group: "Apps"
+          homepage.name: "Home Assistant"
+          homepage.icon: "home-assistant.png"
+          homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "homeassistant"
+          homepage.showStats: "false"
+#         homepage.widget.type: "home-assistant"
+#         homepage.widget.url: "https://{{ homeassistant_hostname }}.{{ ansible_nas_domain }}"
+          traefik.enable: "{{ homeassistant_available_externally | string }}"
+          traefik.http.routers.homeassistant.rule: "Host(`{{ homeassistant_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.homeassistant.tls.certresolver: "letsencrypt"
+          traefik.http.routers.homeassistant.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.homeassistant.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ homeassistant_hostname }}"
+          traefik.http.routers.homeassistant.middlewares: "{{ homeassistant_hostname }}@docker"
+          traefik.http.middlewares.homeassistant.IPAllowList.sourcerange: "{{ homeassistant_traefik_whitelist }}"
+          traefik.http.services.homeassistant.loadbalancer.server.port: "8123"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/home-assistant/core/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ homeassistant_memory }}"
+  when: homeassistant_enabled is true
+
+- name: Stop Home Assistant
+  block:
+    - name: Stop Home Assistant Docker Container
+      community.docker.docker_container:
+        name: "{{ homeassistant_container_name }}"
+        state: absent
+  when: homeassistant_enabled is false

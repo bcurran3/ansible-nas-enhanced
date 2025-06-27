@@ -1,0 +1,26 @@
+---
+- name: Create Plex Meta Manager Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ plexmetamanager_data_directory }}/config"
+
+- name: Create Plex Meta Manager Docker Container
+  docker_container:
+    name: plex-meta-manager
+    image: lscr.io/linuxserver/plex-meta-manager:latest
+    pull: true
+    volumes:
+      - "{{ plexmetamanager_data_directory }}/config:/config"
+    hostname: "plexmetamanager"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "1000"
+      PGID: "1000"
+      PMM_CONFIG: "/config/config.yml" #optional
+      PMM_TIME: "03:00" #optional
+      PMM_RUN: "False" #optional
+      PMM_TEST: "False" #optional
+      PMM_NO_MISSING: "False" #optional
+    restart_policy: unless-stopped

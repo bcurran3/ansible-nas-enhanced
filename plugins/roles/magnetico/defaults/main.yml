@@ -1,0 +1,27 @@
+#
+magnetico_enabled: false
+magnetico_available_externally: false
+magnetico_traefik_whitelist: "{{ lan }}"
+
+# network
+magnetico_hostname: "magnetico"
+
+magnetico_data_directory: "{{ docker_home }}/magnetico"
+
+magnetico_port_http: "8092"
+
+# docker
+magnetico_container_name: "magneticow"
+magnetico_container2_name: "magneticod"
+
+# homepage
+magnetico_homepage_group: "Apps"
+magnetico_homepage_icon: "magnetico.png"
+magnetico_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ magnetico_port_http }}"
+magnetico_homepage_showStats: "false"
+magneticod_homepage_group: "Apps"
+magneticod_homepage_icon: "magnetico.png"
+magneticod_homepage_showStats: "false"
+
+# watchtower
+magnetico_watchtower_monitor_only: "true"

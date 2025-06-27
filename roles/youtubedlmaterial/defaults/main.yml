@@ -1,0 +1,42 @@
+---
+# enable or disable the application
+youtubedlmaterial_enabled: false
+youtubedlmaterial_available_externally: false
+youtubedlmaterial_traefik_whitelist: "{{ lan }}"
+
+# directories
+youtubedlmaterial_data_directory: "{{ docker_home }}/youtubedlmaterial"
+youtubedlmaterial_dl_audio_directory: "{{ downloads_root }}/youtube/audio"
+youtubedlmaterial_dl_video_directory: "{{ downloads_root }}/youtube/video"
+youtubedlmaterial_dl_subscriptions_directory: "{{ downloads_root }}/youtube/subscriptions"
+youtubedlmaterial_dl_channels_directory: "{{ downloads_root }}/youtube/subscriptions/channels"
+
+# network
+youtubedlmaterial_hostname: "youtubedlmaterial"
+youtubedlmaterial_port_http: "8998"
+
+# docker
+youtubedlmaterial_container_name: "youtubedlmaterial"
+youtubedlmaterial_image_name: "tzahi12345/youtubedl-material"
+youtubedlmaterial_image_version: "latest"
+youtubedlmaterial_memory_limit: "1g"
+youtubedlmaterial_db_container_name: "youtubedlmaterial-db"
+youtubedlmaterial_db_image_name: "mongo"
+youtubedlmaterial_db_image_version: "latest"
+youtubedlmaterial_db_memory_limit: "1g"
+
+# app
+youtubedlmaterial_uid: "1000"
+youtubedlmaterial_gid: "1000"
+
+# homepage
+youtubedlmaterial_homepage_group: "Media Downloading"
+youtubedlmaterial_homepage_icon: "youtube-dl.png"
+youtubedlmaterial_homepage_showStats: "false"
+youtubedlmaterial_db_homepage_group: "DBs"
+youtubedlmaterial_db_homepage_icon: "mongodb.png"
+youtubedlmaterial_db_homepage_showStats: "false"
+
+# watchtower
+youtubedlmaterial_watchtower_monitor_only: "true"
+youtubedlmaterial_db_watchtower_monitor_only: "true"

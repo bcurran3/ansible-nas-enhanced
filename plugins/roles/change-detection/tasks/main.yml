@@ -1,0 +1,104 @@
+---
+- name: Start Change Detection
+  block:
+    - name: Create Change Detection Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ change_detection_data_directory }}"
+        - "{{ change_detection_data_directory }}/datastore"
+
+    - name: Create Sock Puppet(eer) Browser Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ change_detection_sockpuppet_container_name }}"
+        hostname: "{{ change_detection_sockpuppet_container_name }}"
+        image: dgtlmoon/sockpuppetbrowser:latest
+        pull: true
+        capabilities:
+          - SYS_ADMIN
+        env:
+          SCREEN_WIDTH: "1920"
+          SCREEN_HEIGHT: "1024"
+          SCREEN_DEPTH: "16"
+          MAX_CONCURRENT_CHROME_PROCESSES: "10"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ change_detection_sockpuppet_watchtower_monitor_only }}"
+          homepage.name: "Sock Puppet(eer) Browser"
+          homepage.group: "{{ change_detection_sockpuppet_homepage_group }}"
+          homepage.icon: "{{ change_detection_sockpuppet_homepage_icon }}"
+          homepage.href: "{{ change_detection_sockpuppet_homepage_href }}"
+#         homepage.description: "A scalable server for providing Chrome interfaces where needed"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ change_detection_sockpuppet_container_name }}"
+          homepage.showStats: "{{ change_detection_sockpuppet_homepage_showStats }}"
+          traefik.enable: "false"
+          change_detection.tag.include: '^\d+\.\d+\.\d+$$'
+          change_detection.link.template: "https://github.com/dgtlmoon/sockpuppetbrowser/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ change_detection_sockpuppet_memory }}"
+
+    - name: Create Change Detection Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ change_detection_container_name }}"
+        hostname: "{{ change_detection_container_name }}"
+        image: ghcr.io/dgtlmoon/changedetection.io
+        pull: true
+        volumes:
+          - "{{ change_detection_data_directory }}/datastore:/datastore"
+        ports:
+          - "{{ change_detection_port_http }}:{{ change_detection_port_http }}"
+        env:
+#         BASE_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
+          BASE_URL: "https://{{ change_detection_hostname }}.{{ ansible_nas_domain }}"
+          # ^^^ should move to variable so IP address can be used
+          HIDE_REFERER: "true"
+          PLAYWRIGHT_DRIVER_URL: "ws://{{ change_detection_sockpuppet_hostname }}:3000"
+          PORT: "{{ change_detection_port_http }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        links:
+          - "{{ change_detection_sockpuppet_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ change_detection_watchtower_monitor_only }}"
+          homepage.name: "Change Detection"
+          homepage.group: "{{ change_detection_homepage_group }}"
+          homepage.icon: "{{ change_detection_homepage_icon }}"
+          homepage.href: "{{ change_detection_homepage_href }}"
+#         homepage.description: "The best and simplest free open source web page change detection, website watcher, restock monitor and notification service. "
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ change_detection_container_name }}"
+          homepage.showStats: "{{ change_detection_homepage_showStats }}"
+          homepage.widget.type: "changedetectionio"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
+          homepage.widget.key: "{{ change_detection_widget_key }}"
+          traefik.enable: "{{ change_detection_available_externally | string }}"
+          traefik.http.routers.change_detection.rule: "Host(`{{ change_detection_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.change_detection.tls.certresolver: "letsencrypt"
+          traefik.http.routers.change_detection.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.change_detection.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ change_detection_hostname }}"
+          traefik.http.routers.change_detection.middlewares: "change_detection@docker"
+          traefik.http.middlewares.change_detection.IPAllowList.sourcerange: "{{ change_detection_traefik_whitelist }}"
+          traefik.http.services.change_detection.loadbalancer.server.port: "{{ change_detection_port_http }}"
+          change_detection.tag.include: '^\d+\.\d+\.\d+$$'
+          change_detection.link.template: "https://github.com/dgtlmoon/changedetection.io/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ change_detection_memory }}"
+  when: change_detection_enabled is true
+
+- name: Stop Change Detection
+  block:
+    - name: Stop Change Detection
+      community.docker.docker_container:
+        name: "{{ change_detection_container_name }}"
+        state: absent
+    - name: Stop Sock Puppet(eer) Browser
+      community.docker.docker_container:
+        name: "{{ change_detection_sockpuppet_container_name }}"
+        state: absent
+  when: change_detection_enabled is false

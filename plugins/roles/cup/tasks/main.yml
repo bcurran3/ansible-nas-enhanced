@@ -1,0 +1,71 @@
+---
+- name: Start Cup
+  block:
+    - name: Create Cup Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ cup_data_directory }}"
+        - "{{ cup_data_directory }}/config"
+
+    - name: Create Cup Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ cup_container_name }}"
+        hostname: "{{ cup_container_name }}"
+        image: ghcr.io/sergi0g/cup
+        pull: true
+        command: "serve -p 8000"
+        ports:
+          - "{{ cup_port_http }}:8000"
+        volumes:
+          - "{{ cup_data_directory }}/config:/config/cup.json"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ cup_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ cup_watchtower_monitor_only }}"
+          homepage.name: "Cup"
+          homepage.group: "{{ cup_homepage_group }}"
+          homepage.icon: "{{ cup_homepage_icon }}"
+          homepage.href: "{{ cup_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cup_port_http }}"
+    #     homepage.description: "Docker container updates made easy"
+          homepage.server: "my-docker"
+          homepage.container: "{{ cup_container_name }}"
+          homepage.showStats: "{{ cup_homepage_showStats }}"
+          homepage.widget.type: "customapi"
+          homepage.widget.url: "{{ cup_homepage_widget_url }}"
+          homepage.widget.mappings[0].label: "Monitoring"
+          homepage.widget.mappings[0].field.metrics: "monitored_images"
+          homepage.widget.mappings[0].format: "number"
+          homepage.widget.mappings[1].label: "Up to date"
+          homepage.widget.mappings[1].field.metrics: "up_to_date"
+          homepage.widget.mappings[1].format: "number"
+          homepage.widget.mappings[2].label: "Updates"
+          homepage.widget.mappings[2].field.metrics: "update_available"
+          homepage.widget.mappings[2].format: "number"
+          traefik.enable: "{{ cup_available_externally | string }}"
+          traefik.http.routers.cup.rule: "Host(`{{ cup_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.cup.tls.certresolver: "letsencrypt"
+          traefik.http.routers.cup.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.cup.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ cup_hostname }}"
+          traefik.http.routers.cup.middlewares: "{{ cup_hostname }}@docker"
+          traefik.http.middlewares.cup.IPAllowList.sourcerange: "{{ cup_traefik_whitelist }}"
+          traefik.http.services.cup.loadbalancer.server.port: "8000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/sergi0g/cup/releases/tag/$${major}.$${minor}.$${patch}"
+  when: cup_enabled is true
+
+- name: Stop cup
+  block:
+    - name: Stop cup Docker Container
+      community.docker.docker_container:
+        name: "{{ cup_container_name }}"
+        state: absent
+  when: cup_enabled is false

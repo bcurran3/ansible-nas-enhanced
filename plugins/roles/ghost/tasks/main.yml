@@ -1,0 +1,119 @@
+---
+# WIP
+- name: Start Ghost
+  block:
+    - name: Create Ghost Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ ghost_data_directory }}"
+        - "{{ ghost_data_directory }}/content"
+        - "{{ ghost_data_directory }}/db"
+
+    - name: Create Ghost network
+      community.docker.docker_network:
+        name: "{{ ghost_network }}"
+
+    - name: Create Ghost MySQL Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ ghost_db_container_name }}"
+        hostname: "{{ ghost_db_container_name }}"
+        image: mysql:8.0
+        pull: true
+        networks:
+          - name: "{{ ghost_network }}"
+        networks_cli_compatible: "yes"
+        network_mode: bridge
+        env:
+          MYSQL_ROOT_PASSWORD: "{{ ghost_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        volumes:
+          - "{{ ghost_data_directory }}/db:/var/lib/mysql"
+        restart_policy: unless-stopped
+        memory: "{{ ghost_db_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ ghost_db_watchtower_monitor_only }}"
+          homepage.name: "Ghost MySQL"
+          homepage.group: "{{ ghost_db_homepage_group }}"
+          homepage.icon: "{{ ghost_db_homepage_icon }}"
+          homepage.href: "{{ ghost_db_homepage_href }}"
+#         homepage.description: "MySQL Server, the world's most popular open source database"
+          homepage.server: "my-docker"
+          homepage.container: "{{ ghost_db_container_name }}"
+          homepage.showStats: "{{ ghost_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create Ghost Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ ghost_container_name }}"
+        hostname: "{{ ghost_container_name }}"
+        image: ghost
+        pull: true
+        networks:
+          - name: "{{ ghost_network }}"
+        networks_cli_compatible: "yes"
+        network_mode: bridge
+        ports:
+          - "{{ ghost_port_http }}:2368"
+        env:
+          # see https://ghost.org/docs/config/#configuration-options
+          database__client: "mysql"
+          database__connection__host: "{{ ghost_db_container_name }}"
+          database__connection__user: "root"
+          database__connection__password: "{{ ghost_db_password }}"
+          database__connection__database: "ghost"
+          mail__from: "{{ ghost_mail_from }}"
+          mail__transport: "{{ ghost_mail_transport }}"
+          mail__options__host: "{{ ghost_mail_options_host }}"
+          mail__options__port: "{{ ghost_mail_options_port }}"
+          NODE_ENV: "production"
+          # this url value is just an example, and is likely wrong for your environment!
+          url: "https://{{ ghost_hostname }}.{{ ansible_nas_domain }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        volumes:
+          - "{{ ghost_data_directory }}/content:/var/lib/ghost/content"
+#         - "{{ ghost_data_directory }}/config.production.json:/var/lib/ghost/config.production.json
+        restart_policy: unless-stopped
+        memory: "{{ ghost_memory_limit }}"
+        links:
+          - "{{ ghost_db_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ ghost_watchtower_monitor_only }}"
+          homepage.name: "Ghost"
+          homepage.group: "{{ ghost_homepage_group }}"
+          homepage.icon: "{{ ghost_homepage_icon }}"
+          homepage.href: "{{ ghost_homepage_href }}"
+          homepage.siteMonitor: "{{ ghost_homepage_siteMonitor }}"
+#         homepage.description: "Independent technology for modern publishing, memberships, subscriptions and newsletters."
+          homepage.server: "my-docker"
+          homepage.container: "{{ ghost_container_name }}"
+          homepage.showStats: "{{ ghost_homepage_showStats }}"
+          traefik.enable: "{{ ghost_available_externally | string }}"
+          traefik.http.routers.ghost.rule: "Host(`{{ ghost_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.ghost.tls.certresolver: "letsencrypt"
+          traefik.http.routers.ghost.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.ghost.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ ghost_hostname }}"
+          traefik.http.routers.ghost.middlewares: "{{ ghost_hostname }}@docker"
+          traefik.http.middlewares.ghost.IPAllowList.sourcerange: "{{ ghost_traefik_whitelist }}"
+          traefik.http.services.ghost.loadbalancer.server.port: "2368"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/TryGhost/Ghost/releases/tag/$${major}.$${minor}.$${patch}"
+  when: ghost_enabled is true
+
+- name: Stop Ghost
+  block:
+    - name: Stop Ghost Docker Container
+      community.docker.docker_container:
+        name: "{{ ghost_container_name }}"
+        state: absent
+    - name: Stop Ghost MySQL Docker Container
+      community.docker.docker_container:
+        name: "{{ ghost_db_container_name }}"
+        state: absent
+  when: ghost_enabled is false

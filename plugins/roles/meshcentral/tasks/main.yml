@@ -1,0 +1,131 @@
+---
+# WORK IN PROGRESS
+# NEEDS A TEMPLATE TO ADD SOME VALUES
+
+- name: Start MeshCentral
+  block:
+    - name: Create MeshCentral Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ meshcentral_data_directory }}"
+        - "{{ meshcentral_data_directory }}/backups"
+        - "{{ meshcentral_data_directory }}/data"
+        - "{{ meshcentral_data_directory }}/db"
+        - "{{ meshcentral_data_directory }}/user_files"
+        - "{{ meshcentral_data_directory }}/web"
+
+    - name: Create MeshCentral network
+      community.docker.docker_network:
+        name: "{{ meshcentral_network }}"
+
+    - name: Create MeshCentral MongoDB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ meshcentral_db_container_name }}"
+        hostname: "mongodb"
+        image: mongo:latest
+        pull: true
+        networks:
+          - name: "{{ meshcentral_network }}"
+        networks_cli_compatible: "yes"
+#       ports:
+#         - "27017:27017"  # MongoDB
+        volumes:
+          - "{{ meshcentral_data_directory }}/db:/data/db"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ meshcentral_db_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_db_watchtower_monitor_only }}"
+          homepage.name: "MeshCentral MongoDB"
+          homepage.group: "{{ meshcentral_db_homepage_group }}"
+          homepage.icon: "{{ meshcentral_db_homepage_icon }}"
+          homepage.href: "{{ meshcentral_homepage_href }}"
+#         homepage.description: "The MongoDB Database"
+#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_db_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ meshcentral_db_container_name }}"
+          homepage.showStats: "{{ meshcentral_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+
+    - name: Create MeshCentral Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ meshcentral_container_name }}"
+        hostname: "{{ meshcentral_container_name }}"
+        image: typhonragewind/meshcentral:mongodb-latest
+        pull: true
+        networks:
+          - name: "{{ meshcentral_network }}"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ meshcentral_port_http }}:4430"
+          - 4433:4433 # Intel AMT CIRA
+          - 16990/udp:16990/udp
+        volumes:
+          - "{{ meshcentral_data_directory }}/data:/opt/meshcentral/meshcentral-data"
+          - "{{ meshcentral_data_directory }}/user_files:/opt/meshcentral/meshcentral-files"
+          - "{{ meshcentral_data_directory }}/backups:/opt/meshcentral/meshcentral-backups"
+          - "{{ meshcentral_data_directory }}/web:/opt/meshcentral/meshcentral-web"
+        network_mode: bridge
+        env:
+          HOSTNAME: "{{ meshcentral_hostname }}.{{ ansible_nas_domain }}"
+          REVERSE_PROXY: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}" #set to your reverse proxy IP if you want to put meshcentral behind a reverse proxy
+          REVERSE_PROXY_TLS_PORT: "443"
+          IFRAME: "{{ meshcentral_iframe }}"                #set to true if you wish to enable iframe support
+          ALLOW_NEW_ACCOUNTS: "{{ meshcentral_allow_new_accounts }}"     #set to false if you want disable self-service creation of new accounts besides the first (admin)
+          WEBRTC: "{{ meshcentral_webrtc }}"                #set to true to enable WebRTC - per documentation it is not officially released with meshcentral, but is solid enough to work with. Use with caution
+          NODE_ENV: "production"
+          BACKUPS_PW: "TopSecret" #password for the autobackup function
+          BACKUP_INTERVAL: "24" # Interval in hours for the autobackup function
+          BACKUP_KEEP_DAYS: "10" #number of days of backups the function keeps
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ meshcentral_memory_limit }}"
+        links:
+          - "{{ meshcentral_db_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_watchtower_monitor_only }}"
+          homepage.name: "MeshCentral"
+          homepage.group: "{{ meshcentral_homepage_group }}"
+          homepage.icon: "{{ meshcentral_homepage_icon }}"
+          homepage.href: "{{ meshcentral_homepage_href }}"
+#         homepage.description: "A complete web-based remote monitoring and management web site."
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ meshcentral_container_name }}"
+          homepage.showStats: "{{ meshcentral_homepage_showStats }}"
+          traefik.enable: "{{ meshcentral_available_externally | string }}"
+          traefik.http.routers.meshcentral.rule: "Host(`{{ meshcentral_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.meshcentral.tls.certresolver: "letsencrypt"
+          traefik.http.routers.meshcentral.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.meshcentral.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ meshcentral_hostname }}"
+          traefik.http.routers.meshcentral.middlewares: "{{ meshcentral_hostname }}@docker"
+          traefik.http.middlewares.meshcentral.IPAllowList.sourcerange: "{{ meshcentral_traefik_whitelist }}"
+          traefik.http.services.meshcentral.loadbalancer.server.port: "4430"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/Typhonragewind/meshcentral-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: meshcentral_enabled is true
+
+- name: Stop MeshCentral
+  block:
+    - name: Stop MeshCentral Docker Container
+      community.docker.docker_container:
+        name: "{{ meshcentral_container_name }}"
+        state: absent
+    - name: Stop MeshCentral MongoDB Docker Container
+      community.docker.docker_container:
+        name: "{{ meshcentral_db_container_name }}"
+        state: absent
+  when: meshcentral_enabled is false
+
+  # NOTE:
+  # need to edit config.json with       "allowedOrigin": true 
+  # need to edit config.json with the IP address in two fields

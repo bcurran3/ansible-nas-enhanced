@@ -1,0 +1,28 @@
+#
+rocketchat_enabled: false
+rocketchat_available_externally: false
+rocketchat_traefik_whitelist: "{{ lan }}"
+rocketchat_data_directory: "{{ docker_home }}/rocketchat"
+
+# network
+rocketchat_hostname: "rocketchat"
+rocketchat_http_port: "3333"
+
+# docker
+rocketchat_network_name: "rocketchat"
+rocketchat_container_name: "rocketchat"
+rocketchat_db_container_name: "rocketchat_mongodb"
+
+# homepage
+rocketchat_homepage_group: "Apps"
+rocketchat_homepage_icon: "rocketchat.png"
+rocketchat_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocketchat_port_http }}"
+rocketchat_homepage_showStats: "false"
+rocketchat_db_homepage_group: "DBs"
+rocketchat_db_homepage_icon: "mongodb.png"
+rocketchat_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocketchat_port_http }}"
+rocketchat_db_homepage_showStats: "false"
+
+# watchtower
+rocketchat_watchtower_monitor_only: "true"
+rocketchat_db_watchtower_monitor_only: "true"

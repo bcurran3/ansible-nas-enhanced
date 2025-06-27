@@ -1,0 +1,106 @@
+# https://bitmagnet.io/setup/installation.html
+---
+- name: Start bitmagnet
+  block:
+    - name: Create bitmagnet Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ bitmagnet_data_directory }}"
+        - "{{ bitmagnet_data_directory }}/config"
+        - "{{ bitmagnet_data_directory }}/db"
+
+    - name: Create bitmagnet DB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ bitmagnet_db_container_name }}"
+        hostname: "{{ bitmagnet_db_container_name }}"
+        image: postgres:16-alpine
+        pull: true
+        volumes:
+          - "{{ bitmagnet_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_PASSWORD: "bitmagnet"
+          POSTGRES_DB: "bitmagnet"
+          PGUSER: "postgres"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ bitmagnet_db_memory }}"
+        healthcheck:
+          test:
+            - CMD-SHELL
+            - pg_isready
+          start_period: 20s
+          interval: 10s
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ bitmagnet_db_watchtower_monitor_only }}"
+          homepage.name: "bitmagnet PostGreSQL"
+          homepage.group: "{{ bitmagnet_db_homepage_group }}"
+          homepage.icon: "{{ bitmagnet_db_homepage_icon }}"
+          homepage.href: "{{ bitmagnet_homepage_href }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ bitmagnet_db_container_name }}"
+          homepage.showStats: "{{ bitmagnet_db_homepage_showStats }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/postgres/postgres/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create bitmagnet Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ bitmagnet_container_name }}"
+        hostname: "{{ bitmagnet_container_name }}"
+        image: ghcr.io/bitmagnet-io/bitmagnet:latest
+        pull: true
+        volumes:
+          - "{{ bitmagnet_data_directory }}/config:/root/.config/bitmagnet"
+        links:
+          - "{{ bitmagnet_db_container_name }}"
+        ports:
+          - "{{ bitmagnet_port_http }}:3333"
+          - "{{ bitmagnet_port_http2 }}:3334"
+          - "{{ bitmagnet_port_http2 }}:3334/udp"
+        env:
+          POSTGRES_HOST: "{{ bitmagnet_db_container_name }}"
+          POSTGRES_PASSWORD: "bitmagnet"
+          TMDB_API_KEY: "{{ bitmagnet_tmdb_api_key }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        command: worker run --keys=http_server --keys=queue_server --keys=dht_crawler
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ bitmagnet_watchtower_monitor_only }}"
+          homepage.name: "bitmagnet"
+          homepage.group: "{{ bitmagnet_homepage_group }}"
+          homepage.icon: "{{ bitmagnet_homepage_icon }}"
+          homepage.href: "{{ bitmagnet_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bitmagnet_port_http }}"
+#         homepage.description: "A self-hosted BitTorrent indexer, DHT crawler, content classifier and torrent search engine with web UI, GraphQL API and Servarr stack integration."
+          homepage.server: "my-docker"
+          homepage.container: "{{ bitmagnet_container_name }}"
+          homepage.showStats: "{{ bitmagnet_homepage_showStats }}"
+          traefik.enable: "{{ bitmagnet_available_externally | string }}"
+          traefik.http.routers.bitmagnet.rule: "Host(`{{ bitmagnet_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.bitmagnet.tls.certresolver: "letsencrypt"
+          traefik.http.routers.bitmagnet.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.bitmagnet.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ bitmagnet_hostname }}"
+          traefik.http.routers.bitmagnet.middlewares: "{{ bitmagnet_hostname }}@docker"
+          traefik.http.middlewares.bitmagnet.IPAllowList.sourcerange: "{{ bitmagnet_traefik_whitelist }}"
+          traefik.http.services.bitmagnet.loadbalancer.server.port: "3333"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/bitmagnet-io/bitmagnet/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ bitmagnet_memory }}"
+  when: bitmagnet_enabled is true
+
+- name: Stop bitmagnet
+  block:
+    - name: Stop bitmagnet Docker Container
+      community.docker.docker_container:
+        name: "{{ bitmagnet_container_name }}"
+        state: absent
+    - name: Stop bitmagnet DB Docker Container
+      community.docker.docker_container:
+        name: "{{ bitmagnet_db_container_name }}"
+        state: absent
+  when: bitmagnet_enabled is false

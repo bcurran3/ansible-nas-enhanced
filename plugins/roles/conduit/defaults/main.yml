@@ -1,0 +1,27 @@
+---
+# enable or disable the application
+conduit_enabled: false
+conduit_available_externally: false
+conduit_traefik_whitelist: "{{ lan }}"
+
+# directories
+conduit_data_directory: "{{ docker_home }}/conduit"
+
+# network
+conduit_hostname: "conduit"
+conduit_port: "6167"
+
+# specs
+conduit_memory: "1G"
+
+# docker
+conduit_container_name: "conduit"
+
+# homepage
+conduit_homepage_group: "Apps"
+conduit_homepage_icon: "conduit.png"
+conduit_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ conduit_port }}"
+conduit_homepage_showStats: "false"
+
+# watchtower
+conduit_watchtower_monitor_only: "true"

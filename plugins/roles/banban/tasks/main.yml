@@ -1,0 +1,62 @@
+---
+- name: Start BanBan
+  block:
+    - name: Create BanBan Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ banban_data_directory }}"
+        - "{{ banban_data_directory }}/db"
+        - "{{ banban_data_directory }}/storage"
+
+    - name: Create BanBan Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ banban_container_name }}"
+        hostname: "{{ banban_container_name }}"
+        image: m0gd0ck/banban:latest
+        pull: true
+        volumes:
+          - "{{ banban_data_directory }}/db:/app/prisma/db"
+          - "{{ banban_data_directory }}/storage:/app/storage"
+        ports:
+          - "{{ banban_port_http }}:{{ banban_port_http }}"
+        env:
+          DATABASE_URL: "file:./db/banban.db"
+          PORT: "{{ banban_port_http }}"
+          NODE_ENV: "production"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ banban_watchtower_monitor_only }}"
+          homepage.name: "banban"
+          homepage.group: "{{ banban_homepage_group }}"
+          homepage.icon: "{{ banban_homepage_icon }}"
+          homepage.href: "{{ banban_homepage_href }}"
+    #     homepage.description: "Self hosted Kanban board tool"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ banban_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ banban_container_name }}"
+          homepage.showStats: "{{ banban_homepage_showStats }}"
+          traefik.enable: "{{ banban_available_externally | string }}"
+          traefik.http.routers.banban.rule: "Host(`banban.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.banban.tls.certresolver: "letsencrypt"
+          traefik.http.routers.banban.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.banban.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ banban_hostname }}"
+          traefik.http.routers.banban.middlewares: "{{ banban_hostname }}@docker"
+          traefik.http.middlewares.banban.IPAllowList.sourcerange: "{{ banban_traefik_whitelist }}"
+          traefik.http.services.banban.loadbalancer.server.port: "{{ banban_port_http }}"
+          banban.tag.include: '^\d+\.\d+\.\d+$$'
+          banban.link.template: "https://github.com/m0g/banban/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ banban_memory }}"
+  when: banban_enabled is true
+
+- name: Stop BanBan
+  block:
+    - name: Stop BanBan
+      community.docker.docker_container:
+        name: "{{ banban_container_name }}"
+        state: absent
+  when: banban_enabled is false

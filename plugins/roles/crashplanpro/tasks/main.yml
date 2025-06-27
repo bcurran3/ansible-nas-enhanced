@@ -1,0 +1,60 @@
+---
+- name: Start CrashPlan Pro
+  block:
+    - name: Create CrashPlan Pro Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ crashplanpro_data_directory }}"
+        - "{{ crashplanpro_data_directory }}/config"
+
+    - name: Create CrashPlan Pro Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ crashplanpro_container_name }}"
+        hostname: "{{ crashplanpro_container_name }}"
+        image: jlesage/crashplan-pro
+        pull: true
+        ports:
+          - "{{ crashplanpro_port_http }}:5800"
+        volumes:
+          - "{{ crashplanpro_data_directory }}/config:/config"
+          - "{{ crashplanpro_storage_directory }}:/storage:ro"
+        network_mode: bridge
+        env:
+          CRASHPLAN_SRV_MAX_MEM: "8G"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ crashplanpro_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ crashplanpro_watchtower_monitor_only }}"
+          homepage.name: "CrashPlan Pro"
+          homepage.group: "{{ crashplanpro_homepage_group }}"
+          homepage.icon: "{{ crashplanpro_homepage_icon }}"
+          homepage.href: "{{ crashplanpro_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crashplanpro_port_http }}"
+#         homepage.description: "Docker container for CrashPlan PRO (aka CrashPlan for Small Business)"
+          homepage.server: "my-docker"
+          homepage.container: "{{ crashplanpro_container_name }}"
+          homepage.showStats: "{{ crashplanpro_homepage_showStats }}"
+          traefik.enable: "{{ crashplanpro_available_externally | string }}"
+          traefik.http.routers.crashplanpro.rule: "Host(`{{ crashplanpro_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.crashplanpro.tls.certresolver: "letsencrypt"
+          traefik.http.routers.crashplanpro.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.crashplanpro.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ crashplanpro_hostname }}"
+          traefik.http.routers.crashplanpro.middlewares: "{{ crashplanpro_hostname }}@docker"
+          traefik.http.middlewares.crashplanpro.IPAllowList.sourcerange: "{{ crashplanpro_traefik_whitelist }}"
+          traefik.http.services.crashplanpro.loadbalancer.server.port: "5800"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/jlesage/docker-crashplan-pro/releases/tag/$${major}.$${minor}.$${patch}"
+  when: crashplanpro_enabled is true
+
+- name: Stop CrashPlan Pro
+  block:
+    - name: Stop CrashPlan Pro
+      community.docker.docker_container:
+        name: "{{ crashplanpro_container_name }}"
+        state: absent
+  when: crashplanpro_enabled is false

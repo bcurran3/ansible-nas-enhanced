@@ -1,0 +1,9 @@
+---
+- name: Stop SearXNG
+  docker_container:
+    name: "{{ searxng_container_name }}"
+    state: absent
+  when: searxng_enabled is false
+  listen:
+    - "stop searxng"
+    - "stop disabled applications"

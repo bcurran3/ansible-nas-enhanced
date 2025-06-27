@@ -1,0 +1,22 @@
+#
+dokemon_enabled: false
+dokemon_available_externally: false
+dokemon_traefik_whitelist: "{{ lan }}"
+dokemon_data_directory: "{{ docker_home }}/dokemon"
+
+# network
+dokemon_hostname: "dokemon"
+dokemon_port_http: "9091"
+dokemon_memory_limit: "1G"
+
+# docker
+dokemon_container_name: "dokemon"
+
+# homepage
+dokemon_homepage_group: "Apps"
+dokemon_homepage_icon: "dokemon.png"
+dokemon_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dokemon_port_http }}"
+dokemon_homepage_showStats: "false"
+
+# watchtower
+dokemon_watchtower_monitor_only: "true"

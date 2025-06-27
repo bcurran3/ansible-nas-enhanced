@@ -1,0 +1,111 @@
+---
+- name: Start GameVault
+  block:
+    - name: Create GameVault Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ gamevault_data_directory }}"
+        - "{{ gamevault_data_directory }}/config"
+        - "{{ gamevault_data_directory }}/db"
+        - "{{ gamevault_data_directory }}/files"
+        - "{{ gamevault_data_directory }}/media"
+        - "{{ gamevault_data_directory }}/plugins"
+
+    - name: Create GameVault DB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ gamevault_db_container_name }}"
+        hostname: "{{ gamevault_db_container_name }}"
+        image: postgres:16-alpine
+        pull: true
+        volumes:
+          - "{{ gamevault_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "gamevault"
+          POSTGRES_PASSWORD: "gamevault"
+          POSTGRES_DB: "gamevault"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ gamevault_db_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ gamevault_db_watchtower_monitor_only }}"
+          homepage.name: "GameVault PostgreSQL"
+          homepage.group: "{{ gamevault_db_homepage_group }}"
+          homepage.icon: "{{ gamevault_db_homepage_icon }}"
+          homepage.href: "{{ gamevault_homepage_href }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ gamevault_db_container_name }}"
+          homepage.showStats: "{{ gamevault_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/_/postgres/tags/$${major}.$${minor}.$${patch}-alpine"
+
+    - name: Create GameVault Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ gamevault_container_name }}"
+        hostname: "{{ gamevault_container_name }}"
+        image: phalcode/gamevault-backend:latest
+        pull: true
+        links:
+          - "{{ gamevault_db_container_name }}"
+        volumes:
+          - "{{ gamevault_data_directory }}/config:/config"
+          - "{{ gamevault_data_directory }}/media:/media"
+          - "{{ gamevault_data_directory }}/plugins:/plugins"
+          - "{{ games_root }}:/files"
+          - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
+        ports:
+          - "{{ gamevault_port_http }}:8080"
+        env:
+          DB_HOST: "{{ gamevault_db_container_name }}"
+          DB_USERNAME: "gamevault"
+          DB_PASSWORD: "gamevault"
+          METADATA_IGDB_CLIENT_ID: "{{ gamevault_metadata_igdb_client_id }}"
+          METADATA_IGDB_CLIENT_SECRET: "{{ gamevault_metadata_igdb_client_secret }}"
+#         SERVER_ADMIN_USERNAME: "admin"
+#         SERVER_ADMIN_PASSWORD: "{{ gamevault_server_admin_password }}"
+          # Uncomment and Insert your RAWG API Key here if you have one (https://gamevau.lt/docs/server-docs/indexing-and-metadata#rawg-api-key)
+          RAWG_API_KEY: "{{ gamevault_rawg_api_key }}"
+          PUID: "{{ gamevault_puid }}"
+          PGID: "{{ gamevault_pgid }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ gamevault_watchtower_monitor_only }}"
+          homepage.name: "GameVault"
+          homepage.group: "{{ gamevault_homepage_group }}"
+          homepage.icon: "{{ gamevault_homepage_icon }}"
+          homepage.href: "{{ gamevault_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gamevault_port_http }}"
+#         homepage.description: "the self-hosted gaming platform for drm-free games"
+          homepage.server: "my-docker"
+          homepage.container: "{{ gamevault_container_name }}"
+          homepage.showStats: "{{ gamevault_homepage_showStats }}"
+          traefik.enable: "{{ gamevault_available_externally | string }}"
+          traefik.http.routers.gamevault.rule: "Host(`{{ gamevault_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.gamevault.tls.certresolver: "letsencrypt"
+          traefik.http.routers.gamevault.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.gamevault.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ gamevault_hostname }}"
+          traefik.http.routers.gamevault.middlewares: "{{ gamevault_hostname }}@docker"
+          traefik.http.middlewares.gamevault.IPAllowList.sourcerange: "{{ gamevault_traefik_whitelist }}"
+          traefik.http.services.gamevault.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/r/phalcode/gamevault-backend/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ gamevault_memory }}"
+  when: gamevault_enabled is true
+
+- name: Stop GameVault
+  block:
+    - name: Stop GameVault
+      community.docker.docker_container:
+        name: "{{ gamevault_container_name }}"
+        state: absent
+    - name: Stop GameVault
+      community.docker.docker_container:
+        name: "{{ gamevault_db_container_name }}"
+        state: absent
+  when: gamevault_enabled is false

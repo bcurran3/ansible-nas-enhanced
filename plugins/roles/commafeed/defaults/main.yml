@@ -1,0 +1,30 @@
+---
+commafeed_enabled: false
+commafeed_available_externally: false
+commafeed_traefik_whitelist: "{{ lan }}"
+
+# directories
+commafeed_data_directory: "{{ docker_home }}/commafeed"
+
+# network
+commafeed_port_http: "8082"
+commafeed_hostname: "commafeed"
+
+# docker
+commafeed_container_name: "commafeed"
+commafeed_db_container_name: "commafeed-postgres"
+commafeed_memory: 1g
+
+# homepage
+commafeed_homepage_group: "Apps"
+commafeed_homepage_icon: "commafeed.png"
+commafeed_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ commafeed_port_http }}"
+commafeed_homepage_showStats: "false"
+commafeed_db_homepage_group: "DBs"
+commafeed_db_homepage_icon: "postgres.png"
+commafeed_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ commafeed_port_http }}"
+commafeed_db_homepage_showStats: "false"
+
+# watchtower
+commafeed_watchtower_monitor_only: "true"
+commafeed_db_watchtower_monitor_only: "true"

@@ -1,0 +1,35 @@
+---
+- name: Chowdown Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ chowdown_data_directory }}/config"
+
+- name: Chowdown Docker Container
+  docker_container:
+    name: chowdown
+    image: gregyankovoy/chowdown:latest
+    pull: true
+    volumes:
+      - "{{ chowdown_data_directory }}/config:/config:rw"
+    ports:
+      - "{{ chowdown_port_http }}:4000"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+#      PUID: "{{ chowdown_user_id }}"
+#      PGID: "{{ chowdown_group_id }}"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{ chowdown_available_externally | string }}"
+      traefik.http.middlewares.chowdown.IPAllowList.sourcerange: "{{ chowdown_traefik_whitelist }}"
+      traefik.http.routers.chowdown.rule: "Host(`chowdown.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.chowdown.tls.certresolver: "letsencrypt"
+      traefik.http.routers.chowdown.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.chowdown.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.chowdown.loadbalancer.server.port: "4000"
+#      traefik.backend: "chowdown"
+#      traefik.frontend.rule: "Host:chowdown.{{ ansible_nas_domain }}"
+#      traefik.enable: "{{ chowdown_available_externally }}"
+#      traefik.port: "4000"
+    memory: 1g

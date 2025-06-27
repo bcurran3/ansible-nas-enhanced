@@ -1,0 +1,59 @@
+---
+- name: Start Glance
+  block:
+    - name: Create Glance Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ glance_data_directory }}"
+        - "{{ glance_data_directory }}/assets"
+
+    - name: Create Glance Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ glance_container_name }}"
+        hostname: "{{ glance_container_name }}"
+        image: glanceapp/glance
+        pull: true
+        ports:
+          - "{{ glance_port_http }}:8080"
+        volumes:
+          - "{{ glance_data_directory }}/glance.yml:/app/glance.yml"
+          - "{{ glance_data_directory }}/assets:/app/assets"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ glance_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ glance_watchtower_monitor_only }}"
+          homepage.name: "Glance"
+          homepage.group: "{{ glance_homepage_group }}"
+          homepage.icon: "{{ glance_homepage_icon }}"
+          homepage.href: "{{ glance_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glance_port_http }}"
+#         homepage.description: "A self-hosted dashboard that puts all your feeds in one place."
+          homepage.server: "my-docker"
+          homepage.container: "{{ glance_container_name }}"
+          homepage.showStats: "{{ glance_homepage_showStats }}"
+          traefik.enable: "{{ glance_available_externally | string }}"
+          traefik.http.routers.glance.rule: "Host(`{{ glance_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.glance.tls.certresolver: "letsencrypt"
+          traefik.http.routers.glance.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.glance.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ glance_hostname }}"
+          traefik.http.routers.glance.middlewares: "{{ glance_hostname }}@docker"
+          traefik.http.middlewares.glance.IPAllowList.sourcerange: "{{ glance_traefik_whitelist }}"
+          traefik.http.services.glance.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/glanceapp/glance/releases/tag/$${major}.$${minor}.$${patch}"
+  when: glance_enabled is true
+
+- name: Stop Glance
+  block:
+    - name: Stop Glance
+      community.docker.docker_container:
+        name: "{{ glance_container_name }}"
+        state: absent
+  when: glance_enabled is false

@@ -1,0 +1,31 @@
+---
+# enable or disable the application
+glances_enabled: false
+glances_available_externally: false
+glances_traefik_whitelist: "{{ lan }}"
+
+# network
+glances_hostname: "glances"
+glances_port_one: "61208"
+glances_port_two: "61209"
+
+# security options
+glances_security_options:
+  - "apparmor=unconfined"
+
+# docker
+glances_container_name: "glances"
+glances_image_name: "nicolargo/glances"
+glances_image_version: "latest"
+
+# specs
+glances_memory: 1g
+
+# homepage
+glances_homepage_group: "Apps"
+glances_homepage_icon: "glances.png"
+glances_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glances_port_one }}"
+glances_homepage_showStats: "false"
+
+# watchtower
+glances_watchtower_monitor_only: "true"

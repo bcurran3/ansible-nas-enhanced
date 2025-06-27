@@ -1,0 +1,60 @@
+---
+- name: Start Radarr
+  block:
+    - name: Radarr Create Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ radarr_data_directory }}"
+
+    - name: Radarr Docker Container
+      community.docker.docker_container:
+        name: "{{ radarr_container_name }}"
+        image: "{{ radarr_image_name }}:{{ radarr_image_version }}"
+        pull: true
+        volumes:
+          - "{{ radarr_movies_directory }}:/movies:rw"
+          - "{{ radarr_download_directory }}:/downloads:rw"
+          - "{{ radarr_data_directory }}:/config:rw"
+        ports:
+          - "{{ radarr_port }}:7878"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ radarr_user_id }}"
+          PGID: "{{ radarr_group_id }}"
+#         DOCKER_MODS: "linuxserver/mods:radarr-striptracks"   # added
+#         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:radarr"
+        restart_policy: unless-stopped
+        memory: "{{ radarr_memory }}"
+        labels:
+          homepage.group: "Media Management"
+          homepage.name: "Radarr"
+          homepage.href: "https://{{ radarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port }}"
+          homepage.icon: "radarr.png"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "radarr"
+          homepage.showStats: "false"      
+          homepage.widget.type: "radarr"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port }}"
+          homepage.widget.key: "{{ radarr_homepage_widget_key }}"
+          traefik.enable: "{{ radarr_available_externally | string }}"
+          traefik.http.routers.radarr.rule: "Host(`{{ radarr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.radarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.radarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.radarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ radarr_hostname }}"
+          traefik.http.routers.radarr.middlewares: "{{ radarr_hostname }}@docker"
+          traefik.http.middlewares.radarr.IPAllowList.sourcerange: "{{ radarr_traefik_whitelist }}"
+          traefik.http.services.radarr.loadbalancer.server.port: "7878"
+  when: radarr_enabled is true
+
+- name: Stop Radarr
+  block:
+    - name: Stop Radarr Docker Container
+      community.docker.docker_container:
+        name: "{{ radarr_container_name }}"
+        state: absent
+  when: radarr_enabled is false

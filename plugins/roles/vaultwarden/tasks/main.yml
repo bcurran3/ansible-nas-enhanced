@@ -1,0 +1,120 @@
+---
+- name: Start Vaultwarden
+  block:
+    - name: Create Vaultwarden Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      with_items:
+        - "{{ vaultwarden_data_directory }}"
+        - "{{ vaultwarden_data_directory }}/backup"
+
+    - name: Create Vaultwarden Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ vaultwarden_container_name }}"
+        hostname: "{{ vaultwarden_container_name }}"
+        image: vaultwarden/server:latest
+        pull: true
+        ports:
+          - "{{ vaultwarden_port_http }}:80"
+          - "{{ vaultwarden_port_websockets }}:3012"
+        volumes:
+          - "{{ vaultwarden_data_directory }}:/data:rw"
+        env:
+          SIGNUPS_ALLOWED: "{{ vaultwarden_allow_signups | string }}"
+          ADMIN_TOKEN: "{{ vaultwarden_admin_token }}"
+          DOMAIN: "{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
+          LOG_FILE: "/data/vaultwarden.log"
+          SMTP_HOST: "{{ vaultwarden_SMTP_host }}"
+          SMTP_FROM: "{{ vaultwarden_SMTP_from }}"
+          SMTP_FROM_NAME: "{{ vaultwarden_SMTP_from_name }}"
+          SMTP_SECURITY: "{{ vaultwarden_SMTP_security }}"
+          SMTP_PORT: "{{ vaultwarden_SMTP_port }}"
+          SMTP_USERNAME: "{{ vaultwarden_SMTP_username }}"
+          SMTP_PASSWORD: "{{ vaultwarden_SMTP_password }}"
+          SMTP_TIMEOUT: "{{ vaultwarden_SMTP_timeout }}"
+          WEBSOCKET_ENABLED: "{{ vaultwarden_websocket_enabled }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_watchtower_monitor_only }}"
+          homepage.name: "Vaultwarden"
+          homepage.group: "{{ vaultwarden_homepage_group }}"
+          homepage.icon: "{{ vaultwarden_homepage_icon }}"
+          homepage.href: "{{ vaultwarden_homepage_href }}"
+#         homepage.description: "Unofficial Bitwarden compatible server written in Rust"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ vaultwarden_container_name }}"
+          homepage.showStats: "{{ vaultwarden_homepage_showStats }}"
+          traefik.enable: "{{ vaultwarden_available_externally | string }}"
+          traefik.http.routers.vaultwarden.rule: "Host(`{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.vaultwarden.tls.certresolver: "letsencrypt"
+          traefik.http.routers.vaultwarden.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.vaultwarden.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ vaultwarden_hostname }}"
+          traefik.http.routers.vaultwarden.middlewares: "{{ vaultwarden_hostname }}@docker"
+          traefik.http.middlewares.vaultwarden.IPAllowList.sourcerange: "{{ vaultwarden_traefik_whitelist }}"
+          traefik.http.services.vaultwarden.loadbalancer.server.port: "80"
+# Websockets?
+#         traefik.http.routers.vaultwarden-ws.rule: "Host(`{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}`) && Path(`/notifications/hub`)"
+#         traefik.http.routers.vaultwarden-ws.tls.certresolver: "letsencrypt"
+#         traefik.http.routers.vaultwarden-ws.tls.domains[0].main: "{{ ansible_nas_domain }}"
+#         traefik.http.routers.vaultwarden-ws.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+#         traefik.http.routers.vaultwarden-ws.service: "vaultwarden-ws"
+##        traefik.http.routers.frontend.middlewares: "{{ vaultwarden_hostname }}-ws"
+#         traefik.http.routers.vaultwarden-ws.middlewares: "{{ vaultwarden_hostname }}-ws@docker"
+#         traefik.http.middlewares.vaultwarden-ws.IPAllowList.sourcerange: "{{ vaultwarden_traefik_whitelist }}"
+#         traefik.http.services.vaultwarden-ws.loadbalancer.server.port: "3012"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/dani-garcia/vaultwarden/releases/tag/$${major}.$${minor}.$${patch}"
+        restart_policy: unless-stopped
+        memory: "{{ vaultwarden_memory }}"
+      when: vaultwarden_enabled is true
+
+    - name: Create Vaultwarden Backup Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ vaultwarden_backup_container_name }}"
+        hostname: "{{ vaultwarden_backup_container_name }}"
+        image: bruceforce/vaultwarden-backup:latest
+        pull: true
+        restart_policy: unless-stopped
+        volumes:
+          - "{{ vaultwarden_data_directory }}:/data"
+          - "{{ vaultwarden_data_directory }}/backup:/backup"
+        env:
+          DELETE_AFTER: "30"
+          UID: "0"
+          TIMESTAMP: "true"
+          TZ: "{{ ansible_nas_timezone }}"
+        memory: "{{ vaultwarden_backup_memory }}"
+        links:
+          - "{{ vaultwarden_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_backup_watchtower_monitor_only }}"
+          homepage.name: "Vaultwarden-backup"
+          homepage.group: "{{ vaultwarden_backup_homepage_group }}"
+          homepage.icon: "{{ vaultwarden_backup_homepage_icon }}"
+          homepage.href: "{{ vaultwarden_backup_homepage_href }}"
+#         homepage.description: "A simple cron powered backup image for vaultwarden."
+          homepage.server: "my-docker"
+          homepage.container: "{{ vaultwarden_backup_container_name }}"
+          homepage.showStats: "{{ vaultwarden_backup_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://gitlab.com/1O/vaultwarden-backup/-/releases/$${major}.$${minor}.$${patch}"
+  when: vaultwarden_enabled is true
+
+- name: Stop Vaultwarden
+  block:
+    - name: Stop Vaultwarden Docker Container
+      community.docker.docker_container:
+        name: "{{ vaultwarden_container_name }}"
+        state: absent
+    - name: Stop Vaultwarden Backup Container
+      community.docker.docker_container:
+        name: "{{ vaultwarden_backup_container_name }}"
+        state: absent
+  when: vaultwarden_enabled is false

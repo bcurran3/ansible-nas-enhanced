@@ -1,0 +1,36 @@
+---
+# enable or disable the application
+diskover_enabled: false
+diskover_available_externally: false
+diskover_traefik_whitelist: "{{ lan }}"
+
+# directories
+diskover_data_directory: "{{ docker_home }}/diskover"
+
+# network
+diskover_hostname: "diskover"
+diskover_network_name: "diskover"
+diskover_port_http: "3005"
+diskover_elasticsearch_hostname: "elasticsearch"
+diskover_elasticsearch_port_http: "9200"
+
+# specs
+diskover_memory: "4g"
+
+# docker
+diskover_container_name: "diskover"
+diskover_elasticsearch_container_name: "elasticsearch"
+
+# homepage
+diskover_homepage_group: "Apps"
+diskover_homepage_icon: "diskover.png"
+diskover_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_port_http }}"
+diskover_homepage_showStats: "false"
+diskover_elasticsearch_homepage_group: "Apps"
+diskover_elasticsearch_homepage_icon: "elasticsearch.png"
+diskover_elasticsearch_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_elasticsearch_port_http }}"
+diskover_elasticsearch_homepage_showStats: "false"
+
+# watchtower
+diskover_watchtower_monitor_only: "true"
+diskover_elasticsearch_watchtower_monitor_only: "true"

@@ -1,0 +1,30 @@
+#
+phpbb_enabled: false
+phpbb_available_externally: false
+phpbb_traefik_whitelist: "{{ lan }}"
+phpbb_data_directory: "{{ docker_home }}/phpbb"
+
+# network
+phpbb_hostname: "phpbb"
+phpbb_network_name: "phpbb"
+phpbb_port_http: "8081"
+
+# docker
+phpbb_container_name: "phpbb"
+phpbb_memory_limit: "1g"
+phpbb_db_container_name: "phpbb_mariadb"
+phpbb_db_memory_limit: "1g"
+
+# homepage
+phpbb_homepage_group: "Apps"
+phpbb_homepage_icon: "https://raw.githubusercontent.com/phpbb/phpbb/master/phpBB/styles/all/imgs/svg/phpbb_logo_large_cosmic.svg"
+phpbb_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ phpbb_port_http }}"
+phpbb_homepage_showStats: "false"
+phpbb_db_homepage_group: "DBs"
+phpbb_db_homepage_icon: "mariadb.png"
+phpbb_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ phpbb_port_http }}"
+phpbb_db_homepage_showStats: "false"
+
+# watchtower
+phpbb_watchtower_monitor_only: "true"
+phpbb_db_watchtower_monitor_only: "true"

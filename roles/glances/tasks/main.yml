@@ -1,0 +1,51 @@
+---
+- name: Start Glances
+  block:
+    - name: Create Glances Docker Container
+      community.docker.docker_container:
+        name: "{{ glances_container_name }}"
+        hostname: "{{ glances_container_name }}"
+        image: "{{ glances_image_name }}:{{ glances_image_version }}"
+        pull: true
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+          - "/etc/timezone:/etc/timezone:ro"
+        pid_mode: host
+        ports:
+          - "{{ glances_port_one }}:61208"
+          - "{{ glances_port_two }}:61209"
+        env:
+          GLANCES_OPT: "-w"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        security_opts: "{{ glances_security_options }}"
+        memory: "{{ glances_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ glances_watchtower_monitor_only }}"
+          homepage.name: "Glances"
+          homepage.group: "{{ glances_homepage_group }}"
+          homepage.icon: "{{ glances_homepage_icon }}"
+          homepage.href: "{{ glances_homepage_href }}"
+          homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "glances"
+          homepage.showStats: "{{ glances_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glances_port_one }}"
+          traefik.enable: "{{ glances_available_externally | string }}"
+          traefik.http.routers.glances.rule: "Host(`{{ glances_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.glances.tls.certresolver: "letsencrypt"
+          traefik.http.routers.glances.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.glances.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ glances_hostname }}"
+          traefik.http.routers.glances.middlewares: "{{ glances_hostname }}@docker"
+          traefik.http.middlewares.glances.IPAllowList.sourcerange: "{{ glances_traefik_whitelist }}"
+          traefik.http.services.glances.loadbalancer.server.port: "61208"
+  when: glances_enabled is true
+
+- name: Stop Glances
+  block:
+    - name: Stop Glances
+      community.docker.docker_container:
+        name: "{{ glances_container_name }}"
+        state: absent
+  when: glances_enabled is false

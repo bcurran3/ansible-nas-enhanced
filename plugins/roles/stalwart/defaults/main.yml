@@ -1,0 +1,22 @@
+#
+stalwart_enabled: false
+stalwart_available_externally: false
+stalwart_traefik_whitelist: "{{ lan }}"
+stalwart_data_directory: "{{ docker_home }}/stalwart"
+
+# network
+stalwart_hostname: "stalwart"
+stalwart_port_http: "3008"
+
+# docker
+stalwart_container_name: "stalwart-mail"
+stalwart_memory_limit: "1G"
+
+# homepage
+stalwart_homepage_group: "Apps"
+stalwart_homepage_icon: "stalwart.png"
+stalwart_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stalwart_port_http }}"
+stalwart_homepage_showStats: "false"
+
+# watchtower
+stalwart_watchtower_monitor_only: "true"

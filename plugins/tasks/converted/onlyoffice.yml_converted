@@ -1,0 +1,32 @@
+---
+- name: Create ONLYOFFICE directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ onlyoffice_data_directory }}/data"
+    - "{{ onlyoffice_data_directory }}/log"
+
+- name: ONLYOFFICE Docker Container
+  docker_container:
+    name: onlyoffice-document-server
+    image: onlyoffice/documentserver:latest
+    pull: true
+    volumes:
+      - "{{ onlyoffice_data_directory }}/data:/var/www/onlyoffice/Data:rw"
+      - "{{ onlyoffice_data_directory }}/log:/var/log/onlyoffice:rw"
+    ports:
+      - "{{ onlyoffice_port_http }}:80"
+    env:
+    dns_servers: "192.168.69.11"
+    hostname: "onlyoffice"
+    restart_policy: unless-stopped
+    memory: 1g
+    labels:
+      traefik.enable: "{{ onlyoffice_available_externally | string }}"
+      traefik.http.middlewares.onlyoffice.ipwhitelist.sourcerange: "{{ onlyoffice_traefik_whitelist }}"
+      traefik.http.routers.onlyoffice.rule: "Host(`onlyoffice.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.onlyoffice.tls.certresolver: "letsencrypt"
+      traefik.http.routers.onlyoffice.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.onlyoffice.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.onlyoffice.loadbalancer.server.port: "80"

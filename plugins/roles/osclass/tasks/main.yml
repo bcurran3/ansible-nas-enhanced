@@ -1,0 +1,120 @@
+---
+- name: Start OsClass
+  block:
+    - name: Create OsClass Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1001"
+      with_items:
+        - "{{ osclass_data_directory }}"
+        - "{{ osclass_data_directory }}/data"
+        - "{{ osclass_data_directory }}/db"
+
+    - name: Create OsClass MariaDB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ osclass_db_container_name }}"
+        hostname: "{{ osclass_db_container_name }}"
+        image: bitnami/mariadb:latest
+#        image: mariadb:latest
+        pull: true
+        network_mode: "bridge"
+        networks_cli_compatible: "yes"
+        volumes:
+          - "{{ osclass_data_directory }}/db:/bitnami/mariadb"
+#          - "{{ osclass_data_directory }}/db:/var/lib/mysql"
+        env:
+          ALLOW_EMPTY_PASSWORD: "no"
+          MARIADB_ROOT_PASSWORD: "Ansible-NAS"
+          MARIADB_USER: "osclass"
+          MARIADB_PASSWORD: "bitnami"
+          MARIADB_DATABASE: "osclass_db"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ osclass_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ osclass_db_watchtower_monitor_only }}"
+          homepage.name: "OsClass MariaDB"
+          homepage.group: "{{ osclass_db_homepage_group }}"
+          homepage.icon: "{{ osclass_db_homepage_icon }}"
+          homepage.href: "{{ osclass_homepage_href }}"
+#         homepage.description: "One of the world’s most popular open source relational databases"
+          homepage.server: "my-docker"
+          homepage.container: "{{ osclass_db_container_name }}"
+          homepage.showStats: "{{ osclass_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.link.template: "https://mariadb.com/kb/en/mariadb-$${major}$${minor}$${patch}-changelog"
+
+    - name: Create OsClass Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ osclass_container_name }}"
+        hostname: "{{ osclass_container_name }}"
+        image: bitnami/osclass-archived:latest
+        pull: true
+        network_mode: "bridge"
+        networks_cli_compatible: "yes"
+        links:
+          - "{{ osclass_db_container_name }}"
+        volumes:
+          - "{{ osclass_data_directory }}/data:/bitnami/osclass"
+        ports:
+          - "{{ osclass_port_http }}:8080"
+        env:
+          ALLOW_EMPTY_PASSWORD: "no"
+          OSCLASS_DATABASE_USER: "{{ osclass_database_user }}"
+          OSCLASS_DATABASE_PASSWORD: "{{ osclass_database_password }}"
+          OSCLASS_DATABASE_NAME: "osclass_db"
+          OSCLASS_DATABASE_HOST: "{{ osclass_db_container_name }}"
+          OSCLASS_DATABASE_PORT_NUMBER: "3306"
+          OSCLASS_EMAIL: "{{ osclass_email }}"
+          OSCLASS_SMTP_HOST: "{{ osclass_smtp_host }}"
+          OSCLASS_SMTP_PORT: "{{ osclass_smtp_port }}"
+          OSCLASS_SMTP_USER: "{{ osclass_smtp_user }}"
+          OSCLASS_SMTP_PASSWORD: " {{ osclass_smtp_password }}"
+          OSCLASS_USERNAME: "{{ osclass_admin_username }}"
+          OSCLASS_PASSWORD: "{{ osclass_admin_password }}"
+          OSCLASS_WEB_TITLE: "{{ osclass_hostname }}.{{ ansible_nas_domain }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ osclass_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ osclass_watchtower_monitor_only }}"
+          homepage.name: "OsClass"
+          homepage.group: "{{ osclass_homepage_group }}"
+          homepage.icon: "{{ osclass_homepage_icon }}"
+          homepage.href: "{{ osclass_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osclass_port_http }}"
+#         homepage.description: "classifieds"
+          homepage.server: "my-docker"
+          homepage.container: "osclass"
+          homepage.showStats: "{{ osclass_homepage_showStats }}"
+          traefik.enable: "{{ osclass_available_externally | string }}"
+          traefik.http.routers.osclass.rule: "Host(`{{ osclass_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.osclass.tls.certresolver: "letsencrypt"
+          traefik.http.routers.osclass.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.osclass.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ osclass_hostname }}"
+          traefik.http.routers.osclass.middlewares: "osclass@docker"
+          traefik.http.middlewares.osclass.IPAllowList.sourcerange: "{{ osclass_traefik_whitelist }}"
+          traefik.http.services.osclass.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/r/bitnami/osclass-archived/tags/tag/$${major}.$${minor}.$${patch}"
+  when: osclass_enabled is true
+
+- name: Stop OsClass
+  block:
+    - name: Stop OsClass Docker Container
+      community.docker.docker_container:
+        name: "{{ osclass_container_name }}"
+        state: absent
+    - name: Stop OsClass MariaDB Docker Container
+      community.docker.docker_container:
+        name: "{{ osclass_db_container_name }}"
+        state: absent
+  when: osclass_enabled is false
+
+# NOTE:
+# Would like to move this from Bitnami's mariadb to normal mariadb

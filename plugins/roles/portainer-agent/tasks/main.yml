@@ -1,0 +1,42 @@
+---
+- name: Portainer Agent
+  block:
+    - name: Portainer Agent Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ portainer_agent_container_name }}"
+        hostname: "{{ portainer_agent_container_name }}"
+        image: portainer/agent
+        pull: true
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+          - "/var/lib/docker/volumes:/var/lib/docker/volumes"
+          - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ portainer_agent_port }}:9001"
+        restart_policy: unless-stopped
+        memory: "{{ portainer_agent_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ portainer_agent_watchtower_monitor_only }}"
+          homepage.name: "Portainer Agent"
+          homepage.group: "{{ portainer_agent_homepage_group }}"
+          homepage.href: "{{ portainer_agent_homepage_href }}"
+          homepage.icon: "{{ portainer_agent_homepage_icon }}"
+#         homepage.description: "The Portainer agent"
+          homepage.server: "my-docker"
+          homepage.container: "{{ portainer_agent_container_name }}"
+          homepage.showStats: "{{ portainer_agent_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/portainer/agent/releases/tag/$${major}.$${minor}.$${patch}"
+  when: portainer_agent_enabled is true
+
+- name: Stop Portainer Agent
+  block:
+    - name: Stop Portainer Agent
+      community.docker.docker_container:
+        name: "{{ portainer_agent_container_name }}"
+        state: absent
+  when: portainer_agent_enabled is false

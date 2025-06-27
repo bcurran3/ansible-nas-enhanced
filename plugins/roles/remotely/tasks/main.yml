@@ -1,0 +1,61 @@
+---
+- name: Start Remotely
+  block:
+    - name: Create Remotely Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ remotely_data_directory }}"
+        - "{{ remotely_data_directory }}/data"
+
+    - name: Create Remotely Docker Container
+      community.docker.docker_container:
+        name: "{{ remotely_container_name }}"
+        hostname: "{{ remotely_container_name }}"
+        image: immybot/remotely:latest
+        pull: true
+        ports:
+          - "{{ remotely_port_http }}:5000"
+        volumes:
+          - "{{ remotely_data_directory }}/data:/app/AppData"
+        container_default_behavior: no_defaults
+        env:
+          ASPNETCORE_ENVIRONMENT: "Production"
+          ASPNETCORE_HTTP_PORTS: "5000"
+          Remotely_ApplicationOptions__DbProvider: "SQLite"
+          Remotely_ConnectionStrings__SQLite: "Data Source=/app/AppData/Remotely.db"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ remotely_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ remotely_watchtower_monitor_only }}"
+          homepage.name: "Remotely"
+          homepage.group: "{{ remotely_homepage_group }}"
+          homepage.icon: "{{ remotely_homepage_icon }}"
+          homepage.href: "{{ remotely_homepage_href}}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ remotely_port_http }}"
+#         homepage.description: "A remote control and remote scripting solution, built with .NET 8, Blazor, and SignalR."
+          homepage.server: "my-docker"
+          homepage.container: "{{ remotely_container_name }}"
+          homepage.showStats: "{{ remotely_homepage_showStats }}"
+          traefik.enable: "{{ remotely_available_externally | string }}"
+          traefik.http.routers.remotely.rule: "Host(`{{ remotely_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.remotely.tls.certresolver: "letsencrypt"
+          traefik.http.routers.remotely.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.remotely.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ remotely_hostname }}"
+          traefik.http.routers.remotely.middlewares: "{{ remotely_hostname }}@docker"
+          traefik.http.middlewares.remotely.IPAllowList.sourcerange: "{{ remotely_traefik_whitelist }}"
+          traefik.http.services.remotely.loadbalancer.server.port: "5000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/r/immybot/remotely/tags/tag/$${major}.$${minor}.$${patch}"
+  when: remotely_enabled is true
+
+- name: Stop Remotely
+  block:
+    - name: Stop Remotely
+      community.docker.docker_container:
+        name: "{{ remotely_container_name }}"
+        state: absent
+  when: remotely_enabled is false

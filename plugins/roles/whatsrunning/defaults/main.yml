@@ -1,0 +1,22 @@
+#
+whatsrunning_enabled: false
+whatsrunning_available_externally: false
+whatsrunning_traefik_whitelist: "{{ lan }}"
+whatsrunning_data_directory: "{{ docker_home }}/whatsrunning"
+
+# network
+whatsrunning_hostname: "whatsrunning"
+whatsrunning_port_http: "3021"
+
+# docker
+whatsrunning_container_name: "whatsrunning"
+whatsrunning_memory_limit: "256m"
+
+# homepage
+whatsrunning_homepage_group: "Apps"
+whatsrunning_homepage_icon: "docker.png"
+whatsrunning_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
+whatsrunning_homepage_showStats: "false"
+
+# watchtower
+whatsrunning_watchtower_monitor_only: "true"

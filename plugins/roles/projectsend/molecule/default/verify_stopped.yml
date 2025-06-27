@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove ProjectSend
+      community.docker.docker_container:
+        name: "{{ projectsend_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check ProjectSend is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Try and stop and remove ProjectSend DB
+      community.docker.docker_container:
+        name: "{{ projectsend_db_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check ProjectSend DB is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

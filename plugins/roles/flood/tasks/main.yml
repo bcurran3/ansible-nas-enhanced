@@ -1,0 +1,60 @@
+---
+- name: Start Flood
+  block:
+    - name: Create Flood Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ flood_data_directory }}/config"
+
+    - name: Create Flood Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ flood_container_name }}"
+        hostname: "{{ flood_container_name }}"
+        image: jesec/flood:latest
+        pull: true
+        volumes:
+          - "{{ flood_data_directory }}/date:/date:rw"
+        ports:
+          - "{{ flood_port_http }}:3000"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ flood_watchtower_monitor_only }}"
+          homepage.name: "Flood"
+          homepage.group: "{{ flood_homepage_group }}"
+          homepage.icon: "{{ flood_homepage_icon }}"
+          homepage.href: "{{ flood_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flood_port_http }}"
+#         homepage.description: "A modern web UI for various torrent clients with a Node.js backend and React frontend."
+          homepage.server: "my-docker"
+          homepage.container: "{{ flood_container_name }}"
+          homepage.showStats: "{{ flood_homepage_showStats }}"
+          homepage.widget.type: "flood"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flood_port_http }}"
+          homepage.widget.username: "{{ flood_homepage_widget_username }}"
+          homepage.widget.password: "{{ flood_homepage_widget_password }}"
+          traefik.enable: "{{ flood_available_externally | string }}"
+          traefik.http.routers.flood.rule: "Host(`flood.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.flood.tls.certresolver: "letsencrypt"
+          traefik.http.routers.flood.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.flood.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ flood_hostname }}"
+          traefik.http.routers.flood.middlewares: "{{ flood_hostname }}@docker"
+          traefik.http.middlewares.flood.IPAllowList.sourcerange: "{{ flood_traefik_whitelist }}"
+          traefik.http.services.flood.loadbalancer.server.port: "3000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/jesec/flood/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: 1g
+  when: flood_enabled is true
+
+- name: Stop Flood
+  block:
+    - name: Stop Flood
+      community.docker.docker_container:
+        name: "{{ flood_container_name }}"
+        state: absent
+  when: flood_enabled is false

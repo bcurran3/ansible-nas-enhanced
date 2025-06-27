@@ -1,0 +1,63 @@
+---
+- name: Start Reubah
+  block:
+    - name: Create Reubah Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+#        user: appuser
+#        group: appgroup
+      with_items:
+        - "{{ reubah_data_directory }}"
+
+    - name: Create Reubah Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ reubah_container_name }}"
+        hostname: "{{ reubah_container_name }}"
+        image: ghcr.io/dendianugerah/reubah:latest
+        pull: true
+#        volumes:
+#          - "{{ reubah_data_directory }}/tmp:/tmp"
+        ports:
+          - "{{ reubah_port_http }}:{{ reubah_port_http }}"
+#        security_opt:
+#          - no-new-privileges:true
+#        cap_drop:
+#          - ALL
+        env:
+          PORT: "{{ reubah_port_http }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ reubah_watchtower_monitor_only }}"
+          homepage.name: "Reubah"
+          homepage.group: "{{ reubah_homepage_group }}"
+          homepage.icon: "{{ reubah_homepage_icon }}"
+          homepage.href: "{{ reubah_homepage_href }}"
+#         homepage.description: "a web-based tool for processing images and converting documents with a simple interface"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ reubah_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ reubah_container_name }}"
+          homepage.showStats: "{[ reubah_homepage_showStats ]}"
+          traefik.enable: "{{ reubah_available_externally | string }}"
+          traefik.http.routers.reubah.rule: "Host(`reubah.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.reubah.tls.certresolver: "letsencrypt"
+          traefik.http.routers.reubah.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.reubah.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ reubah_hostname }}"
+          traefik.http.routers.reubah.middlewares: "{{ reubah_hostname }}@docker"
+          traefik.http.middlewares.reubah.IPAllowList.sourcerange: "{{ reubah_traefik_whitelist }}"
+          traefik.http.services.reubah.loadbalancer.server.port: "{{ reubah_port_http }}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ reubah_memory }}"
+  when: reubah_enabled is true
+
+- name: Stop Reubah
+  block:
+    - name: Stop Reubah
+      community.docker.docker_container:
+        name: "{{ reubah_container_name }}"
+        state: absent
+  when: reubah_enabled is false

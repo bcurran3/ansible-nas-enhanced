@@ -1,0 +1,49 @@
+---
+- name: Start Fast Music Remover
+  block:
+    - name: Create Fast Music Remover Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ fastmusicremover_container_name }}"
+        hostname: "{{ fastmusicremover_container_name }}"
+        image: ghcr.io/omeryusufyagci/fast-music-remover
+        pull: true
+        ports:
+          - "{{ fastmusicremover_port_http }}:8080"
+        network_mode: "bridge"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ fastmusicremover_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ fastmusicremover_watchtower_monitor_only }}"
+          homepage.name: "Fast Music Remover"
+          homepage.group: "{{ fastmusicremover_homepage_group }}"
+          homepage.href: "{{ fastmusicremover_homepage_href }}"
+          homepage.icon: "{{ fastmusicremover_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fastmusicremover_port_http }}"
+#         homepage.description: "lightweight music and noise remover for YouTube and other internet media, using DeepFilterNet for audio enhancement"
+          homepage.server: "my-docker"
+          homepage.container: "fastmusicremover"
+          homepage.showStats: "{{ fastmusicremover_homepage_showStats }}"
+          traefik.enable: "{{ fastmusicremover_available_externally | string }}"
+          traefik.http.routers.fastmusicremover.rule: "Host(`{{ fastmusicremover_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.fastmusicremover.tls.certresolver: "letsencrypt"
+          traefik.http.routers.fastmusicremover.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.fastmusicremover.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ fastmusicremover_hostname }}"
+          traefik.http.routers.fastmusicremover.middlewares: "{{ fastmusicremover_hostname }}@docker"
+          traefik.http.middlewares.fastmusicremover.IPAllowList.sourcerange: "{{ fastmusicremover_traefik_whitelist }}"
+          traefik.http.services.fastmusicremover.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/omeryusufyagci/fast-music-remover/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ no releases info published
+  when: fastmusicremover_enabled is true
+
+- name: Stop Fast Music Remover
+  block:
+    - name: Stop Fast Music Remover
+      community.docker.docker_container:
+        name: "{{ fastmusicremover_container_name }}"
+        state: absent
+  when: fastmusicremover_enabled is false

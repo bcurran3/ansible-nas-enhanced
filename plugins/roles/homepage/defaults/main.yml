@@ -1,0 +1,22 @@
+---
+# enable or disable the application
+homepage_enabled: false
+homepage_available_externally: false
+homepage_traefik_whitelist: "{{ lan }}"
+
+# directories
+homepage_data_directory: "{{ docker_home }}/homepage"
+
+# network
+homepage_hostname: "homepage"
+homepage_port_http: "11111"
+
+# docker
+homepage_container_name: "homepage"
+homepage_memory_limit: "512m"
+homepage_puid: "0"
+homepage_pgid: "0"
+homepage_allowed_hosts: "{{ homepage_hostname }}.{{ ansible_nas_domain }}"
+
+# watchtower
+homepage_watchtower_monitor_only: "true"

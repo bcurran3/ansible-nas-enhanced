@@ -1,0 +1,9 @@
+---
+- name: Stop Tdarr Node
+  docker_container:
+    name: "{{ tdarr_node_container_name }}"
+    state: absent
+  when: tdarr_node_enabled is false
+  listen:
+    - "stop tdarr_node"
+    - "stop disabled applications"

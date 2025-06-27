@@ -1,0 +1,9 @@
+---
+- name: Stop NetAlertX
+  docker_container:
+    name: "{{ netalertx_container_name }}"
+    state: absent
+  when: netalertx_enabled is false
+  listen:
+    - "stop netalertx"
+    - "stop disabled applications"

@@ -1,0 +1,33 @@
+---
+# enable or disable the application
+joplin_enabled: false
+joplin_available_externally: false
+joplin_traefik_whitelist: "{{ lan }}"
+
+# directories
+joplin_data_directory: "{{ docker_home }}/joplin"
+
+# network
+joplin_hostname: "joplin"
+joplin_port_http: "22300"
+
+# specs
+joplin_memory: "1g"
+joplin_db_memory: "1g"
+
+# docker
+joplin_container_name: "joplin"
+joplin_db_container_name: "joplin-db"
+
+# homepage
+joplin_homepage_group: "Apps"
+joplin_homepage_icon: "joplin.png"
+joplin_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
+joplin_homepage_showStats: "false"
+joplin_db_homepage_group: "DBs"
+joplin_db_homepage_icon: "postgres.png"
+joplin_db_homepage_showStats: "false"
+
+# watchtower
+joplin_watchtower_monitor_only: "true"
+joplin_db_watchtower_monitor_only: "true"

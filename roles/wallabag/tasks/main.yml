@@ -1,0 +1,55 @@
+---
+- name: Start Wallabag
+  block:
+    - name: Create Wallabag Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: 65534
+        group: 65534
+      with_items:
+        - "{{ wallabag_data_directory }}/data"
+        - "{{ wallabag_data_directory }}/data/db"
+        - "{{ wallabag_data_directory }}/images"
+
+    - name: Wallabag Docker Container
+      community.docker.docker_container:
+        name: "{{ wallabag_container_name }}"
+        image: "{{ wallabag_image_name }}:{{ wallabag_image_version }}"
+        pull: true
+        volumes:
+          - "{{ wallabag_data_directory }}/data:/var/www/wallabag/data:rw"
+          - "{{ wallabag_data_directory }}/images:/var/www/wallabag/web/assets/images:rw"
+        ports:
+          - "{{ wallabag_port }}:80"
+        env:
+          SYMFONY__ENV__DOMAIN_NAME: "https://{{ wallabag_hostname }}.{{ ansible_nas_domain }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ wallabag_memory }}"
+        labels:
+          homepage.name: "Wallabag"
+          homepage.group: "Apps"
+          homepage.icon: "wallabag.png"
+          homepage.href: "{{ wallabag_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wallabag_port }}"
+    #     homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "wallabag"
+          homepage.showStats: "false"
+          traefik.enable: "{{ wallabag_available_externally | string }}"
+          traefik.http.middlewares.wallabag.IPAllowList.sourcerange: "{{ wallabag_traefik_whitelist }}"
+          traefik.http.routers.wallabag.rule: "Host(`wallabag.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.wallabag.tls.certresolver: "letsencrypt"
+          traefik.http.routers.wallabag.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.wallabag.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.services.wallabag.loadbalancer.server.port: "80"
+  when: wallabag_enabled is true
+
+- name: Stop Wallabag
+  block:
+    - name: Stop Wallabag
+      community.docker.docker_container:
+        name: "{{ wallabag_container_name }}"
+        state: absent
+  when: wallabag_enabled is false

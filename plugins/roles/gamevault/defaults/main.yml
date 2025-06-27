@@ -1,0 +1,40 @@
+---
+# enable or disable the application
+gamevault_enabled: false
+gamevault_available_externally: false
+gamevault_traefik_whitelist: "{{ lan }}"
+
+# directories
+gamevault_data_directory: "{{ docker_home }}/gamevault"
+
+# network
+gamevault_hostname: "gamevault"
+gamevault_port_http: "5082"
+
+# specs
+gamevault_memory: "2g"
+gamevault_db_memory: "1g"
+
+# docker
+gamevault_container_name: "gamevault"
+gamevault_db_container_name: "gamevault-db"
+gamevault_puid: "0"
+gamevault_pgid: "0"
+
+gamevault_metadata_igdb_client_id: "generate_at_dev.twitch.tv"
+gamevault_metadata_igdb_client_secret: "generate_at_dev.twitch.tv"
+gamevault_server_admin_password: "topsecret"
+gamevault_rawg_api_key: "https://gamevau.lt/docs/server-docs/indexing-and-metadata#rawg-api-key"
+
+# homepage
+gamevault_homepage_group: "Apps"
+gamevault_homepage_icon: "gamevault.png"
+gamevault_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gamevault_port_http }}"
+gamevault_homepage_showStats: "false"
+gamevault_db_homepage_group: "DBs"
+gamevault_db_homepage_icon: "postgres.png"
+gamevault_db_homepage_showStats: "false"
+
+# watchtower
+gamevault_watchtower_monitor_only: "true"
+gamevault_db_watchtower_monitor_only: "true"

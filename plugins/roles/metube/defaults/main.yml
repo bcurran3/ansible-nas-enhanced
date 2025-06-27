@@ -1,0 +1,24 @@
+#
+metube_enabled: false
+metube_available_externally: false
+metube_traefik_whitelist: "{{ lan }}"
+
+# network
+metube_port_http: "3018"
+metube_hostname: "metube"
+metube_data_directory: "{{ docker_home }}/metube"
+
+# docker
+metube_container_name: "metube"
+metube_memory_limit: "1g"
+
+metube_dl_directory: "{{ downloads_root }}/youtube/video"
+
+# homepage
+metube_homepage_group: "Apps"
+metube_homepage_icon: "metube.png"
+metube_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ metube_port_http }}"
+metube_homepage_showStats: "false"
+
+# watchtower
+metube_watchtower_monitor_only: "true"

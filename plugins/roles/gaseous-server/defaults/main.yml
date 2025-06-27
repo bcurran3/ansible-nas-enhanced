@@ -1,0 +1,34 @@
+#
+gaseous_server_enabled: false
+gaseous_server_available_externally: false
+gaseous_server_traefik_whitelist: "{{ lan }}"
+gaseous_server_data_directory: "{{ docker_home }}/gaseous-server"
+
+# network
+gaseous_server_hostname: "gaseous-server"
+gaseous_server_network_name: "gaseous-server"
+gaseous_server_port_http: "5198"
+
+# docker
+gaseous_server_container_name: "gaseous-server"
+gaseous_server_db_container_name: "gaseous-server-db"
+gaseous_server_memory_limit: "1G"
+gaseous_server_db_memory_limit: "1G"
+
+gaseous_server_db_password: "gaseous"
+gaseous_server_igdb_client_id: "_generated_ID_here_"
+gaseous_server_igdb_client_secret: "enter secret here"
+
+# homepage
+gaseous_server_homepage_group: "Apps"
+gaseous_server_homepage_icon: "gaseous-server.png"
+gaseous_server_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
+gaseous_server_homepage_showStats: "false"
+gaseous_server_db_homepage_group: "DBs"
+gaseous_server_db_homepage_icon: "mariadb.png"
+gaseous_server_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
+gaseous_server_db_homepage_showStats: "false"
+
+# watchtower
+gaseous_server_watchtower_monitor_only: "true"
+gaseous_server_db_watchtower_monitor_only: "true"

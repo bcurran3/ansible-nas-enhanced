@@ -1,0 +1,32 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Get container state
+      community.docker.docker_container_info:
+        name: "{{ ollama_container_name }}"
+      register: result
+
+    - name: Get container state
+      community.docker.docker_container_info:
+        name: "{{ ollama_openedai_container_name }}"
+      register: result_openedai
+
+    - name: Get container state
+      community.docker.docker_container_info:
+        name: "{{ ollama_openwebui_container_name }}"
+      register: result_openwebui
+
+    - name: Check Ollama is running
+      ansible.builtin.assert:
+        that:
+          - result.container['State']['Status'] == "running"
+          - result.container['State']['Restarting'] == false
+          - result_openedai.container['State']['Status'] == "running"
+          - result_openedai.container['State']['Restarting'] == false
+          - result_openwebui.container['State']['Status'] == "running"
+          - result_openwebui.container['State']['Restarting'] == false

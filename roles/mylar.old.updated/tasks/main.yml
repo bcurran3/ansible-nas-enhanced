@@ -1,0 +1,50 @@
+---
+- name: Create Mylar Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    # mode: 0755
+  with_items:
+    - "{{ mylar_data_directory }}/config"
+
+- name: Mylar Docker Container
+  docker_container:
+    name: mylar
+    hostname: mylar
+    image: linuxserver/mylar3      # changed to 3
+    pull: true
+    volumes:
+      - "{{ mylar_comics_directory }}:/comics:rw"
+      - "{{ mylar_downloads_directory }}:/downloads:rw"
+      - "{{ mylar_data_directory }}/config:/config:rw"
+    network_mode: "bridge"
+    ports:
+      - "{{ mylar_port_http }}:8090"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+      PUID: "{{ mylar_user_id }}"
+      PGID: "{{ mylar_group_id }}"
+    restart_policy: unless-stopped
+    memory: "{{ mylar_memory }}"
+    labels:
+      homepage.group: "{{ mylar_homepage_group }}"
+      homepage.name: "{{ mylar_homepage_name }}"
+      homepage.icon: "{{ mylar_homepage_icon }}"
+      homepage.href: "{{ mylar_homepage_href }}"
+      homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mylar_port_http }}"
+#     homepage.description: ""
+      homepage.server: "my-docker"
+      homepage.container: "mylar"
+      homepage.showStats: "false"
+      homepage.widget.type: "mylar"
+      homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mylar_port_http }}"
+      homepage.widget.key: "{{ mylar_homepage_widget_key }}"
+      traefik.enable: "{{ mylar_available_externally | string }}"
+      traefik.http.routers.mylar.rule: "Host(`{{ mylar_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.mylar.tls.certresolver: "letsencrypt"
+      traefik.http.routers.mylar.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.mylar.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ mylar_hostname }}"
+      traefik.http.routers.mylar.middlewares: "{{ mylar_hostname }}@docker"
+      traefik.http.middlewares.mylar.IPAllowList.sourcerange: "{{ mylar_traefik_whitelist }}"
+      traefik.http.services.mylar.loadbalancer.server.port: "8090"

@@ -1,0 +1,48 @@
+---
+- name: Start Sonos-Web
+  block:
+    - name: Create Sonos-Web Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ sonos_web_container_name }}"
+        hostname: "{{ sonos_web_container_name }}"
+        image: sonosweb/sonos-web
+        pull: true
+#        ports:
+#          - "{{ sonos_web_port_http }}:5050"
+        network_mode: host
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ sonos_web_watchtower_monitor_only }}"
+          homepage.name: "Sonos-Web"
+          homepage.group: "{{ sonos_web_homepage_group }}"
+          homepage.icon: "{{ sonos_web_homepage_icon }}"
+          homepage.href: "{{ sonos_web_homepage_href }}"
+    #     homepage.description: "Sonos controller for your web browser"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonos_web_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ sonos_web_container_name }}"
+          homepage.showStats: "{{ sonos_web_homepage_showStats }}"
+#          traefik.enable: "{{ sonos_web_available_externally | string }}"
+#          traefik.http.routers.sonos_web.rule: "Host(`sonos_web.{{ ansible_nas_domain }}`)"
+#          traefik.http.routers.sonos_web.tls.certresolver: "letsencrypt"
+#          traefik.http.routers.sonos_web.tls.domains[0].main: "{{ ansible_nas_domain }}"
+#          traefik.http.routers.sonos_web.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+#          traefik.http.routers.frontend.middlewares: "{{ sonos_web_hostname }}"
+#          traefik.http.routers.sonos_web.middlewares: "{{ sonos_web_hostname }}@docker"
+#          traefik.http.middlewares.sonos_web.IPAllowList.sourcerange: "{{ sonos_web_traefik_whitelist }}"
+#          traefik.http.services.sonos_web.loadbalancer.server.port: "5050"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/sonos-web/sonos-web/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ sonos_web_memory }}"
+  when: sonos_web_enabled is true
+
+- name: Stop Sonos-Web
+  block:
+    - name: Stop Sonos-Web
+      community.docker.docker_container:
+        name: "{{ sonos_web_container_name }}"
+        state: absent
+  when: sonos_web_enabled is false

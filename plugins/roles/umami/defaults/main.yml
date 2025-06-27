@@ -1,0 +1,31 @@
+#
+umami_enabled: false
+umami_available_externally: false
+umami_traefik_whitelist: "{{ lan }}"
+
+# network
+umami_port_http: "3019"
+umami_hostname: "umami"
+umami_data_directory: "{{ docker_home }}/umami"
+
+# docker
+umami_container_name: "umami"
+umami_memory: "1g"
+umami_db_container_name: "umami-db"
+umami_db_memory: "1g"
+
+umami_app_secret: "topsecret"
+
+# homepage
+umami_homepage_group: "Apps"
+umami_homepage_icon: "umami.png"
+umami_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
+umami_homepage_showStats: "false"
+umami_db_homepage_group: "DBs"
+umami_db_homepage_icon: "postgres.png"
+umami_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
+umami_db_homepage_showStats: "false"
+
+# watchtower
+umami_watchtower_monitor_only: "true"
+umami_db_watchtower_monitor_only: "true"

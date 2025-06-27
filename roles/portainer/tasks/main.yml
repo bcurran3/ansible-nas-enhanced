@@ -1,0 +1,63 @@
+---
+- name: Start Portainer
+  block:
+    - name: Check for Deprecated IP Whitelist setting
+      ansible.builtin.fail:
+        msg: "Use portainer_ip_allowlist instead of portainer_ip_whitelist! Read https://traefik.io/blog/announcing-traefik-proxy-v2-11/ for more information."
+      when: portainer_ip_whitelist is defined
+
+    - name: Create Portainer Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ portainer_data_directory }}"
+
+    - name: Portainer Docker Container
+      community.docker.docker_container:
+        name: "{{ portainer_container_name }}"
+        hostname: "{{ portainer_container_name }}"
+        image: "{{ portainer_image_name }}:{{ portainer_image_version }}"
+        pull: true
+        volumes:
+          - "{{ portainer_data_directory }}:/data:rw"
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+          - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ portainer_port }}:9000"
+        restart_policy: unless-stopped
+        memory: "{{ portainer_memory }}"
+        labels:
+          homepage.name: "Portainer"
+          homepage.group: "{{ portainer_homepage_group }}"
+          homepage.href: "{{ portainer_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port }}"
+          homepage.icon: "{{ portainer_homepage_icon }}"
+    #     homepage.description: "Making Docker and Kubernetes management easy."
+          homepage.server: "my-docker"
+          homepage.container: "portainer"
+          homepage.showStats: "{{ portainer_homepage_showStats }}"
+          homepage.widget.type: "portainer"
+          homepage.widget.env: "2"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port }}"
+          homepage.widget.key: "{{ portainer_homepage_widget_key }}"
+          traefik.enable: "{{ portainer_available_externally | string }}"
+          traefik.http.routers.portainer.rule: "Host(`{{ portainer_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.portainer.tls.certresolver: "letsencrypt"
+          traefik.http.routers.portainer.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.portainer.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ portainer_hostname }}"
+          traefik.http.routers.portainer.middlewares: "{{ portainer_hostname }}@docker"
+          traefik.http.middlewares.portainer.IPAllowList.sourcerange: "{{ portainer_traefik_whitelist }}"
+          traefik.http.services.portainer.loadbalancer.server.port: "9000"
+  when: portainer_enabled is true
+
+- name: Stop Portainer
+  block:
+    - name: Stop Portainer
+      community.docker.docker_container:
+        name: "{{ portainer_container_name }}"
+        state: absent
+  when: portainer_enabled is false

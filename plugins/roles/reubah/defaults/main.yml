@@ -1,0 +1,23 @@
+#
+reubah_enabled: false
+reubah_available_externally: false
+reubah_traefik_whitelist: "{{ lan }}"
+
+# network
+reubah_port_http: "3020"
+reubah_hostname: "reubah"
+
+reubah_data_directory: "{{ docker_home }}/reubah"
+
+# docker
+reubah_container_name: "reubah"
+reubah_memory: "512M"
+
+# homepage
+reubah_homepage_group: "Apps"
+reubah_homepage_icon: "reubah.png"
+reubah_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ reubah_port_http }}"
+reubah_homepage_showStats: "false"
+
+# watchtower
+reubah_watchtower_monitor_only: "true"

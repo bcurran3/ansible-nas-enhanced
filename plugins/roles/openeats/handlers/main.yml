@@ -1,0 +1,9 @@
+---
+- name: Stop OpenEats
+  docker_container:
+    name: "{{ openeats_container_name }}"
+    state: absent
+  when: openeats_enabled is false
+  listen:
+    - "stop openeats"
+    - "stop disabled applications"

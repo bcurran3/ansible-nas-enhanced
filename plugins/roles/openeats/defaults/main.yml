@@ -1,0 +1,32 @@
+#
+openeats_enabled: false
+openeats_available_externally: false
+openeats_traefik_whitelist: "{{ lan }}"
+openeats_data_directory: "{{ docker_home }}/openeats"
+
+# network
+openeats_hostname: "openeats"
+openeats_port_http: "5807"
+openeats_port_api: "8082"
+openeats_port_db: "3306"
+
+# docker
+openeats_container_name: "openeats-web"
+openeats_db_container_name: "openeats-db"
+openeats_api_container_name: "openeats-api"
+
+# homepage
+openeats_homepage_group: "Apps"
+openeats_homepage_icon: "openeats.png"
+openeats_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
+openeats_homepage_showStats: "false"
+openeats_api_homepage_group: "Apps"
+openeats_api_homepage_icon: "openeats.png"
+openeats_api_homepage_showStats: "false"
+openeats_db_homepage_group: "DBs"
+openeats_db_homepage_icon: "mariadb.png"
+openeats_db_homepage_showStats: "false"
+
+# watchtower
+openeats_watchtower_monitor_only: "true"
+openeats_db_watchtower_monitor_only: "true"

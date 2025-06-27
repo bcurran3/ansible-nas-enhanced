@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove Change Detection
+      community.docker.docker_container:
+        name: "{{ change_detection_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Change Detection is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Try and stop and remove Sock Puppet(eer) Browser
+      community.docker.docker_container:
+        name: "{{ change_detection_sockpuppet_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Sock Puppet(eer) Browser is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

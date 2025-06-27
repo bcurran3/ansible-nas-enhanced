@@ -1,0 +1,79 @@
+---
+- name: Start Grafana
+  block:
+    - name: Create Grafana Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "472"
+        recurse: yes
+      changed_when: false
+      with_items:
+        - "{{ stats_grafana_data_directory }}"
+        - "{{ stats_grafana_config_directory }}"
+        - "{{ stats_grafana_config_directory }}/dashboards"
+        - "{{ stats_grafana_config_directory }}/provisioning/datasources"
+        - "{{ stats_grafana_config_directory }}/provisioning/dashboards"
+
+    - name: Template Grafana data source
+      ansible.builtin.template:
+        src: datasources/ansible-nas.yml
+        dest: "{{ stats_grafana_config_directory }}/provisioning/datasources/ansible-nas.yml"
+
+    - name: Copy Grafana dashboards configuration
+      ansible.builtin.copy:
+        src: dashboards/ansible-nas.yml
+        dest: "{{ stats_grafana_config_directory }}/provisioning/dashboards/ansible-nas.yml"
+
+    - name: Copy Grafana Ansible-NAS dashboard
+      ansible.builtin.copy:
+        src: dashboards/ansible-nas-overview.json
+        dest: "{{ stats_grafana_config_directory }}/dashboards/ansible-nas-overview.json"
+
+    - name: Grafana Docker Container
+      community.docker.docker_container:
+        name: "{{ stats_grafana_container_name }}"
+        hostname: "{{ stats_grafana_container_name }}"
+        image: "{{ stats_grafana_image_name }}:{{ stats_grafana_image_version }}"
+        pull: true
+        volumes:
+          - "{{ stats_grafana_data_directory }}:/var/lib/grafana:rw"
+          - "{{ stats_grafana_config_directory }}/provisioning:/etc/grafana/provisioning:ro"
+          - "{{ stats_grafana_config_directory }}/dashboards:/etc/dashboards:ro"
+        ports:
+          - "{{ stats_grafana_port }}:3000"
+        env:
+          GF_PLUGINS_ENABLE_ALPHA: "true"
+          GF_UNIFIED_ALERTING_ENABLED: "true"
+        restart_policy: unless-stopped
+        memory: 1g
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ stats_grafana_watchtower_monitor_only }}"
+          homepage.group: "{{ stats_grafana_homepage_group }}"
+          homepage.name: "Grafana"
+          homepage.icon: "{{ stats_grafana_homepage_icon }}"
+          homepage.href: "{{ stats_grafana_homepage_href }}"
+#         homepage.description: "Dashboards and centralized observability."
+          homepage.server: "my-docker"
+          homepage.container: "{{ stats_grafana_container_name }}"
+          homepage.showStats: "{{ stats_grafana_homepage_showStats }}"
+          traefik.enable: "{{ stats_grafana_available_externally | string }}"
+          traefik.http.routers.grafana.rule: "Host(`grafana.{{ ansible_nas_domain }}`) "
+          traefik.http.routers.grafana.tls.certresolver: "letsencrypt"
+          traefik.http.routers.grafana.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.grafana.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ stats_grafana_hostname }}"
+          traefik.http.routers.grafana.middlewares: "{{ stats_grafana_hostname }}@docker"
+          traefik.http.middlewares.grafana.IPAllowList.sourcerange: "{{ stats_grafana_traefik_whitelist }}"
+          traefik.http.services.grafana.loadbalancer.server.port: "3000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/grafana/grafana/releases/tag/$${major}.$${minor}.$${patch}"
+  when: stats_enabled is true
+
+- name: Stop Grafana
+  block:
+    - name: Stop Grafana
+      community.docker.docker_container:
+        name: "{{ stats_grafana_container_name }}"
+        state: absent
+  when: stats_enabled is false

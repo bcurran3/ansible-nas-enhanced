@@ -1,0 +1,59 @@
+---
+- name: Start Homarr
+  block:
+    - name: Create Homarr Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ homarr_data_directory }}"
+        - "{{ homarr_data_directory }}/appdata"
+
+    - name: Create Homarr Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ homarr_container_name }}"
+        hostname: "{{ homarr_container_name }}"
+        image: ghcr.io/homarr-labs/homarr:latest
+        pull: true
+        volumes:
+        - "{{ homarr_data_directory }}/appdata:/appdata"
+        - "/var/run/docker.sock:/var/run/docker.sock" # ignores this and uses UTC
+        ports:
+          - "{{ homarr_port_http }}:7575"
+        env:
+          SECRET_ENCRYPTION_KEY: "{{ homarr_secret_encryption_key }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ homarr_watchtower_monitor_only }}"
+          homepage.name: "Homarr"
+          homepage.group: "{{ homarr_homepage_group }}"
+          homepage.icon: "{{ homarr_homepage_icon }}"
+          homepage.href: "{{ homarr_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homarr_port_http }}"
+#         homepage.description: "A modern and easy to use dashboard."
+          homepage.server: "my-docker"
+          homepage.container: "{{ homarr_container_name }}"
+          homepage.showStats: "{{ homarr_homepage_showStats }}"
+          traefik.enable: "{{ homarr_available_externally | string }}"
+          traefik.http.routers.homarr.rule: "Host(`homarr.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.homarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.homarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.homarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ homarr_hostname }}"
+          traefik.http.routers.homarr.middlewares: "{{ homarr_hostname }}@docker"
+          traefik.http.middlewares.homarr.IPAllowList.sourcerange: "{{ homarr_traefik_whitelist }}"
+          traefik.http.services.homarr.loadbalancer.server.port: "7575"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/homarr-labs/homarr/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: 512m
+  when: homarr_enabled is true
+
+- name: Stop Homarr
+  block:
+    - name: Stop Homarr
+      community.docker.docker_container:
+        name: "{{ homarr_container_name }}"
+        state: absent
+  when: homarr_enabled is false

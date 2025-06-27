@@ -1,0 +1,34 @@
+---
+netbootxyz_enabled: false
+netbootxyz_available_externally: false
+netbootxyz_traefik_whitelist: "{{ lan }}"
+
+# directories
+netbootxyz_config_directory: "{{ docker_home }}/netbootxyz/config"
+netbootxyz_assets_directory: "{{ docker_home }}/netbootxyz/assets"
+
+# network
+netbootxyz_hostname: "netbootxyz"
+netbootxyz_hostname2: "netbootxyz2"
+netbootxyz_port_http: "3002"
+netbootxyz_port_http2: "5803"
+netbootxyz_port_tftp: "69"
+
+# docker
+netbootxyz_container_name: "netbootxyz"
+netbootxyz_image_name: "ghcr.io/netbootxyz/netbootxyz"
+netbootxyz_image_version: "latest"
+netbootxyz_user_id: "1000"
+netbootxyz_group_id: "1000"
+
+# specs
+netbootxyz_memory: 1g
+
+# homepage
+netbootxyz_homepage_group: "Apps"
+netbootxyz_homepage_icon: "netbootxyz.png"
+netbootxyz_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbootxyz_port_http }}"
+netbootxyz_homepage_showStats: "false"
+
+# watchtower
+netbootxyz_watchtower_monitor_only: "true"

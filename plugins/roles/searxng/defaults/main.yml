@@ -1,0 +1,22 @@
+#
+searxng_enabled: false
+searxng_available_externally: false
+searxng_traefik_whitelist: "{{ lan }}"
+searxng_data_directory: "{{ docker_home }}/searxng"
+
+# network
+searxng_hostname: "searxng"
+searxng_port_http: "3008"
+
+# docker
+searxng_container_name: "searxng"
+searxng_memory_limit: "1G"
+
+# homepage
+searxng_homepage_group: "Apps"
+searxng_homepage_icon: "searxng.png"
+searxng_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
+searxng_homepage_showStats: "false"
+
+# watchtower
+searxng_watchtower_monitor_only: "true"

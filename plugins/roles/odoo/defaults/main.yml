@@ -1,0 +1,26 @@
+#
+odoo_enabled: false
+odoo_available_externally: false
+odoo_traefik_whitelist: "{{ lan }}"
+odoo_data_directory: "{{ docker_home }}/odoo"
+
+# network
+odoo_hostname: "odoo"
+odoo_port_http: "8069"
+odoo_port_chat: "8072"
+
+# docker
+odoo_container_name: "odoo"
+odoo_memory_limit: "1g"
+odoo_db_container_name: "odoo-db"
+odoo_db_memory_limit: "1g"
+
+# homepage
+odoo_homepage_group: "Apps"
+odoo_homepage_icon: "odoo.png"
+odoo_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ odoo_port_http }}"
+odoo_homepage_showStats: "false"
+odoo_db_homepage_group: "DBs"
+odoo_db_homepage_icon: "postgres.png"
+odoo_db_homepage_showStats: "false"
+

@@ -1,0 +1,22 @@
+---
+# enable or disable the application
+doku_enabled: false
+doku_available_externally: false
+doku_traefik_whitelist: "{{ lan }}"
+
+# network
+doku_hostname: "doku"
+doku_port: "9091"
+
+# specs
+doku_memory: "512M"
+
+# homepage
+doku_homepage_group: "Apps"
+doku_homepage_name: "Doku"
+doku_homepage_icon: "mdi-harddisk"
+doku_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port }}"
+doku_homepage_showStats: "false"
+
+# watchtower
+doku_watchtower_monitor_only: "true"

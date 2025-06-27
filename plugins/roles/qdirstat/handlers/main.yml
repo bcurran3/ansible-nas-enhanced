@@ -1,0 +1,9 @@
+---
+- name: Stop QDirStat
+  docker_container:
+    name: "{{ qdirstat_container_name }}"
+    state: absent
+  when: qdirstat_enabled is false
+  listen:
+    - "stop qdirstat"
+    - "stop disabled applications"

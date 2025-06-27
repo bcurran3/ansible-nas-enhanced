@@ -1,0 +1,73 @@
+---
+- name: Start code-server
+  block:
+    - name: Create code-server Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1000"
+        group: ansible-nas
+      with_items:
+        - "{{ codeserver_data_directory }}"
+        - "{{ codeserver_data_directory }}/project"
+        - "{{ codeserver_data_directory }}/.config"
+        - "{{ codeserver_data_directory }}/.config/code-server"
+        - "{{ codeserver_data_directory }}/.local"
+        - "{{ codeserver_data_directory }}/.local/share"
+        - "{{ codeserver_data_directory }}/.local/share/code-server"
+        - "{{ codeserver_data_directory }}/.local/share/code-server/extensions"
+
+    - name: Create code-server Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: code-server
+        hostname: code-server
+        image: codercom/code-server:latest
+        pull: true
+        ports:
+          - "{{ codeserver_port_http }}:8080"
+        volumes:
+#         - "{{ codeserver_data_directory }}/project:/home/coder/project"
+          - "{{ codeserver_data_directory }}/.config:/home/coder/.config"
+          - "{{ codeserver_data_directory }}/.local:/home/coder/.local"
+          - "/etc/timezone:/etc/timezone:ro"
+          - "/home/{{ ansible_nas_user }}:/home/coder/{{ ansible_nas_user }}" # added
+          - "{{ docker_home }}:/home/coder/dockerdata" # added
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          DOCKER_USER: "{{ ansible_nas_user }}"
+          PASSWORD: "{{ codeserver_password }}"
+        restart_policy: unless-stopped
+        memory: "{{ codeserver_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ codeserver_watchtower_monitor_only }}"
+          homepage.group: "{{ codeserver_homepage_group }}"
+          homepage.name: "code-server"
+          homepage.icon: "{{ codeserver_homepgae_icon }}"
+          homepage.href: "{{ codeserver_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ codeserver_port_http }}"
+#         homepage.description: "VS Code in the browser"
+          homepage.server: "my-docker"
+          homepage.container: "code-server"
+          homepage.showStats: "{{ codeserver_homepage_showStats }}"
+          traefik.enable: "{{ codeserver_available_externally | string }}"
+          traefik.http.routers.codeserver.rule: "Host(`{{ codeserver_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.codeserver.tls.certresolver: "letsencrypt"
+          traefik.http.routers.codeserver.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.codeserver.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ codeserver_hostname }}"
+          traefik.http.routers.codeserver.middlewares: "{{ codeserver_hostname }}@docker"
+          traefik.http.middlewares.codeserver.IPAllowList.sourcerange: "{{ codeserver_traefik_whitelist }}"
+          traefik.http.services.codeserver.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/r/codercom/code-server/tags/$${major}.$${minor}.$${patch}"
+  when: codeserver_enabled is true
+
+- name: Stop code-server
+  block:
+    - name: Stop code-server
+      community.docker.docker_container:
+        name: "{{ codeserver_container_name }}"
+        state: absent
+  when: codeserver_enabled is false

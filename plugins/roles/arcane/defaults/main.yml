@@ -1,0 +1,28 @@
+#
+arcane_enabled: false
+arcane_available_externally: false
+arcane_traefik_whitelist: "{{ lan }}"
+
+arcane_puid: "1000"
+arcane_pgid: "1000"
+arcane_public_session_secret: "run openssl rand -base64 32"
+
+# network
+arcane_port_http: "3024"
+arcane_hostname: "arcane"
+
+arcane_data_directory: "{{ docker_home }}/arcane"
+
+# docker
+arcane_container_name: "arcane"
+arcane_memory: "1G"
+
+# homepage
+arcane_homepage_group: "Apps"
+# arcane_homepage_icon: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ arcane_port_http }}/static/img/favicon.svg"
+arcane_homepage_icon: "arcane.png"
+arcane_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ arcane_port_http }}"
+arcane_homepage_showStats: "false"
+
+# watchtower
+arcane_watchtower_monitor_only: "true"

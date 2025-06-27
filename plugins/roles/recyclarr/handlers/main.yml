@@ -1,0 +1,9 @@
+---
+- name: Stop Recyclarr
+  docker_container:
+    name: "{{ recyclarr_container_name }}"
+    state: absent
+  when: recyclarr_enabled is false
+  listen:
+    - "stop recyclarr"
+    - "stop disabled applications"

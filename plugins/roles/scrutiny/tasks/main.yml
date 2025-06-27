@@ -1,0 +1,80 @@
+---
+- name: Start Scrutiny
+  block:
+    - name: Create Scrutiny Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ scrutiny_data_directory }}"
+        - "{{ scrutiny_data_directory }}/config"
+        - "{{ scrutiny_data_directory }}/influxdb"
+
+    - name: Install smartmontools
+      apt:
+        name: "smartmontools"
+        state: present
+      register: result
+      until: result is succeeded
+
+    - name: Template Scrutiny scrutiny.yaml
+      template:
+        src: scrutiny.yaml
+        dest: "{{ scrutiny_data_directory }}/config/scrutiny.yaml"
+      register: template_config
+
+    - name: Create Scrutiny Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ scrutiny_container_name }}"
+        hostname: "{{ scrutiny_container_name }}"
+        image: ghcr.io/analogj/scrutiny:master-omnibus
+        pull: true
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        volumes:
+          - "{{ scrutiny_data_directory }}/config:/opt/scrutiny/config"
+          - "{{ scrutiny_data_directory }}/influxdb:/opt/scrutiny/influxdb"
+          - "/run/udev:/run/udev:ro"
+          - "/etc/timezone:/etc/timezone:ro"
+        ports:
+          - "{{ scrutiny_port }}: 8080"
+        devices: "{{ scrutiny_devices }}"
+        capabilities:
+          - SYS_RAWIO
+          - SYS_ADMIN
+        restart_policy: unless-stopped
+        memory: "{{ scrutiny_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ scrutiny_watchtower_monitor_only }}"
+          homepage.name: "Scrutiny"
+          homepage.group: "{{ scrutiny_homepage_group }}"
+          homepage.href: "{{ scrutiny_homepage_href }}"
+          homepage.icon: "{{ scrutiny_homepage_icon }}"
+#         homepage.description: "Hard Drive S.M.A.R.T Monitoring, Historical Trends & Real World Failure Thresholds"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scrutiny_port }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ scrutiny_container_name }}"
+          homepage.showStats: "{{ scrutiny_homepage_showStats }}"
+          homepage.widget.type: "scrutiny"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scrutiny_port }}"
+          traefik.enable: "{{ scrutiny_available_externally | string }}"
+          traefik.http.routers.scrutiny.rule: "Host(`{{ scrutiny_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.scrutiny.tls.certresolver: "letsencrypt"
+          traefik.http.routers.scrutiny.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.scrutiny.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ scrutiny_hostname }}"
+          traefik.http.routers.scrutiny.middlewares: "{{ scrutiny_hostname }}@docker"
+          traefik.http.middlewares.scrutiny.IPAllowList.sourcerange: "{{ scrutiny_traefik_whitelist }}"
+          traefik.http.services.scrutiny.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/AnalogJ/scrutiny/releases/tag/$${major}.$${minor}.$${patch}"
+  when: scrutiny_enabled is true
+
+- name: Stop Scrutiny
+  block:
+    - name: Stop Scrutiny
+      community.docker.docker_container:
+        name: "{{ scrutiny_container_name }}"
+        state: absent
+  when: scrutiny_enabled is false

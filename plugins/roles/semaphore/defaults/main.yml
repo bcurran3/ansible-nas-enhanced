@@ -1,0 +1,25 @@
+---
+# enable or disable the application
+semaphore_enabled: false
+semaphore_available_externally: false
+semaphore_traefik_whitelist: "{{ lan }}"
+
+# directories
+semaphore_data_directory: "{{ docker_home }}/semaphore"
+
+# network
+semaphore_hostname: "semaphore"
+semaphore_port_http: "3001"
+
+# docker
+semaphore_container_name: "semaphore"
+semaphore_memory_limit: "1g"
+
+# homepage
+semaphore_homepage_group: "Apps"
+semaphore_homepage_icon: "semaphore.png"
+semaphore_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ semaphore_port_http }}"
+semaphore_homepage_showStats: "false"
+
+# watchtower
+semaphore_watchtower_monitor_only: "true"

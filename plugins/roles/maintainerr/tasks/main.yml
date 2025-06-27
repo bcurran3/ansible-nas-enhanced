@@ -1,0 +1,57 @@
+---
+- name: Start Maintainerr
+  block:
+    - name: Create Maintainerr Data Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ maintainerr_data_directory }}"
+        - "{{ maintainerr_data_directory }}/data"
+
+    - name: Create Maintainerr Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ maintainerr_container_name }}"
+        image: "{{ maintainerr_docker_image }}"
+        pull: true
+        ports:
+          - "{{ maintainerr_port }}:80"
+        volumes:
+          - "{{ maintainerr_data_directory }}/data:/opt/data"
+        env:
+          UV_USE_IO_URING: "0"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ maintainerr_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ maintainerr_watchtower_monitor_only }}"
+          homepage.name: "Maintainerr"
+          homepage.group: "{{ maintainerr_homepage_group }}"
+          homepage.icon: "{{ maintainerr_homepage_icon }}"
+          homepage.href: "{{ maintainerr_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ maintainerr_port_http }}"
+#         homepage.description: "Looks and smells like Overseerr, does the opposite. Maintenance tool for the Plex ecosystem"
+          homepage.server: "my-docker"
+          homepage.container: "{{ maintainerr_container_name }}"
+          homepage.showStats: "{{ maintainerr_homepage_showStats }}"
+          traefik.enable: "{{ maintainerr_available_externally | string }}"
+          traefik.http.routers.maintainerr.rule: "Host(`{{ maintainerr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.maintainerr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.maintainerr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.maintainerr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ maintainerr_hostname }}"
+          traefik.http.routers.maintainerr.middlewares: "{{ maintainerr_hostname }}@docker"
+          traefik.http.middlewares.maintainerr.IPAllowList.sourcerange: "{{ maintainerr_traefik_whitelist }}"      
+          traefik.http.services.maintainerr.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: maintainerr_enabled is true
+
+- name: Stop Maintainerr
+  block:
+    - name: Stop Maintainerr
+      community.docker.docker_container:
+        name: "{{ maintainerr_container_name }}"
+        state: absent
+  when: maintainerr_enabled is false

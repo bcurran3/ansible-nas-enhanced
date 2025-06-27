@@ -1,0 +1,25 @@
+#
+lancommander_enabled: false
+lancommander_available_externally: false
+lancommander_traefik_whitelist: "{{ lan }}"
+lancommander_data_directory: "{{ docker_home }}/lancommander"
+
+# network
+lancommander_hostname: "lancommander"
+lancommander_port_http: "1337"
+
+# docker
+lancommander_container_name: "lancommander"
+lancommander_memory_limit: "1g"
+
+lancommander_puid: "1000"
+lancommander_pgid: "1000"
+
+# homepage
+lancommander_homepage_group: "Apps"
+lancommander_homepage_icon: "lancommander.png"
+lancommander_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lancommander_port_http }}"
+lancommander_homepage_showStats: "false"
+
+# watchtower
+lancommander_watchtower_monitor_only: "true"

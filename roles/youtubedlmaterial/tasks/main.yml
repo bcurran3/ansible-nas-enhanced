@@ -1,0 +1,101 @@
+---
+- name: Start YoutubeDL-Material
+  block:
+    - name: Create YoutubeDL-Material Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        # mode: 0755
+      with_items:
+        - "{{ youtubedlmaterial_data_directory }}/appdata"
+        - "{{ youtubedlmaterial_data_directory }}/db"
+        - "{{ youtubedlmaterial_dl_audio_directory }}"
+        - "{{ youtubedlmaterial_dl_video_directory }}"
+        - "{{ youtubedlmaterial_dl_subscriptions_directory }}"
+        - "{{ youtubedlmaterial_dl_channels_directory }}"
+
+    - name: Create YoutubeDL-Material MongoDB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ youtubedlmaterial_db_container_name }}"
+        hostname: "{{ youtubedlmaterial_db_container_name }}"
+        image: "{{ youtubedlmaterial_db_image_name }}:{{ youtubedlmaterial_db_image_version }}"
+        pull: true
+        volumes:
+          - "{{ youtubedlmaterial_data_directory }}/db:/data/db"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ youtubedlmaterial_db_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ youtubedlmaterial_db_watchtower_monitor_only }}"
+          homepage.name: "YoutubeDL-Material MongoDB"
+          homepage.group: "{{ youtubedlmaterial_db_homepage_group }}"
+          homepage.icon: "{{ youtubedlmaterial_db_homepage_icon }}"
+          homepage.href: "{{ youtubedlmaterial_homepage_href }}"
+#         homepage.description: "The MongoDB Database"
+          homepage.server: "my-docker"
+          homepage.container: "{{ youtubedlmaterial_db_container_name }}"
+          homepage.showStats: "{{ youtubedlmaterial_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+
+    - name: Create YoutubeDL-Material Docker Container
+      community.docker.docker_container:
+        name: "{{ youtubedlmaterial_container_name }}"
+        hostname: "{{ youtubedlmaterial_container_name }}"
+        image: "{{ youtubedlmaterial_image_name }}:{{ youtubedlmaterial_image_version }}"
+        pull: true
+        volumes:
+          - "{{ youtubedlmaterial_data_directory }}/appdata:/app/appdata:rw"
+          - "{{ youtubedlmaterial_dl_audio_directory }}:/app/audio:rw"
+          - "{{ youtubedlmaterial_dl_video_directory }}:/app/video:rw"
+          - "{{ youtubedlmaterial_dl_subscriptions_directory }}:/app/subscriptions:rw"
+          - "{{ youtubedlmaterial_dl_channels_directory }}:/app/subscriptions/channels:rw"
+          - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
+        network_mode: "bridge"
+        ports:
+          - "{{ youtubedlmaterial_port_http }}:17442"
+        env:
+          ALLOW_CONFIG_MUTATIONS: "true"
+          ytdl_mongodb_connection_string: "mongodb://{{ youtubedlmaterial_db_container_name }}:27017"
+          ytdl_use_local_db: "true"
+          UID: "{{ youtubedlmaterial_uid }}"
+          GID: "{{ youtubedlmaterial_gid }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ youtubedlmaterial_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ youtubedlmaterial_watchtower_monitor_only }}"
+          homepage.name: "YoutubeDL-Material"
+          homepage.group: "{{ youtubedlmaterial_homepage_group }}"
+          homepage.icon: "{{ youtubedlmaterial_homepage_icon }}"
+          homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtubedlmaterial_port_http }}"
+#         homepage.description: "Self-hosted YouTube downloader built on Material Design"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ youtubedlmaterial_container_name }}"
+          homepage.showStats: "{{ youtubedlmaterial_homepage_showStats }}"
+          traefik.enable: "{{ youtubedlmaterial_available_externally | string }}"
+          traefik.http.routers.youtubedlmaterial.rule: "Host(`{{ youtubedlmaterial_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.youtubedlmaterial.tls.certresolver: "letsencrypt"
+          traefik.http.routers.youtubedlmaterial.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.youtubedlmaterial.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.services.youtubedlmaterial.loadbalancer.server.port: "17442"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/Tzahi12345/YoutubeDL-Material/releases/tags/$${major}.$${minor}.$${patch}"
+  when: youtubedlmaterial_enabled is true
+
+- name: Stop YoutubeDL-Material
+  block:
+    - name: Stop YoutubeDL-Material Docker Container
+      community.docker.docker_container:
+        name: "{{ youtubedlmaterial_container_name }}"
+        state: absent
+    - name: Stop YoutubeDL-Material DB Docker Container
+      community.docker.docker_container:
+        name: "{{ youtubedlmaterial_db_container_name }}"
+        state: absent
+  when: youtubedlmaterial_enabled is false

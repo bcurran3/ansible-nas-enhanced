@@ -1,0 +1,58 @@
+---
+- name: Start QDirStat
+  block:
+    - name: Create QDirStat Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ qdirstat_data_directory }}"
+        - "{{ qdirstat_data_directory }}/config"
+
+    - name: Create QDirStat Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ qdirstat_container_name }}"
+        hostname: "{{ qdirstat_container_name }}"
+        image: jlesage/qdirstat:latest
+        pull: true
+        volumes:
+          - "{{ qdirstat_data_directory }}/config:/config:rw"
+          - "{{ qdirstat_storage_directory }}:/storage:ro"
+        ports:
+          - "{{ qdirstat_port_http }}:5800"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ qdirstat_watchtower_monitor_only }}"
+          homepage.name: "QDirStat"
+          homepage.group: "{{ qdirstat_homepage_group }}"
+          homepage.href: "{{ qdirstat_homepage_href }}"
+          homepage.icon: "{{ qdirstat_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
+#         homepage.description: "Qt-based directory statistics"
+          homepage.server: "my-docker"
+          homepage.container: "{{ qdirstat_container_name }}"
+          homepage.showStats: "{{ qdirstat_homepage_showStats }}"
+          traefik.enable: "{{ qdirstat_available_externally | string }}"
+          traefik.http.routers.qdirstat.rule: "Host(`qdirstat.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.qdirstat.tls.certresolver: "letsencrypt"
+          traefik.http.routers.qdirstat.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.qdirstat.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ qdirstat_hostname }}"
+          traefik.http.routers.qdirstat.middlewares: "{{ qdirstat_hostname }}@docker"
+          traefik.http.middlewares.qdirstat.IPAllowList.sourcerange: "{{ qdirstat_traefik_whitelist }}"
+          traefik.http.services.qdirstat.loadbalancer.server.port: "5800"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/jlesage/docker-qdirstat/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ qdirstat_memory_limit }}"
+  when: qdirstat_enabled is true
+
+- name: Stop QDirStat
+  block:
+    - name: Stop QDirStat
+      community.docker.docker_container:
+        name: "{{ qdirstat_container_name }}"
+        state: absent
+  when: qdirstat_enabled is false

@@ -1,0 +1,62 @@
+---
+- name: Start Whisparr
+  block:
+    - name: Create Whisparr Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ whisparr_data_directory }}"
+        - "{{ whisparr_data_directory }}/config"
+
+    - name: Create whisparr Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ whisparr_container_name }}"
+        hostname: "{{ whisparr_container_name }}"
+        image: ghcr.io/thespad/whisparr:latest
+        pull: true
+        ports:
+          - "{{ whisparr_port_http }}:6969"
+        volumes:
+          - "{{ whisparr_data_directory }}/config:/config"
+          - "{{ whisparr_porn_directory }}:/porn"
+          - "{{ whisparr_download_directory }}:/downloads"
+        network_mode: bridge
+        env:
+          PUID: "998"
+          PGID: "1001"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ whisparr_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ whisparr_watchtower_monitor_only }}"
+          homepage.name: "Whisparr"
+          homepage.group: "{{ whisparr_homepage_group }}"
+          homepage.icon: "{{ whisparr_homepage_icon }}"
+          homepage.href: "{{ whisparr_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whisparr_port_http }}"
+#         homepage.description: "Whisparr is an adult movie collection manager for Usenet and BitTorrent users. "
+          homepage.server: "my-docker"
+          homepage.container: "{{ whisparr_container_name }}"
+          homepage.showStats: "{{ whisparr_homepage_showStats }}"
+          traefik.enable: "{{ whisparr_available_externally | string }}"
+          traefik.http.routers.whisparr.rule: "Host(`{{ whisparr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.whisparr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.whisparr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.whisparr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ whisparr_hostname }}"
+          traefik.http.routers.whisparr.middlewares: "{{ whisparr_hostname }}@docker"
+          traefik.http.middlewares.whisparr.IPAllowList.sourcerange: "{{ whisparr_traefik_whitelist }}"
+          traefik.http.services.whisparr.loadbalancer.server.port: "6969"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: whisparr_enabled is true
+
+- name: Stop Whisparr
+  block:
+    - name: Stop Whisparr
+      community.docker.docker_container:
+        name: "{{ whisparr_container_name }}"
+        state: absent
+  when: whisparr_enabled is false

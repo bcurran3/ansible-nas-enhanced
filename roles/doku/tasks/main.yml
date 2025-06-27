@@ -1,0 +1,50 @@
+---
+- name: Start Doku
+  block:
+    - name: Create Doku Docker Container
+      docker_container:
+        name: doku
+        hostname: doku
+        image: amerkurev/doku:latest
+        pull: true
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+          - "{{ docker_home }}:/hostroot:ro"
+        ports:
+          - "{{ doku_port }}:{{ doku_port }}"
+        env:
+          PORT: "{{ doku_port }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ doku_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ doku_watchtower_monitor_only }}"
+          homepage.group: "{{ doku_homepage_group }}"
+          homepage.name: "{{ doku_homepage_name}} "
+          homepage.icon: "{{ doku_homepage_icon }}"
+          homepage.href: "{{ doku_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port }}"
+    #     homepage.description: "Docker disk space usage"
+          homepage.server: "my-docker"
+          homepage.container: "doku"
+          homepage.showStats: "{{ doku_homepage_showStats }}"
+          traefik.enable: "{{ doku_available_externally | string }}"
+          traefik.http.routers.doku.rule: "Host(`{{ doku_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.doku.tls.certresolver: "letsencrypt"
+          traefik.http.routers.doku.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.doku.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ doku_hostname }}"
+          traefik.http.routers.doku.middlewares: "{{ doku_hostname }}@docker"
+          traefik.http.middlewares.doku.IPAllowList.sourcerange: "{{ doku_traefik_whitelist }}"
+          traefik.http.services.doku.loadbalancer.server.port: "{{ doku_port }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/amerkurev/doku/releases/tag/$${major}.$${minor}.$${patch}"
+  when: doku_enabled is true
+
+- name: Stop Doku
+  block:
+    - name: Stop Doku Docker Container
+      community.docker.docker_container:
+        name: "{{ doku_container_name }}"
+        state: absent
+  when: doku_enabled is false

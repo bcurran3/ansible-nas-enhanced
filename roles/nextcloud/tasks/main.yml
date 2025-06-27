@@ -1,0 +1,180 @@
+---
+- name: Start Nextcloud
+  block:
+    - name: Nextcloud Create Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ nextcloud_data_directory }}/nextcloud"
+        - "{{ nextcloud_data_directory }}/mysql"
+        - "{{ nextcloud_data_directory }}/mysql/mysql" # added
+        - "{{ nextcloud_data_directory }}/nextcloud/before-starting" # added
+        - "{{ nextcloud_data_directory }}/nextcloud/pre-installation" # added
+        - "{{ nextcloud_data_directory }}/nextcloud/post-installation" # added
+        - "{{ nextcloud_data_directory }}/nextcloud/pre-upgrade" # added
+        - "{{ nextcloud_data_directory }}/nextcloud/post-upgrade" # added
+
+    - name: Create Nextcloud network
+      community.docker.docker_network:
+        name: "{{ nextcloud_network_name }}"
+
+    - name: Nextcloud Redis Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ nextcloud_redis_container_name }}"
+        hostname: "{{ nextcloud_redis_container_name }}"
+        image: "{{ nextcloud_redis_image_name }}:{{ nextcloud_redis_image_version }}"
+        pull: true
+        networks:
+          - name: "{{ nextcloud_network_name }}"
+        network_mode: "{{ nextcloud_network_name }}"
+        networks_cli_compatible: "yes"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ nextcloud_redis_memory }}"
+        command: "redis-server --requirepass topsecret"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "true"
+          homepage.group: "{{ nextcloud_redis_homepage_group }}"
+          homepage.name: "Nextcloud Redis"
+          homepage.icon: "{{ nextcloud_redis_homepage_icon }}"
+          homepage.href: "{{ nextcloud_homepage_href }}"
+#         homepage.description: "Redis"
+          homepage.server: "my-docker"
+          homepage.container: "{{ nextcloud_redis_container_name }}"
+          homepage.showStats: "{{ nextcloud_redis_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Nextcloud MySQL Docker Container
+      community.docker.docker_container:
+        name: "{{ nextcloud_db_container_name }}"
+        hostname: "{{ nextcloud_db_container_name }}"
+        image: "{{ nextcloud_db_image_name }}:{{ nextcloud_db_image_version }}"
+        networks:
+          - name: "{{ nextcloud_network_name }}"
+        network_mode: "{{ nextcloud_network_name }}"
+        pull: true
+        volumes:
+          - "{{ nextcloud_data_directory }}/mysql/mysql:/var/lib/mysql" # added
+          - "{{ nextcloud_data_directory }}/mysql/my.cnf:/etc/my.cnf" # added
+          - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
+        env:
+          MYSQL_DATABASE: "nextcloud"
+          MYSQL_USER: "{{ nextcloud_sql_user }}"
+          MYSQL_PASSWORD: "{{ nextcloud_sql_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ nextcloud_sql_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ nextcloud_db_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "true"
+          homepage.group: "{{ nextcloud_db_homepage_group }}"
+          homepage.name: "Nextcloud MySQL"
+          homepage.icon: "{{ nextcloud_db_homepage_icon }}"
+          homepage.href: "{{ nextcloud_homepage_href }}"
+#         homepage.description: "MySQL"
+          homepage.server: "my-docker"
+          homepage.container: "{{ nextcloud_db_container_name }}"
+          homepage.showStats: "{{ nextcloud_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Nextcloud Docker Container
+      community.docker.docker_container:
+        name: "{{ nextcloud_container_name }}"
+        hostname: "{{ nextcloud_container_name }}"
+        image: "{{ nextcloud_image_name }}:{{ nextcloud_image_version }}"
+        networks:
+          - name: "{{ nextcloud_network_name }}"
+        network_mode: "{{ nextcloud_network_name }}"
+        pull: true
+        volumes:
+          - "{{ nextcloud_data_directory }}/nextcloud:/var/www/html:rw"
+          - "{{ nextcloud_data_directory }}/nextcloud/pre-installation:/docker-entrypoint-hooks.d/pre-installation" # added
+          - "{{ nextcloud_data_directory }}/nextcloud/post-installation:/docker-entrypoint-hooks.d/post-installation" # added
+          - "{{ nextcloud_data_directory }}/nextcloud/pre-upgrade:/docker-entrypoint-hooks.d/pre-upgrade" # added
+          - "{{ nextcloud_data_directory }}/nextcloud/post-upgrade:/docker-entrypoint-hooks.d/post-upgrade" # added
+          - "{{ nextcloud_data_directory }}/nextcloud/before-starting:/docker-entrypoint-hooks.d/before-starting" # added
+          - "{{ audiobooks_root }}:/media/audiobooks:ro" # added
+          - "{{ books_root }}:/media/books:ro"   # added
+          - "{{ comics_root }}:/media/comics:ro" # added
+          - "{{ music_root }}:/media/music:ro"   # added
+        ports:
+          - "{{ nextcloud_port }}:80"
+          - "3478:3478"               # TURN server for Talk
+        env:
+          MYSQL_HOST: "{{ nextcloud_db_container_name }}"
+          MYSQL_DATABASE: "nextcloud"
+          MYSQL_USER: "{{ nextcloud_sql_user }}"
+          MYSQL_PASSWORD: "{{ nextcloud_sql_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ nextcloud_sql_root_password }}"
+          NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
+          REDIS_HOST: "{{ nextcloud_redis_container_name }}" # added
+          REDIS_PORT: "6379"               # added
+          REDIS_HOST_PASSWORD: "topsecret" # added
+#         NEXTCLOUD_INIT_HTACCESS: "true"
+#         ^^^ added localhost
+          APACHE_DISABLE_REWRITE_IP: "1"   # added
+          TZ: "{{ ansible_nas_timezone }}" # added
+        restart_policy: unless-stopped
+        memory: "{{ nextcloud_memory }}"
+        links:
+          - "{{ nextcloud_redis_container_name }}"
+          - "{{ nextcloud_db_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "true"
+          homepage.group: "{{ nextcloud_homepage_group }}"
+          homepage.name: "Nextcloud"
+          homepage.icon: "{{ nextcloud_homepage_icon }}"
+          homepage.href: "{{ nextcloud_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port }}"
+#         homepage.description: "Open source dropbox alternative"
+          homepage.server: "my-docker"
+          homepage.container: "{{ nextcloud_container_name }}"
+          homepage.showStats: "{{ nextcloud_homepage_showStats }}"
+          homepage.widget.type: "nextcloud"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port }}"
+          homepage.widget.key: "{{ nextcloud_homepage_widget_key }}"
+          traefik.enable: "{{ nextcloud_available_externally | string }}"
+          traefik.http.routers.nextcloud.rule: "Host(`{{ nextcloud_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.nextcloud.tls.certresolver: "letsencrypt"
+          traefik.http.routers.nextcloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.nextcloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ nextcloud_hostname }}"
+          traefik.http.routers.nextcloud.middlewares: "{{ nextcloud_hostname }}@docker"
+          traefik.http.middlewares.nextcloud.IPAllowList.sourcerange: "{{ nextcloud_traefik_whitelist }}"
+          traefik.http.services.nextcloud.loadbalancer.server.port: "80"
+#
+# from https://docs.nextcloud.com/server/27/admin_manual/configuration_server/reverse_proxy_configuration.html#traefik-2
+#      traefik.http.routers.nextcloud.middlewares: "nextcloud_redirectregex"
+#      traefik.http.middlewares.nextcloud_redirectregex.redirectregex.permanent: "true"
+#      traefik.http.middlewares.nextcloud_redirectregex.redirectregex.regex: "https://(.*)/.well-known/(?:card|cal)dav"
+#      traefik.http.middlewares.nextcloud_redirectregex.redirectregex.replacement: "https://$${1}/remote.php/dav"
+# ^^^^^^^^^ above did not fix problem
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/nextcloud/server/releases/tag/$${major}.$${minor}.$${patch}"
+  when: nextcloud_enabled is true
+
+- name: Stop Nextcloud
+  block:
+    - name: Stop Nextcloud Docker Container
+      community.docker.docker_container:
+        name: "{{ nextcloud_container_name }}"
+        state: absent
+    - name: Stop Nextcloud Redis Docker Container
+      community.docker.docker_container:
+        name: "{{ nextcloud_redis_container_name }}"
+        state: absent
+    - name: Stop Nextcloud MySQL Docker Container
+      community.docker.docker_container:
+        name: "{{ nextcloud_db_container_name }}"
+        state: absent
+  when: nextcloud_enabled is false
+
+# adding redis makes it faster!
+# some changes to make my.cnf persistant

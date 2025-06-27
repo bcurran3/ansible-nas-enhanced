@@ -1,0 +1,9 @@
+---
+- name: Stop Diskover
+  docker_container:
+    name: "{{ diskover_container_name }}"
+    state: absent
+  when: diskover_enabled is false
+  listen:
+    - "stop diskover"
+    - "stop disabled applications"

@@ -1,0 +1,22 @@
+#
+pornvault_enabled: false
+pornvault_available_externally: false
+pornvault_traefik_whitelist: "{{ lan }}"
+
+pornvault_hostname: "pornvault"
+
+pornvault_data_directory: "{{ docker_home }}/pornvault"
+
+pornvault_http_port: "3030"
+
+# docker
+pornvault_container_name: "porn-vault"
+
+# homepage
+pornvault_homepage_group: "Apps"
+pornvault_homepage_icon: "pornvault.png"
+pornvault_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pornvault_port_http }}"
+pornvault_homepage_showStats: "false"
+
+# watchtower
+pornvault_watchtower_monitor_only: "true"

@@ -1,0 +1,9 @@
+---
+- name: Stop MakeMKV
+  docker_container:
+    name: "{{ makemkv_container_name }}"
+    state: absent
+  when: makemkv_enabled is false
+  listen:
+    - "stop makemkv"
+    - "stop disabled applications"

@@ -1,0 +1,68 @@
+---
+- name: Start Jellyfin
+  block:
+    - name: Create Jellyfin Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ jellyfin_config_directory }}"
+
+    - name: Jellyfin Docker Container
+      community.docker.docker_container:
+        name: "{{ jellyfin_container_name }}"
+        hostname: "{{ jellyfin_container_name }}"
+        image: "{{ jellyfin_image_name }}:{{ jellyfin_image_version }}"
+        pull: true
+        volumes:
+          - "{{ jellyfin_config_directory }}:/config:rw"
+          - "{{ jellyfin_movies_directory }}:/movies:{{ jellyfin_movies_permissions }}"
+          - "{{ jellyfin_music_directory }}:/music:{{ jellyfin_music_permissions }}"
+          - "{{ jellyfin_photos_directory }}:/photos:{{ jellyfin_photos_permissions }}"
+          - "{{ jellyfin_tv_directory }}:/tv:{{ jellyfin_tv_permissions }}"
+          - "{{ jellyfin_books_directory }}:/books:{{ jellyfin_books_permissions }}"
+          - "{{ jellyfin_audiobooks_directory }}:/audiobooks:{{ jellyfin_audiobooks_permissions }}"
+        ports:
+          - "{{ jellyfin_port_http }}:8096"
+        env:
+          PUID: "{{ jellyfin_user_id }}"
+          PGID: "{{ jellyfin_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ jellyfin_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ jellyfin_watchtower_monitor_only }}"
+          homepage.group: "{{ jellyfin_homepage_group }}"
+          homepage.name: "Jellyfin"
+          homepage.icon: "{{ jellyfin_homepage_icon }}"
+          homepage.href: "{{ jellyfin_homepage_href}}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyfin_port_http }}"
+          homepage.showStats: "{{ jellyfin_homepage_showStats }}"
+#         homepage.description: Media server
+          homepage.server: "my-docker"
+          homepage.container: "jellyfin"
+          homepage.widget.type: "jellyfin"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyfin_port_http }}"
+          homepage.widget.key: "{{ jellyfin_homepage_widget_key }}"
+          homepage.widget.enableBlocks: "true"
+          homepage.widget.enableNowPlaying: "true"
+          traefik.enable: "{{ jellyfin_available_externally | string }}"
+          traefik.http.routers.jellyfin.rule: "Host(`{{ jellyfin_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.jellyfin.tls.certresolver: "letsencrypt"
+          traefik.http.routers.jellyfin.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.jellyfin.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ jellyfin_hostname }}"
+          traefik.http.routers.jellyfin.middlewares: "{{ jellyfin_hostname }}@docker"
+          traefik.http.middlewares.jellyfin.IPAllowList.sourcerange: "{{ jellyfin_traefik_whitelist }}"
+          traefik.http.services.jellyfin.loadbalancer.server.port: "8096"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/jellyfin/jellyfin/releases/tags/$${major}.$${minor}.$${patch}"
+  when: jellyfin_enabled is true
+
+- name: Stop Jellyfin
+  block:
+    - name: Stop Jellyfin Docker Container
+      community.docker.docker_container:
+        name: "{{ jellyfin_container_name }}"
+        state: absent
+  when: jellyfin_enabled is false

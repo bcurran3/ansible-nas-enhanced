@@ -1,0 +1,9 @@
+---
+- name: Stop tacticalrmm
+  docker_container:
+    name: "{{ tacticalrmm_container_name }}"
+    state: absent
+  when: tacticalrmm_enabled is false
+  listen:
+    - "stop tacticalrmm"
+    - "stop disabled applications"

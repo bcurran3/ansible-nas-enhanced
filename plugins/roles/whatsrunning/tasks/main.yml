@@ -1,0 +1,52 @@
+---
+- name: Start What's Running
+  block:
+    - name: Create What's Running Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ whatsrunning_container_name }}"
+        hostname: "{{ whatsrunning_container_name }}"
+        image: mikeage/whatsrunning:latest
+        pull: true
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        env:
+#         HOST_HOSTNAME: "https://{{ whatsrunning_hostname }}.{{ ansible_nas_domain }}"
+          HOST_HOSTNAME: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+          VERBOSE: "true"
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ whatsrunning_port_http }}:5000"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ whatsrunning_watchtower_monitor_only }}"
+          homepage.name: "What's Running"
+          homepage.group: "{{ whatsrunning_homepage_group }}"
+          homepage.icon: "{{ whatsrunning_homepage_icon }}"
+          homepage.href: "{{ whatsrunning_homepage_href }}"
+#         homepage.description: "a barebones webpage showing all docker containers that expose ports"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ whatsrunning_container_name }}"
+          homepage.showStats: "{{ whatsrunning_homepage_showStats }}"
+          traefik.enable: "{{ whatsrunning_available_externally | string }}"
+          traefik.http.routers.whatsrunning.rule: "Host(`{{ whatsrunning_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.whatsrunning.tls.certresolver: "letsencrypt"
+          traefik.http.routers.whatsrunning.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.whatsrunning.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ whatsrunning_hostname }}"
+          traefik.http.routers.whatsrunning.middlewares: "{{ whatsrunning_hostname }}@docker"
+          traefik.http.middlewares.whatsrunning.IPAllowList.sourcerange: "{{ whatsrunning_traefik_whitelist }}"
+          traefik.http.services.whatsrunning.loadbalancer.server.port: "5000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mikeage/whatsrunning/tags/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ whatsrunning_memory_limit }}"
+  when: whatsrunning_enabled is true
+
+- name: Stop What's Running
+  block:
+    - name: Stop What's Running Docker Container
+      community.docker.docker_container:
+        name: "{{ whatsrunning_container_name }}"
+        state: absent
+  when: whatsrunning_enabled is false

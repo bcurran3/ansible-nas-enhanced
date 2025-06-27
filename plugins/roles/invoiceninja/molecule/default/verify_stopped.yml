@@ -1,0 +1,40 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove Invoice Ninja
+      community.docker.docker_container:
+        name: "{{ invoiceninja_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Invoice Ninja is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Try and stop and remove Invoice Ninja backend
+      community.docker.docker_container:
+        name: "{{ invoiceninja_backend_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Invoice Ninja backend is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Try and stop and remove Invoice Ninja DB
+      community.docker.docker_container:
+        name: "{{ invoiceninja_db_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Invoice Ninja DB is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

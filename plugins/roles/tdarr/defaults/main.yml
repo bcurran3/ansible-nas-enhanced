@@ -1,0 +1,36 @@
+---
+#
+tdarr_enabled: false
+tdarr_available_externally: false
+tdarr_traefik_whitelist: "{{ lan }}"
+
+# directories
+tdarr_data_directory: "{{ docker_home }}/tdarr"
+tdarr_cache_directory: "{{ samba_shares_root }}/dump/tdar_temp"
+tdarr_configs_directory: "{{ docker_home }}/tdarr/configs"
+tdarr_logs_directory: "{{ docker_home }}/tdarr/logs"
+tdarr_media_directory: "{{ samba_shares_root }}"
+
+# uid / gid
+tdarr_user_id: "0"
+tdarr_group_id: "0"
+
+# network
+tdarr_hostname: "tdarr"
+tdarr_port_http: "8265"
+tdarr_port_server: "8266"
+
+# docker
+tdarr_container_name: "tdarr"
+tdarr_memory: "4g"
+tdarr_cpu_shares: "512" # about half default CPU resources
+
+# homepage
+tdarr_homepage_group: "Apps"
+tdarr_homepage_icon: "tdarr.png"
+tdarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tdarr_port_http }}"
+tdarr_homepage_showStats: "false"
+tdarr_homepage_key: "insert Tdarr API key here"
+
+# watchtower
+tdarr_watchtower_monitor_only: "true"

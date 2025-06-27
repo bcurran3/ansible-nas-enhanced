@@ -1,0 +1,98 @@
+---
+- name: Start Joplin
+  block:
+    - name: Create Joplin Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ joplin_data_directory }}"
+        - "{{ joplin_data_directory }}/db"
+
+    - name: Create Joplin DB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ joplin_db_container_name }}"
+        hostname: "{{ joplin_db_container_name }}"
+        image: postgres:16-alpine
+        pull: true
+        volumes:
+          - "{{ joplin_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "joplin"
+          POSTGRES_PASSWORD: "joplin"
+          POSTGRES_DB: "joplin"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ joplin_db_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ joplin_db_watchtower_monitor_only }}"
+          homepage.name: "Joplin PostGreSQL"
+          homepage.group: "{{ joplin_db_homepage_group }}"
+          homepage.icon: "{{ joplin_db_homepage_icon }}"
+          homepage.href: "{{ joplin_homepage_href }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ joplin_db_container_name }}"
+          homepage.showStats: "{{ joplin_db_homepage_showStats }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+
+    - name: Create Joplin Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ joplin_container_name }}"
+        hostname: "{{ joplin_container_name }}"
+        image: joplin/server:latest
+        pull: true
+        links:
+          - "{{ joplin_db_container_name }}"
+        ports:
+          - "{{ joplin_port_http }}:22300"
+        env:
+          APP_PORT: "22300"
+          APP_BASE_URL: "https://{{ joplin_hostname }}.{{ ansible_nas_domain }}"
+          DB_CLIENT: "pg"
+          POSTGRES_PASSWORD: "joplin"
+          POSTGRES_DATABASE: "joplin"
+          POSTGRES_USER: "joplin"
+          POSTGRES_PORT: "5432"
+          POSTGRES_HOST: "{{ joplin_db_container_name }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ joplin_watchtower_monitor_only }}"
+          homepage.name: "joplin"
+          homepage.group: "{{ joplin_homepage_group }}"
+          homepage.icon: "{{ joplin_homepage_icon }}"
+          homepage.href: "{{ joplin_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joplin_port_http }}"
+#         homepage.description: "the privacy-focused note taking app with sync capabilities for Windows, macOS, Linux, Android and iOS."
+          homepage.server: "my-docker"
+          homepage.container: "{{ joplin_container_name }}"
+          homepage.showStats: "{{ joplin_homepage_showStats }}"
+          traefik.enable: "{{ joplin_available_externally | string }}"
+          traefik.http.routers.joplin.rule: "Host(`{{ joplin_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.joplin.tls.certresolver: "letsencrypt"
+          traefik.http.routers.joplin.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.joplin.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ joplin_hostname }}"
+          traefik.http.routers.joplin.middlewares: "{{ joplin_hostname }}@docker"
+          traefik.http.middlewares.joplin.IPAllowList.sourcerange: "{{ joplin_traefik_whitelist }}"
+          traefik.http.services.joplin.loadbalancer.server.port: "22300"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/laurent22/joplin/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ joplin_memory }}"
+  when: joplin_enabled is true
+
+- name: Stop Joplin
+  block:
+    - name: Stop Joplin Docker Container
+      community.docker.docker_container:
+        name: "{{ joplin_container_name }}"
+        state: absent
+    - name: Stop Joplin DB Docker Container
+      community.docker.docker_container:
+        name: "{{ joplin_db_container_name }}"
+        state: absent
+  when: joplin_enabled is false

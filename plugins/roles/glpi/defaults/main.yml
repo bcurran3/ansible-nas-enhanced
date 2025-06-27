@@ -1,0 +1,31 @@
+#
+glpi_enabled: false
+glpi_available_externally: false
+glpi_traefik_whitelist: "{{ lan }}"
+
+# network
+glpi_port_http: "3022"
+glpi_hostname: "glpi"
+glpi_data_directory: "{{ docker_home }}/glpi"
+
+# docker
+glpi_container_name: "glpi"
+glpi_memory: "1g"
+glpi_db_container_name: "glpi-db"
+glpi_db_memory: "1g"
+
+glpi_db_password: "glpi"
+
+# homepage
+glpi_homepage_group: "Apps"
+glpi_homepage_icon: "glpi.png"
+glpi_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
+glpi_homepage_showStats: "false"
+glpi_db_homepage_group: "DBs"
+glpi_db_homepage_icon: "mariadb.png"
+glpi_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
+glpi_db_homepage_showStats: "false"
+
+# watchtower
+glpi_watchtower_monitor_only: "true"
+glpi_db_watchtower_monitor_only: "true"

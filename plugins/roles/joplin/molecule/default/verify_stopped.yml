@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove Joplin
+      community.docker.docker_container:
+        name: "{{ joplin_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Joplin is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Try and stop and remove Joplin DB
+      community.docker.docker_container:
+        name: "{{ joplin_db_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check Joplin DB is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

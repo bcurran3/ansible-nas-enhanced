@@ -1,0 +1,38 @@
+---
+- name: Create Homepage Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ homepage_data_directory }}/"
+    - "{{ homepage_data_directory }}/config"
+    - "{{ homepage_data_directory }}/config/logs"
+
+- name: Create Homepage Docker Container
+  docker_container:
+    name: homepage
+    image: ghcr.io/gethomepage/homepage:latest
+    pull: true
+    volumes:
+      - "{{ homepage_data_directory }}/config:/app/config"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "media:/media:ro"
+      - "/other:/other:ro"
+      - "/downloads:/downloads:ro"
+    ports:
+      - "{{ homepage_port_http }}:3000"
+    hostname: "homepage"
+    user: "1000:1000"
+    env:
+    restart_policy: unless-stopped
+    memory: "{{ homepage_memory }}"
+    labels:
+      traefik.enable: "{{ homepage_available_externally | string }}"
+      traefik.http.routers.homepage.rule: "Host(`homepage.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.homepage.tls.certresolver: "letsencrypt"
+      traefik.http.routers.homepage.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.homepage.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ homepage_hostname }}"
+      traefik.http.routers.homepage.middlewares: "{{ homepage_hostname }}@docker"
+      traefik.http.middlewares.homepage.IPAllowList.sourcerange: "{{ homepage_traefik_whitelist }}"
+      traefik.http.services.homepage.loadbalancer.server.port: "3000"

@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove phpBB
+      community.docker.docker_container:
+        name: "{{ phpbb_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check phpBB is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Try and stop and remove phpBB MariaDB
+      community.docker.docker_container:
+        name: "{{ phpbb_db_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check phpBB MariaDB is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

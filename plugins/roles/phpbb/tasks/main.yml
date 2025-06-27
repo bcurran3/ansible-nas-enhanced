@@ -1,0 +1,114 @@
+---
+- name: Start phpbb
+  block:
+    - name: Create phpBB Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1001"
+        group: "1001"
+      with_items:
+        - "{{ phpbb_data_directory }}/phpbb"
+        - "{{ phpbb_data_directory }}/db"
+
+    - name: Create phpBB network
+      community.docker.docker_network:
+        name: "{{ phpbb_network_name }}"
+
+    - name: Create phpBB MariaDB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ phpbb_db_container_name }}"
+        hostname: "{{ phpbb_db_container_name }}"
+        image: bitnami/mariadb:latest
+        pull: true
+        network_mode: "bridge"
+        networks:
+          - name: "{{ phpbb_network_name }}"
+        networks_cli_compatible: "yes"
+        volumes:
+          - "{{ phpbb_data_directory }}/db:/bitnami/mariadb"
+        env:
+          ALLOW_EMPTY_PASSWORD: "yes"
+          MARIADB_USER: "phpbb"
+          MARIADB_PASSWORD: "topsecret"
+          MARIADB_DATABASE: "phpbb_db"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ phpbb_db_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ phpbb_db_watchtower_monitor_only }}"
+          homepage.name: "phpBB-DB"
+          homepage.group: "{{ phpbb_db_homepage_group }}"
+          homepage.icon: "{{ phpbb_db_homepage_icon }}"
+          homepage.href: "{{ phpbb_db_homepage_href }}"
+#         homepage.description: "phpBB is a popular open-source bulletin board written in PHP."
+          homepage.server: "my-docker"
+          homepage.container: "{{ phpbb_db_container_name }}"
+          homepage.showStats: "{{ phpbb_db_container_homepage_showStats }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create phpBB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ phpbb_container_name }}"
+        hostname: "{{ phpbb_container_name }}"
+        image: bitnami/phpbb:latest
+        pull: true
+        networks:
+          - name: "{{ phpbb_network_name }}"
+        networks_cli_compatible: "yes"
+        network_mode: "bridge"
+        ports:
+          - "{{ phpbb_port_http }}:8080"
+        volumes:
+          - "{{ phpbb_data_directory }}/phpbb:/bitnami/phpbb"
+        env:
+          ALLOW_EMPTY_PASSWORD: "yes"
+          PHPBB_DATABASE_USER: "phpbb"
+          PHPBB_DATABASE_PASSWORD: "topsecret"
+          PHPBB_DATABASE_NAME: "phpbb_db"
+          PHPBB_DATABASE_HOST: "{{ phpbb_container_db_name }}"
+          PHPBB_FORUM_SERVER_PROTOCOL: "http://"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ phpbb_memory_limit }}"
+        links:
+          - "{{ phpbb_container_db_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ phpbb_watchtower_monitor_only }}"
+          homepage.name: "phpBB"
+          homepage.group: "{{ phpbb_homepage_group }}"
+          homepage.icon: "{{ phpbb_homepage_icon }}"
+          homepage.href: "{{ phpbb_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ phpbb_port_http }}"
+#         homepage.description: "phpBB is a popular open-source bulletin board written in PHP."
+          homepage.server: "my-docker"
+          homepage.container: "{{ phpbb_container_name }}"
+          homepage.showStats: "{{ phpbb_homepage_showStats }}"
+          traefik.enable: "{{ phpbb_available_externally | string }}"
+          traefik.http.routers.phpbb.rule: "Host(`{{ phpbb_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.phpbb.tls.certresolver: "letsencrypt"
+          traefik.http.routers.phpbb.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.phpbb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ phpbb_hostname }}"
+          traefik.http.routers.phpbb.middlewares: "{{ phpbb_hostname }}@docker"
+          traefik.http.middlewares.phpbb.IPAllowList.sourcerange: "{{ phpbb_traefik_whitelist }}"
+          traefik.http.services.phpbb.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: phpbb_enabled is true
+
+- name: Stop phpBB
+  block:
+    - name: Stop phpBB Docker Container
+      community.docker.docker_container:
+        name: "{{ phpbb_container_name }}"
+        state: absent
+    - name: Stop phpBB MariaDb Docker Container
+      community.docker.docker_container:
+        name: "{{ phpbb_db_container_name }}"
+        state: absent
+  when: phpbb_enabled is false

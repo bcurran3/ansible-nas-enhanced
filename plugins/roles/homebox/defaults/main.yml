@@ -1,0 +1,30 @@
+#
+homebox_enabled: false
+homebox_available_externally: false
+homebox_traefik_whitelist: "{{ lan }}"
+
+# network
+homebox_port_http: "3100"
+homebox_hostname: "homebox"
+
+homebox_data_directory: "{{ docker_home }}/homebox"
+
+# docker
+homebox_container_name: "homebox"
+homebox_memory: "1G"
+
+# app
+homebox_mail_host: ""
+homebox_mail_port: "587"
+homebox_mail_username: ""
+homebox_mail_password: ""
+homebox_mail_from: ""
+
+# homepage
+homebox_homepage_group: "Apps"
+homebox_homepage_icon: "homebox.png"
+homebox_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
+homebox_homepage_showStats: "false"
+
+# watchtower
+homebox_watchtower_monitor_only: "true"

@@ -1,0 +1,96 @@
+---
+- name: Start FreshRSS
+  block:
+    - name: Create FreshRSS Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        # mode: 0755
+      with_items:
+        - "{{ freshrss_data_directory }}/db"
+        - "{{ freshrss_data_directory }}/data"
+        - "{{ freshrss_data_directory }}/extensions"
+
+    - name: Create FreshRSS PostgreSQL Docker Container
+      community.docker.docker_container:
+        name: freshrss-db
+        hostname: freshrss-db
+        image: postgres:16-alpine
+        pull: true
+        volumes:
+          - "{{ freshrss_data_directory }}/db:/var/lib/postgresql/data"
+#          - "/etc/timezone:/etc/timezone:ro" # only displays UTC
+        container_default_behavior: no_defaults
+        env:
+          POSTGRES_USER: "freshrss"
+          POSTGRES_PASSWORD: "freshrss"
+          POSTGRES_DB: "freshrss"
+        restart_policy: unless-stopped
+        memory: 1g
+        labels:
+          homepage.group: "DBs"
+          homepage.name: "FreshRSS PostgreSQL"
+          homepage.icon: "postgres.png"
+          homepage.href: "{{ freshrss_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
+#         homepage.description: "PostgrSQL"
+          homepage.server: "my-docker"
+          homepage.container: "freshrss-db"
+          homepage.showStats: "false"
+          traefik.enable: "false"
+
+    - name: Create FreshRSS Docker Container
+      community.docker.docker_container:
+        name: "{{ freshrss_container_name }}"
+        hostname: "{{ freshrss_container_name }}"
+        image: "{{ freshrss_image_name }}:{{ freshrss_image_version }}"
+        pull: true
+        links:
+          - freshrss-db
+        volumes:
+          - "{{ freshrss_data_directory }}/data:/var/www/FreshRSS/data:rw"
+          - "{{ freshrss_data_directory }}/extensions:/var/www/FreshRSS/extensions:rw"
+        ports:
+          - "{{ freshrss_port }}:80"
+        container_default_behavior: no_defaults
+        env:
+          CRON_MIN: "1,31"
+          DB_HOST: "freshrss-db"
+          DB_BASE: "freshrss"
+          DB_PASSWORD: "freshrss"
+          DB_USER: "freshrss"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ freshrss_memory }}"
+        labels:
+          homepage.group: "Apps"
+          homepage.name: "FreshRSS"
+          homepage.icon: "freshrss.png"
+          homepage.href: "{{ freshrss_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
+#         homepage.description: "A free, self-hostable news aggregator…"
+          homepage.server: "my-docker"
+          homepage.container: "freshrss"
+          homepage.showStats: "false"
+#         homepage.widget.type: "freshrss"
+#         homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
+#         homepage.widget.username: "{{ freshrss_homepage_widget_username }}"
+#         homepage.widget.password: "{{ freshrss_homepage_widget_password }}"
+          traefik.enable: "{{ freshrss_available_externally | string }}"
+          traefik.http.routers.freshrss.rule: "Host(`{{ freshrss_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.freshrss.tls.certresolver: "letsencrypt"
+          traefik.http.routers.freshrss.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.freshrss.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+#         traefik.http.routers.frontend.middlewares: "{{ freshrss_hostname }}"
+#         traefik.http.routers.freshrss.middlewares: "{{ freshrss_hostname }}@docker"
+          traefik.http.middlewares.freshrss.IPAllowList.sourcerange: "{{ freshrss_traefik_whitelist }}"
+          traefik.http.services.freshrss.loadbalancer.server.port: "80"
+  when: freshrss_enabled is true
+
+- name: Stop FreshRSS
+  block:
+    - name: Stop FreshRSS
+      community.docker.docker_container:
+        name: "{{ freshrss_container_name }}"
+        state: absent
+  when: freshrss_enabled is false

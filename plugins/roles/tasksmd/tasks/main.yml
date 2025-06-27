@@ -1,0 +1,62 @@
+---
+- name: Start Tasks.md
+  block:
+    - name: Create Tasks.md Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ tasksmd_data_directory }}"
+        - "{{ tasksmd_data_directory }}/config"
+        - "{{ tasksmd_data_directory }}/tasks"
+
+    - name: Create Tasks.md Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tasksmd_container_name }}"
+        hostname: "{{ tasksmd_container_name }}"
+        image: baldissaramatheus/tasks.md
+        pull: true
+        ports:
+          - "{{ tasksmd_port_http }}:8080"
+        volumes:
+          - "{{ tasksmd_data_directory }}/config:/config"
+          - "{{ tasksmd_data_directory }}/tasks:/tasks"
+        network_mode: bridge
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ tasksmd_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ tasksmd_watchtower_monitor_only }}"
+          homepage.name: "Tasks.md"
+          homepage.group: "{{ tasksmd_homepage_group }}"
+          homepage.icon: "{{ tasksmd_homepage_icon }}"
+          homepage.href: "{{ tasksmd_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tasksmd_port_http }}"
+#         homepage.description: "Lightweight server monitoring hub with historical data, docker stats, and alerts."
+          homepage.server: "my-docker"
+          homepage.container: "{{ tasksmd_container_name }}"
+          homepage.showStats: "{{ tasksmd_homepage_showStats }}"
+          traefik.enable: "{{ tasksmd_available_externally | string }}"
+          traefik.http.routers.tasksmd.rule: "Host(`{{ tasksmd_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.tasksmd.tls.certresolver: "letsencrypt"
+          traefik.http.routers.tasksmd.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.tasksmd.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ tasksmd_hostname }}"
+          traefik.http.routers.tasksmd.middlewares: "{{ tasksmd_hostname }}@docker"
+          traefik.http.middlewares.tasksmd.IPAllowList.sourcerange: "{{ tasksmd_traefik_whitelist }}"
+          traefik.http.services.tasksmd.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: tasksmd_enabled is true
+
+- name: Stop Tasks.md
+  block:
+    - name: Stop Tasks.md Docker Container
+      community.docker.docker_container:
+        name: "{{ tasksmd_container_name }}"
+        state: absent
+  when: tasksmd_enabled is false

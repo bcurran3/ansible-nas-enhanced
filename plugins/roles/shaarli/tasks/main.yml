@@ -1,0 +1,59 @@
+---
+- name: Start Shaarli
+  block:
+    - name: Shaarli Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0777
+      with_items:
+        - "{{ shaarli_data_directory }}/cache"
+        - "{{ shaarli_data_directory }}/data"
+
+    - name: Shaarli Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ shaarli_container_name }}"
+        hostname: "{{ shaarli_container_name }}"
+        image: shaarli/shaarli:latest
+        pull: true
+        volumes:
+          - "{{ shaarli_data_directory }}/cache:/var/www/shaarli/cache:rw"
+          - "{{ shaarli_data_directory }}/data:/var/www/shaarli/data:rw"
+        ports:
+          - "{{ shaarli_port_http }}:80"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ shaarli_watchtower_monitor_only }}"
+          homepage.name: "Shaarli"
+          homepage.group: "{{ shaarli_homepage_group }}"
+          homepage.icon: "{{ shaarli_homepage_icon }}"
+          homepage.href: "{{ shaarli_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ shaarli_port_http }}"
+#         homepage.description: "The personal, minimalist, super-fast, database free, bookmarking service"
+          homepage.server: "my-docker"
+          homepage.container: "{{ shaarli_container_name }}"
+          homepage.showStats: "{{ shaarli_homepage_showStats }}"
+          traefik.enable: "{{ shaarli_available_externally | string }}"
+          traefik.http.routers.shaarli.rule: "Host(`shaarli.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.shaarli.tls.certresolver: "letsencrypt"
+          traefik.http.routers.shaarli.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.shaarli.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ shaarli_hostname }}"
+          traefik.http.routers.shaarli.middlewares: "{{ shaarli_hostname }}@docker"
+          traefik.http.middlewares.shaarli.IPAllowList.sourcerange: "{{ shaarli_traefik_whitelist }}"
+          traefik.http.services.shaarli.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: 1g
+  when: shaarli_enabled is true
+
+- name: Stop Shaarli
+  block:
+    - name: Stop Shaarli
+      community.docker.docker_container:
+        name: "{{ shaarli_container_name }}"
+        state: absent
+  when: shaarli_enabled is false

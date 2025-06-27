@@ -1,0 +1,58 @@
+---
+- name: Start Porn Vault
+  block:
+    - name: Porn Vault Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ pornvault_data_directory }}"
+        - "{{ pornvault_data_directory }}/config"
+
+    - name: Porn Vault Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ pornvault_container_name }}"
+        hostname: "{{ pornvault_container_name }}"
+        image: boi12321/porn-vault:release-0.25.0
+        pull: true
+        volumes:
+          - "/etc/localtime:/etc/localtime:ro"
+          - "{{ pornvault_data_directory }}/config:/config:rw"
+          - "{{ porn_root }}:/videos:ro"
+          - "{{ porn_root }}/pix:/images:ro"
+        ports:
+          - "{{ pornvault_http_port }}:3000"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ pornvault_watchtower_monitor_only }}"
+          homepage.name: "Porn Vault"
+          homepage.group: "{{ pornvault_homepage_group }}"
+          homepage.icon: "{{ pornvault_homepage_icon }}"
+          homepage.href: "{{ pornvault_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pornvault_port_http }}"
+#         homepage.description: "Porn-Vault is a self hosted organizer for adult videos and imagery."
+          homepage.server: "my-docker"
+          homepage.container: "{{ pornvault_container_name }}"
+          homepage.showStats: "{{ pornvault_homepage_showStats }}"
+          traefik.enable: "{{ pornvault_available_externally | string }}"
+          traefik.http.routers.pornvault.rule: "Host(`pornvault.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.pornvault.tls.certresolver: "letsencrypt"
+          traefik.http.routers.pornvault.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.pornvault.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ pornvault_hostname }}"
+          traefik.http.routers.pornvault.middlewares: "{{ pornvault_hostname }}@docker"
+          traefik.http.middlewares.pornvault.IPAllowList.sourcerange: "{{ pornvault_traefik_whitelist }}"
+          traefik.http.services.pornvault.loadbalancer.server.port: "3000"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: 2g
+  when: pornvault_enabled is true
+
+- name: Stop Porn Vault
+  block:
+    - name: Stop Porn Vault
+      community.docker.docker_container:
+        name: "{{ pornvault_container_name }}"
+        state: absent
+  when: pornvault_enabled is false

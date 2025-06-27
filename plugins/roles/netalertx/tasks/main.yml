@@ -1,0 +1,60 @@
+---
+- name: Start NetAlertX
+  block:
+    - name: Create NetAlertX Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ netalertx_data_directory }}"
+        - "{{ netalertx_data_directory }}/config"
+        - "{{ netalertx_data_directory }}/db"
+
+    - name: Create NetAlertX Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netalertx_container_name }}"
+        image: jokobsk/netalertx:latest
+        pull: true
+        volumes:
+          - "{{ netalertx_data_directory }}/config:/app/config"
+          - "{{ netalertx_data_directory }}/db:/app/db"
+        network_mode: host
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ netalertx_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ netalertx_watchtower_monitor_only }}"
+          homepage.name: "NetAlertX"
+          homepage.group: "{{ netalertx_homepage_group }}"
+          homepage.icon: "{{ netalertx_homepage_icon }}"
+          homepage.href: "{{ netalertx_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
+#         homepage.description: "WIFI / LAN intruder detector. Scans for devices connected to your network and alerts you if new and unknown devices are found."
+          homepage.server: "my-docker"
+          homepage.container: "netalertx"
+          homepage.showStats: "false"
+          homepage.widget.type: "netalertx"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
+          homepage.widget.key: "{{ netalertx_homepage_widget_key }}"
+          traefik.enable: "{{ netalertx_available_externally | string }}"
+          traefik.http.routers.netalertx.rule: "Host(`{{ netalertx_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.netalertx.tls.certresolver: "letsencrypt"
+          traefik.http.routers.netalertx.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.netalertx.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ netalertx_hostname }}"
+          traefik.http.routers.netalertx.middlewares: "{{ netalertx_hostname }}@docker"
+          traefik.http.middlewares.netalertx.IPAllowList.sourcerange: "{{ netalertx_traefik_whitelist }}"
+          traefik.http.services.netalertx.loadbalancer.server.port: "20211"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: netalertx_enabled is true
+
+- name: Stop NetAlertX
+  block:
+    - name: Stop NetAlertX
+      community.docker.docker_container:
+        name: "{{ netalertx_container_name }}"
+        state: absent
+  when: netalertx_enabled is false

@@ -1,0 +1,63 @@
+---
+- name: Start Stalwart Mail
+  block:
+    - name: Create Stalwart Mail Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ stalwart_data_directory }}"
+
+    - name: Create Stalwart Mail Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ stalwart_container_name }}"
+        image: stalwartlabs/mail-server:latest
+        pull: true
+        ports:
+          - "{{ stalwart_port_http }}:8080"
+#         - "443:443"
+          - "25:25"
+          - "587:587"
+          - "465:465"
+          - "143:143"
+          - "993:993"
+          - "4190:4190"
+        volumes:
+          - "{{ stalwart_data_directory }}:/opt/stalwart-mail"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ stalwart_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ stalwart_watchtower_monitor_only }}"
+          homepage.name: "Stalwart Mail"
+          homepage.group: "{{ stalwart_homepage_group }}"
+          homepage.icon: "{{ stalwart_homepage_icon }}"
+          homepage.href: "{{ stalwart_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stalwart_port_http }}"
+#         homepage.description: "Secure & Modern All-in-One Mail Server (IMAP, JMAP, POP3, SMTP)"
+          homepage.server: "my-docker"
+          homepage.container: "{{ stalwart_container_name }}"
+          homepage.showStats: "{{ stalwart_homepage_showStats }}"
+          traefik.enable: "{{ stalwart_available_externally | string }}"
+          traefik.http.routers.stalwart.rule: "Host(`{{ stalwart_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.stalwart.tls.certresolver: "letsencrypt"
+          traefik.http.routers.stalwart.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.stalwart.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ stalwart_hostname }}"
+          traefik.http.routers.stalwart.middlewares: "{{ stalwart_hostname }}@docker"
+          traefik.http.middlewares.stalwart.IPAllowList.sourcerange: "{{ stalwart_traefik_whitelist }}"
+          traefik.http.services.stalwart.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: stalwart_enabled is true
+
+- name: Stop Stalwart Mail
+  block:
+    - name: Stop Stalwart Mail
+      community.docker.docker_container:
+        name: "{{ stalwart_container_name }}"
+        state: absent
+  when: stalwart_enabled is false

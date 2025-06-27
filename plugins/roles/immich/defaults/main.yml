@@ -1,0 +1,69 @@
+---
+immich_enabled: false
+immich_available_externally: false
+immich_traefik_whitelist: "{{ lan }}"
+
+# directories
+immich_data_directory: "{{ docker_home }}/immich"
+immich_upload_directory: "{{ photos_root }}/immich"
+
+# network
+immich_port: "2283"
+immich_hostname: "immich"
+immich_network_name: "immich"
+
+# specs
+immich_machinelearning_memory: 1g
+immich_postgres_memory: 2g
+immich_redis_memory: 1g
+immich_server_memory: 1g
+
+# docker
+immich_machinelearning_container_name: "immich-machine-learning"
+immich_postgres_container_name: "immich-postgres"
+immich_redis_container_name: "immich-redis"
+immich_server_container_name: "immich-server"
+
+immich_machinelearning_image: "ghcr.io/immich-app/immich-machine-learning"
+immich_machinelearning_tag: "release"
+immich_postgres_image: "ghcr.io/immich-app/postgres"
+immich_postgres_tag: "14-vectorchord0.3.0-pgvectors0.2.0"
+immich_redis_image: "redis"
+immich_redis_tag: "6.2-alpine"
+immich_server_image: "ghcr.io/immich-app/immich-server"
+immich_server_tag: "release"
+immich_user_id: "1000"
+immich_group_id: "1000"
+
+# database
+immich_db_password: "postgres" # $(pwgen -s 40 1)
+immich_db_username: "postgres"
+immich_db_name: "immich_db"
+immich_db_port: "5432"
+
+# immich
+immich_jwt_secret: "verylongandsecrettext"
+immich_enable_mapbox: "false"
+immich_mapbox_key: ""
+immich_public_login_page_message: "Welcome to Immich!"
+
+immich_typesense_api_key: "1234567890"
+
+# homepage
+immich_homepage_group: "Apps"
+immich_homepage_icon: "immich.png"
+immich_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port }}"
+immich_homepage_showStats: "false"
+immich_homepage_widget_key: "your_admin_api_key"
+immich_machinelearning_homepage_group: "Misc"
+immich_machinelearning_homepage_icon: "immich.png"
+immich_machinelearning_homepage_showStats: "false"
+immich_postgres_homepage_group: "DBs"
+immich_postgres_homepage_icon: "postgres.png"
+immich_postgres_homepage_showStats: "false"
+immich_redis_homepage_group: "DBs"
+immich_redis_homepage_icon: "redis.png"
+immich_redis_homepage_showStats: "false"
+
+# watchtower
+immich_watchtower_monitor_only: "true"

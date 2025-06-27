@@ -1,0 +1,54 @@
+---
+- name: Create magnetico Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ magnetico_data_directory }}"
+    - "{{ magnetico_data_directory }}/magneticod"
+    - "{{ magnetico_data_directory }}/magneticow"
+
+- name: magneticod Container
+  docker_container:
+    name: magneticod
+    image: boramalper/magneticod
+    pull: true
+    volumes:
+      - "{{ magnetico_data_directory }}/magneticod:/root/.local/share/magneticod/"
+      - "{{ magnetico_data_directory }}/magneticod/configuration.toml:/root/.config/magneticod/configuration.toml"
+      - "/etc/timezone:/etc/timezone:ro"
+    env:
+      PUID: "{{ magnetico_user_id }}"
+      PGID: "{{ magnetico_group_id }}"
+    restart_policy: unless-stopped
+    memory: 1g
+
+- name: magneticow Container
+  docker_container:
+    name: magneticow
+    image: boramalper/magneticow
+    pull: true
+    volumes:
+      - "{{ magnetico_data_directory }}/magneticod:/root/.local/share/magneticod/"
+      - "{{ magnetico_data_directory }}/magneticow/configuration.toml:/root/.config/magneticow/configuration.toml"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - "8090:8080"
+    env:
+      PUID: "{{ magnetico_user_id }}"
+      PGID: "{{ magnetico_group_id }}"
+    restart_policy: unless-stopped
+    memory: 1g
+    labels:
+#      traefik.enable: "{{ magnetico_available_externally | string }}"
+#      traefik.http.middlewares.magnetico.ipwhitelist.sourcerange: "{{ magnetico_traefik_whitelist }}"
+#      traefik.http.routers.magnetico.rule: "Host(`magnetico.{{ ansible_nas_domain }}`)"
+#      traefik.http.routers.magnetico.tls.certresolver: "letsencrypt"
+#      traefik.http.routers.magnetico.tls.domains[0].main: "{{ ansible_nas_domain }}"
+#      traefik.http.routers.magnetico.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+#      traefik.http.services.magnetico.loadbalancer.server.port: "8080"
+#      traefik.backend: "magnetico"
+#      traefik.frontend.rule: "Host:magnetico.{{ ansible_nas_domain }}"
+#      traefik.enable: "{{ magnetico_available_externally }}"
+#      traefik.port: "8080"
+

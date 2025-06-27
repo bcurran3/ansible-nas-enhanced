@@ -1,0 +1,34 @@
+#
+meshcentral_enabled: false
+meshcentral_available_externally: false
+meshcentral_traefik_whitelist: "{{ lan }}"
+meshcentral_data_directory: "{{ docker_home }}/meshcentral"
+
+# network
+meshcentral_network: "meshcentral"
+meshcentral_hostname: "meshcentral"
+meshcentral_port_http: "8086"
+
+# docker
+meshcentral_container_name: "meshcentral"
+meshcentral_db_container_name: "meshcentral-db"
+meshcentral_memory_limit: "1g"
+meshcentral_db_memory_limit: "1g"
+
+# app
+meshcentral_iframe: "false"
+meshcentral_allow_new_accounts: "false"
+meshcentral_webrtc: "false"
+
+# homepage
+meshcentral_homepage_group: "Apps"
+meshcentral_homepage_icon: "meshcentral.png"
+meshcentral_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
+meshcentral_homepage_showStats: "false"
+meshcentral_db_homepage_group: "DBs"
+meshcentral_db_homepage_icon: "mongodb.png"
+meshcentral_db_homepage_showStats: "false"
+
+# watchtower
+meshcentral_watchtower_monitor_only: "true"
+meshcentral_db_watchtower_monitor_only: "true"

@@ -1,0 +1,185 @@
+# LOTS more work needed - see docker compose file
+- name: Start Invoice Ninja
+  block:
+    - name: Invoice Ninja Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ invoiceninja_user_id }}"
+        group: "{{ invoiceninja_group_id }}"
+        mode: "755"
+      with_items:
+#       - "{{ invoiceninja_data_directory }}/logo"
+        - "{{ invoiceninja_data_directory }}/public"
+        - "{{ invoiceninja_data_directory }}/storage"
+        - "{{ invoiceninja_data_directory }}/appdata"
+        - "{{ invoiceninja_data_directory }}/appdata/nginx"
+        - "{{ invoiceninja_data_directory }}/appdata/mariadb"
+
+    - name: Create Invoice Ninja network
+      community.docker.docker_network:
+        name: "{{ invoiceninja_network_name }}"
+
+    - name: Template nginx conf
+      template:
+        src: in-vhost.conf
+        dest: "{{ invoiceninja_data_directory }}/appdata/nginx/in-vhost.conf"
+      register: template_config
+
+    - name: Invoice Ninja Docker nginx Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ invoiceninja_container_name }}"
+        hostname: "{{ invoiceninja_container_name }}"
+        image: nginx
+        pull: true
+        networks:
+          - name: "{{ invoiceninja_network_name }}"
+        network_mode: "{{ invoiceninja_network_name }}"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ invoiceninja_port_http }}:80"
+        volumes:
+#          - "{{ invoiceninja_data_directory }}/appdata/mariadb:/config"
+          - "{{ invoiceninja_data_directory }}/appdata/nginx/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro"
+          - "{{ invoiceninja_data_directory }}/public:/var/www/app/public:ro"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ invoiceninja_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
+          homepage.name: "Invoice Ninja"
+          homepage.group: "{{ invoiceninja_homepage_group }}"
+          homepage.icon: "invoiceninja.png"
+          homepage.href: "{{ invoiceninja_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ invoiceninja_port_http }}"
+    #     homepage.description: "the world's most popular Web Server"
+          homepage.server: "my-docker"
+          homepage.container: "{{ invoiceninja_container_name }}"
+          homepage.showStats: "{{ invoiceninja_homepage_showStats }}"
+          traefik.enable: "{{ invoiceninja_available_externally | string }}"
+          traefik.http.routers.invoiceninja.rule: "Host(`invoiceninja.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.invoiceninja.tls.certresolver: "letsencrypt"
+          traefik.http.routers.invoiceninja.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.invoiceninja.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ invoiceninja_hostname }}"
+          traefik.http.routers.invoiceninja.middlewares: "{{ invoiceninja_hostname }}@docker"
+          traefik.http.middlewares.invoiceninja.IPAllowList.sourcerange: "{{ invoiceninja_traefik_whitelist }}"
+          traefik.http.services.invoiceninja.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/nginx/nginx/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Invoice Ninja Docker MariaDB Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ invoiceninja_db_container_name }}"
+        hostname: "{{ invoiceninja_db_container_name }}"
+        image: linuxserver/mariadb:10.11.6
+        pull: true
+        networks:
+          - name: "{{ invoiceninja_network_name }}"
+        network_mode: "{{ invoiceninja_network_name }}"
+        networks_cli_compatible: "yes"
+        volumes:
+#          - "{{ invoiceninja_data_directory }}/appdata/mariadb:/config"
+          - "{{ invoiceninja_data_directory }}/appdata/mariadb:/var/lib/mysql"
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          MYSQL_ROOT_PASSWORD: "topsecretroot"
+          MYSQL_DATABASE: "invoiceninja"
+          MYSQL_USER: "invoiceninja"
+          MYSQL_PASSWORD: "{{ invoiceninja_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ invoiceninja_db_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_db_watchtower_monitor_only }}"
+          homepage.name: "Invoice Ninja MariaDB"
+          homepage.group: "{{ invoiceninja_db_homepage_group }}"
+          homepage.icon: "{{ invoiceninja_db_homepage_icon }}"
+#         homepage.description: "The open source relational database"
+          homepage.server: "my-docker"
+          homepage.container: "{{ invoiceninja_db_container_name }}"
+          homepage.showStats: "{{ invoiceninja_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Invoice Ninja Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ invoiceninja_backend_container_name }}"
+        hostname: "{{ invoiceninja_backend_container_name }}"
+        image: invoiceninja/invoiceninja:5
+        pull: true
+        networks:
+          - name: "{{ invoiceninja_network_name }}"
+        network_mode: "{{ invoiceninja_network_name }}"
+        networks_cli_compatible: "yes"
+        links:
+          - "{{ invoiceninja_db_container_name }}"
+          - "{{ invoiceninja_container_name }}"
+        ports:
+          - "9099:9000"
+        volumes:
+          - "{{ invoiceninja_data_directory }}/public:/var/www/app/public"
+          - "{{ invoiceninja_data_directory }}/storage:/var/www/app/storage"
+        env:
+          APP_ENV: "production"
+          APP_URL: "https://{{ invoiceninja_hostname }}.{{ ansible_nas_domain }}"
+          APP_KEY: "{{ invoiceninja_app_key }}"
+          APP_DEBUG: "true"
+          REQUIRE_HTTPS: "false"
+          PHANTOMJS_PDF_GENERATION: "false"
+          PDF_GENERATOR: "snappdf"
+          TRUSTED_PROXIES: '*'
+          DB_HOST: "{{ invoiceninja_db_container_name }}"
+          DB_PORT: "3306"
+          DB_DATABASE: "invoiceninja"
+          DB_USERNAME: "invoiceninja"
+          DB_PASSWORD: "{{ invoiceninja_db_password }}"
+          IN_USER_EMAIL: "{{ invoiceninja_in_user_email }}"
+          IN_PASSWORD: "{{ invoiceninja_in_password }}"
+          MAIL_MAILER: "{{ invoiceninja_mail_mailer }}"
+          MAIL_HOST: "{{ invoiceninja_mail_host }}"
+          MAIL_PORT: "{{ invoiceninja_mail_port }}"
+          MAIL_USERNAME: "{{ invoiceninja_mail_username }}"
+          MAIL_PASSWORD: "{{ invoiceninja_mail_password }}"
+          MAIL_ENCRYPTION: "{{ invoiceninja_mail_encryption }}"
+          MAIL_FROM_ADDRESS: "{{ invoiceninja_mail_from_address }}"
+          MAIL_FROM_NAME: "{{ invoiceninja_mail_from_name }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ invoiceninja_backend_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
+          homepage.name: "Invoice Ninja backend"
+          homepage.group: "{{ invoiceninja_backend_homepage_group }}"
+          homepage.icon: "{{ invoiceninja_backend_homepage_icon }}"
+          homepage.href: "{{ invoiceninja_homepage_href }}"
+#         homepage.description: "A source-available invoice, quote, project and time-tracking app built with Laravel"
+          homepage.server: "my-docker"
+          homepage.container: "{{ invoiceninja_backend_container_name }}"
+          homepage.showStats: "{{ invoiceninja_backend_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/invoiceninja/invoiceninja/releases/tag/$${major}.$${minor}.$${patch}"
+  when: invoiceninja_enabled is true
+
+- name: Stop Invoice Ninja
+  block:
+    - name: Stop Invoice Ninja Web UI Docker Container
+      community.docker.docker_container:
+        name: "{{ invoiceninja_container_name }}"
+        state: absent
+    - name: Stop Invoice Ninja App Docker Container
+      community.docker.docker_container:
+        name: "{{ invoiceninja_backend_container_name }}"
+        state: absent
+    - name: Stop Invoice Ninja MariaDB Docker Container
+      community.docker.docker_container:
+        name: "{{ invoiceninja_db_container_name }}"
+        state: absent
+  when: invoiceninja_enabled is false

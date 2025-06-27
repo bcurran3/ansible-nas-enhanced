@@ -1,0 +1,9 @@
+---
+- name: Stop Stalwart Mail
+  docker_container:
+    name: "{{ stalwart_container_name }}"
+    state: absent
+  when: stalwart_enabled is false
+  listen:
+    - "stop stalwart"
+    - "stop disabled applications"

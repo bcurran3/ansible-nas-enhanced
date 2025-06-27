@@ -1,0 +1,64 @@
+---
+- name: Start Flexget
+  block:
+    - name: Flexget Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ flexget_data_directory }}/config"
+        - "{{ flexget_data_directory }}/data"
+
+    - name: Flexget Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ flexget_container_name }}"
+        hostname: "{{ flexget_container_name }}"
+        image: wiserain/flexget:latest
+        pull: true
+        volumes:
+          - "{{ flexget_data_directory }}/config"
+          - "{{ flexget_data_directory }}/data"
+        ports:
+          - "{{ flexget_port_http }}:5050"
+        env:
+          FG_WEBUI_PASSWD: "{{ flexget_FG_WEBUI_PASSWD }}"
+          FG_LOG_LEVEL: "info"
+          FG_PLUGINS: "write_magnet"
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ flexget_user_id }}"
+          PGID: "{{ flexget_group_id }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ flexget_watchtower_monitor_only }}"
+          homepage.name: "Flexget"
+          homepage.group: "{{ flexget_homepage_group }}"
+          homepage.icon: "{{ flexget_homepage_icon }}"
+          homepage.href: "{{ flexget_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flexget_port_http }}"
+#         homepage.description: "FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc."
+          homepage.server: "my-docker"
+          homepage.container: "{{ flexget_container_name }}"
+          homepage.showStats: "{{ flexget_homepage_showStats }}"
+          traefik.enable: "{{ flexget_available_externally | string }}"
+          traefik.http.routers.flexget.rule: "Host(`flexget.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.flexget.tls.certresolver: "letsencrypt"
+          traefik.http.routers.flexget.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.flexget.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ flexget_hostname }}"
+          traefik.http.routers.flexget.middlewares: "{{ flexget_hostname }}@docker"
+          traefik.http.middlewares.flexget.IPAllowList.sourcerange: "{{ flexget_traefik_whitelist }}"
+          traefik.http.services.flexget.loadbalancer.server.port: "5050"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/Flexget/Flexget/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ not necessarily in sync with docker image
+        memory: 1g
+  when: flexget_enabled is true
+
+- name: Stop Flexget
+  block:
+    - name: Stop Flexget
+      community.docker.docker_container:
+        name: "{{ flexget_container_name }}"
+        state: absent
+  when: flexget_enabled is false

@@ -1,0 +1,28 @@
+# specs
+idrac6_enabled: false
+idrac6_available_externally: true
+idrac6_traefik_whitelist: "{{ lan }}"
+idrac6_data_directory: "{{ docker_home }}/idrac6"
+idrac6_memory_limit: "512m"
+
+# docker
+idrac6_container_name: "idrac6"
+idrac6_hostname: "idrac6"
+idrac6_port_web: "5800"
+idrac6_port_vnc: "5900"
+
+# app
+idrac6_ip: "192.0.0.2"
+idrac6_username: "root"
+idrac6_password: "password"
+idrac6_vnc_password: "topsecret"
+idrac6_virtualmedia: ""
+
+# homepage
+idrac6_homepage_group: "Apps"
+idrac6_homepage_icon: "https://snpi.dell.com/snp/images/products/large/en-nz~385-BBHP_v1/385-BBHP_v1.jpg"
+idrac6_homepage_showStats: "false"
+idrac6_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ idrac6_port_web }}"
+
+# watchtower
+idrac6_watchtower_monitor_only: "true"

@@ -1,0 +1,62 @@
+---
+- name: Start Beszel
+  block:
+    - name: Create Beszel Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ beszel_data_directory }}"
+        - "{{ beszel_data_directory }}/data"
+
+    - name: Create Beszel Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ beszel_container_name }}"
+        hostname: "{{ beszel_container_name }}"
+        image: henrygd/beszel
+        pull: true
+        ports:
+          - "{{ beszel_port_http }}:8090"
+        volumes:
+          - "{{ beszel_data_directory }}/data:/beszel_data"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ beszel_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ beszel_watchtower_monitor_only }}"
+          homepage.name: "Beszel"
+          homepage.group: "{{ beszel_homepage_group }}"
+          homepage.icon: "{{ beszel_homepage_icon }}"
+          homepage.href: "{{ beszel_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ beszel_port_http }}"
+#         homepage.description: "Lightweight server monitoring hub with historical data, docker stats, and alerts."
+          homepage.server: "my-docker"
+          homepage.container: "{{ beszel_container_name }}"
+          homepage.showStats: "{{ beszel_homepage_showStats }}"
+          traefik.enable: "{{ beszel_available_externally | string }}"
+          traefik.http.routers.beszel.rule: "Host(`{{ beszel_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.beszel.tls.certresolver: "letsencrypt"
+          traefik.http.routers.beszel.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.beszel.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ beszel_hostname }}"
+          traefik.http.routers.beszel.middlewares: "{{ beszel_hostname }}@docker"
+          traefik.http.middlewares.beszel.IPAllowList.sourcerange: "{{ beszel_traefik_whitelist }}"
+          traefik.http.services.beszel.loadbalancer.server.port: "8090"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/henrygd/beszel/releases/tag/$${major}.$${minor}.$${patch}"
+  when: beszel_enabled is true
+
+- name: Stop Beszel
+  block:
+    - name: Stop Beszel Docker Container
+      community.docker.docker_container:
+        name: "{{ beszel_container_name }}"
+        state: absent
+  when: beszel_enabled is false
+
+# might need to look at 
+# https://github.com/henrygd/beszel/blob/main/supplemental/docker/same-system/docker-compose.yml
+# for agent in same system

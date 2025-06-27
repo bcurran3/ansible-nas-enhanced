@@ -1,0 +1,9 @@
+---
+- name: Stop Autoheal
+  docker_container:
+    name: "{{ autoheal_container_name }}"
+    state: absent
+  when: autoheal_enabled is false
+  listen:
+    - "stop autoheal"
+    - "stop disabled applications"

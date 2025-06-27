@@ -1,0 +1,38 @@
+---
+- name: Porn Vault Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ pornvault_data_directory }}"
+    - "{{ pornvault_data_directory }}/config"
+
+- name: Porn Vault Docker Container
+  docker_container:
+    name: porn-vault
+    image: boi12321/porn-vault:release-0.25.0
+    pull: true
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "{{ pornvault_data_directory }}/config:/config:rw"
+      - "{{ porn_root }}:/videos:ro"
+      - "{{ porn_root }}/pix:/images:ro"
+    ports:
+      - "{{ pornvault_http_port }}:3000"
+    dns_servers: "{{ ansible_nas_dns }}"
+    hostname: "porn-vault"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{ pornvault_available_externally | string }}"
+      traefik.http.middlewares.pornvault.IPAllowList.sourcerange: "{{ pornvault_traefik_whitelist }}"
+      traefik.http.routers.pornvault.rule: "Host(`pornvault.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.pornvault.tls.certresolver: "letsencrypt"
+      traefik.http.routers.pornvault.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.pornvault.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.pornvault.loadbalancer.server.port: "3000"
+#      traefik.backend: "pornvault"
+#      traefik.frontend.rule: "Host:pornvault.{{ ansible_nas_domain }}"
+#      traefik.enable: "{{ pornvault_available_externally }}"
+#      traefik.frontend.whiteList.sourceRange: "{{ stash_traefik_whitelist }}"
+#      traefik.port: "3000"
+    memory: 2g

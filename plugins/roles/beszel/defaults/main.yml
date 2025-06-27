@@ -1,0 +1,24 @@
+#
+beszel_enabled: false
+beszel_available_externally: false
+beszel_traefik_whitelist: "{{ lan }}"
+beszel_data_directory: "{{ docker_home }}/beszel"
+
+# network
+beszel_hostname: "beszel"
+beszel_port_http: "3015"
+
+# specs
+beszel_memory_limit: "1G"
+
+# docker
+beszel_container_name: "beszel"
+
+# homepage
+beszel_homepage_group: "Apps"
+beszel_homepage_icon: ""
+beszel_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ beszel_port_http }}"
+beszel_homepage_showStats: "false"
+
+# watchtower
+beszel_watchtower_monitor_only: "true"

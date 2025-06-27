@@ -1,0 +1,59 @@
+---
+- name: Start Kapowarr
+  block:
+    - name: Create Kapowarr Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ kapowarr_data_directory }}/config"
+
+    - name: Kapowarr Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ kapowarr_container_name }}"
+        hostname: "{{ kapowarr_container_name }}"
+        image: mrcas/kapowarr:latest
+        pull: true
+        volumes:
+          - "{{ kapowarr_comics_directory }}:/comics:rw"
+          - "{{ kapowarr_downloads_directory }}:/downloads:rw"
+          - "{{ kapowarr_data_directory }}/config:/app/db:rw"
+        network_mode: "bridge"
+        ports:
+          - "{{ kapowarr_port_http }}:8090"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ kapowarr_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ kapowarr_watchtower_monitor_only }}"
+          homepage.name: "Kapowarr"
+          homepage.group: "{{ kapowarr_homepage_group }}"
+          homepage.icon: "{{ kapowarr_homepage_icon }}"
+          homepage.href: "{{ kapowarr_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kapowarr_port_http }}"
+#         homepage.description: "Kapowarr is a software to build and manage a comic book library, fitting in the *arr suite of software."
+          homepage.server: "my-docker"
+          homepage.container: "{{ kapowarr_container_name }}"
+          homepage.showStats: "{{ kapowarr_homepage_showStats }}"
+          traefik.enable: "{{ kapowarr_available_externally | string }}"
+          traefik.http.routers.kapowarr.rule: "Host(`{{ kapowarr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.kapowarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.kapowarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.kapowarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ kapowarr_hostname }}"
+          traefik.http.routers.kapowarr.middlewares: "{{ kapowarr_hostname }}@docker"
+          traefik.http.middlewares.kapowarr.IPAllowList.sourcerange: "{{ kapowarr_traefik_whitelist }}"
+          traefik.http.services.kapowarr.loadbalancer.server.port: "5656"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/Casvt/Kapowarr/releases/tag/$${major}.$${minor}.$${patch}"
+  when: kapowarr_enabled is true
+
+- name: Stop Kapowarr
+  block:
+    - name: Stop Kapowarr
+      community.docker.docker_container:
+        name: "{{ kapowarr_container_name }}"
+        state: absent
+  when: kapowarr_enabled is false

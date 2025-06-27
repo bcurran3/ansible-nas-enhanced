@@ -1,0 +1,34 @@
+---
+- name: Create Homarr Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ homarr_data_directory }}"
+    - "{{ homarr_data_directory }}/configs"
+    - "{{ homarr_data_directory }}/icons"
+
+- name: Create Homarr Docker Container
+  docker_container:
+    name: homarr
+    image: ghcr.io/ajnart/homarr:latest
+    pull: true
+    volumes:
+    - "{{ homarr_data_directory }}/configs:/app/data/configs"
+    - "{{ homarr_data_directory }}/icons:/app/public/icons"
+    ports:
+      - "{{ homarr_port_http }}:7575"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{ homarr_available_externally | string }}"
+      traefik.http.routers.homarr.rule: "Host(`homarr.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.homarr.tls.certresolver: "letsencrypt"
+      traefik.http.routers.homarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.homarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ homarr_hostname }}"
+      traefik.http.routers.homarr.middlewares: "{{ homarr_hostname }}@docker"
+      traefik.http.middlewares.homarr.IPAllowList.sourcerange: "{{ homarr_traefik_whitelist }}"
+      traefik.http.services.homarr.loadbalancer.server.port: "7575"
+    memory: 512m

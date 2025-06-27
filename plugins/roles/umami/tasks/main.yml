@@ -1,0 +1,103 @@
+---
+- name: Start Umami
+  block:
+    - name: Create Umami Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ umami_data_directory }}"
+        - "{{ umami_data_directory }}/db"
+
+    - name: Create Umami PostgreSQL Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ umami_db_container_name }}"
+        hostname: "{{ umami_db_container_name }}"
+        image: postgres:16-alpine
+        pull: true
+        volumes:
+          - "{{ umami_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_DB: "umami"
+          POSTGRES_USER: "umami"
+          POSTGRES_PASSWORD: "umami"
+        restart_policy: unless-stopped
+#        healthcheck:
+#          test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+#          interval: 5s
+#          timeout: 5s
+#          retries: "5"
+        memory: "{{ umami_db_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ umami_db_watchtower_monitor_only }}"
+          homepage.name: "Umami PostgreSQL"
+          homepage.group: "{{ umami_db_homepage_group }}"
+          homepage.icon: "{{ umami_db_homepage_icon }}"
+          homepage.href: "{{ umami_db_homepage_href }}"
+#         homepage.description: "The World's Most Advanced Open Source Relational Database"
+          homepage.server: "my-docker"
+          homepage.container: "{{ umami_db_container_name }}"
+          homepage.showStats: "{{ umami_db_homepage_showStats }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+
+    - name: Create Umami Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ umami_container_name }}"
+        hostname: "{{ umami_container_name }}"
+        image: ghcr.io/umami-software/umami:postgresql-latest
+        pull: true
+        ports:
+          - "{{ umami_port_http }}:3000"
+        env:
+          DATABASE_TYPE: "postgresql"
+          DATABASE_URL: "postgres://umami:umami@{{ umami_db_container_name }}:5432/umami"
+          APP_SECRET: "{{ umami_app_secret }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+#        healthcheck:
+#          test: ["CMD-SHELL", "curl http://localhost:{{ umami_port_http }}/api/heartbeat"]
+#          interval: 5s
+#          timeout: 5s
+#          retries: 5
+        links:
+          - "{{ umami_db_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ umami_watchtower_monitor_only }}"
+          homepage.name: "Umami"
+          homepage.group: "{{ umami_homepage_group }}"
+          homepage.icon: "{{ umami_homepage_icon }}"
+          homepage.href: "{{ umami_homepage_href }}"
+#         homepage.description: "a simple, fast, privacy-focused alternative to Google Analytics"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ umami_container_name }}"
+          homepage.showStats: "{{ umami_homepage_showStats }}"
+          traefik.enable: "{{ umami_available_externally | string }}"
+          traefik.http.routers.umami.rule: "Host(`umami.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.umami.tls.certresolver: "letsencrypt"
+          traefik.http.routers.umami.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.umami.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ umami_hostname }}"
+          traefik.http.routers.umami.middlewares: "{{ umami_hostname }}@docker"
+          traefik.http.middlewares.umami.IPAllowList.sourcerange: "{{ umami_traefik_whitelist }}"
+          traefik.http.services.umami.loadbalancer.server.port: "3000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/umami-software/umami/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ umami_memory }}"
+  when: umami_enabled is true
+
+- name: Stop Umami
+  block:
+    - name: Stop Umami Docker Container
+      community.docker.docker_container:
+        name: "{{ umami_container_name }}"
+        state: absent
+    - name: Stop Umami PostgreSQL Docker Container
+      community.docker.docker_container:
+        name: "{{ umami_db_container_name }}"
+        state: absent
+  when: umami_enabled is false

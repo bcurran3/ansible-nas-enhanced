@@ -1,0 +1,24 @@
+# specs
+htpcmanager_enabled: false
+htpcmanager_available_externally: true
+htpcmanager_traefik_whitelist: "{{ lan }}"
+htpcmanager_data_directory: "{{ docker_home }}/htpcmanager"
+
+# docker
+htpcmanager_container_name: "htpcmanager"
+htpcmanager_hostname: "htpcmanager"
+htpcmanager_port_http: "8086"
+htpcmanager_memory_limit: "1g"
+
+# app
+htpcmanager_puid: "1000"
+htpcmanager_pgid: "1000"
+
+# homepage
+htpcmanager_homepage_group: "Apps"
+htpcmanager_homepage_icon: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ htpcmanager_port_http }}/img/homescreen.png"
+htpcmanager_homepage_showStats: "false"
+htpcmanager_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ htpcmanager_port_http }}"
+
+# watchtower
+htpcmanager_watchtower_monitor_only: "true"

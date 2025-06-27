@@ -1,0 +1,9 @@
+---
+- name: Stop RustDesk
+  docker_container:
+    name: "{{ rustdesk_container_name }}"
+    state: absent
+  when: rustdesk_enabled is false
+  listen:
+    - "stop rustdesk"
+    - "stop disabled applications"

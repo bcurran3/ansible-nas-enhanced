@@ -1,0 +1,9 @@
+---
+- name: Stop autobrr
+  docker_container:
+    name: "{{ autobrr_container_name }}"
+    state: absent
+  when: autobrr_enabled is false
+  listen:
+    - "stop autobrr"
+    - "stop disabled applications"

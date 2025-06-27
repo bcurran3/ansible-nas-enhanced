@@ -1,0 +1,1546 @@
+---
+##                       ._____.  .__ _____ ____ _____|__\_ |__ | | ____ ____ _____ ______ \__ \ / \ / ___/ || 
+##  __ \| | _/ __ \ ______ / \\__ \ / ___/
+##   / __ \|   |  \\___ \|  || \_\ \  |_\  ___/  /_____/ |   |  \/ __ \_\___ \
+##  (____  /___|  /____  >__||___  /____/\___  >         |___|  (____  /____  >
+##       \/     \/     \/        \/          \/               \/     \/     \/
+##     a n s i b l e - n a s      https://github.com/davestephens/ansible-nas
+
+# Add your all.yml config overrides to this file. See group_vars/all.yml for all possible settings.
+
+# Plugins
+plugins_enabled: true
+cleanup_enabled: false
+test_enabled: false
+
+# Example options
+ansible_nas_hostname: SuperNAS
+ansible_nas_timezone: America/Los_Angeles
+ansible_nas_user: bill
+ansible_nas_email: bcurran3@yahoo.com
+ansible_nas_domain: mrbillsabode.org
+ansible_nas_dns: 192.168.69.201
+docker_home: "/data/docker"
+docker_image_directory: "{{ docker_home }}/_images"
+# shares
+nfs_shares_root: "/data/nfsshares"
+samba_shares_root: "/data/media"
+samba_shares_other_root: "/data/media2"
+audiobooks_root: "{{ samba_shares_root }}/audiobooks"
+downloads_root: "/data/downloads"
+movies_root: "{{ samba_shares_root }}/movies"
+tv_root: "{{ samba_shares_root }}/tv"
+torrents_root: "{{ samba_shares_other_root }}/torrents"
+roms_root: "{{ samba_shares_other_root }}/roms"        # added
+games_root: "{{ samba_shares_other_root }}/games"      # added
+music_root: "{{ samba_shares_root }}/music"
+podcasts_root: "{{ samba_shares_other_root }}/podcasts"
+anime_root: "{{ samba_shares_root }}/anime"
+books_root: "{{ samba_shares_root }}/books"
+comics_root: "{{ samba_shares_root }}/comics"
+photos_root: "{{ samba_shares_root }}/photos"
+porn_root: "{{ samba_shares_other_root }}/porn"
+backups_root: "{{ samba_shares_other_root }}/backups"
+linux_root: "{{ samba_shares_other_root }}/linux"
+programs_root: "{{ samba_shares_other_root }}/programs"
+samba_server_string: SuperNAS
+
+## Enable some applications
+cloudflare_ddns_enabled: true
+cloudflare_token: "AAk8S1uTvP7_xmfuw_CIbcghhwHO938jQ_UrhwdK"
+cloudflare_proxy: true
+
+duplicati_enabled: false
+duplicati_available_externally: true
+duplicati_traefik_whitelist: "{{ lan }}"
+duplicati_data_permissions: "rw"
+duplicati_memory: 4g
+
+freshrss_enabled: true
+freshrss_available_externally: true
+freshrss_traefik_whitelist: "{{ wan }}"
+freshrss_homepage_href: "https://{{ freshrss_hostname }}.{{ ansible_nas_domain }}"
+freshrss_homepage_widget_username: "bcurran"
+freshrss_homepage_widget_password: "letmein69"
+
+glances_enabled: true
+glances_available_externally: true
+glances_traefik_whitelist: "{{ lan }}"
+glances_memory: "256m"
+glances_homepage_href: "https://{{ glances_hostname }}.{{ ansible_nas_domain }}"
+
+gotify_enabled: true
+gotify_available_externally: true
+gotify_traefik_whitelist: "{{ wan }}"
+gotify_homepage_href: "https://{{ gotify_hostname }}.{{ ansible_nas_domain }}"
+gotify_homepage_widget_key: "CfXsKAaMFw2Hd0F"
+
+healthchecks_enabled: false      # <- need to read the docs for setup
+
+heimdall_enabled: true
+heimdall_available_externally: true
+heimdall_traefik_whitelist: "{{ lan }}"
+heimdall_memory: "256m"
+heimdall_homepage_href: "https://{{ heimdall_hostname }}.{{ ansible_nas_domain }}"
+
+homeassistant_enabled: false
+homeassistant_available_externally: true
+homeassistant_traefik_whitelist: "{{ lan }}"
+
+jellyfin_enabled: true
+jellyfin_available_externally: true
+jellyfin_traefik_whitelist: "{{ lan }}"
+jellyfin_anime_directory: "{{ anime_root }}"
+jellyfin_anime_permissions: "ro"
+jellyfin_porn_directory: "{{ porn_root }}"
+jellyfin_porn_permissions: "ro"
+jellyfin_memory: "4g"
+jellyfin_homepage_href: "https://{{ jellyfin_hostname }}.{{ ansible_nas_domain }}"
+jellyfin_homepage_widget_key: "94b6b50198c3408483f92396116d5e76"
+
+komga_enabled: true
+komga_available_externally: true
+komga_traefik_whitelist: "{{ wan }}"
+komga_memory: "4g"
+komga_homepage_href: "https://{{ komga_hostname }}.{{ ansible_nas_domain }}"
+komga_widget_username: "bcurran3@yahoo.com"
+komga_widget_password: "letmein69"
+komga_widget_key: "3b65ac9f3f8b4a78ad107b33d4d9086d"
+
+krusader_enabled: false
+krusader_available_externally: true
+krusader_traefik_whitelist: "{{ lan }}"
+
+lidarr_enabled: true
+lidarr_user_id: "0"
+lidarr_group_id: "1001"
+lidarr_available_externally: true
+lidarr_traefik_whitelist: "{{ lan }}"
+lidarr_homepage_href: "https://{{ lidarr_hostname }}.{{ ansible_nas_domain }}"
+lidarr_homepage_widget_key: "2b2888a7f0b149f0b7b76fd5b836b234"
+
+minecraft_server_enabled: false
+
+mosquitto_enabled: true
+
+mylar_enabled: false
+mylar_available_externally: true
+mylar_traefik_whitelist: "{{ lan }}"
+mylar_user_id: "1001"
+mylar_group_id: "1001"
+mylar_image_name: "linuxserver/mylar3"
+mylar_homepage_href: "https://{{ mylar_hostname }}.{{ ansible_nas_domain }}"
+mylar_homepage_widget_key: "238c201d9755cbfd12f0dd0ff0e2fe88"
+
+netdata_enabled: true
+netdata_available_externally: true
+netdata_traefik_whitelist: "{{ lan }}"
+netdata_homepage_href: "https://{{ netdata_hostname }}.{{ ansible_nas_domain }}"
+
+netbootxyz_enabled: true
+netbootxyz_available_externally: true
+netbootxyz_traefik_whitelist: "{{ lan }}"
+netbootxyz_homepage_href: "https://{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}"
+
+nextcloud_enabled: true
+nextcloud_available_externally: true
+nextcloud_traefik_whitelist: "{{ wan }}"
+#nextcloud_command: "docker exec nextcloud apt update && docker exec nextcloud apt install smbclient -y"
+nextcloud_db_image_version: "8.4"
+nextcloud_homepage_href: "https://{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
+nextcloud_homepage_widget_key: "77518f29fb0c9983cbca61c0e6d7897a79a8718060c2efd8a8c38c3c7380df75"
+
+plex_enabled: true
+plex_available_externally: true
+plex_traefik_whitelist: "{{ wan }}"
+plex_anime_directory: "{{ anime_root }}"
+plex_anime_permissions: "ro"
+plex_porn_directory: "{{ porn_root }}"
+plex_porn_permissions: "ro"
+plex_transcode_directory: "{{ docker_home }}/plex/transcode"
+plex_memory: "12g"
+plex_homepage_widget_key: "PSi1G9ldHE4qya15_ya_RCGuXg6nvRgA"
+plex_homepage_href: "https://{{ plex_hostname }}.{{ ansible_nas_domain }}"
+
+portainer_enabled: true
+portainer_available_externally: true
+portainer_traefik_whitelist: "{{ lan }}"
+portainer_homepage_href: "https://{{ portainer_hostname }}.{{ ansible_nas_domain }}"
+portainer_homepage_widget_key: "ptr_EZCSQoNAj8Qpu08BPxYApzGgzznfDzxxSADRIpnqueA="
+portainer_homepage_group: "Docker Utils"
+
+radarr_enabled: true
+radarr_user_id: "0"
+radarr_group_id: "1001"
+radarr_available_externally: true
+radarr_traefik_whitelist: "{{ lan }}"
+radarr_homepage_widget_key: "06e456e4928a4887a915dc84dfcccefd"
+radarr_homepage_href: "https://{{ radarr_hostname }}.{{ ansible_nas_domain }}"
+
+sonarr_enabled: true
+sonarr_user_id: "0"
+sonarr_group_id: "1001"
+sonarr_available_externally: true
+sonarr_traefik_whitelist: "{{ lan }}"
+sonarr_anime_directory: "{{ anime_root }}"
+#sonarr_port: "8988"
+sonarr_homepage_widget_key: "34843c21e13b4dddb4d7b7de514b7a02"
+sonarr_homepage_href: "https://{{ sonarr_hostname }}.{{ ansible_nas_domain }}"
+
+speedtest_tracker_enabled: true
+speedtest_tracker_available_externally: true
+speedtest_tracker_traefik_whitelist: "{{ lan }}"
+speedtest_tracker_hostname: "speedtest"
+speedtest_tracker_memory: "256m"
+speedtest_tracker_homepage_href: "https://{{ speedtest_tracker_hostname }}.{{ ansible_nas_domain }}"
+
+stats_enabled: true
+stats_internet_speed_test_enabled: true
+stats_grafana_available_externally: true
+stats_grafana_homepage_href: "https://{{ stats_grafana_hostname }}.{{ ansible_nas_domain }}"
+stats_prometheus_available_externally: true
+stats_prometheus_homepage_href: "https://{{ stats_prometheus_hostname }}.{{ ansible_nas_domain }}"
+
+telegraf_enabled: true
+
+traefik_enabled: true
+traefik_available_externally: true
+traefik_traefik_whitelist: "{{ lan }}"
+traefik_environment_variables:
+  CF_API_EMAIL: bcurran3@yahoo.com
+  CF_API_KEY: a71a5e91751de3eb2efe9e55ef88d510deeea
+  CF_DNS_API_TOKEN: Z3BUEN-ioNCFgimn_IXGgQBvl22wG6qdjjvXOQxG
+  CF_ZONE_API_TOKEN: Dz8xwdY0OhSgDWhqx_3vqKmKJskCOIABqpy63TOW
+traefik_hostname: "traefik"
+traefik_image_version: "mimolette"
+traefik_homepage_group: "Network"
+
+transmission_enabled: true
+transmission_available_externally: true
+transmission_traefik_whitelist: "{{ lan }}"
+transmission_external_port: "6881"
+transmission_memory: "5g"
+transmission_watch_directory: "{{ torrents_root }}/transmission"
+transmission_group_id: "1001"
+transmission_homepage_href: "https://{{ transmission_hostname }}.{{ ansible_nas_domain }}"
+transmission_homepage_widget_user: "admin"
+transmission_homepage_widget_password: "nowdammit69"
+
+tautulli_enabled: true
+tautulli_available_externally: true
+tautulli_traefik_whitelist: "{{ lan }}"
+tautulli_homepage_href: "https://{{ tautulli_hostname }}.{{ ansible_nas_domain }}"
+tautulli_homepage_widget_key: "PSi1G9ldHE4qya15_ya_RCGuXg6nvRgA"
+
+prowlarr_enabled: true
+prowlarr_available_externally: true
+prowlarr_traefik_whitelist: "{{ lan }}"
+prowlarr_homepage_widget_key: "dd02db20ed384d6ea6ce6e38e8c2c41f"
+prowlarr_homepage_href: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
+
+virtual_desktop_enabled: false
+
+youtubedlmaterial_enabled: true
+youtubedlmaterial_available_externally: true
+youtubedlmaterial_traefik_whitelist: "{{ lan }}"
+youtubedlmaterial_user_id: "1000"
+youtubedlmaterial_group_id: "1001"
+youtubedlmaterial_dl_audio_directory: "{{ downloads_root }}/complete/YOUTUBEDL/audio"
+youtubedlmaterial_dl_video_directory: "{{ downloads_root }}/complete/YOUTUBEDL/video"
+youtubedlmaterial_dl_subscriptions_directory: "{{ downloads_root }}/complete/YOUTUBEDL/subscriptions"
+youtubedlmaterial_dl_channels_directory: "{{ podcasts_root }}"
+#youtubedlmaterial_dl_podcasts_directory: "{{ podcasts_root }}"
+youtubedlmaterial_memory: "2g"
+youtubedlmaterial_homepage_href: "https://{{ youtubedlmaterial_hostname }}.{{ ansible_nas_domain }}"
+
+wallabag_enabled: true
+wallabag_available_externally: true
+wallabag_traefik_whitelist: "{{ wan }}"
+wallabag_memory: "512m"
+wallabag_hostname: "wallabag"
+wallabag_homepage_href: "https://{{ wallabag_hostname }}.{{ ansible_nas_domain }}"
+
+# https://github.com/bertvv/ansible-role-samba
+
+samba_shares:
+  - name: downloads
+    comment: 'Downloaded Stuff'
+    group: ansible-nas
+    guest_ok: no
+    public: yes
+#    writable: no
+    write_list: bill
+    browseable: yes
+    path: "{{ downloads_root }}"
+
+#  - name: movies
+#    comment: 'Movies'
+#    group: ansible-nas
+#    guest_ok: yes
+#    public: yes
+#    writable: no
+#    browseable: yes
+#    path: "{{ movies_root }}"
+
+#  - name: tv
+#    comment: 'TV Episodes'
+#    group: ansible-nas
+#    guest_ok: yes
+#    public: yes
+#    writable: no
+#    browseable: yes
+#    path: "{{ tv_root }}"
+
+#  - name: music
+#    comment: 'Music'
+#    group: ansible-nas
+#    guest_ok: yes
+#    public: yes
+#    writable: no
+#    browseable: yes
+#    path: "{{ music_root }}"
+
+  - name: dump
+    comment: 'File dump'
+    group: ansible-nas
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+#    path: "{{ samba_shares_root }}/dump"
+    path: "{{ samba_shares_other_root }}/dump"
+
+  - name: public
+    comment: 'Public/Shared'
+    group: ansible-nas
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+#    path: "{{ samba_shares_root }}/public"
+    path: "{{ samba_shares_other_root }}/public"
+
+  - name: photos
+    comment: 'Pictures'
+    group: ansible-nas
+    guest_ok: yes
+    public: yes
+    writable: no
+    browseable: yes
+    path: "{{ photos_root }}"
+
+#  - name: books
+#    comment: 'Books'
+#    group: ansible-nas
+#    guest_ok: yes
+#    public: yes
+#    writable: no
+#    browseable: yes
+#    path: "{{ books_root }}"
+
+#  - name: audiobooks
+#    comment: 'Audiobooks'
+#    group: ansible-nas
+#    guest_ok: yes
+#    public: yes
+#    writable: no
+#    browsable: yes
+#    path: "{{ audiobooks_root }}"
+
+#  - name: comics
+#    comment: 'Comics'
+#    group: ansible-nas
+#    guest_ok: yes
+#    public: yes
+#    writable: no
+#    browseable: yes
+#    path: "{{ comics_root }}"
+
+#  - name: games
+#    comment: 'Games'
+#    group: ansible-nas
+#    guest_ok: yes
+#    public: yes
+#    writable: no
+#    browseable: yes
+#    path: "{{ samba_shares_other_root }}/games"
+
+#  - name: porn
+#    comment: 'Stuff downloaded'
+#    group: ansible-nas
+#    guest_ok: yes
+#    public: yes
+#    writable: yes
+#    browseable: yes
+#    path: "{{ porn_root }}"
+
+  - name: media_root
+    comment: 'Media'
+    group: ansible-nas
+    guest_ok: no
+    public: yes
+#    writable: yes
+    write_list: bill
+    browseable: yes
+    path: "{{ samba_shares_root }}"
+
+  - name: other_root
+    comment: 'Media 2 / Other (non-media)'
+    group: ansible-nas
+    guest_ok: no
+    public: yes
+#    writable: yes
+    write_list: bill
+    browseable: yes
+    path: "{{ samba_shares_other_root }}"
+
+  - name: torrents
+    comment: 'Torrents'
+    group: ansible-nas
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ torrents_root }}"
+
+ansible_nas_extra_packages:
+#  - nfs-common
+#  - samba
+#  - bonnie++
+#  - ctop
+#  - htop
+#  - lm-sensors
+#  - mdadm
+#  - smartmontools
+#  - net-tools
+  - ansible-lint
+  - figlet
+  - mc
+  - nala
+  - nano
+  - rsync
+  - rar
+  - unrar
+  - zip
+  - unzip
+
+
+#################### NEW STUFF ####################
+#################### NEW STUFF ####################
+#################### NEW STUFF ####################
+
+# Extra Samba options put in by Bill
+# https://github.com/bertvv/ansible-role-samba
+samba_domain_master: false
+samba_local_master: false
+#samba_server_min_protocol: 3.1
+samba_preferred_master: false
+samba_wins_support: true
+samba_workgroup: "LACB"
+samba_realm: "LACB.local"
+samba_users:
+  - name: "{{ ansible_nas_user }}"
+    password: "topsecret"
+
+# traefik whitelist options 
+# traefik_frontend_whiteList_lan: "192.168.69.2/31, 192.168.69.4/30, 192.168.69.8/29, 192.168.69.16/28, 192.168.69.32/27"
+# letsencryptorg: "172.65.32.248/32, 172.65.46.172/32" # acme-v02.api.letsencrypt.org & acme-staging-v02.api.letsencrypt.org
+lan_whitelist: 192.168.69.0/24
+iotlan: 192.168.9.0/24
+unifivpn: 192.168.2.1/32
+unifiwg: 192.168.99.0/24          # wireguard on UDMPRO
+wireguard: 172.17.0.27/16         # wireguard container
+lan: "{{ lan_whitelist }}, {{ iotlan }}, {{ unifivpn }}, {{ wireguard }}, {{ unifiwg }}"
+wan: "0.0.0.0/0"
+
+###
+### Readarr
+###
+readarr_enabled: false
+readarr_available_externally: true
+readarr_traefik_whitelist: "{{ lan }}"
+readarr_group_id: "1001"
+
+###
+### Wireshark
+###
+wireshark_enabled: false
+wireshark_available_externally: true
+wireshark_traefik_whitelist: "{{ lan }}"
+
+###
+### Doku
+###
+doku_enabled: true
+doku_available_externally: true
+doku_traefik_whitelist: "{{ lan }}"
+doku_homepage_group: "Docker Utils"
+doku_homepage_href: "https://{{ doku_hostname }}.{{ ansible_nas_domain }}"
+doku_watchtower_monitor_only: "false"
+
+###
+### Watchtower
+###
+watchtower_enabled: true
+watchtower_available_externally: true
+watchtower_traefik_whitelist: "{{ lan }}"
+# REF - https://containrrr.github.io/watchtower/arguments/
+watchtower_cleanup: "true"
+watchtower_remove_volumes: "true"
+watchtower_debug: "true"
+watchtower_include_stopped: "false"
+watchtower_revive_stopped: "false"
+# watchtower_poll_interval: "0" # "Only schedule or interval can be defined, not both."
+watchtower_monitor_only: "false"
+watchtower_no_restart: "false"
+watchtower_no_pull: "false"
+watchtower_schedule: "0 0 5 * * *"
+watchtower_timeout: "10"
+# REF https://containrrr.github.io/watchtower/notifications/
+watchtower_notifications: "gotify" # email, gotify, slack, or msteams
+watchtower_notification_email_from: "fromaddress@domain.com"
+watchtower_notification_email_to: "{{ ansible_nas_email }}"
+watchtower_notification_email_server: "smpt.someserver.com"
+watchtower_notification_email_server_tls_skip_verify: "false"
+watchtower_notification_email_server_port: "25"
+watchtower_notification_email_server_user: "fromaddress@domain.com"
+watchtower_notification_email_server_password: "topsecretemailpassword"
+watchtower_notification_email_delay: "2"
+watchtower_notification_gotify_url: "https://gotify.{{ ansible_nas_domain }}"
+watchtower_notification_gotify_token: "A3WOahw5jnEOo_x"
+watchtower_notifications_msteams_hook_url: "https://outlook.office.com/webhook/xxxxxxxx@xxxxxxx/IncomingWebhook/yyyyyyy>"
+watchtower_notifications_msteams_use_log_data: "true"
+watchtower_notifications_slack_hook_url: "https://hooks.slack.com/services/xxx/yyyyyyyyyyyyyyy"
+watchtower_notifications_slack_identifier: "{{ ansible_nas_hostname }}"
+watchtower_notifications_slack_channel: "#my-custom-channel"
+watchtower_notifications_slack_icon_emoji: ":whale:"
+watchtower_notifications_slack_icon_url: "http://somewhere.com/icon.png"
+
+
+#################### PLUGINS ####################
+#################### PLUGINS ####################
+#################### PLUGINS ####################
+#################### PLUGINS ####################
+
+###
+### 2FAuth
+###
+twofauth_enabled: false
+twofauth_available_externally: true
+twofauth_traefik_whitelist: "{{ lan }}"
+twofauth_app_key: "hJynzncFetdmQMa4FMhjNwHSmjenM7gf"
+twofauth_homepage_href: "https://{{ twofauth_hostname }}.{{ ansible_nas_domain }}"
+twofauth_watchtower_monitor_only: "false"
+
+###
+### acmenator
+###
+acmenator_enabled: true
+acmenator_homepage_group: "Misc"
+acmenator_watchtower_monitor_only: "false"
+
+###
+### autobrr
+###
+autobrr_enabled: false
+autobrr_available_externally: true
+autobrr_traefik_whitelist: "{{ lan }}"
+
+###
+### autoheal
+###
+autoheal_enabled: false
+autoheal_watchtower_monitor_only: "false"
+
+###
+### Beszel
+###
+beszel_enabled: false
+beszel_available_externally: true
+beszel_traefik_whitelist: "{{ lan }}"
+beszel_homepage_href: "https://{{ beszel_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Beszel Agent
+###
+beszel_agent_enabled: false
+beszel_agent_available_externally: true
+beszel_agent_traefik_whitelist: "{{ lan }}"
+beszel_agent_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPuqeoQaV+KIFd22dmWG8GUX7Td25Imf+Tt9p/2e3gjk"
+
+###
+### Checkmate
+###
+checkmate_enabled: false
+checkmate_available_externally: true
+checkmate_traefik_whitelist: "{{ lan }}"
+
+###
+### Checkmk
+###
+checkmk_enabled: false
+checkmk_available_externally: true
+checkmk_traefik_whitelist: "{{ lan }}"
+
+###
+### Chowdown
+###
+chowdown_enabled: false
+chowdown_available_externally: false
+chowdown_traefik_whitelist: "{{ lan }}"
+chowdown_watchtower_monitor_only: "false"
+
+###
+### Christmas Community
+###
+christmas_community_enabled: false
+christmas_community_available_externally: true
+christmas_community_traefik_whitelist: "{{ lan }}"
+christmas_community_homepage_href: "https://{{ christmas_community_hostname }}.{{ ansible_nas_domain }}"
+christmas_community_watchtower_monitor_only: "false"
+
+###
+### codeserver
+###
+codeserver_enabled: true
+codeserver_available_externally: true
+codeserver_traefik_whitelist: "{{ lan }}"
+codeserver_password: "nowdammit69"
+codeserver_memory_limit: "2G"
+codeserver_homepage_href: "https://{{ codeserver_hostname }}.{{ ansible_nas_domain }}"
+codeserver_watchtower_monitor_only: "false"
+
+###
+### CommaFeed
+###
+commafeed_enabled: false
+commafeed_available_externally: true
+commafeed_traefik_whitelist: "{{ wan }}"
+
+###
+### ControlR
+###
+controlr_enabled: false
+controlr_available_externally: true
+controlr_traefik_whitelist: "{{ lan }}"
+controlr_homepage_href: "https://{{ controlr_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Cup
+###
+cup_enabled: false
+cup_available_externally: true
+cup_traefik_whitelist: "{{ lan }}"
+cup_homepage_href: "https://{{ cup_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### DailyTxT
+###
+dailytxt_enabled: true
+dailytxt_available_externally: true
+dailytxt_traefik_whitelist: "{{ lan }}"
+dailytxt_allow_registration: "false"
+dailytxt_secret_key: "UKMyVlqL7VrZMLrtVuIkn++fCq271dhO4QuOwEkU73Y"
+dailytxt_homepage_href: "https://{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
+dailytxt_watchtower_monitor_only: "false"
+
+###
+### dashdot
+###
+dashdot_enabled: false
+dashdot_available_externally: true
+dashdot_traefik_whitelist: "{{ lan }}"
+
+###
+### diskover
+###
+diskover_enabled: true
+diskover_available_externally: true
+diskover_traefik_whitelist: "{{ lan }}"
+diskover_homepage_href: "https://{{ diskover_hostname }}.{{ ansible_nas_domain }}"
+diskover_elasticsearch_homepage_href: "https://{{ diskover_elasticsearch_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### doublecommander
+###
+doublecommander_enabled: false
+doublecommander_available_externally: true
+doublecommander_traefik_whitelist: "{{ lan }}"
+
+###
+### dozzle
+###
+dozzle_enabled: true
+dozzle_available_externally: true
+dozzle_traefik_whitelist: "{{ lan }}"
+dozzle_homepage_href: "https://{{ dozzle_hostname }}.{{ ansible_nas_domain }}"
+dozzle_homepage_group: "Docker Utils"
+dozzle_watchtower_monitor_only: "false"
+
+###
+### DweebUI
+###
+dweebui_enabled: false
+dweebui_available_externally: true
+dweebui_traefik_whitelist: "{{ lan }}"
+dweebui_secret: "nowdammit69"
+
+###
+### Dokemon
+###
+dokemon_enabled: false
+dokemon_available_externally: true
+dokemon_traefik_whitelist: "{{ lan }}"
+dokemon_homepage_href: "https://{{ dokemon_hostname }}.{{ ansible_nas_domain }}"
+dokemon_homepage_group: "Docker Utils"
+dokemon_watchtower_monitor_only: "false"
+
+###
+### Fasten
+###
+fasten_enabled: false
+fasten_available_externally: true
+fasten_traefik_whitelist: "{{ lan }}"
+
+###
+### File Browser
+###
+filebrowser_enabled: false
+filebrowser_available_externally: true
+filebrowser_traefik_whitelist: "{{ lan }}"
+
+###
+### FileShelter
+###
+fileshelter_enabled: false
+fileshelter_available_externally: true
+fileshelter_traefik_whitelist: "{{ wan }}"
+fileshelter_homepage_href: "https://{{ fileshelter_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### FlareSolverr
+###
+flaresolverr_enabled: true
+flaresolverr_available_externally: true
+flaresolverr_traefik_whitelist: "{{ lan }}"
+flaresolverr_homepage_href: "https://{{ flaresolverr_hostname }}.{{ ansible_nas_domain }}"
+flaresolverr_homepage_group: "Misc"
+flaresolverr_watchtower_monitor_only: "false"
+
+###
+### Flexget
+###
+flexget_enabled: false
+flexget_available_externally: true
+flexget_traefik_whitelist: "{{ lan }}"
+flexget_FG_WEBUI_PASSWD: "nowdammit69"
+flexget_homepage_href: "https://{{ flexget_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Flood
+###
+flood_enabled: false
+flood_available_externally: true
+flood_traefik_whitelist: "{{ lan }}"
+
+###
+### GameVault
+###
+gamevault_enabled: true
+gamevault_available_externally: true
+gamevault_traefik_whitelist: "{{ lan }}"
+gamevault_metadata_igdb_client_id: "xrlipegxq0zq3g522ww6pevby1msp7"
+gamevault_metadata_igdb_client_secret: "h4iqddcunerjlkyp1rssim0b8qzxjh"
+#gamevault_server_admin_password: "nowdammit69"
+gamevault_rawg_api_key: "e4339b3aa88f4241a755c900a6d18ff1"
+gamevault_homepage_href: "https://{{ gamevault_hostname }}.{{ ansible_nas_domain }}"
+gamevault_watchtower_monitor_only: "false"
+
+###
+### Gaseous Server
+###
+gaseousserver_enabled: false
+gaseousserver_available_externally: true
+gaseousserver_traefik_whitelist: "{{ lan }}"
+gaseousserver_igdb_client_id: "xrlipegxq0zq3g522ww6pevby1msp7"
+gaseousserver_igdb_client_secret: "h4iqddcunerjlkyp1rssim0b8qzxjh"
+gaseousserver_homepage_href: "https://{{ gasseousserver_hostname }}.{{ ansible_nas_domain }}"
+gaseousserver_watchtower_monitor_only: "false"
+
+###
+### Ghost
+###
+ghost_enabled: false
+ghost_available_externally: true
+ghost_traefik_whitelist: "{{ lan }}"
+
+###
+### Gitea
+###
+gitea_enabled: true
+gitea_available_externally: true
+gitea_homepage_href: "https://{{ gitea_hostname }}.{{ ansible_nas_domain }}"
+gitea_watchtower_monitor_only: "false"
+gitea_db_image_version: "9.3"
+gitea_db_homepage_href: "https://{{ gitea_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Gokapi
+###
+gokapi_enabled: false
+gokapi_available_externally: true
+gokapi_traefik_whitelist: "{{ wan }}"
+
+###
+### Grocy
+###
+grocy_enabled: false
+grocy_available_externally: true
+grocy_traefik_whitelist: "{{ wan }}"
+
+###
+### Handbrake
+###
+handbrake_enabled: true
+handbrake_available_externally: true
+handbrake_traefik_whitelist: "{{ lan }}"
+handbrake_dark_mode: "1"
+handbrake_watch_directory: "{{ samba_shares_other_root }}/dump/transcode"
+handbrake_output_directory: "{{ samba_shares_other_root }}/dump/transcoded"
+handbrake_memory: "4g"
+handbrake_homepage_href: "https://{{ handbrake_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Homarr
+###
+homarr_enabled: true
+homarr_available_externally: true
+homarr_traefik_whitelist: "{{ lan }}"
+homarr_secret_encryption_key: "2116c2c44976e7a626bad5b8e432c4c345ebb81987693b4aaa27f441c27e54d7"
+homarr_homepage_href: "https://{{ homarr_hostname }}.{{ ansible_nas_domain }}"
+homarr_watchtower_monitor_only: "false"
+
+###
+### Homepage
+###
+homepage_enabled: true
+homepage_available_externally: true
+homepage_traefik_whitelist: "{{ lan }}"
+hopepage_watchtower_monitor_only: "false"
+
+###
+### idrac6
+###
+idrac6_enabled: false
+idrac6_available_externally: true
+idrac6_traefik_whitelist: "{{ lan }}"
+idrac6_homepage_href: "https://{{ idrac6_hostname }}.{{ ansible_nas_domain }}"
+idrac6_ip: "192.168.69.15"
+idrac6_username: "root"
+idrac6_password: "nowdammit69"
+idrac6_virtualmedia: "/vmedia/proxmox-ve_8.3-1.iso"
+idrac6_vnc_password: "letmein69"
+idrac6_watchtower_monitor_only: "false"
+
+###
+### IDrive
+###
+idrive_enabled: true
+idrive_homepage_group: "Misc"
+
+###
+### Immich
+###
+immich_enabled: true
+immich_available_externally: true
+immich_traefik_whitelist: "{{ wan }}"
+immich_jwt_secret: "zxBzxIYLEbLiR9W2hU9amzsNqVNn38MdqqAo6yYM"
+immich_typesense_api_key: "tMuGiEItSHldD6apldAoseJ1dqPMqmSa3xqHiNm3"
+immich_homepage_href: "https://{{ immich_hostname }}.{{ ansible_nas_domain }}"
+immich_homepage_widget_key: "gsXZmjlcoKEKDLpFqmLpJJxk3yWq4YHcYasuE4xykQ"
+
+###
+### Karaoke-Forever
+###
+karaokeforever_enabled: false
+karaokeforever_available_externally: true
+karaokeforever_traefik_whitelist: "{{ lan }}"
+karaokeforever_watchtower_monitor_only: "false"
+
+###
+### Joplin
+###
+joplin_enabled: false
+joplin_available_externally: true
+joplin_traefik_whitelist: "{{ wan }}"
+joplin_homepage_href: "https://{{ joplin_hostname }}.{{ ansible_nas_domain }}"
+joplin_watchtower_monitor_only: "false"
+
+###
+### Kapowarr
+###
+kapowarr_enabled: false
+kapowarr_available_externally: true
+kapowarr_traefik_whitelist: "{{ lan }}"
+
+###
+### LANCommander
+###
+lancommander_enabled: false
+lancommander_available_externally: true
+lancommander_traefik_whitelist: "{{ lan }}"
+
+###
+### MakeMKV
+###
+makemkv_enabled: false
+makemkv_available_externally: true
+makemkv_traefik_whitelist: "{{ lan }}"
+makemkv_homepage_href: "https://{{ makemkv_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Maintainerr
+###
+maintainerr_enabled: false
+maintainerr_available_externally: true
+maintainerr_traefik_whitelist: "{{ lan }}"
+maintainerr_watchtower_monitor_only: "false"
+
+###
+### MKVToolNix
+###
+mkvtoolnix_enabled: false
+mkvtoolnix_available_externally: true
+mkvtoolnix_traefik_whitelist: "{{ lan }}"
+
+###
+### Monitorr
+###
+monitorr_enabled: false
+monitorr_available_externally: true
+monitorr_traefik_whitelist: "{{ lan }}"
+monitorr_watchtower_monitor_only: "false"
+
+###
+### NetAlertX - runs in host mode
+###
+netalertx_enabled: false
+netalertx_available_externally: true
+netalertx_traefik_whitelist: "{{ lan }}"
+netalertx_watchtower_monitor_only: "false"
+
+###
+### ntfy
+###
+ntfy_enabled: true
+ntfy_available_externally: true
+ntfy_traefik_whitelist: "{{ lan }}"
+ntfy_homepage_href: "https://{{ ntfy_hostname }}.{{ ansible_nas_domain }}"
+ntfy_watchtower_monitor_only: "false"
+
+###
+### ONLYOFFICE
+###
+onlyoffice_enabled: true
+onlyoffice_available_externally: true
+onlyoffice_traefik_whitelist: "{{ wan }}"
+onlyoffice_watchtower_monitor_only: "false"
+
+###
+### OpenEats
+###
+openeats_enabled: false
+openeats_available_externally: false
+openeats_traefik_whitelist: "{{ wan }}"
+openeats_watchtower_monitor_only: "false"
+
+###
+### osclass
+###
+osclass_enabled: true
+osclass_available_externally: true
+osclass_traefik_whitelist: "{{ wan }}"
+osclass_admin_password: "nowdammit69"
+osclass_email: "classifieds@mrbillsabode.org"
+osclass_smtp_host: "lumina.websitewelcome.com"
+osclass_smtp_port: "587"
+osclass_smtp_user: "classifieds@mrbillsabode.org"
+osclass_smtp_password: "iB[bpG0TMlYq"
+osclass_homepage_href: "https://{{ osclass_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Overseerr
+###
+overseerr_enabled: true
+overseerr_available_externally: true
+overseerr_traefik_whitelist: "{{ wan }}"
+overseerr_homepage_widget_key: "MTY2NDQ3Nzk2MTgzOTJmODhjZWYzLWI0YjAtNDY4Mi05MjkxLTM4MGJmOGYwNmYxNyk="
+overseerr_watchtower_monitor_only: "false"
+
+###
+### Paperless-ngx
+###
+paperlessngx_enabled: false
+paperlessngx_available_externally: true
+paperlessngx_traefik_whitelist: "{{ wan }}"
+paperlessngx_watchtower_monitor_only: "false"
+
+###
+### phpBB
+###
+phpbb_enabled: false
+phpbb_available_externally: true
+phpbb_traefik_whitelist: "{{ lan }}"
+phpbb_homepage_href: "https://{{ phpbb_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### pialert
+###
+pialert_enabled: false
+pialert_available_externally: false
+pialert_traefik_whitelist: "{{ lan }}"
+pialert_watchtower_monitor_only: "false"
+
+###
+### Pingvin Share
+###
+pingvinshare_enabled: false
+pingvinshare_available_externally: true
+pingvinshare_traefik_whitelist: "{{ wan }}"
+
+###
+### plexmetamanager
+###
+plexmetamanager_enabled: false
+plexmetamanager_data_directory: "{{ docker_home }}/plexmetamanager"
+plexmetamanager_watchtower_monitor_only: "false"
+
+###
+### Porn Vault
+###
+pornvault_enabled: false
+pornvault_available_externally: true
+pornvault_traefik_whitelist: "{{ lan }}"
+pornvault_watchtower_monitor_only: "false"
+
+###
+### Portainer Agent
+###
+portainer_agent_enabled: true
+portainer_agent_homepage_href: "https://{{ portainer_hostname }}.{{ ansible_nas_domain }}"
+portainer_agent_homepage_group: "Misc"
+portainer_agent_watchtower_monitor_only: "false"
+
+###
+### Projectsend
+###
+projectsend_enabled: false
+projectsend_available_externally: true
+projectsend_traefik_whitelist: "{{ wan }}"
+projectsend_watchtower_monitor_only: "false"
+
+###
+### Qbittorrent
+###
+qbittorrent_enabled: true
+qbittorrent_available_externally: true
+qbittorrent_traefik_whitelist: "{{ lan }}"
+qbittorrent_hostname: "qbittorrent"
+qbittorrent_memory: "10g"
+qbittorrent_watch_directory: "{{ torrents_root }}/qbittorrent"
+qbittorrent_homepage_href: "https://{{ qbittorrent_hostname }}.{{ ansible_nas_domain }}"
+qbittorrent_homepage_group: "Media Downloading"
+qbittorrent_homepage_widget_password: "nowdammit69"
+qbittorrent_watchtower_monitor_only: "false"
+
+###
+### QDirStat
+###
+qdirstat_enabled: false
+qdirstat_available_externally: true
+qdirstat_traefik_whitelist: "{{ lan }}"
+qdirstat_storage_directory: "/"
+qdirstat_homepage_href: "https://{{ qdirstat_hostname }}.{{ ansible_nas_domain }}"
+adirstat_watchtower_monitor_only: "false"
+
+###
+### Remotely
+###
+remotely_enabled: false
+remotely_available_externally: true
+remotely_traefik_whitelist: "{{ wan }}"
+remotely_port_http: "3333"
+remotely_watchtower_monitor_only: "false"
+
+###
+### Rocket.Chat
+###
+rocketchat_enabled: false
+rocketchat_available_externally: true
+rocketchat_traefik_whitelist: "{{ lan }}"
+
+###
+### RomM
+###
+romm_enabled: false
+romm_available_externally: true
+romm_traefik_whitelist: "{{ lan }}"
+romm_auth_password: "nowdammit69"
+romm_igdb_client_id: "xrlipegxq0zq3g522ww6pevby1msp7"
+romm_igdb_client_secret: "h4iqddcunerjlkyp1rssim0b8qzxjh"
+romm_homepage_href: "https://{{ romm_hostname }}.{{ ansible_nas_domain }}"
+romm_watchtower_monitor_only: "false"
+
+###
+### Scrutiny
+###
+scrutiny_enabled: true
+scrutiny_available_externally: true
+scrutiny_traefik_whitelist: "{{ lan }}"
+scrutiny_homepage_href: "https://{{ scrutiny_hostname }}.{{ ansible_nas_domain }}"
+scrutiny_devices:
+ - /dev/sdd:/dev/sdd
+ - /dev/sde:/dev/sde
+ - /dev/sdf:/dev/sdf
+ - /dev/sdg:/dev/sdg
+ - /dev/sdh:/dev/sdh
+ - /dev/sdi:/dev/sdi
+ - /dev/sdj:/dev/sdj
+ - /dev/sdk:/dev/sdk
+ - /dev/sdl:/dev/sdl
+ - /dev/sdm:/dev/sdm
+ - /dev/sdn:/dev/sdn
+ - /dev/sdo:/dev/sdo
+ - /dev/sdp:/dev/sdp
+scrutiny_gotify_token: "Ay-GzmabLFEfDm-"
+scrutiny_watchtower_monitor_only: "false"
+
+###
+### searxng
+###
+searxng_enabled: false
+searxng_available_externally: true
+searxng_traefik_whitelist: "{{ lan }}"
+
+###
+### Semaphore
+###
+semaphore_enabled: false
+semaphore_available_externally: true
+semaphore_traefik_whitelist: "{{ lan }}"
+
+###
+### Shaarli
+###
+shaarli_enabled: false
+shaarli_available_externally: true
+shaarli_traefik_whitelist: "{{ lan }}"
+shaarli_watchtower_monitor_only: "false"
+
+###
+### Stalwart Mail
+###
+stalwart_enabled: false
+stalwart_available_externally: true
+stalwart_traefik_whitelist: "{{ lan }}"
+
+###
+### Stash
+###
+stash_enabled: false
+stash_available_externally: true
+stash_traefik_whitelist: "{{ lan }}"
+stash_watchtower_monitor_only: "false"
+
+###
+### Striparr
+###
+striparr_enabled: false
+striparr_watchtower_monitor_only: "false"
+
+###
+### SquirrelServersManager (SSM)
+###
+ssm_enabled: false
+ssm_available_externally: true
+ssm_traefik_whitelist: "{{ lan }}"
+ssm_homepage_href: "https://{{ ssm_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Tdarr v2
+###
+tdarr_enabled: false
+tdarr_available_externally: true
+tdarr_traefik_whitelist: "{{ lan }}"
+tdarr_memory: "1g"
+tdarr_cache_directory: "{{ samba_shares_root }}/dump/tdar_temp"
+tdarr_homepage_href: "https://{{ tdarr_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Tdarr v2 Node
+###
+tdarr_node_enabled: false
+tdarr_node_available_externally: true
+tdarr_node_traefik_whitelist: "{{ lan }}"
+tdarr_node_memory: "6g"
+
+###
+### Umami
+###
+umami_enabled: false
+umami_available_externally: true
+umami_traefik_whitelist: "{{ lan }}"
+umami_homepage_href: "https://{{ umami_hostname }}.{{ ansible_nas_domain }}"
+umami_app_secret: "ojDBuVXyvrJDbY2HJ4IhuZ4FUUSNDCK3"
+
+###
+### Stirling PDF
+###
+stirling_pdf_enabled: false # currently causes homepage to bork
+stirling_pdf_available_externally: true
+stirling_pdf_traefik_whitelist: "{{ lan }}"
+stirling_pdf_homepage_href: "https://{{ stirling_pdf_hostname }}.{{ ansible_nas_domain }}"
+stirling_pdf_watchtower_monitor_only: "false"
+
+###
+### Reubah
+###
+reubah_enabled: false # currently causes homepage to bork
+reubah_available_externally: true
+reubah_traefik_whitelist: "{{ lan }}"
+reubah_pdf_homepage_href: "https://{{ reubah_hostname }}.{{ ansible_nas_domain }}"
+reubah_watchtower_monitor_only: "false"
+
+###
+### Stump
+###
+stump_enabled: false
+stump_available_externally: true
+stump_traefik_whitelist: "{{ lan }}"
+stump_homepage_href: "https://{{ stump_hostname }}.{{ ansible_nas_domain }}"
+stump_watchtower_monitor_only: "false"
+
+###
+### Update Kuma
+###
+uptimekuma_enabled: true
+uptimekuma_available_externally: true
+uptimekuma_traefik_whitelist: "{{ lan }}"
+uptimekuma_homepage_href: "https://{{ uptimekuma_hostname }}.{{ ansible_nas_domain }}"
+uptimekuma_homepage_widget_slug: "mba"
+uptimekuma_watchtower_monitor_only: "false"
+
+###
+### Vaultwarden
+###
+vaultwarden_enabled: true
+vaultwarden_available_externally: true
+vaultwarden_traefik_whitelist: "{{ wan }}"
+vaultwarden_homepage_href: "https://{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
+vaultwarden_backup_homepage_href: "https://{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
+vaultwarden_backup_homepage_group: "Misc"
+vaultwarden_admin_token: "1/pE2HtGJ1faKZ25TqwCHPcIVWCZVT/d40JDxHXJVREDpgm1hXpYY/uoquY8SElt"
+vaultwarden_watchtower_monitor_only: "false"
+vaultwarden_backup_watchtower_monitor_only: "false"
+vaultwarden_SMTP_host: "lumina.websitewelcome.com"
+vaultwarden_SMTP_from: "vaultwarden@mrbillsabode.org"
+vaultwarden_SMTP_from_name: "Vaultwarden@MBA"
+vaultwarden_SMTP_security: "starttls" # ("starttls", "force_tls", "off") Enable a secure connection. Default is "starttls" (Explicit - ports 587 or 25), "force_tls" (Implicit - port 465) or "off", no encryption (port 25)
+vaultwarden_SMTP_port: "587"          # Ports 587 (submission) and 25 (smtp) are standard without encryption and with encryption via STARTTLS (Explicit TLS). Port 465 (submissions) is used for encrypted submission (Implicit TLS).
+vaultwarden_SMTP_username: "vaultwarden@mrbillsabode.org"
+vaultwarden_SMTP_password: "9E+_BihS_osr"
+
+###
+### Webtop
+###
+webtop_enabled: false
+webtop_available_externally: true
+webtop_traefik_whitelist: "{{ lan }}"
+webtop_watchtower_monitor_only: "false"
+
+###
+### What's Running
+###
+whatsrunning_enabled: true
+whatsrunning_available_externally: true
+whatsrunning_traefik_whitelist: "{{ lan }}"
+whatsrunning_homepage_href: "https://{{ whatsrunning_hostname }}.{{ ansible_nas_domain }}"
+whatsrunning_homepage_group: "Docker Utils"
+whatsrunning_watchtower_monitor_only: "false"
+
+###
+### Whats-Up-Docker
+###
+wud_enabled: true
+wud_available_externally: true
+wud_traefik_whitelist: "{{ lan }}"
+wud_admin_password: "nowdammit69"
+wud_homepage_href: "https://{{ wud_hostname }}.{{ ansible_nas_domain }}"
+wud_homepage_group: "Docker Utils"
+wud_watchtower_monitor_only: "false"
+
+###
+### Whisparr
+###
+whisparr_enabled: false
+whisparr_available_externally: true
+whisparr_traefik_whitelist: "{{ lan }}"
+whisparr_watchtower_monitor_only: "false"
+
+###
+### Windows
+###
+windows_enabled: false
+windows_available_externally: true
+windows_traefik_whitelist: "{{ lan }}"
+
+###
+### WireGuard
+###
+wireguard_enabled: false
+wireguard_available_externally: true
+wireguard_traefik_whitelist: "{{ lan }}"
+wireguard_environment_variables:
+  PASSWORD: "nowdammit69"
+  WG_HOST: "{{ wireguard_hostname }}.{{ ansible_nas_domain }}"
+  WG_PORT: "{{ wireguard_port }}"
+  WG_MTU: "1420"
+  WG_PERSISTENT_KEEPALIVE: "0"
+  WG_DEFAULT_ADDRESS: "10.22.22.x"
+  WG_DEFAULT_DNS: "{{ ansible_nas_dns }}"
+  WG_ALLOWED_IPS: "0.0.0.0/0, ::/0"
+  WG_PRE_UP: ""
+  WG_POST_UP: ""
+  WG_PRE_DOWN: ""
+  WG_POST_DOWN: ""
+  TZ: "{{ ansible_nas_timezone }}"
+wireguard_watchtower_monitor_only: "false"
+
+#################### WORK IN PROGESS ####################
+#################### WORK IN PROGESS ####################
+#################### WORK IN PROGESS ####################
+
+###
+### Nvidia runtime 
+###
+# THIS STILL NEEDS WORK
+nvidia_runtime_enabled: false
+
+###
+### Focalboard
+###
+focalboard_enabled: false
+focalboard_available_externally: true
+focalboard_traefik_whitelist: "{{ lan }}"
+focalboard_homepage_href: "https://{{ focalboard_hostname }}.{{ ansible_nas_domain }}"
+focalboard_watchtower_monitor_only: "false"
+
+###
+### Hammond
+###
+hammond_enabled: false
+hammond_available_externally: true
+hammond_traefik_whitelist: "{{ lan }}"
+hammond_homepage_href: "https://{{ hammond_hostname }}.{{ ansible_nas_domain }}"
+hammond_watchtower_monitor_only: "false"
+
+###
+### Homebox
+###
+homebox_enabled: false
+homebox_available_externally: true
+homebox_traefik_whitelist: "{{ lan }}"
+homebox_homepage_href: "https://{{ homebox_hostname }}.{{ ansible_nas_domain }}"
+homebox_watchtower_monitor_only: "false"
+
+###
+### kasm
+###                                                                               
+kasm_enabled: false
+kasm_available_externally: true
+kasm_traefik_whitelist: "{{ lan }}"
+kasm_homepage_href: "https://{{ kasm_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Kavita
+###
+kavita_enabled: false
+kavita_available_externally: true
+kavita_traefik_whitelist: "{{ wan }}"
+kavita_homepage_href: "https://{{ kavita_hostname }}.{{ ansible_nas_domain }}"
+kavita_watchtower_monitor_only: "false"
+
+###
+### MIND
+###
+mind_enabled: false
+mind_available_externally: true
+mind_traefik_whitelist: "{{ lan }}"
+mind_homepage_href: "https://{{ mind_hostname }}.{{ ansible_nas_domain }}"
+mind_watchtower_monitor_only: "false"
+
+###
+### Mastodon
+###
+mastodon_enabled: false
+mastodon_available_externally: true
+mastodon_traefik_whitelist: "{{ lan }}"
+mastodon_homepage_href: "https://{{ mastodon_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Tactical RMM
+###
+tacticalrmm_enabled: false
+tacticalrmm_available_externally: true
+tacticalrmm_traefik_whitelist: "{{ lan }}"
+
+###
+### Shoutcast Server
+###
+shoutcast_enabled: false
+shoutcast_available_externally: true
+shoutcast_traefik_whitelist: "{{ lan }}"
+
+###
+### RustDesk
+###
+rustdesk_enabled: false
+rustdesk_available_externally: true
+rustdesk_traefik_whitelist: "{{ lan }}"
+rustdesk_homepage_href: "https://{{ rustdesk_hostname }}.{{ ansible_nas_domain }}"
+
+###
+### Change Detection
+###
+change_detection_enabled: false
+change_detection_available_externally: true
+change_detection_homepage_href: "https://{{ change_detection_hostname }}.{{ ansible_nas_domain }}"
+change_detection_sockpuppet_homepage_href: "https://{{ change_detection_hostname }}.{{ ansible_nas_domain }}"
+change_detection_sockpuppet_homepage_group: "Misc"
+change_detection_watchtower_monitor_only: "false"
+
+###
+### Koillection
+###
+koillection_enabled: false
+koillection_available_externally: true
+koillection_homepage_href: "https://{{ koillection_hostname }}.{{ ansible_nas_domain }}"
+koillection_watchtower_monitor_only: "false"
+
+###
+### Gramps Web
+###
+grampsweb_enabled: false
+grampsweb_available_externally: true
+grampsweb_homepage_href: "https://{{ grampsweb_hostname }}.{{ ansible_nas_domain }}"
+grampsweb_celery_homepage_href: "https://{{ grampsweb_hostname }}.{{ ansible_nas_domain }}"
+grampsweb_redis_homepage_href: "https://{{ grampsweb_hostname }}.{{ ansible_nas_domain }}"
+grampsweb_watchtower_monitor_only: "false"
+
+###
+### crowdsec
+###
+crowdsec_enabled: false
+crowdsec_available_externally: true
+crowdsec_homepage_href: "https://{{ crowdsec_hostname }}.{{ ansible_nas_domain }}"
+crowdsec_watchtower_monitor_only: "false"
+
+###
+### VFD
+###
+vfd_enabled: false
+vfd_available_externally: true
+vfd_homepage_href: "https://{{ vfd_hostname }}.{{ ansible_nas_domain }}"
+vfd_watchtower_monitor_only: "false"
+vfd_scrapper_start_dates: "2025-06-10"
+vfd_scapper_end_dates: "2025-08-14"
+vfd_scapper_departure_airports: "LAX, BUR"
+vfd_scapper_arrival_airports: "MNL, CRK"
+vfd_scrapper_interval: "300"
+
+###
+### Sonus-Web
+###
+sonos_web_enabled: false
+sonos_web_available_externally: true
+sonos_web_traefik_whitelist: "{{ lan }}"
+# sonos_web_homepage_href: "https://{{ sonos_web_hostname }}.{{ ansible_nas_domain }}"
+# ^^^ find the ports that sonos uses and take the container out of host mode
+sonos_web_watchtower_monitor_only: "false"
+
+###
+### Resilio Sync
+###
+resilio_sync_enabled: true
+resilio_sync_available_externally: true
+resilio_sync_traefik_whitelist: "{{ lan }}"
+resilio_sync_homepage_href: "https://{{ resilio_sync_hostname }}.{{ ansible_nas_domain }}"
+resilio_sync_watchtower_monitor_only: "false"
+
+###
+### bitmagnet
+###
+bitmagnet_enabled: false
+bitmagnet_available_externally: true
+bitmagnet_traefik_whitelist: "{{ lan }}"
+bitmagnet_db_watchtower_monitor_only: "false"
+bitmagnet_homepage_href: "https://{{ bitmagnet_hostname }}.{{ ansible_nas_domain }}"
+bitmagnet_tmdb_api_key: ""
+bitmagnet_watchtower_monitor_only: "false"
+
+###
+### HTPC-Manager
+###
+htpcmanager_enabled: false
+htpcmanager_available_externally: true
+htpcmanager_traefik_whitelist: "{{ lan }}"
+htpcmanager_homepage_href: "https://{{ htpcmanager_hostname }}.{{ ansible_nas_domain }}"
+htpcmanager_watchtower_monitor_only: "false"
+htpcmanager_homepage_icon: "https://{{ htpcmanager_hostname }}.{{ ansible_nas_domain }}/img/homescreen.png"
+
+###                                                                                                                     
+### Huntarr
+###
+huntarr_enabled: false
+huntarr_available_externally: true
+huntarr_traefik_whitelist: "{{ lan }}"
+huntarr_homepage_href: "https://{{ huntarr_hostname }}.{{ ansible_nas_domain }}"
+huntarr_image_version: "7.8.2"
+huntarr_watchtower_monitor_only: "false"
+
+###
+### Cleanuperr
+###
+cleanuperr_enabled: false
+cleanuperr_watchtower_monitor_only: "false"
+
+###
+### WatchYourLAN
+###
+watchyourlan_enabled: false
+watchyourlan_ifaces: "enp6s18"
+watchyourlan_watchtower_monitor_only: "false"
+
+###
+### ollama
+###
+ollama_enabled: true
+ollama_available_externally: true
+ollama_traefik_whitelist: "{{ lan }}"
+ollama_homepage_href: "https://{{ ollama_hostname }}.{{ ansible_nas_domain }}"
+ollama_watchtower_monitor_only: "false"
+ollama_openedai_homepage_href: "https://{{ ollama_openedai_hostname }}.{{ ansible_nas_domain }}"
+ollama_openedai_watchtower_monitor_only: "false"
+ollama_openwebui_homepage_href: "https://{{ ollama_openwebui_hostname }}.{{ ansible_nas_domain }}"
+ollama_openwebui_watchtower_monitor_only: "false"
+
+###
+### Arcane
+###
+arcane_enabled: true
+arcane_available_externally: true
+arcane_traefik_whitelist: "{{ lan }}"
+arcane_homepage_group: "Docker Utils"
+arcane_homepage_href: "https://{{ arcane_hostname }}.{{ ansible_nas_domain }}"
+arcane_public_session_secret: "3262BhhNtgbTs6KSNTCu5FKN1GKh23SUHfrsr3kY5rs="
+arcane_watchtower_monitor_only: "false"

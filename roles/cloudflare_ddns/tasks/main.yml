@@ -1,0 +1,49 @@
+---
+- name: Start Cloudflare DDNS
+  block:
+    - name: Check for deprecated API key
+      ansible.builtin.fail:
+        msg: "Using a Cloudflare global API key is no longer supported. Please unset cloudflare_api_key and set cloudflare_token"
+      when: cloudflare_api_key is defined
+
+    - name: Create cloudflare Dynamic DNS Directories
+      ansible.builtin.file:
+        path: "{{ cloudflare_data_directory }}"
+        state: directory
+
+    - name: Template Cloudflare Dynamic DNS config.yml with scoped token
+      ansible.builtin.template:
+        src: config.yml
+        dest: "{{ cloudflare_data_directory }}/config.yml"
+      register: template_files_result
+
+    - name: Cloudflare Dynamic DNS Container
+      community.docker.docker_container:
+        name: "{{ cloudflare_container_name }}"
+        image: joshava/cloudflare-ddns:latest
+        pull: true
+        volumes:
+          - "{{ cloudflare_data_directory }}/config.yml:/app/config.yaml"
+          - "/etc/timezone:/etc/timezone:ro"
+        restart_policy: unless-stopped
+        memory: "{{ cloudflare_memory }}"
+        recreate: "{{ template_files_result is changed }}"
+        labels:
+          homepage.group: "Network"
+          homepage.name: "Cloudflare DDNS"
+          homepage.icon: "cloudflare.png"
+          homepage.href: "https://dash.cloudflare.com/login"
+    #     homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "cloudflare-ddns"
+          homepage.showStats: "false"
+          traefik.enable: "false"
+  when: cloudflare_ddns_enabled is true
+
+- name: Stop Cloudflare DDNS
+  block:
+    - name: Stop Cloudflare DDNS
+      community.docker.docker_container:
+        name: "{{ cloudflare_container_name }}"
+        state: absent
+  when: cloudflare_ddns_enabled is false

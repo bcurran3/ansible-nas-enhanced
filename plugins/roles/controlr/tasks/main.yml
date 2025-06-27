@@ -1,0 +1,101 @@
+---
+### WORK IN PROGRESS
+- name: Start ControlR
+  block:
+    - name: Create ControlR Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ controlr_data_directory }}"
+        - "{{ controlr_data_directory }}/data"
+
+    - name: Create ControlR network
+      community.docker.docker_network:
+        name: "{{ controlr_network_name }}"
+        ipam_config:
+          - subnet: "{{ controlr_network_subnet }}"
+
+    - name: Create ControlR Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ controlr_container_name }}"
+        hostname: "{{ controlr_container_name }}"
+        image: translucency/controlr:latest
+        pull: true
+        networks:
+          - name: "{{ controlr_network_name }}"
+        networks_cli_compatible: "yes"
+        network_mode: "bridge"
+        ports:
+          - "{{ controlr_port_http }}:8080"
+        volumes:
+          - "{{ controlr_data_directory }}/data:/app/AppData"
+        env:
+#         ASPNETCORE variables should *not* be changed.
+          ASPNETCORE_ENVIRONMENT: "Production"
+          ASPNETCORE_HTTP_PORTS: "8080"
+          ControlR_ApplicationOptions__DockerGatewayIp: "{{ controlr_network_gateway }}"
+          ControlR_ApplicationOptions__LogRetentionDays: "7"
+#         Uncomment these variables to control access to your server.
+#         For multiple values in an array, put each item on a new line
+#         with the next consecutive number.  Example:
+#         ControlR_ApplicationOptions__AdminPublicKeys__0={first-admin-key}
+#         ControlR_ApplicationOptions__AdminPublicKeys__1={second-admin-key}
+#
+#         ControlR_ApplicationOptions__AdminPublicKeys__0=
+#         ControlR_ApplicationOptions__EnableRestrictedUserAccess=false
+#         ControlR_ApplicationOptions__AuthorizedUserPublicKeys__0=
+#
+#         Uncomment and add an entry for each proxy that will be forwarding traffic
+#         to ControlR.  The app will not work correctly if this isn't done or if the
+#         forwarded headers are not in the correct format.
+#         See the docs for more details:  
+#         https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/proxy-load-balancer
+#         ControlR_ApplicationOptions__KnownProxies__0=
+
+#         If enabled, ControlR will attempt to use geolocation APIs to determine
+#         the closest relay server to the viewer when starting a remote control
+#         session.  Otherwise, the local server will be used.
+          ControlR_ApplicationOptions__UseExternalWebSocketBridge: "false"
+#         ControlR_ApplicationOptions__ExternalWebSocketHosts__0__Label=
+#         ControlR_ApplicationOptions__ExternalWebSocketHosts__0__Origin=
+#         ControlR_ApplicationOptions__ExternalWebSocketHosts__0__Latitude=
+#         ControlR_ApplicationOptions__ExternalWebSocketHosts__0__Longitude=
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ controlr_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ controlr_watchtower_monitor_only }}"
+          homepage.name: "ControlR"
+          homepage.group: "{{ controlr_homepage_group }}"
+          homepage.icon: "{{ controlr_homepage_icon }}"
+          homepage.href: "{{ controlr_homepage_href }}"
+#         homepage.description: "Open-source, self-hostable remote control and remote access."
+          homepage.server: "my-docker"
+          homepage.container: "{{ controlr_container_name }}"
+          homepage.showStats: "{{ controlr_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glances_port_one }}"
+          traefik.enable: "{{ controlr_available_externally | string }}"
+          traefik.http.routers.controlr.rule: "Host(`{{ controlr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.controlr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.controlr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.controlr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ controlr_hostname }}"
+          traefik.http.routers.controlr.middlewares: "{{ controlr_hostname }}@docker"
+          traefik.http.middlewares.controlr.IPAllowList.sourcerange: "{{ controlr_traefik_whitelist }}"
+          traefik.http.services.controlr.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/bitbound/ControlR/releases/tag/$${major}.$${minor}.$${patch}"
+
+- name: Stop ControlR
+  block:
+    - name: Stop ControlR
+      community.docker.docker_container:
+        name: "{{ controlr_container_name }}"
+        state: absent
+  when: controlr_enabled is false
+
+# as of 07/10/24:
+# Note: ControlR is still in alpha and isn't ready for self-hosting yet.
+# When it is, I'll add a quick start section here with Docker instructions.

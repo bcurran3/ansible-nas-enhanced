@@ -1,0 +1,75 @@
+---
+### WORK IN PROGRESS - TESTING
+- name: Start Crowdsec
+  block:
+    - name: Create Crowdsec Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ crowdsec_data_directory }}"
+        - "{{ crowdsec_data_directory }}/config"
+        - "{{ crowdsec_data_directory }}/data"
+
+    - name: Create Crowdsec Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ crowdsec_container_name }}"
+        hostname: "{{ crowdsec_container_name }}"
+        image: crowdsecurity/crowdsec
+        pull: true
+        volumes:
+          - "{{ crowdsec_data_directory }}/config:/etc/crowdsec"
+          - "{{ crowdsec_data_directory }}/config/acquis.d:/etc/crowdsec/acquis.d"
+          - "{{ crowdsec_data_directory }}/config/acquis.yaml:/etc/crowdsec/acquis.yaml"
+          - "{{ crowdsec_data_directory }}/data:/var/lib/crowdsec/data"
+          - "/var/log/auth.log:/logs/auth.log:ro"
+          - "/var/log/syslog.log:/logs/syslog.log:ro"
+          - "/var/log/apache:/logs/apache:ro"
+        ports:
+          - "{{ crowdsec_port_http }}:8080"
+          - "{{ crowdsec_port_metrics }}:{{ crowdsec_port_metrics }}" # Port to expose Prometheus metrics
+        env:
+          COLLECTIONS: "{{ crowdsec_collections }}"
+          DISABLE_COLLECTIONS: "{{ crowdsec_disable_collections }}"
+          LOCAL_API_URL: "http://0.0.0.0:{{ crowdsec_port_http }}"
+          METRICS_PORT: "{{ crowdsec_port_metrics }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ crowdsec_watchtower_monitor_only }}"
+          homepage.name: "Crowdsec"
+          homepage.group: "{{ crowdsec_homepage_group }}"
+          homepage.icon: "{{ crowdsec_homepage_icon }}"
+          homepage.href: "{{ crowdsec_homepage_href }}"
+#         homepage.description: "Crowdsec - An open-source, lightweight agent to detect and respond to bad behaviours."
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ crowdsec_container_name }}"
+          homepage.showStats: "{{ crowdsec_homepage_showStats }}"
+          homepage.widget.type: "crowdsec"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
+          homepage.widget.username: "{{ crowdsec_homepage_widget_username }}"
+          homepage.widget.password: "{{ crowdsec_homepage_widget_password }}"
+#         traefik.enable: "{{ crowdsec_available_externally | string }}"
+          traefik.enable: "false"
+#         traefik.http.routers.crowdsec.rule: "Host(`crowdsec.{{ ansible_nas_domain }}`)"
+#         traefik.http.routers.crowdsec.tls.certresolver: "letsencrypt"
+#         traefik.http.routers.crowdsec.tls.domains[0].main: "{{ ansible_nas_domain }}"
+#         traefik.http.routers.crowdsec.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+#         traefik.http.routers.frontend.middlewares: "{{ crowdsec_hostname }}"
+#         traefik.http.routers.crowdsec.middlewares: "{{ crowdsec_hostname }}@docker"
+#         traefik.http.middlewares.crowdsec.IPAllowList.sourcerange: "{{ crowdsec_traefik_whitelist }}"
+#         traefik.http.services.crowdsec.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/Casvt/crowdsec/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ crowdsec_memory }}"
+  when: crowdsec_enabled is true
+
+- name: Stop Crowdsec
+  block:
+    - name: Stop Crowdsec
+      community.docker.docker_container:
+        name: "{{ crowdsec_container_name }}"
+        state: absent
+  when: crowdsec_enabled is false

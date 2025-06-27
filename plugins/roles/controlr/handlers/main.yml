@@ -1,0 +1,9 @@
+---
+- name: Stop ControlR
+  docker_container:
+    name: "{{ controlr_container_name }}"
+    state: absent
+  when: controlr_enabled is false
+  listen:
+    - "stop controlr"
+    - "stop disabled applications"

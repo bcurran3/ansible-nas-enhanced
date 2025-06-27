@@ -1,0 +1,61 @@
+---
+- name: Start FileShelter
+  block:
+    - name: Create FileShelter Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "0"
+        group: "1000"
+      with_items:
+        - "{{ fileshelter_data_directory }}"
+        - "{{ fileshelter_data_directory }}/data"
+
+    - name: Create FileShelter Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ fileshelter_container_name }}"
+        hostname: "{{ fileshelter_container_name }}"
+        image: epoupon/fileshelter
+        pull: true
+        user: "0:1000"
+        ports:
+          - "{{ fileshelter_port_http }}:5091"
+        volumes:
+          - "{{ fileshelter_data_directory }}/data:/var/fileshelter"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ fileshelter_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ fileshelter_watchtower_monitor_only }}"
+          homepage.name: "FileShelter"
+          homepage.group: "{{ fileshelter_homepage_group }}"
+          homepage.icon: "{{ fileshelter_homepage_icon }}"
+          homepage.href: "{{ fileshelter_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fileshelter_port_http }}"
+#         homepage.description: "FileShelter is a “one-click” file sharing web application"
+          homepage.server: "my-docker"
+          homepage.container: "{{ fileshelter_container_name }}"
+          homepage.showStats: "{{ fileshelter_homepage_showStats }}"
+          traefik.enable: "{{ fileshelter_available_externally | string }}"
+          traefik.http.routers.fileshelter.rule: "Host(`{{ fileshelter_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.fileshelter.tls.certresolver: "letsencrypt"
+          traefik.http.routers.fileshelter.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.fileshelter.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ fileshelter_hostname }}"
+          traefik.http.routers.fileshelter.middlewares: "{{ fileshelter_hostname }}@docker"
+          traefik.http.middlewares.fileshelter.IPAllowList.sourcerange: "{{ fileshelter_traefik_whitelist }}"
+          traefik.http.services.fileshelter.loadbalancer.server.port: "5091"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/epoupon/fileshelter/releases/tag/$${major}.$${minor}.$${patch}"
+  when: fileshelter_enabled is true
+
+- name: Stop FileShelter
+  block:
+    - name: Stop FileShelter
+      community.docker.docker_container:
+        name: "{{ fileshelter_container_name }}"
+        state: absent
+  when: fileshelter_enabled is false

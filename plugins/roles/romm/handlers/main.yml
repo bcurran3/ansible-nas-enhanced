@@ -1,0 +1,18 @@
+---
+- name: Stop RomM
+  docker_container:
+    name: "{{ romm_container_name }}"
+    state: absent
+  when: romm_enabled is false
+  listen:
+    - "stop romm"
+    - "stop disabled applications"
+
+- name: Stop RomM DB
+  docker_container:
+    name: "{{ romm_db_container_name }}"
+    state: absent
+  when: romm_enabled is false
+  listen:
+    - "stop romm"
+    - "stop disabled applications"

@@ -1,0 +1,24 @@
+#
+seedsync_enabled: false
+seedsync_available_externally: false
+seedsync_traefik_whitelist: "{{ lan }}"
+seedsync_data_directory: "{{ docker_home }}/seedsync"
+
+# network
+seedsync_hostname: "seedsync"
+seedsync_port_http: "8800"
+
+# specs
+seedsync_memory_limit: "1G"
+
+# docker
+seedsync_container_name: "seedsync"
+
+# homepage
+seedsync_homepage_group: "Apps"
+seedsync_homepage_icon: "seedsync.png"
+seedsync_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ seedsync_port_http }}"
+seedsync_homepage_showStats: "false"
+
+# watchtower
+seedsync_watchtower_monitor_only: "true"

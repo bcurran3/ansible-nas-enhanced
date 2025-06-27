@@ -1,0 +1,41 @@
+---
+- name: Start cloudflared
+  block:
+    - name: Create cloudflared Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ cloudflared_container_name }}"
+        image: cloudflare/cloudflared:latest
+        pull: true
+        network_mode: "bridge"
+        command: "tunnel --no-autoupdate run --token {{ cloudflared_token }}"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ cloudflared_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ cloudflared_watchtower_monitor_only }}"
+          homepage.group: "{{ cloudflared_homepage_group }}"
+          homepage.name: "cloudflared"
+          homepage.icon: "{{ cloudflared_homepage_icon }}"
+          homepage.href: "https://dash.cloudflare.com/login"
+#         homepage.description: "Client for Cloudflare Tunnel, a daemon that exposes private services through the Cloudflare edge."
+          homepage.server: "my-docker"
+          homepage.container: "{{ cloudflared_container_name }}"
+          homepage.showStats: "{{ cloudflared_homepage_showStats }}"
+          homepage.widget.type: "cloudflared"
+          homepage.widget.accountid: "{{ cloudflared_homepage_widget_accountid }}"
+          homepage.widget.tunnelid: "{{ cloudflared_homepage_widget_tunnelid }}"
+          homepage.widget.key: "{{ cloudflared_homepage_widget_key }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/cloudflare/cloudflared/releases/tag/$${major}.$${minor}.$${patch}"
+  when: cloudflared_enabled is true
+
+- name: Stop cloudflared
+  block:
+    - name: Stop cloudflared
+      community.docker.docker_container:
+        name: "{{ cloudflared_container_name }}"
+        state: absent
+  when: cloudflared_enabled is false

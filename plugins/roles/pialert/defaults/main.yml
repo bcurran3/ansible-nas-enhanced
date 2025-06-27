@@ -1,0 +1,22 @@
+#
+pialert_enabled: false
+pialert_available_externally: false
+pialert_traefik_whitelist: "{{ lan }}"
+pialert_data_directory: "{{ docker_home }}/pialert"
+
+# network
+pialert_hostname: "pialert"
+pialert_port_http: "20211"
+
+# docker
+pialert_container_name: "pialert"
+pialert_memory_limit: "1g"
+
+# homepage
+pialert_homepage_group: "Apps"
+pialert_homepage_icon: "pialert.png"
+pialert_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pialert_port_http }}"
+pialert_homepage_showStats: "false"
+
+# watchtower
+pialert_watchtower_monitor_only: "true"

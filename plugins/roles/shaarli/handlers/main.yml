@@ -1,0 +1,9 @@
+---
+- name: Stop Shaarli
+  docker_container:
+    name: "{{ shaarli_container_name }}"
+    state: absent
+  when: shaarli_enabled is false
+  listen:
+    - "stop shaarli"
+    - "stop disabled applications"

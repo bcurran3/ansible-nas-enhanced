@@ -1,0 +1,23 @@
+#
+grocy_enabled: false
+grocy_available_externally: false
+grocy_traefik_whitelist: "{{ lan }}"
+grocy_data_directory: "{{ docker_home }}/grocy"
+
+# network
+grocy_hostname: "grocy"
+grocy_user_id: "1000"
+grocy_group_id: "1000"
+grocy_port_http: "9283"
+
+# docker
+grocy_container_name: "grocy"
+
+# homepage
+grocy_homepage_group: "Apps"
+grocy_homepage_icon: "grocy.png"
+grocy_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grocy_port_http }}"
+grocy_homepage_showStats: "false"
+
+# watchtower
+grocy_watchtower_monitor_only: "true"

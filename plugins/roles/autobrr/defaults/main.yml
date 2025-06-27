@@ -1,0 +1,20 @@
+# specs
+autobrr_enabled: false
+autobrr_available_externally: false
+autobrr_traefik_whitelist: "{{ lan }}"
+autobrr_data_directory: "{{ docker_home }}/autobrr"
+autobrr_container_name: "autobrr"
+autobrr_memory_limit: "1g"
+
+# network
+autobrr_hostname: "autobrr"
+autobrr_port_http: "7474"
+
+# homepage 
+autobrr_homepage_group: "Apps"
+autobrr_homepage_icon: "autobrr.png"
+autobrr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ autobrr_port_http }}"
+autobrr_homepage_showStats: "false"
+
+# watchtower
+autobrr_watchtower_monitor_only: "true"

@@ -1,0 +1,22 @@
+#
+localai_enabled: false
+localai_available_externally: false
+localai_traefik_whitelist: "{{ lan }}"
+localai_data_directory: "{{ docker_home }}/localai"
+
+# network
+localai_hostname: "localai"
+localai_port_http: "3006"
+
+# docker
+localai_container_name: "localai"
+localai_memory_limit: "1g"
+
+# homepage
+localai_homepage_group: "Apps"
+localai_homepage_icon: "localai.png"
+localai_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ localai_port_http }}"
+localai_homepage_showStats: "false"
+
+# watchtower
+localai_watchtower_monitor_only: "true"

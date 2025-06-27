@@ -1,0 +1,21 @@
+#
+striparr_enabled: false
+striparr_available_externally: false
+striparr_traefik_whitelist: "{{ lan }}"
+striparr_data_directory: "{{ docker_home }}/striparr"
+
+# network
+striparr_port_http: "8989"
+
+# docker
+striparr_container_name: "striparr"
+striparr_memory_limit: "512m"
+
+# homepage
+striparr_homepage_group: "Apps"
+striparr_homepage_icon: "striparr.png"
+striparr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ striparr_port_http }}"
+striparr_homepage_showStats: "false"
+
+# watchtower
+striparr_watchtower_monitor_only: "true"

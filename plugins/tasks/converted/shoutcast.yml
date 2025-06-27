@@ -1,0 +1,35 @@
+---
+- name: Shoutcast Server Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ shoutcast_data_directory }}"
+
+- name: Shoutcast Server Docker Container
+  docker_container:
+    name: shoutcast
+    image: luzifer/shoutcast
+    pull: true
+    volumes:
+      - "{{ shoutcast_media_directory }}:/media:ro"
+      - "{{ shoutcast_data_directory }}:/etc/shoutcast:rw"
+    ports:
+      - "{{ shoutcast_port_http }}:8001"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{ shoutcast_available_externally | string }}"
+      traefik.http.middlewares.shoutcast.IPAllowList.sourcerange: "{{ shoutcast_traefik_whitelist }}"
+      traefik.http.routers.shoutcast.rule: "Host(`shoutcast.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.shoutcast.tls.certresolver: "letsencrypt"
+      traefik.http.routers.shoutcast.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.shoutcast.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.services.shoutcast.loadbalancer.server.port: "8001"
+#      traefik.backend: "shoutcast"
+#      traefik.frontend.rule: "Host:shoutcast.{{ ansible_nas_domain }}"
+#      traefik.enable: "{{ shoutcast_available_externally }}"
+#      traefik.frontend.whiteList.sourceRange: "{{ shoutcast_traefik_whitelist }}"
+#      traefik.port: "8001"
+    memory: 1g

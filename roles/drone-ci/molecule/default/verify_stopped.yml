@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove Drone CI
+      community.docker.docker_container:
+        name: "{{ drone_ci_container_name }}"
+        state: absent
+      register: result
+
+    - name: Try and stop and remove Drone CI runner
+      community.docker.docker_container:
+        name: "{{ drone_ci_runner_container_name }}"
+        state: absent
+      register: result_runner
+
+    - name: Check Drone CI is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - not result_runner.changed

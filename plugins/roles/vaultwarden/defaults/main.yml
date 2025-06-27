@@ -1,0 +1,59 @@
+---
+vaultwarden_enabled: false
+vaultwarden_available_externally: false
+vaultwarden_traefik_whitelist: "{{ lan }}"
+
+# directories
+vaultwarden_data_directory: "{{ docker_home }}/vaultwarden"
+
+# network
+vaultwarden_port_http: "19080"
+vaultwarden_port_websockets: "3012"
+vaultwarden_hostname: "vaultwarden"
+vaultwarden_ip_whitelist: "0.0.0.0/0"
+
+# specs
+vaultwarden_memory: "512m"
+vaultwarden_backup_memory: "512m"
+
+# docker
+vaultwarden_container_name: vaultwarden
+vaultwarden_backup_container_name: vaultwarden-backup
+
+# Keep this token secret, this is password to access admin area of your server!
+# This token can be anything, but it's recommended to use a long, randomly generated string of characters,
+# for example running openssl rand -base64 48
+vaultwarden_admin_token: Dkgp/XHTYIQCFlCTqxpii9yiaSrjxWEZo/ctQBthxwrWuarHc2qyYpt4jlVKA+YU
+
+# To create a user set this to "true", and reprovision the container by re-running the anarion-nas playbook.
+# Once you have created your user, set to "false" and run one more time.
+# Target just Vaultwarden by running: ansible-playbook -i inventory nas.yml -b -K -t vaultwarden
+vaultwarden_allow_signups: false
+
+## Mail specific settings, set SMTP_FROM and either SMTP_HOST or USE_SENDMAIL to enable the mail service.
+## To make sure the email links are pointing to the correct host, set the DOMAIN variable.
+## Note: if SMTP_USERNAME is specified, SMTP_PASSWORD is mandatory
+vaultwarden_SMTP_host: "smtp.domain.tld"
+vaultwarden_SMTP_from: "vaultwarden@domain.tld"
+vaultwarden_SMTP_from_name: "Vaultwarden"
+vaultwarden_SMTP_security: "starttls" # ("starttls", "force_tls", "off") Enable a secure connection. Default is "starttls" (Explicit - ports 587 or 25), "force_tls" (Implicit - port 465) or "off", no encryption (port 25)
+vaultwarden_SMTP_port: "587"          # Ports 587 (submission) and 25 (smtp) are standard without encryption and with encryption via STARTTLS (Explicit TLS). Port 465 (submissions) is used for encrypted submission (Implicit TLS).
+vaultwarden_SMTP_username: "username"
+vaultwarden_SMTP_password: "password"
+vaultwarden_SMTP_timeout: "15"
+
+vaultwarden_websocket_enabled: "false"
+
+# homepage
+vaultwarden_homepage_group: "Apps"
+vaultwarden_homepage_icon: "vaultwarden.png"
+vaultwarden_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
+vaultwarden_homepage_showStats: "false"
+vaultwarden_backup_homepage_group: "Apps"
+vaultwarden_backup_homepage_icon: "vaultwarden.png"
+vaultwarden_backup_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
+vaultwarden_backup_homepage_showStats: "false"
+
+# watchtower
+vaultwarden_watchtower_monitor_only: "true"
+vaultwarden_backup_watchtower_monitor_only: "true"

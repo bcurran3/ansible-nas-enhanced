@@ -1,0 +1,58 @@
+---
+- name: Start Dokemon
+  block:
+    - name: Create Dokemon Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ dokemon_data_directory }}"
+
+    - name: Create Dokemon Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dokemon_container_name }}"
+        hostname: "{{ dokemon_container_name }}"
+        image: productiveops/dokemon:latest
+        pull: true
+        ports:
+          - "{{ dokemon_port_http }}:9090"
+        volumes:
+          - "{{ dokemon_data_directory }}:/data"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        network_mode: bridge
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ dokemon_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ dokemon_watchtower_monitor_only }}"
+          homepage.name: "Dokemon"
+          homepage.group: "{{ dokemon_homepage_group }}"
+          homepage.icon: "{{ dokemon_homepage_icon }}"
+          homepage.href: "{{ dokemon_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dokemon_port_http }}"
+#         homepage.description: "Docker Container Management GUI"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dokemon_container_name }}"
+          homepage.showStats: "{{ dokemon_homepage_showStats }}"
+          traefik.enable: "{{ dokemon_available_externally | string }}"
+          traefik.http.routers.dokemon.rule: "Host(`{{ dokemon_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.dokemon.tls.certresolver: "letsencrypt"
+          traefik.http.routers.dokemon.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.dokemon.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ dokemon_hostname }}"
+          traefik.http.routers.dokemon.middlewares: "{{ dokemon_hostname }}@docker"
+          traefik.http.middlewares.dokemon.IPAllowList.sourcerange: "{{ dokemon_traefik_whitelist }}"
+          traefik.http.services.dokemon.loadbalancer.server.port: "9090"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/productiveops/dokemon/releases/tag/$${major}.$${minor}.$${patch}"
+  when: dokemon_enabled is true
+
+- name: Stop Dokemon
+  block:
+    - name: Stop Dokemon
+      community.docker.docker_container:
+        name: "{{ dokemon_container_name }}"
+        state: absent
+  when: dokemon_enabled is false

@@ -1,0 +1,61 @@
+---
+- name: Start Monitorr
+  block:
+    - name: Monitorr Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ monitorr_data_directory }}/app"
+
+    - name: Monitorr Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ monitorr_container_name }}"
+        image: monitorr/monitorr:latest
+        pull: true
+        volumes:
+          - "{{ monitorr_data_directory }}/app:/app:rw"
+          - "{{ samba_shares_root }}:/shares:ro"
+          - "{{ samba_shares_other_root }}:/other:ro"
+        ports:
+          - "{{ monitorr_port_http }}:80"
+        dns_servers: "{{ ansible_nas_dns }}"
+        hostname: "monitorr"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ monitorr_user_id }}"
+          PGID: "{{ monitorr_group_id }}"
+        restart_policy: unless-stopped
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ monitorr_watchtower_monitor_only }}"
+          homepage.name: "Monitorr"
+          homepage.group: "{{ monitorr_homepage_group }}"
+          homepage.icon: "{{ monitorr_homepage_icon }}"
+          homepage.href: "{{ monitorr_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ monitorr_port_http }}"
+#         homepage.description: "a self-hosted PHP web app that monitors the status of local and remote network services, websites, and applications"
+          homepage.server: "my-docker"
+          homepage.container: "{{ monitorr_container_name }}"
+          homepage.showStats: "{{ monitorr_homepage_showStats }}"
+          traefik.enable: "{{ monitorr_available_externally | string }}"
+          traefik.http.routers.monitorr.rule: "Host(`monitorr.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.monitorr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.monitorr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.monitorr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ monitorr_hostname }}"
+          traefik.http.routers.monitorr.middlewares: "{{ monitorr_hostname }}@docker"
+          traefik.http.middlewares.monitorr.IPAllowList.sourcerange: "{{ monitorr_traefik_whitelist }}"
+          traefik.http.services.monitorr.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: 256m
+  when: monitorr_enabled is true
+
+- name: Stop Monitorr
+  block:
+    - name: Stop Monitorr
+      community.docker.docker_container:
+        name: "{{ monitorr_container_name }}"
+        state: absent
+  when: monitorr_enabled is false

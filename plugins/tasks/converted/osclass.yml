@@ -1,0 +1,80 @@
+---
+- name: Create OsClass Directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "1001"
+  with_items:
+    - "{{ osclass_data_directory }}"
+    - "{{ osclass_data_directory }}/data"
+    - "{{ osclass_data_directory }}/db"
+
+- name: Create OsClass network
+  community.docker.docker_network:
+    name: "osclass-network"
+
+- name: Create OsClass MariaDB Docker Container
+  docker_container:
+    name: osclass_mariadb
+    hostname: "osclass_mariadb"
+    image: bitnami/mariadb:latest
+    pull: true
+    networks:
+      - name: "osclass-network"
+    volumes:
+      - "{{ osclass_data_directory }}/db:/bitnami/mariadb"
+    env:
+      ALLOW_EMPTY_PASSWORD: "no"
+      MARIADB_ROOT_PASSWORD: "Ansible-NAS"
+      MARIADB_USER: "osclass"
+      MARIADB_PASSWORD: "bitnami"
+      MARIADB_DATABASE: "osclass_db"
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    memory: "{{ osclass_memory_limit }}"
+    labels:
+      traefik.enable: "false"
+
+- name: Create OsClass Docker Container
+  docker_container:
+    name: osclass
+    hostname: "osclass"
+    image: bitnami/osclass:latest
+    pull: true
+    networks:
+      - name: "osclass-network"
+#    dns_servers: "1.1.1.1"
+#    links:
+#      - osclass_mariadb
+    volumes:
+      - "{{ osclass_data_directory }}/data:/bitnami/osclass"
+    ports:
+      - "{{ osclass_port }}:8080"
+    env:
+      ALLOW_EMPTY_PASSWORD: "no"
+      OSCLASS_DATABASE_USER: "osclass"
+      OSCLASS_DATABASE_PASSWORD: "bitnami"
+      OSCLASS_DATABASE_NAME: "osclass_db"
+      OSCLASS_DATABASE_HOST: "osclass_mariadb"
+      OSCLASS_DATABASE_PORT_NUMBER: "3306"
+      OSCLASS_EMAIL: ""
+      OSCLASS_SMTP_HOST: ""
+      OSCLASS_SMTP_PORT: ""
+      OSCLASS_SMTP_USER: ""
+      OSCLASS_SMTP_PASSWORD: ""
+      OSCLASS_USERNAME: "admin"
+      OSCLASS_PASSWORD: "{{ osclass_admin_password }}"
+      OSCLASS_WEB_TITLE: "{{ osclass_web_title }}"
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    memory: "{{ osclass_memory_limit }}"
+    labels:
+      traefik.enable: "{{ osclass_available_externally | string }}"
+      traefik.http.routers.osclass.rule: "Host(`{{ osclass_hostname }}.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.osclass.tls.certresolver: "letsencrypt"
+      traefik.http.routers.osclass.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.osclass.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ osclass_hostname }}"
+      traefik.http.routers.osclass.middlewares: "osclass@docker"
+      traefik.http.middlewares.osclass.ipwhitelist.sourcerange: "{{ osclass_traefik_whitelist }}"
+      traefik.http.services.osclass.loadbalancer.server.port: "8080"

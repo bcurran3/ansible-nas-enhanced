@@ -1,0 +1,41 @@
+---
+gitea_enabled: false
+gitea_available_externally: false
+gitea_traefik_whitelist: "{{ lan }}"
+
+# directories
+gitea_data_directory: "{{ docker_home }}/gitea"
+
+# network
+gitea_hostname: "gitea"
+gitea_network_name: "gitea"
+gitea_port_http: "3001"
+gitea_port_ssh: "2221"
+
+# specs
+gitea_memory: 1g
+gitea_db_memory: 1g
+
+# docker
+gitea_container_name: gitea
+gitea_image_name: gitea/gitea
+gitea_image_version: latest
+gitea_db_container_name: gitea-db
+gitea_db_image_name: mysql
+gitea_db_image_version: "5.7"
+
+gitea_uid: "1000"
+gitea_gid: "1000"
+
+# homepage
+gitea_homepage_group: "Apps"
+gitea_homepage_icon: "gitea.png"
+gitea_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"
+gitea_homepage_showStats: "false"
+gitea_db_homepage_group: "DBs"
+gitea_db_homepage_icon: "mysql.png"
+gitea_db_homepage_showStats: "false"
+
+# watchtower
+gitea_watchtower_monitor_only: "true"
+gitea_db_watchtower_monitor_only: "true"

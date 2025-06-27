@@ -1,0 +1,34 @@
+---
+- name: Shaarli Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0777
+  with_items:
+    - "{{ shaarli_data_directory }}/cache"
+    - "{{ shaarli_data_directory }}/data"
+
+- name: Shaarli Docker Container
+  docker_container:
+    name: shaarli
+    image: shaarli/shaarli:latest
+    pull: true
+    volumes:
+      - "{{ shaarli_data_directory }}/cache:/var/www/shaarli/cache:rw"
+      - "{{ shaarli_data_directory }}/data:/var/www/shaarli/data:rw"
+    ports:
+      - "{{ shaarli_port_http }}:80"
+    env:
+      TZ: "{{ ansible_nas_timezone }}"
+    restart_policy: unless-stopped
+    labels:
+      traefik.enable: "{{ shaarli_available_externally | string }}"
+      traefik.http.routers.shaarli.rule: "Host(`shaarli.{{ ansible_nas_domain }}`)"
+      traefik.http.routers.shaarli.tls.certresolver: "letsencrypt"
+      traefik.http.routers.shaarli.tls.domains[0].main: "{{ ansible_nas_domain }}"
+      traefik.http.routers.shaarli.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+      traefik.http.routers.frontend.middlewares: "{{ shaarli_hostname }}"
+      traefik.http.routers.shaarli.middlewares: "{{ shaarli_hostname }}@docker"
+      traefik.http.middlewares.shaarli.IPAllowList.sourcerange: "{{ shaarli_traefik_whitelist }}"
+      traefik.http.services.shaarli.loadbalancer.server.port: "80"
+    memory: 1g

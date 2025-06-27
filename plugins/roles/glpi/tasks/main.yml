@@ -1,0 +1,99 @@
+---
+- name: Start GLPI
+  block:
+    - name: Create GLPI Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ glpi_data_directory }}"
+        - "{{ glpi_data_directory }}/db"
+        - "{{ glpi_data_directory }}/html"
+
+    - name: Create GLPI MariaDB Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ glpi_db_container_name }}"
+        hostname: "{{ glpi_db_container_name }}"
+        image: mariadb:10.7
+        pull: true
+        volumes:
+          - "{{ glpi_data_directory }}/db:/var/lib/mysql"
+        env:
+          MARIADB_ROOT_PASSWORD: "diouxx"
+          MARIADB_DATABASE: "glpidb"
+          MARIADB_USER: "glpi_user"
+          MARIADB_PASSWORD: "{{ glpi_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ glpi_db_memory }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ glpi_db_watchtower_monitor_only }}"
+          homepage.name: "GLPI MariaDB"
+          homepage.group: "{{ glpi_db_homepage_group }}"
+          homepage.icon: "{{ glpi_db_homepage_icon }}"
+          homepage.href: "{{ glpi_db_homepage_href }}"
+#         homepage.description: "MariaDB"
+          homepage.server: "my-docker"
+          homepage.container: "{{ glpi_db_container_name }}"
+          homepage.showStats: "{[ glpi_db_homepage_showStats ]}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/MariaDB/mariadb-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create GLPI Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ glpi_container_name }}"
+        hostname: "{{ glpi_container_name }}"
+        image: diouxx/glpi
+        pull: true
+        volumes:
+          - "/etc/timezone:/etc/timezone:ro"
+          - "/etc/localtime:/etc/localtime:ro"
+          - "{{ glpi_data_directory }}/html:/var/www/html/glpi"
+        ports:
+          - "{{ glpi_port_http }}:80"
+        env:
+          TIMEZONE: "{{ ansible_nas_timezone }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        links:
+          - "{{ glpi_db_container_name }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ glpi_watchtower_monitor_only }}"
+          homepage.name: "GLPI"
+          homepage.group: "{{ glpi_homepage_group }}"
+          homepage.icon: "{{ glpi_homepage_icon }}"
+          homepage.href: "{{ glpi_homepage_href }}"
+#         homepage.description: "GLPI is a Free Asset and IT Management Software package, Data center management, ITIL Service Desk, licenses tracking and software auditing."
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ glpi_container_name }}"
+          homepage.showStats: "{[ glpi_homepage_showStats ]}"
+          traefik.enable: "{{ glpi_available_externally | string }}"
+          traefik.http.routers.glpi.rule: "Host(`glpi.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.glpi.tls.certresolver: "letsencrypt"
+          traefik.http.routers.glpi.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.glpi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ glpi_hostname }}"
+          traefik.http.routers.glpi.middlewares: "{{ glpi_hostname }}@docker"
+          traefik.http.middlewares.glpi.IPAllowList.sourcerange: "{{ glpi_traefik_whitelist }}"
+          traefik.http.services.glpi.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/glpi-project/glpi/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ may not be in sync with container maintainer
+        memory: "{{ glpi_memory }}"
+  when: glpi_enabled is true
+
+- name: Stop GLPI
+  block:
+    - name: Stop GLPI Docker Container
+      community.docker.docker_container:
+        name: "{{ glpi_container_name }}"
+        state: absent
+    - name: Stop GLPI PostgreSQL Docker Container
+      community.docker.docker_container:
+        name: "{{ glpi_db_container_name }}"
+        state: absent
+  when: glpi_enabled is false

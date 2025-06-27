@@ -1,0 +1,9 @@
+---
+- name: Stop Shoutcast Server
+  docker_container:
+    name: "{{ shoutcast_container_name }}"
+    state: absent
+  when: shoutcast_enabled is false
+  listen:
+    - "stop shoutcast"
+    - "stop disabled applications"

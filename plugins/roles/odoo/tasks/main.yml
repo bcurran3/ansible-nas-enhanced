@@ -1,0 +1,101 @@
+---
+### WORK IN PROGRESS
+- name: Start Odoo
+  block:
+    - name: Create Odoo Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ odoo_data_directory }}/data"
+        - "{{ odoo_data_directory }}/db"
+        - "{{ odoo_data_directory }}/config"
+        - "{{ odoo_data_directory }}/addons"
+
+    - name: Create Odoo PostgreSQL Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        image: docker.io/library/postgres:15
+        name: "{{ odoo_db_container_name }}"
+        hostname: "{{ odoo_db_container_name }}"
+        pull: true
+        volumes:
+          - "{{ odoo_data_directory }}/db:/var/lib/postgresql/data/pgdata"
+        network_mode: bridge
+        env:
+          POSTGRES_DB: "postgres"
+          POSTGRES_USER: "odoo"
+          POSTGRES_PASSWORD: "odoo"
+          PGDATA: "/var/lib/postgresql/data/pgdata"
+        restart_policy: unless-stopped
+        memory: "{{ odoo_db_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ odoo_db_watchtower_monitor_only }}"
+          homepage.name: "Odoo-db"
+          homepage.group: "{{ odoo_db_homepage_group }}"
+          homepage.icon: "{{ odoo_db_homepage_icon }}"
+          homepage.showStats: "{{ odoo_db_homepage_showStats }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create Odoo Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ odoo_container_name }}"
+        hostname: "{{ odoo_container_name }}"
+        image: odoo:17
+        pull: true
+        user: root
+        links:
+          - "{{ odoo_db_container_name }}"
+        ports:
+          - "{{ odoo_port_http }}:8069"
+          - "{{ odoo_port_chat }}:8072"
+        volumes:
+          - "{{ odoo_data_directory }}/data:/var/lib/odoo"  # needed?
+          - "{{ odoo_data_directory }}/config:/etc/odoo"
+          - "{{ odoo_data_directory }}/addons:/mnt/extra-addons"
+        network_mode: bridge
+        env:
+          HOST: "{{ odoo_db_container_name }}"
+          USER: "odoo"
+          PASSWORD: "odoo"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ odoo_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ odoo_watchtower_monitor_only }}"
+          homepage.name: "odoo"
+          homepage.group: "{{ odoo_homepage_group }}"
+          homepage.icon: "{{ odoo_homepage_icon }}"
+          homepage.href: "{{ odoo_homepage_href }}"
+#         homepage.description: "Open Source Apps To Grow Your Business."
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ odoo_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "odoo"
+          homepage.showStats: "{[ odoo_homepage_showStats ]}"
+          traefik.enable: "{{ odoo_available_externally | string }}"
+          traefik.http.routers.odoo.rule: "Host(`{{ odoo_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.odoo.tls.certresolver: "letsencrypt"
+          traefik.http.routers.odoo.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.odoo.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ odoo_hostname }}"
+          traefik.http.routers.odoo.middlewares: "{{ odoo_hostname }}@docker"
+          traefik.http.middlewares.odoo.IPAllowList.sourcerange: "{{ odoo_traefik_whitelist }}"
+          traefik.http.services.odoo.loadbalancer.server.port: "8069"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: odoo_enabled is true
+
+- name: Stop Odoo
+  block:
+    - name: Stop Odoo Docker Container
+      community.docker.docker_container:
+        name: "{{ odoo_container_name }}"
+        state: absent
+    - name: Stop Odoo PostgreSQL Docker Container
+      community.docker.docker_container:
+        name: "{{ odoo_db_container_name }}"
+        state: absent
+  when: odoo_enabled is false

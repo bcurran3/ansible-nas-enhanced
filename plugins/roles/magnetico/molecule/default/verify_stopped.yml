@@ -1,0 +1,29 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove magnetico
+      community.docker.docker_container:
+        name: "{{ magnetico_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check magnetico is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+
+    - name: Try and stop and remove magneticod
+      community.docker.docker_container:
+        name: "{{ magnetico_container2_name }}"
+        state: absent
+      register: result
+
+    - name: Check magneticod is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

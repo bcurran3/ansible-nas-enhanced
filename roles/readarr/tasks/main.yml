@@ -1,0 +1,62 @@
+---
+- name: Start Readarr
+  block:
+    - name: Create Readarr Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ readarr_data_directory }}"
+        - "{{ readarr_data_directory }}/config"
+
+    - name: Create Readarr Docker Container
+      docker_container:
+        name: readarr
+        image: linuxserver/readarr:nightly
+        pull: true
+        volumes:
+          - "{{ readarr_data_directory }}/config:/config:rw"
+          - "{{ books_root }}:/books:rw"
+          - "{{ readarr_download_directory }}:/downloads:rw"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ readarr_user_id }}"
+          PGID: "{{ readarr_group_id }}"
+          DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:readarr"
+        ports:
+          - "{{ readarr_port }}:8787"
+        restart_policy: unless-stopped
+        labels:
+          homepage.group: "Media Management"
+          homepage.name: "Readarr"
+          homepage.icon: "readarr.png"
+          homepage.href: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.siteMonitor: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
+    #     homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "readarr"
+          homepage.showStats: "false"
+          homepage.widget.type: "readarr"
+          homepage.widget.url: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
+    ## SECRET
+          homepage.widget.key: "3f6097307b0a4cfeab977dc6bbd8adf0"
+    ## SECRET
+          traefik.enable: "{{ readarr_available_externally | string }}"
+          traefik.http.routers.readarr.rule: "Host(`{{ readarr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.readarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.readarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.readarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ readarr_hostname }}"
+          traefik.http.routers.readarr.middlewares: "{{ readarr_hostname }}@docker"
+          traefik.http.middlewares.readarr.IPAllowList.sourcerange: "{{ readarr_traefik_whitelist }}"
+          traefik.http.services.readarr.loadbalancer.server.port: "8787"
+        memory: "{{readarr_memory}}"
+  when: readarr_enabled is true
+
+- name: Stop readarr
+  block:
+    - name: Stop readarr
+      community.docker.docker_container:
+        name: "readarr"
+        state: absent
+  when: readarr_enabled is false

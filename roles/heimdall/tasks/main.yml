@@ -1,0 +1,53 @@
+---
+- name: Start Heimdall
+  block:
+    - name: Create Heimdall Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0775
+      with_items:
+        - "{{ heimdall_data_directory }}"
+
+    - name: Create Heimdall container
+      community.docker.docker_container:
+        name: "{{ heimdall_container_name }}"
+        hostname: "{{ heimdall_container_name }}"
+        image: "{{ heimdall_docker_image }}"
+        pull: true
+        volumes:
+          - "{{ heimdall_data_directory }}:/config:rw"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ heimdall_port_http }}:80"
+        restart_policy: unless-stopped
+        memory: "{{ heimdall_memory }}"
+        labels:
+          homepage.group: "Apps"
+          homepage.name: "Heimdall"
+          homepage.icon: "heimdall.png"
+          homepage.href: "https://{{ heimdall_hostname }}.{{ ansible_nas_domain }}"
+          homepage.siteMonitor: "https://{{ heimdall_hostname }}.{{ ansible_nas_domain }}"
+    #     homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "heimdall"
+          homepage.showStats: "false"
+          traefik.enable: "{{ heimdall_available_externally | string }}"
+          traefik.http.routers.heimdall.rule: "Host(`{{ heimdall_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.heimdall.tls.certresolver: "letsencrypt"
+          traefik.http.routers.heimdall.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.heimdall.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ heimdall_hostname }}"
+          traefik.http.routers.heimdall.middlewares: "{{ heimdall_hostname }}@docker"
+          traefik.http.middlewares.heimdall.IPAllowList.sourcerange: "{{ heimdall_traefik_whitelist }}"
+          traefik.http.services.heimdall.loadbalancer.server.port: "80"
+  when: heimdall_enabled is true
+
+- name: Stop Heimdall
+  block:
+    - name: Stop Heimdall
+      community.docker.docker_container:
+        name: "{{ heimdall_container_name }}"
+        state: absent
+  when: heimdall_enabled is false

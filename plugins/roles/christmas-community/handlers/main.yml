@@ -1,0 +1,9 @@
+---
+- name: Stop Christmas Community
+  docker_container:
+    name: "{{ christmas_community_container_name }}"
+    state: absent
+  when: dchristmas_community_enabled is false
+  listen:
+    - "stop christmas_community"
+    - "stop disabled applications"

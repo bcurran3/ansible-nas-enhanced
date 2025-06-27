@@ -1,0 +1,24 @@
+#
+gokapi_enabled: false
+gokapi_available_externally: false
+gokapi_traefik_whitelist: "{{ lan }}"
+gokapi_data_directory: "{{ docker_home }}/gokapi"
+
+# network
+gokapi_hostname: "gokapi"
+gokapi_port_http: "53842"
+
+# specs
+gokapi_memory: "512m"
+
+# docker
+gokapi_container_name: "gokapi"
+
+# homepage
+gokapi_homepage_group: "Apps"
+gokapi_homepage_icon: "gokapi.png"
+gokapi_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gokapi_port_http }}"
+gokapi_homepage_showStats: "false"
+
+# watchtower
+gokapi_watchtower_monitor_only: "true"

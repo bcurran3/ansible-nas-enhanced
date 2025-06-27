@@ -1,0 +1,60 @@
+---
+- name: Start DweebUI
+  block:
+    - name: Create DweebUI Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ dweebui_data_directory }}"
+
+    - name: Create DweebUI Docker Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dweebui_container_name }}"
+        hostname: "{{ dweebui_container_name }}"
+        image: lllllllillllllillll/dweebui:latest
+        pull: true
+        ports:
+          - "{{ dweebui_port_http }}:{{ dweebui_port_http }}"
+        volumes:
+          - "{{ dweebui_data_directory }}:/app"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        network_mode: bridge
+        env:
+          PORT: "{{ dweebui_port_http }}"
+          SECRET: "{{ dweebui_secret }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ dweebui_memory_limit }}"
+        labels:
+          com.centurylinklabs.watchtower.monitor-only: "{{ dweebuit_watchtower_monitor_only }}"
+          homepage.name: "DweebUI"
+          homepage.group: "{{ dweebui_homepage_group }}"
+          homepage.icon: "{{ dweebui_homepage_icon }}"
+          homepage.href: "{{ dweebui_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dweebui_port_http }}"
+#         homepage.description: "DweebUI is a WebUI for managing your containers. Simple setup, a dynamically updating dashboard, and a multi-user permission system."
+          homepage.server: "my-docker"
+          homepage.container: "{{ dweebui_container_name }}"
+          homepage.showStats: "{{ dweebui_homepage_showStats }}"
+          traefik.enable: "{{ dweebui_available_externally | string }}"
+          traefik.http.routers.dweebui.rule: "Host(`{{ dweebui_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.dweebui.tls.certresolver: "letsencrypt"
+          traefik.http.routers.dweebui.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.dweebui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ dweebui_hostname }}"
+          traefik.http.routers.dweebui.middlewares: "{{ dweebui_hostname }}@docker"
+          traefik.http.middlewares.dweebui.IPAllowList.sourcerange: "{{ dweebui_traefik_whitelist }}"
+          traefik.http.services.dweebui.loadbalancer.server.port: "{{ dweebui_port_http }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/lllllllillllllillll/DweebUI/releases/tag/$${major}.$${minor}.$${patch}"
+  when: dweebui_enabled is true
+
+- name: Stop DweebUI
+  block:
+    - name: Stop DweebUI
+      community.docker.docker_container:
+        name: "{{ dweebui_container_name }}"
+        state: absent
+  when: dweebui_enabled is false
