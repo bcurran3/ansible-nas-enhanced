@@ -1,19 +1,4 @@
 ---
-#- name: Install figlet
-#  apt:
-#    name: "figlet"
-#    state: present
-#  register: result
-#  until: result is succeeded
-
-#- name: Create login banner
-#  shell: "figlet {{ ansible_nas_hostname }} > files/motd.txt"
-
-- name: Set login banner
-  copy:
-    src: motd.txt
-    dest: /etc/motd
-
 #- name: Enable Universe repository
 #  raw: apt-add-repository universe
 #  register: add_repo_result
@@ -45,6 +30,20 @@
   until: result is succeeded
 
 #  - name: Configure smartmontools
+
+- name: Generate banner using figlet
+  shell: "echo \"{{ ansible_nas_hostname }}\" | figlet > roles/ansible-nas-general/files/motd.txt"
+
+- name: Add text to generated banner
+  lineinfile:
+    path: roles/ansible-nas-general/files/motd.txt
+    line: "Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced"
+    create: yes
+
+- name: Set login banner
+  copy:
+    src: motd.txt
+    dest: /etc/motd
 
 - name: "Set hostname to {{ ansible_nas_hostname }}"
   hostname:
