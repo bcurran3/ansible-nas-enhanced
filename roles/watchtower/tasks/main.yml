@@ -74,6 +74,8 @@
           traefik.http.routers.watchtower.middlewares: "{{ watchtower_hostname }}@docker"
           traefik.http.middlewares.watchtower.IPAllowList.sourcerange: "{{ watchtower_traefik_whitelist }}"
           traefik.http.services.watchtower.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/containrrr/watchtower/releases/tag/$${major}.$${minor}.$${patch}"
   when: watchtower_enabled is true
 
 - name: Stop Watchtower

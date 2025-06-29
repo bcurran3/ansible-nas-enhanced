@@ -20,26 +20,31 @@
     - name: Cloudflare Dynamic DNS Container
       community.docker.docker_container:
         name: "{{ cloudflare_container_name }}"
-        image: joshava/cloudflare-ddns:latest
+        hostname: "{{ cloudflare_container_name }}"
+        image: "{{ cloudflare_image_name }}:{{ cloudflare_image_version }}"
         pull: true
         volumes:
           - "{{ cloudflare_data_directory }}/config.yml:/app/config.yaml"
           - "/etc/timezone:/etc/timezone:ro"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ cloudflare_memory }}"
         recreate: "{{ template_files_result is changed }}"
         labels:
           autoheal: "{{ cloudflare_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ cloudflare_watchtower_monitor_only }}"
-          homepage.group: "Network"
           homepage.name: "Cloudflare DDNS"
-          homepage.icon: "cloudflare.png"
+          homepage.group: "{{ cloudflare_homepage_group }}"
+          homepage.icon: "{{ cloudflare_homepage_icon }}"
           homepage.href: "https://dash.cloudflare.com/login"
-    #     homepage.description: ""
+#         homepage.description: "Cloudflare DDNS minimal docker."
           homepage.server: "my-docker"
-          homepage.container: "cloudflare-ddns"
-          homepage.showStats: "false"
+          homepage.container: "{{ cloudflare_container_name }}"
+          homepage.showStats: "{{ cloudflare_homepage_showStats }}"
           traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/joshuaavalon/docker-cloudflare/releases/tag/$${major}.$${minor}.$${patch}"
   when: cloudflare_ddns_enabled is true
 
 - name: Stop Cloudflare DDNS

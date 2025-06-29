@@ -12,6 +12,8 @@ plex_photos_directory: "{{ photos_root }}"
 plex_podcasts_directory: "{{ podcasts_root }}"
 plex_music_directory: "{{ music_root }}"
 plex_audiobooks_directory: "{{ audiobooks_root }}"
+plex_animie_directory: "{{ anime_root }}"
+plex_porn_directory: "{{ porn_root }}"
 
 # uid / gid
 plex_user_id: "0"
@@ -25,6 +27,8 @@ plex_photos_permissions: "rw"
 plex_podcasts_permissions: "rw"
 plex_music_permissions: "rw"
 plex_audiobooks_permissions: "rw"
+plex_anime_permissions: "rw"
+plex_porn_permissions: "rw"
 
 # network
 plex_hostname: "plex"
@@ -49,7 +53,11 @@ plex_version: "docker"
 plex_autoheal: "false"
 
 # homepage
-# more variables need to be converted
-plex_homepage_widget_key: "your api key here"
+plex_homepage_group: "Media Servers"
+plex_homepage_icon: "plex.png"
+plex_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400/web"
+plex_homepage_showStats: "false"
+plex_homepage_widget_key: "your_api_key_here"
 
+# watchtower
 plex_watchtower_monitor_only: "true"

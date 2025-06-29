@@ -35,6 +35,7 @@
           - "33400:33400"       # Plex Web Tools
 #         - "1900:1900/udp"     # Plex DLNA Server
         runtime: "nvidia"       # added
+#       runtime: "{{ nvidia_runtime_enabled | default(omit) }}"
         volumes:
           - "{{ plex_config_directory }}:/config:rw"
           - "{{ plex_logs }}:/opt/plex/Library/Application Support/Plex Media Server/Logs:rw"
@@ -64,16 +65,17 @@
         labels:
           autoheal: "{{ plex_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ plex_watchtower_monitor_only }}"
-          homepage.group: "Media Servers"
+          homepage.group: "{{ plex_homepage_group }}"
           homepage.name: "Plex Media Server"
-          homepage.icon: "plex.png"
-          homepage.href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400/web"
+          homepage.icon: "{{ plex_homepage_icon }}"
+          homepage.href: "{{ plex_homepage_href }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400/web"
 #         homepage.description: Plex Media Server
           homepage.server: "my-docker"
           homepage.container: "{{ plex_container_name }}"
+          homepage.showStats: "{{ plex_homepage_showStats }}"
           homepage.widget.type: "tautulli"
-          homepage.widget.url: "https://{{ tautulli_hostname }}.{{ ansible_nas_domain }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tautulli_port }}"
           homepage.widget.key: "{{ plex_homepage_widget_key }}"
           traefik.enable: "{{ plex_available_externally | string }}"
           traefik.http.routers.plex.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_domain }}`)"
@@ -84,6 +86,8 @@
           traefik.http.routers.plex.middlewares: "{{ plex_hostname }}@docker"
           traefik.http.middlewares.plex.IPAllowList.sourcerange: "{{ plex_traefik_whitelist }}"
           traefik.http.services.plex.loadbalancer.server.port: "32400"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-plex/releases/tag/$${major}.$${minor}.$${patch}"
   when: plex_enabled is true
 
 - name: Stop Plex

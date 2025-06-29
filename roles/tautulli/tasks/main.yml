@@ -21,20 +21,34 @@
         ports:
           - "{{ tautulli_port }}:8181"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ tautulli_user_id }}"
           PGID: "{{ tautulli_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ tautulli_memory }}"
         labels:
           autoheal: "{{ tautulli_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tautulli_watchtower_monitor_only }}"
+          homepage.name: "Tautulli"
+          homepage.group: "{{ tautulli_homepage_group }}"
+          homepage.icon: "{{ tautulli_homepage_icon }}"
+          homepage.href: "{{ tautulli_homepage_href }}"
+#         homepage.description: "a python based web application for monitoring, analytics and notifications for Plex Media Server"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tautulli_container_name }}"
+          homepage.showStats: "{{ tautulli_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tautulli_port }}"
           traefik.enable: "{{ tautulli_available_externally | string }}"
           traefik.http.routers.tautulli.rule: "Host(`{{ tautulli_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tautulli.tls.certresolver: "letsencrypt"
           traefik.http.routers.tautulli.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.tautulli.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ tautulli_hostname }}"
+          traefik.http.routers.tautulli.middlewares: "{{ tautulli_hostname }}@docker"
+          traefik.http.middlewares.tautulli.IPAllowList.sourcerange: "{{ tautulli_traefik_whitelist }}"
           traefik.http.services.tautulli.loadbalancer.server.port: "8181"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-tautulli/releases/tag/$${major}.$${minor}.$${patch}"
   when: tautulli_enabled is true
 
 - name: Stop Tautulli

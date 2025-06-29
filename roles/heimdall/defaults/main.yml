@@ -4,7 +4,8 @@ heimdall_available_externally: false
 heimdall_traefik_whitelist: "{{ lan }}"
 
 # directories
-heimdall_docker_image: linuxserver/heimdall:latest
+heimdall_docker_image: "lscr.io/linuxserver/heimdall"
+heimdall_docker_image_tag: "latest"
 heimdall_data_directory: "{{ docker_home }}/heimdall"
 
 # network
@@ -12,12 +13,22 @@ heimdall_port_http: "11112"
 heimdall_hostname: heimdall
 
 # specs
-heimdall_memory: 1g
+heimdall_memory: 256m  # changed
 
 heimdall_container_name: heimdall
 
+# app
+heimdall_puid: "1000"
+heimdall_pgid: "1000"
+
 # autoheal
 heimdall_autoheal: "false"
+
+# homepage
+heimdall_homepage_group: "Apps"
+heimdall_homepage_icon: "heimdall.png"
+heimdall_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ heimdall_port_http }}"
+heimdall_homepage_showStats: "false"
 
 # watchtower
 heimdall_watchtower_monitor_only: "true"

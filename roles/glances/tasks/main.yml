@@ -10,12 +10,13 @@
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
           - "/etc/timezone:/etc/timezone:ro"
+          - "/etc/os-release:/etc/os-release:ro" # added
         pid_mode: host
         ports:
           - "{{ glances_port_one }}:61208"
           - "{{ glances_port_two }}:61209"
         env:
-          GLANCES_OPT: "-w"
+          GLANCES_OPT: "{{ glances_env_opt }}" # made var
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         security_opts: "{{ glances_security_options }}"
@@ -27,7 +28,7 @@
           homepage.group: "{{ glances_homepage_group }}"
           homepage.icon: "{{ glances_homepage_icon }}"
           homepage.href: "{{ glances_homepage_href }}"
-          homepage.description: ""
+#         homepage.description: "Glances an Eye on your system."
           homepage.server: "my-docker"
           homepage.container: "{{ glances_container_name }}"
           homepage.showStats: "{{ glances_homepage_showStats }}"
@@ -41,6 +42,8 @@
           traefik.http.routers.glances.middlewares: "{{ glances_hostname }}@docker"
           traefik.http.middlewares.glances.IPAllowList.sourcerange: "{{ glances_traefik_whitelist }}"
           traefik.http.services.glances.loadbalancer.server.port: "61208"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/nicolargo/glances/releases/tag/$${major}.$${minor}.$${patch}"
   when: glances_enabled is true
 
 - name: Stop Glances
@@ -50,3 +53,6 @@
         name: "{{ glances_container_name }}"
         state: absent
   when: glances_enabled is false
+
+# NOTE: want to add GPU support
+# https://glances.readthedocs.io/en/develop/docker.html#using-gpu-plugin-with-docker-only-nvidia-gpus

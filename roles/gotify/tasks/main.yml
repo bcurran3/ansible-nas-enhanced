@@ -31,12 +31,12 @@
           homepage.group: "{{ gotify_homepage_group }}"
           homepage.name: "{{ gotify_homepage_name }}"
           homepage.icon: "{{ gotify_homepage_icon }}"
-#         homepage.description: ""
+#         homepage.description: "A simple server for sending and receiving messages in real-time per WebSocket."
           homepage.href: "{{ gotify_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}"
           homepage.server: "my-docker"
-          homepage.container: "gotify"
-          homepage.showStats: "false"
+          homepage.container: "{{ gotify_container_name }}"
+          homepage.showStats: "{{ gotify_homepage_showStats }}"
           homepage.widget.type: "gotify"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}"
           homepage.widget.key: "{{ gotify_homepage_widget_key }}"
@@ -49,6 +49,8 @@
           traefik.http.routers.gotify.middlewares: "{{ gotify_hostname }}@docker"
           traefik.http.middlewares.gotify.IPAllowList.sourcerange: "{{ gotify_traefik_whitelist }}"
           traefik.http.services.gotify.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/gotify/server/releases/tag/$${major}.$${minor}.$${patch}"
   when: gotify_enabled is true
 
 - name: Stop Gotify

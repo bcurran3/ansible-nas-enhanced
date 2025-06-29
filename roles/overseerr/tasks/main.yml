@@ -9,7 +9,7 @@
         - "{{ overseerr_data_directory }}"
         - "{{ overseerr_data_directory }}/config"
 
-    - name: Overseerr Docker Container
+    - name: Create Overseerr Docker Container
       community.docker.docker_container:
         name: "{{ overseerr_container_name }}"
         hostname: "{{ overseerr_container_name }}"
@@ -20,9 +20,9 @@
         ports:
           - "{{ overseerr_port }}:5055"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ overseerr_user_id }}"
           PGID: "{{ overseerr_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ overseerr_memory }}"
         labels:
@@ -46,8 +46,8 @@
           traefik.http.routers.overseerr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.overseerr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.frontend.middlewares: "{{ overseerr_hostname }}"
-          traefik.http.routers.overseer.middlewares: "{{ overseerr_hostname }}@docker"
-          traefik.http.middlewares.overseerr.IPAllowList.sourcerange: "{{ overseerr_traefik_whitelist }}"      
+          traefik.http.routers.overseerr.middlewares: "overseerr@docker"
+          traefik.http.middlewares.overseerr.IPAllowList.sourcerange: "{{ overseerr_traefik_whitelist }}"
           traefik.http.services.overseerr.loadbalancer.server.port: "5055"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-overseerr/releases/tag/$${major}.$${minor}.$${patch}"

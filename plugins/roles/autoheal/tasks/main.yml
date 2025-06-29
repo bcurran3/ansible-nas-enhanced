@@ -1,12 +1,13 @@
 ---
 # https://github.com/willfarrell/docker-autoheal
-- name: Start Autoheal
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Autoheal Docker Container
+    - name: Create {{ ansible_nas_app_name }} Docker Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ autoheal_container_name }}"
-        image: willfarrell/autoheal:latest
+        hostname: "{{ autoheal_container_name }}"
+        image: "{{ autoheal_image_name }}:{{ autoheal_image_version }}"
         pull: true
         network_mode: "none"
         env:
@@ -24,7 +25,7 @@
         labels:
           autoheal: "{{ autoheal_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ autoheal_watchtower_monitor_only }}"
-          homepage.name: "Autoheal"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ autoheal_homepage_group }}"
           homepage.icon: "{{ autoheal_homepage_icon }}"
 #         homepage.description: "Monitor and restart unhealthy docker containers."
@@ -36,9 +37,9 @@
           wud.link.template: "https://github.com/willfarrell/docker-autoheal/releases/tag/$${major}.$${minor}.$${patch}"
   when: autoheal_enabled is true
 
-- name: Stop Autoheal
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Autoheal
+    - name: Stop {{ ansible_nas_app_name }} Docker Container
       community.docker.docker_container:
         name: "{{ autoheal_container_name }}"
         state: absent

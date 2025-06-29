@@ -54,6 +54,8 @@
           traefik.http.routers.portainer.middlewares: "{{ portainer_hostname }}@docker"
           traefik.http.middlewares.portainer.IPAllowList.sourcerange: "{{ portainer_traefik_whitelist }}"
           traefik.http.services.portainer.loadbalancer.server.port: "9000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/r/portainer/portainer-ce/tags/tag/$${major}.$${minor}.$${patch}"
   when: portainer_enabled is true
 
 - name: Stop Portainer

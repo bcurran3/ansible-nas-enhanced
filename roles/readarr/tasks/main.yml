@@ -11,35 +11,36 @@
 
     - name: Create Readarr Docker Container
       docker_container:
-        name: readarr
-        image: linuxserver/readarr:nightly
+        name: "{{ readarr_container_name }}"
+        hostname: "{{ readarr_container_name }}"
+        image: "{{ readarr_image_name }}:{{ readarr_image_version }}"
         pull: true
         volumes:
           - "{{ readarr_data_directory }}/config:/config:rw"
           - "{{ books_root }}:/books:rw"
           - "{{ readarr_download_directory }}:/downloads:rw"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ readarr_user_id }}"
           PGID: "{{ readarr_group_id }}"
-          DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:readarr"
+          TZ: "{{ ansible_nas_timezone }}"
+#         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:readarr"
         ports:
           - "{{ readarr_port }}:8787"
         restart_policy: unless-stopped
         labels:
           autoheal: "{{ readarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ readarr_watchtower_monitor_only }}"
-          homepage.group: "Media Management"
           homepage.name: "Readarr"
-          homepage.icon: "readarr.png"
-          homepage.href: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
-          homepage.siteMonitor: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
-#         homepage.description: ""
+          homepage.group: "{{ readarr_homepage_group }}"
+          homepage.icon: "{{ readarr_homepage_icon }}"
+          homepage.href: "{{ readarr_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ readarr_port }}"
+#         homepage.description: "Book Manager and Automation (Sonarr for Ebooks)"
           homepage.server: "my-docker"
-          homepage.container: "readarr"
-          homepage.showStats: "false"
+          homepage.container: "{{ readarr_container_name }}"
+          homepage.showStats: "{{ readarr_homepage_showStats }}"
           homepage.widget.type: "readarr"
-          homepage.widget.url: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ readarr_port }}"
           homepage.widget.key: "{{ readarr_homepage_widget_key }}"
           traefik.enable: "{{ readarr_available_externally | string }}"
           traefik.http.routers.readarr.rule: "Host(`{{ readarr_hostname }}.{{ ansible_nas_domain }}`)"
@@ -50,6 +51,8 @@
           traefik.http.routers.readarr.middlewares: "{{ readarr_hostname }}@docker"
           traefik.http.middlewares.readarr.IPAllowList.sourcerange: "{{ readarr_traefik_whitelist }}"
           traefik.http.services.readarr.loadbalancer.server.port: "8787"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-readarr/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{readarr_memory}}"
   when: readarr_enabled is true
 
@@ -60,3 +63,7 @@
         name: "readarr"
         state: absent
   when: readarr_enabled is false
+
+  # NOTE: deprecated / retired
+  # https://github.com/linuxserver/docker-readarr
+  # https://github.com/Readarr/Readarr

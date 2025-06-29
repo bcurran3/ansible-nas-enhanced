@@ -7,6 +7,7 @@
         state: directory
       with_items:
         - "{{ homepage_data_directory }}"
+        - "{{ homepage_data_directory }}/images"
 
     - name: Template config files
       ansible.builtin.template:
@@ -27,10 +28,11 @@
         pull: true
         volumes:
           - "{{ homepage_data_directory }}:/app/config"
+          - "{{ homepage_data_directory }}/images:/app/public/images"
           - "/var/run/docker.sock:/var/run/docker.sock"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           HOMEPAGE_ALLOWED_HOSTS: "{{ homepage_allowed_hosts }}"
+          TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ homepage_port }}:3000"
         restart_policy: unless-stopped
@@ -48,6 +50,8 @@
           traefik.http.routers.jackett.middlewares: "{{ homepage_hostname }}@docker"
           traefik.http.middlewares.jackett.IPAllowList.sourcerange: "{{ homepage_traefik_whitelist }}"
           traefik.http.services.homepage.loadbalancer.server.port: "3000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/gethomepage/homepage/releases/tag/$${major}.$${minor}.$${patch}"
   when: homepage_enabled is true
 
 - name: Stop Homepage

@@ -1,14 +1,14 @@
 ---
-- name: Start arcane
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Arcane Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ arcane_data_directory }}"
 
-    - name: Create Arcane Docker Container
+    - name: Create {{ ansible_nas_app_name }} Docker Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ arcane_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ arcane_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ arcane_watchtower_monitor_only }}"
-          homepage.name: "Arcane"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ arcane_homepage_group }}"
           homepage.icon: "{{ arcane_homepage_icon }}"
           homepage.href: "{{ arcane_homepage_href }}"
@@ -54,9 +54,9 @@
         memory: "{{ arcane_memory }}"
   when: arcane_enabled is true
 
-- name: Stop Arcane
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Arcane Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Docker Container
       community.docker.docker_container:
         name: "{{ arcane_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Wallabag
+- name: Start wallabag
   block:
-    - name: Create Wallabag Directories
+    - name: Create wallabag Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ wallabag_data_directory }}/data/db"
         - "{{ wallabag_data_directory }}/images"
 
-    - name: Wallabag Docker Container
+    - name: wallabag Docker Container
       community.docker.docker_container:
         name: "{{ wallabag_container_name }}"
         hostname: "{{ wallabag_container_name }}"
@@ -31,27 +31,31 @@
         labels:
           autoheal: "{{ wallabag_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ wallabag_watchtower_monitor_only }}"
-          homepage.name: "Wallabag"
-          homepage.group: "Apps"
-          homepage.icon: "wallabag.png"
+          homepage.name: "wallabag"
+          homepage.group: "{{ wallabag_homepage_group }}"
+          homepage.icon: "{{ wallabag_homepage_icon }}"
           homepage.href: "{{ wallabag_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wallabag_port }}"
-    #     homepage.description: ""
+#         homepage.description: "wallabag is a self hostable application for saving web pages: Save and classify articles. Read them later. Freely."
           homepage.server: "my-docker"
           homepage.container: "{{ wallabag_container_name }}"
-          homepage.showStats: "false"
+          homepage.showStats: "{{ wallabag_homepage_showStats }}"
           traefik.enable: "{{ wallabag_available_externally | string }}"
-          traefik.http.middlewares.wallabag.IPAllowList.sourcerange: "{{ wallabag_traefik_whitelist }}"
           traefik.http.routers.wallabag.rule: "Host(`wallabag.{{ ansible_nas_domain }}`)"
           traefik.http.routers.wallabag.tls.certresolver: "letsencrypt"
           traefik.http.routers.wallabag.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.wallabag.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ wallabag_hostname }}"
+          traefik.http.routers.wallabag.middlewares: "{{ wallabag_hostname }}@docker"
+          traefik.http.middlewares.wallabag.IPAllowList.sourcerange: "{{ wallabag_traefik_whitelist }}"
           traefik.http.services.wallabag.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/wallabag/wallabag/releases/tag/$${major}.$${minor}.$${patch}"
   when: wallabag_enabled is true
 
-- name: Stop Wallabag
+- name: Stop wallabag
   block:
-    - name: Stop Wallabag
+    - name: Stop wallabag Docker Container
       community.docker.docker_container:
         name: "{{ wallabag_container_name }}"
         state: absent

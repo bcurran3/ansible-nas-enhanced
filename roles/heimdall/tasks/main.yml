@@ -13,11 +13,13 @@
       community.docker.docker_container:
         name: "{{ heimdall_container_name }}"
         hostname: "{{ heimdall_container_name }}"
-        image: "{{ heimdall_docker_image }}"
+        image: "{{ heimdall_docker_image }}:{{ heimdall_docker_image_tag }}"
         pull: true
         volumes:
           - "{{ heimdall_data_directory }}:/config:rw"
         env:
+#         PUID: "{{ heimdall_puid }}"    # unknown effects on existing installs
+#         PGID: "{{ heimdall_pgid }}"    # unknown effects on existing installs
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ heimdall_port_http }}:80"
@@ -26,15 +28,15 @@
         labels:
           autoheal: "{{ heimdall_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ heimdall_watchtower_monitor_only }}"
-          homepage.group: "Apps"
+          homepage.group: "{{ heimdall_homepage_group }}"
           homepage.name: "Heimdall"
-          homepage.icon: "heimdall.png"
-          homepage.href: "https://{{ heimdall_hostname }}.{{ ansible_nas_domain }}"
-          homepage.siteMonitor: "https://{{ heimdall_hostname }}.{{ ansible_nas_domain }}"
-    #     homepage.description: ""
+          homepage.icon: "{[ heimdall_homepage_icon ]}"
+          homepage.href: "{{ heimdall_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ heimdall_port_http }}"
+#         homepage.description: "An application dashboard and launcher"
           homepage.server: "my-docker"
           homepage.container: "{{ heimdall_container_name }}"
-          homepage.showStats: "false"
+          homepage.showStats: "{{ heimdall_homepage_showStats }}"
           traefik.enable: "{{ heimdall_available_externally | string }}"
           traefik.http.routers.heimdall.rule: "Host(`{{ heimdall_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.heimdall.tls.certresolver: "letsencrypt"
@@ -44,6 +46,8 @@
           traefik.http.routers.heimdall.middlewares: "{{ heimdall_hostname }}@docker"
           traefik.http.middlewares.heimdall.IPAllowList.sourcerange: "{{ heimdall_traefik_whitelist }}"
           traefik.http.services.heimdall.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-heimdall/releases/tag/$${major}.$${minor}.$${patch}"
   when: heimdall_enabled is true
 
 - name: Stop Heimdall

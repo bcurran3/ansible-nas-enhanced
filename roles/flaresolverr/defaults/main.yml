@@ -8,15 +8,24 @@ flaresolverr_config_directory: "{{ docker_home }}/flaresolverr"
 
 # network
 flaresolverr_port: "8191"
+flaresolverr_hostname: "flaresolverr"
 
 # specs
-flaresolverr_memory: 200m
+flaresolverr_memory: 256m
 
 # docker
 flaresolverr_container_name: flaresolverr
+flaresolverr_image_name: "ghcr.io/flaresolverr/flaresolverr"
+flaresolverr_image_version: "latest"
 
 # autoheal
 flaresolverr_autoheal: "false"
+
+# homepage
+flaresolverr_homepage_group: "Apps"
+flaresolverr_homepage_icon: "flaresolverr.png"
+flaresolverr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flaresolverr_port }}"
+flaresolverr_homepage_showStats: "false"
 
 # watchtower
 flaresolverr_watchtower_monitor_only: "true"

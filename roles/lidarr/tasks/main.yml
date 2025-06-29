@@ -22,21 +22,21 @@
           PUID: "{{ lidarr_user_id }}"
           PGID: "{{ lidarr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-#         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:lidarr"
+#        DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:lidarr"
         restart_policy: unless-stopped
         memory: "{{ lidarr_memory }}"
         labels:
           autoheal: "{{ lidarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ lidarr_watchtower_monitor_only }}"
           homepage.group: "{{ lidarr_homepage_group }}"
-          homepage.name: "{{ lidarr_homepage_name }}"
+          homepage.name: "Lidarr"
           homepage.icon: "{{ lidarr_homepage_icon }}"
           homepage.href: "{{ lidarr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port }}"
-#         homepage.description: ""
+#         homepage.description: "a music collection manager "
           homepage.server: "my-docker"
           homepage.container: "{{ lidarr_container_name }}"
-          homepage.showStats: "false"
+          homepage.showStats: "{{ lidarr_homepage_showStats }}"
           homepage.widget.type: "lidarr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port }}"
           homepage.widget.key: "{{ lidarr_homepage_widget_key }}"
@@ -49,6 +49,8 @@
           traefik.http.routers.lidarr.middlewares: "{{ lidarr_hostname }}@docker"
           traefik.http.middlewares.lidarr.IPAllowList.sourcerange: "{{ lidarr_traefik_whitelist }}"
           traefik.http.services.lidarr.loadbalancer.server.port: "8686"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-lidarr/releases/tag/$${major}.$${minor}.$${patch}"
   when: lidarr_enabled is true
 
 - name: Stop Lidarr

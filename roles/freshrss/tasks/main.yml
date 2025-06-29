@@ -13,9 +13,9 @@
 
     - name: Create FreshRSS PostgreSQL Docker Container
       community.docker.docker_container:
-        name: freshrss-db
-        hostname: freshrss-db
-        image: postgres:16-alpine
+        name: "{{ freshrss_db_container_name }}"
+        hostname: "{{ freshrss_db_container_name }}"
+        image: "{{ freshrss_db_image_name }}:{{ freshrss_db_image_version }}"
         pull: true
         volumes:
           - "{{ freshrss_data_directory }}/db:/var/lib/postgresql/data"
@@ -25,20 +25,20 @@
           POSTGRES_USER: "freshrss"
           POSTGRES_PASSWORD: "freshrss"
           POSTGRES_DB: "freshrss"
+          TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ freshrss_db_memory }}"
         labels:
           autoheal: "{{ freshrss_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_db_watchtower_monitor_only }}"
-          homepage.group: "DBs"
+          homepage.group: "{{ freshrss_db_homepage_group }}"
           homepage.name: "FreshRSS PostgreSQL"
-          homepage.icon: "postgres.png"
+          homepage.icon: "{{ freshrss_db_homepage_icon }}"
           homepage.href: "{{ freshrss_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
 #         homepage.description: "PostgrSQL"
           homepage.server: "my-docker"
-          homepage.container: "freshrss-db"
-          homepage.showStats: "false"
+          homepage.container: "{{ freshrss_db_container_name }}"
+          homepage.showStats: "{{ freshrss_db_homepage_showStats }}"
           traefik.enable: "false"
 
     - name: Create FreshRSS Docker Container
@@ -48,7 +48,7 @@
         image: "{{ freshrss_image_name }}:{{ freshrss_image_version }}"
         pull: true
         links:
-          - freshrss-db
+          - "{{ freshrss_db_container_name }}"
         volumes:
           - "{{ freshrss_data_directory }}/data:/var/www/FreshRSS/data:rw"
           - "{{ freshrss_data_directory }}/extensions:/var/www/FreshRSS/extensions:rw"
@@ -57,7 +57,7 @@
         container_default_behavior: no_defaults
         env:
           CRON_MIN: "1,31"
-          DB_HOST: "freshrss-db"
+          DB_HOST: "{{ freshrss_container_name }}"
           DB_BASE: "freshrss"
           DB_PASSWORD: "freshrss"
           DB_USER: "freshrss"
@@ -67,15 +67,15 @@
         labels:
           autoheal: "{{ freshrss_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_watchtower_monitor_only }}"
-          homepage.group: "Apps"
+          homepage.group: "{{ freshrss_homepage_group }}"
           homepage.name: "FreshRSS"
-          homepage.icon: "freshrss.png"
+          homepage.icon: "{{ freshrss_homepage_icon }}"
           homepage.href: "{{ freshrss_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
 #         homepage.description: "A free, self-hostable news aggregator…"
           homepage.server: "my-docker"
-          homepage.container: "freshrss"
-          homepage.showStats: "false"
+          homepage.container: "{{ freshrss_container_name }}"
+          homepage.showStats: "{{ freshrss_homepage_showStats }}"
 #         homepage.widget.type: "freshrss"
 #         homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
 #         homepage.widget.username: "{{ freshrss_homepage_widget_username }}"

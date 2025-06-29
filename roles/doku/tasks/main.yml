@@ -3,9 +3,9 @@
   block:
     - name: Create Doku Docker Container
       docker_container:
-        name: doku
-        hostname: doku
-        image: amerkurev/doku:latest
+        name: "{{ doku_container_name }}"
+        hostname: "{{ doku_container_name }}"
+        image: "{{ doku_image_name }}:{{ doku_image_version }}"
         pull: true
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -27,7 +27,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port }}"
 #         homepage.description: "Docker disk space usage"
           homepage.server: "my-docker"
-          homepage.container: "doku"
+          homepage.container: "{{ doku_container_name }}"
           homepage.showStats: "{{ doku_homepage_showStats }}"
           traefik.enable: "{{ doku_available_externally | string }}"
           traefik.http.routers.doku.rule: "Host(`{{ doku_hostname }}.{{ ansible_nas_domain }}`)"

@@ -19,6 +19,7 @@
     - name: Create Mosquitto container
       community.docker.docker_container:
         name: "{{ mosquitto_container_name }}"
+        hostname: "{{ mosquitto_container_name }}"
         image: "{{ mosquitto_image_name }}:{{ mosquitto_image_version }}"
         pull: true
         volumes:
@@ -34,14 +35,16 @@
         labels:
           autoheal: "{{ mosquitto_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mosquitto_watchtower_monitor_only }}"
-          homepage.group: "Misc"
+          homepage.group: "{{ mosquitto_homepage_group }}"
           homepage.name: "Mosquitto"
-          homepage.icon: "mosquitto.png"
-#         homepage.description: ""
+          homepage.icon: "{{ mosquitto_homepage_icon }}"
+#         homepage.description: "An open source MQTT broker"
           homepage.server: "my-docker"
-          homepage.container: "mosquitto"
-          homepage.showStats: "false"
+          homepage.container: "{{ mosquitto_container_name }}"
+          homepage.showStats: "{{ mosquitto_homepage_showStats }}"
           traefik_enabled: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/_/eclipse-mosquitto/tags/tag/$${major}.$${minor}.$${patch}"
   when: mosquitto_enabled is true
 
 - name: Stop Mosquitto

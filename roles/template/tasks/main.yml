@@ -4,21 +4,22 @@
 #
 ############################## comments ##############################
 ---
-- name: Start AppName
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create AppName Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ appname_data_directory }}"
 
-    - name: Create AppName Docker Container
+    - name: Create {{ ansible_nas_app_name }} Docker Container
       docker_container:
         name: "{{ appname_container_name }}"
         hostname: "{{ appname_container_name }}"
         image: "{{ appname_image_name }}:{{ appname_image_version }}"
         pull: true
+        cpu_shares: "{{ appname_cpu_shares }}"
         volumes:
           - "{{ appname_data_directory }}:/"
         ports:
@@ -32,13 +33,13 @@
         labels:
           autoheal: "{{ appname_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ appname_watchtower_monitor_only }}"
-          homepage.name: "appname"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ appname_homepage_group }}"
           homepage.icon: "{{ appname_homepage_icon }}"
           homepage.href: "{{ appname_homepage_href }}"
           homepage.description: ""
           homepage.server: "my-docker"
-          homepage.container: "appname"
+          homepage.container: "{{ appname_container_name }}"
           homepage.showStats: "{{ appname_homepage_showStats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ appname_port }}"
           traefik.enable: "{{ appname_available_externally | string }}"
@@ -50,14 +51,17 @@
           traefik.http.routers.appname.middlewares: "{{ appname_hostname }}@docker"
           traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ appname_traefik_whitelist }}"
           traefik.http.services.appname.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
   when: appname_enabled is true
 
-- name: Stop AppName
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop AppName Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Docker Container
       community.docker.docker_container:
         name: "{{ appname_container_name }}"
         state: absent
   when: appname_enabled is false
 
-# NOTE: consider adding common database setups to the template
+# NOTE: add common database setups to the template
+# consider making wud lables variables - if the image changes, so would the link

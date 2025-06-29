@@ -26,24 +26,24 @@
         env:
           PUID: "{{ komga_user_id }}"
           PGID: "{{ komga_group_id }}"
-          TZ: "{{ ansible_nas_timezone }}"
-          JAVA_TOOL_OPTIONS: "-Xmx4g" # added
-          journal-mode: "wal" # added
+          JAVA_TOOL_OPTIONS: "-Xmx4g"          # added
+          journal-mode: "wal"                  # added
           SERVER_PORT: "{{ komga_port_http }}" # added
+          TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ komga_memory }}"
         labels:
           autoheal: "{{ komga_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ komga_watchtower_monitor_only }}"
           homepage.group: "{{ komga_homepage_group }}"
-          homepage.name: "{{ komga_homepage_name }}"
+          homepage.name: "Komga"
           homepage.icon: "{{ komga_homepage_icon }}"
           homepage.href: "{{ komga_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
 #         homepage.description: "Media server for comics/mangas/BDs/magazines/eBooks with API, OPDS, Kobo Sync and KOReader Sync support"
           homepage.server: "my-docker"
           homepage.container: "{{ komga_container_name }}"
-          homepage.showStats: "false"
+          homepage.showStats: "{{ komga_homepage_showStats }}"
           homepage.widget.type: "komga"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
           homepage.widget.username: "{{ komga_widget_username }}"
@@ -58,6 +58,8 @@
           traefik.http.routers.komga.middlewares: "{{ komga_hostname }}@docker"
           traefik.http.middlewares.komga.IPAllowList.sourcerange: "{{ komga_traefik_whitelist }}"
           traefik.http.services.komga.loadbalancer.server.port: "{{ komga_port_http }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/gotson/komga/releases/tag/$${major}.$${minor}.$${patch}"
   when: komga_enabled is true
 
 - name: Stop Komga

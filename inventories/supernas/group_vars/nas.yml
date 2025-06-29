@@ -153,6 +153,8 @@ nextcloud_homepage_widget_key: "77518f29fb0c9983cbca61c0e6d7897a79a8718060c2efd8
 plex_enabled: true
 plex_available_externally: true
 plex_traefik_whitelist: "{{ wan }}"
+plex_devices:
+  - "/dev/dri:/dev/dri"
 plex_anime_directory: "{{ anime_root }}"
 plex_anime_permissions: "ro"
 plex_porn_directory: "{{ porn_root }}"
@@ -160,7 +162,7 @@ plex_porn_permissions: "ro"
 plex_transcode_directory: "{{ docker_home }}/plex/transcode"
 plex_memory: "12g"
 plex_homepage_widget_key: "PSi1G9ldHE4qya15_ya_RCGuXg6nvRgA"
-plex_homepage_href: "https://{{ plex_hostname }}.{{ ansible_nas_domain }}"
+plex_homepage_href: "https://{{ plex_hostname }}.{{ ansible_nas_domain }}/web"
 
 portainer_enabled: true
 portainer_available_externally: true
@@ -462,6 +464,7 @@ readarr_enabled: false
 readarr_available_externally: true
 readarr_traefik_whitelist: "{{ lan }}"
 readarr_group_id: "1001"
+radarr_homepage_href: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
 readarr_homepage_widget_key: "3f6097307b0a4cfeab977dc6bbd8adf0"
 
 ###
@@ -979,7 +982,7 @@ osclass_homepage_href: "https://{{ osclass_hostname }}.{{ ansible_nas_domain }}"
 ###
 overseerr_enabled: true
 overseerr_available_externally: true
-overseerr_traefik_whitelist: "{{ wan }}"
+overarcaseerr_traefik_whitelist: "{{ wan }}"
 overseerr_homepage_widget_key: "MTY2NDQ3Nzk2MTgzOTJmODhjZWYzLWI0YjAtNDY4Mi05MjkxLTM4MGJmOGYwNmYxNyk="
 overseerr_watchtower_monitor_only: "false"
 overseerr_homepage_href: "https://{{ overseerr_hostname }}.{{ ansible_nas_domain }}"

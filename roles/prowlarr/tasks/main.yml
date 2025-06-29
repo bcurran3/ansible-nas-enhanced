@@ -19,26 +19,26 @@
         ports:
           - "{{ prowlarr_port }}:9696"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ prowlarr_user_id }}"
           PGID: "{{ prowlarr_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
 #         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:prowlarr"
         restart_policy: unless-stopped
         memory: "{{ prowlarr_memory }}"
         labels:
           autoheal: "{{ prowlarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ prowlarr_watchtower_monitor_only }}"
-          homepage.group: "Media Downloading"
           homepage.name: "Prowlarr"
-          homepage.href: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
-          homepage.siteMonitor: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
-          homepage.icon: "prowlarr.png"
+          homepage.group: "{{ prowlarr_homepage_group }}"
+          homepage.icon: "{{ prowlarr_homepage_icon }}"
+          homepage.href: "{{ prowlarr_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port }}"
 #         homepage.description: "Indexer Proxy"
           homepage.server: "my-docker"
           homepage.container: "{{ prowlarr_container_name }}"
-          homepage.showStats: "false"
+          homepage.showStats: "{{ prowlarr_homepage_showStats }}"
           homepage.widget.type: "prowlarr"
-          homepage.widget.url: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port }}"
           homepage.widget.key: "{{ prowlarr_homepage_widget_key }}"
           traefik.enable: "{{ prowlarr_available_externally | string }}"
           traefik.http.routers.prowlarr.rule: "Host(`{{ prowlarr_hostname }}.{{ ansible_nas_domain }}`)"
@@ -49,6 +49,8 @@
           traefik.http.routers.prowlarr.middlewares: "{{ prowlarr_hostname }}@docker"
           traefik.http.middlewares.prowlarr.IPAllowList.sourcerange: "{{ prowlarr_traefik_whitelist }}"
           traefik.http.services.prowlarr.loadbalancer.server.port: "9696"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-prowlarr/releases/tag/$${major}.$${minor}.$${patch}"
   when: prowlarr_enabled is true
 
 - name: Stop Prowlarr
