@@ -87,8 +87,8 @@
           traefik.http.routers.youtubedlmaterial.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.youtubedlmaterial.loadbalancer.server.port: "17442"
           traefik.http.routers.frontend.middlewares: "{{ youtubedlmaterial_hostname }}"
-          traefik.http.routers.overseerr.middlewares: "{{ youtubedlmaterial_hostname }}@docker"
-          traefik.http.middlewares.overseerr.IPAllowList.sourcerange: "{{ youtubedlmaterial_traefik_whitelist }}"
+          traefik.http.routers.youtubedlmaterial.middlewares: "{{ youtubedlmaterial_hostname }}@docker"
+          traefik.http.middlewares.youtubedlmaterial.IPAllowList.sourcerange: "{{ youtubedlmaterial_traefik_whitelist }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Tzahi12345/YoutubeDL-Material/releases/tags/$${major}.$${minor}.$${patch}"
   when: youtubedlmaterial_enabled is true

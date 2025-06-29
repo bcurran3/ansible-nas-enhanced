@@ -16,7 +16,7 @@
         image: "{{ overseerr_image_name }}:{{ overseerr_image_version }}"
         pull: true
         volumes:
-          - "{{ overseerr_data_directory }}/config:/app/config:rw"
+          - "{{ overseerr_data_directory }}/config:/config:rw" #changed for linuxserver.io container
         ports:
           - "{{ overseerr_port }}:5055"
         env:
