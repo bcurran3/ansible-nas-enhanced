@@ -18,7 +18,7 @@
         volumes:
           - "{{ overseerr_data_directory }}/config:/app/config:rw"
         ports:
-          - "{{ overseerr_webui_port }}:5055"
+          - "{{ overseerr_port }}:5055"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ overseerr_user_id }}"
@@ -26,27 +26,31 @@
         restart_policy: unless-stopped
         memory: "{{ overseerr_memory }}"
         labels:
-          homepage.group: "Media Management"
+          autoheal: "{{ overseerr_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ overseerr_watchtower_monitor_only }}"
           homepage.name: "Overseerr"
-          homepage.href: "https://{{ overseerr_hostname }}.{{ ansible_nas_domain }}"
-          homepage.siteMonitor: "https://{{ overseerr_hostname }}.{{ ansible_nas_domain }}"
-          homepage.icon: "overseerr.png"
-#         homepage.description: "Plex requests"
+          homepage.group: "{{ overseerr_homepage_group }}"
+          homepage.icon: "{{ overseerr_homepage_icon }}"
+          homepage.href: "{{ overseerr_homepage_href }}"
+#         homepage.description: "Request management and media discovery tool for the Plex ecosystem"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ overseerr_port }}"
           homepage.server: "my-docker"
-          homepage.container: "overseerr"
-          homepage.showStats: "false"
+          homepage.container: "{{ overseerr_container_name }}"
+          homepage.showStats: "{{ overseerr_homepage_showStats }}"
           homepage.widget.type: "overseerr"
-          homepage.widget.url: "https://{{ overseerr_hostname }}.{{ ansible_nas_domain }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ overseerr_port }}"
           homepage.widget.key: "{{ overseerr_homepage_widget_key }}"
           traefik.enable: "{{ overseerr_available_externally | string }}"
           traefik.http.routers.overseerr.rule: "Host(`{{ overseerr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.overseerr.tls.certresolver: "letsencrypt"
           traefik.http.routers.overseerr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.overseerr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-#         traefik.http.routers.frontend.middlewares: "{{ overseerr_hostname }}"
-#         traefik.http.routers.overseerr.middlewares: "{{ overseerr_hostname }}@docker"
-          traefik.http.middlewares.overseerr.IPAllowList.sourcerange: "{{ overseerr_traefik_whitelist }}"
+          traefik.http.routers.frontend.middlewares: "{{ overseerr_hostname }}"
+          traefik.http.routers.overseer.middlewares: "{{ overseerr_hostname }}@docker"
+          traefik.http.middlewares.overseerr.IPAllowList.sourcerange: "{{ overseerr_traefik_whitelist }}"      
           traefik.http.services.overseerr.loadbalancer.server.port: "5055"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-overseerr/releases/tag/$${major}.$${minor}.$${patch}"
   when: overseerr_enabled is true
 
 - name: Stop Overseerr

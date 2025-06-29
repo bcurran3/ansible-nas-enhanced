@@ -11,14 +11,14 @@
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
         env:
-#         HOST_HOSTNAME: "https://{{ whatsrunning_hostname }}.{{ ansible_nas_domain }}"
-          HOST_HOSTNAME: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+          HOST_HOSTNAME: "{{ whatsrunning_host_hostname }}"
           VERBOSE: "true"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ whatsrunning_port_http }}:5000"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ whatsrunning_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ whatsrunning_watchtower_monitor_only }}"
           homepage.name: "What's Running"
           homepage.group: "{{ whatsrunning_homepage_group }}"

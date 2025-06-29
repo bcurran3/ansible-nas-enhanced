@@ -21,6 +21,9 @@
           - "{{ get_iplayer_port }}:8181"
         restart_policy: unless-stopped
         memory: "{{ get_iplayer_memory }}"
+        labels:
+          autoheal: "{{ get_iplayer_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ get_iplayer_watchtower_monitor_only }}"
   when: get_iplayer_enabled is true
 
 - name: Stop get_iplayer

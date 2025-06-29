@@ -27,20 +27,20 @@
           - "{{ readarr_port }}:8787"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ readarr_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ readarr_watchtower_monitor_only }}"
           homepage.group: "Media Management"
           homepage.name: "Readarr"
           homepage.icon: "readarr.png"
           homepage.href: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
           homepage.siteMonitor: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
-    #     homepage.description: ""
+#         homepage.description: ""
           homepage.server: "my-docker"
           homepage.container: "readarr"
           homepage.showStats: "false"
           homepage.widget.type: "readarr"
           homepage.widget.url: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
-    ## SECRET
-          homepage.widget.key: "3f6097307b0a4cfeab977dc6bbd8adf0"
-    ## SECRET
+          homepage.widget.key: "{{ readarr_homepage_widget_key }}"
           traefik.enable: "{{ readarr_available_externally | string }}"
           traefik.http.routers.readarr.rule: "Host(`{{ readarr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.readarr.tls.certresolver: "letsencrypt"

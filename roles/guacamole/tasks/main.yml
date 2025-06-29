@@ -39,6 +39,8 @@
         restart_policy: unless-stopped
         memory: "{{ guacamole_memory }}"
         labels:
+          autoheal: "{{ guacamole_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ guacamole_watchtower_monitor_only }}"
           traefik.enable: "{{ guacamole_available_externally | string }}"
           traefik.http.routers.guacamole.rule: "Host(`{{ guacamole_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.guacamole.tls.certresolver: "letsencrypt"

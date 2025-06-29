@@ -26,8 +26,10 @@
           POSTGRES_PASSWORD: "freshrss"
           POSTGRES_DB: "freshrss"
         restart_policy: unless-stopped
-        memory: 1g
+        memory: "{{ freshrss_db_memory }}"
         labels:
+          autoheal: "{{ freshrss_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_db_watchtower_monitor_only }}"
           homepage.group: "DBs"
           homepage.name: "FreshRSS PostgreSQL"
           homepage.icon: "postgres.png"
@@ -63,6 +65,8 @@
         restart_policy: unless-stopped
         memory: "{{ freshrss_memory }}"
         labels:
+          autoheal: "{{ freshrss_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_watchtower_monitor_only }}"
           homepage.group: "Apps"
           homepage.name: "FreshRSS"
           homepage.icon: "freshrss.png"
@@ -92,5 +96,10 @@
     - name: Stop FreshRSS
       community.docker.docker_container:
         name: "{{ freshrss_container_name }}"
+        state: absent
+
+    - name: Stop FreshRSS PostgreSQL
+      community.docker.docker_container:
+        name: "freshrss-db"
         state: absent
   when: freshrss_enabled is false

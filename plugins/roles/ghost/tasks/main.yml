@@ -34,6 +34,7 @@
         restart_policy: unless-stopped
         memory: "{{ ghost_db_memory_limit }}"
         labels:
+          autoheal: "{{ ghost_DB_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ghost_db_watchtower_monitor_only }}"
           homepage.name: "Ghost MySQL"
           homepage.group: "{{ ghost_db_homepage_group }}"
@@ -83,6 +84,7 @@
         links:
           - "{{ ghost_db_container_name }}"
         labels:
+          autoheal: "{{ ghost_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ghost_watchtower_monitor_only }}"
           homepage.name: "Ghost"
           homepage.group: "{{ ghost_homepage_group }}"

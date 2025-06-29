@@ -36,6 +36,7 @@
         memory: "{{ mastodon_redis_memory_limit }}"
         command: "redis-server --requirepass topsecret"
         labels:
+          autoheal: "{{ mastodon_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_redis_watchtower_monitor_only }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -66,6 +67,7 @@
         healthcheck:
           test: ['CMD', 'pg_isready', '-U', 'postgres']
         labels:
+          autoheal: "{{ mastodon_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_db_watchtower_monitor_only }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -138,6 +140,7 @@
           - "{{ mastodon_redis_container_name }}"
           - "{{ mastodon_db_container_name }}"
         labels:
+          autoheal: "{{ mastodon_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_watchtower_monitor_only }}"
           homepage.name: "Mastodon"
           homepage.group: "{{ mastodon_homepage_group }}"
@@ -170,14 +173,17 @@
       community.docker.docker_container:
         name: "{{ mastodon_container_name }}"
         state: absent
+
     - name: Stop Mastodon redris
       community.docker.docker_container:
         name: "{{ mastodon_redris_container_name }}"
         state: absent
+
     - name: Stop Mastodon Postgres
       community.docker.docker_container:
         name: "{{ mastodon_db_container_name }}"
         state: absent
+
     - name: Remove Mastodon network
       community.docker.docker_network:
         name: "{{ mastodon_network_name }}"

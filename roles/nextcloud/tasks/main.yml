@@ -36,7 +36,8 @@
         memory: "{{ nextcloud_redis_memory }}"
         command: "redis-server --requirepass topsecret"
         labels:
-          com.centurylinklabs.watchtower.monitor-only: "true"
+          autoheal: "{{ nextcloud_redis_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_redis_watchtower_monitor_only }}"
           homepage.group: "{{ nextcloud_redis_homepage_group }}"
           homepage.name: "Nextcloud Redis"
           homepage.icon: "{{ nextcloud_redis_homepage_icon }}"
@@ -71,7 +72,8 @@
         restart_policy: unless-stopped
         memory: "{{ nextcloud_db_memory }}"
         labels:
-          com.centurylinklabs.watchtower.monitor-only: "true"
+          autoheal: "{{ nextcloud_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_db_watchtower_monitor_only }}"
           homepage.group: "{{ nextcloud_db_homepage_group }}"
           homepage.name: "Nextcloud MySQL"
           homepage.icon: "{{ nextcloud_db_homepage_icon }}"
@@ -127,7 +129,8 @@
           - "{{ nextcloud_redis_container_name }}"
           - "{{ nextcloud_db_container_name }}"
         labels:
-          com.centurylinklabs.watchtower.monitor-only: "true"
+          autoheal: "{{ nextcloud_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_watchtower_monitor_only }}"
           homepage.group: "{{ nextcloud_homepage_group }}"
           homepage.name: "Nextcloud"
           homepage.icon: "{{ nextcloud_homepage_icon }}"
@@ -166,10 +169,12 @@
       community.docker.docker_container:
         name: "{{ nextcloud_container_name }}"
         state: absent
+
     - name: Stop Nextcloud Redis Docker Container
       community.docker.docker_container:
         name: "{{ nextcloud_redis_container_name }}"
         state: absent
+
     - name: Stop Nextcloud MySQL Docker Container
       community.docker.docker_container:
         name: "{{ nextcloud_db_container_name }}"

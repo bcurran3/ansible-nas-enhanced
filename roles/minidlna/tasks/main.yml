@@ -17,6 +17,9 @@
         restart_policy: unless-stopped
         network_mode: host
         memory: "{{ minidlna_memory }}"
+        labels:
+          autoheal: "{{ minidlna_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ minidlna_watchtower_monitor_only }}"
   when: minidlna_enabled is true
 
 - name: Stop MiniDLNA

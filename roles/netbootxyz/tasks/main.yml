@@ -31,6 +31,7 @@
           WEB_APP_PORT: "{{ netbootxyz_port_http }}" # added
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ netbootxyz_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ netbootxyz_watchtower_monitor_only }}"
           homepage.group: "{{ netbootxyz_homepage_group }}"
           homepage.name: "netboot.xyz"
@@ -39,7 +40,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbootxyz_port_http }}"
 #         homepage.description: "Your favorite operating systems in one place. A network-based bootable operating system installer based on iPXE."
           homepage.server: "my-docker"
-          homepage.container: "netbootxyz"
+          homepage.container: "{{ netbootxyz_container_name }}"
           homepage.showStats: "{{ netbootxyz_homepage_showStats }}"
           traefik.enable: "{{ netbootxyz_available_externally | string }}"
 

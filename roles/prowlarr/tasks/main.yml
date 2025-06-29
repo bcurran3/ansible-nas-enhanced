@@ -11,6 +11,7 @@
     - name: Create Prowlarr Docker Container
       community.docker.docker_container:
         name: "{{ prowlarr_container_name }}"
+        hostname: "{{ prowlarr_container_name }}"
         image: "{{ prowlarr_image_name }}:{{ prowlarr_image_version }}"
         pull: true
         volumes:
@@ -25,6 +26,8 @@
         restart_policy: unless-stopped
         memory: "{{ prowlarr_memory }}"
         labels:
+          autoheal: "{{ prowlarr_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ prowlarr_watchtower_monitor_only }}"
           homepage.group: "Media Downloading"
           homepage.name: "Prowlarr"
           homepage.href: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
@@ -32,7 +35,7 @@
           homepage.icon: "prowlarr.png"
 #         homepage.description: "Indexer Proxy"
           homepage.server: "my-docker"
-          homepage.container: "prowlarr"
+          homepage.container: "{{ prowlarr_container_name }}"
           homepage.showStats: "false"
           homepage.widget.type: "prowlarr"
           homepage.widget.url: "https://{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"

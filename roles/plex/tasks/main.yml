@@ -12,27 +12,28 @@
     - name: Create Plex Docker Container
       community.docker.docker_container:
         name: "{{ plex_container_name }}"
+        hostname: "{{ plex_container_name }}"
         image: "{{ plex_image_name }}:{{ plex_image_version }}"
         pull: true
-    #    healthcheck:
-    #      test: curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity
-    #      interval: 1m00s
-    #      timeout: 15s
-    #      retries: 3
-    #      start_period: 1m00s
+#       healthcheck:
+#         test: curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity
+#         interval: 1m00s
+#         timeout: 15s
+#         retries: 3
+#         start_period: 1m00s
         ports:
           - "{{ plex_port }}:32400"
           - "32400:32400/udp"
-    #      - "5353:5353/udp"     # older Bonjour/Avahi network discovery
+#         - "5353:5353/udp"     # older Bonjour/Avahi network discovery
           - "8324:8324"         # controlling Plex for Roku via Plex Companion
           - "32410:32410/udp"   # GDM network discovery
           - "32412:32412/udp"   # GDM network discovery
           - "32413:32413/udp"   # GDM network discovery
           - "32414:32414/udp"   # GDM network discovery
           - "32469:32469"       # access to the Plex DLNA Server
-          - "32469:32469/udp"
+          - "32469:32469/udp"   # access to the Plex DLNA Server
           - "33400:33400"       # Plex Web Tools
-    #      - "1900:1900/udp"    # Plex DLNA Server
+#         - "1900:1900/udp"     # Plex DLNA Server
         runtime: "nvidia"       # added
         volumes:
           - "{{ plex_config_directory }}:/config:rw"
@@ -46,8 +47,7 @@
           - "{{ plex_porn_directory }}:/porn:{{ plex_porn_permissions }}"  # added
           - "{{ plex_anime_directory }}:/anime:{{ plex_anime_permissions }}"  # added
           - "{{ acmenator_data_directory }}:/certs" # added
-#       network_mode: "host"
-        network_mode: "bridge"
+        network_mode: "bridge"   # changed
         devices: "{{ plex_devices | default(omit) }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
@@ -62,18 +62,19 @@
         restart_policy: unless-stopped
         memory: "{{ plex_memory }}"
         labels:
+          autoheal: "{{ plex_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ plex_watchtower_monitor_only }}"
           homepage.group: "Media Servers"
           homepage.name: "Plex Media Server"
           homepage.icon: "plex.png"
           homepage.href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400/web"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400/web"
-#         homepage.description: Media server
+#         homepage.description: Plex Media Server
           homepage.server: "my-docker"
-          homepage.container: "plex"
+          homepage.container: "{{ plex_container_name }}"
           homepage.widget.type: "tautulli"
           homepage.widget.url: "https://{{ tautulli_hostname }}.{{ ansible_nas_domain }}"
           homepage.widget.key: "{{ plex_homepage_widget_key }}"
-#         autoheal: "true"
           traefik.enable: "{{ plex_available_externally | string }}"
           traefik.http.routers.plex.rule: "Host(`{{ plex_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.plex.tls.certresolver: "letsencrypt"

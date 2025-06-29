@@ -33,6 +33,8 @@
         restart_policy: unless-stopped
         memory: "{{ utorrent_memory }}"
         labels:
+          autoheal: "{{ utorrent_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ utorrent_watchtower_monitor_only }}"
           traefik.enable: "{{ utorrent_available_externally | string }}"
           traefik.http.routers.utorrent.rule: "Host(`{{ utorrent_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.utorrent.tls.certresolver: "letsencrypt"

@@ -48,6 +48,7 @@
         restart_policy: unless-stopped
         memory: "{{ invoiceninja_memory_limit }}"
         labels:
+          autoheal: "{{ invoiceninja_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
           homepage.name: "Invoice Ninja"
           homepage.group: "{{ invoiceninja_homepage_group }}"
@@ -95,6 +96,7 @@
         restart_policy: unless-stopped
         memory: "{{ invoiceninja_db_memory_limit }}"
         labels:
+          autoheal: "{{ invoiceninja_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_db_watchtower_monitor_only }}"
           homepage.name: "Invoice Ninja MariaDB"
           homepage.group: "{{ invoiceninja_db_homepage_group }}"
@@ -112,7 +114,7 @@
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_backend_container_name }}"
         hostname: "{{ invoiceninja_backend_container_name }}"
-        image: invoiceninja/invoiceninja:5
+        image: invoiceninja/invoiceninja:latest
         pull: true
         networks:
           - name: "{{ invoiceninja_network_name }}"
@@ -154,6 +156,7 @@
         restart_policy: unless-stopped
         memory: "{{ invoiceninja_backend_memory_limit }}"
         labels:
+          autoheal: "{{ invoiceninja_backend_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
           homepage.name: "Invoice Ninja backend"
           homepage.group: "{{ invoiceninja_backend_homepage_group }}"

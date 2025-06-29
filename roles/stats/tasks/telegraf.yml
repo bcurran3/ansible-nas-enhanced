@@ -51,6 +51,7 @@
         memory: 1g
         restart: "{{ telegraf_config is changed }}"
         labels:
+          autoheal: "{{ stats_telegraf_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stats_telegraf_watchtower_monitor_only }}"
           homepage.name: "Telegraf"
           homepage.group: "{{ stats_telegraf_homepage_group }}"

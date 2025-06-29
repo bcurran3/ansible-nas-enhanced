@@ -17,11 +17,20 @@ openemr_memory_limit: "1g"
 openemr_container_db_name: "openemr_mariadb"
 openemr_db_memory_limit: "1g"
 
+# autoheal
+openemr_autoheal: "false"
+openemr_db_autoheal: "false"
+
 # homepage
 openemr_homepage_group: "Apps"
 openemr_homepage_icon: "openemr.png"
-openemr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
+openemr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
 openemr_homepage_showStats: "false"
+
+openemr_db_homepage_group: "DBs"
+openemr_db_homepage_icon: "mariadb.png"
+openemr_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
+openemr_db_homepage_showStats: "false"
 
 # watchtower
 openemer_watchtower_monitor_only: "true"

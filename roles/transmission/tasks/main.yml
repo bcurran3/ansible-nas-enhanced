@@ -14,6 +14,7 @@
     - name: Transmission Docker Container
       community.docker.docker_container:
         name: "{{ transmission_container_name }}"
+        hostname: "{{ transmission_container_name }}"
         image: "{{ transmission_image_name }}:{{ transmission_image_version }}"
         pull: true
         volumes:
@@ -31,6 +32,8 @@
         restart_policy: unless-stopped
         memory: "{{ transmission_memory }}"
         labels:
+          autoheal: "{{ transmission_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ transmission_watchtower_monitor_only }}"
           homepage.group: "Media Downloading"
           homepage.name: "Transmission"
           homepage.href: "https://{{ transmission_hostname }}.{{ ansible_nas_domain }}"
@@ -38,7 +41,7 @@
           homepage.icon: "transmission.png"
     #     homepage.description: ""
           homepage.server: "my-docker"
-          homepage.container: "transmission"
+          homepage.container: "{{ transmission_container_name }}"
           homepage.showStats: "false"
           homepage.weight: "15"
           homepage.widget.type: "transmission"

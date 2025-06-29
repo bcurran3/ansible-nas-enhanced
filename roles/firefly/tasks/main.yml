@@ -24,6 +24,9 @@
           MYSQL_ROOT_PASSWORD: "firefly"
         restart_policy: unless-stopped
         memory: "{{ firefly_mysql_memory }}"
+        labels:
+          autoheal: "{{ firefly_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ firefly_db_watchtower_monitor_only }}"
 
     - name: Wait for MySQL to init
       ansible.builtin.pause:
@@ -55,6 +58,8 @@
         restart_policy: unless-stopped
         memory: "{{ firefly_memory }}"
         labels:
+          autoheal: "{{ firefly_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ firefly_watchtower_monitor_only }}"
           traefik.enable: "{{ firefly_available_externally | string }}"
           traefik.http.routers.firefly.rule: "Host(`{{ firefly_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.firefly.tls.certresolver: "letsencrypt"

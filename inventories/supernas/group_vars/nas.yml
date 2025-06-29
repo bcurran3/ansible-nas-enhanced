@@ -214,6 +214,8 @@ traefik_environment_variables:
 traefik_hostname: "traefik"
 traefik_image_version: "mimolette"
 traefik_homepage_group: "Network"
+traefik_autoheal: "true"
+traefik_watchtower_monitor_only: "false"
 
 transmission_enabled: true
 transmission_available_externally: true
@@ -460,6 +462,7 @@ readarr_enabled: false
 readarr_available_externally: true
 readarr_traefik_whitelist: "{{ lan }}"
 readarr_group_id: "1001"
+readarr_homepage_widget_key: "3f6097307b0a4cfeab977dc6bbd8adf0"
 
 ###
 ### Wireshark
@@ -483,7 +486,8 @@ doku_watchtower_monitor_only: "false"
 ###
 watchtower_enabled: true
 watchtower_available_externally: true
-watchtower_traefik_whitelist: "{{ lan }}"
+watchtower_homepage_group: "Docker Utils"
+watchtower_homepage_href: "https://{{ watchtower_hostname }}.{{ ansible_nas_domain }}"
 # REF - https://containrrr.github.io/watchtower/arguments/
 watchtower_cleanup: "true"
 watchtower_remove_volumes: "true"
@@ -491,7 +495,7 @@ watchtower_debug: "true"
 watchtower_include_stopped: "false"
 watchtower_revive_stopped: "false"
 # watchtower_poll_interval: "0" # "Only schedule or interval can be defined, not both."
-watchtower_monitor_only: "false"
+watchtower_monitor_only: "true"
 watchtower_no_restart: "false"
 watchtower_no_pull: "false"
 watchtower_schedule: "0 0 5 * * *"
@@ -515,6 +519,7 @@ watchtower_notifications_slack_identifier: "{{ ansible_nas_hostname }}"
 watchtower_notifications_slack_channel: "#my-custom-channel"
 watchtower_notifications_slack_icon_emoji: ":whale:"
 watchtower_notifications_slack_icon_url: "http://somewhere.com/icon.png"
+watchtower_watchtower_monitor_only: "false"
 
 
 #################### PLUGINS ####################
@@ -549,7 +554,7 @@ autobrr_traefik_whitelist: "{{ lan }}"
 ###
 ### autoheal
 ###
-autoheal_enabled: false
+autoheal_enabled: true
 autoheal_watchtower_monitor_only: "false"
 
 ###
@@ -960,6 +965,7 @@ openeats_watchtower_monitor_only: "false"
 osclass_enabled: true
 osclass_available_externally: true
 osclass_traefik_whitelist: "{{ wan }}"
+osclass_autoheal: "true"
 osclass_admin_password: "nowdammit69"
 osclass_email: "classifieds@mrbillsabode.org"
 osclass_smtp_host: "lumina.websitewelcome.com"
@@ -976,6 +982,7 @@ overseerr_available_externally: true
 overseerr_traefik_whitelist: "{{ wan }}"
 overseerr_homepage_widget_key: "MTY2NDQ3Nzk2MTgzOTJmODhjZWYzLWI0YjAtNDY4Mi05MjkxLTM4MGJmOGYwNmYxNyk="
 overseerr_watchtower_monitor_only: "false"
+overseerr_homepage_href: "https://{{ overseerr_hostname }}.{{ ansible_nas_domain }}"
 
 ###
 ### Paperless-ngx

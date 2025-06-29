@@ -29,6 +29,8 @@
         restart_policy: unless-stopped
         memory: "{{ thelounge_memory }}"
         labels:
+          autoheal: "{{ thelounge_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ thelounge_watchtower_monitor_only }}"
           traefik.enable: "{{ thelounge_available_externally | string }}"
           traefik.http.routers.thelounge.rule: "Host(`{{ thelounge_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.thelounge.tls.certresolver: "letsencrypt"

@@ -28,6 +28,7 @@
         restart_policy: unless-stopped
         memory: "{{ glpi_db_memory }}"
         labels:
+          autoheal: "{{ glpi_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glpi_db_watchtower_monitor_only }}"
           homepage.name: "GLPI MariaDB"
           homepage.group: "{{ glpi_db_homepage_group }}"
@@ -61,6 +62,7 @@
         links:
           - "{{ glpi_db_container_name }}"
         labels:
+          autoheal: "{{ glpi_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glpi_watchtower_monitor_only }}"
           homepage.name: "GLPI"
           homepage.group: "{{ glpi_homepage_group }}"

@@ -40,10 +40,12 @@
         restart: "{{ ddns_updater_config is changed }}"
         memory: "{{ ddns_updater_memory }}"
         labels:
+          autoheal: "{{ ddns_updater_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ ddns_updater_watchtower_monitor_only }}"
           homepage.group: "Network"
           homepage.name: "DDNS Updater"
           homepage.icon: "/images/ddns_updater.png"
-    #     homepage.description: ""
+#         homepage.description: ""
           homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port }}"
           homepage.server: "my-docker"
           homepage.container: "ddns-updater"

@@ -1,4 +1,5 @@
 ---
+# https://github.com/willfarrell/docker-autoheal
 - name: Start Autoheal
   block:
     - name: Create Autoheal Docker Container
@@ -9,6 +10,11 @@
         pull: true
         network_mode: "none"
         env:
+          AUTOHEAL_CONTAINER_LABEL: "autoheal"
+          AUTOHEAL_INTERVAL: "10"
+          AUTOHEAL_START_PERIOD: "30"
+          AUTOHEAL_DEFAULT_STOP_TIMEOUT: "10"
+          AUTOHEAL_ONLY_MONITOR_RUNNING: "true"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "/etc/localtime:/etc/localtime:ro"
@@ -16,17 +22,18 @@
         restart_policy: unless-stopped
         memory: "{{ autoheal_memory_limit }}"
         labels:
+          autoheal: "{{ autoheal_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ autoheal_watchtower_monitor_only }}"
           homepage.name: "Autoheal"
           homepage.group: "{{ autoheal_homepage_group }}"
           homepage.icon: "{{ autoheal_homepage_icon }}"
 #         homepage.description: "Monitor and restart unhealthy docker containers."
           homepage.server: "my-docker"
-          homepage.container: "autoheal"
+          homepage.container: "{{ autoheal_container_name }}"
           homepage.showStats: "{{ autoheal_homepage_showStats }}"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/willfarrell/docker-autoheal/releases/tag/$${major}.$${minor}.$${patch}"
   when: autoheal_enabled is true
 
 - name: Stop Autoheal

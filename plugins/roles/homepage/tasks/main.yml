@@ -33,6 +33,7 @@
         restart_policy: unless-stopped
         memory: "{{ homepage_memory_limit }}"
         labels:
+          autoheal: "{{ homepage_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ homepage_watchtower_monitor_only }}"
           traefik.enable: "{{ homepage_available_externally | string }}"
           traefik.http.routers.homepage.rule: "Host(`homepage.{{ ansible_nas_domain }}`)"

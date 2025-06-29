@@ -15,12 +15,13 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ sonos_web_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ sonos_web_watchtower_monitor_only }}"
           homepage.name: "Sonos-Web"
           homepage.group: "{{ sonos_web_homepage_group }}"
           homepage.icon: "{{ sonos_web_homepage_icon }}"
           homepage.href: "{{ sonos_web_homepage_href }}"
-    #     homepage.description: "Sonos controller for your web browser"
+#         homepage.description: "Sonos controller for your web browser"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonos_web_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ sonos_web_container_name }}"
@@ -46,3 +47,6 @@
         name: "{{ sonos_web_container_name }}"
         state: absent
   when: sonos_web_enabled is false
+
+# NOTE: you can use Sonos's website instead
+# https://play.sonos.com

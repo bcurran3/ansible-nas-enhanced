@@ -29,6 +29,9 @@
           MYSQL_ROOT_PASSWORD: "{{ joomla_database_password }}"
         restart_policy: unless-stopped
         memory: "{{ joomla_db_memory }}"
+        labels:
+          autoheal: "{{ joomla_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ joomla_db_watchtower_monitor_only }}"
 
     - name: Joomla Docker Container
       community.docker.docker_container:
@@ -49,6 +52,8 @@
         restart_policy: unless-stopped
         memory: "{{ joomla_memory }}"
         labels:
+          autoheal: "{{ joomla_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ joomla_watchtower_monitor_only }}"
           traefik.enable: "{{ joomla_available_externally | string }}"
           traefik.http.routers.joomla.rule: "Host(`{{ joomla_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.joomla.tls.certresolver: "letsencrypt"
@@ -63,6 +68,7 @@
       community.docker.docker_container:
         name: "{{ joomla_container_name }}"
         state: absent
+
     - name: Stop Joomla DB
       community.docker.docker_container:
         name: "{{ joomla_db_container_name }}"

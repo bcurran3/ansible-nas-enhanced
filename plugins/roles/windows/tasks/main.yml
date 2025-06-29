@@ -12,6 +12,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ windows_container_name }}"
+        hostname: "{{ windows_container_name }}"
         image: dockurr/windows
         pull: true
         capabilities:
@@ -37,6 +38,7 @@
         stop_timeout: 120
         memory: "{{ windows_memory_size }}"
         labels:
+          autoheal: "{{ windows_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ windows_watchtower_monitor_only }}"
           homepage.name: "Windows"
           homepage.group: "{{ windows_homepage_group }}"

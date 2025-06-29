@@ -13,6 +13,7 @@
         restart_policy: unless-stopped
         memory: "{{ stats_prometheus_smartctl_memory }}"
         labels:
+          autoheal: "{{ stats_smartctl_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stats_smartctl_watchtower_monitor_only }}"
           homepage.name: "prometheus-smartctl"
           homepage.group: "{{ stats_smartctl_homepage_group }}"
@@ -28,8 +29,8 @@
 
     - name: HDDTemp Docker Container
       community.docker.docker_container:
-        name: "{{ stats_hddtemp_docker_container_name }}"
-        hostname: "{{ stats_hddtemp_docker_container_name }}"
+        name: "{{ stats_hddtemp_container_name }}"
+        hostname: "{{ stats_hddtemp_container_name }}"
         image: "{{ stats_hddtemp_docker_image_name }}:{{ stats_hddtemp_docker_image_tag }}"
         pull: true
         privileged: true
@@ -43,13 +44,14 @@
         restart_policy: unless-stopped
         memory: "{{ stats_hddtemp_memory }}"
         labels:
+          autoheal: "{{ stats_hddtemp_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stats_hddtemp_watchtower_monitor_only }}"
           homepage.name: "HDDTemp"
           homepage.group: "{{ stats_hddtemp_homepage_group }}"
           homepage.icon: "{{ stats_hddtemp_homepage_icon }}"
 #         homepage.description: "Hard disk temperature tool"
           homepage.server: "my-docker"
-          homepage.container: "{{ stats_hddtemp_docker_container_name }}"
+          homepage.container: "{{ stats_hddtemp_container_name }}"
           homepage.showStats: "{{ stats_hddtemp_homepage_showStats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -67,6 +69,7 @@
         restart_policy: unless-stopped
         memory: "{{ stats_speedtest_exporter_memory }}"
         labels:
+          autoheal: "{{ stats_speedtest_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stats_speedtest_watchtower_monitor_only }}"
           homepage.name: "Speedtest-Exporter"
           homepage.group: "{{ stats_speedtest_homepage_group }}"

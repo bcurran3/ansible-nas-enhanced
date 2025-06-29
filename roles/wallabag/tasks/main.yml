@@ -15,6 +15,7 @@
     - name: Wallabag Docker Container
       community.docker.docker_container:
         name: "{{ wallabag_container_name }}"
+        hostname: "{{ wallabag_container_name }}"
         image: "{{ wallabag_image_name }}:{{ wallabag_image_version }}"
         pull: true
         volumes:
@@ -28,6 +29,8 @@
         restart_policy: unless-stopped
         memory: "{{ wallabag_memory }}"
         labels:
+          autoheal: "{{ wallabag_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ wallabag_watchtower_monitor_only }}"
           homepage.name: "Wallabag"
           homepage.group: "Apps"
           homepage.icon: "wallabag.png"
@@ -35,7 +38,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wallabag_port }}"
     #     homepage.description: ""
           homepage.server: "my-docker"
-          homepage.container: "wallabag"
+          homepage.container: "{{ wallabag_container_name }}"
           homepage.showStats: "false"
           traefik.enable: "{{ wallabag_available_externally | string }}"
           traefik.http.middlewares.wallabag.IPAllowList.sourcerange: "{{ wallabag_traefik_whitelist }}"

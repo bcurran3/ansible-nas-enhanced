@@ -26,6 +26,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ stump_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stump_watchtower_monitor_only }}"
           homepage.name: "Stump"
           homepage.group: "{{ stump_homepage_group }}"

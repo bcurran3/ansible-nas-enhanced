@@ -20,6 +20,8 @@
         restart_policy: unless-stopped
         memory: "{{ hello_world_memory }}"
         labels:
+          autoheal: "{{ hello_world_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ hello_world_watchtower_monitor_only }}"
           traefik.enable: "{{ hello_world_available_externally | string }}"
           traefik.http.routers.hello_world.rule: "Host(`{{ hello_world_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.hello_world.tls.certresolver: "letsencrypt"

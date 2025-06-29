@@ -27,6 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ openeats_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openeats_db_watchtower_monitor_only }}"
           homepage.name: "OpenEats MariaDB"
           homepage.group: "{{ openeats_db_homepage_group }}"
@@ -46,7 +47,7 @@
         image: openeats/openeats-api
         pull: true
         links:
-          - openeats-db
+          - "{{ openeats_db_container_name }}"
         volumes:
           - "{{ openeats_data_directory }}/openeats-api:/code"
           - "{{ openeats_data_directory }}/static-files:/code/static-files"
@@ -59,7 +60,8 @@
         restart_policy: unless-stopped
         memory: 1g
         labels:
-          com.centurylinklabs.watchtower.monitor-only: "{{ openeats_watchtower_monitor_only }}"
+          autoheal: "{{ openeats_api_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ openeats_api_watchtower_monitor_only }}"
           homepage.name: "OpenEats API"
           homepage.group: "{{ openeats_api_homepage_group }}"
           homepage.icon: "{{ openeats_api_homepage_icon }}"
@@ -78,7 +80,7 @@
         image: openeats/openeats-web
         pull: true
         links:
-          - openeats-api
+          - "{{ openeats_api_container_name }}"
         volumes:
           - "{{ openeats_data_directory }}/openeats-web:/code"
         ports:
@@ -87,6 +89,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ openeats_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openeats_watchtower_monitor_only }}"
           homepage.name: "OpenEats"
           homepage.group: "{{ openeats_homepage_group }}"

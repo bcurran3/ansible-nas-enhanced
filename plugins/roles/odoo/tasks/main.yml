@@ -30,6 +30,7 @@
         restart_policy: unless-stopped
         memory: "{{ odoo_db_memory_limit }}"
         labels:
+          autoheal: "{{ odoo_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ odoo_db_watchtower_monitor_only }}"
           homepage.name: "Odoo-db"
           homepage.group: "{{ odoo_db_homepage_group }}"
@@ -65,6 +66,7 @@
         restart_policy: unless-stopped
         memory: "{{ odoo_memory_limit }}"
         labels:
+          autoheal: "{{ odoo_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ odoo_watchtower_monitor_only }}"
           homepage.name: "odoo"
           homepage.group: "{{ odoo_homepage_group }}"

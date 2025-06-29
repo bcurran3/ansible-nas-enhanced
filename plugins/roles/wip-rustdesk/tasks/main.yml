@@ -28,6 +28,7 @@
         restart_policy: unless-stopped
         memory: "{{ rustdesk_hbbr_memory_limit }}"
         labels:
+          autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
           homepage.name: "RustDesk Relay Server"
           homepage.group: "{{ rustdesk_hbbr_homepage_group }}"
@@ -66,6 +67,7 @@
         links:
           - "{{ rustdesk_hbbr_container_name }}"
         labels:
+          autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
           homepage.name: "RustDesk ID Server"
           homepage.group: "{{ rustdesk_hbbs_homepage_group }}"
@@ -98,6 +100,7 @@
           - "{{ rustdesk_hbbs_container_name }}"
           - "{{ rustdesk_hbbr_container_name }}"
         labels:
+          autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
           homepage.name: "RustDesk Web Client"
           homepage.group: "{{ rustdesk_web_homepage_group }}"
@@ -123,17 +126,19 @@
 
 - name: Stop RustDesk
   block:
+    - name: Stop RustDesk Web Client Docker Container
+      community.docker.docker_container:
+        name: "{{ rustdesk_web_container_name }}"
+        state: absent
+
     - name: Stop RustDesk ID Server Docker Container
       community.docker.docker_container:
         name: "{{ rustdesk_hbbr_container_name }}"
         state: absent
+
     - name: Stop RustDesk Relay Server Docker Container
       community.docker.docker_container:
         name: "{{ rustdesk_hbbs_container_name }}"
-        state: absent
-    - name: Stop RustDesk Web Client Docker Container
-      community.docker.docker_container:
-        name: "{{ rustdesk_web_container_name }}"
         state: absent
   when: rustdesk_enabled is false
   

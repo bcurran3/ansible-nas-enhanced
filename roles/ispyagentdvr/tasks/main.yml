@@ -32,6 +32,8 @@
         restart_policy: unless-stopped
         memory: "{{ ispyagentdvr_memory }}"
         labels:
+          autoheal: "{{ ispyagentdvr_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ ispyagentdvr_watchtower_monitor_only }}"
           traefik.enable: "{{ ispyagentdvr_available_externally | string }}"
           traefik.http.routers.ispyagentdvr.rule: "Host(`ispyagentdvr.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ispyagentdvr.tls.certresolver: "letsencrypt"

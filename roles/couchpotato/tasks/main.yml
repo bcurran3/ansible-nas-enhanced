@@ -28,6 +28,8 @@
         restart_policy: unless-stopped
         memory: "{{ couchpotato_memory }}"
         labels:
+          autoheal: "{{ couchpotato_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ couchpotato_watchtower_monitor_only }}"
           traefik.enable: "{{ couchpotato_available_externally | string }}"
           traefik.http.routers.couchpotato.rule: "Host(`couchpotato.{{ ansible_nas_domain }}`)"
           traefik.http.routers.couchpotato.tls.certresolver: "letsencrypt"

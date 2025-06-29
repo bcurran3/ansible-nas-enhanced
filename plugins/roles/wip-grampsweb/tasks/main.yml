@@ -31,6 +31,7 @@
 #        memory: "{{ grampsweb_celery_memory_limit }}"
 #        command: "celery -A gramps_webapi.celery worker --loglevel=INFO --concurrency=2"
 #        labels:
+#          autoheal: "{{ grampsweb_celery_autoheal }}"
 #          com.centurylinklabs.watchtower.enable: "false"
 #          com.centurylinklabs.watchtower.monitor-only: "true"
 #          homepage.name: "Gramps Web Celery"
@@ -57,7 +58,7 @@
         restart_policy: unless-stopped
         memory: "{{ grampsweb_redis_memory_limit }}"
         labels:
-          com.centurylinklabs.watchtower.enable: "false"
+          autoheal: "{{ grampsweb_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
           homepage.name: "Gramps Web DB"
           homepage.group: "{{ grampsweb_redis_homepage_group }}"
@@ -99,6 +100,7 @@
 #          - "{{ grampsweb_celery_container_name }}"
           - "{{ grampsweb_redis_container_name }}"
         labels:
+          autoheal: "{{ grampsweb_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ grampsweb_watchtower_monitor_only }}"
           homepage.name: "Gramps Web"
           homepage.group: "{{ grampsweb_homepage_group }}"
@@ -129,10 +131,12 @@
       community.docker.docker_container:
         name: "{{ grampsweb_container_name }}"
         state: absent
+
     - name: Stop Gramps Web Celery
       community.docker.docker_container:
         name: "{{ grampsweb_celery_container_name }}"
         state: absent
+    
     - name: Stop Gramps Web DB
       community.docker.docker_container:
         name: "{{ grampsweb_redis_container_name }}"

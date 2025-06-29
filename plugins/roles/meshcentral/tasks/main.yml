@@ -40,6 +40,7 @@
         restart_policy: unless-stopped
         memory: "{{ meshcentral_db_memory_limit }}"
         labels:
+          autoheal: "{{ meshcentral_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_db_watchtower_monitor_only }}"
           homepage.name: "MeshCentral MongoDB"
           homepage.group: "{{ meshcentral_db_homepage_group }}"
@@ -91,6 +92,7 @@
         links:
           - "{{ meshcentral_db_container_name }}"
         labels:
+          autoheal: "{{ meshcentral_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_watchtower_monitor_only }}"
           homepage.name: "MeshCentral"
           homepage.group: "{{ meshcentral_homepage_group }}"

@@ -16,8 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ osclass_db_container_name }}"
         hostname: "{{ osclass_db_container_name }}"
-        image: bitnami/mariadb:latest
-#        image: mariadb:latest
+        image: "{{ osclass_db_image_name }}:{{ osclass_db_image_tag }}"
         pull: true
         network_mode: "bridge"
         networks_cli_compatible: "yes"
@@ -32,8 +31,9 @@
           MARIADB_DATABASE: "osclass_db"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
-        memory: "{{ osclass_memory_limit }}"
+        memory: "{{ osclass_db_memory_limit }}"
         labels:
+          autoheal: "{{ osclass_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osclass_db_watchtower_monitor_only }}"
           homepage.name: "OsClass MariaDB"
           homepage.group: "{{ osclass_db_homepage_group }}"
@@ -52,7 +52,7 @@
         container_default_behavior: "compatibility"
         name: "{{ osclass_container_name }}"
         hostname: "{{ osclass_container_name }}"
-        image: bitnami/osclass-archived:latest
+        image: "{{ osclass_image_name }}:{{ osclass_image_tag }}"
         pull: true
         network_mode: "bridge"
         networks_cli_compatible: "yes"
@@ -81,6 +81,7 @@
         restart_policy: unless-stopped
         memory: "{{ osclass_memory_limit }}"
         labels:
+          autoheal: "{{ osclass_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osclass_watchtower_monitor_only }}"
           homepage.name: "OsClass"
           homepage.group: "{{ osclass_homepage_group }}"
@@ -89,7 +90,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osclass_port_http }}"
 #         homepage.description: "classifieds"
           homepage.server: "my-docker"
-          homepage.container: "osclass"
+          homepage.container: "{{ osclass_container_name }}"
           homepage.showStats: "{{ osclass_homepage_showStats }}"
           traefik.enable: "{{ osclass_available_externally | string }}"
           traefik.http.routers.osclass.rule: "Host(`{{ osclass_hostname }}.{{ ansible_nas_domain }}`)"
@@ -110,6 +111,7 @@
       community.docker.docker_container:
         name: "{{ osclass_container_name }}"
         state: absent
+
     - name: Stop OsClass MariaDB Docker Container
       community.docker.docker_container:
         name: "{{ osclass_db_container_name }}"

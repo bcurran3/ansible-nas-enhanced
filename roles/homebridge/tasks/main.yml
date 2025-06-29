@@ -26,6 +26,8 @@
         restart_policy: unless-stopped
         memory: "{{ homebridge_memory }}"
         labels:
+          autoheal: "{{ homebridge_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ homebridge_watchtower_monitor_only }}"
           traefik.enable: "{{ homebridge_available_externally | string }}"
           traefik.http.routers.homebridge.rule: "Host(`{{ homebridge_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.homebridge.tls.certresolver: "letsencrypt"

@@ -14,9 +14,11 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
           WATCHTOWER_CLEANUP: "{{ watchtower_cleanup }}"
+          WATCHTOWER_LABEL_ENABLE: "true"
+          WATCHTOWER_LABEL_TAKE_PRECEDENCE: "true"
           WATCHTOWER_REMOVE_VOLUMES: "{{ watchtower_remove_volumes }}"
           WATCHTOWER_DEBUG: "{{ watchtower_debug }}"
-          WATCHTOWER_HTTP_API_TOKEN: "123456789"           # added
+          WATCHTOWER_HTTP_API_TOKEN: "{{ watchtower_api_token }}"           # added
           WATCHTOWER_HTTP_API_METRICS: "true"              # added
           WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"       # added
           WATCHTOWER_INCLUDE_STOPPED: "{{ watchtower_include_stopped }}"
@@ -49,18 +51,20 @@
         restart_policy: unless-stopped
         memory: "{{ watchtower_memory }}"
         labels:
-          homepage.group: "Docker Utils"
+          autoheal: "{{ watchtower_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ watchtower_watchtower_monitor_only }}"
+          homepage.group: "{{ watchtower_homepage_group }}"
           homepage.name: "Watchtower"
-          homepage.icon: "watchtower.png"
-#         homepage.href: "https://{{ watchtower_hostname }}.{{ ansible_nas_domain }}"
-#         homepage.siteMonitor: "https://{{ watchtower_hostname }}.{{ ansible_nas_domain }}"
-#         homepage.description: ""
+          homepage.icon: "{{ watchtower_homepage_icon }}"
+#         homepage.href: "{{ watchtower_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port }}"
+#         homepage.description: "A process for automating Docker container base image updates."
           homepage.server: "my-docker"
-          homepage.container: "watchtower"
-          homepage.showStats: "false"
-#         homepage.widget.type: "watchtower"
-#         homepage.widget.url: "https://{{ watchtower_hostname }}.{{ ansible_nas_domain }}"
-#         homepage.widget.key: "{{ watchtower_homepage_widget_key }}"
+          homepage.container: "{{ watchtower_container_name }}"
+          homepage.showStats: "{{ watchtower_homepage_showStats }}"
+          homepage.widget.type: "watchtower"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port }}"
+          homepage.widget.key: "{{ watchtower_api_token }}"
           traefik.enable: "{{ watchtower_available_externally | string }}"
           traefik.http.routers.watchtower.rule: "Host(`{{ watchtower_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.watchtower.tls.certresolver: "letsencrypt"

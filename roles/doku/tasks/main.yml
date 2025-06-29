@@ -18,13 +18,14 @@
         restart_policy: unless-stopped
         memory: "{{ doku_memory }}"
         labels:
+          autoheal: "{{ doku_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ doku_watchtower_monitor_only }}"
           homepage.group: "{{ doku_homepage_group }}"
           homepage.name: "{{ doku_homepage_name}} "
           homepage.icon: "{{ doku_homepage_icon }}"
           homepage.href: "{{ doku_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port }}"
-    #     homepage.description: "Docker disk space usage"
+#         homepage.description: "Docker disk space usage"
           homepage.server: "my-docker"
           homepage.container: "doku"
           homepage.showStats: "{{ doku_homepage_showStats }}"

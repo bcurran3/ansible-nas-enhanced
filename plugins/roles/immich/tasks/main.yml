@@ -33,6 +33,7 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
+          autoheal: "{{ immich_machinelearning_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
           homepage.group: "{{ immich_machinelearning_homepage_group }}"
           homepage.name: "Immich Machine Learning"
@@ -69,6 +70,7 @@
           PG_DATA: "/var/lib/postgresql/data"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
+          autoheal: "{{ immich_postgres_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
           homepage.group: "{{ immich_postgres_homepage_group }}"
           homepage.name: "Immich PostgreSQL"
@@ -105,6 +107,7 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
+          autoheal: "{{ immich_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ immich_watchtower_monitor_only }}"
           homepage.group: "{{ immich_redis_homepage_group }}"
           homepage.name: "Immich Redis"
@@ -154,6 +157,7 @@
 #        healthcheck:
 #          disable: "false"
         labels:
+          autoheal: "{{ immich_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
           homepage.name: "Immich"
           homepage.group: "{{ immich_homepage_group }}"

@@ -37,8 +37,9 @@
         restart_policy: unless-stopped
         memory: "{{ osticket_db_memory_limit }}"
         labels:
+          autoheal: "{{ osticket_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osticket_db_watchtower_monitor_only }}"
-          homepage.name: "osTicket-DB"
+          homepage.name: "osTicket MariaDB"
           homepage.group: "{{ osticket_db_homepage_group }}"
           homepage.icon: "{{ osticket_db_homepage_icon }}"
 #         homepage.description: "osticket"
@@ -76,6 +77,7 @@
         links:
           - "{{ osticket_container_db_name }}"
         labels:
+          autoheal: "{{ osticket_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osticket_watchtower_monitor_only }}"
           homepage.name: "osTicket"
           homepage.group: "{{ osticket_homepage_group }}"

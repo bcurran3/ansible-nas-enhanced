@@ -34,6 +34,7 @@
           start_period: 20s
           interval: 10s
         labels:
+          autoheal: "{{ bitmagnet_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ bitmagnet_db_watchtower_monitor_only }}"
           homepage.name: "bitmagnet PostGreSQL"
           homepage.group: "{{ bitmagnet_db_homepage_group }}"
@@ -69,6 +70,7 @@
         command: worker run --keys=http_server --keys=queue_server --keys=dht_crawler
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ bitmagnet_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ bitmagnet_watchtower_monitor_only }}"
           homepage.name: "bitmagnet"
           homepage.group: "{{ bitmagnet_homepage_group }}"

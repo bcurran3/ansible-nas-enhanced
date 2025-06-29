@@ -12,6 +12,7 @@
     - name: Komga Docker Container
       community.docker.docker_container:
         name: "{{ komga_container_name }}"
+        hostname: "{{ komga_container_name }}"
         image: "{{ komga_image_name }}:{{ komga_image_version }}"
         pull: true
         volumes:
@@ -32,6 +33,8 @@
         restart_policy: unless-stopped
         memory: "{{ komga_memory }}"
         labels:
+          autoheal: "{{ komga_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ komga_watchtower_monitor_only }}"
           homepage.group: "{{ komga_homepage_group }}"
           homepage.name: "{{ komga_homepage_name }}"
           homepage.icon: "{{ komga_homepage_icon }}"
@@ -39,7 +42,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
 #         homepage.description: "Media server for comics/mangas/BDs/magazines/eBooks with API, OPDS, Kobo Sync and KOReader Sync support"
           homepage.server: "my-docker"
-          homepage.container: "komga"
+          homepage.container: "{{ komga_container_name }}"
           homepage.showStats: "false"
           homepage.widget.type: "komga"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"

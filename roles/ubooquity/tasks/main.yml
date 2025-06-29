@@ -29,6 +29,8 @@
         restart_policy: unless-stopped
         memory: "{{ ubooquity_memory }}"
         labels:
+          autoheal: "{{ ubooquity_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ ubooquity_watchtower_monitor_only }}"
           traefik.enable: "{{ ubooquity_available_externally | string }}"
           traefik.http.routers.ubooquity.rule: "Host(`{{ ubooquity_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ubooquity.tls.certresolver: "letsencrypt"

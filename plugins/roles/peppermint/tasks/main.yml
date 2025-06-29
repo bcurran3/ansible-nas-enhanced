@@ -25,6 +25,7 @@
         restart_policy: unless-stopped
         memory: "{{ peppermint_db_memory_limit }}"
         labels:
+          autoheal: "{{ peppermint_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ peppermint_db_watchtower_monitor_only }}"
           homepage.name: "Peppermint PostgreSQL"
           homepage.group: "{{ peppermint_db_homepage_group }}"
@@ -59,6 +60,7 @@
         links:
           - "{{ peppermint_db_container_name }}"
         labels:
+          autoheal: "{{ peppermint_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ peppermint_watchtower_monitor_only }}"
           homepage.name: "Peppermint"
           homepage.group: "{{ peppermint_homepage_group }}"

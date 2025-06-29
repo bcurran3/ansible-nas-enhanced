@@ -11,6 +11,7 @@
     - name: Home Assistant Docker Container
       community.docker.docker_container:
         name: "{{ homeassistant_container_name }}"
+        hostname: "{{ homeassistant_container_name }}"
         image: "{{ homeassistant_image_name }}:{{ homeassistant_image_version }}"
         pull: true
         volumes:
@@ -20,6 +21,8 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
+          autoheal: "{{ homeassistant_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ homeassistant_watchtower_monitor_only }}"
           homepage.group: "Apps"
           homepage.name: "Home Assistant"
           homepage.icon: "home-assistant.png"
@@ -27,7 +30,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
 #         homepage.description: ""
           homepage.server: "my-docker"
-          homepage.container: "homeassistant"
+          homepage.container: "{{ homeassistant_container_name }}"
           homepage.showStats: "false"
 #         homepage.widget.type: "home-assistant"
 #         homepage.widget.url: "https://{{ homeassistant_hostname }}.{{ ansible_nas_domain }}"

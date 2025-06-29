@@ -26,6 +26,7 @@
         restart_policy: unless-stopped
         memory: "{{ koillection_db_memory }}"
         labels:
+          autoheal: "{{ koillection_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ koillection_db_watchtower_monitor_only }}"
           homepage.name: "Koillection PostgreSQL"
           homepage.group: "{{ koillection_db_homepage_group }}"
@@ -70,6 +71,7 @@
         links:
           - "{{ koillection_db_container_name }}"
         labels:
+          autoheal: "{{ koillection_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ koillection_watchtower_monitor_only }}"
           homepage.name: "koillection"
           homepage.group: "{{ koillection_homepage_group }}"

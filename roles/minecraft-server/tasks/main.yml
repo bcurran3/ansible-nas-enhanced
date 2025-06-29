@@ -20,6 +20,9 @@
         env:
           EULA: "TRUE"
         restart_policy: unless-stopped
+        labels:
+          autoheal: "{{ minecraft_server_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ minecraft_server_watchtower_monitor_only }}"
   when: minecraft_server_enabled is true
 
 - name: Stop Minecraft Server

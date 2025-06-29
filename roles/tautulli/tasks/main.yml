@@ -27,6 +27,8 @@
         restart_policy: unless-stopped
         memory: "{{ tautulli_memory }}"
         labels:
+          autoheal: "{{ tautulli_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ tautulli_watchtower_monitor_only }}"
           traefik.enable: "{{ tautulli_available_externally | string }}"
           traefik.http.routers.tautulli.rule: "Host(`{{ tautulli_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tautulli.tls.certresolver: "letsencrypt"

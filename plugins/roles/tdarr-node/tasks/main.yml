@@ -37,7 +37,7 @@
           - "/dev/dri/:/dev/dri/"
         env:
           nodeName: "{{ ansible_nas_hostname }} Node"
-          serverIP: "192.168.69.15"
+          serverIP: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
           serverPort: "{{ tdarr_node_port_server }}"
           inContainer: "true"
           ffmpegVersion: "6"
@@ -50,6 +50,7 @@
         restart_policy: unless-stopped
         memory: "{{ tdarr_node_memory }}"
         labels:
+          autoheal: "{{ tdarr_node_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tdarr_node_watchtower_monitor_only }}"
           homepage.name: "Tdarr Node"
           homepage.group: "{{ tdarr_node_homepage_group }}"

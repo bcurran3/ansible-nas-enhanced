@@ -47,6 +47,8 @@
         restart_policy: unless-stopped
         memory: "{{ openhab_memory }}"
         labels:
+          autoheal: "{{ openhab_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ openhab_watchtower_monitor_only }}"
           traefik.enable: "{{ openhab_available_externally | string }}"
           traefik.http.routers.openhab.rule: "Host(`{{ openhab_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.openhab.tls.certresolver: "letsencrypt"

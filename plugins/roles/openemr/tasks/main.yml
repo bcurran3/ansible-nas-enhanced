@@ -43,6 +43,7 @@
         restart_policy: unless-stopped
         memory: "{{ openemr_db_memory_limit }}"
         labels:
+          autoheal: "{{ openemr_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openemr_db_watchtower_monitor_only }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -80,6 +81,7 @@
         links:
           - "{{ openemr_container_db_name }}"
         labels:
+          autoheal: "{{ openemr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openemr_watchtower_monitor_only }}"
           homepage.name: "OpenEMR"
           homepage.group: "{{ openemr_homepage_group }}"

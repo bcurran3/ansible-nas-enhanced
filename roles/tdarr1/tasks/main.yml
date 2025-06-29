@@ -39,6 +39,8 @@
           VERSION: "docker"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ tdarr1_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ tdarr1_watchtower_monitor_only }}"
           traefik.enable: "{{ tdarr1_available_externally | string }}"
           traefik.http.routers.tdarr.rule: "Host(`tdarr.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tdarr.tls.certresolver: "letsencrypt"

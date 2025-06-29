@@ -38,6 +38,7 @@
           WEBSOCKET_ENABLED: "{{ vaultwarden_websocket_enabled }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
+          autoheal: "{{ vaultwarden_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_watchtower_monitor_only }}"
           homepage.name: "Vaultwarden"
           homepage.group: "{{ vaultwarden_homepage_group }}"
@@ -93,6 +94,7 @@
         links:
           - "{{ vaultwarden_container_name }}"
         labels:
+          autoheal: "{{ vaultwarden_backup_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_backup_watchtower_monitor_only }}"
           homepage.name: "Vaultwarden-backup"
           homepage.group: "{{ vaultwarden_backup_homepage_group }}"

@@ -37,6 +37,7 @@
         memory: "{{ ssm_redis_memory_limit }}"
         command: "--save 60 1"
         labels:
+          autoheal: "{{ ssm_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_redis_watchtower_monitor_only }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -63,6 +64,7 @@
         healthcheck:
           test: ['CMD', 'pg_isready', '-U', 'postgres']
         labels:
+          autoheal: "{{ ssm_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_db_watchtower_monitor_only }}"
           traefik.enable: "false"
 
@@ -84,7 +86,8 @@
         restart_policy: unless-stopped
         memory: "{{ ssm_client_memory_limit }}"
         labels:
-          com.centurylinklabs.watchtower.monitor-only: "{{ ssm_watchtower_monitor_only }}"
+          autoheal: "{{ ssm_client_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ ssm_client_watchtower_monitor_only }}"
           traefik.enable: "{{ ssm_available_externally | string }}"
           traefik.http.routers.ssm.rule: "Host(`{{ ssm_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ssm.tls.certresolver: "letsencrypt"
@@ -127,6 +130,7 @@
         restart_policy: unless-stopped
         memory: "{{ ssm_memory_limit }}"
         labels:
+          autoheal: "{{ ssm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_watchtower_monitor_only }}"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
@@ -134,22 +138,26 @@
 
 - name: Stop Squirrel Servers Manager (SSM)
   block:
-    - name: Stop Squirrel Servers Manager (SSM) Server
-      community.docker.docker_container:
-        name: "{{ ssm_container_name }}"
-        state: absent
     - name: Stop Squirrel Servers Manager (SSM) Client
       community.docker.docker_container:
         name: "{{ ssm_client_container_name }}"
         state: absent
+
+    - name: Stop Squirrel Servers Manager (SSM) Server
+      community.docker.docker_container:
+        name: "{{ ssm_container_name }}"
+        state: absent
+
     - name: Stop Squirrel Servers Manager (SSM) redis
       community.docker.docker_container:
         name: "{{ ssm_redis_container_name }}"
         state: absent
+
     - name: Stop Squirrel Servers Manager (SSM) MongDB
       community.docker.docker_container:
         name: "{{ ssm_db_container_name }}"
         state: absent
+
     - name: Remove Squirrel Servers Manager (SSM) network
       community.docker.docker_network:
         name: "{{ ssm_network_name }}"

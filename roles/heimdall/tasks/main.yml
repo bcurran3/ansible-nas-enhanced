@@ -24,6 +24,8 @@
         restart_policy: unless-stopped
         memory: "{{ heimdall_memory }}"
         labels:
+          autoheal: "{{ heimdall_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ heimdall_watchtower_monitor_only }}"
           homepage.group: "Apps"
           homepage.name: "Heimdall"
           homepage.icon: "heimdall.png"
@@ -31,7 +33,7 @@
           homepage.siteMonitor: "https://{{ heimdall_hostname }}.{{ ansible_nas_domain }}"
     #     homepage.description: ""
           homepage.server: "my-docker"
-          homepage.container: "heimdall"
+          homepage.container: "{{ heimdall_container_name }}"
           homepage.showStats: "false"
           traefik.enable: "{{ heimdall_available_externally | string }}"
           traefik.http.routers.heimdall.rule: "Host(`{{ heimdall_hostname }}.{{ ansible_nas_domain }}`)"

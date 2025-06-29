@@ -51,8 +51,9 @@
 #         - "{{ rocketchat_data_directory }}/mongodb/dump:/dump"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ rocketchat_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rocketchat_db_watchtower_monitor_only }}"
-          homepage.name: "Rocket.Chat DB"
+          homepage.name: "Rocket.Chat MongoDB"
           homepage.group: "{{ rocketchat_db_homepage_group }}"
           homepage.icon: "{{ rocketchat_db_homepage_icon }}"
           homepage.href: "{{ rocketchat_db_homepage_href }}"
@@ -92,6 +93,7 @@
           - "{{ rocketchat_data_directory }}/uploads:/app/uploads"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ rocketchat_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rocketchat_watchtower_monitor_only }}"
           homepage.name: "Rocket.Chat"
           homepage.group: "{{ rocketchat_homepage_group }}"
@@ -118,12 +120,13 @@
 
 - name: Stop Rocket.Chat
   block:
-    - name: Stop Rocket.Chat  MongoDB Docker Container
-      community.docker.docker_container:
-        name: "{{ rocketchat_db_container_name }}"
-        state: absent
     - name: Stop Rocket.Chat Docker Container
       community.docker.docker_container:
         name: "{{ rocketchat_container_name }}"
+        state: absent
+
+    - name: Stop Rocket.Chat MongoDB Docker Container
+      community.docker.docker_container:
+        name: "{{ rocketchat_db_container_name }}"
         state: absent
   when: rocketchat_enabled is false

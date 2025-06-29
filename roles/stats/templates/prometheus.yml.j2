@@ -45,6 +45,17 @@ scrape_configs:
                  ]
 {% endif %}
 
+{% if watchtower_enabled %}
+  - job_name: "watchtower"
+    scrape_interval: {{ watchtower_collection_interval }}
+    metrics_path: "/v1/metrics"
+    bearer_token: "{{ watchtower_api_token }}"
+    static_configs:
+      - targets: [
+                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port }}"
+                 ]
+{% endif %}
+
 {% if stats_prometheus_additional_hosts is defined %}
   - job_name: "additional_hosts"
     static_configs:

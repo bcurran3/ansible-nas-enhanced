@@ -37,6 +37,8 @@
         restart_policy: unless-stopped
         memory: "{{ promtail_memory }}"
         labels:
+          autoheal: "{{ promtail_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ promtail_watchtower_monitor_only }}"
           traefik.enable: "{{ promtail_available_externally | string }}"
           traefik.http.routers.promtail.rule: "Host(`{{ promtail_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.promtail.tls.certresolver: "letsencrypt"

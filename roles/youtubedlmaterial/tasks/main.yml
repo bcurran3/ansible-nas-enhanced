@@ -29,6 +29,7 @@
         restart_policy: unless-stopped
         memory: "{{ youtubedlmaterial_db_memory_limit }}"
         labels:
+          autoheal: "{{ youtubedlmaterial_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ youtubedlmaterial_db_watchtower_monitor_only }}"
           homepage.name: "YoutubeDL-Material MongoDB"
           homepage.group: "{{ youtubedlmaterial_db_homepage_group }}"
@@ -68,11 +69,12 @@
         restart_policy: unless-stopped
         memory: "{{ youtubedlmaterial_memory }}"
         labels:
+          autoheal: "{{ youtubedlmaterial_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ youtubedlmaterial_watchtower_monitor_only }}"
           homepage.name: "YoutubeDL-Material"
           homepage.group: "{{ youtubedlmaterial_homepage_group }}"
           homepage.icon: "{{ youtubedlmaterial_homepage_icon }}"
-          homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtubedlmaterial_port_http }}"
+          homepage.href: "{{ youtubedlmaterial_homepage_href }}"
 #         homepage.description: "Self-hosted YouTube downloader built on Material Design"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.server: "my-docker"
@@ -84,6 +86,9 @@
           traefik.http.routers.youtubedlmaterial.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.youtubedlmaterial.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.youtubedlmaterial.loadbalancer.server.port: "17442"
+          traefik.http.routers.frontend.middlewares: "{{ youtubedlmaterial_hostname }}"
+          traefik.http.routers.overseerr.middlewares: "{{ youtubedlmaterial_hostname }}@docker"
+          traefik.http.middlewares.overseerr.IPAllowList.sourcerange: "{{ youtubedlmaterial_traefik_whitelist }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Tzahi12345/YoutubeDL-Material/releases/tags/$${major}.$${minor}.$${patch}"
   when: youtubedlmaterial_enabled is true

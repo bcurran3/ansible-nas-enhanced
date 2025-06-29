@@ -29,6 +29,7 @@
         restart_policy: unless-stopped
         memory: "{{ gitea_db_memory }}"
         labels:
+          autoheal: "{{ gitea_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gitea_db_watchtower_monitor_only }}"
           homepage.group: "{{ gitea_db_homepage_group }}"
           homepage.name: "Gitea MySQL"
@@ -63,6 +64,7 @@
           DB_NAME: "gitea"
           DB_USER: "gitea"
           DB_PASSWD: "gitea"
+          DISABLE_REGISTRATION: "true"
           RUN_MODE: "prod"
           SSH_DOMAIN: "{{ ansible_nas_hostname }}"
           SSH_PORT: "{{ gitea_port_ssh }}"
@@ -73,6 +75,7 @@
         restart_policy: unless-stopped
         memory: "{{ gitea_memory }}"
         labels:
+          autoheal: "{{ gitea_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gitea_watchtower_monitor_only }}"
           homepage.group: "{{ gitea_homepage_group }}"
           homepage.name: "Gitea"
@@ -108,3 +111,6 @@
         name: "{{ gitea_db_container_name }}"
         state: absent
   when: gitea_enabled is false
+
+# NOTE: configuration options
+# https://docs.gitea.com/next/administration/config-cheat-sheet#service-service

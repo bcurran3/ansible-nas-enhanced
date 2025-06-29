@@ -23,6 +23,9 @@
           MYSQL_PASSWORD: "{{ romm_database_password }}"
         restart_policy: unless-stopped
         memory: "{{ romm_db_memory }}"
+        labels:
+          autoheal: "{{ romm_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ romm_db_watchtower_monitor_only }}"
 
     - name: Create Romm Redis
       community.docker.docker_container:
@@ -31,6 +34,9 @@
         pull: true
         restart_policy: unless-stopped
         memory: "{{ romm_redis_memory }}"
+        labels:
+          autoheal: "{{ romm_redis_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ romm_redis_watchtower_monitor_only }}"
 
     - name: Romm Docker Container
       community.docker.docker_container:
@@ -66,6 +72,8 @@
           - "{{ romm_db_container_name }}:db"
           - "{{ romm_redis_container_name }}:redis"
         labels:
+          autoheal: "{{ romm_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ romm_watchtower_monitor_only }}"
           traefik.enable: "{{ romm_available_externally | string }}"
           traefik.http.routers.romm.rule: "Host(`{{ romm_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.romm.tls.certresolver: "letsencrypt"

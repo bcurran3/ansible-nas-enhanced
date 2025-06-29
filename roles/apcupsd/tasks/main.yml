@@ -37,6 +37,9 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ apcupsd_memory }}"
+        labels:
+          autoheal: "{{ apcupsd_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ apcupsd_watchtower_monitor_only }}"
   when: apcupsd_enabled is true
 
 - name: Stop Apcupsd

@@ -30,6 +30,9 @@
         privileged: true
         restart_policy: unless-stopped
         memory: "{{ virtual_desktop_memory }}"
+        labels:
+          autoheal: "{{ virtual_desktop_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ virtual_desktop_watchtower_monitor_only }}"
   when: virtual_desktop_enabled is true
 
 - name: Stop Virtual Desktop

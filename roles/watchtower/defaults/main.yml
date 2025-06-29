@@ -1,5 +1,7 @@
 ---
 watchtower_enabled: false
+watchtower_available_externally: "false"
+watchtower_traefik_whitelist: "{{ lan }}"
 
 # Sets the 6 field cron schedule to use for checks and updates. This will check at 5am daily.
 watchtower_cron_schedule: 0 0 5 * * *
@@ -25,8 +27,17 @@ watchtower_image_version: "latest"
 
 # added
 watchtower_hostname: "watchtower"
-watchtower_available_externally: "false"
-watchtower_traefik_whitelist: "lan"
 watchtower_port: "2347"
 
-watchtower_homepage_widget_key: "123456789"
+# autoheal
+watchtower_autoheal: "false"
+
+# homepage
+watchtower_homepage_group: "Apps"
+watchtower_homepage_icon: "watchtower.png"
+watchtower_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port }}"
+watchtower_homepage_showStats: "false"
+watchtower_api_token: "123456789"
+
+# watchtower
+watchtower_watchtower_monitor_only: "true"

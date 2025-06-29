@@ -24,6 +24,9 @@
         network_mode: bridge
         restart_policy: unless-stopped
         memory: "{{ timemachine_memory }}"
+        labels:
+          autoheal: "{{ timemachine_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ timemachine_watchtower_monitor_only }}"
 
     - name: Install avahi
       ansible.builtin.apt:

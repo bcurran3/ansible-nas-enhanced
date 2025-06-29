@@ -22,6 +22,8 @@
         restart_policy: unless-stopped
         memory: "{{ flaresolverr_memory }}"
         labels:
+          autoheal: "{{ flaresolverr_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ flaresolverr_watchtower_monitor_only }}"
           traefik.enable: "{{ flaresolverr_available_externally | string }}"
           traefik.http.routers.flaresolverr.rule: "Host(`flaresolverr.{{ ansible_nas_domain }}`)"
           traefik.http.routers.flaresolverr.tls.certresolver: "letsencrypt"

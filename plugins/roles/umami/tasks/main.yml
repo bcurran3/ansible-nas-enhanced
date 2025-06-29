@@ -30,6 +30,7 @@
 #          retries: "5"
         memory: "{{ umami_db_memory }}"
         labels:
+          autoheal: "{{ umami_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ umami_db_watchtower_monitor_only }}"
           homepage.name: "Umami PostgreSQL"
           homepage.group: "{{ umami_db_homepage_group }}"
@@ -66,6 +67,7 @@
         links:
           - "{{ umami_db_container_name }}"
         labels:
+          autoheal: "{{ umami_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ umami_watchtower_monitor_only }}"
           homepage.name: "Umami"
           homepage.group: "{{ umami_homepage_group }}"

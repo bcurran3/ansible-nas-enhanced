@@ -27,6 +27,9 @@
           MEMBERS: "{{ minecraft_bedrock_server_members }}"
           VISITORS: "{{ minecraft_bedrock_server_visitors }}"
         restart_policy: unless-stopped
+        labels:
+          autoheal: "{{ minecraft_bedrock_server_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ minecraft_bedrock_server_watchtower_monitor_only }}"
   when: minecraft_bedrock_server_enabled is true
 
 - name: Stop Minecraft Bedrock Server

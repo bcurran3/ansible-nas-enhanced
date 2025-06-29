@@ -32,6 +32,8 @@
         restart: "{{ mosquitto_conf is changed }}"
         memory: 1g
         labels:
+          autoheal: "{{ mosquitto_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ mosquitto_watchtower_monitor_only }}"
           homepage.group: "Misc"
           homepage.name: "Mosquitto"
           homepage.icon: "mosquitto.png"

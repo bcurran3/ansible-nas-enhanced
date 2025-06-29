@@ -28,6 +28,8 @@
         restart_policy: unless-stopped
         memory: "{{ calibreweb_memory }}"
         labels:
+          autoheal: "{{ calibreweb_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ calibreweb_watchtower_monitor_only }}"
           traefik.enable: "{{ calibreweb_available_externally | string }}"
           traefik.http.routers.calibreweb.rule: "Host(`{{ calibreweb_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.calibreweb.tls.certresolver: "letsencrypt"

@@ -30,6 +30,8 @@
         restart_policy: unless-stopped
         memory: "{{ sonarr_memory }}"
         labels:
+          autoheal: "{{ sonarr_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ sonarr_watchtower_monitor_only }}"
           homepage.group: "Media Management"
           homepage.name: "Sonarr"
           homepage.href: "https://{{ sonarr_hostname }}.{{ ansible_nas_domain }}"
@@ -37,7 +39,7 @@
           homepage.icon: "sonarr.png"
 #         homepage.description: ""
           homepage.server: "my-docker"
-          homepage.container: "sonarr"
+          homepage.container: "{{ sonarr_container_name }}"
           homepage.showStats: "false"
           homepage.widget.type: "sonarr"
           homepage.widget.url: "https://{{ sonarr_hostname }}.{{ ansible_nas_domain }}"

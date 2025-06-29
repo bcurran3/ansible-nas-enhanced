@@ -13,10 +13,6 @@
         - "{{ romm_data_directory }}/resources"
         - "{{ romm_data_directory }}/redis"
 
-#    - name: Create RomM network
-#      community.docker.docker_network:
-#        name: "{{ romm_network_name }}"
-
     - name: Create RomM MariaDB Docker Container
       docker_container:
         container_default_behavior: "compatibility"
@@ -25,8 +21,6 @@
         image: mariadb:latest
         pull: true
         network_mode: "bridge"
-#        networks:
-#          - name: "{{ romm_network_name }}"
         networks_cli_compatible: "yes"
         volumes:
           - "{{ romm_data_directory }}/db:/var/lib/mysql"
@@ -50,6 +44,7 @@
           timeout: "5s"
           retries: "5"
         labels:
+          autoheal: "{{ romm_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ romm_db_watchtower_monitor_only }}"
           homepage.name: "RomM MariaDB"
           homepage.group: "{{ romm_db_homepage_group }}"
@@ -70,8 +65,6 @@
         image: rommapp/romm:latest
         pull: true
         network_mode: "bridge"
-#        networks:
-#          - name: "{{ romm_network_name }}"
         networks_cli_compatible: "yes"
         ports:
           - "{{ romm_port_http }}:8080"
@@ -97,7 +90,10 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ romm_memory_limit }}"
+        links:
+          - "{{ romm_db_container_name }}"
         labels:
+          autoheal: "{{ romm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ romm_watchtower_monitor_only }}"
           homepage.name: "RomM"
           homepage.group: "{{ romm_homepage_group }}"
@@ -132,6 +128,7 @@
       community.docker.docker_container:
         name: "{{ romm_container_name }}"
         state: absent
+
     - name: Stop RomM MariaDB Docker Container
       community.docker.docker_container:
         name: "{{ romm_db_container_name }}"

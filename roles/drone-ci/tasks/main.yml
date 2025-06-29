@@ -39,6 +39,8 @@
         restart_policy: unless-stopped
         memory: "{{ drone_ci_memory }}"
         labels:
+          autoheal: "{{ drone_ci_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ drone_ci_watchtower_monitor_only }}"
           traefik.enable: "{{ drone_ci_available_externally | string }}"
           traefik.http.routers.drone_ci.rule: "Host(`{{ drone_ci_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.drone_ci.tls.certresolver: "letsencrypt"
@@ -63,6 +65,9 @@
           DRONE_RUNNER_NAME: "{{ drone_ci_runner_name }}"
         restart_policy: unless-stopped
         memory: "{{ drone_ci_agent_memory }}"
+        labels:
+          autoheal: "{{ drune_ci_runner_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ drone_ci_runner_watchtower_monitor_only }}"
 
     - name: Add webhook allowed hosts to Gitea
       ansible.builtin.blockinfile:

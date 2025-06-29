@@ -31,8 +31,9 @@
         restart_policy: unless-stopped
         memory: "{{ tianji_db_memory }}"
         labels:
+          autoheal: "{{ tianji_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tianji_db_watchtower_monitor_only }}"
-          homepage.name: "tianji PostGreSQL"
+          homepage.name: "Tianji PostGreSQL"
           homepage.group: "{{ tianji_db_homepage_group }}"
           homepage.icon: "{{ tianji_db_homepage_icon }}"
           traefik.enable: "false"
@@ -59,8 +60,9 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ tianji_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tianji_watchtower_monitor_only }}"
-          homepage.name: "tianji"
+          homepage.name: "Tianji"
           homepage.group: "{{ tianji_homepage_group }}"
           homepage.icon: "{{ tianji_homepage_icon }}"
           homepage.href: "{{ tianji_homepage_href }}"

@@ -32,6 +32,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         labels:
+          autoheal: "{{ ollama_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_watchtower_monitor_only }}"
           homepage.name: "Ollama"
           homepage.group: "{{ ollama_homepage_group }}"
@@ -74,6 +75,7 @@
         restart_policy: unless-stopped
         runtime: "nvidia"
         labels:
+          autoheal: "{{ ollama_openedai_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openedai_watchtower_monitor_only }}"
           homepage.name: "Ollama OpenedAI Speech"
           homepage.group: "{{ ollama_openedai_homepage_group }}"
@@ -121,6 +123,7 @@
         restart_policy: unless-stopped
         runtime: "nvidia"
         labels:
+          autoheal: "{{ ollama_openwebui_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openwebui_watchtower_monitor_only }}"
           homepage.name: "Ollama Open WebUI"
           homepage.group: "{{ ollama_openwebui_homepage_group }}"

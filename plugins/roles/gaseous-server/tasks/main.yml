@@ -42,6 +42,7 @@
 #          timeout: 5s
 #          retries: 5
         labels:
+          autoheal: "{{ gaseous_server_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gaseous_server_db_watchtower_monitor_only }}"
           homepage.name: "Gaseous Server MariaDB"
 #         homepage.description: "The open source relational database"
@@ -81,6 +82,7 @@
         restart_policy: unless-stopped
         memory: "{{ gaseous_server_memory_limit }}"
         labels:
+          autoheal: "{{ gaseous_server_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gaseous_server_watchtower_monitor_only }}"
           homepage.name: "Gaseous Server"
           homepage.group: "{{ gaseous_server_homepage_group }}"

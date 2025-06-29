@@ -39,6 +39,7 @@
             restart_policy: unless-stopped
             memory: "{{ projectsend_db_memory_limit }}"
             labels:
+              autoheal: "{{ projectsend_db_autoheal }}"
               com.centurylinklabs.watchtower.monitor-only: "{{ projectsend_db_watchtower_monitor_only }}"
               homepage.name: "ProjectSend MariaDB"
               homepage.group: "{{ projectsend_db_homepage_group }}"
@@ -77,6 +78,7 @@
             links:
               - "{{ projectsend_db_container_name }}"
             labels:
+              autoheal: "{{ projectsend_autoheal }}"
               com.centurylinklabs.watchtower.monitor-only: "{{ projectsend_watchtower_monitor_only }}"
               homepage.name: "ProjectSend"
               homepage.group: "{{ projectsend_homepage_group }}"

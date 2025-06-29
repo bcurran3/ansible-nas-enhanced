@@ -51,6 +51,8 @@
         memory: "{{ loki_memory }}"
         restart: "{{ loki_config is changed }}"
         labels:
+          autoheal: "{{ loki_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ loki_watchtower_monitor_only }}"
           traefik.enable: "{{ loki_available_externally | string }}"
           traefik.http.routers.loki.rule: "Host(`{{ loki_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.loki.tls.certresolver: "letsencrypt"

@@ -37,8 +37,9 @@
         restart_policy: unless-stopped
         memory: "{{ phpbb_db_memory_limit }}"
         labels:
+          autoheal: "{{ phpbb_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ phpbb_db_watchtower_monitor_only }}"
-          homepage.name: "phpBB-DB"
+          homepage.name: "phpBB MariaDB"
           homepage.group: "{{ phpbb_db_homepage_group }}"
           homepage.icon: "{{ phpbb_db_homepage_icon }}"
           homepage.href: "{{ phpbb_db_homepage_href }}"
@@ -78,6 +79,7 @@
         links:
           - "{{ phpbb_container_db_name }}"
         labels:
+          autoheal: "{{ phpbb_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ phpbb_watchtower_monitor_only }}"
           homepage.name: "phpBB"
           homepage.group: "{{ phpbb_homepage_group }}"
