@@ -1,7 +1,7 @@
 ---
-- name: Start Plex Rewind
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Plex Rewind Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ plexrewind_data_directory }}"
         - "{{ plexrewind_data_directory }}/config"
 
-    - name: Create Plex Rewind Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ plexrewind_container_name }}"
@@ -32,7 +32,7 @@
         labels:
           autoheal: "{{ plexrewind_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ plexrewind_watchtower_monitor_only }}"
-          homepage.name: "Plex Rewind"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ plexrewind_homepage_group }}"
           homepage.icon: "{{ plexrewind_homepage_icon }}"
           homepage.href: "{{ plexrewind_homepage_href }}"
@@ -54,9 +54,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: plexrewind_enabled is true
 
-- name: Stop Plex Rewind Docker Container
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop plexrewind
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ plexrewind_container_name }}"
         state: absent

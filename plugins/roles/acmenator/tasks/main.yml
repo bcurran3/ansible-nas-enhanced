@@ -1,19 +1,20 @@
 ---
-- name: Start acmenator
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create acmenator Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ acmenator_data_directory }}"
 
-    - name: Create acmenator Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ acmenator_container_name }}"
-        image: ummecasino/acmenator:latest
+        image: "{{ acmenator_image_name }}:{{ acmenator_image_version }}"
         pull: true
+        cpu_shares: "{{ acmenator_cpu_shares }}"
         network_mode: "bridge"
         volumes:
           - "{{ traefik_data_directory }}/letsencrypt/acme.json:/traefik.json:ro"
@@ -29,7 +30,7 @@
           autoheal: "{{ acmenator_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ acmenator_watchtower_monitor_only }}"
           homepage.group: "{{ acmenator_homepage_group }}"
-          homepage.name: "acmenator"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ acmenator_homepage_icon }}"
 #         homepage.description: "Convert Traefik certs to PEM or p12"
           homepage.server: "my-docker"
@@ -40,9 +41,9 @@
           wud.link.template: "https://github.com/ummecasino/acmenator/releases/tag/$${major}.$${minor}.$${patch}"
   when: acmenator_enabled is true
 
-- name: Stop acmenator
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop acmenator
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ acmenator_container_name }}"
         state: absent

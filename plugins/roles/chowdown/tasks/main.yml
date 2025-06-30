@@ -1,14 +1,14 @@
 ---
-- name: Start Chowdown
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Chowdown Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ chowdown_data_directory }}/config"
 
-    - name: Chowdown Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ chowdown_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ chowdown_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ chowdown_watchtower_monitor_only }}"
-          homepage.name: "Chowdown"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ chowdown_homepage_group }}"
           homepage.icon: "{{ chowdown_homepage_icon }}"
           homepage.href: "{{ chowdown_homepage_href }}"
@@ -52,9 +52,9 @@
         memory: 1g
   when: chowdown_enabled is true
 
-- name: Stop Chowdown
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Chowdown
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ chowdown_container_name }}"
         state: absent

@@ -1,8 +1,8 @@
 ---
 # WIP - traefik headers need work
-- name: Start Kasm
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create kasm Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ kasm_data_directory }}/opt"
         - "{{ kasm_data_directory }}/profiles"
 
-    - name: Create Kasm Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ kasm_container_name }}"
@@ -41,7 +41,7 @@
         labels:
           autoheal: "{{ kasm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ kasm_watchtower_monitor_only }}"
-          homepage.name: "Kasm"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ kasm_homepage_group }}"
           homepage.icon: "{{ kasm_homepage_icon }}"
           homepage.href: "{{ kasm_homepage_href }}"
@@ -69,9 +69,9 @@
         memory: "{{ kasm_memory_limit }}"
   when: kasm_enabled is true
 
-- name: Stop Kasm
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Kasm
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ kasm_container_name }}"
         state: absent

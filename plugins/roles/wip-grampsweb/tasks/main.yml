@@ -1,7 +1,7 @@
 ---
-- name: Start grampsweb
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Gramps Web Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -18,7 +18,7 @@
 
 # I don't understand how to create the container below w/no image to pull
 
-#    - name: Gramps Web celery Docker Container
+#    - name: {{ ansible_nas_app_name }} celery Container
 #      docker_container:
 #        container_default_behavior: "compatibility"
 #        name: "{{ grampsweb_celery_container_name }}"
@@ -45,7 +45,7 @@
 #          homepage.showStats: "{{ grampsweb_celery_homepage_showStats }}"
 #          traefik.enable: "false"
 
-    - name: Gramps Web Redis Docker Container
+    - name: Create {{ ansible_nas_app_name }} Redis Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ grampsweb_redis_container_name }}"
@@ -60,7 +60,7 @@
         labels:
           autoheal: "{{ grampsweb_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
-          homepage.name: "Gramps Web DB"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ grampsweb_redis_homepage_group }}"
           homepage.icon: "{{ grampsweb_redis_homepage_icon }}"
           homepage.href: "{{ grampsweb_redis_homepage_href }}"
@@ -71,7 +71,7 @@
           homepage.showStats: "{{ grampsweb_redis_homepage_showStats }}"
           traefik.enable: "false"
 
-    - name: Create Gramps Web Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ grampsweb_container_name }}"
@@ -102,7 +102,7 @@
         labels:
           autoheal: "{{ grampsweb_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ grampsweb_watchtower_monitor_only }}"
-          homepage.name: "Gramps Web"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ grampsweb_homepage_group }}"
           homepage.icon: "{{ grampsweb_homepage_icon }}"
           homepage.href: "{{ grampsweb_homepage_href }}"
@@ -125,19 +125,19 @@
         memory: "{{ grampsweb_memory_limit }}"
   when: grampsweb_enabled is true
 
-- name: Stop Gramps Web
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Gramps Web
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ grampsweb_container_name }}"
         state: absent
 
-    - name: Stop Gramps Web Celery
+    - name: Stop {{ ansible_nas_app_name }} Celery Container
       community.docker.docker_container:
         name: "{{ grampsweb_celery_container_name }}"
         state: absent
     
-    - name: Stop Gramps Web DB
+    - name: Stop {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
         name: "{{ grampsweb_redis_container_name }}"
         state: absent

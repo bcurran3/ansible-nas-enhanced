@@ -1,7 +1,7 @@
 ---
-- name: Start Cup
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Cup Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ cup_data_directory }}"
         - "{{ cup_data_directory }}/config"
 
-    - name: Create Cup Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ cup_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ cup_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ cup_watchtower_monitor_only }}"
-          homepage.name: "Cup"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ cup_homepage_group }}"
           homepage.icon: "{{ cup_homepage_icon }}"
           homepage.href: "{{ cup_homepage_href }}"
@@ -63,9 +63,9 @@
           wud.link.template: "https://github.com/sergi0g/cup/releases/tag/$${major}.$${minor}.$${patch}"
   when: cup_enabled is true
 
-- name: Stop cup
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop cup Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ cup_container_name }}"
         state: absent

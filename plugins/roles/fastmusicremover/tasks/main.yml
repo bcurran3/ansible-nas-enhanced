@@ -1,7 +1,7 @@
 ---
-- name: Start Fast Music Remover
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Fast Music Remover Docker Container
+    - name: Create Fast {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ fastmusicremover_container_name }}"
@@ -18,7 +18,7 @@
         labels:
           autoheal: "{{ fastmusicremover_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ fastmusicremover_watchtower_monitor_only }}"
-          homepage.name: "Fast Music Remover"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ fastmusicremover_homepage_group }}"
           homepage.href: "{{ fastmusicremover_homepage_href }}"
           homepage.icon: "{{ fastmusicremover_homepage_icon }}"
@@ -41,9 +41,9 @@
 #         ^ no releases info published
   when: fastmusicremover_enabled is true
 
-- name: Stop Fast Music Remover
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Fast Music Remover
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ fastmusicremover_container_name }}"
         state: absent

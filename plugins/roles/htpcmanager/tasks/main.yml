@@ -1,8 +1,8 @@
 # https://hub.docker.com/r/linuxserver/htpcmanager/
 ---
-- name: Start HTPC Manager
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create HTPC Manager Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ htpcmanager_data_directory }}"
         - "{{ htpcmanager_data_directory }}/config"
 
-    - name: Create HTPC Manager Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ htpcmanager_container_name }}"
@@ -32,7 +32,7 @@
           autoheal: "{{ htpcmanager_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ htpcmanager_watchtower_monitor_only }}"
           homepage.group: "{{ htpcmanager_homepage_group }}"
-          homepage.name: "HTPC Manager"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.href: "{{ htpcmanager_homepage_href }}"
           homepage.icon: "{{ htpcmanager_homepage_icon }}"
 #         homepage.description: "A fully responsive interface to manage all your favorite software on your Htpc."
@@ -53,9 +53,9 @@
           wud.link.template: "https://github.com/Hellowlol/HTPC-Manager/releases/tag/$${major}.$${minor}.$${patch}"
   when: htpcmanager_enabled is true
 
-- name: Stop HTPC Manager
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop HTPC Manager
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ htpcmanager_container_name }}"
         state: absent

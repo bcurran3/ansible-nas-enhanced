@@ -1,7 +1,7 @@
 ---
-- name: Start MIND
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create MIND Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ mind_data_directory }}"
         - "{{ mind_data_directory }}/db"
 
-    - name: Create MIND Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mind_container_name }}"
@@ -26,7 +26,7 @@
         labels:
           autoheal: "{{ mind_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mind_watchtower_monitor_only }}"
-          homepage.name: "MIND"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mind_homepage_group }}"
           homepage.icon: "{{ mind_homepage_icon }}"
           homepage.href: "{{ mind_homepage_href }}"
@@ -49,9 +49,9 @@
         memory: "{{ mind_memory }}"
   when: mind_enabled is true
 
-- name: Stop MIND
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop MIND
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mind_container_name }}"
         state: absent

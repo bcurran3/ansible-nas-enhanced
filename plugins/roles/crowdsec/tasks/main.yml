@@ -1,8 +1,8 @@
 ---
 ### WORK IN PROGRESS - TESTING
-- name: Start Crowdsec
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Crowdsec Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ crowdsec_data_directory }}/config"
         - "{{ crowdsec_data_directory }}/data"
 
-    - name: Create Crowdsec Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ crowdsec_container_name }}"
@@ -39,7 +39,7 @@
         labels:
           autoheal: "{{ crowdsec_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ crowdsec_watchtower_monitor_only }}"
-          homepage.name: "Crowdsec"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ crowdsec_homepage_group }}"
           homepage.icon: "{{ crowdsec_homepage_icon }}"
           homepage.href: "{{ crowdsec_homepage_href }}"
@@ -67,9 +67,9 @@
         memory: "{{ crowdsec_memory }}"
   when: crowdsec_enabled is true
 
-- name: Stop Crowdsec
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Crowdsec
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ crowdsec_container_name }}"
         state: absent

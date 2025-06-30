@@ -1,7 +1,7 @@
 ---
-- name: Start OsClass
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create OsClass Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ osclass_data_directory }}/data"
         - "{{ osclass_data_directory }}/db"
 
-    - name: Create OsClass MariaDB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ osclass_db_container_name }}"
@@ -35,7 +35,7 @@
         labels:
           autoheal: "{{ osclass_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osclass_db_watchtower_monitor_only }}"
-          homepage.name: "OsClass MariaDB"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ osclass_db_homepage_group }}"
           homepage.icon: "{{ osclass_db_homepage_icon }}"
           homepage.href: "{{ osclass_homepage_href }}"
@@ -47,7 +47,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.link.template: "https://mariadb.com/kb/en/mariadb-$${major}$${minor}$${patch}-changelog"
 
-    - name: Create OsClass Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ osclass_container_name }}"
@@ -83,7 +83,7 @@
         labels:
           autoheal: "{{ osclass_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osclass_watchtower_monitor_only }}"
-          homepage.name: "OsClass"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ osclass_homepage_group }}"
           homepage.icon: "{{ osclass_homepage_icon }}"
           homepage.href: "{{ osclass_homepage_href }}"
@@ -105,18 +105,18 @@
           wud.link.template: "https://hub.docker.com/r/bitnami/osclass-archived/tags/tag/$${major}.$${minor}.$${patch}"
   when: osclass_enabled is true
 
-- name: Stop OsClass
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop OsClass Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ osclass_container_name }}"
         state: absent
 
-    - name: Stop OsClass MariaDB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ osclass_db_container_name }}"
         state: absent
   when: osclass_enabled is false
 
 # NOTE:
-# Would like to move this from Bitnami's mariadb to normal mariadb
+# Would like to move this from Bitnami's mariadb to linuxserver's mariadb

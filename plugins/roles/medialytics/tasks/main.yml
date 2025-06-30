@@ -1,7 +1,7 @@
 ---
-- name: Start Medialytics
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Medialytics Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ medialytics_container_name }}"
@@ -19,7 +19,7 @@
         labels:
           autoheal: "{{ medialytics_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ medialytics_watchtower_monitor_only }}"
-          homepage.name: "Medialytics"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ medialytics_homepage_group }}"
           homepage.icon: "{{ medialytics_homepage_icon }}"
           homepage.href: "{{ medialytics_homepage_href }}"
@@ -41,9 +41,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: medialytics_enabled is true
 
-- name: Stop Medialytics
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Medialytics
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ medialytics_container_name }}"
         state: absent

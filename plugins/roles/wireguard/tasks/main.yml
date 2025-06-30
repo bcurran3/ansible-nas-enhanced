@@ -1,14 +1,14 @@
 ---
-- name: Start WireGuard
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create WireGuard Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ wireguard_data_directory }}"
 
-    - name: Create WireGuard Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ wireguard_container_name }}"
@@ -32,7 +32,7 @@
         labels:
           autoheal: "{{ wireguard_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ wireguard_watchtower_monitor_only }}"
-          homepage.name: "WireGuard"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ wireguard_homepage_group }}"
           homepage.icon: "{{ wireguard_homepage_icon }}"
           homepage.href: "{{ wireguard_homepage_href }}"
@@ -54,9 +54,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: wireguard_enabled is true
 
-- name: Stop WireGuard
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop WireGuard Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ wireguard_container_name }}"
         state: absent

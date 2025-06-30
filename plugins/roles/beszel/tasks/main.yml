@@ -1,7 +1,7 @@
 ---
-- name: Start Beszel
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Beszel Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ beszel_data_directory }}"
         - "{{ beszel_data_directory }}/data"
 
-    - name: Create Beszel Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ beszel_container_name }}"
@@ -50,9 +50,9 @@
           wud.link.template: "https://github.com/henrygd/beszel/releases/tag/$${major}.$${minor}.$${patch}"
   when: beszel_enabled is true
 
-- name: Stop Beszel
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Beszel Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ beszel_container_name }}"
         state: absent

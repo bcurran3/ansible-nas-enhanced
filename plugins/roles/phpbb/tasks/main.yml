@@ -1,7 +1,7 @@
 ---
-- name: Start phpbb
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create phpBB Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,11 +11,11 @@
         - "{{ phpbb_data_directory }}/phpbb"
         - "{{ phpbb_data_directory }}/db"
 
-    - name: Create phpBB network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ phpbb_network_name }}"
 
-    - name: Create phpBB MariaDB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ phpbb_db_container_name }}"
@@ -39,7 +39,7 @@
         labels:
           autoheal: "{{ phpbb_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ phpbb_db_watchtower_monitor_only }}"
-          homepage.name: "phpBB MariaDB"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ phpbb_db_homepage_group }}"
           homepage.icon: "{{ phpbb_db_homepage_icon }}"
           homepage.href: "{{ phpbb_db_homepage_href }}"
@@ -51,7 +51,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create phpBB Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ phpbb_container_name }}"
@@ -81,7 +81,7 @@
         labels:
           autoheal: "{{ phpbb_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ phpbb_watchtower_monitor_only }}"
-          homepage.name: "phpBB"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ phpbb_homepage_group }}"
           homepage.icon: "{{ phpbb_homepage_icon }}"
           homepage.href: "{{ phpbb_homepage_href }}"
@@ -103,13 +103,13 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: phpbb_enabled is true
 
-- name: Stop phpBB
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop phpBB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ phpbb_container_name }}"
         state: absent
-    - name: Stop phpBB MariaDb Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ phpbb_db_container_name }}"
         state: absent

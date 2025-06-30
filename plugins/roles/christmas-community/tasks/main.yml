@@ -1,14 +1,14 @@
 ---
-- name: Start Christmas Community
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Christmas Community Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ christmas_community_data_directory }}"
 
-    - name: Create Christmas Cmmunity Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ christmas_community_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ christmas_community_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ christmas_community_watchtower_monitor_only }}"
-          homepage.name: "Christmas Community"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ christmas_community_homepage_group }}"
           homepage.href: "{{ christmas_community_homepage_href }}"
           homepage.icon: "{{ christmas_community_homepage_icon }}"
@@ -52,9 +52,9 @@
           wud.link.template: "https://github.com/Wingysam/Christmas-Community/releases/tag/$${major}.$${minor}.$${patch}"
   when: christmas_community_enabled is true
 
-- name: Stop Christmas Community
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Christmas Community Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ christmas_community_container_name }}"
         state: absent

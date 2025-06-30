@@ -1,119 +1,117 @@
 ---
-- name: Start ProjectSend
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Start ProjectSend
-      block:
-        - name: Create ProjectSend Directories
-          file:
-            path: "{{ item }}"
-            state: directory
-          with_items:
-            - "{{ projectsend_data_directory }}"
-            - "{{ projectsend_data_directory }}/config"
-            - "{{ projectsend_data_directory }}/data"
-            - "{{ projectsend_data_directory }}/db"
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ projectsend_data_directory }}"
+        - "{{ projectsend_data_directory }}/config"
+        - "{{ projectsend_data_directory }}/data"
+        - "{{ projectsend_data_directory }}/db"
 
 #        - name: Create ProjectSend network
 #          community.docker.docker_network:
 #            name: "{{ projectsend_network_name }}"
 
-        - name: Create ProjectSend MariaDB Docker Container
-          docker_container:
-            container_default_behavior: "compatibility"
-            name: "{{ projectsend_db_container_name }}"
-            hostname: "{{ projectsend_db_container_name }}"
-            image: linuxserver/mariadb
-            pull: true
-            network_mode: "bridge"
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ projectsend_db_container_name }}"
+        hostname: "{{ projectsend_db_container_name }}"
+        image: linuxserver/mariadb
+        pull: true
+        network_mode: "bridge"
 #            networks:
 #              - name: "{{ projectsend_network_name }}"
 #            networks_cli_compatible: "yes"
-            volumes:
-              - "{{ projectsend_data_directory }}/db:/config/databases"
-            env:
-              MYSQL_ROOT_PASSWORD: "projectsend"
-              MYSQL_DATABASE: "projectsend"
-              MYSQL_USER: "projectsend"
-              MYSQL_PASSWORD: "projectsend"
-              TZ: "{{ ansible_nas_timezone }}"
-            restart_policy: unless-stopped
-            memory: "{{ projectsend_db_memory_limit }}"
-            labels:
-              autoheal: "{{ projectsend_db_autoheal }}"
-              com.centurylinklabs.watchtower.monitor-only: "{{ projectsend_db_watchtower_monitor_only }}"
-              homepage.name: "ProjectSend MariaDB"
-              homepage.group: "{{ projectsend_db_homepage_group }}"
-              homepage.icon: "{{ projectsend_db_homepage_icon }}"
-              homepage.href: "{{ projectsend_db_homepage_href }}"
+        volumes:
+          - "{{ projectsend_data_directory }}/db:/config/databases"
+        env:
+          MYSQL_ROOT_PASSWORD: "projectsend"
+          MYSQL_DATABASE: "projectsend"
+          MYSQL_USER: "projectsend"
+          MYSQL_PASSWORD: "projectsend"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ projectsend_db_memory_limit }}"
+        labels:
+          autoheal: "{{ projectsend_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ projectsend_db_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ projectsend_db_homepage_group }}"
+          homepage.icon: "{{ projectsend_db_homepage_icon }}"
+          homepage.href: "{{ projectsend_db_homepage_href }}"
 #             homepage.description: ""
-              homepage.server: "my-docker"
-              homepage.container: "{{ projectsend_db_container_name }}"
-              homepage.showStats: "{{ projectsend_db_homepage_showStats }}"
-              traefik.enable: "false"
+          homepage.server: "my-docker"
+          homepage.container: "{{ projectsend_db_container_name }}"
+          homepage.showStats: "{{ projectsend_db_homepage_showStats }}"
+          traefik.enable: "false"
 #             wud.tag.include: '^\d+\.\d+\.\d+$$'
 #             wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-        - name: Create ProjectSend Docker Container
-          docker_container:
-            container_default_behavior: "compatibility"
-            name: "{{ projectsend_container_name }}"
-            hostname: "{{ projectsend_container_name }}"
-            image: lscr.io/linuxserver/projectsend:latest
-            network_mode: "bridge"
+    - name: Create {{ ansible_nas_app_name }} Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ projectsend_container_name }}"
+        hostname: "{{ projectsend_container_name }}"
+        image: lscr.io/linuxserver/projectsend:latest
+        network_mode: "bridge"
 #            networks:
 #              - name: "{{ projectsend_network_name }}"
 #            networks_cli_compatible: "yes"
-            pull: true
-            volumes:
-              - "{{ projectsend_data_directory }}/config:/config"
-              - "{{ projectsend_data_directory }}/data:/data"
-            env:
-              MAX_UPLOAD: "{{ projectsend_max_upload }}"
-              PUID: "{{ projectsend_user_id }}"
-              PGID: "{{ projectsend_group_id }}"
-              TZ: "{{ ansible_nas_timezone }}"
-            ports:
-              - "{{ projectsend_port_http }}:80"
-            restart_policy: unless-stopped
-            links:
-              - "{{ projectsend_db_container_name }}"
-            labels:
-              autoheal: "{{ projectsend_autoheal }}"
-              com.centurylinklabs.watchtower.monitor-only: "{{ projectsend_watchtower_monitor_only }}"
-              homepage.name: "ProjectSend"
-              homepage.group: "{{ projectsend_homepage_group }}"
-              homepage.href: "{{ projectsend_homepage_href }}"
-              homepage.icon: "{{ projectsend_homepage_icon }}"
+        pull: true
+        volumes:
+          - "{{ projectsend_data_directory }}/config:/config"
+          - "{{ projectsend_data_directory }}/data:/data"
+        env:
+          MAX_UPLOAD: "{{ projectsend_max_upload }}"
+          PUID: "{{ projectsend_user_id }}"
+          PGID: "{{ projectsend_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ projectsend_port_http }}:80"
+        restart_policy: unless-stopped
+        links:
+          - "{{ projectsend_db_container_name }}"
+        labels:
+          autoheal: "{{ projectsend_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ projectsend_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ projectsend_homepage_group }}"
+          homepage.href: "{{ projectsend_homepage_href }}"
+          homepage.icon: "{{ projectsend_homepage_icon }}"
 #             homepage.description: "ProjectSend is a free, open source software that lets you share files with your clients, focused on ease of use and privacy."
-              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
-              homepage.server: "my-docker"
-              homepage.container: "{{ projectsend_container_name }}"
-              homepage.showStats: "{{ projectsend_homepage_showStats }}"
-              traefik.enable: "{{ projectsend_available_externally | string }}"
-              traefik.http.routers.projectsend.rule: "Host(`{{ projectsend_hostname }}.{{ ansible_nas_domain }}`)"
-              traefik.http.routers.projectsend.tls.certresolver: "letsencrypt"
-              traefik.http.routers.projectsend.tls.domains[0].main: "{{ ansible_nas_domain }}"
-              traefik.http.routers.projectsend.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-              traefik.http.routers.frontend.middlewares: "{{ projectsend_hostname }}"
-              traefik.http.routers.projectsend.middlewares: "{{ projectsend_hostname }}@docker"
-              traefik.http.middlewares.projectsend.IPAllowList.sourcerange: "{{ projectsend_traefik_whitelist }}"
-              traefik.http.services.projectsend.loadbalancer.server.port: "80"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ projectsend_container_name }}"
+          homepage.showStats: "{{ projectsend_homepage_showStats }}"
+          traefik.enable: "{{ projectsend_available_externally | string }}"
+          traefik.http.routers.projectsend.rule: "Host(`{{ projectsend_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.projectsend.tls.certresolver: "letsencrypt"
+          traefik.http.routers.projectsend.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.projectsend.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ projectsend_hostname }}"
+          traefik.http.routers.projectsend.middlewares: "{{ projectsend_hostname }}@docker"
+          traefik.http.middlewares.projectsend.IPAllowList.sourcerange: "{{ projectsend_traefik_whitelist }}"
+          traefik.http.services.projectsend.loadbalancer.server.port: "80"
 #             wud.tag.include: '^\d+\.\d+\.\d+$$'
 #             wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
-            memory: "{{ projectsend_memory_limit }}"
+        memory: "{{ projectsend_memory_limit }}"
   when: projectsend_enabled is true
 
-- name: Stop ProjectSend
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop ProjectSend Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ projectsend_container_name }}"
         state: absent
-    - name: Stop ProjectSend MariaDB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ projectsend_db_container_name }}"
         state: absent
-    - name: Remove ProjectSend network
+    - name: Remove {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ projectsend_network_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Porn Vault
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Porn Vault Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ pornvault_data_directory }}"
         - "{{ pornvault_data_directory }}/config"
 
-    - name: Porn Vault Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ pornvault_container_name }}"
@@ -27,7 +27,7 @@
         labels:
           autoheal: "{{ pornvault_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pornvault_watchtower_monitor_only }}"
-          homepage.name: "Porn Vault"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pornvault_homepage_group }}"
           homepage.icon: "{{ pornvault_homepage_icon }}"
           homepage.href: "{{ pornvault_homepage_href }}"
@@ -50,9 +50,9 @@
         memory: 2g
   when: pornvault_enabled is true
 
-- name: Stop Porn Vault
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Porn Vault
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ pornvault_container_name }}"
         state: absent

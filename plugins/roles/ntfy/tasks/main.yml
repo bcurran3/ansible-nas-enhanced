@@ -1,7 +1,7 @@
 ---
-- name: Start ntfy
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create ntfy Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ ntfy_data_directory }}"
         - "{{ ntfy_data_directory }}/cache"
 
-    - name: Create ntfy Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ntfy_container_name }}"
@@ -35,7 +35,7 @@
         labels:
           autoheal: "{{ ntfy_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ntfy_watchtower_monitor_only }}"
-          homepage.name: "ntfy"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ ntfy_homepage_group }}"
           homepage.icon: "{{ ntfy_homepage_icon }}"
           homepage.href: "{{ ntfy_homepage_href }}"
@@ -57,9 +57,9 @@
           wud.link.template: "https://github.com/binwiederhier/ntfy/releases/tag/$${major}.$${minor}.$${patch}"
   when: ntfy_enabled is true
 
-- name: Stop ntfy
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop ntfy Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ntfy_container_name }}"
         state: absent

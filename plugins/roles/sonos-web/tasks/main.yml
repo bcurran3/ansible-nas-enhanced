@@ -1,7 +1,7 @@
 ---
-- name: Start Sonos-Web
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Sonos-Web Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ sonos_web_container_name }}"
@@ -17,7 +17,7 @@
         labels:
           autoheal: "{{ sonos_web_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ sonos_web_watchtower_monitor_only }}"
-          homepage.name: "Sonos-Web"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ sonos_web_homepage_group }}"
           homepage.icon: "{{ sonos_web_homepage_icon }}"
           homepage.href: "{{ sonos_web_homepage_href }}"
@@ -40,9 +40,9 @@
         memory: "{{ sonos_web_memory }}"
   when: sonos_web_enabled is true
 
-- name: Stop Sonos-Web
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Sonos-Web
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ sonos_web_container_name }}"
         state: absent

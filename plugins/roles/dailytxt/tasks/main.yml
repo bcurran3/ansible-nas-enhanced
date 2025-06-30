@@ -1,7 +1,7 @@
 ---
 - name: Start DailyTxT
   block:
-    - name: Create DailyTxT Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ dailytxt_data_directory }}"
         - "{{ dailytxt_data_directory }}/data"
 
-    - name: Create DailyTxT Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dailytxt_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ dailytxt_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dailytxt_watchtower_monitor_only }}"
-          homepage.name: "DailyTxT"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dailytxt_homepage_group }}"
           homepage.href: "{{ dailytxt_homepage_href }}"
           homepage.icon: "{{ dailytxt_homepage_icon }}"
@@ -53,9 +53,9 @@
           wud.link.template: "https://hub.docker.com/r/phitux/dailytxt/tags/$${major}.$${minor}.$${patch}"
   when: dailytxt_enabled is true
 
-- name: Stop DailyTxT
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop DailyTxT
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dailytxt_container_name }}"
         state: absent

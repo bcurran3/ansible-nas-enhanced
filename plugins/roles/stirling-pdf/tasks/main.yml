@@ -1,7 +1,7 @@
 ---
-- name: Start Stirling PDF
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Stirling PDF Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ stirling_pdf_data_directory }}/extraConfigs"
         - "{{ stirling_pdf_data_directory }}/trainingData"
 
-    - name: Create Stirling PDF Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ stirling_pdf_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ stirling_pdf_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stirling_pdf_watchtower_monitor_only }}"
-          homepage.name: "Stirling PDF"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ stirling_pdf_homepage_group }}"
           homepage.icon: "{{ stirling_pdf_homepage_icon }}"
           homepage.href: "{{ stirling_pdf_homepage_href }}"
@@ -55,9 +55,9 @@
         memory: "{{ stirling_pdf_memory }}"
   when: stirling_pdf_enabled is true
 
-- name: Stop Stirling PDF Docker
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Stirling PDF Docker
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ stirling_pdf_container_name }}"
         state: absent

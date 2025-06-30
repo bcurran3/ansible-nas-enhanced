@@ -1,7 +1,7 @@
 ---
-- name: Start Chatpad AI
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Chatpad AI Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ chatpadai_container_name }}"
@@ -17,7 +17,7 @@
         labels:
           autoheal: "{{ chatpadai_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ chatpadai_watchtower_monitor_only }}"
-          homepage.name: "Chatpad AI"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ chatpadai_homepage_group }}"
           homepage.icon: "{{ chatpadai_homepage_icon }}"
           homepage.href: "{{ chatpadai_homepage_href }}"
@@ -40,9 +40,9 @@
 #         ^ no releases listed
   when: chatpadai_enabled is true
 
-- name: Stop Chatpad AI
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Chatpad AI
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ chatpadai_container_name }}"
         state: absent

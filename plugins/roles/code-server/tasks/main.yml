@@ -1,7 +1,7 @@
 ---
-- name: Start code-server
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create code-server Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -17,7 +17,7 @@
         - "{{ codeserver_data_directory }}/.local/share/code-server"
         - "{{ codeserver_data_directory }}/.local/share/code-server/extensions"
 
-    - name: Create code-server Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: code-server
@@ -44,7 +44,7 @@
           autoheal: "{{ codeserver_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ codeserver_watchtower_monitor_only }}"
           homepage.group: "{{ codeserver_homepage_group }}"
-          homepage.name: "code-server"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ codeserver_homepgae_icon }}"
           homepage.href: "{{ codeserver_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ codeserver_port_http }}"
@@ -65,9 +65,9 @@
           wud.link.template: "https://hub.docker.com/r/codercom/code-server/tags/$${major}.$${minor}.$${patch}"
   when: codeserver_enabled is true
 
-- name: Stop code-server
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop code-server
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ codeserver_container_name }}"
         state: absent

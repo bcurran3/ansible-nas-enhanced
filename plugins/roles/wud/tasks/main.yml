@@ -1,14 +1,14 @@
 ---
-- name: Start What's Up Docker
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create What's Up Docker Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ wud_data_directory }}"
 
-    - name: Create What's Up Docker Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ wud_container_name }}"
@@ -35,7 +35,7 @@
         labels:
           autoheal: "{{ wud_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ wud_watchtower_monitor_only }}"
-          homepage.name: "What's Up Docker?"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ wud_homepage_group }}"
           homepage.icon: "{{ wud_homepage_icon }}"
           homepage.href: "{{ wud_homepage_href }}"
@@ -60,9 +60,9 @@
         memory: "{{ wud_memory }}"
   when: wud_enabled is true
 
-- name: Stop What's Up Docker
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop What's Up Docker
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ wud_container_name }}"
         state: absent

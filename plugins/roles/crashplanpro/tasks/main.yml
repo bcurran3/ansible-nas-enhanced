@@ -1,7 +1,7 @@
 ---
-- name: Start CrashPlan Pro
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create CrashPlan Pro Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ crashplanpro_data_directory }}"
         - "{{ crashplanpro_data_directory }}/config"
 
-    - name: Create CrashPlan Pro Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ crashplanpro_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ crashplanpro_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ crashplanpro_watchtower_monitor_only }}"
-          homepage.name: "CrashPlan Pro"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ crashplanpro_homepage_group }}"
           homepage.icon: "{{ crashplanpro_homepage_icon }}"
           homepage.href: "{{ crashplanpro_homepage_href }}"
@@ -52,9 +52,9 @@
           wud.link.template: "https://github.com/jlesage/docker-crashplan-pro/releases/tag/$${major}.$${minor}.$${patch}"
   when: crashplanpro_enabled is true
 
-- name: Stop CrashPlan Pro
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop CrashPlan Pro
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ crashplanpro_container_name }}"
         state: absent

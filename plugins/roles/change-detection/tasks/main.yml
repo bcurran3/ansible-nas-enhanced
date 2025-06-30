@@ -1,7 +1,7 @@
 ---
-- name: Start Change Detection
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Change Detection Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ change_detection_data_directory }}"
         - "{{ change_detection_data_directory }}/datastore"
 
-    - name: Create Sock Puppet(eer) Browser Docker Container
+    - name: Create {{ ansible_nas_app_name }} Sock Puppet(eer) Browser Docker Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ change_detection_sockpuppet_container_name }}"
@@ -42,7 +42,7 @@
           change_detection.link.template: "https://github.com/dgtlmoon/sockpuppetbrowser/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ change_detection_sockpuppet_memory }}"
 
-    - name: Create Change Detection Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ change_detection_container_name }}"
@@ -66,7 +66,7 @@
           - "{{ change_detection_sockpuppet_container_name }}"
         labels:
           com.centurylinklabs.watchtower.monitor-only: "{{ change_detection_watchtower_monitor_only }}"
-          homepage.name: "Change Detection"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ change_detection_homepage_group }}"
           homepage.icon: "{{ change_detection_homepage_icon }}"
           homepage.href: "{{ change_detection_homepage_href }}"
@@ -92,13 +92,13 @@
         memory: "{{ change_detection_memory }}"
   when: change_detection_enabled is true
 
-- name: Stop Change Detection
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Change Detection
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ change_detection_container_name }}"
         state: absent
-    - name: Stop Sock Puppet(eer) Browser
+    - name: Stop Sock Puppet(eer) Browser Container
       community.docker.docker_container:
         name: "{{ change_detection_sockpuppet_container_name }}"
         state: absent

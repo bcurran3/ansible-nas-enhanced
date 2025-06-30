@@ -1,7 +1,7 @@
 ---
-- name: Start MakeMKV
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create MakeMKV Config Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ makemkv_data_directory }}"
         - "{{ makemkv_output_directory }}"
 
-    - name: MakeMKV Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ makemkv_container_name }}"
@@ -34,7 +34,7 @@
         labels:
           autoheal: "{{ makemkv_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ makemkv_watchtower_monitor_only }}"
-          homepage.name: "MakeMKV"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ makemkv_homepage_group }}"
           homepage.icon: "{{ makemkv_homepage_icon }}"
           homepage.href: "{{ makemkv_homepage_href }}"
@@ -56,9 +56,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: makemkv_enabled is true
 
-- name: Stop MakeMKV
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop MakeMKV
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ makemkv_container_name }}"
         state: absent

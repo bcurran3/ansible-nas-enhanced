@@ -1,7 +1,7 @@
 ---
-- name: Start Homarr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Homarr Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ homarr_data_directory }}"
         - "{{ homarr_data_directory }}/appdata"
 
-    - name: Create Homarr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ homarr_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ homarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ homarr_watchtower_monitor_only }}"
-          homepage.name: "Homarr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ homarr_homepage_group }}"
           homepage.icon: "{{ homarr_homepage_icon }}"
           homepage.href: "{{ homarr_homepage_href }}"
@@ -51,9 +51,9 @@
         memory: 512m
   when: homarr_enabled is true
 
-- name: Stop Homarr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Homarr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homarr_container_name }}"
         state: absent

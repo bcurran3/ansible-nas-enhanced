@@ -8,13 +8,14 @@
       with_items:
         - "{{ arcane_data_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ arcane_container_name }}"
         hostname: "{{ arcane_container_name }}"
-        image: ghcr.io/ofkm/arcane:latest
+        image: "{{ arcane_image_name }}:{{ arcane_image_version }}"
         pull: true
+        cpu_shares: "{{ arcane_cpu_shares }}"
         volumes:
           - "{{ arcane_data_directory }}:/app/data"
           - "{{ docker_home }}:/opt/my-docker-stacks:ro"
@@ -56,7 +57,7 @@
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ arcane_container_name }}"
         state: absent

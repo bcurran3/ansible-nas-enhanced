@@ -1,7 +1,7 @@
 ---
-- name: Start qBittorrent
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create qBittorrent Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ qbittorrent_data_directory }}/custom-cont-init.d"
         - "{{ qbittorrent_download_directory }}"
 
-    - name: Create qBittorrent Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ qbittorrent_container_name }}"
@@ -39,7 +39,7 @@
         labels:
           autoheal: "{{ qbittorrent_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ qbittorrent_watchtower_monitor_only }}"
-          homepage.name: "qBittorrent"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ qbittorrent_homepage_group }}"
           homepage.href: "{{ qbittorrent_homepage_href }}"
           homepage.icon: "{{ qbittorrent_homepage_icon }}"
@@ -65,9 +65,9 @@
           wud.link.template: "https://github.com/linuxserver/docker-qbittorrent/releases/tags/$${major}.$${minor}.$${patch}"
   when: qbittorrent_enabled is true
 
-- name: Stop qBittorrent
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop qBittorrent
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ qbittorrent_container_name }}"
         state: absent

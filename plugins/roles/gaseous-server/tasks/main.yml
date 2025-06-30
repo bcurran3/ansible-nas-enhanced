@@ -1,7 +1,7 @@
 ---
-- name: Start Gaseous Server
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Gaseous Server Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,11 +10,11 @@
         - "{{ gaseous_server_data_directory }}/db"
         - "{{ gaseous_server_data_directory }}/gaseous-server"
 
-    - name: Create Gaseous Server network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ gaseous_server_network_name }}"
 
-    - name: Create Gaseous Server MariaDB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gaseous_server_db_container_name }}"
@@ -44,7 +44,7 @@
         labels:
           autoheal: "{{ gaseous_server_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gaseous_server_db_watchtower_monitor_only }}"
-          homepage.name: "Gaseous Server MariaDB"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
 #         homepage.description: "The open source relational database"
           homepage.group: "{{ gaseous_server_db_homepage_group }}"
           homepage.icon: "{{ gaseous_server_db_homepage_icon }}"
@@ -56,7 +56,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/MariaDB/mariadb-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create Gaseous Server Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gaseous_server_container_name }}"
@@ -106,13 +106,13 @@
           wud.link.template: "https://github.com/gaseous-project/gaseous-server/releases/tag/$${major}.$${minor}.$${patch}"
   when: gaseous_server_enabled is true
 
-- name: Stop Gaseous Server
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Gaseous Server Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ gaseous_server_container_name }}"
         state: absent
-    - name: Stop Gaseous Server MariaDB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ gaseous_server_db_container_name }}"
         state: absent

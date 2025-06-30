@@ -1,7 +1,7 @@
 ---
-- name: Start IDrive
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create IDrive Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ idrive_data_directory }}"
         - "{{ idrive_data_directory }}/config"
 
-    - name: Create IDrive Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ idrive_container_name }}"
@@ -40,9 +40,9 @@
           wud.link.template: "https://github.com/RenoFischa/idrive/releases/tag/$${major}.$${minor}.$${patch}"
   when: idrive_enabled is true
 
-- name: Stop IDrive
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop IDrive
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ idrive_container_name }}"
         state: absent

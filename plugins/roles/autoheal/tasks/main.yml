@@ -1,8 +1,7 @@
 ---
-# https://github.com/willfarrell/docker-autoheal
 - name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ autoheal_container_name }}"
@@ -39,7 +38,7 @@
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ autoheal_container_name }}"
         state: absent

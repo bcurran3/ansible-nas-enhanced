@@ -1,7 +1,7 @@
 ---
-- name: Start RustDesk
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create RustDesk Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ rustdesk_data_directory }}"
         - "{{ rustdesk_data_directory }}/data"
 
-    - name: Create RustDesk Relay Server Docker Container
+    - name: Create {{ ansible_nas_app_name }} Relay Server Container
       community.docker.docker_container:
         name: "{{ rustdesk_hbbr_container_name }}"
         hostname: "{{ rustdesk_hbbr_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
-          homepage.name: "RustDesk Relay Server"
+          homepage.name: "{{ ansible_nas_app_name }} Relay Server"
           homepage.group: "{{ rustdesk_hbbr_homepage_group }}"
           homepage.icon: "{{ rustdesk_hbbr_homepage_icon }}"
           homepage.href: "{{ rustdesk_hbbr_homepage_href }}"
@@ -43,7 +43,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
 
-    - name: Create RustDesk ID Server Docker Container
+    - name: Create {{ ansible_nas_app_name }} ID Server Container
       community.docker.docker_container:
         name: "{{ rustdesk_hbbs_container_name }}"
         hostname: "{{ rustdesk_hbbs_container_name }}"
@@ -69,7 +69,7 @@
         labels:
           autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
-          homepage.name: "RustDesk ID Server"
+          homepage.name: "{{ ansible_nas_app_name }} ID Server"
           homepage.group: "{{ rustdesk_hbbs_homepage_group }}"
           homepage.icon: "{{ rustdesk_hbbs_homepage_icon }}"
           homepage.href: "{{ rustdesk_hbbs_homepage_href }}"
@@ -82,7 +82,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
 
-    - name: Create RustDesk Web Client Docker Container
+    - name: Create {{ ansible_nas_app_name }} Web Client Container
       community.docker.docker_container:
         name: "{{ rustdesk_web_container_name }}"
         hostname: "{{ rustdesk_web_container_name }}"
@@ -102,7 +102,7 @@
         labels:
           autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
-          homepage.name: "RustDesk Web Client"
+          homepage.name: "{{ ansible_nas_app_name }} Web Client"
           homepage.group: "{{ rustdesk_web_homepage_group }}"
           homepage.icon: "{{ rustdesk_web_homepage_icon }}"
           homepage.href: "{{ rustdesk_web_homepage_href }}"
@@ -124,19 +124,19 @@
           wud.link.template: "https://hub.docker.com/r/keyurbhole/flutter_web_desk/tags/$${major}.$${minor}.$${patch}"
   when: rustdesk_enabled is true
 
-- name: Stop RustDesk
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop RustDesk Web Client Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Web Client Container
       community.docker.docker_container:
         name: "{{ rustdesk_web_container_name }}"
         state: absent
 
-    - name: Stop RustDesk ID Server Docker Container
+    - name: Stop {{ ansible_nas_app_name }} ID Server Container
       community.docker.docker_container:
         name: "{{ rustdesk_hbbr_container_name }}"
         state: absent
 
-    - name: Stop RustDesk Relay Server Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Relay Server Container
       community.docker.docker_container:
         name: "{{ rustdesk_hbbs_container_name }}"
         state: absent

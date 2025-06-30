@@ -1,8 +1,8 @@
 # https://hub.docker.com/r/linuxserver/resilio-sync
 ---
-- name: Start Resilio Sync
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Resilio Sync Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ resilio_sync_data_directory }}/downloads"
         - "{{ resilio_sync_data_directory }}/sync"
 
-    - name: Create Resilio Sync Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ resilio_sync_container_name }}"
@@ -35,7 +35,7 @@
         labels:
           autoheal: "{{ resilio_sync_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ resilio_sync_watchtower_monitor_only }}"
-          homepage.name: "Resilio Sync"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ resilio_sync_homepage_group }}"
           homepage.icon: "{{ resilio_sync_homepage_icon }}"
           homepage.href: "{{ resilio_sync_homepage_href }}"
@@ -58,9 +58,9 @@
         memory: "{{ resilio_sync_memory }}"
   when: resilio_sync_enabled is true
 
-- name: Stop Resilio Sync
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Resilio Sync
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ resilio_sync_container_name }}"
         state: absent

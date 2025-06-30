@@ -1,7 +1,7 @@
 # LOTS more work needed - see docker compose file
-- name: Start Invoice Ninja
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Invoice Ninja Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -16,7 +16,7 @@
         - "{{ invoiceninja_data_directory }}/appdata/nginx"
         - "{{ invoiceninja_data_directory }}/appdata/mariadb"
 
-    - name: Create Invoice Ninja network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ invoiceninja_network_name }}"
 
@@ -26,7 +26,7 @@
         dest: "{{ invoiceninja_data_directory }}/appdata/nginx/in-vhost.conf"
       register: template_config
 
-    - name: Invoice Ninja Docker nginx Container
+    - name: Create {{ ansible_nas_app_name }} Web UI Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_container_name }}"
@@ -50,7 +50,7 @@
         labels:
           autoheal: "{{ invoiceninja_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
-          homepage.name: "Invoice Ninja"
+          homepage.name: "{{ ansible_nas_app_name }} (frontend)"
           homepage.group: "{{ invoiceninja_homepage_group }}"
           homepage.icon: "invoiceninja.png"
           homepage.href: "{{ invoiceninja_homepage_href }}"
@@ -71,7 +71,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/nginx/nginx/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Invoice Ninja Docker MariaDB Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_db_container_name }}"
@@ -109,7 +109,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Invoice Ninja Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_backend_container_name }}"
@@ -158,7 +158,7 @@
         labels:
           autoheal: "{{ invoiceninja_backend_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
-          homepage.name: "Invoice Ninja backend"
+          homepage.name: "{{ ansible_nas_app_name }} (backend)"
           homepage.group: "{{ invoiceninja_backend_homepage_group }}"
           homepage.icon: "{{ invoiceninja_backend_homepage_icon }}"
           homepage.href: "{{ invoiceninja_homepage_href }}"
@@ -171,17 +171,17 @@
           wud.link.template: "https://github.com/invoiceninja/invoiceninja/releases/tag/$${major}.$${minor}.$${patch}"
   when: invoiceninja_enabled is true
 
-- name: Stop Invoice Ninja
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Invoice Ninja Web UI Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Web UI Container
       community.docker.docker_container:
         name: "{{ invoiceninja_container_name }}"
         state: absent
-    - name: Stop Invoice Ninja App Docker Container
+    - name: Stop {{ ansible_nas_app_name }} App Container
       community.docker.docker_container:
         name: "{{ invoiceninja_backend_container_name }}"
         state: absent
-    - name: Stop Invoice Ninja MariaDB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ invoiceninja_db_container_name }}"
         state: absent

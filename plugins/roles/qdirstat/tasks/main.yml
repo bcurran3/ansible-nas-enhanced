@@ -1,7 +1,7 @@
 ---
-- name: Start QDirStat
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create QDirStat Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ qdirstat_data_directory }}"
         - "{{ qdirstat_data_directory }}/config"
 
-    - name: Create QDirStat Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ qdirstat_container_name }}"
@@ -27,7 +27,7 @@
         labels:
           autoheal: "{{ qdirstat_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ qdirstat_watchtower_monitor_only }}"
-          homepage.name: "QDirStat"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ qdirstat_homepage_group }}"
           homepage.href: "{{ qdirstat_homepage_href }}"
           homepage.icon: "{{ qdirstat_homepage_icon }}"
@@ -50,9 +50,9 @@
         memory: "{{ qdirstat_memory_limit }}"
   when: qdirstat_enabled is true
 
-- name: Stop QDirStat
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop QDirStat
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ qdirstat_container_name }}"
         state: absent

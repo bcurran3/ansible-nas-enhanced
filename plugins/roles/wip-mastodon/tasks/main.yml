@@ -2,7 +2,7 @@
 ### WORK IN PROGRESS
 - name: Start Mastodon
   block:
-    - name: Create Mastodon Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,11 +11,11 @@
         - "{{ mastodon_data_directory }}/data"
         - "{{ mastodon_data_directory }}/db"
 
-    - name: Create Mastodon network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ mastodon_network_name }}"
 
-    - name: Create Mastodon redis Docker Container
+    - name: Create {{ ansible_nas_app_name }} Redis Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mastodon_redis_container_name }}"
@@ -42,7 +42,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create Mastodon Postgres Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mastodon_db_container_name }}"
@@ -73,7 +73,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create Mastodon Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mastodon_container_name }}"
@@ -142,7 +142,7 @@
         labels:
           autoheal: "{{ mastodon_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_watchtower_monitor_only }}"
-          homepage.name: "Mastodon"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mastodon_homepage_group }}"
           homepage.icon: "{{ mastodon_homepage_icon }}"
           homepage.href: "{{ mastodon_homepage_href }}"
@@ -167,24 +167,24 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: mastodon_enabled is true
 
-- name: Stop Mastodon
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Mastodon
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mastodon_container_name }}"
         state: absent
 
-    - name: Stop Mastodon redris
+    - name: Stop {{ ansible_nas_app_name }} Redris Container
       community.docker.docker_container:
         name: "{{ mastodon_redris_container_name }}"
         state: absent
 
-    - name: Stop Mastodon Postgres
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ mastodon_db_container_name }}"
         state: absent
 
-    - name: Remove Mastodon network
+    - name: Remove {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ mastodon_network_name }}"
         state: absent

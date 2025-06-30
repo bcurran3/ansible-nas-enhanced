@@ -1,7 +1,7 @@
 ---
-- name: Start HomeBox
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create HomeBox Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ homebox_data_directory }}"
         - "{{ homebox_data_directory }}/data"
 
-    - name: Create HomeBox Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ homebox_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ homebox_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ homebox_watchtower_monitor_only }}"
-          homepage.name: "HomeBox"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ homebox_homepage_group }}"
           homepage.icon: "{{ homebox_homepage_icon }}"
           homepage.href: "{{ homebox_homepage_href }}"
@@ -54,9 +54,9 @@
         memory: "{{ homebox_memory }}"
   when: homebox_enabled is true
 
-- name: Stop HomeBox
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop HomeBox
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homebox_container_name }}"
         state: absent

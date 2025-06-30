@@ -1,14 +1,14 @@
 ---
-- name: Start Monitorr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Monitorr Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ monitorr_data_directory }}/app"
 
-    - name: Monitorr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ monitorr_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ monitorr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ monitorr_watchtower_monitor_only }}"
-          homepage.name: "Monitorr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ monitorr_homepage_group }}"
           homepage.icon: "{{ monitorr_homepage_icon }}"
           homepage.href: "{{ monitorr_homepage_href }}"
@@ -53,9 +53,9 @@
         memory: 256m
   when: monitorr_enabled is true
 
-- name: Stop Monitorr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Monitorr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ monitorr_container_name }}"
         state: absent

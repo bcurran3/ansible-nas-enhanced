@@ -1,7 +1,7 @@
 ---
-- name: Start GoToSocial
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create GoToSocial Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ gotosocial_data_directory }}"
         - "{{ gotosocial_data_directory }}/data"
 
-    - name: Create GoToSocial Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gotosocial_container_name }}"
@@ -60,9 +60,9 @@
           wud.link.template: "https://github.com/superseriousbusiness/gotosocial/releases/tag/$${major}.$${minor}.$${patch}"
   when: gotosocial_enabled is true
 
-- name: Stop GoToSocial
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop gotosocial Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ gotosocial_container_name }}"
         state: absent

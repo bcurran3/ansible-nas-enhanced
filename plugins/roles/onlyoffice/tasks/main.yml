@@ -1,7 +1,7 @@
 ---
-- name: Start ONLYOFFICE
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create ONLYOFFICE Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ onlyoffice_data_directory }}/data"
         - "{{ onlyoffice_data_directory }}/logs"
 
-    - name: Create ONLYOFFICE Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ onlyoffice_container_name }}"
@@ -38,7 +38,7 @@
         labels:
           autoheal: "{{ onlyoffice_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ onlyoffice_watchtower_monitor_only }}"
-          homepage.name: "OnlyOffice"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ onlyoffice_homepage_group }}"
           homepage.icon: "{{ onlyoffice_homepage_icon }}"
           homepage.href: "{{ onlyoffice_homepage_href }}"
@@ -64,9 +64,9 @@
           wud.link.template: "https://github.com/ONLYOFFICE/DocumentServer/releases/tag/$${major}.$${minor}.$${patch}"
   when: onlyoffice_enabled is true
 
-- name: Stop ONLYOFFICE
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop ONLYOFFICE
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ onlyoffice_container_name }}"
         state: absent

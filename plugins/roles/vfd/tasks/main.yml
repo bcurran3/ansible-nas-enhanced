@@ -1,7 +1,7 @@
 ---
-- name: Start VFD
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create VFD Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ vfd_data_directory }}"
         - "{{ vfd_data_directory }}/data"
 
-    - name: Create VFD Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ vfd_container_name }}"
@@ -37,7 +37,7 @@
         labels:
           autoheal: "{{ vfd_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ vfd_watchtower_monitor_only }}"
-          homepage.name: "vfd"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ vfd_homepage_group }}"
           homepage.href: "{{ vfd_homepage_href }}"
           homepage.icon: "{{ vfd_homepage_icon }}"
@@ -59,9 +59,9 @@
           wud.link.template: "https://github.com/kiinami/vfd/releases/tag/$${major}.$${minor}.$${patch}"
   when: vfd_enabled is true
 
-- name: Stop VFD
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop VFD
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ vfd_container_name }}"
         state: absent

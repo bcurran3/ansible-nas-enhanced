@@ -1,14 +1,14 @@
 ---
-- name: Start Flood
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Flood Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ flood_data_directory }}/config"
 
-    - name: Create Flood Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ flood_container_name }}"
@@ -25,7 +25,7 @@
         labels:
           autoheal: "{{ flood_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ flood_watchtower_monitor_only }}"
-          homepage.name: "Flood"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ flood_homepage_group }}"
           homepage.icon: "{{ flood_homepage_icon }}"
           homepage.href: "{{ flood_homepage_href }}"
@@ -52,9 +52,9 @@
         memory: 1g
   when: flood_enabled is true
 
-- name: Stop Flood
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Flood
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ flood_container_name }}"
         state: absent

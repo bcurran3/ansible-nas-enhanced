@@ -13,7 +13,7 @@
       with_items:
         - "{{ appname_data_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         name: "{{ appname_container_name }}"
         hostname: "{{ appname_container_name }}"
@@ -57,7 +57,7 @@
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ appname_container_name }}"
         state: absent

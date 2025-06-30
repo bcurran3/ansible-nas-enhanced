@@ -1,7 +1,7 @@
 ---
-- name: Start Joplin
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Joplin Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ joplin_data_directory }}"
         - "{{ joplin_data_directory }}/db"
 
-    - name: Create Joplin DB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Doer Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ joplin_db_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ joplin_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ joplin_db_watchtower_monitor_only }}"
-          homepage.name: "Joplin PostGreSQL"
+          homepage.name: "{{ ansible_nas_app_name }} PostGreSQL"
           homepage.group: "{{ joplin_db_homepage_group }}"
           homepage.icon: "{{ joplin_db_homepage_icon }}"
           homepage.href: "{{ joplin_homepage_href }}"
@@ -39,7 +39,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
 
-    - name: Create Joplin Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ joplin_container_name }}"
@@ -64,7 +64,7 @@
         labels:
           autoheal: "{{ joplin_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ joplin_watchtower_monitor_only }}"
-          homepage.name: "joplin"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ joplin_homepage_group }}"
           homepage.icon: "{{ joplin_homepage_icon }}"
           homepage.href: "{{ joplin_homepage_href }}"
@@ -87,13 +87,13 @@
         memory: "{{ joplin_memory }}"
   when: joplin_enabled is true
 
-- name: Stop Joplin
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Joplin Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ joplin_container_name }}"
         state: absent
-    - name: Stop Joplin DB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ joplin_db_container_name }}"
         state: absent

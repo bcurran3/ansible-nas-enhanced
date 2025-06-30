@@ -1,7 +1,7 @@
 ---
-- name: Start Pingvin Share
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Pingvin Share Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ pingvinshare_data_directory }}/data"
         - "{{ pingvinshare_data_directory }}/data/images"
 
-    - name: Create Pingvin Share Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ pingvinshare_container_name }}"
@@ -29,7 +29,7 @@
         labels:
           autoheal: "{{ pingvinshare_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pingvinshare_watchtower_monitor_only }}"
-          homepage.name: "Pingvin Share"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pingvinshare_homepage_group }}"
           homepage.icon: "{{ pingvinshare_homepage_icon }}"
           homepage.href: "{{ pingvinshare_homepage_href }}"
@@ -51,9 +51,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: pingvinshare_enabled is true
 
-- name: Stop Pingvin Share
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Pingvin Share
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ pingvinshare_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start CommaFeed
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create CommaFeed Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ commafeed_data_directory }}/data"
         - "{{ commafeed_data_directory }}/db"
 
-    - name: Create CommaFeed PostgreSQL Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ commafeed_db_container_name }}"
@@ -41,7 +41,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/postgres/postgres/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create CommaFeed Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ commafeed_container_name }}"
@@ -64,7 +64,7 @@
         memory: "{{ commafeed_memory }}"
         labels:
           com.centurylinklabs.watchtower.monitor-only: "{{ commafeed_watchtower_monitor_only }}"
-          homepage.name: "CommaFeed"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ commafeed_homepage_group }}"
           homepage.icon: "{{ commafeed_homepage_icon }}"
           homepage.href: "{{ commafeed_homepage_href }}"
@@ -86,13 +86,13 @@
           wud.link.template: "https://github.com/Athou/commafeed/releases/tag/$${major}.$${minor}.$${patch}"
   when: commafeed_enabled is true
 
-- name: Stop CommaFeed
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop CommaFeed Docker Container
+    - name: Stop {{ ansible_nas_app_name }}  Container
       community.docker.docker_container:
         name: "{{ commafeed_container_name }}"
         state: absent
-    - name: Stop CommaFeed PostgreSQL Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ commafeed_db_container_name }}"
         state: absent

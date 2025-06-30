@@ -1,7 +1,7 @@
 ---
-- name: Start Fasten
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Fasten Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ fasten_data_directory }}/cache"
         - "{{ fasten_data_directory }}/db"
 
-    - name: Create Fasten Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ fasten_container_name }}"
@@ -29,7 +29,7 @@
         labels:
           autoheal: "{{ fasten_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ fasten_watchtower_monitor_only }}"
-          homepage.name: "Fasten"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ fasten_homepage_group }}"
           homepage.icon: "{{ fasten_homepage_icon }}"
           homepage.href: "{{ fasten_homepage_href }}"
@@ -51,9 +51,9 @@
           wud.link.template: "https://github.com/fastenhealth/fasten-onprem/releases/tag/$${major}.$${minor}.$${patch}"
   when: fasten_enabled is true
 
-- name: Stop Fasten
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Fasten
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ fasten_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Vaultwarden
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Vaultwarden Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ vaultwarden_data_directory }}"
         - "{{ vaultwarden_data_directory }}/backup"
 
-    - name: Create Vaultwarden Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ vaultwarden_container_name }}"
@@ -40,7 +40,7 @@
         labels:
           autoheal: "{{ vaultwarden_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_watchtower_monitor_only }}"
-          homepage.name: "Vaultwarden"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ vaultwarden_homepage_group }}"
           homepage.icon: "{{ vaultwarden_homepage_icon }}"
           homepage.href: "{{ vaultwarden_homepage_href }}"
@@ -58,7 +58,7 @@
           traefik.http.routers.vaultwarden.middlewares: "{{ vaultwarden_hostname }}@docker"
           traefik.http.middlewares.vaultwarden.IPAllowList.sourcerange: "{{ vaultwarden_traefik_whitelist }}"
           traefik.http.services.vaultwarden.loadbalancer.server.port: "80"
-# Websockets?
+# Add Websockets support?
 #         traefik.http.routers.vaultwarden-ws.rule: "Host(`{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}`) && Path(`/notifications/hub`)"
 #         traefik.http.routers.vaultwarden-ws.tls.certresolver: "letsencrypt"
 #         traefik.http.routers.vaultwarden-ws.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -74,7 +74,7 @@
         memory: "{{ vaultwarden_memory }}"
       when: vaultwarden_enabled is true
 
-    - name: Create Vaultwarden Backup Container
+    - name: Create {{ ansible_nas_app_name }} Backup Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ vaultwarden_backup_container_name }}"
@@ -96,7 +96,7 @@
         labels:
           autoheal: "{{ vaultwarden_backup_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_backup_watchtower_monitor_only }}"
-          homepage.name: "Vaultwarden-backup"
+          homepage.name: "{{ ansible_nas_app_name }} Backup"
           homepage.group: "{{ vaultwarden_backup_homepage_group }}"
           homepage.icon: "{{ vaultwarden_backup_homepage_icon }}"
           homepage.href: "{{ vaultwarden_backup_homepage_href }}"
@@ -109,13 +109,13 @@
           wud.link.template: "https://gitlab.com/1O/vaultwarden-backup/-/releases/$${major}.$${minor}.$${patch}"
   when: vaultwarden_enabled is true
 
-- name: Stop Vaultwarden
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Vaultwarden Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ vaultwarden_container_name }}"
         state: absent
-    - name: Stop Vaultwarden Backup Container
+    - name: Stop {{ ansible_nas_app_name }} Backup Container
       community.docker.docker_container:
         name: "{{ vaultwarden_backup_container_name }}"
         state: absent

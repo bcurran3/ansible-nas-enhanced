@@ -1,7 +1,7 @@
 ---
-- name: Start Karaoke-Forever
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name:  Karaoke-Forever Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ karaokeforever_container_name }}"
@@ -17,7 +17,7 @@
         restart_policy: unless-stopped
         labels:
           com.centurylinklabs.watchtower.monitor-only: "{{ karaokeforever_watchtower_monitor_only }}"
-          homepage.name: "Karaoke-Forever"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ karaokeforever_homepage_group }}"
           homepage.icon: "{{ karaokeforever_homepage_icon }}"
           homepage.href: "{{ karaokeforever_homepage_href }}"
@@ -41,9 +41,9 @@
         memory: "{{ karaokeforever_memory_limit }}"
   when: karaokeforever_enabled is true
 
-- name: Stop Karaoke-Forever
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Karaoke-Forever
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ karaokeforever_container_name }}"
         state: absent

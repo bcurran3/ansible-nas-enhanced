@@ -1,7 +1,7 @@
 ---
-- name: Start Shaarli
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Shaarli Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ shaarli_data_directory }}/cache"
         - "{{ shaarli_data_directory }}/data"
 
-    - name: Shaarli Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ shaarli_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ shaarli_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ shaarli_watchtower_monitor_only }}"
-          homepage.name: "Shaarli"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ shaarli_homepage_group }}"
           homepage.icon: "{{ shaarli_homepage_icon }}"
           homepage.href: "{{ shaarli_homepage_href }}"
@@ -51,9 +51,9 @@
         memory: 1g
   when: shaarli_enabled is true
 
-- name: Stop Shaarli
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Shaarli
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ shaarli_container_name }}"
         state: absent

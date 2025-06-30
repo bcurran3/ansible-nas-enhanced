@@ -1,14 +1,14 @@
 ---
-- name: Start Kapowarr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Kapowarr Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ kapowarr_data_directory }}/config"
 
-    - name: Kapowarr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ kapowarr_container_name }}"
@@ -29,7 +29,7 @@
         labels:
           autoheal: "{{ kapowarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ kapowarr_watchtower_monitor_only }}"
-          homepage.name: "Kapowarr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ kapowarr_homepage_group }}"
           homepage.icon: "{{ kapowarr_homepage_icon }}"
           homepage.href: "{{ kapowarr_homepage_href }}"
@@ -51,9 +51,9 @@
           wud.link.template: "https://github.com/Casvt/Kapowarr/releases/tag/$${major}.$${minor}.$${patch}"
   when: kapowarr_enabled is true
 
-- name: Stop Kapowarr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Kapowarr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ kapowarr_container_name }}"
         state: absent

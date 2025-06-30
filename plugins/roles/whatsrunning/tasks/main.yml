@@ -1,7 +1,7 @@
 ---
-- name: Start What's Running
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create What's Running Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ whatsrunning_container_name }}"
@@ -20,7 +20,7 @@
         labels:
           autoheal: "{{ whatsrunning_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ whatsrunning_watchtower_monitor_only }}"
-          homepage.name: "What's Running"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ whatsrunning_homepage_group }}"
           homepage.icon: "{{ whatsrunning_homepage_icon }}"
           homepage.href: "{{ whatsrunning_homepage_href }}"
@@ -43,9 +43,9 @@
         memory: "{{ whatsrunning_memory_limit }}"
   when: whatsrunning_enabled is true
 
-- name: Stop What's Running
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop What's Running Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ whatsrunning_container_name }}"
         state: absent

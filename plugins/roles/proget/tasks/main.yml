@@ -1,14 +1,14 @@
 ---
-- name: Start ProGet
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create ProGet Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ proget_data_directory }}/packages"
 
-    - name: Create ProGet SQL Directories
+    - name: Create {{ ansible_nas_app_name }} DB Directories
       file:
         path: "{{ item }}"
         owner: "10001"
@@ -18,11 +18,11 @@
         - "{{ proget_data_directory }}/log"
         - "{{ proget_data_directory }}/secrets"
 
-    - name: Create ProGet network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ proget_network_name }}"
 
-    - name: ProGet SQL Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ proget_db_container_name}}"
@@ -48,7 +48,7 @@
         labels:
           autoheal: "{{ proget_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ proget_db_watchtower_monitor_only }}"
-          homepage.name: "ProGet MSSQL"
+          homepage.name: "{{ ansible_nas_app_name }} MSSQL"
           homepage.group: "{{ proget_db_homepage_group }}"
           homepage.icon: "{{ proget_db_homepage_icon }}"
           homepage.href: "{{ proget_db_homepage_href}}"
@@ -60,7 +60,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
 
-    - name: ProGet Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ proget_container_name }}"
@@ -85,7 +85,7 @@
           autoheal: "{{ proget_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ proget_watchtower_monitor_only }}"
           homepage.group: "{{ proget_homepage_group }}"
-          homepage.name: "ProGet"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ proget_homepage_icon }}"
           homepage.href: "{{ proget_homepage_href}}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proget_port_http }}"
@@ -112,11 +112,15 @@
         memory: "{{ proget_memory_limit }}"
   when: proget_enabled is true
 
-- name: Stop ProGet
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop ProGet
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ proget_container_name }}"
+        state: absent
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ proget_db_container_name }}"
         state: absent
   when: proget_enabled is false
 

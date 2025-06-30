@@ -1,7 +1,7 @@
 ---
-- name: Start Flexget
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Flexget Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ flexget_data_directory }}/config"
         - "{{ flexget_data_directory }}/data"
 
-    - name: Flexget Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ flexget_container_name }}"
@@ -32,7 +32,7 @@
         labels:
           autoheal: "{{ flexget_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ flexget_watchtower_monitor_only }}"
-          homepage.name: "Flexget"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ flexget_homepage_group }}"
           homepage.icon: "{{ flexget_homepage_icon }}"
           homepage.href: "{{ flexget_homepage_href }}"
@@ -56,9 +56,9 @@
         memory: 1g
   when: flexget_enabled is true
 
-- name: Stop Flexget
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Flexget
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ flexget_container_name }}"
         state: absent

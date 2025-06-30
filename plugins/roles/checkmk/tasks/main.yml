@@ -1,7 +1,7 @@
 ---
-- name: Start Checkmk Raw Edition
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Checkmk Raw Edition Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ checkmk_data_directory }}/omd"
         - "{{ checkmk_data_directory }}/omd/sites"
 
-    - name: Checkmk Raw Edition Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmk_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ checkmk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ checkmk_watchtower_monitor_only }}"
-          homepage.name: "Checkmk Raw Edition"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ checkmk_homepage_group }}"
           homepage.icon: "{{ checkmk_homepage_icon }}"
           homepage.href: "{{ checkmk_homepage_href }}"
@@ -52,9 +52,9 @@
         memory: 1g
   when: checkmk_enabled is true
 
-- name: Stop Checkmk Raw Edition
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Checkmk Raw Edition
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ checkmk_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Karaoke-Forever
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Kavita Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ kavita_data_directory }}"
         - "{{ kavita_data_directory }}/config"
 
-    - name: Kavita Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ kavita_container_name }}"
@@ -30,14 +30,14 @@
         labels:
           autoheal: "{{ kavita_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ kavita_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ kavita_homepage_group }}"
-          homepage.name: "Kavita"
           homepage.icon: "{{ kavita_homepage_icon }}"
           homepage.href: "{{ kavita_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kavita_port_http }}"
 #         homepage.description: "Kavita is a fast, feature rich, cross platform reading server."
           homepage.server: "my-docker"
-          homepage.container: "kavita"
+          homepage.container: "{{ kavita_container_name }}"
           homepage.showStats: "{{ kavita_homepage_showStats }}"
           traefik.enable: "{{ kavita_available_externally | string }}"
           traefik.http.routers.kavita.rule: "Host(`{{ kavita_hostname }}.{{ ansible_nas_domain }}`)"
@@ -52,9 +52,9 @@
           wud.link.template: "https://github.com/Kareadita/Kavita/releases/tag/$${major}.$${minor}.$${patch}"
   when: kavita_enabled is true
 
-- name: Stop Kavita
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Kavita
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ kavita_container_name }}"
         state: absent

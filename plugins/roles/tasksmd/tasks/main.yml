@@ -1,7 +1,7 @@
 ---
-- name: Start Tasks.md
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Tasks.md Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ tasksmd_data_directory }}/config"
         - "{{ tasksmd_data_directory }}/tasks"
 
-    - name: Create Tasks.md Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ tasksmd_container_name }}"
@@ -32,7 +32,7 @@
         labels:
           autoheal: "{{ tasksmd_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tasksmd_watchtower_monitor_only }}"
-          homepage.name: "Tasks.md"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ tasksmd_homepage_group }}"
           homepage.icon: "{{ tasksmd_homepage_icon }}"
           homepage.href: "{{ tasksmd_homepage_href }}"
@@ -54,9 +54,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: tasksmd_enabled is true
 
-- name: Stop Tasks.md
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Tasks.md Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ tasksmd_container_name }}"
         state: absent

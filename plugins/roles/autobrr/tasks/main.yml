@@ -1,12 +1,13 @@
 ---
-- name: Start autobrr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create autobrr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
-        name: "{{autobrr_container_name }}"
-        image: ghcr.io/autobrr/autobrr:latest
+        name: "{{ autobrr_container_name }}"
+        image: "{{ autobrr_image_name }}:{{ autobrr_image_version }}"
         pull: true
+        cpu_shares: "{{ autobrr_cpu_shares }}"
         volumes:
           - "{{ autobrr_data_directory }}/config:/config"
         ports:
@@ -20,7 +21,7 @@
         labels:
           autoheal: "{{ autobrr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ autobrr_watchtower_monitor_only }}"
-          homepage.name: "autobrr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ autobrr_homepage_group }}"
           homepage.href: "{{ autobrr_homepage_href }}"
           homepage.icon: "{{ autobrr_homepage_icon }}"
@@ -42,9 +43,9 @@
           wud.link.template: "https://github.com/autobrr/autobrr/releases/tag/$${major}.$${minor}.$${patch}"
   when: autobrr_enabled is true
 
-- name: Stop autobrr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop autobrr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ autobrr_container_name }}"
         state: absent

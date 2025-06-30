@@ -1,8 +1,8 @@
 ---
 ### WORK IN PROGRESS
-- name: Start Odoo
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Odoo Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ odoo_data_directory }}/config"
         - "{{ odoo_data_directory }}/addons"
 
-    - name: Create Odoo PostgreSQL Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         image: docker.io/library/postgres:15
@@ -32,7 +32,7 @@
         labels:
           autoheal: "{{ odoo_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ odoo_db_watchtower_monitor_only }}"
-          homepage.name: "Odoo-db"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ odoo_db_homepage_group }}"
           homepage.icon: "{{ odoo_db_homepage_icon }}"
           homepage.showStats: "{{ odoo_db_homepage_showStats }}"
@@ -40,7 +40,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create Odoo Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ odoo_container_name }}"
@@ -68,7 +68,7 @@
         labels:
           autoheal: "{{ odoo_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ odoo_watchtower_monitor_only }}"
-          homepage.name: "odoo"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ odoo_homepage_group }}"
           homepage.icon: "{{ odoo_homepage_icon }}"
           homepage.href: "{{ odoo_homepage_href }}"
@@ -90,13 +90,13 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: odoo_enabled is true
 
-- name: Stop Odoo
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Odoo Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ odoo_container_name }}"
         state: absent
-    - name: Stop Odoo PostgreSQL Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ odoo_db_container_name }}"
         state: absent

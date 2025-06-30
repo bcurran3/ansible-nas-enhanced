@@ -1,14 +1,14 @@
 ---
-- name: Start Stalwart Mail
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Stalwart Mail Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ stalwart_data_directory }}"
 
-    - name: Create Stalwart Mail Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ stalwart_container_name }}"
@@ -33,7 +33,7 @@
         labels:
           autoheal: "{{ stalwart_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stalwart_watchtower_monitor_only }}"
-          homepage.name: "Stalwart Mail"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ stalwart_homepage_group }}"
           homepage.icon: "{{ stalwart_homepage_icon }}"
           homepage.href: "{{ stalwart_homepage_href }}"
@@ -55,9 +55,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: stalwart_enabled is true
 
-- name: Stop Stalwart Mail
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Stalwart Mail
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ stalwart_container_name }}"
         state: absent

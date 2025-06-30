@@ -1,7 +1,7 @@
 ---
-- name: Start Stump
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Stump Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ stump_data_directory }}"
         - "{{ stump_data_directory }}/config"
 
-    - name: Create Stump Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ stump_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ stump_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stump_watchtower_monitor_only }}"
-          homepage.name: "Stump"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ stump_homepage_group }}"
           homepage.icon: "{{ stump_homepage_icon }}"
           homepage.href: "{{ stump_homepage_href }}"
@@ -51,9 +51,9 @@
         memory: "{{ stump_memory_limit }}"
   when: stump_enabled is true
 
-- name: Stop Stump
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Stump Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ stump_container_name }}"
         state: absent

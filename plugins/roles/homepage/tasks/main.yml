@@ -1,7 +1,7 @@
 ---
-- name: Start Homepage
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Homepage Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ homepage_data_directory }}/config/logs"
         - "{{ homepage_data_directory }}/images"
 
-    - name: Create Homepage Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ homepage_container_name }}"
@@ -48,9 +48,9 @@
           wud.link.template: "https://github.com/gethomepage/homepage/releases/tag/$${major}.$${minor}.$${patch}"
   when: homepage_enabled is true
 
-- name: Stop Homepage
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Homepage
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homepage_container_name }}"
         state: absent

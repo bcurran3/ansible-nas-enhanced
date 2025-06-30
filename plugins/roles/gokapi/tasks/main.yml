@@ -1,7 +1,7 @@
 ---
-- name: Start Gokapi
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Gokapi Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ gokapi_data_directory }}/config"
         - "{{ gokapi_data_directory }}/data"
 
-    - name: Create Gokapi Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gokapi_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ gokapi_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gokapi_watchtower_monitor_only }}"
-          homepage.name: "Gokapi"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ gokapi_homepage_group }}"
           homepage.icon: "{{ gokapi_homepage_icon }}"
           homepage.href: "{{ gokapi_homepage_href }}"
@@ -51,9 +51,9 @@
         memory: "{{ gokapi_memory }}"
   when: gokapi_enabled is true
 
-- name: Stop Gokapi
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Gokapi
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ gokapi_container_name }}"
         state: absent

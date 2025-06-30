@@ -1,7 +1,7 @@
 ---
-- name: Start Pi.Alert
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Pi.Alert Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ pialert_data_directory }}/db"
 
     # https://github.com/jokob-sk/Pi.Alert/blob/main/dockerfiles/README.md
-    - name: Create Pi.Alert Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ pialert_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ pialert_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pialert_watchtower_monitor_only }}"
-          homepage.name: "Pi.Alert"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pialert_homepage_group }}"
           homepage.icon: "{{ pialert_homepage_icon }}"
           homepage.href: "{{ pialert_homepage_href }}"
@@ -53,9 +53,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: pialert_enabled is true
 
-- name: Stop Pi.Alert
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Pi.Alert
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ pialert_container_name }}"
         state: absent

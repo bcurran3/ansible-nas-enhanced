@@ -1,7 +1,7 @@
 ---
-- name: Start GameVault
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create GameVault Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -13,7 +13,7 @@
         - "{{ gamevault_data_directory }}/media"
         - "{{ gamevault_data_directory }}/plugins"
 
-    - name: Create GameVault DB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gamevault_db_container_name }}"
@@ -32,7 +32,7 @@
         labels:
           autoheal: "{{ gamevault_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gamevault_db_watchtower_monitor_only }}"
-          homepage.name: "GameVault PostgreSQL"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ gamevault_db_homepage_group }}"
           homepage.icon: "{{ gamevault_db_homepage_icon }}"
           homepage.href: "{{ gamevault_homepage_href }}"
@@ -43,7 +43,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/_/postgres/tags/$${major}.$${minor}.$${patch}-alpine"
 
-    - name: Create GameVault Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gamevault_container_name }}"
@@ -77,7 +77,7 @@
         labels:
           autoheal: "{{ gamevault_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gamevault_watchtower_monitor_only }}"
-          homepage.name: "GameVault"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ gamevault_homepage_group }}"
           homepage.icon: "{{ gamevault_homepage_icon }}"
           homepage.href: "{{ gamevault_homepage_href }}"
@@ -100,13 +100,13 @@
         memory: "{{ gamevault_memory }}"
   when: gamevault_enabled is true
 
-- name: Stop GameVault
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop GameVault
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ gamevault_container_name }}"
         state: absent
-    - name: Stop GameVault
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ gamevault_db_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start OpenEats
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: OpenEats Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ openeats_data_directory }}/openeats-web"
         - "{{ openeats_data_directory }}/database"
 
-    - name: OpenEats DB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_db_container_name }}"
@@ -29,7 +29,7 @@
         labels:
           autoheal: "{{ openeats_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openeats_db_watchtower_monitor_only }}"
-          homepage.name: "OpenEats MariaDB"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ openeats_db_homepage_group }}"
           homepage.icon: "{{ openeats_db_homepage_icon }}"
 #         homepage.description: "The innovative open source database"
@@ -40,7 +40,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: OpenEats API Docker Container
+    - name: Create {{ ansible_nas_app_name }} API Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_api_container_name }}"
@@ -62,7 +62,7 @@
         labels:
           autoheal: "{{ openeats_api_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openeats_api_watchtower_monitor_only }}"
-          homepage.name: "OpenEats API"
+          homepage.name: "{{ ansible_nas_app_name }} API"
           homepage.group: "{{ openeats_api_homepage_group }}"
           homepage.icon: "{{ openeats_api_homepage_icon }}"
 #         homepage.description: ""
@@ -73,7 +73,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: OpenEats Web Docker Container
+    - name: Create {{ ansible_nas_app_name }} Web Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_container_name }}"
@@ -91,7 +91,7 @@
         labels:
           autoheal: "{{ openeats_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openeats_watchtower_monitor_only }}"
-          homepage.name: "OpenEats"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ openeats_homepage_group }}"
           homepage.icon: "{{ openeats_homepage_icon }}"
           homepage.href: "{{ openeats_homepage_href }}"
@@ -114,17 +114,17 @@
         memory: 1g
   when: openeats_enabled is true
 
-- name: Stop OpenEats
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop OpenEats Web Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Web Container
       community.docker.docker_container:
         name: "{{ openeats_container_name }}"
         state: absent
-    - name: Stop OpenEats API Docker Container
+    - name: Stop {{ ansible_nas_app_name }} API Container
       community.docker.docker_container:
         name: "{{ openeats_api_container_name }}"
         state: absent
-    - name: Stop OpenEats DB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ openeats_db_container_name }}"
         state: absent

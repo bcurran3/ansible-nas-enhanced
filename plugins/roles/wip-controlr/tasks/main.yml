@@ -1,8 +1,8 @@
 ---
 ### WORK IN PROGRESS
-- name: Start ControlR
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create ControlR Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,13 +10,13 @@
         - "{{ controlr_data_directory }}"
         - "{{ controlr_data_directory }}/data"
 
-    - name: Create ControlR network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ controlr_network_name }}"
         ipam_config:
           - subnet: "{{ controlr_network_subnet }}"
 
-    - name: Create ControlR Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ controlr_container_name }}"
@@ -80,9 +80,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: controlr_enabled is true
 
-- name: Stop ControlR
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop ControlR
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ controlr_container_name }}"
         state: absent

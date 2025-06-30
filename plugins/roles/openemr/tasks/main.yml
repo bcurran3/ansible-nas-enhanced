@@ -1,8 +1,8 @@
 ---
 # https://github.com/openemr/openemr/blob/master/docker/production/docker-compose.yml
-- name: Start OpenEMR
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create openemr Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -13,11 +13,11 @@
         - "{{ openemr_data_directory }}/sites"
         - "{{ openemr_data_directory }}/sites/default"
 
-    - name: Create OpenEMR network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ openemr_network_name }}"
 
-    - name: Create OpenEMR MariaDB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openemr_container_db_name }}"
@@ -49,7 +49,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create OpenEMR Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openemr_container_name }}"
@@ -83,7 +83,7 @@
         labels:
           autoheal: "{{ openemr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openemr_watchtower_monitor_only }}"
-          homepage.name: "OpenEMR"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ openemr_homepage_group }}"
           homepage.icon: "{{ openemr_homepage_icon }}"
           homepage.href: "{{ openemr_homepage_href }}"
@@ -105,13 +105,13 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: openemr_enabled is true
 
-- name: Stop OpenEMR
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop OpenEMR Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ openemr_container_name }}"
         state: absent
-    - name: Stop OpenEMR  MariaDB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ openemr_container_db_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Uptime Kuma
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Uptime Kuma Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ uptimekuma_data_directory }}"
         - "{{ uptimekuma_data_directory }}/data"
 
-    - name: Create Uptime Kuma Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ uptimekuma_container_name }}"
@@ -27,7 +27,7 @@
         labels:
           autoheal: "{{ uptimekuma_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ uptimekuma_watchtower_monitor_only }}"
-          homepage.name: "Uptime Kuma"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ uptimekuma_homepage_group }}"
           homepage.href: "{{ uptimekuma_homepage_href }}"
           homepage.icon: "{{ uptimekuma_homepage_icon }}"
@@ -53,9 +53,9 @@
         memory: "{{ uptimekuma_memory }}"
   when: uptimekuma_enabled is true
 
-- name: Stop Uptime Kuma
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Uptime Kuma
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ uptimekuma_container_name }}"
         state: absent

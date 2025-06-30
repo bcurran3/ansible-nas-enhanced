@@ -1,7 +1,7 @@
 ---
-- name: Start Striparr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Striparr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ striparr_container_name }}"
@@ -23,7 +23,7 @@
         labels:
           autoheal: "{{ striparr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ striparr_watchtower_monitor_only }}"
-          homepage.name: "Striparr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ striparr_homepage_group }}"
           homepage.icon: "{{ striparr_homepage_icon }}"
           homepage.href: "{{ striparr_homepage_href }}"
@@ -37,9 +37,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: striparr_enabled is true
 
-- name: Stop Striparr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Striparr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ striparr_container_name }}"
         state: absent

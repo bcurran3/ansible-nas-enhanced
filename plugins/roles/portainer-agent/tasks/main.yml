@@ -1,7 +1,7 @@
 ---
-- name: Portainer Agent
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Portainer Agent Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ portainer_agent_container_name }}"
@@ -21,7 +21,7 @@
         labels:
           autoheal: "{{ portainer_agent_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ portainer_agent_watchtower_monitor_only }}"
-          homepage.name: "Portainer Agent"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ portainer_agent_homepage_group }}"
           homepage.href: "{{ portainer_agent_homepage_href }}"
           homepage.icon: "{{ portainer_agent_homepage_icon }}"
@@ -34,9 +34,9 @@
           wud.link.template: "https://github.com/portainer/agent/releases/tag/$${major}.$${minor}.$${patch}"
   when: portainer_agent_enabled is true
 
-- name: Stop Portainer Agent
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Portainer Agent
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ portainer_agent_container_name }}"
         state: absent

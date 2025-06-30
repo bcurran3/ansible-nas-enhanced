@@ -1,9 +1,10 @@
 ---
+# WIP
 # need sudo touch credentials to config dir
 # add admin:$2y$12$yOtVgiZRJ.l9ecjFYPW11e0N19PNs3jcbxDTund57DRs26..jNGaq for admin/topsecret
-- name: Start magnetico
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create magnetico Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +13,7 @@
         - "{{ magnetico_data_directory }}/config"
         - "{{ magnetico_data_directory }}/data"
 
-    - name: magneticod Container
+    - name: Create {{ ansible_nas_app_name }}d Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ magnetico_container2_name }}"
@@ -31,7 +32,7 @@
         labels:
           autoheal: "{{ magneticod_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ magnetico_watchtower_monitor_only }}"
-          homepage.name: "magneticod"
+          homepage.name: "{{ ansible_nas_app_name }}d"
           homepage.group: "{{ magneticod_homepage_group }}"
           homepage.icon: "{{ magneticod_homepage_icon }}"
           homepage.href: "{{ magneticod_homepage_href }}"
@@ -43,7 +44,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: magneticow Container
+    - name: Create {{ ansible_nas_app_name }}w Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ magnetico_container_name }}"
@@ -65,7 +66,7 @@
         labels:
           autoheal: "{{ magneticow_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ magnetico_watchtower_monitor_only }}"
-          homepage.name: "magnetico"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ magnetico_homepage_group }}"
           homepage.icon: "{{ magnetico_homepage_icon }}"
           homepage.href: "{{ magnetico_homepage_href }}"
@@ -87,14 +88,16 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: magnetico_enabled is true
 
-- name: Stop magnetico
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop magneticow
+    - name: Stop {{ ansible_nas_app_name }}w Container
       community.docker.docker_container:
         name: "{{ magnetico_container_name }}"
         state: absent
-    - name: Stop magneticod
+    - name: Stop {{ ansible_nas_app_name }}d Container
       community.docker.docker_container:
         name: "{{ magnetico_container2_name }}"
         state: absent
   when: magnetico_enabled is false
+
+  # NOTE: Might rename the containers 1/2 or front/back

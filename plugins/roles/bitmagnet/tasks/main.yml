@@ -1,8 +1,8 @@
 # https://bitmagnet.io/setup/installation.html
 ---
-- name: Start bitmagnet
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create bitmagnet Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ bitmagnet_data_directory }}/config"
         - "{{ bitmagnet_data_directory }}/db"
 
-    - name: Create bitmagnet DB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ bitmagnet_db_container_name }}"
@@ -47,7 +47,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/postgres/postgres/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create bitmagnet Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ bitmagnet_container_name }}"
@@ -95,13 +95,13 @@
         memory: "{{ bitmagnet_memory }}"
   when: bitmagnet_enabled is true
 
-- name: Stop bitmagnet
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop bitmagnet Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ bitmagnet_container_name }}"
         state: absent
-    - name: Stop bitmagnet DB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ bitmagnet_db_container_name }}"
         state: absent

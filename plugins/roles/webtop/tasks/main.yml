@@ -1,7 +1,7 @@
 ---
-- name: Start Webtop
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Webtop Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ webtop_data_directory }}"
         - "{{ webtop_data_directory }}/config"
 
-    - name: Create Webtop Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ webtop_container_name }}"
@@ -33,7 +33,7 @@
         labels:
           autoheal: "{{ webtop_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ webtop_watchtower_monitor_only }}"
-          homepage.name: "Webtop"
+          homepage.name: "Web{{ ansible_nas_app_name }}top"
           homepage.group: "{{ webtop_homepage_group }}"
           homepage.icon: "{{ webtop_homepage_icon }}"
           homepage.href: "{{ webtop_homepage_href }}"
@@ -56,9 +56,9 @@
         memory: "{{ webtop_memory_limit }}"
   when: webtop_enabled is true
 
-- name: Stop Webtop
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Webtop
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ webtop_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Scrutiny
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Scrutiny Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -17,13 +17,13 @@
       register: result
       until: result is succeeded
 
-    - name: Template Scrutiny scrutiny.yaml
+    - name: Template {{ ansible_nas_app_name }}
       template:
         src: scrutiny.yaml
         dest: "{{ scrutiny_data_directory }}/config/scrutiny.yaml"
       register: template_config
 
-    - name: Create Scrutiny Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ scrutiny_container_name }}"
@@ -48,7 +48,7 @@
         labels:
           autoheal: "{{ scrutiny_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ scrutiny_watchtower_monitor_only }}"
-          homepage.name: "Scrutiny"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ scrutiny_homepage_group }}"
           homepage.href: "{{ scrutiny_homepage_href }}"
           homepage.icon: "{{ scrutiny_homepage_icon }}"
@@ -72,9 +72,9 @@
           wud.link.template: "https://github.com/AnalogJ/scrutiny/releases/tag/$${major}.$${minor}.$${patch}"
   when: scrutiny_enabled is true
 
-- name: Stop Scrutiny
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Scrutiny
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ scrutiny_container_name }}"
         state: absent

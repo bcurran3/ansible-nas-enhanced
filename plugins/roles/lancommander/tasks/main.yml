@@ -1,7 +1,7 @@
 ---
-- name: Start LANCommander
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create LANCommander Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ lancommander_data_directory }}"
         - "{{ lancommander_data_directory }}/config"
 
-    - name: Create LANCommander Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ lancommander_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ lancommander_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ lancommander_watchtower_monitor_only }}"
-          homepage.name: "LANCommander"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ lancommander_homepage_group }}"
           homepage.icon: "{{ lancommander_homepage_icon }}"
           homepage.href: "{{ lancommander_homepage_href }}"
@@ -53,9 +53,9 @@
           wud.link.template: "https://github.com/LANCommander/LANCommander/releases/tag/$${major}.$${minor}.$${patch}"
   when: lancommander_enabled is true
 
-- name: Stop LANCommander
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop LANCommander
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ lancommander_container_name }}"
         state: absent

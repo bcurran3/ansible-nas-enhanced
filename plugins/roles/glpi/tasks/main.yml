@@ -1,7 +1,7 @@
 ---
-- name: Start GLPI
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create GLPI Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ glpi_data_directory }}/db"
         - "{{ glpi_data_directory }}/html"
 
-    - name: Create GLPI MariaDB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ glpi_db_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ glpi_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glpi_db_watchtower_monitor_only }}"
-          homepage.name: "GLPI MariaDB"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ glpi_db_homepage_group }}"
           homepage.icon: "{{ glpi_db_homepage_icon }}"
           homepage.href: "{{ glpi_db_homepage_href }}"
@@ -42,7 +42,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/MariaDB/mariadb-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create GLPI Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ glpi_container_name }}"
@@ -64,7 +64,7 @@
         labels:
           autoheal: "{{ glpi_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glpi_watchtower_monitor_only }}"
-          homepage.name: "GLPI"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ glpi_homepage_group }}"
           homepage.icon: "{{ glpi_homepage_icon }}"
           homepage.href: "{{ glpi_homepage_href }}"
@@ -88,13 +88,13 @@
         memory: "{{ glpi_memory }}"
   when: glpi_enabled is true
 
-- name: Stop GLPI
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop GLPI Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ glpi_container_name }}"
         state: absent
-    - name: Stop GLPI PostgreSQL Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ glpi_db_container_name }}"
         state: absent

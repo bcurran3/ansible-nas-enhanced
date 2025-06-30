@@ -1,7 +1,7 @@
 ---
-- name: Start dashdot
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create dash. Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dashdot_container_name }}"
@@ -18,7 +18,7 @@
         labels:
           autoheal: "{{ dashdot_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dashdot_watchtower_monitor_only }}"
-          homepage.name: "dash."
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dashdot_homepage_group }}"
           homepage.icon: "{{ dashdot_homepage_icon }}"
           homepage.href: "{{ dashdot_homepage_href }}"
@@ -40,9 +40,9 @@
           wud.link.template: "https://hub.docker.com/r/mauricenino/dashdot/tags/$${major}.$${minor}.$${patch}"
   when: dashdot_enabled is true
 
-- name: Stop dash.
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop dash.
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dashdot_container_name }}"
         state: absent

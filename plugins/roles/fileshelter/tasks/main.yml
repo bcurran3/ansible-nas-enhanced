@@ -1,7 +1,7 @@
 ---
-- name: Start FileShelter
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create FileShelter Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ fileshelter_data_directory }}"
         - "{{ fileshelter_data_directory }}/data"
 
-    - name: Create FileShelter Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ fileshelter_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ fileshelter_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ fileshelter_watchtower_monitor_only }}"
-          homepage.name: "FileShelter"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ fileshelter_homepage_group }}"
           homepage.icon: "{{ fileshelter_homepage_icon }}"
           homepage.href: "{{ fileshelter_homepage_href }}"
@@ -53,9 +53,9 @@
           wud.link.template: "https://github.com/epoupon/fileshelter/releases/tag/$${major}.$${minor}.$${patch}"
   when: fileshelter_enabled is true
 
-- name: Stop FileShelter
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop FileShelter
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ fileshelter_container_name }}"
         state: absent

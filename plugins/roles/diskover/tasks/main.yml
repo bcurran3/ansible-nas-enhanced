@@ -1,7 +1,7 @@
 ---
-- name: Start Diskover
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Diskover Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ diskover_data_directory }}/"
         - "{{ diskover_data_directory }}/config"
 
-    - name: Create Diskover Elasticsearch Directories
+    - name: Create {{ ansible_nas_app_name }} Elasticsearch Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -19,11 +19,11 @@
         - "{{ diskover_data_directory }}/elasticsearch"
         - "{{ diskover_data_directory }}/elasticsearch/data"
 
-    - name: Create Diskover network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ diskover_network_name }}"
 
-    - name: Create Diskover Elasticsearch Docker Container
+    - name: Create {{ ansible_nas_app_name }} Elasticsearch Docker Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_elasticsearch_container_name }}"
@@ -72,7 +72,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://gallery.ecr.aws/elastic/elasticsearch/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Diskover Elasticsearch-helper Docker Container
+    - name: Create {{ ansible_nas_app_name }} Elasticsearch-helper Container
       docker_container:
         container_default_behavior: "compatibility"
         name: elasticsearch-helper
@@ -90,7 +90,7 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ diskover_elasticsearch_watchtower_monitor_only }}"
           traefik.enable: "false"
 
-    - name: Create Diskover Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_container_name }}"
@@ -123,7 +123,7 @@
         labels:
           autoheal: "{{ diskover_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ diskover_watchtower_monitor_only }}"
-          homepage.name: "Diskover"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ diskover_homepage_group }}"
           homepage.href: "{{ diskover_homepage_href }}"
           homepage.icon: "{{ diskover_homepage_icon }}"
@@ -145,13 +145,13 @@
           wud.link.template: "https://github.com/linuxserver/docker-diskover/releases/tag/$${major}.$${minor}.$${patch}"
   when: diskover_enabled is true
 
-- name: Stop Diskover
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Diskover Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ diskover_container_name }}"
         state: absent
-    - name: Stop Diskover Elasticsearch Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Elasticsearch Container
       community.docker.docker_container:
         name: "{{ diskover_elasticsearch_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Huntarr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Huntarr Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ huntarr_data_directory }}"
         - "{{ huntarr_data_directory }}/config"
 
-    - name: Create Huntarr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ huntarr_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ huntarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ huntarr_watchtower_monitor_only }}"
-          homepage.name: "Huntarr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ huntarr_homepage_group }}"
           homepage.icon: "{{ huntarr_homepage_icon }}"
           homepage.href: "{{ huntarr_homepage_href }}"
@@ -50,9 +50,9 @@
           wud.link.template: "https://github.com/plexguide/Huntarr.io/releases/tag/$${major}.$${minor}.$${patch}"
   when: huntarr_enabled is true
 
-- name: Stop Huntarr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop huntarr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ huntarr_container_name }}"
         state: absent

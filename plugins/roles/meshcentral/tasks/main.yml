@@ -2,9 +2,9 @@
 # WORK IN PROGRESS
 # NEEDS A TEMPLATE TO ADD SOME VALUES
 
-- name: Start MeshCentral
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create MeshCentral Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -16,11 +16,11 @@
         - "{{ meshcentral_data_directory }}/user_files"
         - "{{ meshcentral_data_directory }}/web"
 
-    - name: Create MeshCentral network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ meshcentral_network }}"
 
-    - name: Create MeshCentral MongoDB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ meshcentral_db_container_name }}"
@@ -42,7 +42,7 @@
         labels:
           autoheal: "{{ meshcentral_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_db_watchtower_monitor_only }}"
-          homepage.name: "MeshCentral MongoDB"
+          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ meshcentral_db_homepage_group }}"
           homepage.icon: "{{ meshcentral_db_homepage_icon }}"
           homepage.href: "{{ meshcentral_homepage_href }}"
@@ -55,7 +55,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
 
-    - name: Create MeshCentral Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ meshcentral_container_name }}"
@@ -94,7 +94,7 @@
         labels:
           autoheal: "{{ meshcentral_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_watchtower_monitor_only }}"
-          homepage.name: "MeshCentral"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ meshcentral_homepage_group }}"
           homepage.icon: "{{ meshcentral_homepage_icon }}"
           homepage.href: "{{ meshcentral_homepage_href }}"
@@ -116,13 +116,13 @@
 #         wud.link.template: "https://github.com/Typhonragewind/meshcentral-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: meshcentral_enabled is true
 
-- name: Stop MeshCentral
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop MeshCentral Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ meshcentral_container_name }}"
         state: absent
-    - name: Stop MeshCentral MongoDB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ meshcentral_db_container_name }}"
         state: absent

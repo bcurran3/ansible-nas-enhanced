@@ -1,7 +1,7 @@
 ---
-- name: Start Reubah
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Reubah Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
       with_items:
         - "{{ reubah_data_directory }}"
 
-    - name: Create Reubah Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ reubah_container_name }}"
@@ -32,7 +32,7 @@
         labels:
           autoheal: "{{ reubah_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ reubah_watchtower_monitor_only }}"
-          homepage.name: "Reubah"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ reubah_homepage_group }}"
           homepage.icon: "{{ reubah_homepage_icon }}"
           homepage.href: "{{ reubah_homepage_href }}"
@@ -55,9 +55,9 @@
         memory: "{{ reubah_memory }}"
   when: reubah_enabled is true
 
-- name: Stop Reubah
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Reubah
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ reubah_container_name }}"
         state: absent

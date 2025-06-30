@@ -1,17 +1,17 @@
 ---
 # WIP: should have persistant model save dir and nvidia true/false
 
-#- name: Create LocalAI Directories
-#  file:
-#    path: "{{ item }}"
-#    state: directory
-#  with_items:
-#    - "{{ localai_data_directory }}"
-#    - "{{ localai_data_directory }}/some path to models"
-
-- name: Start LocalAI
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create LocalAI Docker Container
+    #- name: Create {{ ansible_nas_app_name }} Directories
+    #  file:
+    #    path: "{{ item }}"
+    #    state: directory
+    #  with_items:
+    #    - "{{ localai_data_directory }}"
+    #    - "{{ localai_data_directory }}/some path to models"
+
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ localai_container_name }}"
@@ -32,7 +32,7 @@
         labels:
           autoheal: "{{ localai_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ localai_watchtower_monitor_only }}"
-          homepage.name: "LocalAI"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ localai_homepage_group }}"
           homepage.icon: "{{ localai_homepage_icon }}"
           homepage.href: "{{ localai_homepage_href }}"
@@ -54,9 +54,9 @@
 #          wud.link.template: "https://github.com/mudler/LocalAI/releases/tag/$${major}.$${minor}.$${patch}"
   when: localai_enabled is true
 
-- name: Stop LocalAI
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop LocalAI
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ localai_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Tdarr Server
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Tdarr Server Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -13,7 +13,7 @@
         - "{{ tdarr_cache_directory }}"
         - "{{ tdarr_media_directory }}"
 
-    - name: Create Tdarr Server Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ tdarr_container_name }}"
@@ -58,7 +58,7 @@
         labels:
           autoheal: "{{ tdarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tdarr_watchtower_monitor_only }}"
-          homepage.name: "Tdarr Server"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ tdarr_homepage_group }}"
           homepage.href: "{{ tdarr_homepage_href }}"
           homepage.icon: "{{ tdarr_homepage_icon }}"
@@ -83,9 +83,9 @@
           wud.link.template: "https://github.com/HaveAGitGat/Tdarr/releases/tag/$${major}.$${minor}-Beta"
   when: tdarr_enabled is true
 
-- name: Stop Tdarr Server
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Tdarr Server
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ tdarr_container_name }}"
         state: absent

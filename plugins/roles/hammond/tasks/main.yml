@@ -1,7 +1,7 @@
 ---
-- name: Start Hammond
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Hammond Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ hammond_data_directory }}/assets"
         - "{{ hammond_data_directory }}/config"
 
-    - name: Create Hammond Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ hammond_container_name }}"
@@ -29,7 +29,7 @@
         labels:
           autoheal: "{{ hammond_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ hammond_watchtower_monitor_only }}"
-          homepage.name: "Hammond"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ hammond_homepage_group }}"
           homepage.icon: "{{ hammond_homepage_icon }}"
           homepage.href: "{{ hammond_homepage_href }}"
@@ -52,9 +52,9 @@
         memory: "{{ hammond_memory }}"
   when: hammond_enabled is true
 
-- name: Stop Hammond
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Hammond
+    - name: Stop {{ ansible_nas_app_name }} Contaner
       community.docker.docker_container:
         name: "{{ hammond_container_name }}"
         state: absent

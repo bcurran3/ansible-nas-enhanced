@@ -1,7 +1,7 @@
 ---
-- name: Start Conduit
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Conduit Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ conduit_data_directory }}"
         - "{{ conduit_data_directory }}/db"
 
-    - name: Create Conduit Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ conduit_container_name }}"
@@ -38,7 +38,7 @@
         labels:
           autoheal: "{{ conduit_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ conduit_watchtower_monitor_only }}"
-          homepage.name: "conduit"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ conduit_homepage_group }}"
           homepage.href: "{{ conduit_homepage_href }}"
           homepage.icon: "{{ conduit_homepage_icon }}"
@@ -61,9 +61,9 @@
 #         ^ most likely bad          
   when: conduit_enabled is true
 
-- name: Stop Conduit
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Conduit
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ conduit_container_name }}"
         state: absent

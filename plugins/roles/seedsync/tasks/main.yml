@@ -1,7 +1,7 @@
 ---
-- name: Start SeedSync
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create SeedSync Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ seedsync_data_directory }}/config"
         - "{{ seedsync_data_directory }}/downloads"
 
-    - name: Create SeedSync Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ seedsync_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ seedsync_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ seedsync_watchtower_monitor_only }}"
-          homepage.name: "SeedSync"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ seedsync_homepage_group }}"
           homepage.icon: "{{ seedsync_homepage_icon }}"
           homepage.href: "{{ seedsync_homepage_href }}"
@@ -52,9 +52,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: seedsync_enabled is true
 
-- name: Stop SeedSync
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop SeedSync Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ seedsync_container_name }}"
         state: absent

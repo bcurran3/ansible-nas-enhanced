@@ -1,8 +1,8 @@
 ---
 # WIP
-- name: Start Ghost
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Ghost Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,11 +11,11 @@
         - "{{ ghost_data_directory }}/content"
         - "{{ ghost_data_directory }}/db"
 
-    - name: Create Ghost network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ ghost_network }}"
 
-    - name: Create Ghost MySQL Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ghost_db_container_name }}"
@@ -36,7 +36,7 @@
         labels:
           autoheal: "{{ ghost_DB_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ghost_db_watchtower_monitor_only }}"
-          homepage.name: "Ghost MySQL"
+          homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ ghost_db_homepage_group }}"
           homepage.icon: "{{ ghost_db_homepage_icon }}"
           homepage.href: "{{ ghost_db_homepage_href }}"
@@ -48,7 +48,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create Ghost Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ghost_container_name }}"
@@ -108,13 +108,13 @@
           wud.link.template: "https://github.com/TryGhost/Ghost/releases/tag/$${major}.$${minor}.$${patch}"
   when: ghost_enabled is true
 
-- name: Stop Ghost
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Ghost Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ghost_container_name }}"
         state: absent
-    - name: Stop Ghost MySQL Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ ghost_db_container_name }}"
         state: absent

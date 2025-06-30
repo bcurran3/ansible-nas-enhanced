@@ -1,7 +1,7 @@
 ---
-- name: Start 2FAuth
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create 2FAuth Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,13 +11,14 @@
         - "{{ twofauth_data_directory }}"
         - "{{ twofauth_data_directory }}/data"
 
-    - name: Create 2FAuth Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ twofauth_container_name }}"
         hostname: "{{ twofauth_container_name }}"
         image: 2fauth/2fauth
         pull: true
+        cpu_shares: "{{ twofauth_cpu_shares }}"
         ports:
           - "{{ twofauth_port_http }}:8000"
         volumes:
@@ -136,7 +137,7 @@
         labels:
           autoheal: "{{ twofauth_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ twofauth_watchtower_monitor_only }}"
-          homepage.name: "2FAuth"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ twofauth_homepage_group }}"
           homepage.href: "{{ twofauth_homepage_href }}"
           homepage.icon: "{{ twofauth_homepage_icon }}"
@@ -158,9 +159,9 @@
           wud.link.template: "https://github.com/Bubka/2FAuth/releases/tag/$${major}.$${minor}.$${patch}"
   when: twofauth_enabled is true
   
-- name: Stop 2FAuth
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop 2FAuth
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ twofauth_container_name }}"
         state: absent

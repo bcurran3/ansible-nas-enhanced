@@ -1,7 +1,7 @@
 ---
-- name: Start iDRAC6
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create iDRAC6 Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ idrac6_data_directory }}/vmedia"
         - "{{ idrac6_data_directory }}/screenshots"
 
-    - name: Create iDRAC6 Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ idrac6_container_name }}"
@@ -41,7 +41,7 @@
           autoheal: "{{ idrac6_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ idrac6_watchtower_monitor_only }}"
           homepage.group: "{{ idrac6_homepage_group }}"
-          homepage.name: "iDRAC6"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.href: "{{ idrac6_homepage_href }}"
           homepage.icon: "{{ idrac6_homepage_icon }}"
 #         homepage.description: "iDRAC 6 web interface and VNC proxy"
@@ -62,9 +62,9 @@
           wud.link.template: "https://github.com/DomiStyle/docker-idrac6/releases/tag/$${major}.$${minor}.$${patch}"
   when: idrac6_enabled is true
 
-- name: Stop iDRAC6
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop iDRAC6
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ idrac6_container_name }}"
         state: absent

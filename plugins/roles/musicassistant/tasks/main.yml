@@ -1,7 +1,7 @@
 ---
-- name: Start Music Assistant
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Music Assistant Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ musicassistant_data_directory }}"
         - "{{ musicassistant_data_directory }}/data"
 
-    - name: Create Music Assistant Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ musicassistant_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ musicassistant_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ musicassistant_watchtower_monitor_only }}"
-          homepage.name: "Music Assistant"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ musicassistant_homepage_group }}"
           homepage.icon: "{{ musicassistant_homepage_icon }}"
 #         homepage.description: "a free, opensource Media library manager that connects to your streaming services and a wide range of connected speakers"
@@ -40,9 +40,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: musicassistant_enabled is true
 
-- name: Stop Music Assistant
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Music Assistant
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ musicassistant_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Koillection
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Koillection Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ koillection_data_directory }}/db"
         - "{{ koillection_data_directory }}/uploads"
 
-    - name: Create Koillection PostgreSQL Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ koillection_db_container_name }}"
@@ -28,7 +28,7 @@
         labels:
           autoheal: "{{ koillection_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ koillection_db_watchtower_monitor_only }}"
-          homepage.name: "Koillection PostgreSQL"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ koillection_db_homepage_group }}"
           homepage.icon: "{{ koillection_db_homepage_icon }}"
           homepage.href: "{{ koillection_db_homepage_href }}"
@@ -40,7 +40,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
 
-    - name: Create Koillection Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ koillection_container_name }}"
@@ -96,13 +96,13 @@
         memory: "{{ koillection_memory }}"
   when: koillection_enabled is true
 
-- name: Stop Koillection
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Koillection Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ koillection_container_name }}"
         state: absent
-    - name: Stop Koillection PostgreSQL Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Docker Container
       community.docker.docker_container:
         name: "{{ koillection_db_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Peppermint
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Peppermint Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ peppermint_data_directory }}"
         - "{{ peppermint_data_directory }}/db"
 
-    - name: Create Peppermint PostgreSQL Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ peppermint_db_container_name }}"
@@ -27,7 +27,7 @@
         labels:
           autoheal: "{{ peppermint_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ peppermint_db_watchtower_monitor_only }}"
-          homepage.name: "Peppermint PostgreSQL"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ peppermint_db_homepage_group }}"
           homepage.icon: "{{ peppermint_db_homepage_icon }}"
           homepage.href: "{{ peppermint_db_homepage_href }}"
@@ -40,7 +40,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
-    - name: Create Peppermint Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ peppermint_container_name }}"
@@ -62,7 +62,7 @@
         labels:
           autoheal: "{{ peppermint_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ peppermint_watchtower_monitor_only }}"
-          homepage.name: "Peppermint"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ peppermint_homepage_group }}"
           homepage.icon: "{{ peppermint_homepage_icon }}"
           homepage.href: "{{ peppermint_homepage_href }}"
@@ -85,14 +85,14 @@
         memory: "{{ peppermint_memory_limit }}"
   when: peppermint_enabled is true
 
-- name: Stop Peppermint
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Peppermint PostgreSQL Docker Container
-      community.docker.docker_container:
-        name: "{{ peppermint_db_container_name }}"
-        state: absent
-    - name: Stop Peppermint Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ peppermint_container_name }}"
+        state: absent
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ peppermint_db_container_name }}"
         state: absent
   when: peppermint_enabled is false

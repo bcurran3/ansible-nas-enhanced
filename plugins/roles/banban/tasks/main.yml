@@ -1,7 +1,7 @@
 ---
-- name: Start BanBan
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create BanBan Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ banban_data_directory }}/db"
         - "{{ banban_data_directory }}/storage"
 
-    - name: Create BanBan Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ banban_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ banban_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ banban_watchtower_monitor_only }}"
-          homepage.name: "banban"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ banban_homepage_group }}"
           homepage.icon: "{{ banban_homepage_icon }}"
           homepage.href: "{{ banban_homepage_href }}"
@@ -54,9 +54,9 @@
         memory: "{{ banban_memory }}"
   when: banban_enabled is true
 
-- name: Stop BanBan
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop BanBan
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ banban_container_name }}"
         state: absent

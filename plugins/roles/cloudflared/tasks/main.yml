@@ -1,7 +1,7 @@
 ---
-- name: Start cloudflared
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create cloudflared Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ cloudflared_container_name }}"
@@ -17,7 +17,7 @@
           autoheal: "{{ cloudflared_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ cloudflared_watchtower_monitor_only }}"
           homepage.group: "{{ cloudflared_homepage_group }}"
-          homepage.name: "cloudflared"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ cloudflared_homepage_icon }}"
           homepage.href: "https://dash.cloudflare.com/login"
 #         homepage.description: "Client for Cloudflare Tunnel, a daemon that exposes private services through the Cloudflare edge."
@@ -33,9 +33,9 @@
           wud.link.template: "https://github.com/cloudflare/cloudflared/releases/tag/$${major}.$${minor}.$${patch}"
   when: cloudflared_enabled is true
 
-- name: Stop cloudflared
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop cloudflared
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ cloudflared_container_name }}"
         state: absent

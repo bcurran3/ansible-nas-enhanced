@@ -1,14 +1,14 @@
 ---
-- name: Start DweebUI
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create DweebUI Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ dweebui_data_directory }}"
 
-    - name: Create DweebUI Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dweebui_container_name }}"
@@ -30,7 +30,7 @@
         labels:
           autoheal: "{{ dweebui_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dweebuit_watchtower_monitor_only }}"
-          homepage.name: "DweebUI"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dweebui_homepage_group }}"
           homepage.icon: "{{ dweebui_homepage_icon }}"
           homepage.href: "{{ dweebui_homepage_href }}"
@@ -52,9 +52,9 @@
           wud.link.template: "https://github.com/lllllllillllllillll/DweebUI/releases/tag/$${major}.$${minor}.$${patch}"
   when: dweebui_enabled is true
 
-- name: Stop DweebUI
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop DweebUI
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dweebui_container_name }}"
         state: absent

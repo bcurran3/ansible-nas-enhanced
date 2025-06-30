@@ -1,7 +1,7 @@
 ---
-- name: Start Double Commander
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Double Commander Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ doublecommander_data_directory }}"
         - "{{ doublecommander_data_directory }}/config"
 
-    - name: Create Double Commander Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ doublecommander_container_name }}"
@@ -29,7 +29,7 @@
         labels:
           autoheal: "{{ doublecommander_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ doublecommander_watchtower_monitor_only }}"
-          homepage.name: "Double Commander"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ doublecommander_homepage_group }}"
           homepage.icon: "{{ doublecommander_homepage_icon }}"
           homepage.href: "{{ doublecommander_homepage_href }}"
@@ -52,9 +52,9 @@
         memory: 512m
   when: doublecommander_enabled is true
 
-- name: Stop Double Commander
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Double Commander
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ doublecommander_container_name }}"
         state: absent

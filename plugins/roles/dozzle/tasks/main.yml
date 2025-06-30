@@ -1,7 +1,7 @@
 ---
-- name: Start Dozzle
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Dozzle Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dozzle_container_name }}"
@@ -20,7 +20,7 @@
         labels:
           autoheal: "{{ dozzle_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dozzle_watchtower_monitor_only }}"
-          homepage.name: "Dozzle"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dozzle_homepage_group }}"
           homepage.icon: "{{ dozzle_homepage_icon }}"
           homepage.href: "{{ dozzle_homepage_href }}"
@@ -42,9 +42,9 @@
           wud.link.template: "https://github.com/amir20/dozzle/releases/tag/$${major}.$${minor}.$${patch}"
   when: dozzle_enabled is true
 
-- name: Stop Dozzle
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Dozzle
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dozzle_container_name }}"
         state: absent

@@ -1,6 +1,6 @@
-- name: Start WatchYourLAN
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create WatchYourLAN Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ watchyourlan_container_name }}"
@@ -22,7 +22,7 @@
         labels:
           autoheal: "{{ watchyourlan_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ watchyourlan_watchtower_monitor_only }}"
-          homepage.name: "WatchYourLAN"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ watchyourlan_homepage_group }}"
           homepage.icon: "{{ watchyourlan_homepage_icon }}"
           homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchyourlan_port_http }}"
@@ -36,9 +36,9 @@
           wud.link.template: "https://github.com/aceberg/WatchYourLAN/releases/tag/$${major}.$${minor}.$${patch}"
   when: watchyourlan_enabled is true
 
-- name: Stop WatchYourLAN
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop WatchYourLAN Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ watchyourlan_container_name }}"
         state: absent

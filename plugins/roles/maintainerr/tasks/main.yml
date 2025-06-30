@@ -1,7 +1,7 @@
 ---
-- name: Start Maintainerr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Maintainerr Data Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ maintainerr_data_directory }}"
         - "{{ maintainerr_data_directory }}/data"
 
-    - name: Create Maintainerr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ maintainerr_container_name }}"
@@ -27,7 +27,7 @@
         labels:
           autoheal: "{{ maintainerr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ maintainerr_watchtower_monitor_only }}"
-          homepage.name: "Maintainerr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ maintainerr_homepage_group }}"
           homepage.icon: "{{ maintainerr_homepage_icon }}"
           homepage.href: "{{ maintainerr_homepage_href }}"
@@ -49,9 +49,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: maintainerr_enabled is true
 
-- name: Stop Maintainerr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Maintainerr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ maintainerr_container_name }}"
         state: absent

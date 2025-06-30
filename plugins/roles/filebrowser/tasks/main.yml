@@ -1,14 +1,14 @@
 ---
-- name: Start File Browser
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create File Browser Data Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ filebrowser_data_directory }}"
 
-    - name: Create File Browser Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ filebrowser_container_name }}"
@@ -31,7 +31,7 @@
         labels:
           autoheal: "{{ filebrowser_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ filebrowser_watchtower_monitor_only }}"
-          homepage.name: "File Browser"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ filebrowser_homepage_group }}"
           homepage.icon: "{{ filebrowser_homepage_icon }}"
           homepage.href: "{{ filebrowser_homepage_href }}"
@@ -53,9 +53,9 @@
           wud.link.template: "https://github.com/filebrowser/filebrowser/releases/tag/$${major}.$${minor}.$${patch}"
   when: filebrowser_enabled is true
 
-- name: Stop File Browser
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop File Browser
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ filebrowser_container_name }}"
         state: absent

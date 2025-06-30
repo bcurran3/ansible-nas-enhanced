@@ -1,8 +1,8 @@
 ---
 # WORK IN PROGRESS
-- name: Start Nextcloud AIO
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Nextcloud AIO directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -21,7 +21,7 @@
     #  community.docker.docker_network:
     #    name: "{{ nextcloudaio_network_name }}"
 
-    - name: Nextcloud AIO Docker Container
+    - name: Nextcloud {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ nextcloudaio_container_name }}"
@@ -89,9 +89,9 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
   when: nextcloudaio_enabled is true
 
-- name: Stop Nextcloud AIO
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Nextcloud AIO
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ nextcloudaio_container_name }}"
         state: absent
