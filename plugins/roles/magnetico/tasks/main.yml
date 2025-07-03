@@ -20,6 +20,7 @@
         hostname: "{{ magnetico_container2_name }}"
         image: boramalper/magneticod
         pull: true
+        cpu_shares: "{{ magneticod_cpu_shares }}"
         volumes:
           - "{{ magnetico_data_directory }}/config:/root/.config/magneticod"
           - "{{ magnetico_data_directory }}/data:/root/.local/share/magneticod"
@@ -50,6 +51,7 @@
         name: "{{ magnetico_container_name }}"
         image: boramalper/magneticow
         pull: true
+        cpu_shares: "{{ magneticow_cpu_shares }}"
         links:
           - "{{ magnetico_container2_name }}"
         volumes:

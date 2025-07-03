@@ -13,15 +13,16 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mkvtoolnix_container_name }}"
+        hostname: "{{ mkvtoolnix_container_name }}"
         image: jlesage/mkvtoolnix
         pull: true
+        cpu_shares: "{{ mkvtoolnix_cpu_shares }}"
         volumes:
           - "{{ mkvtoolnix_data_directory }}/config:/config:rw"
           - "{{ mkvtoolnix_storage_directory }}:/storage:rw"
         ports:
           - "{{ mkvtoolnix_port_http }}:5800"
         dns_servers: "{{ ansible_nas_dns }}"
-        hostname: "mkvtoolnix"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           USER_ID: "{{ mkvtoolnix_user_id }}"

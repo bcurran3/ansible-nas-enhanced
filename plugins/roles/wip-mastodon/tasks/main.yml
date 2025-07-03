@@ -22,6 +22,7 @@
         hostname: "{{ mastodon_redis_container_name }}"
         image: redis:7-alpine
         pull: true
+        cpu_shares: "{{ mastodon_redis_cpu_shares }}"
         networks:
           - name: "{{ mastodon_network_name }}"
         networks_cli_compatible: "yes"
@@ -49,6 +50,7 @@
         hostname: "{{ mastodon_db_container_name }}"
         image: postgres:14-alpine
         pull: true
+        cpu_shares: "{{ mastodon_db_cpu_shares }}"
         networks:
           - name: "{{ mastodon_network_name }}"
         networks_cli_compatible: "yes"
@@ -81,6 +83,7 @@
         image: lscr.io/linuxserver/mastodon:latest
 #        image: ghcr.io/mastodon/mastodon:v4.3.0
         pull: true
+        cpu_shares: "{{ mastodon_cpu_shares }}"
         networks:
           - name: "{{ mastodon_network_name }}"
         networks_cli_compatible: "yes"

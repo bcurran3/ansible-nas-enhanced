@@ -16,6 +16,7 @@
         hostname: "{{ musicassistant_container_name }}"
         image: ghcr.io/music-assistant/server
         pull: true
+        cpu_shares: "{{ musicassistant_cpu_shares }}"
         privileged: true
         volumes:
           - "{{ musicassistant_data_directory }}/data:/data"

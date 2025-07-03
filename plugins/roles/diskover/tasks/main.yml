@@ -30,6 +30,7 @@
         hostname: "{{ diskover_elasticsearch_hostname }}"
         image: public.ecr.aws/elastic/elasticsearch:8.16.2
         pull: true
+        cpu_shares: "{{ diskover_elasticsearch_cpu_shares }}"
         networks:
           - name: "{{ diskover_network_name }}"
         networks_cli_compatible: "yes"
@@ -97,8 +98,9 @@
         hostname: "{{ diskover_container_name }}"
         image: lscr.io/linuxserver/diskover:latest
         pull: true
-#        links:
-#          - "{{ diskover_elasticsearch_container_name }}"
+        cpu_shares: "{{ diskover_cpu_shares }}"
+        links:
+          - "{{ diskover_elasticsearch_container_name }}"
 #          - elasticsearch-helper
         networks:
           - name: "{{ diskover_network_name }}"

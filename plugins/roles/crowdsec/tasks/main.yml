@@ -18,6 +18,7 @@
         hostname: "{{ crowdsec_container_name }}"
         image: crowdsecurity/crowdsec
         pull: true
+        cpu_shares: "{{ crowdsec_cpu_shares }}"
         volumes:
           - "{{ crowdsec_data_directory }}/config:/etc/crowdsec"
           - "{{ crowdsec_data_directory }}/config/acquis.d:/etc/crowdsec/acquis.d"

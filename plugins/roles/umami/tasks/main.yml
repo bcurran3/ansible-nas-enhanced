@@ -16,6 +16,7 @@
         hostname: "{{ umami_db_container_name }}"
         image: postgres:16-alpine
         pull: true
+        cpu_shares: "{{ umami_db_cpu_shares }}"
         volumes:
           - "{{ umami_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -51,6 +52,7 @@
         hostname: "{{ umami_container_name }}"
         image: ghcr.io/umami-software/umami:postgresql-latest
         pull: true
+        cpu_shares: "{{ umami_cpu_shares }}"
         ports:
           - "{{ umami_port_http }}:3000"
         env:

@@ -16,6 +16,7 @@
         hostname: "{{ conduit_container_name }}"
         image: matrixconduit/matrix-conduit:latest
         pull: true
+        cpu_shares: "{{ conduit_cpu_shares }}"
         env:
           CONDUIT_SERVER_NAME: "{{ conduit_hostname}}.{{ ansible_nas_domain }}"
           CONDUIT_DATABASE_PATH: "/var/lib/matrix-conduit/"

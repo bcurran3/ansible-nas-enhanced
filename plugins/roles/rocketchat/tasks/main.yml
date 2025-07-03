@@ -31,6 +31,7 @@
         hostname: "{{ rocketchat_db_container_name }}"
         image: docker.io/bitnami/mongodb:5.0
         pull: true
+        cpu_shares: "{{ rocketchat_db_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ rocketchat_network_name }}"
@@ -72,6 +73,7 @@
         hostname: "{{ rocketchat_container_name }}"
         image: rocketchat/rocket.chat:latest
         pull: true
+        cpu_shares: "{{ rocketchat_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ rocketchat_network_name }}"

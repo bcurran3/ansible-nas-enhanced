@@ -15,6 +15,7 @@
         hostname: "{{ wireguard_container_name }}"
         image: weejewel/wg-easy:latest
         pull: true
+        cpu_shares: "{{ wireguard_cpu_shares }}"
         env: "{{ wireguard_environment_variables }}"
         volumes:
           - "{{ wireguard_data_directory }}:/etc/wireguard"

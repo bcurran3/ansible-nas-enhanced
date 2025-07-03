@@ -21,6 +21,7 @@
         hostname: "{{ ollama_container_name }}"
         image: ollama/ollama
         pull: true
+        cpu_shares: "{{ ollama_cpu_shares }}"
         runtime: "nvidia"
         volumes:
           - "{{ ollama_data_directory }}/ollama:/root/.ollama"
@@ -63,6 +64,7 @@
         hostname: "{{ ollama_openedai_container_name }}"
         image: ghcr.io/matatonic/openedai-speech
         pull: true
+        cpu_shares: "{{ ollama_openedai_cpu_shares }}"
         volumes:
           - "{{ ollama_data_directory }}/openedai/config:/app/config"
           - "{{ ollama_data_directory }}/openedai/voices:/app/voices"
@@ -106,6 +108,7 @@
         hostname: "{{ ollama_openwebui_container_name }}"
         image: ghcr.io/open-webui/open-webui:cuda
         pull: true
+        cpu_shares: "{{ ollama_openwebui_cpu_shares }}"
         volumes:
           - "{{ ollama_data_directory }}/openwebui:/app/backend/data"
         ports:

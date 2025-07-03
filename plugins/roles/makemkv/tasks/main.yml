@@ -16,11 +16,12 @@
         hostname: "{{ makemkv_container_name }}"
         image: jlesage/makemkv
         pull: true
+        cpu_shares: "{{ makemkv_cpu_shares }}"
         volumes:
           - "{{ makemkv_data_directory }}:/config:rw"
-    #      - "{{ makemkv_optical_drive }}: /dev/sr0:ro"
+#         - "{{ makemkv_optical_drive }}: /dev/sr0:ro"
           - "{{ makemkv_storage_directory }}:/storage:ro"
-    #      - "{{ makemkv_storagealt_directory }}:/storagealt:rw"
+#         - "{{ makemkv_storagealt_directory }}:/storagealt:rw"
           - "{{ makemkv_output_directory }}:/output:rw"
         ports:
           - "{{ makemkv_port_http }}:5800"
@@ -39,7 +40,7 @@
           homepage.icon: "{{ makemkv_homepage_icon }}"
           homepage.href: "{{ makemkv_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ makemkv_port_http }}"
-    #     homepage.description: "Backup your Bluray and DVD discs"
+#         homepage.description: "Backup your Bluray and DVD discs"
           homepage.server: "my-docker"
           homepage.container: "{{ makemkv_container_name }}"
           homepage.showStats: "{{ makemkv_homepage_showStats }}"

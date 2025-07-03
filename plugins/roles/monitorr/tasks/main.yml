@@ -14,6 +14,7 @@
         name: "{{ monitorr_container_name }}"
         image: monitorr/monitorr:latest
         pull: true
+        cpu_shares: "{{ monitorr_cpu_shares }}"
         volumes:
           - "{{ monitorr_data_directory }}/app:/app:rw"
           - "{{ samba_shares_root }}:/shares:ro"

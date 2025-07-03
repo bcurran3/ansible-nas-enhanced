@@ -23,7 +23,9 @@
 #        container_default_behavior: "compatibility"
 #        name: "{{ grampsweb_celery_container_name }}"
 #        hostname: "{{ grampsweb_celery_container_name }}"
+#        image: ??????????????????????????????
 #        pull: true
+#        cpu_shares: "{{ gramsweb_celery_cpu_shares }}"
 #        networks_cli_compatible: "yes"
 #        env:
 #          TZ: "{{ ansible_nas_timezone }}"
@@ -52,6 +54,7 @@
         hostname: "{{ grampsweb_redis_container_name }}"
         image: docker.io/library/redis:7.2.4-alpine
         pull: true
+        cpu_shares: "{{ grampsweb_redis_cpu_shares }}"
         networks_cli_compatible: "yes"
         env:
           TZ: "{{ ansible_nas_timezone }}"
@@ -78,6 +81,7 @@
         hostname: "{{ grampsweb_container_name }}"
         image: ghcr.io/gramps-project/grampsweb:latest
         pull: true
+        cpu_shares: "{{ grampsweb_cpu_shares }}"
         volumes:
           - "{{ grampsweb_data_directory }}/users:/app/users"  # persist user database
           - "{{ grampsweb_data_directory }}/index:/app/indexdir"  # persist search index

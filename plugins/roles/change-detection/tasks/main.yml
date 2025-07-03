@@ -16,6 +16,7 @@
         hostname: "{{ change_detection_sockpuppet_container_name }}"
         image: dgtlmoon/sockpuppetbrowser:latest
         pull: true
+        cpu_shares: "{{ change_detection_sockpuppet_cpu_shares }}"
         capabilities:
           - SYS_ADMIN
         env:
@@ -49,6 +50,7 @@
         hostname: "{{ change_detection_container_name }}"
         image: ghcr.io/dgtlmoon/changedetection.io
         pull: true
+        cpu_shares: "{{ change_detection_cpu_shares }}"
         volumes:
           - "{{ change_detection_data_directory }}/datastore:/datastore"
         ports:

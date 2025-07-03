@@ -17,6 +17,7 @@
         hostname: "{{ netalertx_container_name }}"
         image: jokobsk/netalertx:latest
         pull: true
+        cpu_shares: "{{ netalertx_cpu_shares }}"
         volumes:
           - "{{ netalertx_data_directory }}/config:/app/config"
           - "{{ netalertx_data_directory }}/db:/app/db"

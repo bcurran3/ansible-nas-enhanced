@@ -5,8 +5,10 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ chatpadai_container_name }}"
+        hostname: "{{ chatpadai_container_name }}"
         image: ghcr.io/deiucanta/chatpad:latest
         pull: true
+        cpu_shares: "{{ chatpadai_cpu_shares }}"
         network_mode: "bridge"
         env:
           TZ: "{{ ansible_nas_timezone }}"

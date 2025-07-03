@@ -16,6 +16,7 @@
         hostname: "{{ tianji_db_container_name }}"
         image: postgres:16-alpine
         pull: true
+        cpu_shares: "{{ tianji_db_cpu_shares }}"
         volumes:
           - "{{ tianji_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -47,6 +48,7 @@
         hostname: "{{ tianji_container_name }}"
         image: moonrailgun/tianji
         pull: true
+        cpu_shares: "{{ tianji_cpu_shares }}"
         links:
           - "{{ tianji_db_container_name }}"
         ports:

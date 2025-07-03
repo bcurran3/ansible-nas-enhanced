@@ -15,6 +15,7 @@
         hostname: "{{ kapowarr_container_name }}"
         image: mrcas/kapowarr:latest
         pull: true
+        cpu_shares: "{{ kapowarr_cpu_shares }}"
         volumes:
           - "{{ kapowarr_comics_directory }}:/comics:rw"
           - "{{ kapowarr_downloads_directory }}:/downloads:rw"

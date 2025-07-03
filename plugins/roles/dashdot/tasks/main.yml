@@ -5,8 +5,10 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dashdot_container_name }}"
+        hostname: "{{ dashdot_container_name }}"
         image: mauricenino/dashdot
         pull: true
+        cpu_shares: "{{ dashdot_cpu_shares }}"
         ports:
           - "{{ dashdot_port_http }}:3001"
         privileged: true

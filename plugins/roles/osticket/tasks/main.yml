@@ -22,6 +22,7 @@
         hostname: "{{ osticket_container_db_name }}"
         image: bitnami/mariadb:latest
         pull: true
+        cpu_shares: "{{ osticket_db_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ osticket_network_name }}"
@@ -54,8 +55,10 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ osticket_container_name }}"
+        hostname: "{{ osticket_container_name }}"
         image: devinsolutions/osticket
         pull: true
+        cpu_shares: "{{ osticket_cpu_shares }}"
         networks:
           - name: "{{ osticket_network_name }}"
         networks_cli_compatible: "yes"

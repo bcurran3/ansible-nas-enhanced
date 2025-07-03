@@ -8,16 +8,17 @@
         hostname: "{{ striparr_container_name }}"
         image: mikenye/striparr
         pull: true
+        cpu_shares: "{{ striparr_cpu_shares }}"
         volumes:
           - "{{ sonarr_tv_directory }}:/tv:rw"
           - "{{ radarr_movies_directory }}:/movies:rw"
         ports:
-          - "40000:40000"
+          - "{{ striparr_port_http }}:40000"
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-          PUID: "500"
-          PGID: "0"
+          PUID: "500" # convert
+          PGID: "0" # convert
         restart_policy: unless-stopped
         memory: "{{ striparr_memory_limit }}"
         labels:

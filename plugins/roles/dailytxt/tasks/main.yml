@@ -15,17 +15,18 @@
         name: "{{ dailytxt_container_name }}"
         image: phitux/dailytxt:latest
         pull: true
+        cpu_shares: "{{ dailytxt_cpu_shares }}"
         volumes:
           - "{{ dailytxt_data_directory }}/data:/app/data:rw"
         ports:
           - "{{ dailytxt_port_http }}:{{ dailytxt_port_http }}"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           ALLOW_REGISTRATION: "{{ dailytxt_allow_registration }}"
           DATA_INDENT: "2"
           JWT_EXP_DAYS: "{{ dailytxt_jwt_exp_days }}"
           PORT: "{{ dailytxt_port_http }}"
           SECRET_KEY: "{{ dailytxt_secret_key }}"
+          TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ dailytxt_memory }}"
         labels:

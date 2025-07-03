@@ -17,6 +17,7 @@
         hostname: "{{ checkmk_container_name }}"
         image: checkmk/check-mk-raw:2.4.0-latest
         pull: true
+        cpu_shares: "{{ checkmk_cpu_shares }}"
         network_mode: "bridge"
         volumes:
           -  "{{ checkmk_data_directory }}/omd/sites:/omd/sites"

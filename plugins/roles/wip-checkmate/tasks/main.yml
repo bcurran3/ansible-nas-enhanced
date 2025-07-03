@@ -21,6 +21,7 @@
         name: "{{ checkmate_redis_container_name }}"
         image: bluewaveuptime/uptime_redis:latest
         pull: true
+        cpu_shares: "{{ checkmate_redis_cpu_shares }}"
         hostname: "{{ checkmate_redis_container_name }}"
         networks:
           - name: "{{ checkmate_network }}"
@@ -52,6 +53,7 @@
         hostname: "{{ checkmate_db_container_name }}"
         image: bluewaveuptime/uptime_database_mongo:latest
         pull: true
+        cpu_shares: "{{ checkmate_db_cpu_shares }}"
         command: '["mongod", "--quiet"]'
         networks:
           - name: "{{ checkmate_network }}"
@@ -88,6 +90,7 @@
         hostname: "{{ checkmate_server_container_name }}"
         image: bluewaveuptime/uptime_server:latest
         pull: true
+        cpu_shares: "{{ checkmate_server_cpu_shares }}"
         networks:
           - name: "{{ checkmate_network }}"
         networks_cli_compatible: "yes"

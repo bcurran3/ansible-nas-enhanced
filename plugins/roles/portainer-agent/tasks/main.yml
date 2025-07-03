@@ -8,6 +8,7 @@
         hostname: "{{ portainer_agent_container_name }}"
         image: portainer/agent
         pull: true
+        cpu_shares: "{{ portainer_agent_cpu_shares }}"
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock"
           - "/var/lib/docker/volumes:/var/lib/docker/volumes"

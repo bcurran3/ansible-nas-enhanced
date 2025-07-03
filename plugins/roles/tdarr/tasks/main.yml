@@ -25,6 +25,7 @@
           max-file: "10"
           max-size: "200k"
         pull: true
+        cpu_shares: "{{ tdarr_cpu_shares }}"
         volumes:
           - "{{ tdarr_data_directory }}/server:/app/server"
           - "{{ tdarr_data_directory }}/configs:/app/configs"
@@ -35,7 +36,6 @@
         ports:
           - "{{ tdarr_port_http }}:8265"
           - "{{ tdarr_port_server }}:8266"
-        cpu_shares: "{{ tdarr_cpu_shares }}"
         devices:
           - "/dev/dri/:/dev/dri/"
         env:

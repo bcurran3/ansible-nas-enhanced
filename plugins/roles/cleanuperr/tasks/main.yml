@@ -17,6 +17,7 @@
         hostname: "{{ cleanuperr_container_name }}"
         image: ghcr.io/flmorg/cleanuperr:latest
         pull: true
+        cpu_shares: "{{ cleanuperr_cpu_shares }}"
         volumes:
           - "{{ cleanuperr_data_directory }}/logs:/var/logs"
       # if you want to ignore certain downloads from being processed

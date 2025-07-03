@@ -16,6 +16,7 @@
         hostname: "{{ webtop_container_name }}"
         image: "lscr.io/linuxserver/webtop:{{ webtop_container_version }}"
         pull: true
+        cpu_shares: "{{ webtop_cpu_shares }}"
         volumes:
           - "{{ webtop_data_directory }}/config:/config"
           - "/var/run/docker.sock:/var/run/docker.sock" #optional

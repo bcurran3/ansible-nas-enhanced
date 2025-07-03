@@ -18,6 +18,7 @@
         hostname: "{{ bitmagnet_db_container_name }}"
         image: postgres:16-alpine
         pull: true
+        cpu_shares: "{{ bigmagnet_db_cpu_shares }}"
         volumes:
           - "{{ bitmagnet_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -54,6 +55,7 @@
         hostname: "{{ bitmagnet_container_name }}"
         image: ghcr.io/bitmagnet-io/bitmagnet:latest
         pull: true
+        cpu_shares: "{{ bitmagnet_cpu_shares }}"
         volumes:
           - "{{ bitmagnet_data_directory }}/config:/root/.config/bitmagnet"
         links:

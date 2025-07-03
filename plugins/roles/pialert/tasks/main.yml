@@ -17,6 +17,7 @@
         name: "{{ pialert_container_name }}"
         image: jokobsk/pi.alert:latest
         pull: true
+        cpu_shares: "{{ pialert_cpu_shares }}"
         volumes:
           - "{{ pialert_data_directory }}/config:/home/pi/pialert/config"
           - "{{ pialert_data_directory }}/db:/home/pi/pialert/db"

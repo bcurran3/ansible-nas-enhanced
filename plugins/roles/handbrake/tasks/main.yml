@@ -18,6 +18,7 @@
         hostname: "{{ handbrake_container_name }}"
         image: jlesage/handbrake
         pull: true
+        cpu_shares: "{{ handbrake_cpu_shares }}"
         volumes:
           - "{{ handbrake_data_directory }}/config:/config:rw"
           - "{{ handbrake_storage_directory }}:/storage:ro"
@@ -25,7 +26,6 @@
           - "{{ handbrake_output_directory }}:/output:rw"
         ports:
           - "{{ handbrake_port_http }}:5800"
-        cpu_shares: 512
         env:
           TZ: "{{ ansible_nas_timezone }}"
           USER_ID: "{{ handbrake_user_id }}"

@@ -21,6 +21,7 @@
         hostname: "{{ gaseous_server_db_container_name }}"
         image: mariadb:latest
         pull: true
+        cpu_shares: "{{ gaseous_server_db_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ gaseous_server_network_name }}"
@@ -63,6 +64,7 @@
         hostname: "{{ gaseous_server_container_name }}"
         image: gaseousgames/gaseous-server:latest
         pull: true
+        cpu_shares: "{{ gaseous_server_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ gaseous_server_network_name }}"

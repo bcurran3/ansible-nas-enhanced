@@ -16,6 +16,7 @@
         hostname: "{{ onlyoffice_container_name }}"
         image: onlyoffice/documentserver
         pull: true
+        cpu_shares: "{{ onlyoffice_cpu_shares }}"
         networks:
           - name: "{{ nextcloud_network_name }}"
         network_mode: "{{ nextcloud_network_name }}"
@@ -31,8 +32,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ onlyoffice_port_http }}:80"
-          - "5222:5222"                     
-          # ^ document what this is for
+          - "5222:5222" # ONLYOFFICE Talk (XMPP client connections)
         restart_policy: unless-stopped
         memory: "{{ onlyoffice_memory }}"
         labels:

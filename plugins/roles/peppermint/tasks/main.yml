@@ -16,6 +16,7 @@
         hostname: "{{ peppermint_db_container_name }}"
         image: postgres:17-alpine
         pull: true
+        cpu_shares: "{{ peppermint_db_cpu_shares }}"
         volumes:
           - "{{ peppermint_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -47,6 +48,7 @@
         hostname: "{{ peppermint_container_name }}"
         image: pepperlabs/peppermint:latest
         pull: true
+        cpu_shares: "{{ peppermint_cpu_shares }}"
         ports:
           - "{{ peppermint_port_http }}:3000"
           - 5003:5003

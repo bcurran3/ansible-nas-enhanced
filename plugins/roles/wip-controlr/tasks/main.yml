@@ -20,8 +20,10 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ controlr_container_name }}"
+        hostname: "{{ controlr_container_name }}"
         image: translucency/controlr:latest
         pull: true
+        cpu_shares: "{{ controlr_cpu_shares }}"
         networks:
           - name: "{{ controlr_network_name }}"
         networks_cli_compatible: "yes"

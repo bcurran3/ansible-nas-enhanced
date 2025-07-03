@@ -22,6 +22,7 @@
         hostname: "{{ projectsend_db_container_name }}"
         image: linuxserver/mariadb
         pull: true
+        cpu_shares: "{{ projectsend_db_cpu_shares }}"
         network_mode: "bridge"
 #            networks:
 #              - name: "{{ projectsend_network_name }}"
@@ -62,6 +63,7 @@
 #              - name: "{{ projectsend_network_name }}"
 #            networks_cli_compatible: "yes"
         pull: true
+        cpu_shares: "{{ projectsend_cpu_shares }}"
         volumes:
           - "{{ projectsend_data_directory }}/config:/config"
           - "{{ projectsend_data_directory }}/data:/data"

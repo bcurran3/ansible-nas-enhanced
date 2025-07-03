@@ -16,6 +16,7 @@
         hostname: "{{ homarr_container_name }}"
         image: ghcr.io/homarr-labs/homarr:latest
         pull: true
+        cpu_shares: "{{ homarr_cpu_shares }}"
         volumes:
         - "{{ homarr_data_directory }}/appdata:/appdata"
         - "/var/run/docker.sock:/var/run/docker.sock" # ignores this and uses UTC

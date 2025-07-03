@@ -16,6 +16,7 @@
         hostname: "{{ uptimekuma_container_name }}"
         image: louislam/uptime-kuma:latest
         pull: true
+        cpu_shares: "{{ uptimekuma_cpu_shares }}"
         volumes:
           - "{{ uptimekuma_data_directory }}/data:/app/data"
           - "/var/run/docker.sock:/var/run/docker.sock"

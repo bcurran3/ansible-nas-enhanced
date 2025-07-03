@@ -19,6 +19,7 @@
         name: "{{ immich_machinelearning_container_name }}"
         image: "{{ immich_machinelearning_image }}:{{ immich_machinelearning_tag }}"
         pull: true
+        cpu_shares: "{{ immich_machinelearning_cpu_shares }}"
         container_default_behavior: no_defaults
     # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
     # Example tag: ${IMMICH_VERSION:-release}-cuda
@@ -54,6 +55,7 @@
         name: "{{ immich_postgres_container_name }}"
         image: "{{ immich_postgres_image }}:{{ immich_postgres_tag }}"
         pull: true
+        cpu_shares: "{{ immich_postgres_cpu_shares }}"
         volumes:
           - "{{ immich_data_directory }}/database:/var/lib/postgresql/data"
           - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
@@ -98,6 +100,7 @@
         name: "{{ immich_redis_container_name }}"
         image: "{{ immich_redis_image }}:{{ immich_redis_tag }}"
         pull: true
+        cpu_shares: "{{ immich_redis_cpu_shares }}"
         container_default_behavior: no_defaults
 #        command: --save 60 1 --loglevel warning
         networks:
@@ -131,6 +134,7 @@
         hostname: "{{ immich_server_container_name }}"
         image: "{{ immich_server_image }}:{{ immich_server_tag }}"
         pull: true
+        cpu_shares: "{{ immich_server_cpu_shares }}"
         container_default_behavior: no_defaults
 #        entrypoint: ["/bin/sh", "./start-server.sh"]
         volumes:

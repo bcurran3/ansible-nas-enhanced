@@ -18,6 +18,7 @@
         hostname: "{{ localai_container_name }}"
         image: localai/localai:latest  # CPU and GPU combined image
         pull: true
+        cpu_shares: "{{ localai_cpu_shares }}"
         ports:
           - "{{ localai_port_http }}:8080"
         runtime: "nvidia" # needs nvidia option configured

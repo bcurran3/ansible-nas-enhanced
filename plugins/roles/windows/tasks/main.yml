@@ -15,6 +15,7 @@
         hostname: "{{ windows_container_name }}"
         image: dockurr/windows
         pull: true
+        cpu_shares: "{{ windows_cpu_shares }}"
         capabilities:
           - NET_ADMIN
         devices:
@@ -25,7 +26,7 @@
           - "{{ windows_port_rdp }}:3389/udp"
         volumes:
           - "{{ windows_data_directory }}:/storage"
-    #      - "{{ samba_shares_root }}/public:/shared"
+#         - "{{ samba_shares_root }}/public:/shared"
           - "{{ samba_shares_other_root }}/public:/shared"
         network_mode: bridge
         env:

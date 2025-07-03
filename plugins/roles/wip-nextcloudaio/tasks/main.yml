@@ -17,19 +17,13 @@
     #    - "{{ nextcloudaio_data_directory }}/nextcloudaio/pre-upgrade"
     #    - "{{ nextcloudaio_data_directory }}/nextcloudaio/post-upgrade"
 
-    #- name: Create nextcloudaio network
-    #  community.docker.docker_network:
-    #    name: "{{ nextcloudaio_network_name }}"
-
     - name: Nextcloud {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ nextcloudaio_container_name }}"
         image: nextcloud/all-in-one:latest
         pull: true
-    #    networks:
-    #      - name: "{{ nextcloudaio_network_name }}"
-    #    network_mode: "{{ nextcloudaio_network_name }}"
+        cpu_shares: "{{ nextcloudaio_cpu_shares }}"
         volumes:
           - "nextcloud_aio_mastercontainer:/mnt/docker-aio-config"
           - "{{ nextcloudaio_data_directory }}/data:/mnt/ncdata"

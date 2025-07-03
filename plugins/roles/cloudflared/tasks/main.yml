@@ -5,8 +5,10 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ cloudflared_container_name }}"
+        hostname: "{{ cloudflared_container_name }}"
         image: cloudflare/cloudflared:latest
         pull: true
+        cpu_shares: "{{ cloudflared_cpu_shares }}"
         network_mode: "bridge"
         command: "tunnel --no-autoupdate run --token {{ cloudflared_token }}"
         env:

@@ -17,6 +17,7 @@
         image: renofischa/idrive:latest
 #        image: ghcr.io/snorre-k/idrive-docker:latest
         pull: true
+        cpu_shares: "{{ idrive_cpu_shares }}"
         volumes:
           - "{{ idrive_data_directory }}/config:/opt/IDriveForLinux/idriveIt"
           - "/:/mnt/backup:ro"

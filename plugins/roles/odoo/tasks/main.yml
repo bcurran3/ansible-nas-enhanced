@@ -19,6 +19,7 @@
         name: "{{ odoo_db_container_name }}"
         hostname: "{{ odoo_db_container_name }}"
         pull: true
+        cpu_shares: "{{ odoo_db_cpu_shares }}"
         volumes:
           - "{{ odoo_data_directory }}/db:/var/lib/postgresql/data/pgdata"
         network_mode: bridge
@@ -47,6 +48,7 @@
         hostname: "{{ odoo_container_name }}"
         image: odoo:17
         pull: true
+        cpu_shares: "{{ odoo_cpu_shares }}"
         user: root
         links:
           - "{{ odoo_db_container_name }}"

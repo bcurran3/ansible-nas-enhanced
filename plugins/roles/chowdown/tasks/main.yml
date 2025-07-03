@@ -15,6 +15,7 @@
         hostname: "{{ chowdown_container_name }}"
         image: gregyankovoy/chowdown:latest
         pull: true
+        cpu_shares: "{{ chowdown_cpu_shares }}"
         network_mode: "bridge"
         volumes:
           - "{{ chowdown_data_directory }}/config:/config:rw"

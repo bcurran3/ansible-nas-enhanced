@@ -17,6 +17,7 @@
         hostname: "{{ glpi_db_container_name }}"
         image: mariadb:10.7
         pull: true
+        cpu_shares: "{{ glpi_db_cpu_shares }}"
         volumes:
           - "{{ glpi_data_directory }}/db:/var/lib/mysql"
         env:
@@ -49,6 +50,7 @@
         hostname: "{{ glpi_container_name }}"
         image: diouxx/glpi
         pull: true
+        cpu_shares: "{{ glpi_cpu_shares }}"
         volumes:
           - "/etc/timezone:/etc/timezone:ro"
           - "/etc/localtime:/etc/localtime:ro"

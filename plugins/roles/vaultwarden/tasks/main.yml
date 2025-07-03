@@ -17,6 +17,7 @@
         hostname: "{{ vaultwarden_container_name }}"
         image: vaultwarden/server:latest
         pull: true
+        cpu_shares: "{{ vaultwarden_cpu_shares }}"
         ports:
           - "{{ vaultwarden_port_http }}:80"
           - "{{ vaultwarden_port_websockets }}:3012"
@@ -81,6 +82,7 @@
         hostname: "{{ vaultwarden_backup_container_name }}"
         image: bruceforce/vaultwarden-backup:latest
         pull: true
+        cpu_shares: "{{ vaultwarden_backup_cpu_shares }}"
         restart_policy: unless-stopped
         volumes:
           - "{{ vaultwarden_data_directory }}:/data"

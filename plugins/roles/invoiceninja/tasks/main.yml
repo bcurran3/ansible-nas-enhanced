@@ -1,4 +1,3 @@
-# LOTS more work needed - see docker compose file
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -26,51 +25,6 @@
         dest: "{{ invoiceninja_data_directory }}/appdata/nginx/in-vhost.conf"
       register: template_config
 
-    - name: Create {{ ansible_nas_app_name }} Web UI Container
-      docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ invoiceninja_container_name }}"
-        hostname: "{{ invoiceninja_container_name }}"
-        image: nginx
-        pull: true
-        networks:
-          - name: "{{ invoiceninja_network_name }}"
-        network_mode: "{{ invoiceninja_network_name }}"
-        networks_cli_compatible: "yes"
-        ports:
-          - "{{ invoiceninja_port_http }}:80"
-        volumes:
-#          - "{{ invoiceninja_data_directory }}/appdata/mariadb:/config"
-          - "{{ invoiceninja_data_directory }}/appdata/nginx/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro"
-          - "{{ invoiceninja_data_directory }}/public:/var/www/app/public:ro"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ invoiceninja_memory_limit }}"
-        labels:
-          autoheal: "{{ invoiceninja_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
-          homepage.name: "{{ ansible_nas_app_name }} (frontend)"
-          homepage.group: "{{ invoiceninja_homepage_group }}"
-          homepage.icon: "invoiceninja.png"
-          homepage.href: "{{ invoiceninja_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ invoiceninja_port_http }}"
-    #     homepage.description: "the world's most popular Web Server"
-          homepage.server: "my-docker"
-          homepage.container: "{{ invoiceninja_container_name }}"
-          homepage.showStats: "{{ invoiceninja_homepage_showStats }}"
-          traefik.enable: "{{ invoiceninja_available_externally | string }}"
-          traefik.http.routers.invoiceninja.rule: "Host(`invoiceninja.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.invoiceninja.tls.certresolver: "letsencrypt"
-          traefik.http.routers.invoiceninja.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.invoiceninja.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ invoiceninja_hostname }}"
-          traefik.http.routers.invoiceninja.middlewares: "{{ invoiceninja_hostname }}@docker"
-          traefik.http.middlewares.invoiceninja.IPAllowList.sourcerange: "{{ invoiceninja_traefik_whitelist }}"
-          traefik.http.services.invoiceninja.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/nginx/nginx/releases/tag/$${major}.$${minor}.$${patch}"
-
     - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
@@ -78,6 +32,7 @@
         hostname: "{{ invoiceninja_db_container_name }}"
         image: linuxserver/mariadb:10.11.6
         pull: true
+        cpu_shares: "{{ invoiceninja_db_cpu_shares }}"
         networks:
           - name: "{{ invoiceninja_network_name }}"
         network_mode: "{{ invoiceninja_network_name }}"
@@ -116,13 +71,13 @@
         hostname: "{{ invoiceninja_backend_container_name }}"
         image: invoiceninja/invoiceninja:latest
         pull: true
+        cpu_shares: "{{ invoiceninja_backend_cpu_shares }}"
         networks:
           - name: "{{ invoiceninja_network_name }}"
         network_mode: "{{ invoiceninja_network_name }}"
         networks_cli_compatible: "yes"
         links:
           - "{{ invoiceninja_db_container_name }}"
-          - "{{ invoiceninja_container_name }}"
         ports:
           - "9099:9000"
         volumes:
@@ -169,6 +124,53 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/invoiceninja/invoiceninja/releases/tag/$${major}.$${minor}.$${patch}"
+
+    - name: Create {{ ansible_nas_app_name }} Web UI Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ invoiceninja_container_name }}"
+        hostname: "{{ invoiceninja_container_name }}"
+        image: nginx
+        pull: true
+        cpu_shares: "{{ invoiceninja_cpu_shares }}"
+        networks:
+          - name: "{{ invoiceninja_network_name }}"
+        network_mode: "{{ invoiceninja_network_name }}"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ invoiceninja_port_http }}:80"
+        volumes:
+          - "{{ invoiceninja_data_directory }}/appdata/nginx/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro"
+          - "{{ invoiceninja_data_directory }}/public:/var/www/app/public:ro"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ invoiceninja_memory_limit }}"
+        links:
+          - "{{ invoiceninja_backend_container_name }}"
+        labels:
+          autoheal: "{{ invoiceninja_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} (frontend)"
+          homepage.group: "{{ invoiceninja_homepage_group }}"
+          homepage.icon: "invoiceninja.png"
+          homepage.href: "{{ invoiceninja_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ invoiceninja_port_http }}"
+#         homepage.description: "the world's most popular Web Server"
+          homepage.server: "my-docker"
+          homepage.container: "{{ invoiceninja_container_name }}"
+          homepage.showStats: "{{ invoiceninja_homepage_showStats }}"
+          traefik.enable: "{{ invoiceninja_available_externally | string }}"
+          traefik.http.routers.invoiceninja.rule: "Host(`invoiceninja.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.invoiceninja.tls.certresolver: "letsencrypt"
+          traefik.http.routers.invoiceninja.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.invoiceninja.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ invoiceninja_hostname }}"
+          traefik.http.routers.invoiceninja.middlewares: "{{ invoiceninja_hostname }}@docker"
+          traefik.http.middlewares.invoiceninja.IPAllowList.sourcerange: "{{ invoiceninja_traefik_whitelist }}"
+          traefik.http.services.invoiceninja.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/nginx/nginx/releases/tag/$${major}.$${minor}.$${patch}"
   when: invoiceninja_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -20,6 +20,7 @@
         hostname: "{{ gamevault_db_container_name }}"
         image: postgres:16-alpine
         pull: true
+        cpu_shares: "{{ gamevault_db_cpu_shares }}"
         volumes:
           - "{{ gamevault_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -50,6 +51,7 @@
         hostname: "{{ gamevault_container_name }}"
         image: phalcode/gamevault-backend:latest
         pull: true
+        cpu_shares: "{{ gamevault_cpu_shares }}"
         links:
           - "{{ gamevault_db_container_name }}"
         volumes:

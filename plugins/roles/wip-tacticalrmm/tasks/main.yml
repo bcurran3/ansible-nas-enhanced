@@ -1,7 +1,7 @@
 # https://raw.githubusercontent.com/amidaware/tacticalrmm/master/docker/docker-compose.yml
 # https://docs.tacticalrmm.com/install_docker/
 ---
-### WORK IN PROGRESS
+### WORK IN PROGRESS OR INDEFINATELY ON HOLD
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create Tactical RMM Directories
@@ -40,6 +40,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: postgres:13-alpine
         name: tactical-postgres
         hostname: tactical-postgres
@@ -67,6 +68,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: mongo:4.4
         name: tactical-mongodb
         hostname: tactical-mongodb
@@ -95,6 +97,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: redis:6.0-alpine
         name: tactical-redis
         hostname: tactical-redis
@@ -120,6 +123,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical-nats
         name: tactical-nats
         hostname: tactical-nats
@@ -154,6 +158,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical-meshcentral
         name: tactical-meshcentral
         hostname: meshcentral
@@ -197,6 +202,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical
         name: tactical-init
         hostname: tactical-init
@@ -238,6 +244,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical-frontend
         name: tactical-frontend
         hostname: tactical-frontend
@@ -262,6 +269,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical
         name: tactical-backend
         hostname: tactical-backend
@@ -291,6 +299,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical
         name: tactical-websockets
         hostname: tactical-websockets
@@ -321,6 +330,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical
         name: tactical-celery
         hostname: tactical-celery
@@ -351,6 +361,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical
         name: tactical-celerybeat
         hostname: tactical-celerybeat
@@ -381,6 +392,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         image: tacticalrmm/tactical-nginx
         name: tactical-nginx
         hostname: tactical-nginx

@@ -16,6 +16,7 @@
         hostname: "{{ joplin_db_container_name }}"
         image: postgres:16-alpine
         pull: true
+        cpu_shares: "{{ joplin_db_cpu_shares }}"
         volumes:
           - "{{ joplin_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -46,6 +47,7 @@
         hostname: "{{ joplin_container_name }}"
         image: joplin/server:latest
         pull: true
+        cpu_shares: "{{ joplin_cpu_shares }}"
         links:
           - "{{ joplin_db_container_name }}"
         ports:

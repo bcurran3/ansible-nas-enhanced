@@ -18,6 +18,7 @@
         hostname: "{{ qbittorrent_container_name }}"
         image: linuxserver/qbittorrent:latest
         pull: true
+        cpu_shares: "{{ qbittorrent_cpu_shares }}"
         volumes:
           - "{{ qbittorrent_data_directory }}/config:/config:rw"
           - "{{ qbittorrent_data_directory }}/custom-cont-init.d:/custom-cont-init.d:ro"

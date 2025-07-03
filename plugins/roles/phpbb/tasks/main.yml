@@ -22,6 +22,7 @@
         hostname: "{{ phpbb_db_container_name }}"
         image: bitnami/mariadb:latest
         pull: true
+        cpu_shares: "{{ phpbb_db_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ phpbb_network_name }}"
@@ -58,6 +59,7 @@
         hostname: "{{ phpbb_container_name }}"
         image: bitnami/phpbb:latest
         pull: true
+        cpu_shares: "{{ phpbb_cpu_shares }}"
         networks:
           - name: "{{ phpbb_network_name }}"
         networks_cli_compatible: "yes"

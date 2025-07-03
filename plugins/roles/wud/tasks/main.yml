@@ -15,6 +15,7 @@
         hostname: "{{ wud_container_name }}"
         image: "{{ wud_image_name }}:{{ wud_image_version }}"
         pull: true
+        cpu_shares: "{{ wud_cpu_shares }}"
         volumes:
           - "{{ wud_data_directory }}:/store"
           - "/var/run/docker.sock:/var/run/docker.sock"

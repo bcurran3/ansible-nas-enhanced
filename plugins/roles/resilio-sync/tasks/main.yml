@@ -19,6 +19,7 @@
         hostname: "{{ resilio_sync_container_name }}"
         image: lscr.io/linuxserver/resilio-sync:latest
         pull: true
+        cpu_shares: "{{ resilio_sync_cpu_shares }}"
         volumes:
           - "{{ resilio_sync_data_directory }}:/config"
           - "{{ resilio_sync_data_directory }}:/downloads"

@@ -27,6 +27,7 @@
         hostname: "mongodb"
         image: mongo:latest
         pull: true
+        cpu_shares: "{{ meshcentral_db_cpu_shares }}"
         networks:
           - name: "{{ meshcentral_network }}"
         networks_cli_compatible: "yes"
@@ -62,6 +63,7 @@
         hostname: "{{ meshcentral_container_name }}"
         image: typhonragewind/meshcentral:mongodb-latest
         pull: true
+        cpu_shares: "{{ meshcentral_cpu_shares }}"
         networks:
           - name: "{{ meshcentral_network }}"
         networks_cli_compatible: "yes"

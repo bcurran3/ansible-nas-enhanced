@@ -28,8 +28,9 @@
         name: "{{ proget_db_container_name}}"
         hostname: "{{ proget_db_container_name}}"
         image: mcr.microsoft.com/mssql/server:2019-latest
-        ports: 1433:1433
+        ports: 1433:1433   # shouldn't be needed
         pull: true
+        cpu_shares: "{{ proget_db_cpu_shares }}"
         networks:
           - name: "{{ proget_network_name }}"
         networks_cli_compatible: "yes"
@@ -67,6 +68,7 @@
         hostname: "{{ proget_container_name }}"
         image: proget.inedo.com/productimages/inedo/proget
         pull: true
+        cpu_shares: "{{ proget_cpu_shares }}"
         networks:
           - name: "{{ proget_network_name }}"
         networks_cli_compatible: "yes"
@@ -79,6 +81,7 @@
           - "{{ proget_port_http }}:80"
         env:
           PROGET_SQL_CONNECTION_STRING: "Data Source=proget-db; Initial Catalog=ProGet; User ID=sa; Password=t0ps3cr3t!pw"
+          # ^ change to the variables
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         labels:
@@ -102,11 +105,6 @@
           traefik.http.routers.proget.middlewares: "proget@docker"
           traefik.http.middlewares.proget.IPAllowList.sourcerange: "{{ proget_traefik_whitelist }}"
           traefik.http.services.proget.loadbalancer.server.port: "80"
-### me only
-#         traefik.frontend.rule: "Host:{{ proget_hostname }}.{{ ansible_nas_domain }}"
-#         traefik.frontend.redirect.regex: "^https:\\\\/\\\\/([^\\\\/]+)\\\\/?$$"
-#         traefik.frontend.redirect.replacement: "https://{{ proget_hostname }}.{{ ansible_nas_domain }}/feeds/chocolatey"
-###
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
         memory: "{{ proget_memory_limit }}"

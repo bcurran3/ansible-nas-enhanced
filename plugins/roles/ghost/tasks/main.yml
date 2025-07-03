@@ -22,6 +22,7 @@
         hostname: "{{ ghost_db_container_name }}"
         image: mysql:8.0
         pull: true
+        cpu_shares: "{{ ghost_db_cpu_shares }}"
         networks:
           - name: "{{ ghost_network }}"
         networks_cli_compatible: "yes"
@@ -55,6 +56,7 @@
         hostname: "{{ ghost_container_name }}"
         image: ghost
         pull: true
+        cpu_shares: "{{ ghost_cpu_shares }}"
         networks:
           - name: "{{ ghost_network }}"
         networks_cli_compatible: "yes"
