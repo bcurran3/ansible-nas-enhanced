@@ -25,6 +25,7 @@
         container_default_behavior: "compatibility"
         name: "{{ meshcentral_db_container_name }}"
         hostname: "mongodb"
+        # ^ can be changed to container name??? check env var in app
         image: mongo:latest
         pull: true
         cpu_shares: "{{ meshcentral_db_cpu_shares }}"
@@ -32,7 +33,7 @@
           - name: "{{ meshcentral_network }}"
         networks_cli_compatible: "yes"
 #       ports:
-#         - "27017:27017"  # MongoDB
+#         - "27017:27017"
         volumes:
           - "{{ meshcentral_data_directory }}/db:/data/db"
         network_mode: bridge

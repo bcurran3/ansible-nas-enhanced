@@ -2,6 +2,7 @@
 # REF: https://docs.ansible.com/ansible/2.5/modules/docker_module.html
 # All comments here
 #
+# consider making wud lables variables - if the image changes, so would the link
 ############################## comments ##############################
 ---
 - name: Start {{ ansible_nas_app_name }}
@@ -63,5 +64,129 @@
         state: absent
   when: appname_enabled is false
 
-# NOTE: add common database setups to the template
-# consider making wud lables variables - if the image changes, so would the link
+
+###################################
+# OPTIONAL - remove if not needed 
+#   __  __       ____   ___  _
+#  |  \/  |_   _/ ___| / _ \| |
+#  | |\/| | | | \___ \| | | | |
+#  | |  | | |_| |___) | |_| | |___
+#  |_|  |_|\__, |____/ \__\_\_____|
+#          |___/
+###################################
+
+    - name: Create {{ ansible_nas_app_name }} MySQL Container
+      community.docker.docker_container:
+        name: "{{ appname_db_container_name }}"
+        hostname: "{{ appname_db_container_name }}"
+        image: "{{ appname_db_image_name }}:{{ appname_db_image_version }}"
+        networks:
+          - name: "{{ appname_network_name }}"
+        network_mode: "{{ appname_network_name }}"
+        pull: true
+        cpu_shares: "{{ appname_db_cpu_shares }}"
+        volumes:
+          - "{{ appname_data_directory }}/mysql/mysql:/var/lib/mysql"
+          - "{{ appname_data_directory }}/mysql/my.cnf:/etc/my.cnf"
+        env:
+          MYSQL_DATABASE: "appname"
+          MYSQL_USER: "{{ appname_sql_user }}"
+          MYSQL_PASSWORD: "{{ appname_sql_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ appname_sql_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ appname_db_memory }}"
+        labels:
+          autoheal: "{{ appname_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ appname_db_watchtower_monitor_only }}"
+          homepage.group: "{{ appname_db_homepage_group }}"
+          homepage.name: "appname MySQL"
+          homepage.icon: "{{ appname_db_homepage_icon }}"
+          homepage.href: "{{ appname_homepage_href }}"
+#         homepage.description: "MySQL"
+          homepage.server: "my-docker"
+          homepage.container: "{{ appname_db_container_name }}"
+          homepage.showStats: "{{ appname_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+
+######################################################
+# OPTIONAL - remove if not needed 
+#   ____           _                 ____   ___  _
+#  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |
+#  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |
+#  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___
+#  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|
+######################################################
+
+    - name: Create {{ ansible_nas_app_name }} PostgreSQL Container
+      community.docker.docker_container:
+        name: "{{ appname_db_container_name }}"
+        hostname: "{{ appname_db_container_name }}"
+        image: "{{ appname_db_image_name }}:{{ appname_db_image_version }}"
+        pull: true
+        cpu_shares: "{{ appname_db_cpu_shares }}"
+        volumes:
+          - "{{ appname_data_directory }}/db:/var/lib/postgresql/data"
+        container_default_behavior: no_defaults
+        env:
+          POSTGRES_USER: "appname"
+          POSTGRES_PASSWORD: "appname"
+          POSTGRES_DB: "appname"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ appname_db_memory }}"
+        labels:
+          autoheal: "{{ appname_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ appname_db_watchtower_monitor_only }}"
+          homepage.group: "{{ appname_db_homepage_group }}"
+          homepage.name: "appname PostgreSQL"
+          homepage.icon: "{{ appname_db_homepage_icon }}"
+          homepage.href: "{{ appname_homepage_href }}"
+#         homepage.description: "PostgrSQL"
+          homepage.server: "my-docker"
+          homepage.container: "{{ appname_db_container_name }}"
+          homepage.showStats: "{{ appname_db_homepage_showStats }}"
+          traefik.enable: "false"
+
+##################################
+# OPTIONAL - remove if not needed
+#      ____          _ _
+#     |  _ \ ___  __| (_)___
+#     | |_) / _ \/ _` | / __|
+#     |  _ <  __/ (_| | \__ \
+#     |_| \_\___|\__,_|_|___/
+##################################
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ appname_redis_container_name }}"
+        hostname: "{{ appname_redis_container_name }}"
+        image: "{{ appname_redis_image_name }}:{{ appname_redis_image_version }}"
+        pull: true
+        cpu_shares: "{{ appname_redis_cpu_shares }}"
+        networks:
+          - name: "{{ appname_network_name }}"
+        network_mode: "{{ appname_network_name }}"
+        networks_cli_compatible: "yes"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ appname_redis_memory }}"
+        command: "redis-server --requirepass topsecret"
+        labels:
+          autoheal: "{{ appname_redis_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ appname_redis_watchtower_monitor_only }}"
+          homepage.group: "{{ appname_redis_homepage_group }}"
+          homepage.name: "appname Redis"
+          homepage.icon: "{{ appname_redis_homepage_icon }}"
+          homepage.href: "{{ appname_homepage_href }}"
+#         homepage.description: "Redis"
+          homepage.server: "my-docker"
+          homepage.container: "{{ appname_redis_container_name }}"
+          homepage.showStats: "{{ appname_redis_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"

@@ -33,7 +33,10 @@
 #    msg: "{{ [item.path] }} "
 #  with_items: "{{ found_directories.files }}"
 
-- name: test task
+- debug:
+    msg: "Testing Discovery and Running of Roles in Apps Directory"
+
+- name: Discover Roles in Apps Directory
   find:
     paths: apps/
     file_type: directory
@@ -55,3 +58,20 @@
     name: "{{ item }}"
   with_items: "{{ found_directories.files | map(attribute='path') | list }}"
 
+- debug:
+    msg: "Testing data archiving"
+
+- name: Create TEST Directory
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: nobody
+    group: nogroup
+  with_items:
+    - "{{ docker_home }}/TEST"
+
+- name: Archive TEST Data Directory
+  community.general.archive:
+    path: "{{ docker_home }}/TEST"
+    dest: "{{ docker_home }}"
+    format: zip

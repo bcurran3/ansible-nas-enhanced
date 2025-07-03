@@ -149,6 +149,7 @@ nextcloud_traefik_whitelist: "{{ wan }}"
 #nextcloud_command: "docker exec nextcloud apt update && docker exec nextcloud apt install smbclient -y"
 nextcloud_db_image_version: "8.4"
 nextcloud_homepage_href: "https://{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
+nextcloud_homepage_siteMonitor: "https://{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
 nextcloud_homepage_widget_key: "77518f29fb0c9983cbca61c0e6d7897a79a8718060c2efd8a8c38c3c7380df75"
 
 plex_enabled: true
@@ -879,9 +880,9 @@ karaokeforever_watchtower_monitor_only: "false"
 ###
 ### Joplin
 ###
-joplin_enabled: false
+joplin_enabled: true
 joplin_available_externally: true
-joplin_traefik_whitelist: "{{ wan }}"
+joplin_traefik_whitelist: "{{ lan }}"
 joplin_homepage_href: "https://{{ joplin_hostname }}.{{ ansible_nas_domain }}"
 joplin_watchtower_monitor_only: "false"
 
@@ -993,7 +994,7 @@ overseerr_homepage_href: "https://{{ overseerr_hostname }}.{{ ansible_nas_domain
 ###
 paperlessngx_enabled: false
 paperlessngx_available_externally: true
-paperlessngx_traefik_whitelist: "{{ wan }}"
+paperlessngx_traefik_whitelist: "{{ lan }}"
 paperlessngx_watchtower_monitor_only: "false"
 
 ###
@@ -1067,7 +1068,7 @@ qbittorrent_watchtower_monitor_only: "false"
 ###
 ### QDirStat
 ###
-qdirstat_enabled: false
+qdirstat_enabled: true
 qdirstat_available_externally: true
 qdirstat_traefik_whitelist: "{{ lan }}"
 qdirstat_storage_directory: "/"
