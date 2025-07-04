@@ -1,0 +1,119 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - debug:
+        msg: "TESTING 1 2 3..."
+
+    - shell: git rev-list ...@{u} --count
+      register: commits_behind_number
+
+    #- shell: git log -"{{ commits_behind_number }}" ...@{u} --pretty=format:"%h - %an, %ar - %s"
+    - shell: 'git log -7 ...@{u} --pretty=format:"%h - %an, %ar - %s"'
+      register: commits_behind
+
+    - debug:
+        msg: "{{ commits_behind_number.stdout }} - {{ commits_behind.stdout }}"
+
+    - debug:
+        msg: "Ansible-NAS is {{ commits_behind_number.stdout }} commits behind master. Here's what you're missing {{ commits_behind.stdout }}"
+
+    - debug:
+        msg: "WAN whitelist: {{ wan }}"
+
+    - debug:
+        msg: "LAN whitelist: {{ lan }}"
+
+    #- name: find roles directories
+    #  find:
+    #    paths: roles
+    #    recurse: no
+    #    file_type: directory
+    #  register: found_directories
+    #
+    #- debug:
+    #    msg: "{{ [item.path] }} "
+    #  with_items: "{{ found_directories.files }}"
+
+########## eventually move to it's own role
+    - debug:
+        msg: "TESTING Discovery and Running of Roles in Apps Directory"
+
+    - name: Gathering Roles in Apps Directory
+      find:
+        paths: apps/
+        file_type: directory
+        use_regex: yes
+        patterns: "^[a-zA-Z0-9_]+$"
+        recurse: no
+      register: found_directories
+
+    - set_fact:
+        "my_{{ item | basename }}": "{{ item }}"
+      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
+
+    - debug:
+        msg: "{{ found_directories.files | map(attribute='path') | list }}"
+
+    - name: "loop through list roles dirs"
+      include_role:
+        name: "{{ item }}"
+      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
+
+########## eventually move to it's own role
+    - debug:
+        msg: "TESTING Discovery and Running of docker-compose files"
+
+    - name: Discover docker-compose directories
+      find:
+        paths: docker-compose/
+        file_type: directory
+        use_regex: yes
+        patterns: "^[a-zA-Z0-9_]+$"
+        recurse: no
+      register: found_directories
+
+    - set_fact:
+        "my_{{ item | basename }}": "{{ item }}"
+      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
+
+# this doesn't work
+    - debug:
+        msg: "{{ found_directories.files | map(attribute='path') | list }}"
+
+# create function to run the docker-compose files here
+#    - name: "loop through list docker-compose dirs"
+#      include_role:
+#        name: "{{ item }}"
+#      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
+
+
+
+
+########## this would probably have to move into each app task
+
+# works beautifully 100%
+
+    - debug:
+        msg: "TESTING docker data archiving"
+
+    - name: Create TEST Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ docker_home }}/TEST"
+        - "{{ docker_home }}/TEST/subdirtest"
+
+    - name: Archive TEST Data Directory
+# requires lzma and zip installed
+# https://docs.ansible.com/ansible/latest/collections/community/general/archive_module.html
+      community.general.archive:
+        path: "{{ docker_home }}/{{ ansible_nas_app_name }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+  when: test_enabled is true
