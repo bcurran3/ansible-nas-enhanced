@@ -1,5 +1,5 @@
 ---
-- name: Start DailyTxT
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
       file:
@@ -13,7 +13,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dailytxt_container_name }}"
-        image: phitux/dailytxt:latest
+        image: "{{ dailytxt_image_name }}:{{ dailytxt_image_tag }}"
         pull: true
         cpu_shares: "{{ dailytxt_cpu_shares }}"
         volumes:
@@ -27,8 +27,6 @@
           PORT: "{{ dailytxt_port_http }}"
           SECRET_KEY: "{{ dailytxt_secret_key }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ dailytxt_memory }}"
         labels:
           autoheal: "{{ dailytxt_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dailytxt_watchtower_monitor_only }}"
@@ -52,6 +50,8 @@
           traefik.http.services.dailytxt.loadbalancer.server.port: "8766"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/phitux/dailytxt/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ dailytxt_memory }}"
+        restart_policy: unless-stopped
   when: dailytxt_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

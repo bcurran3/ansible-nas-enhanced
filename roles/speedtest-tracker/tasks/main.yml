@@ -25,14 +25,17 @@
         ports:
           - "{{ speedtest_tracker_port }}:80"
         env:
+          AUTH: "{{ speedtest_tracker_auth }}"
           OOKLA_EULA_GDPR: "true"
+          PUID: "{{ speedtest_tracker_puid }}"
+          PGID: " {{ speedtest_tracker_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "1g"
         labels:
           autoheal: "{{ speedtest_tracker_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ speedtest_tracker_watchtower_monitor_only }}"
-          homepage.name: "Speedtest Tracker"
+          homepage.name: "Speedtest-Tracker"
           homepage.group: "{{ speedtest_tracker_homepage_group }}"
           homepage.icon: "{{ speedtest_tracker_homepage_icon }}"
           homepage.href: "{{ speedtest_tracker_homepage_href }}"

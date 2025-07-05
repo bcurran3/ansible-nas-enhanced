@@ -16,7 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ handbrake_container_name }}"
         hostname: "{{ handbrake_container_name }}"
-        image: jlesage/handbrake
+        image: "{{ handbrake_image_name }}:{{ handbrake_image_tag }}"
         pull: true
         cpu_shares: "{{ handbrake_cpu_shares }}"
         volumes:
@@ -27,10 +27,6 @@
         ports:
           - "{{ handbrake_port_http }}:5800"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
-          USER_ID: "{{ handbrake_user_id }}"
-          GROUP_ID: "{{ handbrake_group_id }}"
-          KEEP_APP_RUNNING: "{{ handbrake_keep_app_running }}"
           AUTOMATED_CONVERSION_PRESET: "{{ handbrake_automated_conversion_preset }}"
           AUTOMATED_CONVERSION_FORMAT: "{{ handbrake_automated_conversion_format }}"
           AUTOMATED_CONVERSION_KEEP_SOURCE: "{{ handbrake_automated_conversion_keep_source }}"
@@ -43,8 +39,11 @@
           APP_NICENESS: "{{ handbrake_app_niceness }}"
           CLEAN_TMP_DIR: "{{ handbrake_clean_tmp_dir }}"
           DARK_MODE: " {{ handbrake_dark_mode }}"
+          KEEP_APP_RUNNING: "{{ handbrake_keep_app_running }}"
           UMASK: "{{ handbrake_converted_files_umask }}"
-        restart_policy: unless-stopped
+          USER_ID: "{{ handbrake_user_id }}"
+          GROUP_ID: "{{ handbrake_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ handbrake_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ handbrake_watchtower_monitor_only }}"
@@ -69,6 +68,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/jlesage/docker-handbrake/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ handbrake_memory }}"
+        restart_policy: unless-stopped
   when: handbrake_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

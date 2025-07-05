@@ -20,6 +20,8 @@ ansible_nas_user: bill
 ansible_nas_email: bcurran3@yahoo.com
 ansible_nas_domain: mrbillsabode.org
 ansible_nas_dns: 192.168.69.201
+ansible_nas_banner: ""
+archive_app_data_enabled: false
 docker_home: "/data/docker"
 docker_image_directory: "{{ docker_home }}/_images"
 # shares
@@ -198,7 +200,7 @@ speedtest_tracker_hostname: "speedtest"
 speedtest_tracker_memory: "256m"
 speedtest_tracker_homepage_href: "https://{{ speedtest_tracker_hostname }}.{{ ansible_nas_domain }}"
 
-stats_enabled: true
+stats_enabled: false
 stats_internet_speed_test_enabled: true
 stats_grafana_available_externally: true
 stats_grafana_homepage_href: "https://{{ stats_grafana_hostname }}.{{ ansible_nas_domain }}"
@@ -421,6 +423,7 @@ ansible_nas_extra_packages:
 #  - net-tools
   - ansible-lint
   - figlet
+  - lzma
   - mc
   - nala
   - nano
@@ -934,10 +937,11 @@ monitorr_watchtower_monitor_only: "false"
 ###
 ### NetAlertX - runs in host mode
 ###
-netalertx_enabled: false
+netalertx_enabled: true
 netalertx_available_externally: true
 netalertx_traefik_whitelist: "{{ lan }}"
 netalertx_watchtower_monitor_only: "false"
+netalertx_homepage_widget_key: "t_KGV1JE4mo7FNiL6aup0H"
 
 ###
 ### ntfy
@@ -1336,7 +1340,7 @@ wireguard_watchtower_monitor_only: "false"
 ### Nvidia runtime 
 ###
 # THIS STILL NEEDS WORK
-nvidia_runtime_enabled: false
+nvidia_runtime_enabled: true
 
 ###
 ### Focalboard

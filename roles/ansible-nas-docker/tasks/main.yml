@@ -37,6 +37,14 @@
     dest: /etc/docker/daemon.json
     content: "{{ docker_daemon_json | to_nice_json }}"
   register: docker_config
+  when: nvidia_runtime_enabled is false
+
+- name: Generate Docker daemon.json with NVIDIA runtime
+  copy:
+    dest: /etc/docker/daemon.json
+    content: "{{ docker_daemon_with_nvidia_json | to_nice_json }}"
+  register: docker_config
+  when: nvidia_runtime_enabled is true
 
 - name: Restart Docker
   service:

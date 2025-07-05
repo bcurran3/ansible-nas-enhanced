@@ -20,8 +20,8 @@
     - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ openemr_container_db_name }}"
-        hostname: "{{ openemr_container_db_name }}"
+        name: "{{ openemr_db_container_name }}"
+        hostname: "{{ openemr_db_container_name }}"
         image: linuxserver/mariadb
         pull: true
         cpu_shares: "{{ openemr_db_cpu_shares }}"
@@ -69,7 +69,7 @@
           - "{{ openemr_data_directory }}/log:/var/www/logs"
 #          - "{{ openemr_data_directory }}/sites:/var/www/localhost/htdocs/openemr/sites"
         env:
-          MYSQL_HOST: "{{ openemr_container_db_name }}"
+          MYSQL_HOST: "{{ openemr_db_container_name }}"
           MYSQL_ROOT_PASS: "Ansible-NAS"
           MYSQL_USER: "openemr"
           MYSQL_PASS: "openemr"
@@ -81,7 +81,7 @@
         restart_policy: unless-stopped
         memory: "{{ openemr_memory_limit }}"
         links:
-          - "{{ openemr_container_db_name }}"
+          - "{{ openemr_db_container_name }}"
         labels:
           autoheal: "{{ openemr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openemr_watchtower_monitor_only }}"
@@ -115,6 +115,6 @@
         state: absent
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
-        name: "{{ openemr_container_db_name }}"
+        name: "{{ openemr_db_container_name }}"
         state: absent
   when: openemr_enabled is false

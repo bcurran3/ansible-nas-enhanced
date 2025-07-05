@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ glpi_db_container_name }}"
         hostname: "{{ glpi_db_container_name }}"
-        image: mariadb:10.7
+        image: "{{ glpi_db_image_name }}:{{ glpi_db_image_tag }}"
         pull: true
         cpu_shares: "{{ glpi_db_cpu_shares }}"
         volumes:
@@ -26,8 +26,6 @@
           MARIADB_USER: "glpi_user"
           MARIADB_PASSWORD: "{{ glpi_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ glpi_db_memory }}"
         labels:
           autoheal: "{{ glpi_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glpi_db_watchtower_monitor_only }}"
@@ -42,13 +40,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/MariaDB/mariadb-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ glpi_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ glpi_container_name }}"
         hostname: "{{ glpi_container_name }}"
-        image: diouxx/glpi
+        image: "{{ glpi_image_name }}:{{ glpi_image_tag }}"
         pull: true
         cpu_shares: "{{ glpi_cpu_shares }}"
         volumes:
@@ -60,7 +60,6 @@
         env:
           TIMEZONE: "{{ ansible_nas_timezone }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         links:
           - "{{ glpi_db_container_name }}"
         labels:
@@ -88,6 +87,7 @@
           wud.link.template: "https://github.com/glpi-project/glpi/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ may not be in sync with container maintainer
         memory: "{{ glpi_memory }}"
+        restart_policy: unless-stopped
   when: glpi_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

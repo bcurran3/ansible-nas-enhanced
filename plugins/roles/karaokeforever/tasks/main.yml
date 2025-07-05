@@ -6,7 +6,7 @@
         container_default_behavior: "compatibility"
         name: "{{ karaokeforever_container_name }}"
         hostname: "{{ karaokeforever_container_name }}"
-        image: david510c/karaoke-forever:latest
+        image: "{{ karaokeforever_image_name }}:{{ karaokeforever_image_tag }}"
         pull: true
         cpu_shares: "{{ karaokeforever_cpu_shares }}"
         volumes:
@@ -15,7 +15,6 @@
           - "{{ karaokeforever_port_http }}:80"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           com.centurylinklabs.watchtower.monitor-only: "{{ karaokeforever_watchtower_monitor_only }}"
           homepage.name: "{{ ansible_nas_app_name }}"
@@ -39,7 +38,8 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/david510c/Karaoke-Forever/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ no release or tag information published
-        memory: "{{ karaokeforever_memory_limit }}"
+        memory: "{{ karaokeforever_memory }}"
+        restart_policy: unless-stopped
   when: karaokeforever_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -16,9 +16,9 @@
     - name: Create {{ ansible_nas_app_name }}d Container
       docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ magnetico_container2_name }}"
-        hostname: "{{ magnetico_container2_name }}"
-        image: boramalper/magneticod
+        name: "{{ magneticod_container_name }}"
+        hostname: "{{ magneticod_container_name }}"
+        image: "{{ magneticod_image_name }}:{{ magneticod_image_tag }}"
         pull: true
         cpu_shares: "{{ magneticod_cpu_shares }}"
         volumes:
@@ -39,7 +39,7 @@
           homepage.href: "{{ magneticod_homepage_href }}"
 #         homepage.description: "Autonomous (self-hosted) BitTorrent DHT search engine suite."
           homepage.server: "my-docker"
-          homepage.container: "{{ magnetico_container2_name }}"
+          homepage.container: "{{ magneticod_container_name }}"
           homepage.showStats: "{{ magneticod_homepage_showStats }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -48,8 +48,8 @@
     - name: Create {{ ansible_nas_app_name }}w Container
       docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ magnetico_container_name }}"
-        image: boramalper/magneticow
+        name: "{{ magneticow_container_name }}"
+        image: "{{ magneticow_image_name }}:{{ magneticow_image_tag }}"
         pull: true
         cpu_shares: "{{ magneticow_cpu_shares }}"
         links:
@@ -60,7 +60,7 @@
         ports:
           - "{{ magnetico_port_http }}:8080"
         dns_servers: "{{ ansible_nas_dns }}"
-        hostname: "{{ magnetico_container_name }}"
+        hostname: "{{ magneticow_container_name }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
@@ -75,7 +75,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ magnetico_port_http }}"
 #         homepage.description: "Autonomous (self-hosted) BitTorrent DHT search engine suite."
           homepage.server: "my-docker"
-          homepage.container: "{{ magnetico_container_name }}"
+          homepage.container: "{{ magneticow_container_name }}"
           homepage.showStats: "{{ magnetico_homepage_showStats }}"
           traefik.enable: "{{ magnetico_available_externally | string }}"
           traefik.http.routers.magnetico.rule: "Host(`magnetico.{{ ansible_nas_domain }}`)"
@@ -94,12 +94,11 @@
   block:
     - name: Stop {{ ansible_nas_app_name }}w Container
       community.docker.docker_container:
-        name: "{{ magnetico_container_name }}"
+        name: "{{ magneticow_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }}d Container
       community.docker.docker_container:
-        name: "{{ magnetico_container2_name }}"
+        name: "{{ magneticod_container_name }}"
         state: absent
   when: magnetico_enabled is false
-
-  # NOTE: Might rename the containers 1/2 or front/back

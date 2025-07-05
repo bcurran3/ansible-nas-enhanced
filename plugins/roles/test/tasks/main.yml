@@ -1,8 +1,12 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
+
     - debug:
         msg: "TESTING 1 2 3..."
+
+    - debug: # get OS version i.e. Ubuntu 24.04
+        msg: "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
 
     - shell: git rev-list ...@{u} --count
       register: commits_behind_number
@@ -23,23 +27,39 @@
     - debug:
         msg: "LAN whitelist: {{ lan }}"
 
-    #- name: find roles directories
-    #  find:
-    #    paths: roles
-    #    recurse: no
-    #    file_type: directory
-    #  register: found_directories
-    #
-    #- debug:
-    #    msg: "{{ [item.path] }} "
-    #  with_items: "{{ found_directories.files }}"
+    - name: find roles directories
+      ansible.builtin.find:
+        paths: roles/
+        recurse: no
+        file_type: directory
+      register: found_directories
+
+# displays:
+# skipping: [ansible-nas] => (item=roles/airsonic) and the rest
+    - name: Display found roles
+      debug:
+        msg: "{{ item.path }}"
+      loop: "{{ found_directories.files | sort(attribute='path') }}"
+      loop_control:
+        label: "{{ item.path }}"
+      when: not (show_details | default(true))
+    
+#    - debug: Display found roles
+#        msg: "{{ [item.path] }} "
+#      with_items: "{{ found_directories.files }}"
+
+#    - name: Print found roles directories
+#      ansible.builtin.debug:
+#        var: found_directories.files[0].path  # only displays first
+#        # this needs a loop for the total # of files found
+#      when: found_directories is defined
 
 ########## eventually move to it's own role
     - debug:
         msg: "TESTING Discovery and Running of Roles in Apps Directory"
 
     - name: Gathering Roles in Apps Directory
-      find:
+      ansible.builtin.find:
         paths: apps/
         file_type: directory
         use_regex: yes
@@ -63,18 +83,36 @@
     - debug:
         msg: "TESTING Discovery and Running of docker-compose files"
 
+#    - name: Discover docker-compose directories
+#      ansible.builtin.find:
+#        paths: docker-compose/
+#        file_type: directory
+#        use_regex: yes
+#        patterns: "^[a-zA-Z0-9_]+$"
+#        recurse: no
+#      register: found_directories
+
     - name: Discover docker-compose directories
-      find:
+      ansible.builtin.find:
         paths: docker-compose/
-        file_type: directory
-        use_regex: yes
-        patterns: "^[a-zA-Z0-9_]+$"
         recurse: no
+        file_type: directory
       register: found_directories
 
-    - set_fact:
-        "my_{{ item | basename }}": "{{ item }}"
-      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
+    - name: Display found docker-compose directories
+      debug:
+        msg: "{{ item.path }}"
+      loop: "{{ found_directories.files | sort(attribute='path') }}"
+      loop_control:
+        label: "{{ item.path }}"
+      when: not (show_details | default(true))
+# displays:
+# skipping: [ansible-nas] => (item=docker-compose/hello-world)
+
+# this gives an error
+#    - set_fact:
+#        "my_{{ item | basename }}": "{{ item }}"
+#      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
 
 # this doesn't work
     - debug:
@@ -86,34 +124,5 @@
 #        name: "{{ item }}"
 #      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
 
-
-
-
-########## this would probably have to move into each app task
-
-# works beautifully 100%
-
-    - debug:
-        msg: "TESTING docker data archiving"
-
-    - name: Create TEST Directory
-      file:
-        path: "{{ item }}"
-        state: directory
-      with_items:
-        - "{{ docker_home }}/TEST"
-        - "{{ docker_home }}/TEST/subdirtest"
-
-    - name: Archive TEST Data Directory
-# requires lzma and zip installed
-# https://docs.ansible.com/ansible/latest/collections/community/general/archive_module.html
-      community.general.archive:
-        path: "{{ docker_home }}/{{ ansible_nas_app_name }}"
-        dest: "{{ docker_home }}/{{ ansible_nas_app_name }}.zip"
-        force_archive: true
-        format: zip
-        owner: ansible-nas
-        group: ansible-nas
-        mode: u=rw,g=rw
-        remove: true
   when: test_enabled is true
+  

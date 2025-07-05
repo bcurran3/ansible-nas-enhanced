@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ cup_container_name }}"
         hostname: "{{ cup_container_name }}"
-        image: ghcr.io/sergi0g/cup
+        image: "{{ cup_image_name }}:{{ cup_image_tag }}"
         pull: true
         cpu_shares: "{{ cup_cpu_shares }}"
         command: "serve -p 8000"
@@ -26,8 +26,6 @@
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ cup_memory_limit }}"
         labels:
           autoheal: "{{ cup_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ cup_watchtower_monitor_only }}"
@@ -62,6 +60,8 @@
           traefik.http.services.cup.loadbalancer.server.port: "8000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/sergi0g/cup/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ cup_memory }}"
+        restart_policy: unless-stopped
   when: cup_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

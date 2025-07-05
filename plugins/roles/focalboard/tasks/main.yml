@@ -16,7 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ focalboard_container_name }}"
         hostname: "{{ focalboard_container_name }}"
-        image: mattermost/focalboard
+        image: "{{ focalboard_image_name }}:{{ focalboard_image_tag }}"
         pull: true
         cpu_shares: "{{ focalboard_cpu_shares }}"
         ports:
@@ -28,8 +28,6 @@
           VIRTUAL_HOST: "focalboard.local"
           VIRTUAL_PORT: "8000"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ focalboard_memory_limit }}"
         labels:
           autoheal: "{{ focalboard_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ focalboard_watchtower_monitor_only }}"
@@ -53,6 +51,8 @@
           traefik.http.services.focalboard.loadbalancer.server.port: "8000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mattermost-community/focalboard/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ focalboard_memory }}"
+        restart_policy: unless-stopped
   when: focalboard_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

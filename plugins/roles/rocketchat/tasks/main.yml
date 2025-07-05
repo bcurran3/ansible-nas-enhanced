@@ -83,7 +83,7 @@
         ports:
           - "{{ rocketchat_http_port }}:3000"
         env:
-          MONGO_URL: "mongodb://mongodb:27017/rocketchat"
+          MONGO_URL: "mongodb://{{ rocketchat_db_container_name }}:27017/rocketchat"
           ROOT_URL: "https://{{ rocketchat_hostname }}.{{ ansible_nas_domain }}"
           PORT: "3000"
           DEPLOY_METHOD: "docker"

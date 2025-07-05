@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ doublecommander_container_name }}"
         hostname: "{{ doublecommander_container_name }}"
-        image: lscr.io/linuxserver/doublecommander:latest
+        image: "{{ doublecommander_image_name }}:{{ doublecommander_image_tag }}"
         pull: true
         cpu_shares: "{{ doublecommander_cpu_shares }}"
         volumes:
@@ -26,7 +26,6 @@
           PUID: "{{ doublecommander_user_id }}"
           PGID: "{{ doublecommander_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ doublecommander_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ doublecommander_watchtower_monitor_only }}"
@@ -50,7 +49,8 @@
           traefik.http.services.doublecommander.loadbalancer.server.port: "3000"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/linuxserver/docker-doublecommander/releases/tag/$${commit}"
-        memory: 512m
+        memory: "{{ doublecommander_memory }}"
+        restart_policy: unless-stopped
   when: doublecommander_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

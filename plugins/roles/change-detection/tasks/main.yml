@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ change_detection_sockpuppet_container_name }}"
         hostname: "{{ change_detection_sockpuppet_container_name }}"
-        image: dgtlmoon/sockpuppetbrowser:latest
+        image: "{{ change_detection_sockpuppet_image_name }}:{{ change_detection_sockpuppet_image_tag }}"
         pull: true
         cpu_shares: "{{ change_detection_sockpuppet_cpu_shares }}"
         capabilities:
@@ -25,7 +25,6 @@
           SCREEN_DEPTH: "16"
           MAX_CONCURRENT_CHROME_PROCESSES: "10"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ change_detection_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ change_detection_sockpuppet_watchtower_monitor_only }}"
@@ -42,13 +41,14 @@
           change_detection.tag.include: '^\d+\.\d+\.\d+$$'
           change_detection.link.template: "https://github.com/dgtlmoon/sockpuppetbrowser/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ change_detection_sockpuppet_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ change_detection_container_name }}"
         hostname: "{{ change_detection_container_name }}"
-        image: ghcr.io/dgtlmoon/changedetection.io
+        image: "{{ _image_name }}:{{ _image_tag }}"
         pull: true
         cpu_shares: "{{ change_detection_cpu_shares }}"
         volumes:
@@ -63,7 +63,6 @@
           PLAYWRIGHT_DRIVER_URL: "ws://{{ change_detection_sockpuppet_hostname }}:3000"
           PORT: "{{ change_detection_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         links:
           - "{{ change_detection_sockpuppet_container_name }}"
         labels:
@@ -92,6 +91,7 @@
           change_detection.tag.include: '^\d+\.\d+\.\d+$$'
           change_detection.link.template: "https://github.com/dgtlmoon/changedetection.io/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ change_detection_memory }}"
+        restart_policy: unless-stopped
   when: change_detection_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -100,6 +100,7 @@
       community.docker.docker_container:
         name: "{{ change_detection_container_name }}"
         state: absent
+
     - name: Stop Sock Puppet(eer) Browser Container
       community.docker.docker_container:
         name: "{{ change_detection_sockpuppet_container_name }}"

@@ -13,8 +13,10 @@ netalertx_port_http: "20211"
 
 # docker
 netalertx_container_name: "netalertx"
-netalertx_memory_limit: "1g"
+netalertx_image_name: "jokobsk/netalertx"
+netalertx_image_tag: "latest"
 netalertx_cpu_shares: "1024"
+netalertx_memory: "1g"
 
 # autoheal
 netalertx_autoheal: "false"
@@ -23,7 +25,7 @@ netalertx_autoheal: "false"
 netalertx_homepage_group: "Network"
 netalertx_homepage_icon: "netalertx.png"
 netalertx_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
-netalertx_homepage_key: "netalertxsyncapitoken" # optional, only if password is enabled
+netalertx_homepage_widget_key: "netalertx_sync_api_token" # optional, only if password is enabled
 
 # watchtower
 netalertx_watchtower_monitor_only: "true"

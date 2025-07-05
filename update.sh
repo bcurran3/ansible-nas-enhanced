@@ -4,6 +4,6 @@
 ansible-playbook -i inventories/supernas/inventory nas.yml -b -K $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10}
 # --tags "taskname"
 # prune docker stuff to save space
-echo y | docker image prune
-echo y | docker volume prune
+#echo y | docker image prune
+#echo y | docker volume prune
 

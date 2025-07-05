@@ -13,15 +13,17 @@ gamevault_data_directory: "{{ docker_home }}/gamevault"
 gamevault_hostname: "gamevault"
 gamevault_port_http: "5082"
 
-# specs
-gamevault_memory: "2g"
-gamevault_db_memory: "1g"
-
 # docker
 gamevault_container_name: "gamevault"
-gamevault_db_container_name: "gamevault-db"
+gamevault_image_name: "phalcode/gamevault-backend"
+gamevault_image_tag: "latest"
 gamevault_cpu_shares: "1024"
+gamevault_memory: "2g"
+gamevault_db_container_name: "gamevault-db"
+gamevault_db_image_name: "postgres"
+gamevault_db_image_tag: "16-alpine"
 gamevault_db_cpu_shares: "1024"
+gamevault_db_memory: "1g"
 
 # app
 gamevault_puid: "0"
@@ -36,7 +38,7 @@ gamevault_autoheal: "false"
 gamevault_db_autoheal: "false"
 
 # homepage
-gamevault_homepage_group: "Apps"
+gamevault_homepage_group: "Misc"
 gamevault_homepage_icon: "gamevault.png"
 gamevault_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gamevault_port_http }}"
 gamevault_homepage_showStats: "false"

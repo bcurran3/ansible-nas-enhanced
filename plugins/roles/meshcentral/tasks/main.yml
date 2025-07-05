@@ -25,22 +25,19 @@
         container_default_behavior: "compatibility"
         name: "{{ meshcentral_db_container_name }}"
         hostname: "mongodb"
-        # ^ can be changed to container name??? check env var in app
-        image: mongo:latest
+#       ^ check if env var in app can specify db hostname to connect
+#       hostname: "{{ meshcentral_db_container_name }}"
+        image: "{{ meshcentral_db_image_name }}:{{ meshcentral_db_image_tag }}"
         pull: true
         cpu_shares: "{{ meshcentral_db_cpu_shares }}"
         networks:
           - name: "{{ meshcentral_network }}"
         networks_cli_compatible: "yes"
-#       ports:
-#         - "27017:27017"
         volumes:
           - "{{ meshcentral_data_directory }}/db:/data/db"
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ meshcentral_db_memory_limit }}"
         labels:
           autoheal: "{{ meshcentral_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_db_watchtower_monitor_only }}"
@@ -49,20 +46,21 @@
           homepage.icon: "{{ meshcentral_db_homepage_icon }}"
           homepage.href: "{{ meshcentral_homepage_href }}"
 #         homepage.description: "The MongoDB Database"
-#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_db_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ meshcentral_db_container_name }}"
           homepage.showStats: "{{ meshcentral_db_homepage_showStats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ meshcentral_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ meshcentral_container_name }}"
         hostname: "{{ meshcentral_container_name }}"
-        image: typhonragewind/meshcentral:mongodb-latest
+        image: "{{ meshcentral_image_name }}:{{ meshcentral_image_tag }}"
         pull: true
         cpu_shares: "{{ meshcentral_cpu_shares }}"
         networks:
@@ -90,8 +88,6 @@
           BACKUP_INTERVAL: "24" # Interval in hours for the autobackup function
           BACKUP_KEEP_DAYS: "10" #number of days of backups the function keeps
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ meshcentral_memory_limit }}"
         links:
           - "{{ meshcentral_db_container_name }}"
         labels:
@@ -117,6 +113,8 @@
           traefik.http.services.meshcentral.loadbalancer.server.port: "4430"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/Typhonragewind/meshcentral-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ meshcentral_memory }}"
+        restart_policy: unless-stopped
   when: meshcentral_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -125,6 +123,7 @@
       community.docker.docker_container:
         name: "{{ meshcentral_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ meshcentral_db_container_name }}"

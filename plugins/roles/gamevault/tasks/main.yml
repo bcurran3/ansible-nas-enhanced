@@ -18,7 +18,7 @@
         container_default_behavior: "compatibility"
         name: "{{ gamevault_db_container_name }}"
         hostname: "{{ gamevault_db_container_name }}"
-        image: postgres:16-alpine
+        image: "{{ gamevault_db_image_name }}:{{ gamevault_db_image_tag }}"
         pull: true
         cpu_shares: "{{ gamevault_db_cpu_shares }}"
         volumes:
@@ -28,8 +28,6 @@
           POSTGRES_PASSWORD: "gamevault"
           POSTGRES_DB: "gamevault"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ gamevault_db_memory }}"
         labels:
           autoheal: "{{ gamevault_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gamevault_db_watchtower_monitor_only }}"
@@ -43,13 +41,15 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/_/postgres/tags/$${major}.$${minor}.$${patch}-alpine"
+        memory: "{{ gamevault_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gamevault_container_name }}"
         hostname: "{{ gamevault_container_name }}"
-        image: phalcode/gamevault-backend:latest
+        image: "{{ gamevault_image_name }}:{{ gamevault_image_tag }}"
         pull: true
         cpu_shares: "{{ gamevault_cpu_shares }}"
         links:
@@ -70,12 +70,10 @@
           METADATA_IGDB_CLIENT_SECRET: "{{ gamevault_metadata_igdb_client_secret }}"
 #         SERVER_ADMIN_USERNAME: "admin"
 #         SERVER_ADMIN_PASSWORD: "{{ gamevault_server_admin_password }}"
-          # Uncomment and Insert your RAWG API Key here if you have one (https://gamevau.lt/docs/server-docs/indexing-and-metadata#rawg-api-key)
           RAWG_API_KEY: "{{ gamevault_rawg_api_key }}"
           PUID: "{{ gamevault_puid }}"
           PGID: "{{ gamevault_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ gamevault_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gamevault_watchtower_monitor_only }}"
@@ -100,6 +98,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/phalcode/gamevault-backend/tags/$${major}.$${minor}.$${patch}"
         memory: "{{ gamevault_memory }}"
+        restart_policy: unless-stopped
   when: gamevault_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

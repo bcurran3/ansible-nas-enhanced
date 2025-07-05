@@ -13,7 +13,7 @@
         container_default_behavior: "compatibility"
         name: "{{ kapowarr_container_name }}"
         hostname: "{{ kapowarr_container_name }}"
-        image: mrcas/kapowarr:latest
+        image: "{{ kapowarr_image_name }}:{{ kapowarr_image_tag }}"
         pull: true
         cpu_shares: "{{ kapowarr_cpu_shares }}"
         volumes:
@@ -25,8 +25,6 @@
           - "{{ kapowarr_port_http }}:8090"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ kapowarr_memory }}"
         labels:
           autoheal: "{{ kapowarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ kapowarr_watchtower_monitor_only }}"
@@ -50,6 +48,8 @@
           traefik.http.services.kapowarr.loadbalancer.server.port: "5656"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Casvt/Kapowarr/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ kapowarr_memory }}"
+        restart_policy: unless-stopped
   when: kapowarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

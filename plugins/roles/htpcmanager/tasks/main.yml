@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ htpcmanager_container_name }}"
         hostname: "{{ htpcmanager_container_name }}"
-        image: lscr.io/linuxserver/htpcmanager:latest
+        image: "{{ htpcmanager_image_name }}:{{ htpcmanager_image_tag }}"
         pull: true
         cpu_shares: "{{ htpcmanager_cpu_shares }}"
         network_mode: "bridge"
@@ -27,8 +27,6 @@
           PUID: "{{ htpcmanager_puid }}"
           PGID: "{{ htpcmanager_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ htpcmanager_memory_limit }}"
         labels:
           autoheal: "{{ htpcmanager_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ htpcmanager_watchtower_monitor_only }}"
@@ -52,6 +50,8 @@
           traefik.http.services.htpcmanager.loadbalancer.server.port: "8085"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Hellowlol/HTPC-Manager/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ htpcmanager_memory }}"
+        restart_policy: unless-stopped
   when: htpcmanager_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

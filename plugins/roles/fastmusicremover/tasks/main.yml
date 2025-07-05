@@ -6,7 +6,7 @@
         container_default_behavior: "compatibility"
         name: "{{ fastmusicremover_container_name }}"
         hostname: "{{ fastmusicremover_container_name }}"
-        image: ghcr.io/omeryusufyagci/fast-music-remover
+        image: "{{ fastmusicremover_image_name }}:{{ fastmusicremover_image_tag }}"
         pull: true
         cpu_shares: "{{ fastmusicremover_cpu_shares }}"
         ports:
@@ -14,8 +14,6 @@
         network_mode: "bridge"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ fastmusicremover_memory_limit }}"
         labels:
           autoheal: "{{ fastmusicremover_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ fastmusicremover_watchtower_monitor_only }}"
@@ -40,6 +38,8 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/omeryusufyagci/fast-music-remover/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ no releases info published
+        memory: "{{ fastmusicremover_memory }}"
+        restart_policy: unless-stopped
   when: fastmusicremover_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ makemkv_container_name }}"
         hostname: "{{ makemkv_container_name }}"
-        image: jlesage/makemkv
+        image: "{{ makemkv_image_name }}:{{ makemkv_image_tag }}"
         pull: true
         cpu_shares: "{{ makemkv_cpu_shares }}"
         volumes:
@@ -30,8 +30,6 @@
           TZ: "{{ ansible_nas_timezone }}"
           USER_ID: "{{ makemkv_user_id }}"
           GROUP_ID: "{{ makemkv_group_id }}"
-        restart_policy: unless-stopped
-        memory: 1g
         labels:
           autoheal: "{{ makemkv_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ makemkv_watchtower_monitor_only }}"
@@ -55,6 +53,8 @@
           traefik.http.services.makemkv.loadbalancer.server.port: "5800"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ makemkv_memory }}"
+        restart_policy: unless-stopped
   when: makemkv_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

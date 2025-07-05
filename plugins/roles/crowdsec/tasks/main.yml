@@ -16,7 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ crowdsec_container_name }}"
         hostname: "{{ crowdsec_container_name }}"
-        image: crowdsecurity/crowdsec
+        image: "{{ crowdsec_image_name }}:{{ crowdsec_image_tag }}"
         pull: true
         cpu_shares: "{{ crowdsec_cpu_shares }}"
         volumes:
@@ -36,7 +36,6 @@
           LOCAL_API_URL: "http://0.0.0.0:{{ crowdsec_port_http }}"
           METRICS_PORT: "{{ crowdsec_port_metrics }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ crowdsec_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ crowdsec_watchtower_monitor_only }}"
@@ -66,6 +65,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Casvt/crowdsec/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ crowdsec_memory }}"
+        restart_policy: unless-stopped
   when: crowdsec_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

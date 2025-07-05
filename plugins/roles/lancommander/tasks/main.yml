@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ lancommander_container_name }}"
         hostname: "{{ lancommander_container_name }}"
-        image: lancommander/lancommander:latest
+        image: "{{ lancommander_image_name }}:{{ lancommander_image_tag }}"
         pull: true
         cpu_shares: "{{ lancommander_cpu_shares }}"
         ports:
@@ -27,8 +27,6 @@
           PUID: "{{ lancommander_puid }}"
           PGID: "{{ lancommander_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ lancommander_memory_limit }}"
         labels:
           autoheal: "{{ lancommander_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ lancommander_watchtower_monitor_only }}"
@@ -52,6 +50,8 @@
           traefik.http.services.lancommander.loadbalancer.server.port: "1337"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/LANCommander/LANCommander/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ lancommander_memory_limit }}"
+        restart_policy: unless-stopped
   when: lancommander_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

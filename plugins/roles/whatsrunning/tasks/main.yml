@@ -41,7 +41,7 @@
           traefik.http.services.whatsrunning.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mikeage/whatsrunning/tags/tags/$${major}.$${minor}.$${patch}"
-        memory: "{{ whatsrunning_memory_limit }}"
+        memory: "{{ whatsrunning_memory }}"
   when: whatsrunning_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

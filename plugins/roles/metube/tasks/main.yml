@@ -13,7 +13,7 @@
         container_default_behavior: "compatibility"
         name: "{{ metube_container_name }}"
         hostname: "{{ metube_container_name }}"
-        image: ghcr.io/alexta69/metube
+        image: "{{ metube_image_name }}:{{ metube_image_tag }}"
         pull: true
         cpu_shares: "{{ metube_cpu_shares }}"
         volumes:
@@ -22,7 +22,6 @@
           - "{{ metube_port_http }}:8081"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ metube_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ metube_watchtower_monitor_only }}"
@@ -44,9 +43,10 @@
           traefik.http.routers.metube.middlewares: "{{ metube_hostname }}@docker"
           traefik.http.middlewares.metube.IPAllowList.sourcerange: "{{ metube_traefik_whitelist }}"
           traefik.http.services.metube.loadbalancer.server.port: "8081"
-#          wud.tag.include: '^\d+\.\d+\.\d+$$'
-#          wud.link.template: "https://hub.docker.com/r/alexta69/metube/tags/$${major}.$${minor}.$${patch}"
-        memory: "{{ metube_memory_limit }}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://hub.docker.com/r/alexta69/metube/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ metube_memory }}"
+        restart_policy: unless-stopped
   when: metube_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

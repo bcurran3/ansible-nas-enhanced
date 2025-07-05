@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ netalertx_container_name }}"
         hostname: "{{ netalertx_container_name }}"
-        image: jokobsk/netalertx:latest
+        image: "{{ netalertx_image_name }}:{{ netalertx_image_tag }}"
         pull: true
         cpu_shares: "{{ netalertx_cpu_shares }}"
         volumes:
@@ -24,8 +24,6 @@
         network_mode: host
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ netalertx_memory_limit }}"
         labels:
           autoheal: "{{ netalertx_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ netalertx_watchtower_monitor_only }}"
@@ -34,7 +32,7 @@
           homepage.icon: "{{ netalertx_homepage_icon }}"
           homepage.href: "{{ netalertx_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
-#         homepage.description: "WIFI / LAN intruder detector. Scans for devices connected to your network and alerts you if new and unknown devices are found."
+#         homepage.description: "Network scanner & notification framework"
           homepage.server: "my-docker"
           homepage.container: "{{ netalertx_container_name }}"
           homepage.showStats: "false"
@@ -50,8 +48,10 @@
           traefik.http.routers.netalertx.middlewares: "{{ netalertx_hostname }}@docker"
           traefik.http.middlewares.netalertx.IPAllowList.sourcerange: "{{ netalertx_traefik_whitelist }}"
           traefik.http.services.netalertx.loadbalancer.server.port: "20211"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/jokob-sk/NetAlertX/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ netalertx_memory }}"
+        restart_policy: unless-stopped
   when: netalertx_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

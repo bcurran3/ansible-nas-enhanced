@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ homarr_container_name }}"
         hostname: "{{ homarr_container_name }}"
-        image: ghcr.io/homarr-labs/homarr:latest
+        image: "{{ homarr_image_name }}:{{ homarr_image_tag }}"
         pull: true
         cpu_shares: "{{ homarr_cpu_shares }}"
         volumes:
@@ -25,7 +25,6 @@
         env:
           SECRET_ENCRYPTION_KEY: "{{ homarr_secret_encryption_key }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ homarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ homarr_watchtower_monitor_only }}"
@@ -49,7 +48,8 @@
           traefik.http.services.homarr.loadbalancer.server.port: "7575"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/homarr-labs/homarr/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: 512m
+        memory: "{{ homarr_memory }}"
+        restart_policy: unless-stopped
   when: homarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

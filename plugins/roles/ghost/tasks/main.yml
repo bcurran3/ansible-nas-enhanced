@@ -11,7 +11,7 @@
         - "{{ ghost_data_directory }}/content"
         - "{{ ghost_data_directory }}/db"
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ ghost_network }}"
 
@@ -20,7 +20,7 @@
         container_default_behavior: "compatibility"
         name: "{{ ghost_db_container_name }}"
         hostname: "{{ ghost_db_container_name }}"
-        image: mysql:8.0
+        image: "{{ ghost_db_image_name }}:{{ ghost_db_image_tag }}"
         pull: true
         cpu_shares: "{{ ghost_db_cpu_shares }}"
         networks:
@@ -32,10 +32,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ ghost_data_directory }}/db:/var/lib/mysql"
-        restart_policy: unless-stopped
-        memory: "{{ ghost_db_memory_limit }}"
         labels:
-          autoheal: "{{ ghost_DB_autoheal }}"
+          autoheal: "{{ ghost_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ghost_db_watchtower_monitor_only }}"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ ghost_db_homepage_group }}"
@@ -48,13 +46,15 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ ghost_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ghost_container_name }}"
         hostname: "{{ ghost_container_name }}"
-        image: ghost
+        image: "{{ ghost_image_name }}:{{ ghost_image_tag }}"
         pull: true
         cpu_shares: "{{ ghost_cpu_shares }}"
         networks:
@@ -81,8 +81,6 @@
         volumes:
           - "{{ ghost_data_directory }}/content:/var/lib/ghost/content"
 #         - "{{ ghost_data_directory }}/config.production.json:/var/lib/ghost/config.production.json
-        restart_policy: unless-stopped
-        memory: "{{ ghost_memory_limit }}"
         links:
           - "{{ ghost_db_container_name }}"
         labels:
@@ -108,6 +106,8 @@
           traefik.http.services.ghost.loadbalancer.server.port: "2368"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/TryGhost/Ghost/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ ghost_memory }}"
+        restart_policy: unless-stopped
   when: ghost_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

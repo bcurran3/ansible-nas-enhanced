@@ -5,19 +5,21 @@ ansible_nas_app_name: "Shoutcast Server"
 shoutcast_enabled: false
 shoutcast_available_externally: false
 shoutcast_traefik_whitelist: "{{ lan }}"
+shoutcast_data_directory: "{{ docker_home }}/shoutcast"
 
 # network
 shoutcast_hostname: "shoutcast"
-
-shoutcast_data_directory: "{{ docker_home }}/shoutcast"
-
-shoutcast_media_directory: "{{ music_root }}"
-
 shoutcast_port_http: "8002"
+
+# app
+shoutcast_media_directory: "{{ music_root }}"
 
 # docker
 shoutcast_container_name: "shoutcast"
 shoutcast_cpu_shares: "1024"
+shoutcast_image: ""
+shoutcast_image_tag: ""
+shoutcast_memory: "1g"
 
 # autoheal
 shoutcast_autoheal: "false"

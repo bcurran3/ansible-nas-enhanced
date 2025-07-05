@@ -6,7 +6,7 @@
         container_default_behavior: "compatibility"
         name: "{{ autoheal_container_name }}"
         hostname: "{{ autoheal_container_name }}"
-        image: "{{ autoheal_image_name }}:{{ autoheal_image_version }}"
+        image: "{{ autoheal_image_name }}:{{ autoheal_image_tag }}"
         pull: true
         cpu_shares: "{{ autoheal_cpu_shares }}"
         network_mode: "none"
@@ -20,8 +20,6 @@
         volumes:
           - "/etc/localtime:/etc/localtime:ro"
           - "/var/run/docker.sock:/var/run/docker.sock"
-        restart_policy: unless-stopped
-        memory: "{{ autoheal_memory_limit }}"
         labels:
           autoheal: "{{ autoheal_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ autoheal_watchtower_monitor_only }}"
@@ -35,6 +33,8 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/willfarrell/docker-autoheal/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ autoheal_memory }}"
+        restart_policy: unless-stopped
   when: autoheal_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

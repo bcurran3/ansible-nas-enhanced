@@ -14,18 +14,14 @@
         container_default_behavior: "compatibility"
         name: "{{ idrive_container_name }}"
         hostname: "{{ idrive_container_name }}"
-        image: renofischa/idrive:latest
-#        image: ghcr.io/snorre-k/idrive-docker:latest
+        image: "{{ idrive_image_name }}:{{ idrive_image_tag }}"
         pull: true
         cpu_shares: "{{ idrive_cpu_shares }}"
         volumes:
           - "{{ idrive_data_directory }}/config:/opt/IDriveForLinux/idriveIt"
           - "/:/mnt/backup:ro"
-#          - "/:/source/1:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ idrive_memory_limit }}"
         labels:
           autoheal: "{{ idrive_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ idrive_watchtower_monitor_only }}"
@@ -39,6 +35,8 @@
           homepage.showStats: "{{ idrive_homepage_showStats }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/RenoFischa/idrive/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ idrive_memory }}"
+        restart_policy: unless-stopped
   when: idrive_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

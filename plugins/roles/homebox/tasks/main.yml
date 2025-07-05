@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ homebox_container_name }}"
         hostname: "{{ homebox_container_name }}"
-        image: ghcr.io/sysadminsmedia/homebox:latest
+        image: "{{ homebox_image_name }}:{{ homebox_image_tag }}"
         pull: true
         cpu_shares: "{{ homebox_cpu_shares }}"
         volumes:
@@ -28,7 +28,6 @@
           HBOX_MAILER_PASSWORD: "{{ homebox_mail_password }}"
           HBOX_MAILER_FROM: "{{ homebox_mail_from }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ homebox_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ homebox_watchtower_monitor_only }}"
@@ -53,6 +52,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/hay-kot/homebox/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ homebox_memory }}"
+        restart_policy: unless-stopped
   when: homebox_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

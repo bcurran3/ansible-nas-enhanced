@@ -19,7 +19,7 @@
         container_default_behavior: "compatibility"
         name: "{{ gaseous_server_db_container_name }}"
         hostname: "{{ gaseous_server_db_container_name }}"
-        image: mariadb:latest
+        image: "{{ gaseous_server_db_image_name }}:{{ gaseous_server_db_image_tag }}"
         pull: true
         cpu_shares: "{{ gaseous_server_db_cpu_shares }}"
         network_mode: "bridge"
@@ -33,8 +33,6 @@
           MARIADB_USER: "gaseous"
           MARIADB_PASSWORD: "{{ gaseous_server_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ gaseous_server_db_memory_limit }}"
 #        healthcheck:
 #          test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
 #          start_period: 30s
@@ -56,13 +54,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/MariaDB/mariadb-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ gaseous_server_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gaseous_server_container_name }}"
         hostname: "{{ gaseous_server_container_name }}"
-        image: gaseousgames/gaseous-server:latest
+        image: "{{ gaseous_server_image_name }}:{{ gaseous_server_image_tag }}"
         pull: true
         cpu_shares: "{{ gaseous_server_cpu_shares }}"
         network_mode: "bridge"
@@ -81,8 +81,6 @@
           igdbclientid: "{{ gaseous_server_igdb_client_id }}" # Generate an ID and SECRET in IGDB
           igdbclientsecret: "{{ gaseous_server_igdb_client_secret }}" # https://api-docs.igdb.com/#account-creation
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ gaseous_server_memory_limit }}"
         labels:
           autoheal: "{{ gaseous_server_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gaseous_server_watchtower_monitor_only }}"
@@ -106,6 +104,8 @@
           traefik.http.services.gaseous_server.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/gaseous-project/gaseous-server/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ gaseous_server_memory }}"
+        restart_policy: unless-stopped
   when: gaseous_server_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

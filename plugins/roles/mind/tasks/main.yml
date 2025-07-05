@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ mind_container_name }}"
         hostname: "{{ mind_container_name }}"
-        image: mrcas/mind:latest
+        image: "{{ mind_image_name }}:{{ mind_image_tag }}"
         pull: true
         cpu_shares: "{{ mind_cpu_shares }}"
         volumes:
@@ -23,7 +23,6 @@
           - "{{ mind_port_http }}:8080"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ mind_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mind_watchtower_monitor_only }}"
@@ -31,7 +30,7 @@
           homepage.group: "{{ mind_homepage_group }}"
           homepage.icon: "{{ mind_homepage_icon }}"
           homepage.href: "{{ mind_homepage_href }}"
-    #     homepage.description: "A simple self hosted reminder application that can send push notifications to your device. Set the reminder and forget about it!"
+#         homepage.description: "A simple self hosted reminder application that can send push notifications to your device. Set the reminder and forget about it!"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mind_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mind_container_name }}"
@@ -48,6 +47,7 @@
           mind.tag.include: '^\d+\.\d+\.\d+$$'
           mind.link.template: "https://github.com/Casvt/MIND/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ mind_memory }}"
+        restart_policy: unless-stopped
   when: mind_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -16,7 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ idrac6_container_name }}"
         hostname: "{{ idrac6_container_name }}"
-        image: domistyle/idrac6
+        image: "{{ idrac6_image_name }}:{{ idrac6_image_tag }}"
         pull: true
         cpu_shares: "{{ idrac6_cpu_shares }}"
         network_mode: "bridge"
@@ -36,8 +36,6 @@
           VIRTUAL_ISO: "{{ idrac6_virtualmedia }}"
           VNC_PASSWORD: "{{ idrac6_vnc_password }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ idrac6_memory_limit }}"
         labels:
           autoheal: "{{ idrac6_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ idrac6_watchtower_monitor_only }}"
@@ -61,6 +59,8 @@
           traefik.http.services.idrac6.loadbalancer.server.port: "5800"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/DomiStyle/docker-idrac6/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ idrac6_memory }}"
+        restart_policy: unless-stopped
   when: idrac6_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

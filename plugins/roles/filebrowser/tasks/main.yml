@@ -13,7 +13,7 @@
         container_default_behavior: "compatibility"
         name: "{{ filebrowser_container_name }}"
         hostname: "{{ filebrowser_container_name }}"
-        image: filebrowser/filebrowser:latest
+        image: "{{ filebrowser_image_name }}:{{ filebrowser_image_tag }}"
         cpu_shares: "{{ filebrowser_cpu_shares }}"
         pull: true
         volumes:
@@ -27,8 +27,6 @@
           PUID: "{{ filebrowser_user_id }}"
           PGID: "{{ filebrowser_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ filebrowser_memory }}"
         labels:
           autoheal: "{{ filebrowser_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ filebrowser_watchtower_monitor_only }}"
@@ -52,6 +50,8 @@
           traefik.http.services.filebrowser.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/filebrowser/filebrowser/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ filebrowser_memory }}"
+        restart_policy: unless-stopped
   when: filebrowser_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -12,7 +12,8 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ acmenator_container_name }}"
-        image: "{{ acmenator_image_name }}:{{ acmenator_image_version }}"
+        hostname: "{{ acmenator_container_name }}"
+        image: "{{ acmenator_image_name }}:{{ acmenator_image_tag }}"
         pull: true
         cpu_shares: "{{ acmenator_cpu_shares }}"
         network_mode: "bridge"
@@ -24,8 +25,6 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         command: "-input /traefik.json -outdir /target -pem -pkcs -watch"
-        restart_policy: unless-stopped
-        memory: "{{ acmenator_memory_limit }}"
         labels:
           autoheal: "{{ acmenator_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ acmenator_watchtower_monitor_only }}"
@@ -39,6 +38,8 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/ummecasino/acmenator/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ acmenator_memory }}"
+        restart_policy: unless-stopped
   when: acmenator_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -18,7 +18,7 @@
       docker_container:
         name: "{{ appname_container_name }}"
         hostname: "{{ appname_container_name }}"
-        image: "{{ appname_image_name }}:{{ appname_image_version }}"
+        image: "{{ appname_image }}:{{ appname_image_tag }}"
         pull: true
         cpu_shares: "{{ appname_cpu_shares }}"
         volumes:
@@ -64,6 +64,26 @@
         state: absent
   when: appname_enabled is false
 
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ appname_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ appname_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: appname_enabled is false and archive_app_data_enabled is true
+
 
 ###################################
 # OPTIONAL - remove if not needed 
@@ -79,7 +99,7 @@
       community.docker.docker_container:
         name: "{{ appname_db_container_name }}"
         hostname: "{{ appname_db_container_name }}"
-        image: "{{ appname_db_image_name }}:{{ appname_db_image_version }}"
+        image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
         networks:
           - name: "{{ appname_network_name }}"
         network_mode: "{{ appname_network_name }}"
@@ -124,7 +144,7 @@
       community.docker.docker_container:
         name: "{{ appname_db_container_name }}"
         hostname: "{{ appname_db_container_name }}"
-        image: "{{ appname_db_image_name }}:{{ appname_db_image_version }}"
+        image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
         pull: true
         cpu_shares: "{{ appname_db_cpu_shares }}"
         volumes:
@@ -164,7 +184,7 @@
         container_default_behavior: "compatibility"
         name: "{{ appname_redis_container_name }}"
         hostname: "{{ appname_redis_container_name }}"
-        image: "{{ appname_redis_image_name }}:{{ appname_redis_image_version }}"
+        image: "{{ appname_redis_image_name }}:{{ appname_redis_image_tag }}"
         pull: true
         cpu_shares: "{{ appname_redis_cpu_shares }}"
         networks:

@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ flexget_container_name }}"
         hostname: "{{ flexget_container_name }}"
-        image: wiserain/flexget:latest
+        image: "{{ flexget_image_name }}:{{ flexget_image_tag }}"
         pull: true
         cpu_shares: "{{ flexget_cpu_shares }}"
         volumes:
@@ -26,10 +26,9 @@
           FG_WEBUI_PASSWD: "{{ flexget_FG_WEBUI_PASSWD }}"
           FG_LOG_LEVEL: "info"
           FG_PLUGINS: "write_magnet"
-          TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ flexget_user_id }}"
           PGID: "{{ flexget_group_id }}"
-        restart_policy: unless-stopped
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ flexget_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ flexget_watchtower_monitor_only }}"
@@ -54,7 +53,8 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Flexget/Flexget/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ not necessarily in sync with docker image
-        memory: 1g
+        memory: "{{ flexget_memory }}"
+        restart_policy: unless-stopped
   when: flexget_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

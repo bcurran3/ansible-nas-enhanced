@@ -13,7 +13,8 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ maintainerr_container_name }}"
-        image: "{{ maintainerr_docker_image }}"
+        hostname: "{{ maintainerr_container_name }}"
+        image: "{{ maintainerr_image_name }}:{{ maintainerr_image_tag }}"
         pull: true
         cpu_shares: "{{ maintainerr_cpu_shares }}"
         ports:
@@ -23,8 +24,6 @@
         env:
           UV_USE_IO_URING: "0"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ maintainerr_memory }}"
         labels:
           autoheal: "{{ maintainerr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ maintainerr_watchtower_monitor_only }}"
@@ -46,8 +45,10 @@
           traefik.http.routers.maintainerr.middlewares: "{{ maintainerr_hostname }}@docker"
           traefik.http.middlewares.maintainerr.IPAllowList.sourcerange: "{{ maintainerr_traefik_whitelist }}"      
           traefik.http.services.maintainerr.loadbalancer.server.port: "80"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/jorenn92/Maintainerr/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ maintainerr_memory }}"
+        restart_policy: unless-stopped
   when: maintainerr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

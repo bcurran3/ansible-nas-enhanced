@@ -11,13 +11,23 @@ docker_image_directory: "{{ docker_home }}/data"
 # You might want to change this to ZFS, depending on your underlying filesystem.
 docker_storage_driver: overlay2
 
-############### add
 docker_runtimes: "nvidia"
+# ^ this needs more stuff added
 
-############### add
+###
+# added desired output is
+#"runtimes": {
+#        "nvidia": {
+#            "args": [],
+#            "path": "nvidia-container-runtime"
+#        }
+#    }
 
 docker_daemon_json:
   data-root: "{{ docker_image_directory }}"
   storage-driver: "{{ docker_storage_driver }}"
-############### add
-runtimes: "{{ docker_runtimes }}"
+
+docker_daemon_with_nvidia_json:
+  data-root: "{{ docker_image_directory }}"
+  storage-driver: "{{ docker_storage_driver }}"
+  runtimes: "{{ docker_runtimes }}"

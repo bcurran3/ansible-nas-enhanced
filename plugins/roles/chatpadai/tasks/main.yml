@@ -6,7 +6,7 @@
         container_default_behavior: "compatibility"
         name: "{{ chatpadai_container_name }}"
         hostname: "{{ chatpadai_container_name }}"
-        image: ghcr.io/deiucanta/chatpad:latest
+        image: "{{ chatpadai_image_name }}:{{ chatpadai_image_tag }}"
         pull: true
         cpu_shares: "{{ chatpadai_cpu_shares }}"
         network_mode: "bridge"
@@ -14,8 +14,6 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ chatpadai_port_http }}: 80"
-        restart_policy: unless-stopped
-        memory: "{{ chatpadai_memory }}"
         labels:
           autoheal: "{{ chatpadai_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ chatpadai_watchtower_monitor_only }}"
@@ -40,6 +38,8 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/deiucanta/chatpad/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ no releases listed
+        memory: "{{ chatpadai_memory }}"
+        restart_policy: unless-stopped
   when: chatpadai_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

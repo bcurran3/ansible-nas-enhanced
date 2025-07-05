@@ -13,7 +13,7 @@
         container_default_behavior: "compatibility"
         name: "{{ dokemon_container_name }}"
         hostname: "{{ dokemon_container_name }}"
-        image: productiveops/dokemon:latest
+        image: "{{ dokemon_image_name }}:{{ dokemon_image_tag }}"
         pull: true
         cpu_shares: "{{ dokemon_cpu_shares }}"
         ports:
@@ -24,8 +24,6 @@
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ dokemon_memory_limit }}"
         labels:
           autoheal: "{{ dokemon_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dokemon_watchtower_monitor_only }}"
@@ -49,6 +47,8 @@
           traefik.http.services.dokemon.loadbalancer.server.port: "9090"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/productiveops/dokemon/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ dokemon_memory }}"
+        restart_policy: unless-stopped
   when: dokemon_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

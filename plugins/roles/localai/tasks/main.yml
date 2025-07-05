@@ -16,20 +16,21 @@
         container_default_behavior: "compatibility"
         name: "{{ localai_container_name }}"
         hostname: "{{ localai_container_name }}"
-        image: localai/localai:latest  # CPU and GPU combined image
+        image: "{{ localai_image_name }}:{{ localai_image_tag }}"
         pull: true
         cpu_shares: "{{ localai_cpu_shares }}"
+        device_requests:
+          - capabilities: [gpu]
+            count: -1
         ports:
           - "{{ localai_port_http }}:8080"
         runtime: "nvidia" # needs nvidia option configured
-        volumes:
+#       volumes:
         network_mode: bridge
         env:
           NVIDIA_VISIBLE_DEVICES: "all"
           NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ localai_memory_limit }}"
         labels:
           autoheal: "{{ localai_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ localai_watchtower_monitor_only }}"
@@ -51,8 +52,10 @@
           traefik.http.routers.localai.middlewares: "{{ localai_hostname }}@docker"
           traefik.http.middlewares.localai.IPAllowList.sourcerange: "{{ localai_traefik_whitelist }}"
           traefik.http.services.localai.loadbalancer.server.port: "8080"
-#          wud.tag.include: '^\d+\.\d+\.\d+$$'
-#          wud.link.template: "https://github.com/mudler/LocalAI/releases/tag/$${major}.$${minor}.$${patch}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/mudler/LocalAI/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ localai_memory }}"
+        restart_policy: unless-stopped
   when: localai_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

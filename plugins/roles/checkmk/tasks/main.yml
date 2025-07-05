@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ checkmk_container_name }}"
         hostname: "{{ checkmk_container_name }}"
-        image: checkmk/check-mk-raw:2.4.0-latest
+        image: "{{ checkmk_image_name }}:{{ checkmk_image_tag }}"
         pull: true
         cpu_shares: "{{ checkmk_cpu_shares }}"
         network_mode: "bridge"
@@ -28,7 +28,6 @@
         dns_servers: "{{ ansible_nas_dns }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ checkmk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ checkmk_watchtower_monitor_only }}"
@@ -50,7 +49,8 @@
           traefik.http.services.checkmk.loadbalancer.server.port: "5000"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
-        memory: 1g
+        memory: "{{ checkmk_memory }}"
+        restart_policy: unless-stopped
   when: checkmk_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

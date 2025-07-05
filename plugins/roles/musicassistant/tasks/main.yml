@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ musicassistant_container_name }}"
         hostname: "{{ musicassistant_container_name }}"
-        image: ghcr.io/music-assistant/server
+        image: "{{ musicassistant_image_name }}:{{ musicassistant_image_tag }}"
         pull: true
         cpu_shares: "{{ musicassistant_cpu_shares }}"
         privileged: true
@@ -24,8 +24,6 @@
         network_mode: host
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ musicassistant_memory_limit }}"
         labels:
           autoheal: "{{ musicassistant_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ musicassistant_watchtower_monitor_only }}"
@@ -39,6 +37,8 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ musicassistant_memory }}"
+        restart_policy: unless-stopped
   when: musicassistant_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

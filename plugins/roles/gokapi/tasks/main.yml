@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ gokapi_container_name }}"
         hostname: "{{ gokapi_container_name }}"
-        image: f0rc3/gokapi:latest
+        image: "{{ gokapi_image_name }}:{{ gokapi_image_tag }}"
         pull: true
         cpu_shares: "{{ gokapi_cpu_shares }}"
         volumes:
@@ -25,7 +25,6 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ gokapi_port_http }}:53842"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ gokapi_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gokapi_watchtower_monitor_only }}"
@@ -50,6 +49,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Forceu/Gokapi/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ gokapi_memory }}"
+        restart_policy: unless-stopped
   when: gokapi_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

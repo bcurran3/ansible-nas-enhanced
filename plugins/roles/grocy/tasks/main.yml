@@ -13,7 +13,7 @@
         container_default_behavior: "compatibility"
         name: "{{ grocy_container_name }}"
         hostname: "{{ grocy_container_name }}"
-        image: linuxserver/grocy:latest
+        image: "{{ grocy_image_name }}:{{ grocy_image_tag }}"
         pull: true
         cpu_shares: "{{ grocy_cpu_shares }}"
         volumes:
@@ -24,7 +24,6 @@
           PUID: "{{ grocy_user_id }}"
           PGID: "{{ grocy_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ grocy_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ grocy_watchtower_monitor_only }}"
@@ -48,7 +47,8 @@
           traefik.http.services.grocy.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-grocy/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: 1g
+        memory: "{{ grocy_memory }}"
+        restart_policy: unless-stopped
   when: grocy_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

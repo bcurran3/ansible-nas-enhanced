@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ hammond_container_name }}"
         hostname: "{{ hammond_container_name }}"
-        image: alfhou/hammond
+        image: "{{ hammond_image_name }}:{{ hammond_image_tag }}"
         pull: true
         cpu_shares: "{{ hammond_cpu_shares }}"
         volumes:
@@ -26,7 +26,6 @@
         env:
           JWT_SECRET: "{{ hammond_secret }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ hammond_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ hammond_watchtower_monitor_only }}"
@@ -51,6 +50,7 @@
           hammond.tag.include: '^\d+\.\d+\.\d+$$'
           hammond.link.template: "https://github.com/AlfHou/hammond/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ hammond_memory }}"
+        restart_policy: unless-stopped
   when: hammond_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

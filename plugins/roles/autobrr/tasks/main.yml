@@ -5,7 +5,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ autobrr_container_name }}"
-        image: "{{ autobrr_image_name }}:{{ autobrr_image_version }}"
+        image: "{{ autobrr_image_name }}:{{ autobrr_image_tag }}"
         pull: true
         cpu_shares: "{{ autobrr_cpu_shares }}"
         volumes:
@@ -14,10 +14,8 @@
           - "{{ autobrr_port_http }}:7474"
         network_mode: "bridge"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           USER: "1000:1000"
-        restart_policy: unless-stopped
-        memory: "{{ autobrr_memory_limit }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ autobrr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ autobrr_watchtower_monitor_only }}"
@@ -41,6 +39,9 @@
           traefik.http.middlewares.autobrr.IPAllowList.sourcerange: "{{ autobrr_traefik_whitelist }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/autobrr/autobrr/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ autobrr_memory }}"
+        restart_policy: unless-stopped
+
   when: autobrr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

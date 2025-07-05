@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ cleanuperr_container_name }}"
         hostname: "{{ cleanuperr_container_name }}"
-        image: ghcr.io/flmorg/cleanuperr:latest
+        image: "{{ cleanuperr_image_name }}:{{ cleanuperr_image_tag }}"
         pull: true
         cpu_shares: "{{ cleanuperr_cpu_shares }}"
         volumes:
@@ -145,8 +145,6 @@
           APPRISE__URL: "http://apprise:8000"
           APPRISE__KEY: "myConfigKey"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ cleanuperr_memory_limit }}"
         labels:
           autoheal: "{{ cleanuperr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ cleanuperr_watchtower_monitor_only }}"
@@ -160,6 +158,8 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/flmorg/cleanuperr/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ cleanuperr_memory }}"
+        restart_policy: unless-stopped
   when: cleanuperr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

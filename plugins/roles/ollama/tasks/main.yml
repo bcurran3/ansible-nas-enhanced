@@ -23,6 +23,9 @@
         pull: true
         cpu_shares: "{{ ollama_cpu_shares }}"
         runtime: "nvidia"
+        device_requests:
+          - capabilities: [gpu]
+            count: -1
         volumes:
           - "{{ ollama_data_directory }}/ollama:/root/.ollama"
           - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
@@ -75,7 +78,7 @@
           HF_HOME: "voices"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
-        runtime: "nvidia"
+#        runtime: "nvidia"
         labels:
           autoheal: "{{ ollama_openedai_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openedai_watchtower_monitor_only }}"
@@ -124,7 +127,7 @@
 #          SEARXNG_QUERY_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_openwebui_port_http }}/search?q=<query>"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
-        runtime: "nvidia"
+#        runtime: "nvidia"
         labels:
           autoheal: "{{ ollama_openwebui_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openwebui_watchtower_monitor_only }}"

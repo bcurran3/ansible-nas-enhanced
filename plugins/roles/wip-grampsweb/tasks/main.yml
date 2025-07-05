@@ -30,7 +30,7 @@
 #        env:
 #          TZ: "{{ ansible_nas_timezone }}"
 #        restart_policy: unless-stopped
-#        memory: "{{ grampsweb_celery_memory_limit }}"
+#        memory: "{{ grampsweb_celery_memory }}"
 #        command: "celery -A gramps_webapi.celery worker --loglevel=INFO --concurrency=2"
 #        labels:
 #          autoheal: "{{ grampsweb_celery_autoheal }}"
@@ -59,7 +59,7 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
-        memory: "{{ grampsweb_redis_memory_limit }}"
+        memory: "{{ grampsweb_redis_memory }}"
         labels:
           autoheal: "{{ grampsweb_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
@@ -126,7 +126,7 @@
           traefik.http.services.grampsweb.loadbalancer.server.port: "5000"
           grampsweb.tag.include: '^\d+\.\d+\.\d+$$'
           grampsweb.link.template: "https://github.com/Casvt/grampsweb/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: "{{ grampsweb_memory_limit }}"
+        memory: "{{ grampsweb_memory }}"
   when: grampsweb_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

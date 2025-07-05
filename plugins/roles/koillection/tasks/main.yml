@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ koillection_db_container_name }}"
         hostname: "{{ koillection_db_container_name }}"
-        image: postgres:16-alpine
+        image: "{{ koillection_db_image_name }}:{{ koillection_db_image_tag }}"
         pull: true
         cpu_shares: "{{ koillection_db_cpu_shares }}"
         volumes:
@@ -24,8 +24,6 @@
           POSTGRES_DB: "koillection"
           POSTGRES_USER: "koillection"
           POSTGRES_PASSWORD: "koillection"
-        restart_policy: unless-stopped
-        memory: "{{ koillection_db_memory }}"
         labels:
           autoheal: "{{ koillection_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ koillection_db_watchtower_monitor_only }}"
@@ -40,13 +38,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
+        memory: "{{ koillection_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ koillection_container_name }}"
         hostname: "{{ koillection_container_name }}"
-        image: koillection/koillection
+        image: "{{ koillection_image_name }}:{{ koillection_image_tag }}"
         pull: true
         cpu_shares: "{{ koillection_cpu_shares }}"
         volumes:
@@ -69,7 +69,6 @@
           DB_PASSWORD: "koillection"
           DB_VERSION: "16"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         links:
           - "{{ koillection_db_container_name }}"
         labels:
@@ -96,6 +95,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/benjaminjonard/koillection/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ koillection_memory }}"
+        restart_policy: unless-stopped
   when: koillection_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -104,6 +104,7 @@
       community.docker.docker_container:
         name: "{{ koillection_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Docker Container
       community.docker.docker_container:
         name: "{{ koillection_db_container_name }}"

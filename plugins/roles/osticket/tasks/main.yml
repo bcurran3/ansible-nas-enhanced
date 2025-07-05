@@ -18,8 +18,8 @@
     - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ osticket_container_db_name }}"
-        hostname: "{{ osticket_container_db_name }}"
+        name: "{{ osticket_db_container_name }}"
+        hostname: "{{ osticket_db_container_name }}"
         image: bitnami/mariadb:latest
         pull: true
         cpu_shares: "{{ osticket_db_cpu_shares }}"
@@ -36,7 +36,7 @@
           MARIADB_DATABASE: "osticket_db"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
-        memory: "{{ osticket_db_memory_limit }}"
+        memory: "{{ osticket_db_memory }}"
         labels:
           autoheal: "{{ osticket_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osticket_db_watchtower_monitor_only }}"
@@ -72,13 +72,13 @@
           MYSQL_USER: "osticket"
           MYSQL_PASSWORD: "topsecret"
           MYSQL_DATABASE: "osticket_db"
-          MYSQL_HOST: "{{ osticket_container_db_name }}"
+          MYSQL_HOST: "{{ osticket_db_container_name }}"
           ALLOW_EMPTY_PASSWORD: "yes"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
-        memory: "{{ osticket_memory_limit }}"
+        memory: "{{ osticket_memory }}"
         links:
-          - "{{ osticket_container_db_name }}"
+          - "{{ osticket_db_container_name }}"
         labels:
           autoheal: "{{ osticket_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osticket_watchtower_monitor_only }}"
@@ -110,8 +110,9 @@
       community.docker.docker_container:
         name: "{{ osticket_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
-        name: "{{ osticket_container_db_name }}"
+        name: "{{ osticket_db_container_name }}"
         state: absent
   when: osticket_enabled is false

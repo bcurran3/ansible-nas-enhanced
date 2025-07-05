@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ crashplanpro_container_name }}"
         hostname: "{{ crashplanpro_container_name }}"
-        image: jlesage/crashplan-pro
+        image: "{{ crashplanpro_image_name }}:{{ crashplanpro_image_tag }}"
         pull: true
         cpu_shares: "{{ crashplanpro_cpu_shares }}"
         ports:
@@ -26,8 +26,6 @@
         env:
           CRASHPLAN_SRV_MAX_MEM: "8G"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ crashplanpro_memory_limit }}"
         labels:
           autoheal: "{{ crashplanpro_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ crashplanpro_watchtower_monitor_only }}"
@@ -51,6 +49,8 @@
           traefik.http.services.crashplanpro.loadbalancer.server.port: "5800"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/jlesage/docker-crashplan-pro/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ crashplanpro_memory }}"
+        restart_policy: unless-stopped
   when: crashplanpro_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ glance_container_name }}"
         hostname: "{{ glance_container_name }}"
-        image: glanceapp/glance
+        image: "{{ glance_image_name }}:{{ glance_image_tag }}"
         pull: true
         cpu_shares: "{{ glance_cpu_shares }}"
         ports:
@@ -25,8 +25,6 @@
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ glance_memory_limit }}"
         labels:
           autoheal: "{{ glance_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glance_watchtower_monitor_only }}"
@@ -50,6 +48,8 @@
           traefik.http.services.glance.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/glanceapp/glance/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ glance_memory }}"
+        restart_policy: unless-stopped
   when: glance_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

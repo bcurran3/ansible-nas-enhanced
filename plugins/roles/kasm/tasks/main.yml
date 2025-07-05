@@ -16,8 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ kasm_container_name }}"
         hostname: "{{ kasm_container_name }}"
-        image: lscr.io/linuxserver/kasm:latest
-        # https://hub.docker.com/r/linuxserver/kasm
+        image: "{{ kasm_image_name }}:{{ kasm_image_tag }}"
         pull: true
         cpu_shares: "{{ kasm_cpu_shares }}"
         network_mode: "bridge"
@@ -38,7 +37,6 @@
         privileged: true
 #       security_opts:
 #         - apparmor:rootlesskit #optional
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ kasm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ kasm_watchtower_monitor_only }}"
@@ -67,7 +65,8 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/linuxserver/kasm/tags/$${major}.$${minor}.$${patch}"
 # NOTE: Traefik labels need work to make kasm.server.tld work; i.e. pass https header to kasm instead of http
-        memory: "{{ kasm_memory_limit }}"
+        memory: "{{ kasm_memory }}"
+        restart_policy: unless-stopped
   when: kasm_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

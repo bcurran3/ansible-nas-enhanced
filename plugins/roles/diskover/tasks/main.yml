@@ -28,7 +28,7 @@
         container_default_behavior: "compatibility"
         name: "{{ diskover_elasticsearch_container_name }}"
         hostname: "{{ diskover_elasticsearch_hostname }}"
-        image: public.ecr.aws/elastic/elasticsearch:8.16.2
+        image: "{{ diskover_elasticsearch_image_name }}:{{ diskover_elasticsearch_image_tag }}"
         pull: true
         cpu_shares: "{{ diskover_elasticsearch_cpu_shares }}"
         networks:
@@ -46,9 +46,8 @@
           bootstrap.memory_lock: 'true'
           ES_JAVA_OPTS: '-Xms1g -Xmx1g'
           ELASTIC_PASSWORD: "topsecret"
-    #    ulimits:
-    #      - 'memlock:-1:-1'
-        restart_policy: unless-stopped
+        ulimits:
+          - 'memlock:-1:-1'
         labels:
           autoheal: "{{ diskover_elasticsearch_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ diskover_elasticsearch_watchtower_monitor_only }}"
@@ -72,6 +71,8 @@
           traefik.http.services.elasticsearch.loadbalancer.server.port: "9200"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://gallery.ecr.aws/elastic/elasticsearch/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ diskover_elasticsearch_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Elasticsearch-helper Container
       docker_container:
@@ -96,7 +97,7 @@
         container_default_behavior: "compatibility"
         name: "{{ diskover_container_name }}"
         hostname: "{{ diskover_container_name }}"
-        image: lscr.io/linuxserver/diskover:latest
+        image: "{{ diskover_image_name }}:{{ diskover_image_tag }}"
         pull: true
         cpu_shares: "{{ diskover_cpu_shares }}"
         links:
@@ -116,12 +117,10 @@
           ES_USER: "elastic"
           ES_PORT: "9200"
           ES_PASS: "topsecret"
-          ES_HOST: "elasticsearch"
+          ES_HOST: "{{ diskover_elasticsearch_container_name }}"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ diskover_port_http }}:80"
-        restart_policy: unless-stopped
-        memory: "{{ diskover_memory }}"
         labels:
           autoheal: "{{ diskover_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ diskover_watchtower_monitor_only }}"
@@ -145,6 +144,8 @@
           traefik.http.services.diskover.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-diskover/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ diskover_memory }}"
+        restart_policy: unless-stopped
   when: diskover_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -153,6 +154,7 @@
       community.docker.docker_container:
         name: "{{ diskover_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} Elasticsearch Container
       community.docker.docker_container:
         name: "{{ diskover_elasticsearch_container_name }}"

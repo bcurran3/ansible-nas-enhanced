@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ banban_container_name }}"
         hostname: "{{ banban_container_name }}"
-        image: m0gd0ck/banban:latest
+        image: "{{ banban_image_name }}:{{ banban_image_tag }}"
         pull: true
         cpu_shares: "{{ banban_cpu_shares }}"
         volumes:
@@ -28,7 +28,6 @@
           PORT: "{{ banban_port_http }}"
           NODE_ENV: "production"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ banban_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ banban_watchtower_monitor_only }}"
@@ -53,6 +52,7 @@
           banban.tag.include: '^\d+\.\d+\.\d+$$'
           banban.link.template: "https://github.com/m0g/banban/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ banban_memory }}"
+        restart_policy: unless-stopped
   when: banban_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

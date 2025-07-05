@@ -16,7 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ homepage_container_name }}"
         hostname: "{{ homepage_hostname }}"
-        image: ghcr.io/gethomepage/homepage:latest
+        image: "{{ homepage_image_name }}:{{ homepage_image_tag }}"
         pull: true
         cpu_shares: "{{ homepage_cpu_shares }}"
         volumes:
@@ -31,8 +31,6 @@
           PUID: "{{ homepage_puid }}"
           PGID: "{{ homepage_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ homepage_memory_limit }}"
         labels:
           autoheal: "{{ homepage_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ homepage_watchtower_monitor_only }}"
@@ -47,6 +45,8 @@
           traefik.http.services.homepage.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/gethomepage/homepage/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ homepage_memory }}"
+        restart_policy: unless-stopped
   when: homepage_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

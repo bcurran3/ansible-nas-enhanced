@@ -24,7 +24,6 @@
           POSTGRES_PASSWORD: "{{ peppermint_db_password }}"
           POSTGRES_DB: "peppermint"
         restart_policy: unless-stopped
-        memory: "{{ peppermint_db_memory_limit }}"
         labels:
           autoheal: "{{ peppermint_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ peppermint_db_watchtower_monitor_only }}"
@@ -40,6 +39,7 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ peppermint_db_memory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
@@ -84,7 +84,7 @@
           traefik.http.services.peppermint.loadbalancer.server.port: "3000"
 #          wud.tag.include: '^\d+\.\d+\.\d+$$'
 #          wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: "{{ peppermint_memory_limit }}"
+        memory: "{{ peppermint_memory }}"
   when: peppermint_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

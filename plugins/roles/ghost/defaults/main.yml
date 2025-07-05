@@ -9,7 +9,6 @@ ghost_data_directory: "{{ docker_home }}/ghost"
 ghost_hostname: "ghost"
 ghost_port_http: "2368"
 ghost_network: "ghost"
-ghost_memory_limit: "1G"
 
 # mysql
 ghost_db_password: "topsecret"
@@ -17,9 +16,15 @@ ghost_db_memory_limit: "1G"
 
 # docker
 ghost_container_name: "ghost"
-ghost_db_container_name: "ghost-db"
+ghost_image_name: "ghost"
+ghost_image_tag: ""
 ghost_cpu_shares: "1024"
+ghost_memory: "1G"
+ghost_db_container_name: "ghost-db"
+ghost_db_image_name: "mysql"
+ghost_db_image_tag: "8.0"
 ghost_db_cpu_shares: "1024"
+ghost_db_memory: "1G"
 
 # app
 ghost_mail_from: "'MyDomain' <postmaster@{{ ansible_nas_domain }}>"

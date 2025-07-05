@@ -23,6 +23,17 @@
         dest: "{{ scrutiny_data_directory }}/config/scrutiny.yaml"
       register: template_config
 
+############# to test
+#    - name: Set a fact containing a list of available drives
+#      ansible.builtin.set_fact:
+#        available_drives: "{{ ansible_devices.keys() | list }}"
+#      when: ansible_devices is defined # Ensure ansible_devices fact exists
+
+#    - name: Debug and show the list of available drives
+#      ansible.builtin.debug:
+#        var: available_drives
+###################
+
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"

@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ huntarr_container_name }}"
         hostname: "{{ huntarr_container_name }}"
-        image: "{{ huntarr_image_name }}:{{ huntarr_image_version }}"
+        image: "{{ huntarr_image_name }}:{{ huntarr_image_tag }}"
         pull: true
         cpu_shares: "{{ huntarr_cpu_shares }}"
         ports:
@@ -24,8 +24,6 @@
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ huntarr_memory_limit }}"
         labels:
           autoheal: "{{ huntarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ huntarr_watchtower_monitor_only }}"
@@ -49,6 +47,8 @@
           traefik.http.services.huntarr.loadbalancer.server.port: "9705"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/plexguide/Huntarr.io/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ huntarr_memory }}"
+        restart_policy: unless-stopped
   when: huntarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -16,7 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ bitmagnet_db_container_name }}"
         hostname: "{{ bitmagnet_db_container_name }}"
-        image: postgres:16-alpine
+        image: "{{ bitmagnet_db_image_name }}:{{ bitmagnet_db_image_tag }}"
         pull: true
         cpu_shares: "{{ bigmagnet_db_cpu_shares }}"
         volumes:
@@ -26,8 +26,6 @@
           POSTGRES_DB: "bitmagnet"
           PGUSER: "postgres"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ bitmagnet_db_memory }}"
         healthcheck:
           test:
             - CMD-SHELL
@@ -47,13 +45,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/postgres/postgres/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ bitmagnet_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ bitmagnet_container_name }}"
         hostname: "{{ bitmagnet_container_name }}"
-        image: ghcr.io/bitmagnet-io/bitmagnet:latest
+        image: "{{ bitmagnet_image_name }}:{{ bitmagnet_image_tag }}"
         pull: true
         cpu_shares: "{{ bitmagnet_cpu_shares }}"
         volumes:
@@ -70,7 +70,6 @@
           TMDB_API_KEY: "{{ bitmagnet_tmdb_api_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         command: worker run --keys=http_server --keys=queue_server --keys=dht_crawler
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ bitmagnet_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ bitmagnet_watchtower_monitor_only }}"
@@ -95,6 +94,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/bitmagnet-io/bitmagnet/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ bitmagnet_memory }}"
+        restart_policy: unless-stopped
   when: bitmagnet_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -103,6 +103,7 @@
       community.docker.docker_container:
         name: "{{ bitmagnet_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ bitmagnet_db_container_name }}"

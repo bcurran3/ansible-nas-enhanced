@@ -7,9 +7,6 @@ filebrowser_available_externally: false
 filebrowser_traefik_whitelist: "{{ lan }}"
 filebrowser_data_directory: "{{ docker_home }}/filebrowser"
 
-# docker image to use
-filebrowser_docker_image: filebrowser/filebrowser
-
 # network
 filebrowser_port: "8086"
 filebrowser_hostname: "filebrowser"
@@ -18,13 +15,15 @@ filebrowser_hostname: "filebrowser"
 filebrowser_user_id: "0"
 filebrowser_group_id: "0"
 
-# specs
-filebrowser_memory: 256m
+# app
+filebrowser_root_dir: "/"
 
 # docker
 filebrowser_container_name: "filebrowser"
-filebrowser_root_dir: "/"
+filebrowser_image: "filebrowser/filebrowser"
+filebrowser_image_tag: "latest"
 filebrowser_cpu_shares: "1024"
+filebrowser_memory: "256m"
 
 # autoheal
 filebrowser_autoheal: "false"

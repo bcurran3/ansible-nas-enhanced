@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ kavita_container_name }}"
         hostname: "{{ kavita_container_name }}"
-        image: jvmilazz0/kavita:latest
+        image: "{{ kavita_image_name }}:{{ kavita_image_tag }}"
         pull: true
         cpu_shares: "{{ kavita_cpu_shares }}"
         volumes:
@@ -26,8 +26,6 @@
           - "{{ kavita_port_http }}:5000"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ kavita_memory }}"
         labels:
           autoheal: "{{ kavita_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ kavita_watchtower_monitor_only }}"
@@ -51,6 +49,8 @@
           traefik.http.services.kavita.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Kareadita/Kavita/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ kavita_memory }}"
+        restart_policy: unless-stopped
   when: kavita_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

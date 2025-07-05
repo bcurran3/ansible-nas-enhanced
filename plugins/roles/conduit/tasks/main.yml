@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ conduit_container_name }}"
         hostname: "{{ conduit_container_name }}"
-        image: matrixconduit/matrix-conduit:latest
+        image: "{{ conduit_image_name }}:{{ conduit_image_tag }}"
         pull: true
         cpu_shares: "{{ conduit_cpu_shares }}"
         env:
@@ -34,8 +34,6 @@
           - "{{ conduit_data_directory }}/db:/var/lib/matrix-conduit"
         ports:
           - "{{ conduit_port }}:6167"
-        restart_policy: unless-stopped
-        memory: "{{ conduit_memory }}"
         labels:
           autoheal: "{{ conduit_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ conduit_watchtower_monitor_only }}"
@@ -59,7 +57,9 @@
           traefik.http.services.conduit.loadbalancer.server.port: "6167"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://gitlab.com/famedly/conduit/$${major}.$${minor}.$${patch}"
-#         ^ most likely bad          
+#         ^ most likely bad
+        memory: "{{ conduit_memory }}"
+        restart_policy: unless-stopped
   when: conduit_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

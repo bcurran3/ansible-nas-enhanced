@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ fasten_container_name }}"
         hostname: "{{ fasten_container_name }}"
-        image: ghcr.io/fastenhealth/fasten-onprem:main
+        image: "{{ fasten_image_name }}:{{ fasten_image_tag }}"
         pull: true
         cpu_shares: "{{ fasten_cpu_shares }}"
         ports:
@@ -25,8 +25,6 @@
           - "{{ fasten_porn_directory }}/db:/opt/fasten/db"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ fasten_memory_limit }}"
         labels:
           autoheal: "{{ fasten_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ fasten_watchtower_monitor_only }}"
@@ -50,6 +48,8 @@
           traefik.http.services.fasten.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/fastenhealth/fasten-onprem/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ fasten_memory }}"
+        restart_policy: unless-stopped
   when: fasten_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

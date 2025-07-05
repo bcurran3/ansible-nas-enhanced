@@ -12,15 +12,19 @@ openemr_admin_password: "topsecret"
 # network
 openemr_hostname: "openemr"
 openemr_port_http: "3016"
+openemr_network_name: "openemr"
 
 # docker
 openemr_container_name: "openemr"
-openemr_network_name: "openemr"
-openemr_memory_limit: "1g"
-openemr_container_db_name: "openemr_mariadb"
-openemr_db_memory_limit: "1g"
+openemr_image_name: ""
+openemr_image_tag: ""
 openemr_cpu_shares: "1024"
+openemr_memory_limit: "1g"
+openemr_db_container_name: "openemr_mariadb"
+openemr_db_image_name: ""
+openemr_db_image_tag: ""
 opememr_db_cpu_shares: "1024"
+openemr_db_memory_limit: "1g"
 
 # autoheal
 openemr_autoheal: "false"
@@ -31,7 +35,6 @@ openemr_homepage_group: "Apps"
 openemr_homepage_icon: "openemr.png"
 openemr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
 openemr_homepage_showStats: "false"
-
 openemr_db_homepage_group: "DBs"
 openemr_db_homepage_icon: "mariadb.png"
 openemr_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
