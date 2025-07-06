@@ -14,33 +14,33 @@ immich_port: "2283"
 immich_hostname: "immich"
 immich_network_name: "immich"
 
-# specs
-immich_machinelearning_memory: 1g
-immich_postgres_memory: 2g
-immich_redis_memory: 1g
-immich_server_memory: 1g
-
-# docker
-immich_machinelearning_container_name: "immich-machine-learning"
-immich_postgres_container_name: "immich-postgres"
-immich_redis_container_name: "immich-redis"
-immich_server_container_name: "immich-server"
-
-immich_machinelearning_image: "ghcr.io/immich-app/immich-machine-learning"
-immich_machinelearning_tag: "release"
-immich_postgres_image: "ghcr.io/immich-app/postgres"
-immich_postgres_tag: "14-vectorchord0.3.0-pgvectors0.2.0"
-immich_redis_image: "redis"
-immich_redis_tag: "6.2-alpine"
-immich_server_image: "ghcr.io/immich-app/immich-server"
-immich_server_tag: "release"
+# app
 immich_user_id: "1000"
 immich_group_id: "1000"
 
-immich_machinelearning_cpu_shares: "1024"
-immich_postgres_cpu_shares: "1024"
-immich_redis_cpu_shares: "1024"
+# docker
+immich_server_container_name: "immich-server"
+immich_server_image: "ghcr.io/immich-app/immich-server"
+immich_server_tag: "release"
 immich_server_cpu_shares: "1024"
+immich_server_memory: 1g
+# For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
+# Example tag: ${IMMICH_VERSION:-release}-cuda
+immich_machinelearning_container_name: "immich-machine-learning"
+immich_machinelearning_image: "ghcr.io/immich-app/immich-machine-learning"
+immich_machinelearning_tag: "release"
+immich_machinelearning_cpu_shares: "1024"
+immich_machinelearning_memory: 1g
+immich_postgres_container_name: "immich-postgres"
+immich_postgres_image: "ghcr.io/immich-app/postgres"
+immich_postgres_tag: "14-vectorchord0.3.0-pgvectors0.2.0"
+immich_postgres_cpu_shares: "1024"
+immich_postgres_memory: 2g
+immich_redis_container_name: "immich-redis"
+immich_redis_image: "redis"
+immich_redis_tag: "6.2-alpine"
+immich_redis_cpu_shares: "1024"
+immich_redis_memory: 1g
 
 # database
 immich_db_password: "postgres" # $(pwgen -s 40 1)

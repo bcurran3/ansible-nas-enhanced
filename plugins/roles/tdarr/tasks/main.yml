@@ -26,6 +26,9 @@
           max-size: "200k"
         pull: true
         cpu_shares: "{{ tdarr_cpu_shares }}"
+        device_requests:
+          - capabilities: [gpu]
+            count: -1
         volumes:
           - "{{ tdarr_data_directory }}/server:/app/server"
           - "{{ tdarr_data_directory }}/configs:/app/configs"

@@ -21,11 +21,13 @@
         pull: true
         cpu_shares: "{{ immich_machinelearning_cpu_shares }}"
         container_default_behavior: no_defaults
-    # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
-    # Example tag: ${IMMICH_VERSION:-release}-cuda
-    # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
-    #   file: hwaccel.ml.yml
-    #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+#       extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
+#       file: hwaccel.ml.yml
+#       service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
+        device_requests:
+          - capabilities: [gpu]
+            count: -1
         volumes:
           - "{{ immich_data_directory }}/cache:/cache"
         networks:
@@ -102,7 +104,6 @@
         pull: true
         cpu_shares: "{{ immich_redis_cpu_shares }}"
         container_default_behavior: no_defaults
-#        command: --save 60 1 --loglevel warning
         networks:
           - name: "{{ immich_network_name }}"
         network_mode: "bridge"

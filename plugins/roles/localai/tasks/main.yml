@@ -19,12 +19,12 @@
         image: "{{ localai_image_name }}:{{ localai_image_tag }}"
         pull: true
         cpu_shares: "{{ localai_cpu_shares }}"
+        ports:
+          - "{{ localai_port_http }}:8080"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
           - capabilities: [gpu]
             count: -1
-        ports:
-          - "{{ localai_port_http }}:8080"
-        runtime: "nvidia" # needs nvidia option configured
 #       volumes:
         network_mode: bridge
         env:

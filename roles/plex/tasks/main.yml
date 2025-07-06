@@ -34,12 +34,10 @@
           - "32469:32469/udp"   # access to the Plex DLNA Server
           - "33400:33400"       # Plex Web Tools
 #         - "1900:1900/udp"     # Plex DLNA Server
-        runtime: "nvidia"       # added
-        device_requests:        # added
-          - capabilities: [gpu] # added
-            count: -1           # added
-#       runtime: "{{ nvidia_runtime_enabled | default(omit) }}"
-#                ^ this ends up with true/false instead of "nvidia"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
+        device_requests:
+          - capabilities: [gpu]
+            count: -1
         volumes:
           - "{{ plex_config_directory }}:/config:rw"
           - "{{ plex_logs }}:/opt/plex/Library/Application Support/Plex Media Server/Logs:rw"
