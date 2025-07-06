@@ -7,7 +7,7 @@
         state: directory
       with_items:
         - "{{ idrive_data_directory }}"
-        - "{{ idrive_data_directory }}/config"
+        - "{{ idrive_data_directory }}/idriveIt"
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
@@ -18,14 +18,14 @@
         pull: true
         cpu_shares: "{{ idrive_cpu_shares }}"
         volumes:
-          - "{{ idrive_data_directory }}/config:/opt/IDriveForLinux/idriveIt"
-          - "/:/mnt/backup:ro"
+          - "{{ idrive_data_directory }}/idriveIt:/opt/IDriveForLinux/idriveIt"
+          - "{{ idrive_backup_source }}:/source:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ idrive_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ idrive_watchtower_monitor_only }}"
-          homepage.name: "IDrive"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ idrive_homepage_group }}"
           homepage.href: "{{ idrive_homepage_href }}"
           homepage.icon: "{{ idrive_homepage_icon }}"
@@ -46,8 +46,3 @@
         name: "{{ idrive_container_name }}"
         state: absent
   when: idrive_enabled is false
-
-# TDL:
-# switch to https://github.com/snorre-k/idrive-docker
-# ^^ change image and volume now commented out
-# (/mnt/backup to /source change will cause everything to re-upload)
