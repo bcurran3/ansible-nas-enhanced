@@ -1,6 +1,14 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
+    - name: Create {{ ansible_nas_app_name }} Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ autobrr_data_directory }}"
+        - "{{ autobrr_data_directory }}/config"
+
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
@@ -41,7 +49,6 @@
           wud.link.template: "https://github.com/autobrr/autobrr/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ autobrr_memory }}"
         restart_policy: unless-stopped
-
   when: autobrr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -51,3 +58,23 @@
         name: "{{ autobrr_container_name }}"
         state: absent
   when: autobrr_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ autobrr_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ autobrr_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: autobrr_enabled is false and archive_app_data_enabled is true

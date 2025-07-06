@@ -19,8 +19,6 @@
         network_mode: "bridge"
         volumes:
           - "{{ traefik_data_directory }}/letsencrypt/acme.json:/traefik.json:ro"
-#         - "{{ acmenator_traefik_directory }}/acme.json:/traefik.json:ro"
-#         - "/data/docker/traefik/letsencrypt/acme.json:/traefik.json:ro"
           - "{{ acmenator_data_directory }}:/target"
         env:
           TZ: "{{ ansible_nas_timezone }}"
@@ -33,7 +31,7 @@
           homepage.icon: "{{ acmenator_homepage_icon }}"
 #         homepage.description: "Convert Traefik certs to PEM or p12"
           homepage.server: "my-docker"
-          homepage.container: "acmenator"
+          homepage.container: "{{ acmenator_container_name }}"
           homepage.showStats: "{{ acmenator_homepage_showStats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -49,3 +47,24 @@
         name: "{{ acmenator_container_name }}"
         state: absent
   when: acmenator_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ acmenator_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ acmenator_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: acmenator_enabled is false and archive_app_data_enabled is true
+

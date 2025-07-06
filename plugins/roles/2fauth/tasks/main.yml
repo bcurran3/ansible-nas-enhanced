@@ -1,4 +1,5 @@
 ---
+# NOTE: there are some env vars that can be templated still
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -16,27 +17,27 @@
         container_default_behavior: "compatibility"
         name: "{{ twofauth_container_name }}"
         hostname: "{{ twofauth_container_name }}"
-        image: "{{ 2fauth_image_name }}:{{ 2fauth_image_tag }}"
+        image: "{{ twofauth_image_name }}:{{ twofauth_image_tag }}"
         pull: true
         cpu_shares: "{{ twofauth_cpu_shares }}"
         ports:
           - "{{ twofauth_port_http }}:8000"
         volumes:
-          - "{{ twofauth_data_directory }}/data:/2fauth"
+          - "{{ twofauth_data_directory }}/data:/twofauth"
         network_mode: "bridge"
         env:
-          APP_NAME: "2FAuth"
+          APP_NAME: "{{ ansible_nas_app_name }}"
           APP_ENV: "local"
           APP_DEBUG: "false"
           SITE_OWNER: "{{ ansible_nas_email }}"
           APP_KEY: "{{ twofauth_app_key }}"
           # This variable must match your installation's external address.
           # Webauthn won't work otherwise.
-          APP_URL: "https://2fauth.{{ ansible_nas_domain }}"
+          APP_URL: "https://{{ twofauth_hostname }}.{{ ansible_nas_domain }}"
           # If you want to serve js assets from a CDN (like https://cdn.example.com),
           # you need to set this custom URL here.
           # Otherwise, this should be the exact same value as APP_URL.
-          ASSET_URL: "https://2fauth.{{ ansible_nas_domain }}"
+          ASSET_URL: "https://{{ twofauth_hostname }}.{{ ansible_nas_domain }}"
           IS_DEMO_APP: "false"
           LOG_CHANNEL: "daily"
           LOG_LEVEL: "notice"
@@ -44,20 +45,20 @@
           CACHE_DRIVER: "file"
           SESSION_DRIVER: "file"
           # Mail settings
-          MAIL_DRIVER: "log"
-          MAIL_HOST: "smtp.mailtrap.io"
-          MAIL_PORT: "2525"
-          MAIL_USERNAME: "null"
-          MAIL_PASSWORD: "null"
-          MAIL_ENCRYPTION: "null"
-          MAIL_FROM_NAME: "null"
-          MAIL_FROM_ADDRESS: "null"
+          MAIL_DRIVER: "{{ twofauth_mail_driver }}"
+          MAIL_HOST: "{{ twofauth_mail_host }}"
+          MAIL_PORT: "{{ twofauth_mail_port }}"
+          MAIL_USERNAME: "{{ twofauth_mail_username }}"
+          MAIL_PASSWORD: "{{ twofauth_mail_password }}"
+          MAIL_ENCRYPTION: "{{ twofauth_mail_encryption }}"
+          MAIL_FROM_NAME: "{{ twofauth_mail_from_name }}"
+          MAIL_FROM_ADDRESS: "{{ twofauth_mail_from_addres }}"
           # SSL peer verification.
           # Set this to false to disable the SSL certificate validation.
           # WARNING
           # Disabling peer verification can result in a major security flaw.
           # Change it only if you know what you're doing.
-          MAIL_VERIFY_SSL_PEER: "true"
+          MAIL_VERIFY_SSL_PEER: "{{ twofauth_mail_verify_ssl_peer }}"
           THROTTLE_API: "60"
           LOGIN_THROTTLE: "5"
           # The default authentication guard
@@ -147,14 +148,14 @@
           homepage.container: "{{ twofauth_container_name }}"
           homepage.showStats: "{{ twofauth_homepage_showStats }}"
           traefik.enable: "{{ twofauth_available_externally | string }}"
-          traefik.http.routers.2fauth.rule: "Host(`{{ twofauth_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.2fauth.tls.certresolver: "letsencrypt"
-          traefik.http.routers.2fauth.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.2fauth.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.twofauth.rule: "Host(`{{ twofauth_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.twofauth.tls.certresolver: "letsencrypt"
+          traefik.http.routers.twofauth.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.twofauth.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.frontend.middlewares: "{{ twofauth_hostname }}"
-          traefik.http.routers.2fauth.middlewares: "{{ twofauth_hostname }}@docker"
-          traefik.http.middlewares.2fauth.IPAllowList.sourcerange: "{{ twofauth_traefik_whitelist }}"
-          traefik.http.services.2fauth.loadbalancer.server.port: "8000"
+          traefik.http.routers.twofauth.middlewares: "{{ twofauth_hostname }}@docker"
+          traefik.http.middlewares.twofauth.IPAllowList.sourcerange: "{{ twofauth_traefik_whitelist }}"
+          traefik.http.services.twofauth.loadbalancer.server.port: "8000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Bubka/2FAuth/releases/tag/$${major}.$${minor}.$${patch}"
   when: twofauth_enabled is true
@@ -167,5 +168,22 @@
         state: absent
   when: twofauth_enabled is false
 
-  # WIP (functional)
-  # need to convert environmental vars to Ansible vars
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ twofauth_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ twofauth_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: twofauth_enabled is false and archive_app_data_enabled is true

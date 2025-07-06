@@ -37,11 +37,3 @@
         memory: "{{ beszel_agent_memory }}"
         restart_policy: unless-stopped
   when: beszel_agent_enabled is true
-
-- name: Stop {{ ansible_nas_app_name }}
-  block:
-    - name: Stop {{ ansible_nas_app_name }} Container
-      community.docker.docker_container:
-        name: "{{ beszel_agent_container_name }}"
-        state: absent
-  when: beszel_agent_enabled is false

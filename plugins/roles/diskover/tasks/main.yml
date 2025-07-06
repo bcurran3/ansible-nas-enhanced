@@ -19,11 +19,11 @@
         - "{{ diskover_data_directory }}/elasticsearch"
         - "{{ diskover_data_directory }}/elasticsearch/data"
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ diskover_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} Elasticsearch Docker Container
+    - name: Create {{ ansible_nas_app_name }} Elasticsearch Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_elasticsearch_container_name }}"
@@ -165,3 +165,23 @@
         name: "{{ diskover_network_name }}"
         state: absent
   when: diskover_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ diskover_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ diskover_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: diskover_enabled is false and archive_app_data_enabled is true

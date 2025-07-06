@@ -12,6 +12,10 @@ change_detection_sockpuppet_hostname: "sockpuppetserver"
 
 change_detection_data_directory: "{{ docker_home }}/changedetection"
 
+# app
+change_detection_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
+change_detection_hide_referer: "true"
+
 # docker
 change_detection_container_name: "change-detection"
 change_detection_image_name: "ghcr.io/dgtlmoon/changedetection.io"
