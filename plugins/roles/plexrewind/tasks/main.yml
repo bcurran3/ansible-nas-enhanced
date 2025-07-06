@@ -14,7 +14,8 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ plexrewind_container_name }}"
-        image: ghcr.io/raunot/plex-rewind:latest
+        hostname: "{{ plexrewind_container_name }}"
+        image: "{{ plexrewind_image_name }}:{{ plexrewind_image_tag }}"
         pull: true
         cpu_shares: "{{ plexrewind_cpu_shares }}"
         ports:
@@ -28,8 +29,6 @@
           NEXT_PUBLIC_SITE_URL: "{{ plexrewind_next_public_site_url }}"
           NEXT_PUBLIC_STATISTICS_START_DATE: "{{ plexrewind_next_public_statistics_start_date }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ plexrewind_memory_limit }}"
         labels:
           autoheal: "{{ plexrewind_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ plexrewind_watchtower_monitor_only }}"
@@ -53,6 +52,8 @@
           traefik.http.services.plexrewind.loadbalancer.server.port: "8383"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ plexrewind_memory_limit }}"
+        restart_policy: unless-stopped
   when: plexrewind_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

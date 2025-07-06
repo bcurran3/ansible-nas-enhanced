@@ -14,23 +14,22 @@
         container_default_behavior: "compatibility"
         name: "{{ webtop_container_name }}"
         hostname: "{{ webtop_container_name }}"
-        image: "lscr.io/linuxserver/webtop:{{ webtop_container_version }}"
+        image: "{{ webtop_image_name }}:{{ webtop_image_tag }}"
         pull: true
         cpu_shares: "{{ webtop_cpu_shares }}"
         volumes:
           - "{{ webtop_data_directory }}/config:/config"
           - "/var/run/docker.sock:/var/run/docker.sock" #optional
         env:
-          KEYBOARD: "en-us-qwerty" #optional
+          KEYBOARD: "en-us-qwerty"      #optional
           PUID: "{{ webtop_user_id }}"
           PGID: "{{ webtop_group_id }}"
-          SUBFOLDER: "/" #optional
+          SUBFOLDER: "/"                #optional
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ webtop_port_http }}:3000"
         security_opts:
-          - seccomp:unconfined #optional
-        restart_policy: unless-stopped
+          - seccomp:unconfined          #optional
         labels:
           autoheal: "{{ webtop_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ webtop_watchtower_monitor_only }}"
@@ -54,7 +53,8 @@
           traefik.http.services.webtop.loadbalancer.server.port: "3000"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: "{{ webtop_memory_limit }}"
+        memory: "{{ webtop_memory }}"
+        restart_policy: unless-stopped
   when: webtop_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

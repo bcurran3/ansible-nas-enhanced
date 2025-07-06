@@ -11,7 +11,7 @@
         - "{{ checkmate_data_directory }}/redis"
         - "{{ checkmate_data_directory }}/db"
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ checkmate_network }}"
 
@@ -19,7 +19,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_redis_container_name }}"
-        image: bluewaveuptime/uptime_redis:latest
+        image: "{{ checkmate_redis_image_name }}:{{ checkmate_redis_image_tag }}"
         pull: true
         cpu_shares: "{{ checkmate_redis_cpu_shares }}"
         hostname: "{{ checkmate_redis_container_name }}"
@@ -33,25 +33,33 @@
           - "{{ checkmate_data_directory }}/redis:/data"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
 #        healthcheck:
 #          test: ["CMD", "redis-cli", "ping"]
 #          interval: 30s
 #          timeout: 10s
 #          retries: 5
 #          start_period: 5s
-        memory: "{{ checkmate_redis_memory_limit }}"
         labels:
           autoheal: "{{ checkmate_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ checkmate_redis_homepage_group }}"
+          homepage.icon: "{{ checkmate_redis_homepage_icon }}"
+          homepage.href: "{{ checkmate_redis_homepage_href }}"
+#         homepage.description: "Redis"
+          homepage.server: "my-docker"
+          homepage.container: "{{ checkmate_redis_container_name }}"
+          homepage.showStats: "{{ checkmate_redis_homepage_showStats }}"
           traefik.enable: "false"
+        memory: "{{ checkmate_redis_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_db_container_name }}"
         hostname: "{{ checkmate_db_container_name }}"
-        image: bluewaveuptime/uptime_database_mongo:latest
+        image: "{{ checkmate_db_image_name }}:{{ checkmate_db_image_tag }}"
         pull: true
         cpu_shares: "{{ checkmate_db_cpu_shares }}"
         command: '["mongod", "--quiet"]'
@@ -65,30 +73,29 @@
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ checkmate_db_memory_limit }}"
         labels:
           autoheal: "{{ checkmate_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ checkmate_db_watchtower_monitor_only }}"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ checkmate_db_homepage_group }}"
           homepage.icon: "{{ checkmate_db_homepage_icon }}"
-#         homepage.href: "{{ checkmate_db_homepage_href }}"
-#         homepage.description: ""
-#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_db_port_http }}"
+          homepage.href: "{{ checkmate_db_homepage_href }}"
+#         homepage.description: "MongoDB"
           homepage.server: "my-docker"
           homepage.container: "{{ checkmate_db_container_name }}"
           homepage.showStats: "{{ checkmate_db_homepage_showStats }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ checkmate_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Server Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_server_container_name }}"
         hostname: "{{ checkmate_server_container_name }}"
-        image: bluewaveuptime/uptime_server:latest
+        image: "{{ checkmate_server_image_name }}:{{ checkmate_server_image_tag }}"
         pull: true
         cpu_shares: "{{ checkmate_server_cpu_shares }}"
         networks:
@@ -103,8 +110,6 @@
           DB_CONNECTION_STRING: "mongodb://{{ checkmate_db_container_name }}:{{ checkmate_db_port_http }}/uptime_db"
           REDIS_HOST: "{{ checkmate_redis_container_name }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ checkmate_server_memory_limit }}"
         links:
           - "{{ checkmate_db_container_name }}"
         labels:
@@ -130,13 +135,15 @@
           traefik.http.services.checkmate.loadbalancer.server.port: "5000"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ checkmate_server_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Client Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_client_container_name }}"
         hostname: "{{ checkmate_client_container_name }}"
-        image: bluewaveuptime/uptime_client:latest
+        image: "{{ checkmate_client_image_name }}:{{ checkmate_client_image_tag }}"
         pull: true
         networks:
           - name: "{{ checkmate_network }}"
@@ -150,8 +157,6 @@
         env:
           UPTIME_APP_API_BASE_URL: "http://localhost:{{ checkmate_server_port_http }}/api/v1"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ checkmate_client_memory_limit }}"
         links:
           - "{{ checkmate_db_container_name }}"
         labels:
@@ -177,6 +182,8 @@
           traefik.http.services.checkmate.loadbalancer.server.port: "80"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ checkmate_client_memory }}"
+        restart_policy: unless-stopped
   when: checkmate_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -199,6 +206,11 @@
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ checkmate_db_container_name }}"
+        state: absent
+
+    - name: Delete {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ checkmate_network }}"
         state: absent
   when: checkmate_enabled is false
 

@@ -1,4 +1,5 @@
 ---
+# TDL: There are many notification URIs to setup
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -39,7 +40,7 @@
         container_default_behavior: "compatibility"
         name: "{{ scrutiny_container_name }}"
         hostname: "{{ scrutiny_container_name }}"
-        image: ghcr.io/analogj/scrutiny:master-omnibus
+        image: "{{ scrutiny_image_name }}:{{ scrutiny_image_tag }}"
         pull: true
         cpu_shares: "{{ scrutiny_cpu_shares }}"
         env:
@@ -55,8 +56,6 @@
         capabilities:
           - SYS_RAWIO
           - SYS_ADMIN
-        restart_policy: unless-stopped
-        memory: "{{ scrutiny_memory }}"
         labels:
           autoheal: "{{ scrutiny_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ scrutiny_watchtower_monitor_only }}"
@@ -82,6 +81,8 @@
           traefik.http.services.scrutiny.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/AnalogJ/scrutiny/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ scrutiny_memory }}"
+        restart_policy: unless-stopped
   when: scrutiny_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

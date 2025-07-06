@@ -22,7 +22,7 @@
         container_default_behavior: "compatibility"
         name: "{{ nextcloudaio_container_name }}"
         hostname: "{{ nextcloudaio_container_name }}"
-        image: nextcloud/all-in-one:latest
+        image: "{{ nextcloudaio_image_name }}:{{ nextcloudaio_image_tag }}"
         pull: true
         cpu_shares: "{{ nextcloudaio_cpu_shares }}"
         volumes:
@@ -42,7 +42,7 @@
     #      - "{{ music_root }}:/media/music:ro"
         ports:
           - "{{ nextcloudaio_port }}:8080"
-    #      - "3478:3478"     # TURN server for Talk
+          - "3478:3478"     # TURN server for Talk
         env:
           NEXTCLOUD_DATADIR: "/mnt/ncdata"
     #      nextcloudaio_TRUSTED_DOMAINS: "{{ nextcloudaio_hostname }}.{{ ansible_nas_domain }} localhost"
@@ -66,8 +66,6 @@
           # - TALK_PORT=3478 # This allows to adjust the port that the talk container is using.
           APACHE_PORT: "11000"
           APACHE_IP_BINDING: "0.0.0.0"
-        restart_policy: unless-stopped
-        memory: "{{ nextcloudaio_memory }}"
         labels:
           autoheal: "{{ nextcloudaio_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nextcloudaio_watchtower_monitor_only }}"
@@ -82,6 +80,8 @@
           traefik.http.services.nextcloudaio.loadbalancer.server.port: "8080"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ nextcloudaio_memory }}"
+        restart_policy: unless-stopped
   when: nextcloudaio_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

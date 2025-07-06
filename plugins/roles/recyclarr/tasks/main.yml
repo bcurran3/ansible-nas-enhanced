@@ -14,14 +14,13 @@
         container_default_behavior: "compatibility"
         name: "{{ recyclarr_container_name }}"
         hostname: "{{ recyclarr_container_name }}"
-        image: ghcr.io/recyclarr/recyclarr
+        image: "{{ recyclarr_image_name }}:{{ recyclarr_image_tag }}"
         pull: true
         cpu_shares: "{{ recyclarr_cpu_shares }}"
         volumes:
           - "{{ recyclarr_data_directory }}/config:/config"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ recyclarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ recyclarr_watchtower_monitor_only }}"
@@ -36,6 +35,7 @@
           recyclarr.tag.include: '^\d+\.\d+\.\d+$$'
           recyclarr.link.template: https://github.com/recyclarr/recyclarr/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ recyclarr_memory }}"
+        restart_policy: unless-stopped
   when: recyclarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

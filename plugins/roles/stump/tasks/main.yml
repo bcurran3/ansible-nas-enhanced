@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ stump_container_name }}"
         hostname: "{{ stump_container_name }}"
-        image: aaronleopold/stump
+        image: "{{ stump_image_name }}:{{ stump_image_tag }}"
         pull: true
         cpu_shares: "{{ stump_cpu_shares }}"
         volumes:
@@ -25,7 +25,6 @@
           - "{{ stump_port_http }}:10801"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ stump_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stump_watchtower_monitor_only }}"
@@ -50,6 +49,7 @@
           stump.tag.include: '^\d+\.\d+\.\d+$$'
           stump.link.template: "https://github.com/stumpapp/stump/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ stump_memory }}"
+        restart_policy: unless-stopped
   when: stump_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

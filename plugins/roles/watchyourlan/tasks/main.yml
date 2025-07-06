@@ -5,7 +5,7 @@
         container_default_behavior: "compatibility"
         name: "{{ watchyourlan_container_name }}"
         hostname: "{{ watchyourlan_container_name }}"
-        image: ghcr.io/aceberg/watchyourlan
+        image: "{{ watchyourlan_image_name }}:{{ watchyourlan_image_tag }}"
         pull: true
         cpu_shares: "{{ watchyourlan_cpu_shares }}"
         network_mode: host
@@ -18,8 +18,6 @@
           THEME: "sand"                        # optional
           COLOR: "dark"                        # optional
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ watchyourlan_memory }}"
         labels:
           autoheal: "{{ watchyourlan_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ watchyourlan_watchtower_monitor_only }}"
@@ -35,6 +33,8 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/aceberg/WatchYourLAN/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ watchyourlan_memory }}"
+        restart_policy: unless-stopped
   when: watchyourlan_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

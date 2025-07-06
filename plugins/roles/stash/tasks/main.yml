@@ -19,7 +19,7 @@
         container_default_behavior: "compatibility"
         name: "{{ stash_container_name }}"
         hostname: "{{ stash_container_name }}"
-        image: stashapp/stash:latest
+        image: "{{ stash_image_name }}:{{ stash_image_tag }}"
         pull: true
         cpu_shares: "{{ stash_cpu_shares }}"
         log_driver: "json-file"
@@ -35,7 +35,7 @@
           - "{{ porn_root }}:/porn:ro"
         ports:
           - "{{ stash_http_port }}:9999"
-        dns_servers: "{{ ansible_nas_dns }}"
+#        dns_servers: "{{ ansible_nas_dns }}"
         env:
           PUID: "{{ stash_user_id }}"
           PGID: "{{ stash_group_id }}"
@@ -44,8 +44,6 @@
           STASH_METADATA: "/metadata/"
           STASH_CACHE: "/cache/"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ stash_memory_limit }}"
         labels:
           autoheal: "{{ stash_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stash_watchtower_monitor_only }}"
@@ -73,6 +71,8 @@
           traefik.http.services.stash.loadbalancer.server.port: "9999"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ stash_memory }}"
+        restart_policy: unless-stopped
   when: stash_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

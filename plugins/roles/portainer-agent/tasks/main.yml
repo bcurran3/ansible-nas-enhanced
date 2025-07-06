@@ -6,7 +6,7 @@
         container_default_behavior: "compatibility"
         name: "{{ portainer_agent_container_name }}"
         hostname: "{{ portainer_agent_container_name }}"
-        image: portainer/agent
+        image: "{{ portainer_agent_image_name }}:{{ portainer_agent_image_tag }}"
         pull: true
         cpu_shares: "{{ portainer_agent_cpu_shares }}"
         volumes:
@@ -17,8 +17,6 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ portainer_agent_port }}:9001"
-        restart_policy: unless-stopped
-        memory: "{{ portainer_agent_memory_limit }}"
         labels:
           autoheal: "{{ portainer_agent_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ portainer_agent_watchtower_monitor_only }}"
@@ -33,6 +31,8 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/portainer/agent/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ portainer_agent_memory }}"
+        restart_policy: unless-stopped
   when: portainer_agent_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ vfd_container_name }}"
         hostname: "{{ vfd_container_name }}"
-        image: ghcr.io/kiinami/vfd:latest
+        image: "{{ vfd_image_name }}:{{ vfd_image_tag }}"
         pull: true
         cpu_shares: "{{ vfd_cpu_shares }}"
         volumes:
@@ -33,8 +33,6 @@
           VFD_DASHBOARD_HOST: "0.0.0.0"
           VFD_DASHBOARD_PORT: "{{ vfd_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ vfd_memory }}"
         labels:
           autoheal: "{{ vfd_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ vfd_watchtower_monitor_only }}"
@@ -58,6 +56,8 @@
           traefik.http.services.vfd.loadbalancer.server.port: "{{ vfd_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/kiinami/vfd/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ vfd_memory }}"
+        restart_policy: unless-stopped
   when: vfd_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

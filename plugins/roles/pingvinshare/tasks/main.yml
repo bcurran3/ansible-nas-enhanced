@@ -14,7 +14,8 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ pingvinshare_container_name }}"
-        image: stonith404/pingvin-share
+        hostname: "{{ pingvinshare_container_name }}"
+        image: "{{ pingvinshare_image_name }}:{{ pingvinshare_image_tag }}"
         pull: true
         cpu_shares: "{{ pingvinshare_cpu_shares }}"
         ports:
@@ -25,8 +26,6 @@
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ pingvinshare_memory }}"
         labels:
           autoheal: "{{ pingvinshare_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pingvinshare_watchtower_monitor_only }}"
@@ -50,6 +49,8 @@
           traefik.http.services.pingvinshare.loadbalancer.server.port: "3000"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ pingvinshare_memory }}"
+        restart_policy: unless-stopped
   when: pingvinshare_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

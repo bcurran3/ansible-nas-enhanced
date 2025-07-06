@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ tasksmd_container_name }}"
         hostname: "{{ tasksmd_container_name }}"
-        image: baldissaramatheus/tasks.md
+        image: "{{ tasksmd_image_name }}:{{ tasksmd_image_tag }}"
         pull: true
         cpu_shares: "{{ tasksmd_cpu_shares }}"
         ports:
@@ -25,11 +25,9 @@
           - "{{ tasksmd_data_directory }}/tasks:/tasks"
         network_mode: bridge
         env:
-          PUID: "1000"
-          PGID: "1000"
+          PUID: "{{ tasksmd_puid }}"
+          PGID: "{{ tasksmd_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ tasksmd_memory }}"
         labels:
           autoheal: "{{ tasksmd_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tasksmd_watchtower_monitor_only }}"
@@ -53,6 +51,8 @@
           traefik.http.services.tasksmd.loadbalancer.server.port: "8080"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ tasksmd_memory }}"
+        restart_policy: unless-stopped
   when: tasksmd_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

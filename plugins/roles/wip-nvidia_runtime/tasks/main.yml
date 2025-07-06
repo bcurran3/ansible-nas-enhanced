@@ -1,9 +1,9 @@
 ---
 ### WORK IN PROGRESS
-- name: Enable nvidia sources 1
+- name: Enable NVIDIA sources 1
   shell: "curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg"
 
-- name: Enable nvidia sources 2
+- name: Enable NVIDIA sources 2
   shell: "sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list"
 
 - name: Update apt-cache
@@ -13,7 +13,7 @@
   register: result
   until: result is succeeded
 
-- name: Install nvidia-container-toolkit package
+- name: Install nvidia-container-toolkit Package
   apt:
     name: "nvidia-container-toolkit"
     state: present

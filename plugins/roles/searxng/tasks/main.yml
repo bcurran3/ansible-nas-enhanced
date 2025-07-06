@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ searxng_container_name }}"
         hostname: "{{ searxng_container_name }}"
-        image: searxng/searxng
+        image: "{{ searxng_image_name }}:{{ searxng_image_tag }}"
         pull: true
         cpu_shares: "{{ searxng_cpu_shares }}"
         ports:
@@ -27,8 +27,6 @@
           INSTANCE_NAME: "my-instance"
           URL: "searxng.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ searxng_memory_limit }}"
         labels:
           autoheal: "{{ searxng_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ searxng_watchtower_monitor_only }}"
@@ -52,6 +50,8 @@
           traefik.http.services.searxng.loadbalancer.server.port: "8080"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ searxng_memory_limit }}"
+        restart_policy: unless-stopped
   when: searxng_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

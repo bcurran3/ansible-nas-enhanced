@@ -11,7 +11,7 @@
         - "{{ mastodon_data_directory }}/data"
         - "{{ mastodon_data_directory }}/db"
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ mastodon_network_name }}"
 
@@ -20,7 +20,7 @@
         container_default_behavior: "compatibility"
         name: "{{ mastodon_redis_container_name }}"
         hostname: "{{ mastodon_redis_container_name }}"
-        image: redis:7-alpine
+        image: "{{ mastodon_redis_image_name }}:{{ mastodon_redis_image_tag }}"
         pull: true
         cpu_shares: "{{ mastodon_redis_cpu_shares }}"
         networks:
@@ -33,8 +33,6 @@
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ['CMD', 'redis-cli', 'ping']
-        restart_policy: unless-stopped
-        memory: "{{ mastodon_redis_memory_limit }}"
         command: "redis-server --requirepass topsecret"
         labels:
           autoheal: "{{ mastodon_redis_autoheal }}"
@@ -42,13 +40,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ mastodon_redis_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mastodon_db_container_name }}"
         hostname: "{{ mastodon_db_container_name }}"
-        image: postgres:14-alpine
+        image: "{{ mastodon_db_image_name }}:{{ mastodon_db_image_tag }}"
         pull: true
         cpu_shares: "{{ mastodon_db_cpu_shares }}"
         networks:
@@ -58,13 +58,11 @@
         volumes:
           - "{{ mastodon_data_directory }}/db:/var/lib/postgresql/data"
         env:
-#          POSTGRES_DB: "mastodon"
-#          POSTGRES_USER: "mastodon"
-#          POSTGRES_PASSWORD: "mastodon"
+#         POSTGRES_DB: "mastodon"
+#         POSTGRES_USER: "mastodon"
+#         POSTGRES_PASSWORD: "mastodon"
           POSTGRES_HOST_AUTH_METHOD: "trust"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ mastodon_db_memory_limit }}"
         shm_size: "256m"
         healthcheck:
           test: ['CMD', 'pg_isready', '-U', 'postgres']
@@ -74,14 +72,17 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ mastodon_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mastodon_container_name }}"
         hostname: "{{ mastodon_container_name }}"
-        image: lscr.io/linuxserver/mastodon:latest
-#        image: ghcr.io/mastodon/mastodon:v4.3.0
+        image: "{{ mastodon_image_name }}:{{ mastodon_image_tag }}"
+#       image: lscr.io/linuxserver/mastodon:latest
+#       ^ switch to this?
         pull: true
         cpu_shares: "{{ mastodon_cpu_shares }}"
         networks:
@@ -135,10 +136,8 @@
           - "{{ mastodon_data_directory }}/config:/config"
         ports:
           - "{{ mastodon_port_https }}: 443"
-        restart_policy: unless-stopped
         healthcheck:
           test: ['CMD-SHELL',"curl -s --noproxy localhost localhost:3000/health | grep -q 'OK' || exit 1"]
-        memory: "{{ mastodon_memory_limit }}"
         links:
           - "{{ mastodon_redis_container_name }}"
           - "{{ mastodon_db_container_name }}"
@@ -168,6 +167,8 @@
           traefik.http.services.mastodon.loadbalancer.server.scheme: "https"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ mastodon_memory }}"
+        restart_policy: unless-stopped
   when: mastodon_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -187,7 +188,7 @@
         name: "{{ mastodon_db_container_name }}"
         state: absent
 
-    - name: Remove {{ ansible_nas_app_name }} network
+    - name: Remove {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ mastodon_network_name }}"
         state: absent

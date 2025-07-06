@@ -17,7 +17,7 @@
         container_default_behavior: "compatibility"
         name: "{{ tdarr_node_container_name }}"
         hostname: "{{ tdarr_node_container_name }}"
-        image: ghcr.io/haveagitgat/tdarr_node:latest
+        image: "{{ tdarr_node_image_name }}:{{ tdarr_node_image_tag }}"
         network_mode: "bridge"
         log_options:
           driver: json-file
@@ -50,8 +50,6 @@
           NVIDIA_VISIBLE_DEVICES: "all"
           gpus: "all"                 # <----- probably wrong
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ tdarr_node_memory }}"
         labels:
           autoheal: "{{ tdarr_node_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tdarr_node_watchtower_monitor_only }}"
@@ -65,6 +63,8 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ tdarr_node_memory }}"
+        restart_policy: unless-stopped
   when: tdarr_node_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

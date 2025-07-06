@@ -13,7 +13,8 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ filebot_container_name }}"
-        image: rednoah/filebot:latest
+        hostname: "{{ filebot_container_name }}"
+        image: "{{ filebot_image_name }}:{{ filebot_image_tag }}"
         pull: true
         cpu_shares: "{{ filebot_cpu_shares }}"
         volumes:
@@ -27,26 +28,25 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ filebot_user_id }}"
           PGID: "{{ filebot_group_id }}"
-        restart_policy: unless-stopped
-        memory: 1g # Probably can be tweaked
         labels:
           autoheal: "{{ filebot_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
+        memory: "{{ filebot_memory }}" # Probably can be tweaked
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Node Container
       docker_container:
         container_default_behavior: "compatibility"
-        name: filebot-node
-        image: rednoah/filebot:node
+        name: "{{ filebot_node_container_name }}"
+        hostname: "{{ filebot_node_container_name }}"
+        image: "{{ filebot_node_image_name }}:{{ filebot_node_image_tag }}"
         pull: true
         cpu_shares: "{{ filebot_cpu_shares }}"
         ports:
           - "5452:5452"
-        restart_policy: unless-stopped
         volumes_from: filebot
-        memory: 1g # Probably can be tweaked
         labels:
           autoheal: "{{ filebot_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
@@ -68,22 +68,25 @@
           traefik.http.services.filebot.loadbalancer.server.port: "5452"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
+        memory: "{{ filebot_node_memory }}" # Probably can be tweaked
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Watcher Container
       docker_container:
         container_default_behavior: "compatibility"
-        name: filebot-watcher
-        image: rednoah/filebot:watcher
+        name: "{{ filebot_watcher_container_name }}"
+        hostname: "{{ filebot_watcher_container_name }}"
+        image: "{{ filebot_watcher_image_name }}:{{ filebot_watcher_image_tag }}"
         pull: true
         cpu_shares: "{{ filebot_cpu_shares }}"
-        restart_policy: unless-stopped
         volumes_from: filebot
-        memory: 1g # Probably can be tweaked
         labels:
           autoheal: "{{ filebot_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
+        memory: "{{ filebot_watcher_memor }}" # Probably can be tweaked
+        restart_policy: unless-stopped
   when: filebot_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -92,10 +95,12 @@
       community.docker.docker_container:
         name: "filebot-watcher"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ filebot_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} Node
       community.docker.docker_container:
         name: "filebot-node"

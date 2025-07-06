@@ -15,9 +15,9 @@
     - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
-        image: docker.io/library/postgres:15
         name: "{{ odoo_db_container_name }}"
         hostname: "{{ odoo_db_container_name }}"
+        image: "{{ odoo_db_image_name }}:{{ odoo_db_image_tag }}"
         pull: true
         cpu_shares: "{{ odoo_db_cpu_shares }}"
         volumes:
@@ -28,8 +28,6 @@
           POSTGRES_USER: "odoo"
           POSTGRES_PASSWORD: "odoo"
           PGDATA: "/var/lib/postgresql/data/pgdata"
-        restart_policy: unless-stopped
-        memory: "{{ odoo_db_memory_limit }}"
         labels:
           autoheal: "{{ odoo_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ odoo_db_watchtower_monitor_only }}"
@@ -40,13 +38,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ odoo_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ odoo_container_name }}"
         hostname: "{{ odoo_container_name }}"
-        image: odoo:17
+        image: "{{ odoo_image_name }}:{{ odoo_image_tag }}"
         pull: true
         cpu_shares: "{{ odoo_cpu_shares }}"
         user: root
@@ -65,8 +65,6 @@
           USER: "odoo"
           PASSWORD: "odoo"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ odoo_memory_limit }}"
         labels:
           autoheal: "{{ odoo_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ odoo_watchtower_monitor_only }}"
@@ -90,6 +88,8 @@
           traefik.http.services.odoo.loadbalancer.server.port: "8069"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ odoo_memory }}"
+        restart_policy: unless-stopped
   when: odoo_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

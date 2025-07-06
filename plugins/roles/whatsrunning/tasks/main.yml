@@ -6,7 +6,7 @@
         container_default_behavior: "compatibility"
         name: "{{ whatsrunning_container_name }}"
         hostname: "{{ whatsrunning_container_name }}"
-        image: mikeage/whatsrunning:latest
+        image: "{{ whatsrunning_image_name }}:{{ whatsrunning_image_tag }}"
         pull: true
         cpu_shares: "{{ whatsrunning_cpu_shares }}"
         volumes:
@@ -17,7 +17,6 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ whatsrunning_port_http }}:5000"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ whatsrunning_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ whatsrunning_watchtower_monitor_only }}"
@@ -42,6 +41,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mikeage/whatsrunning/tags/tags/$${major}.$${minor}.$${patch}"
         memory: "{{ whatsrunning_memory }}"
+        restart_policy: unless-stopped
   when: whatsrunning_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -179,6 +179,11 @@
       community.docker.docker_container:
         name: "{{ nextcloud_db_container_name }}"
         state: absent
+
+    - name: Delete Nextcloud Network
+      community.docker.docker_network:
+        name: "{{ nextcloud_network_name }}"
+        state: absent
   when: nextcloud_enabled is false
 
 # adding redis makes it faster!

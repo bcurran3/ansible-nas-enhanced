@@ -19,7 +19,7 @@
         container_default_behavior: "compatibility"
         name: "{{ ollama_container_name }}"
         hostname: "{{ ollama_container_name }}"
-        image: ollama/ollama
+        image: "{{ ollama_image_name }}:{{ ollama_image_tag }}"
         pull: true
         cpu_shares: "{{ ollama_cpu_shares }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
@@ -34,7 +34,6 @@
         env:
           OLLAMA_HOST: "0.0.0.0"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ ollama_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_watchtower_monitor_only }}"
@@ -59,13 +58,14 @@
           ollama.tag.include: '^\d+\.\d+\.\d+$$'
           ollama.link.template: "https://github.com/ollama/ollama/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ollama_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} OpenedAI Speech Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ollama_openedai_container_name }}"
         hostname: "{{ ollama_openedai_container_name }}"
-        image: ghcr.io/matatonic/openedai-speech
+        image: "{{ ollama_openedai_image_name }}:{{ ollama_openedai_image_tag }}"
         pull: true
         cpu_shares: "{{ ollama_openedai_cpu_shares }}"
         volumes:
@@ -77,7 +77,6 @@
           TTS_HOME: "voices"
           HF_HOME: "voices"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
           - capabilities: [gpu]
@@ -106,13 +105,14 @@
           ollama.tag.include: '^\d+\.\d+\.\d+$$'
           ollama.link.template: "https://github.com/matatonic/openedai-speech/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ollama_openedai_memory }}"
+        restart_policy: unless-stopped
   
     - name: Create {{ ansible_nas_app_name }} Open WebUI Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ollama_openwebui_container_name }}"
         hostname: "{{ ollama_openwebui_container_name }}"
-        image: ghcr.io/open-webui/open-webui:cuda
+        image: "{{ ollama_openwebui_image_name }}:{{ ollama_openwebui_image_tag }}"
         pull: true
         cpu_shares: "{{ ollama_openwebui_cpu_shares }}"
         volumes:
@@ -129,7 +129,10 @@
 #         SEARXNG_QUERY_URL: "http://SearxngIP:port/search?q=<query>"
 #          SEARXNG_QUERY_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_openwebui_port_http }}/search?q=<query>"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
+        device_requests:
+          - capabilities: [gpu]
+            count: -1
         labels:
           autoheal: "{{ ollama_openwebui_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openwebui_watchtower_monitor_only }}"
@@ -154,6 +157,7 @@
           ollama.tag.include: '^\d+\.\d+\.\d+$$'
           ollama.link.template: "https://github.com/open-webui/open-webui/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ollama_openwebui_memory }}"
+        restart_policy: unless-stopped
   when: ollama_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -162,10 +166,12 @@
       community.docker.docker_container:
         name: "{{ ollama_openwebui_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} OpenedAI Speech Container
       community.docker.docker_container:
         name: "{{ ollama_openedai_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ollama_container_name }}"
@@ -176,5 +182,3 @@
 
 # https://github.com/NightHawkATL/portainer-template-lists/blob/main/compose-files/Ollama/compose.yaml
 
-# ollama
-# docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama

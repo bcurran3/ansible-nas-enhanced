@@ -23,14 +23,13 @@
 #        container_default_behavior: "compatibility"
 #        name: "{{ grampsweb_celery_container_name }}"
 #        hostname: "{{ grampsweb_celery_container_name }}"
+#        image: "{{ grampsweb_celery_image_name }}:{{ grampsweb_celery_image_tag }}"
 #        image: ??????????????????????????????
 #        pull: true
 #        cpu_shares: "{{ gramsweb_celery_cpu_shares }}"
 #        networks_cli_compatible: "yes"
 #        env:
 #          TZ: "{{ ansible_nas_timezone }}"
-#        restart_policy: unless-stopped
-#        memory: "{{ grampsweb_celery_memory }}"
 #        command: "celery -A gramps_webapi.celery worker --loglevel=INFO --concurrency=2"
 #        labels:
 #          autoheal: "{{ grampsweb_celery_autoheal }}"
@@ -46,20 +45,20 @@
 #          homepage.container: "{{ grampsweb_celery_container_name }}"
 #          homepage.showStats: "{{ grampsweb_celery_homepage_showStats }}"
 #          traefik.enable: "false"
+#        memory: "{{ grampsweb_celery_memory }}"
+#        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ grampsweb_redis_container_name }}"
         hostname: "{{ grampsweb_redis_container_name }}"
-        image: docker.io/library/redis:7.2.4-alpine
+        image: "{{ grampsweb_redis_image_name }}:{{ grampsweb_redis_image_tag }}"
         pull: true
         cpu_shares: "{{ grampsweb_redis_cpu_shares }}"
         networks_cli_compatible: "yes"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ grampsweb_redis_memory }}"
         labels:
           autoheal: "{{ grampsweb_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
@@ -73,13 +72,15 @@
           homepage.container: "{{ grampsweb_redis_container_name }}"
           homepage.showStats: "{{ grampsweb_redis_homepage_showStats }}"
           traefik.enable: "false"
+        memory: "{{ grampsweb_redis_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ grampsweb_container_name }}"
         hostname: "{{ grampsweb_container_name }}"
-        image: ghcr.io/gramps-project/grampsweb:latest
+        image: "{{ grampsweb_image_name }}:{{ grampsweb_image_tag }}"
         pull: true
         cpu_shares: "{{ grampsweb_cpu_shares }}"
         volumes:
@@ -99,7 +100,6 @@
           GRAMPSWEB_CELERY_CONFIG__result_backend: "redis://{{ grampsweb_redis_container_name }}:6379/0"
           GRAMPSWEB_RATELIMIT_STORAGE_URI: redis://{{ grampsweb_redis_container_name }}:6379/1
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         links:
 #          - "{{ grampsweb_celery_container_name }}"
           - "{{ grampsweb_redis_container_name }}"
@@ -127,6 +127,7 @@
           grampsweb.tag.include: '^\d+\.\d+\.\d+$$'
           grampsweb.link.template: "https://github.com/Casvt/grampsweb/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ grampsweb_memory }}"
+        restart_policy: unless-stopped
   when: grampsweb_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ pornvault_container_name }}"
         hostname: "{{ pornvault_container_name }}"
-        image: boi12321/porn-vault:release-0.25.0
+        image: "{{ pornvault_image_name }}:{{ pornvault_image_tag }}"
         pull: true
         cpu_shares: "{{ pornvault_cpu_shares }}"
         volumes:
@@ -24,7 +24,6 @@
           - "{{ porn_root }}/pix:/images:ro"
         ports:
           - "{{ pornvault_http_port }}:3000"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ pornvault_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pornvault_watchtower_monitor_only }}"
@@ -48,7 +47,8 @@
           traefik.http.services.pornvault.loadbalancer.server.port: "3000"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: 2g
+        memory: "{{ pornvault_memory }}"
+        restart_policy: unless-stopped
   when: pornvault_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

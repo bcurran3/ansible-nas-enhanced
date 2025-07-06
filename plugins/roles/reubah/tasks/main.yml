@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ reubah_container_name }}"
         hostname: "{{ reubah_container_name }}"
-        image: ghcr.io/dendianugerah/reubah:latest
+        image: "{{ reubah_image_name }}:{{ reubah_image_tag }}"
         pull: true
         cpu_shares: "{{ reubah_cpu_shares }}"
 #        volumes:
@@ -29,7 +29,6 @@
         env:
           PORT: "{{ reubah_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ reubah_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ reubah_watchtower_monitor_only }}"
@@ -54,6 +53,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ reubah_memory }}"
+        restart_policy: unless-stopped
   when: reubah_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

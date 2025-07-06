@@ -12,7 +12,8 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ shoutcast_container_name}}"
-        image: luzifer/shoutcast
+        hostname: "{{ shoutcast_container_name}}"
+        image: "{{ shoutcast_image_name }}:{{ shoutcast_image_tag }}"
         pull: true
         cpu_shares: "{{ shoutcast_cpu_shares }}"
         volumes:
@@ -22,7 +23,6 @@
           - "{{ shoutcast_port_http }}:8001"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ shoutcast_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ shoutcast_watchtower_monitor_only }}"
@@ -46,7 +46,8 @@
           traefik.http.services.shoutcast.loadbalancer.server.port: "8001"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: 1g
+        memory: "{{ shoutcast_memory }}"
+        restart_policy: unless-stopped
   when: shoutcast_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

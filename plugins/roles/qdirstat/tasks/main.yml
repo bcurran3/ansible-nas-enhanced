@@ -20,7 +20,7 @@
         container_default_behavior: "compatibility"
         name: "{{ qdirstat_container_name }}"
         hostname: "{{ qdirstat_container_name }}"
-        image: jlesage/qdirstat:latest
+        image: "{{ qdirstat_image_name }}:{{ qdirstat_image_tag }}"
         pull: true
         cpu_shares: "{{ qdirstat_cpu_shares }}"
         volumes:
@@ -30,7 +30,6 @@
           - "{{ qdirstat_port_http }}:5800"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ qdirstat_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ qdirstat_watchtower_monitor_only }}"
@@ -55,6 +54,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/jlesage/docker-qdirstat/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ qdirstat_memory }}"
+        restart_policy: unless-stopped
   when: qdirstat_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -22,7 +22,7 @@
         container_default_behavior: "compatibility"
         name: "{{ openemr_db_container_name }}"
         hostname: "{{ openemr_db_container_name }}"
-        image: linuxserver/mariadb
+        image: "{{ openemr_db_image_name }}:{{ openemr_db_image_tag }}"
         pull: true
         cpu_shares: "{{ openemr_db_cpu_shares }}"
 #       command: ['mariadb','--character-set-server=utf8mb4']
@@ -33,7 +33,7 @@
         volumes:
           - "{{ openemr_data_directory }}/db:/config"
         env:
-#          ALLOW_EMPTY_PASSWORD: "no"
+#         ALLOW_EMPTY_PASSWORD: "no"
           MYSQL_ROOT_PASSWORD: "Ansible-NAS"
           MYSQL_USER: "openemr"
           MYSQL_PASSWORD: "openemr"
@@ -41,21 +41,29 @@
           PGID: "1000"
           PUID: "1000"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ openemr_db_memory_limit }}"
         labels:
           autoheal: "{{ openemr_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openemr_db_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ openemr_db_homepage_group }}"
+          homepage.icon: "{{ openemr_db_homepage_icon }}"
+          homepage.href: "{{ openemr_db_homepage_href }}"
+#         homepage.description: "MariaDB"
+          homepage.server: "my-docker"
+          homepage.container: "{{ openemr_db_container_name }}"
+          homepage.showStats: "{{ openemr_db_homepage_showStats }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ openemr_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openemr_container_name }}"
         hostname: "{{ openemr_container_name }}"
-        image: openemr/openemr:7.0.2
+        image: "{{ openemr_image_name }}:{{ opmenemr_image_tag }}"
         pull: true
         cpu_shares: "{{ openemr_cpu_shares }}"
         network_mode: "bridge"
@@ -67,19 +75,17 @@
         volumes:
 #         - "{{ openemr_data_directory }}/log:/var/log"
           - "{{ openemr_data_directory }}/log:/var/www/logs"
-#          - "{{ openemr_data_directory }}/sites:/var/www/localhost/htdocs/openemr/sites"
+#         - "{{ openemr_data_directory }}/sites:/var/www/localhost/htdocs/openemr/sites"
         env:
           MYSQL_HOST: "{{ openemr_db_container_name }}"
           MYSQL_ROOT_PASS: "Ansible-NAS"
           MYSQL_USER: "openemr"
           MYSQL_PASS: "openemr"
-#          MYSQL_DATABASE: "openemr_db"
+#         MYSQL_DATABASE: "openemr_db"
           OE_USER: "admin"
           OE_PASS: "{{ openemr_admin_password }}"
           OPENEMR__ENVIRONMENT: "prod"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ openemr_memory_limit }}"
         links:
           - "{{ openemr_db_container_name }}"
         labels:
@@ -89,10 +95,10 @@
           homepage.group: "{{ openemr_homepage_group }}"
           homepage.icon: "{{ openemr_homepage_icon }}"
           homepage.href: "{{ openemr_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osticket_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
     #     homepage.description: "openemr"
           homepage.server: "my-docker"
-          homepage.container: "openemr"
+          homepage.container: "{{ openemr_container_name }}"
           homepage.showStats: "{{ openemr_homepage_showStats }}"
           traefik.enable: "{{ openemr_available_externally | string }}"
           traefik.http.routers.openemr.rule: "Host(`{{ openemr_hostname }}.{{ ansible_nas_domain }}`)"
@@ -105,6 +111,8 @@
           traefik.http.services.openemr.loadbalancer.server.port: "80"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ openemr_memory }}"
+        restart_policy: unless-stopped
   when: openemr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -113,6 +121,7 @@
       community.docker.docker_container:
         name: "{{ openemr_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ openemr_db_container_name }}"

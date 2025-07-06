@@ -1,4 +1,5 @@
 ---
+# ? Is there a better choice than the Bitnami images ?
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -20,7 +21,7 @@
         container_default_behavior: "compatibility"
         name: "{{ phpbb_db_container_name }}"
         hostname: "{{ phpbb_db_container_name }}"
-        image: bitnami/mariadb:latest
+        image: "{{ phpbb_db_image_name }}:{{ phpbb_db_image_tag }}"
         pull: true
         cpu_shares: "{{ phpbb_db_cpu_shares }}"
         network_mode: "bridge"
@@ -35,8 +36,6 @@
           MARIADB_PASSWORD: "topsecret"
           MARIADB_DATABASE: "phpbb_db"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ phpbb_db_memory }}"
         labels:
           autoheal: "{{ phpbb_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ phpbb_db_watchtower_monitor_only }}"
@@ -51,13 +50,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ phpbb_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ phpbb_container_name }}"
         hostname: "{{ phpbb_container_name }}"
-        image: bitnami/phpbb:latest
+        image: "{{ phpbb_image_name }}:{{ phpbb_image_tag }}"
         pull: true
         cpu_shares: "{{ phpbb_cpu_shares }}"
         networks:
@@ -76,8 +77,6 @@
           PHPBB_DATABASE_HOST: "{{ phpbb_container_db_name }}"
           PHPBB_FORUM_SERVER_PROTOCOL: "http://"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ phpbb_memory }}"
         links:
           - "{{ phpbb_container_db_name }}"
         labels:
@@ -103,6 +102,8 @@
           traefik.http.services.phpbb.loadbalancer.server.port: "8080"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ phpbb_memory }}"
+        restart_policy: unless-stopped
   when: phpbb_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -111,6 +112,7 @@
       community.docker.docker_container:
         name: "{{ phpbb_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ phpbb_db_container_name }}"

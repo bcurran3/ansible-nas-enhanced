@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ whisparr_container_name }}"
         hostname: "{{ whisparr_container_name }}"
-        image: ghcr.io/thespad/whisparr:latest
+        image: "{{ whisparr_image_name }}:{{ whisparr_image_tag }}"
         pull: true
         cpu_shares: "{{ whisparr_cpu_shares }}"
         ports:
@@ -28,8 +28,6 @@
           PUID: "{{ whisparr_puid }}"
           PGID: "{{ whisparr_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ whisparr_memory }}"
         labels:
           autoheal: "{{ whisparr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ whisparr_watchtower_monitor_only }}"
@@ -53,6 +51,8 @@
           traefik.http.services.whisparr.loadbalancer.server.port: "6969"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ whisparr_memory }}"
+        restart_policy: unless-stopped
   when: whisparr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

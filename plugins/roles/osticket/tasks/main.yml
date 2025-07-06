@@ -15,12 +15,14 @@
       community.docker.docker_network:
         name: "{{ osticket_network_name }}"
 
+#########################
+# ^ I'd prefer linuxserver/mariadb
     - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ osticket_db_container_name }}"
         hostname: "{{ osticket_db_container_name }}"
-        image: bitnami/mariadb:latest
+        image: "{{ osticket_db_image_name }}:{{ osticket_db_image_tag }}"
         pull: true
         cpu_shares: "{{ osticket_db_cpu_shares }}"
         network_mode: "bridge"
@@ -29,6 +31,7 @@
         networks_cli_compatible: "yes"
         volumes:
           - "{{ osticket_data_directory }}/db:/bitnami/mariadb"
+# ^ I'd prefer linuxserver/mariadb
         env:
           ALLOW_EMPTY_PASSWORD: "yes"
           MARIADB_USER: "osticket"
@@ -56,7 +59,7 @@
         container_default_behavior: "compatibility"
         name: "{{ osticket_container_name }}"
         hostname: "{{ osticket_container_name }}"
-        image: devinsolutions/osticket
+        image: "{{ osticket_image_name }}:{{ osticket_image_tag }}"
         pull: true
         cpu_shares: "{{ osticket_cpu_shares }}"
         networks:
@@ -75,8 +78,6 @@
           MYSQL_HOST: "{{ osticket_db_container_name }}"
           ALLOW_EMPTY_PASSWORD: "yes"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ osticket_memory }}"
         links:
           - "{{ osticket_db_container_name }}"
         labels:
@@ -102,6 +103,8 @@
           traefik.http.services.osticket.loadbalancer.server.port: "80"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ osticket_memory }}"
+        restart_policy: unless-stopped
   when: osticket_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -13,7 +13,7 @@
       community.docker.docker_container:
         name: "{{ rustdesk_hbbr_container_name }}"
         hostname: "{{ rustdesk_hbbr_container_name }}"
-        image: rustdesk/rustdesk-server:latest
+        image: "{{ rustdesk_hbbr_image_name }}:{{ rustdesk_hbbr_image_tag }}"
         pull: true
         cpu_shares: "{{ rustdesk_hbbr_cpu_shares }}"
         network_mode: bridge
@@ -26,8 +26,6 @@
         command: "hbbr"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ rustdesk_hbbr_memory_limit }}"
         labels:
           autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
@@ -43,12 +41,14 @@
           trafik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ rustdesk_hbbr_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} ID Server Container
       community.docker.docker_container:
         name: "{{ rustdesk_hbbs_container_name }}"
         hostname: "{{ rustdesk_hbbs_container_name }}"
-        image: rustdesk/rustdesk-server:latest
+        image: "{{ rustdesk_hbbs_image_name }}:{{ rustdesk_hbbs_image_tag }}"
         pull: true
         cpu_shares: "{{ rustdesk_hbbs_cpu_shares }}"
         network_mode: bridge
@@ -64,8 +64,6 @@
         command: "hbbs"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ rustdesk_hbbs_memory_limit }}"
         links:
           - "{{ rustdesk_hbbr_container_name }}"
         labels:
@@ -83,12 +81,14 @@
           trafik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ rustdesk_hbbs_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Web Client Container
       community.docker.docker_container:
         name: "{{ rustdesk_web_container_name }}"
         hostname: "{{ rustdesk_web_container_name }}"
-        image: keyurbhole/flutter_web_desk:v1.0.0
+        image: "{{ rustdesk_web_image_name }}:{{ rustdesk_web_image_tag }}"
         pull: true
         cpu_shares: "{{ rustdesk_web_cpu_shares }}"
         network_mode: bridge
@@ -97,8 +97,6 @@
         container_default_behavior: no_defaults
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ rustdesk_web_memory_limit }}"
         links:
           - "{{ rustdesk_hbbs_container_name }}"
           - "{{ rustdesk_hbbr_container_name }}"
@@ -125,6 +123,8 @@
           traefik.http.services.rustdesk.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/keyurbhole/flutter_web_desk/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ rustdesk_web_memory }}"
+        restart_policy: unless-stopped
   when: rustdesk_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

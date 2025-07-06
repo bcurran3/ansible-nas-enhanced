@@ -1,7 +1,9 @@
 # https://raw.githubusercontent.com/amidaware/tacticalrmm/master/docker/docker-compose.yml
 # https://docs.tacticalrmm.com/install_docker/
 ---
-### WORK IN PROGRESS OR INDEFINATELY ON HOLD
+### WORK IN PROGRESS
+### INDEFINATELY ON HOLD
+# This is just such a PITA due to the hardcoded IPs
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create Tactical RMM Directories
@@ -40,7 +42,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: postgres:13-alpine
         name: tactical-postgres
         hostname: tactical-postgres
@@ -50,6 +52,7 @@
         networks_cli_compatible: "yes"
     #    ports: 
     #      - "5432:5432"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           POSTGRES_DB: "{{ tacticalrmm_postgress_db }}"
           POSTGRES_USER: "{{ tacticalrmm_postgress_user }}"
@@ -57,18 +60,18 @@
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/postgres:/var/lib/postgresql/data"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} MongoDB Container
     # mongodb container for meshcentral
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: mongo:4.4
         name: tactical-mongodb
         hostname: tactical-mongodb
@@ -79,6 +82,7 @@
         networks_cli_compatible: "yes"
     #    ports:
     #      - "27017:27017"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           MONGO_INITDB_ROOT_USERNAME: "{{ tacticalrmm_mongo_user }}"
           MONGO_INITDB_ROOT_PASSWORD: "{{ tacticalrmm_mongo_password }}"
@@ -86,18 +90,18 @@
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/mongo:/data/db"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
     # redis container for celery tasks
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: redis:6.0-alpine
         name: tactical-redis
         hostname: tactical-redis
@@ -108,22 +112,23 @@
         ports: 
           - "6379:6379"
         user: 1000:1000
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/redis:/data"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} nats Container
     # nats
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical-nats
         name: tactical-nats
         hostname: tactical-nats
@@ -134,12 +139,12 @@
             aliases: 
               - "{{ tacticalrmm_api_hostname }}.{{ ansible_nas_domain }}"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           API_HOST: "{{ tacticalrmm_api_hostname }}.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
@@ -152,13 +157,14 @@
     #      traefik.http.routers.tacticalrmm.middlewares: "{{ tacticalrmm_api_hostname }}@docker"
     #      traefik.http.middlewares.tacticalrmm.IPAllowList.sourcerange: "{{ tacticalrmm_traefik_whitelist }}"
     #      traefik.http.services.tacticalrmm.loadbalancer.server.port: "8080"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} MeshCentral Container
       # meshcentral container
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical-meshcentral
         name: tactical-meshcentral
         hostname: meshcentral
@@ -170,6 +176,7 @@
             aliases: 
               - "{{ tacticalrmm_mesh_hostname }}.{{ ansible_nas_domain }}"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           MESH_HOST: "{{ tacticalrmm_mesh_hostname }}.{{ ansible_nas_domain }}"
           MESH_USER: "{{ tacticalrmm_mesh_user }}"
@@ -181,7 +188,6 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
           - "{{ tacticalrmm_data_directory }}/mesh:/home/node/app/meshcentral-data"
-        restart_policy: unless-stopped
         links:
           - tactical-mongodb
         labels:
@@ -196,13 +202,14 @@
     #      traefik.http.routers.tacticalrmm.middlewares: "{{ tacticalrmm_mesh_hostname }}@docker"
     #      traefik.http.middlewares.tacticalrmm.IPAllowList.sourcerange: "{{ tacticalrmm_traefik_whitelist }}"
     #      traefik.http.services.tacticalrmm.loadbalancer.server.port: "8080"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} init Container
     # used to initialize the docker environment
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical
         name: tactical-init
         hostname: tactical-init
@@ -213,6 +220,7 @@
           - name: "{{ tacticalrmm_proxy_network }}"
           - name: "{{ tacticalrmm_redis_network }}"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           POSTGRES_USER: "{{ tacticalrmm_postgress_user }}"
           POSTGRES_PASS: "{{ tacticalrmm_postgress_password }}"
@@ -229,7 +237,6 @@
           - "{{ tacticalrmm_data_directory }}/mesh:/meshcentral-data"
           - "{{ tacticalrmm_data_directory }}/mongo:/mongo/data/db"
           - "{{ tacticalrmm_data_directory }}/redis:/redis/data"
-        restart_policy: unless-stopped
         labels:
           autoheal: "false"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
@@ -238,13 +245,14 @@
           - tactical-postgres
           - tactical-meshcentral
           - tactical-redis
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} vue Container
     # container that hosts vue frontend
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical-frontend
         name: tactical-frontend
         hostname: tactical-frontend
@@ -253,23 +261,24 @@
         networks:
           - name: "{{ tacticalrmm_proxy_network }}"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           API_HOST: "{{ tacticalrmm_api_hostname }}.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} django Container
     # container for django backend
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical
         name: tactical-backend
         hostname: tactical-backend
@@ -281,25 +290,26 @@
           - name: "{{ tacticalrmm_proxy_network }}"
           - name: "{{ tacticalrmm_redis_network }}"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           API_HOST: "{{ tacticalrmm_api_hostname }}.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
         links:
           - tactical-postgres
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} django websockets Doer Container
     # container for django websockets connections
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical
         name: tactical-websockets
         hostname: tactical-websockets
@@ -311,12 +321,12 @@
           - name: "{{ tacticalrmm_proxy_network }}"
           - name: "{{ tacticalrmm_redis_network }}"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           API_HOST: "{{ tacticalrmm_api_hostname }}.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
@@ -324,13 +334,14 @@
         links:
           - tactical-postgres
           - tactical-backend
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} celery worker Container
     # container for celery worker service
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical
         name: tactical-celery
         hostname: tactical-celery
@@ -342,12 +353,12 @@
           - name: "{{ tacticalrmm_proxy_network }}"
           - name: "{{ tacticalrmm_redis_network }}"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           API_HOST: "{{ tacticalrmm_api_hostname }}.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
@@ -355,13 +366,14 @@
         links:
           - tactical-postgres
           - tactical-redis
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} celery beat Container
     # container for celery beat service
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical
         name: tactical-celerybeat
         hostname: tactical-celerybeat
@@ -373,16 +385,17 @@
           - name: "{{ tacticalrmm_proxy_network }}"
           - name: "{{ tacticalrmm_redis_network }}"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         env:
           API_HOST: "{{ tacticalrmm_api_hostname }}.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+        restart_policy: unless-stopped
         links:
           - tactical-postgres
           - tactical-redis
@@ -392,7 +405,7 @@
       docker_container:
         container_default_behavior: "compatibility"
         pull: true
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        image: "{{ _image_name }}:{{ _image_tag }}"
         image: tacticalrmm/tactical-nginx
         name: tactical-nginx
         hostname: tactical-nginx
@@ -402,6 +415,7 @@
           - name: "{{ tacticalrmm_proxy_network }}"
             ipv4_address: "172.20.0.20"
         networks_cli_compatible: "yes"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         ports:
           - "{{ tacticalrmm_port_http }}:8080"
           - "{{ tacticalrmm_port_https }}:4443"
@@ -415,7 +429,6 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
           - "{{ tacticalrmm_certs_directory }}:/certs"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
@@ -437,6 +450,7 @@
           traefik.http.routers.tacticalrmm.middlewares: "{{ tacticalrmm_hostname }}@docker"
           traefik.http.middlewares.tacticalrmm.IPAllowList.sourcerange: "{{ tacticalrmm_traefik_whitelist }}"
           traefik.http.services.tacticalrmm.loadbalancer.server.port: "8080"
+        restart_policy: unless-stopped
     when: tacticalrmm_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -445,5 +459,7 @@
       community.docker.docker_container:
         name: "{{ appname_container_name }}"
         state: absent
+# TODO: insert all the other containers and networks here
   when: tacticalrmm_enabled is false
+
 ### WORK IN PROGRESS

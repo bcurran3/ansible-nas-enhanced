@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ uptimekuma_container_name }}"
         hostname: "{{ uptimekuma_container_name }}"
-        image: louislam/uptime-kuma:latest
+        image: "{{ uptimekuma_image_name }}:{{ uptimekuma_image_tag }}"
         pull: true
         cpu_shares: "{{ uptimekuma_cpu_shares }}"
         volumes:
@@ -24,7 +24,6 @@
           - "{{ uptimekuma_port_http }}:3001"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ uptimekuma_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ uptimekuma_watchtower_monitor_only }}"
@@ -52,6 +51,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/louislam/uptime-kuma/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ uptimekuma_memory }}"
+        restart_policy: unless-stopped
   when: uptimekuma_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

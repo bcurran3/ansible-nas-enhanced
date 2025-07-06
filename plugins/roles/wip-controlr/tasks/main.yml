@@ -21,10 +21,10 @@
         container_default_behavior: "compatibility"
         name: "{{ controlr_container_name }}"
         hostname: "{{ controlr_container_name }}"
-        image: translucency/controlr:latest
+        image: "{{ controlr_image_name }}:{{ controlr_image_tag }}"
         pull: true
         cpu_shares: "{{ controlr_cpu_shares }}"
-        networks:
+        networks: # I'm not sure why this is in it's own network
           - name: "{{ controlr_network_name }}"
         networks_cli_compatible: "yes"
         network_mode: "bridge"
@@ -64,8 +64,6 @@
 #         ControlR_ApplicationOptions__ExternalWebSocketHosts__0__Latitude=
 #         ControlR_ApplicationOptions__ExternalWebSocketHosts__0__Longitude=
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ controlr_memory }}"
         labels:
           autoheal: "{{ controlr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ controlr_watchtower_monitor_only }}"
@@ -80,6 +78,8 @@
           traefik.http.services.controlr.loadbalancer.server.port: "8080"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ controlr_memory }}"
+        restart_policy: unless-stopped
   when: controlr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -87,6 +87,11 @@
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ controlr_container_name }}"
+        state: absent
+
+    - name: Delete {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ controlr_network_name }}"
         state: absent
   when: controlr_enabled is false
 

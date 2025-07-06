@@ -1,4 +1,5 @@
 ---
+# TDL: move env vars to AN vars
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -12,7 +13,8 @@
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ semaphore_container_name }}"
-        image: semaphoreui/semaphore:latest
+        hostname: "{{ semaphore_container_name }}"
+        image: "{{ semaphore_image_name }}:{{ semaphore_image_tag }}"
         pull: true
         cpu_shares: "{{ semaphore_cpu_shares }}"
         volumes:
@@ -26,8 +28,6 @@
           SEMAPHORE_ADMIN_EMAIL: "admin@localhost"
           SEMAPHORE_ADMIN: "admin"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ semaphore_memory }}"
         labels:
           autoheal: "{{ semaphore_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ semaphore_watchtower_monitor_only }}"
@@ -51,6 +51,8 @@
           traefik.http.services.semaphore.loadbalancer.server.port: "3000"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ semaphore_memory }}"
+        restart_policy: unless-stopped
   when: semaphore_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

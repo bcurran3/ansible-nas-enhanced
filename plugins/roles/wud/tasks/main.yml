@@ -13,20 +13,19 @@
         container_default_behavior: "compatibility"
         name: "{{ wud_container_name }}"
         hostname: "{{ wud_container_name }}"
-        image: "{{ wud_image }}:{{ wud_image_tag }}"
+        image: "{{ wud_image_name }}:{{ wud_image_tag }}"
         pull: true
-        cpu_shares: "{{ wud_cpu_shares }}"
         volumes:
           - "{{ wud_data_directory }}:/store"
           - "/var/run/docker.sock:/var/run/docker.sock"
         ports:
           - "{{ wud_port_http }}:3000"
+        cpu_shares: "{{ wud_cpu_shares }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           WUD_AUTH_BASIC_ADMIN_USER: "{{ wud_admin_username }}"
           WUD_AUTH_BASIC_ADMIN_HASH: "{{ wud_admin_password }}"
           WUD_WATCHER_LOCAL_WATCHALL: "true"
-        restart_policy: unless-stopped
         healthcheck:
           test: 'curl --fail http://localhost:3000/health || exit 1'
           interval: "10s"
@@ -59,6 +58,7 @@
           traefik.http.middlewares.wud.IPAllowList.sourcerange: "{{ wud_traefik_whitelist }}"
           traefik.http.services.wud.loadbalancer.server.port: "3000"
         memory: "{{ wud_memory }}"
+        restart_policy: unless-stopped
   when: wud_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

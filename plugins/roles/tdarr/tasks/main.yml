@@ -18,7 +18,7 @@
         container_default_behavior: "compatibility"
         name: "{{ tdarr_container_name }}"
         hostname: "{{ tdarr_container_name }}"
-        image: ghcr.io/haveagitgat/tdarr
+        image: "{{ tdarr_image_name }}:{{ tdarr_image_tag }}"
         network_mode: "bridge"
         log_driver: json-file
         log_options:
@@ -56,8 +56,6 @@
           NVIDIA_VISIBLE_DEVICES: "all"
           gpus: "all"
           TZ: "{{ ansible_nas_timezone }}"
-        memory: "{{ tdarr_memory }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ tdarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tdarr_watchtower_monitor_only }}"
@@ -84,6 +82,8 @@
           traefik.http.services.tdarr.loadbalancer.server.port: "8265"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/HaveAGitGat/Tdarr/releases/tag/$${major}.$${minor}-Beta"
+        memory: "{{ tdarr_memory }}"
+        restart_policy: unless-stopped
   when: tdarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

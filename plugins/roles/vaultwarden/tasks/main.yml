@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ vaultwarden_container_name }}"
         hostname: "{{ vaultwarden_container_name }}"
-        image: vaultwarden/server:latest
+        image: "{{ vaultwarden_image_name }}:{{ vaultwarden_image_tag }}"
         pull: true
         cpu_shares: "{{ vaultwarden_cpu_shares }}"
         ports:
@@ -80,10 +80,9 @@
         container_default_behavior: "compatibility"
         name: "{{ vaultwarden_backup_container_name }}"
         hostname: "{{ vaultwarden_backup_container_name }}"
-        image: bruceforce/vaultwarden-backup:latest
+        image: "{{ vaultwarden_backup_image_name }}:{{ vaultwarden_backup_image_tag }}"
         pull: true
         cpu_shares: "{{ vaultwarden_backup_cpu_shares }}"
-        restart_policy: unless-stopped
         volumes:
           - "{{ vaultwarden_data_directory }}:/data"
           - "{{ vaultwarden_data_directory }}/backup:/backup"
@@ -92,7 +91,6 @@
           UID: "0"
           TIMESTAMP: "true"
           TZ: "{{ ansible_nas_timezone }}"
-        memory: "{{ vaultwarden_backup_memory }}"
         links:
           - "{{ vaultwarden_container_name }}"
         labels:
@@ -109,6 +107,8 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://gitlab.com/1O/vaultwarden-backup/-/releases/$${major}.$${minor}.$${patch}"
+        memory: "{{ vaultwarden_backup_memory }}"
+        restart_policy: unless-stopped
   when: vaultwarden_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -117,6 +117,7 @@
       community.docker.docker_container:
         name: "{{ vaultwarden_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} Backup Container
       community.docker.docker_container:
         name: "{{ vaultwarden_backup_container_name }}"

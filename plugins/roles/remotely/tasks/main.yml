@@ -13,7 +13,7 @@
       community.docker.docker_container:
         name: "{{ remotely_container_name }}"
         hostname: "{{ remotely_container_name }}"
-        image: immybot/remotely:latest
+        image: "{{ remotely_image_name }}:{{ remotely_image_tag }}"
         pull: true
         cpu_shares: "{{ remotely_cpu_shares }}"
         ports:
@@ -27,8 +27,6 @@
           Remotely_ApplicationOptions__DbProvider: "SQLite"
           Remotely_ConnectionStrings__SQLite: "Data Source=/app/AppData/Remotely.db"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ remotely_memory }}"
         labels:
           autoheal: "{{ remotely_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ remotely_watchtower_monitor_only }}"
@@ -52,6 +50,8 @@
           traefik.http.services.remotely.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/immybot/remotely/tags/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ remotely_memory }}"
+        restart_policy: unless-stopped
   when: remotely_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

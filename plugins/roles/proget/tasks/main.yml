@@ -1,4 +1,9 @@
 ---
+# TDL/NOTES:
+# docker exec -it proget_sql /opt/mssql-tools/bin/sqlcmd \
+#  -S localhost -U SA -P 't0ps3cr3t!pw' \
+#  -Q 'CREATE DATABASE [ProGet] COLLATE SQL_Latin1_General_CP1_CI_AS'
+# ^ this should be automated
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -27,8 +32,8 @@
         container_default_behavior: "compatibility"
         name: "{{ proget_db_container_name}}"
         hostname: "{{ proget_db_container_name}}"
-        image: mcr.microsoft.com/mssql/server:2019-latest
-        ports: 1433:1433   # shouldn't be needed
+        image: "{{ proget_db_image_name }}:{{ proget_db_image_tag }}"
+#       ports: 1433:1433   # shouldn't be needed
         pull: true
         cpu_shares: "{{ proget_db_cpu_shares }}"
         networks:
@@ -44,8 +49,6 @@
           MSSQL_SA_PASSWORD: "t0ps3cr3t!pw"
           MSSQL_PID: "Express"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ proget_db_memory_limit }}"
         labels:
           autoheal: "{{ proget_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ proget_db_watchtower_monitor_only }}"
@@ -60,13 +63,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
+        memory: "{{ proget_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ proget_container_name }}"
         hostname: "{{ proget_container_name }}"
-        image: proget.inedo.com/productimages/inedo/proget
+        image: "{{ proget_image_name }}:{{ proget_image_tag }}"
         pull: true
         cpu_shares: "{{ proget_cpu_shares }}"
         networks:
@@ -83,7 +88,6 @@
           PROGET_SQL_CONNECTION_STRING: "Data Source=proget-db; Initial Catalog=ProGet; User ID=sa; Password=t0ps3cr3t!pw"
           # ^ change to the variables
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ proget_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ proget_watchtower_monitor_only }}"
@@ -92,7 +96,7 @@
           homepage.icon: "{{ proget_homepage_icon }}"
           homepage.href: "{{ proget_homepage_href}}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proget_port_http }}"
-#         homepage.description: ""
+#         homepage.description: "ProGet"
           homepage.server: "my-docker"
           homepage.container: "{{ proget_container_name }}"
           homepage.showStats: "{{ proget_homepage_showStats }}"
@@ -108,6 +112,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
         memory: "{{ proget_memory_limit }}"
+        restart_policy: unless-stopped
   when: proget_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -116,13 +121,9 @@
       community.docker.docker_container:
         name: "{{ proget_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ proget_db_container_name }}"
         state: absent
   when: proget_enabled is false
-
-#docker exec -it proget_sql /opt/mssql-tools/bin/sqlcmd \
-#  -S localhost -U SA -P 't0ps3cr3t!pw' \
-#  -Q 'CREATE DATABASE [ProGet] COLLATE SQL_Latin1_General_CP1_CI_AS'
-# ^ this should be automated

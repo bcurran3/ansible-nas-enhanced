@@ -13,7 +13,7 @@
         container_default_behavior: "compatibility"
         name: "{{ windows_container_name }}"
         hostname: "{{ windows_container_name }}"
-        image: dockurr/windows
+        image: "{{ windows_image_name }}:{{ windows_image_tag }}"
         pull: true
         cpu_shares: "{{ windows_cpu_shares }}"
         capabilities:
@@ -35,9 +35,7 @@
           RAM_SIZE: "{{ windows_memory_size }}"
           VERSION: "{{ windows_version }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         stop_timeout: 120
-        memory: "{{ windows_memory_size }}"
         labels:
           autoheal: "{{ windows_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ windows_watchtower_monitor_only }}"
@@ -61,6 +59,8 @@
           traefik.http.services.windows.loadbalancer.server.port: "8006"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ windows_memory_size }}"
+        restart_policy: unless-stopped
   when: windows_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

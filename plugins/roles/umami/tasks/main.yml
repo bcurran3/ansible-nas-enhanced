@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ umami_db_container_name }}"
         hostname: "{{ umami_db_container_name }}"
-        image: postgres:16-alpine
+        image: "{{ umami_db_image_name }}:{{ umami_db_image_tag }}"
         pull: true
         cpu_shares: "{{ umami_db_cpu_shares }}"
         volumes:
@@ -23,13 +23,11 @@
           POSTGRES_DB: "umami"
           POSTGRES_USER: "umami"
           POSTGRES_PASSWORD: "umami"
-        restart_policy: unless-stopped
 #        healthcheck:
 #          test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
 #          interval: 5s
 #          timeout: 5s
 #          retries: "5"
-        memory: "{{ umami_db_memory }}"
         labels:
           autoheal: "{{ umami_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ umami_db_watchtower_monitor_only }}"
@@ -44,13 +42,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
+        memory: "{{ umami_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ umami_container_name }}"
         hostname: "{{ umami_container_name }}"
-        image: ghcr.io/umami-software/umami:postgresql-latest
+        image: "{{ umami_image_name }}:{{ umami_image_tag }}"
         pull: true
         cpu_shares: "{{ umami_cpu_shares }}"
         ports:
@@ -60,7 +60,6 @@
           DATABASE_URL: "postgres://umami:umami@{{ umami_db_container_name }}:5432/umami"
           APP_SECRET: "{{ umami_app_secret }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
 #        healthcheck:
 #          test: ["CMD-SHELL", "curl http://localhost:{{ umami_port_http }}/api/heartbeat"]
 #          interval: 5s
@@ -92,6 +91,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/umami-software/umami/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ umami_memory }}"
+        restart_policy: unless-stopped
   when: umami_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -100,6 +100,7 @@
       community.docker.docker_container:
         name: "{{ umami_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ umami_db_container_name }}"

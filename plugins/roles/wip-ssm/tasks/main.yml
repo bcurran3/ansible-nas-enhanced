@@ -12,7 +12,7 @@
         - "{{ ssm_data_directory }}/db"
         - "{{ ssm_data_directory }}/playbooks"
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ ssm_network_name }}"
 
@@ -21,7 +21,7 @@
         container_default_behavior: "compatibility"
         name: "{{ ssm_redis_container_name }}"
         hostname: "{{ ssm_redis_container_name }}"
-        image: redis
+        image: "{{ ssm_redis_image_name }}:{{ ssm_redis_image_tag }}"
         pull: true
         cpu_shares: "{{ ssm_redis_cpu_shares }}"
         networks:
@@ -34,8 +34,6 @@
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ['CMD', 'redis-cli', 'ping']
-        restart_policy: unless-stopped
-        memory: "{{ ssm_redis_memory_limit }}"
         command: "--save 60 1"
         labels:
           autoheal: "{{ ssm_redis_autoheal }}"
@@ -43,13 +41,15 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ ssm_redis_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ssm_db_container_name }}"
         hostname: "{{ ssm_db_container_name }}"
-        image: mongo
+        image: "{{ ssm_db_image_name }}:{{ ssm_db_image_tag }}"
         pull: true
         cpu_shares: "{{ ssm_db_cpu_shares }}"
         networks:
@@ -60,22 +60,22 @@
           - "{{ ssm_data_directory }}/db:/data/db"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         command: "--quiet"
-        memory: "{{ ssm_db_memory_limit }}"
         healthcheck:
           test: ['CMD', 'pg_isready', '-U', 'postgres']
         labels:
           autoheal: "{{ ssm_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_db_watchtower_monitor_only }}"
           traefik.enable: "false"
+        memory: "{{ ssm_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Client Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ssm_client_container_name }}"
         hostname: "{{ ssm_client_container_name }}"
-        image: ghcr.io/squirrelcorporation/squirrelserversmanager-client:latest
+        image: "{{ ssm_client_image_name }}:{{ ssm_client_image_tag }}"
         pull: true
         cpu_shares: "{{ ssm_client_cpu_shares }}"
         networks:
@@ -86,8 +86,6 @@
           - "{{ ssm_port_http }}: 8000"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ ssm_client_memory_limit }}"
         labels:
           autoheal: "{{ ssm_client_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_client_watchtower_monitor_only }}"
@@ -102,13 +100,15 @@
           traefik.http.services.ssm.loadbalancer.server.port: "8000"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ ssm_client_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Server Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ssm_container_name }}"
         hostname: "{{ ssm_container_name }}"
-        image: ghcr.io/squirrelcorporation/squirrelserversmanager-server:latest
+        image: "{{ ssm_image_name }}:{{ ssm_image_tag }}"
         pull: true
         cpu_shares: "{{ ssm_cpu_shares }}"
         networks:
@@ -131,13 +131,13 @@
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ ssm_data_directory }}/playbooks:/playbooks"
-        restart_policy: unless-stopped
-        memory: "{{ ssm_memory_limit }}"
         labels:
           autoheal: "{{ ssm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_watchtower_monitor_only }}"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ ssm_memory }}"
+        restart_policy: unless-stopped
   when: ssm_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -162,7 +162,7 @@
         name: "{{ ssm_db_container_name }}"
         state: absent
 
-    - name: Remove {{ ansible_nas_app_name }} network
+    - name: Remove {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ ssm_network_name }}"
         state: absent

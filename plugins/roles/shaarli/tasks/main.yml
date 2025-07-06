@@ -15,7 +15,7 @@
         container_default_behavior: "compatibility"
         name: "{{ shaarli_container_name }}"
         hostname: "{{ shaarli_container_name }}"
-        image: shaarli/shaarli:latest
+        image: "{{ shaarli_image_name }}:{{ shaarli_image_tag }}"
         pull: true
         cpu_shares: "{{ shaarli_cpu_shares }}"
         volumes:
@@ -25,7 +25,6 @@
           - "{{ shaarli_port_http }}:80"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ shaarli_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ shaarli_watchtower_monitor_only }}"
@@ -49,7 +48,8 @@
           traefik.http.services.shaarli.loadbalancer.server.port: "80"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: 1g
+        memory: "{{ shaarli_memory }}"
+        restart_policy: unless-stopped
   when: shaarli_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

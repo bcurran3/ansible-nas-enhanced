@@ -159,4 +159,9 @@
       community.docker.docker_container:
         name: "{{ diskover_elasticsearch_container_name }}"
         state: absent
+
+    - name: Delete {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ diskover_network_name }}"
+        state: absent
   when: diskover_enabled is false

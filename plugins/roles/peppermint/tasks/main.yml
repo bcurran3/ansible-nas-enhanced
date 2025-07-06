@@ -14,7 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ peppermint_db_container_name }}"
         hostname: "{{ peppermint_db_container_name }}"
-        image: postgres:17-alpine
+        image: "{{ peppermint_db_image_name }}:{{ peppermint_db_image_tag }}"
         pull: true
         cpu_shares: "{{ peppermint_db_cpu_shares }}"
         volumes:
@@ -23,7 +23,6 @@
           POSTGRES_USER: "peppermint"
           POSTGRES_PASSWORD: "{{ peppermint_db_password }}"
           POSTGRES_DB: "peppermint"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ peppermint_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ peppermint_db_watchtower_monitor_only }}"
@@ -31,8 +30,7 @@
           homepage.group: "{{ peppermint_db_homepage_group }}"
           homepage.icon: "{{ peppermint_db_homepage_icon }}"
           homepage.href: "{{ peppermint_db_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ peppermint_db_port_http }}"
-#         homepage.description: ""
+#         homepage.description: "MariaDB"
           homepage.server: "my-docker"
           homepage.container: "{{ peppermint_db_container_name }}"
           homepage.showStats: "{{ peppermint_db_homepage_showStats }}"
@@ -40,13 +38,14 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ peppermint_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         container_default_behavior: "compatibility"
         name: "{{ peppermint_container_name }}"
         hostname: "{{ peppermint_container_name }}"
-        image: pepperlabs/peppermint:latest
+        image: "{{ peppermint_image_name }}:{{ peppermint_image_tag }}"
         pull: true
         cpu_shares: "{{ peppermint_cpu_shares }}"
         ports:
@@ -58,7 +57,6 @@
           DB_HOST: "{{ peppermint_db_container_name }}"
           SECRET: 'peppermint4life'
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
         links:
           - "{{ peppermint_db_container_name }}"
         labels:
@@ -85,6 +83,7 @@
 #          wud.tag.include: '^\d+\.\d+\.\d+$$'
 #          wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ peppermint_memory }}"
+        restart_policy: unless-stopped
   when: peppermint_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -93,6 +92,7 @@
       community.docker.docker_container:
         name: "{{ peppermint_container_name }}"
         state: absent
+
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ peppermint_db_container_name }}"

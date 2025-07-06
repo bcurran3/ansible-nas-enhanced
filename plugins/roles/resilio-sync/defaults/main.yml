@@ -5,22 +5,22 @@ ansible_nas_app_name: "Resilio Sync"
 resilio_sync_enabled: false
 resilio_sync_available_externally: false
 resilio_sync_traefik_whitelist: "{{ lan }}"
+resilio_sync_data_directory: "{{ docker_home }}/resilio-sync"
 
 # network
 resilio_sync_port_http: "3014"
 resilio_sync_port_sync: "55555"
 resilio_sync_hostname: "resiliosync"
 
-resilio_sync_data_directory: "{{ docker_home }}/resilio-sync"
+resilio_sync_puid: "1000"
+resilio_sync_pgid: "1000"
 
 # docker
 resilio_sync_container_name: "resilio-sync"
-resilio_sync_memory: "512m"
-resilio_sync_puid: "1000"
-resilio_sync_pgid: "1000"
+resilio_sync_image_name: "lscr.io/linuxserver/resilio-sync"
+resilio_sync_image_tag: "latest"
 resilio_sync_cpu_shares: "1024"
-resilio_sync_image: ""
-resilio_sync_image_tag: ""
+resilio_sync_memory: "512m"
 
 # autoheal
 resilio_sync_autoheal: "false"

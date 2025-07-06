@@ -16,7 +16,7 @@
         container_default_behavior: "compatibility"
         name: "{{ qbittorrent_container_name }}"
         hostname: "{{ qbittorrent_container_name }}"
-        image: linuxserver/qbittorrent:latest
+        image: "{{ qbittorrent_image_name }}:{{ qbittorrent_image_tag }}"
         pull: true
         cpu_shares: "{{ qbittorrent_cpu_shares }}"
         volumes:
@@ -35,8 +35,6 @@
           PGID: "{{ qbittorrent_group_id }}"
           UMASK_SET: "{{ qbittorrent_umask }}"
           WEBUI_PORT: "{{ qbittorrent_port_http }}"
-        restart_policy: unless-stopped
-        memory: "{{ qbittorrent_memory }}"
         labels:
           autoheal: "{{ qbittorrent_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ qbittorrent_watchtower_monitor_only }}"
@@ -64,6 +62,8 @@
           traefik.http.services.qbittorrent.loadbalancer.server.port: "8113"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-qbittorrent/releases/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ qbittorrent_memory }}"
+        restart_policy: unless-stopped
   when: qbittorrent_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
