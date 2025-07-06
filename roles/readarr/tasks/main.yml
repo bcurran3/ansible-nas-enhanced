@@ -1,7 +1,7 @@
 ---
-- name: Start Readarr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Readarr Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ readarr_data_directory }}"
         - "{{ readarr_data_directory }}/config"
 
-    - name: Create Readarr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         name: "{{ readarr_container_name }}"
         hostname: "{{ readarr_container_name }}"
@@ -53,16 +53,37 @@
           traefik.http.services.readarr.loadbalancer.server.port: "8787"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-readarr/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: "{{readarr_memory}}"
+        memory: "{{ readarr_memory }}"
   when: readarr_enabled is true
 
-- name: Stop readarr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop readarr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "readarr"
         state: absent
   when: readarr_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ readarr_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ readarr_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: readarr_enabled is false and archive_app_data_enabled is true
+
 
   # NOTE: deprecated / retired
   # https://github.com/linuxserver/docker-readarr

@@ -19,10 +19,14 @@
         ports:
           - "{{ lidarr_port }}:8686"
         env:
+          DOCKER_MODS: "{{ lidarr_docker_mods }}"
+          TP_DOMAIN: "{{ lidarr_docker_mods_domain }}"
+          TP_THEME: "{{ lidarr_docker_mods_tp_theme }}"
+          TP_COMMUNITY_THEME: "{{ lidarr_docker_mods_community_theme }}"
+          TP_ADDON: "{{ lidarr_docker_mods_addon }}"
           PUID: "{{ lidarr_user_id }}"
           PGID: "{{ lidarr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-#        DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:lidarr"
         restart_policy: unless-stopped
         memory: "{{ lidarr_memory }}"
         labels:
