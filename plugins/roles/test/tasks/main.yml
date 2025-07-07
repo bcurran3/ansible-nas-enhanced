@@ -5,21 +5,18 @@
     - debug:
         msg: "TESTING 1 2 3..."
 
-    - debug: # get OS version i.e. Ubuntu 24.04
-        msg: "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
-
-    - shell: git rev-list ...@{u} --count
-      register: commits_behind_number
+#    - shell: git rev-list ...@{u} --count
+#      register: commits_behind_number
 
     #- shell: git log -"{{ commits_behind_number }}" ...@{u} --pretty=format:"%h - %an, %ar - %s"
-    - shell: 'git log -7 ...@{u} --pretty=format:"%h - %an, %ar - %s"'
-      register: commits_behind
+#    - shell: 'git log -7 ...@{u} --pretty=format:"%h - %an, %ar - %s"'
+#      register: commits_behind
 
-    - debug:
-        msg: "{{ commits_behind_number.stdout }} - {{ commits_behind.stdout }}"
+#    - debug:
+#        msg: "{{ commits_behind_number.stdout }} - {{ commits_behind.stdout }}"
 
-    - debug:
-        msg: "Ansible-NAS is {{ commits_behind_number.stdout }} commits behind master. Here's what you're missing {{ commits_behind.stdout }}"
+#    - debug:
+#        msg: "Ansible-NAS is {{ commits_behind_number.stdout }} commits behind master. Here's what you're missing {{ commits_behind.stdout }}"
 
     - debug:
         msg: "WAN whitelist: {{ wan }}"
@@ -29,7 +26,7 @@
 
     - name: find roles directories
       ansible.builtin.find:
-        paths: roles/
+        paths: apps/
         recurse: no
         file_type: directory
       register: found_directories
@@ -123,6 +120,16 @@
 #      include_role:
 #        name: "{{ item }}"
 #      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
+
+    - name: Check if nvidia-container-runtime executable exists
+      ansible.builtin.stat:
+        path: /usr/bin/nvidia-container-runtime
+      register: nvidia_runtime_executable
+      check_mode: false
+
+    - name: Check NVIDIA Container Runtime result
+      ansible.builtin.debug:
+        msg: "NVIDIA Container Runtime executable exists: {{ nvidia_runtime_executable.stat.exists }}"
 
   when: test_enabled is true
   

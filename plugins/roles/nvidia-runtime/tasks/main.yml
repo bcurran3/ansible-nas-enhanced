@@ -1,0 +1,56 @@
+---
+### WORK IN PROGRESS
+
+- name: Check if nvidia-container-runtime executable exists
+  ansible.builtin.stat:
+    path: /usr/bin/nvidia-container-runtime
+  register: nvidia_runtime_executable
+  check_mode: false
+
+- name: Check NVIDIA Container Runtime result
+  ansible.builtin.debug:
+    msg: "NVIDIA Container Runtime executable exists: {{ nvidia_runtime_executable.stat.exists }}"
+
+- name: Install NVIDIA Container Runtime
+  block:
+    - name: Enable NVIDIA sources 1
+      shell: "curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg"
+
+    - name: Enable NVIDIA sources 2
+      shell: "sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list"
+
+    - name: Update apt-cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      register: result
+      until: result is succeeded
+
+    - name: Install nvidia-container-toolkit Package
+      apt:
+        name: "nvidia-container-toolkit"
+        state: present
+      register: result
+      until: result is succeeded
+
+# not necessary after doing the /etc/docker/daemon.json config already
+#    - name: Configure runtime
+#      shell: nvidia-ctk runtime configure --runtime=docker
+#      register: docker_config
+
+    - name: Restart Docker
+      service:
+        name: docker
+        state: restarted
+      when: docker_config.changed
+      tags:
+        - skip_ansible_lint
+  when: nvidia_runtime_enabled is true and {{ nvidia_runtime_executable.stat.exists }} is false
+
+######################
+### WORK IN PROGRESS
+# how to install NVIDIA drivers
+# https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/
+
+# how to install NVIDIA Container Toolkit
+# https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html

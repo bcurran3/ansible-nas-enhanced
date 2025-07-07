@@ -1,24 +1,33 @@
 ---
-- name: Install python3-pip
-  apt:
-    name: python3-pip
-    state: present
-  register: result
-  until: result is succeeded
+- name: Start Docker setup for Ubuntu 22.04 LTS
+  block:
+    - name: Install python3-pip
+      apt:
+        name: python3-pip
+        state: present
+      register: result
+      until: result is succeeded
 
-- name: Remove docker-py python module
-  pip:
-    name: docker-py
-    state: absent
-  register: result
-  until: result is succeeded
+    - name: Remove docker-py python module
+      pip:
+        name: docker-py
+        state: absent
+      register: result
+      until: result is succeeded
 
-- name: Install docker python module
-  pip:
-    name: docker
-    state: present
-  register: result
-  until: result is succeeded
+    - name: Install docker python module
+      pip:
+        name: docker
+        state: present
+      register: result
+      until: result is succeeded
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
+
+- name: Start Docker setup for Ubuntu 24.04 LTS
+  block:
+    - debug:
+        msg: "WHAT NEEDS TO BE DONE?"
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "24.04"
 
 - name: Create Docker home directory
   file:
