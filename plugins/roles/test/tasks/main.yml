@@ -55,7 +55,7 @@
     - debug:
         msg: "TESTING Discovery and Running of Roles in Apps Directory"
 
-    - name: Gathering Roles in Apps Directory
+    - name: Find roles in apps Directory
       ansible.builtin.find:
         paths: apps/
         file_type: directory
@@ -76,60 +76,34 @@
         name: "{{ item }}"
       with_items: "{{ found_directories.files | map(attribute='path') | list }}"
 
-########## eventually move to it's own role
+########## eventually move to it's own role?
     - debug:
         msg: "TESTING Discovery and Running of docker-compose files"
 
-#    - name: Discover docker-compose directories
-#      ansible.builtin.find:
-#        paths: docker-compose/
-#        file_type: directory
-#        use_regex: yes
-#        patterns: "^[a-zA-Z0-9_]+$"
-#        recurse: no
-#      register: found_directories
-
-    - name: Discover docker-compose directories
+# WORKS - now where to put it? ansible-nas-docker-compose role??
+    - name: Find docker-compose files in {{ docker_compose_directory }}
       ansible.builtin.find:
-        paths: docker-compose/
-        recurse: no
-        file_type: directory
-      register: found_directories
+        paths: "{{ docker_compose_directory }}"
+        file_type: file
+        patterns: "docker-compose.yml"
+        recurse: yes
+      register: compose_files
 
-    - name: Display found docker-compose directories
-      debug:
-        msg: "{{ item.path }}"
-      loop: "{{ found_directories.files | sort(attribute='path') }}"
+    - name: Deploy docker-compose files in {{ docker_compose_directory }}
+      community.docker.docker_compose_v2:
+        project_src: "{{ item.path | dirname }}"
+        state: present
+      loop: "{{ compose_files.files }}"
       loop_control:
-        label: "{{ item.path }}"
-      when: not (show_details | default(true))
-# displays:
-# skipping: [ansible-nas] => (item=docker-compose/hello-world)
+        label: "Deploying {{ item.path | dirname }}"
+# when docker_compose_enabled
 
-# this gives an error
-#    - set_fact:
-#        "my_{{ item | basename }}": "{{ item }}"
-#      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
+# make ansible-nas-pre role to run first; i.e. hello bill
+# make ansible-nas-post role to run last; i.e. cleanup
 
-# this doesn't work
-    - debug:
-        msg: "{{ found_directories.files | map(attribute='path') | list }}"
-
-# create function to run the docker-compose files here
-#    - name: "loop through list docker-compose dirs"
-#      include_role:
-#        name: "{{ item }}"
-#      with_items: "{{ found_directories.files | map(attribute='path') | list }}"
-
-    - name: Check if nvidia-container-runtime executable exists
-      ansible.builtin.stat:
-        path: /usr/bin/nvidia-container-runtime
-      register: nvidia_runtime_executable
-      check_mode: false
-
-    - name: Check NVIDIA Container Runtime result
-      ansible.builtin.debug:
-        msg: "NVIDIA Container Runtime executable exists: {{ nvidia_runtime_executable.stat.exists }}"
+    - name: Report local subnet
+      debug:
+        msg: "The local subnet is {{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.prefix }}"
 
   when: test_enabled is true
   

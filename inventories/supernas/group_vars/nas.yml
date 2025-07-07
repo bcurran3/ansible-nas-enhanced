@@ -1,16 +1,20 @@
 ---
-##                       ._____.  .__ _____ ____ _____|__\_ |__ | | ____ ____ _____ ______ \__ \ / \ / ___/ || 
-##  __ \| | _/ __ \ ______ / \\__ \ / ___/
-##   / __ \|   |  \\___ \|  || \_\ \  |_\  ___/  /_____/ |   |  \/ __ \_\___ \
-##  (____  /___|  /____  >__||___  /____/\___  >         |___|  (____  /____  >
-##       \/     \/     \/        \/          \/               \/     \/     \/
-##     a n s i b l e - n a s      https://github.com/davestephens/ansible-nas
+#     _         _   _       _____
+#    / \       | \ | |     | ____|
+#   / _ \ _____|  \| |_____|  _|
+#  / ___ \_____| |\  |_____| |___
+# /_/   \_\    |_| \_|     |_____|
+
 
 # Add your all.yml config overrides to this file. See group_vars/all.yml for all possible settings.
 
 # Plugins
 plugins_enabled: true
 cleanup_enabled: false
+archive_app_data_enabled: false      # new var
+docker_compose_enabled: true         # new var
+docker_compose_directory: "/home/bill/ansible/supernas/docker-compose"  # new var
+nvidia_runtime_enabled: true         # new var
 test_enabled: true
 
 # Example options
@@ -20,7 +24,6 @@ ansible_nas_user: bill
 ansible_nas_email: bcurran3@yahoo.com
 ansible_nas_domain: mrbillsabode.org
 ansible_nas_dns: 192.168.69.200
-archive_app_data_enabled: false
 docker_home: "/data/docker"
 docker_image_directory: "{{ docker_home }}/_images"
 # shares
@@ -455,12 +458,12 @@ samba_users:
 # traefik whitelist options 
 # traefik_frontend_whiteList_lan: "192.168.69.2/31, 192.168.69.4/30, 192.168.69.8/29, 192.168.69.16/28, 192.168.69.32/27"
 # letsencryptorg: "172.65.32.248/32, 172.65.46.172/32" # acme-v02.api.letsencrypt.org & acme-staging-v02.api.letsencrypt.org
-lan_whitelist: 192.168.69.0/24
-iotlan: 192.168.9.0/24
+#lan_whitelist: "{{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.prefix }}"
+#iotlan: 192.168.9.0/24
 unifivpn: 192.168.2.0/24
 unifiwg: 192.168.99.0/24          # wireguard on UDMPRO
-wireguard: 172.17.0.27/16         # wireguard container
-lan: "{{ lan_whitelist }}, {{ iotlan }}, {{ unifivpn }}, {{ wireguard }}, {{ unifiwg }}"
+#wireguard: 172.17.0.27/16         # wireguard container
+lan: "{{ lan_whitelist }}, {{ unifivpn }}, {{ unifiwg }}"
 wan: "0.0.0.0/0"
 
 ###
@@ -1337,12 +1340,6 @@ wireguard_watchtower_monitor_only: "false"
 #################### WORK IN PROGESS ####################
 #################### WORK IN PROGESS ####################
 #################### WORK IN PROGESS ####################
-
-###
-### Nvidia runtime 
-###
-# THIS STILL NEEDS WORK
-nvidia_runtime_enabled: true
 
 ###
 ### Focalboard
