@@ -1,9 +1,22 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
-
     - debug:
         msg: "TESTING 1 2 3..."
+
+    - name: Be polite
+      debug:
+        msg:
+          - Hello {{ ansible_nas_user }}
+          - Sorry I can't do that Dave.
+          - Would you like to play Global Thermonuclear War?
+
+    - debug:
+        msg: "WAN whitelist: {{ wan }}"
+
+    - debug:
+        msg: "LAN whitelist: {{ lan }}"
+
 
 #    - shell: git rev-list ...@{u} --count
 #      register: commits_behind_number
@@ -17,12 +30,6 @@
 
 #    - debug:
 #        msg: "Ansible-NAS is {{ commits_behind_number.stdout }} commits behind master. Here's what you're missing {{ commits_behind.stdout }}"
-
-    - debug:
-        msg: "WAN whitelist: {{ wan }}"
-
-    - debug:
-        msg: "LAN whitelist: {{ lan }}"
 
     - name: find roles directories
       ansible.builtin.find:
@@ -71,17 +78,17 @@
     - debug:
         msg: "{{ found_directories.files | map(attribute='path') | list }}"
 
-    - name: "loop through list roles dirs"
+    - name: loop through list roles dirs
       include_role:
         name: "{{ item }}"
       with_items: "{{ found_directories.files | map(attribute='path') | list }}"
 
-########## eventually move to it's own role?
+# WORKS - now where to put it? ansible-nas-docker-compose role??
+#      block:
     - debug:
         msg: "TESTING Discovery and Running of docker-compose files"
 
-# WORKS - now where to put it? ansible-nas-docker-compose role??
-    - name: Find docker-compose files in {{ docker_compose_directory }}
+    - name: Find docker-compose files in "{{ docker_compose_directory }}""
       ansible.builtin.find:
         paths: "{{ docker_compose_directory }}"
         file_type: file
@@ -89,21 +96,24 @@
         recurse: yes
       register: compose_files
 
-    - name: Deploy docker-compose files in {{ docker_compose_directory }}
+    - name: Deploy docker-compose files in "{{ docker_compose_directory }}"
       community.docker.docker_compose_v2:
         project_src: "{{ item.path | dirname }}"
         state: present
       loop: "{{ compose_files.files }}"
       loop_control:
         label: "Deploying {{ item.path | dirname }}"
-# when docker_compose_enabled
+#      when: docker_compose_enabled is true
 
 # make ansible-nas-pre role to run first; i.e. hello bill
 # make ansible-nas-post role to run last; i.e. cleanup
 
-    - name: Report local subnet
+# add to all roles?
+# I'd prefer to accumlate them and display at the end in ane-post
+    - name: Display message if FreshRSS is Internet accessable.
       debug:
-        msg: "The local subnet is {{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.prefix }}"
+        msg: "FreshRSS is Internet accessable."
+      when: freshrss_traefik_whitelist == wan
 
   when: test_enabled is true
   

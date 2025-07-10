@@ -8,9 +8,10 @@
         image: "{{ glances_image_name }}:{{ glances_image_version }}"
         pull: true
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-        device_requests:
-          - capabilities: [gpu]
-            count: -1
+### only wth NVIDIA runtime
+#        device_requests:
+#          - capabilities: [gpu]
+#            count: -1
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
           - "/etc/timezone:/etc/timezone:ro"

@@ -1,0 +1,86 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+#    - name: Create {{ ansible_nas_app_name }} Directories
+#      file:
+#        path: "{{ item }}"
+#        state: directory
+#      with_items:
+#        - "{{ yadnsb_data_directory }}"
+#        - "{{ yadnsb_data_directory }}/public/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      docker_container:
+        name: "{{ yadnsb_container_name }}"
+        hostname: "{{ yadnsb_container_name }}"
+        image: "{{ yadnsb_image_name }}:{{ yadnsb_image_tag }}"
+        pull: true
+        cpu_shares: "{{ yadnsb_cpu_shares }}"
+#        volumes:
+#          - "{{ yadnsb_data_directory }}:/"
+        ports:
+          - "{{ yadnsb_port }}:3000"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ yadnsb_memory }}"
+#        security_opt:
+#          no-new-privileges:true
+        healthcheck:
+          test: wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+          interval: 15s
+          timeout: 5s
+          retries: 3
+          start_period: 15s
+        labels:
+          autoheal: "{{ yadnsb_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ yadnsb_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ yadnsb_homepage_group }}"
+          homepage.icon: "{{ yadnsb_homepage_icon }}"
+          homepage.href: "{{ yadnsb_homepage_href }}"
+#         homepage.description: "DNS performance benchmarks "
+          homepage.server: "my-docker"
+          homepage.container: "{{ yadnsb_container_name }}"
+          homepage.showStats: "{{ yadnsb_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ yadnsb_port }}"
+          traefik.enable: "{{ yadnsb_available_externally | string }}"
+          traefik.http.routers.yadnsb.rule: "Host(`{{ yadnsb_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.yadnsb.tls.certresolver: "letsencrypt"
+          traefik.http.routers.yadnsb.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.yadnsb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ yadnsb_hostname }}"
+          traefik.http.routers.yadnsb.middlewares: "{{ yadnsb_hostname }}@docker"
+          traefik.http.middlewares.yadnsb.IPAllowList.sourcerange: "{{ yadnsb_traefik_whitelist }}"
+          traefik.http.services.yadnsb.loadbalancer.server.port: "3000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/altendorfme/yadnsb/releases/tag/$${major}.$${minor}.$${patch}"
+  when: yadnsb_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ yadnsb_container_name }}"
+        state: absent
+  when: yadnsb_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ yadnsb_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ yadnsb_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: yadnsb_enabled is false and archive_app_data_enabled is true

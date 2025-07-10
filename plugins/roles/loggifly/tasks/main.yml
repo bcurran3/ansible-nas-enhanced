@@ -1,0 +1,69 @@
+---
+# WIP
+# ENV VARS HERE:
+# https://clemcer.github.io/loggifly/guide/environment-variables.html
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ loggifly_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      docker_container:
+        name: "{{ loggifly_container_name }}"
+        hostname: "{{ loggifly_container_name }}"
+        image: "{{ loggifly_image_name }}:{{ loggifly_image_tag }}"
+        pull: true
+        cpu_shares: "{{ loggifly_cpu_shares }}"
+        volumes:
+          - "{{ loggifly_data_directory }}:/config"
+          - /var/run/docker.sock:/var/run/docker.sock
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ loggifly_memory }}"
+        labels:
+          autoheal: "{{ loggifly_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ loggifly_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ loggifly_homepage_group }}"
+          homepage.icon: "{{ loggifly_homepage_icon }}"
+#         homepage.description: "A Lightweight Tool that monitors Docker Container Logs for predefined keywords or regex patterns and sends Notifications."
+          homepage.server: "my-docker"
+          homepage.container: "{{ loggifly_container_name }}"
+          homepage.showStats: "{{ loggifly_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/clemcer/loggifly/releases/tag/$${major}.$${minor}.$${patch}"
+  when: loggifly_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ loggifly_container_name }}"
+        state: absent
+  when: loggifly_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ loggifly_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ loggifly_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: loggifly_enabled is false and archive_app_data_enabled is true

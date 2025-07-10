@@ -13,9 +13,10 @@
         - "{{ youtubedlmaterial_dl_video_directory }}"
         - "{{ youtubedlmaterial_dl_subscriptions_directory }}"
         - "{{ youtubedlmaterial_dl_channels_directory }}"
+        - "{{ youtubedlmaterial_dl_users_directory }}"
 
     - name: Create YoutubeDL-Material MongoDB Docker Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ youtubedlmaterial_db_container_name }}"
         hostname: "{{ youtubedlmaterial_db_container_name }}"
@@ -55,6 +56,7 @@
           - "{{ youtubedlmaterial_dl_video_directory }}:/app/video:rw"
           - "{{ youtubedlmaterial_dl_subscriptions_directory }}:/app/subscriptions:rw"
           - "{{ youtubedlmaterial_dl_channels_directory }}:/app/subscriptions/channels:rw"
+          - "{{ youtubedlmaterial_dl_users_directory }}:/app/users:rw"
           - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
         network_mode: "bridge"
         ports:
@@ -62,12 +64,15 @@
         env:
           ALLOW_CONFIG_MUTATIONS: "true"
           ytdl_mongodb_connection_string: "mongodb://{{ youtubedlmaterial_db_container_name }}:27017"
-          ytdl_use_local_db: "true"
+          ytdl_use_local_db: "false"
+          write_ytdl_config: "true"
           UID: "{{ youtubedlmaterial_uid }}"
           GID: "{{ youtubedlmaterial_gid }}"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ youtubedlmaterial_memory }}"
+        links:
+          - "{{ youtubedlmaterial_db_container_name }}"
         labels:
           autoheal: "{{ youtubedlmaterial_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ youtubedlmaterial_watchtower_monitor_only }}"
@@ -99,6 +104,7 @@
       community.docker.docker_container:
         name: "{{ youtubedlmaterial_container_name }}"
         state: absent
+
     - name: Stop YoutubeDL-Material DB Docker Container
       community.docker.docker_container:
         name: "{{ youtubedlmaterial_db_container_name }}"

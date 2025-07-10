@@ -1,0 +1,46 @@
+---
+ansible_nas_app_name: "DumbAssets"
+
+dumbassets_enabled: false
+dumbassets_available_externally: false
+dumbassets_traefik_whitelist: "{{ lan }}"
+
+# directories
+dumbassets_data_directory: "{{ docker_home }}/dumbassets"
+
+# app
+dumbassets_node_env: "production"
+dumbassets_debug: "true"
+dumbassets_site_title: "DumbAssets"
+dumbassets_base_url: "http://localhost:3000"
+dumbassets_pin: "1234"
+dumbassets_allowed_origins: "*"
+dumbassets_demo_mode: "false"
+dumbassets_apprise_url: ""
+dumbassets_currency_code: "USD"
+dumbassets_locale: "en-US"
+
+# docker
+dumbassets_container_name: "dumbassets"
+dumbassets_image_name: "dumbwareio/dumbassets"
+dumbassets_image_tag: "latest"
+dumbassets_cpu_shares: "1024"
+
+# network
+dumbassets_port: "3000"
+dumbassets_hostname: "dumbassets"
+
+# specs
+dumbassets_memory: 1g
+
+# autoheal
+dumbassets_autoheal: "false"
+
+# homepage
+dumbassets_homepage_group: "Apps"
+dumbassets_homepage_icon: "dumbassets.png"
+dumbassets_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dumbassets_port }}"
+dumbassets_homepage_showStats: "false"
+
+# watchtower
+dumbassets_watchtower_monitor_only: "true"

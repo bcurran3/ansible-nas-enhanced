@@ -1,0 +1,94 @@
+services:
+  backend:
+    image: ghcr.io/maxdorninger/mediamanager/backend:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - QBITTORRENT_PASSWORD=
+      - QBITTORRENT_HOST=
+      - QBITTORRENT_USERNAME=
+      - QBITTORRENT_PORT=
+
+      - CORS_URLS=["http://localhost:3000","https://mm.example.com"]
+
+      - DB_HOST=db
+      #- DB_NAME=
+      #- DB_PORT=
+      #- DB_PASSWORD=
+      #- DB_DBNAME=
+
+      #- PROWLARR_ENABLED=
+      #- PROWLARR_URL=http://prowlarr:9696
+      #- PROWLARR_API_KEY=
+
+      #- JACKETT_ENABLED=
+      #- JACKETT_URL=http://jackett:9117
+      #- JACKETT_API_KEY=
+
+      # example indexers, you can also just use ["all"] to use all indexers configured in Jackett
+      #- JACKETT_INDEXERS=["1337x","Rarbg"]
+
+      # generate a random string with "openssl rand -hex 32"
+      - AUTH_TOKEN_SECRET=
+
+      # this should be you email address
+      - AUTH_ADMIN_EMAIL=["admin1@example.com","admin2@example.com"]
+
+      # if you forget your password you can request a link and get it via email, you must have the email settings configured for this to work obviously
+      #- AUTH_EMAIL_PASSWORD_RESETS=TRUE
+
+      # this is the URL of your frontend, e.g. https://mediamanager.example.com
+      - FRONTEND_URL=
+
+      #- EMAIL_SMTP_HOST=
+      #- EMAIL_SMTP_PORT=
+      #- EMAIL_SMTP_USER=
+      #- EMAIL_SMTP_PASSWORD=
+      #- EMAIL_FROM_EMAIL=
+      #- EMAIL_USE_TLS=TRUE
+
+      #- NOTIFICATION_EMAIL=notify@example.com
+
+      #- NOTIFICATION_GOTIFY_API_KEY=
+      #- NOTIFICATION_GOTIFY_URL=https://gotify.example.com
+
+      #- NOTIFICATION_PUSHOVER_API_KEY=
+      #- NOTIFICATION_PUSHOVER_USER=
+
+      #- NOTIFICATION_NTFY_URL=https://ntfy.sh/your-topic
+
+      #- OPENID_ENABLED=FALSE
+      #- OPENID_CLIENT_ID=
+      #- OPENID_CLIENT_SECRET=
+      #- OPENID_CONFIGURATION_ENDPOINT=
+      #- OPENID_NAME=
+
+      #- AUTH_SESSION_LIFETIME=
+      #- API_BASE_PATH=/api/v1
+      #- DEVELOPMENT=
+
+    volumes:
+      - ./data/:/data/
+  frontend:
+    image: ghcr.io/maxdorninger/mediamanager/frontend:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - PUBLIC_API_URL=http://localhost:8000/api/v1
+  db:
+    image: postgres:latest
+    restart: unless-stopped
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+    healthcheck:
+       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+       interval: 10s
+       timeout: 5s
+       retries: 5
+    environment:
+      POSTGRES_USER: MediaManager
+      POSTGRES_DB: MediaManager
+      POSTGRES_PASSWORD: MediaManager
+    ports:
+      - "5432:5432"
+

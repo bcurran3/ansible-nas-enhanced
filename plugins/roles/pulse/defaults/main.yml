@@ -1,0 +1,38 @@
+---
+ansible_nas_app_name: "Pulse for Proxmox VE"
+
+pulse_enabled: false
+pulse_available_externally: false
+pulse_traefik_whitelist: "{{ lan }}"
+
+# directories
+pulse_data_directory: "{{ docker_home }}/pulse"
+
+# docker
+pulse_container_name: "pulse"
+pulse_image_name: "rcourtman/pulse"
+pulse_image_tag: "latest"
+pulse_cpu_shares: "1024"
+
+# uid / gid
+pulse_user_id: "0"
+pulse_group_id: "0"
+
+# network
+pulse_port: "7655"
+pulse_hostname: "pulse"
+
+# specs
+pulse_memory: 1g
+
+# autoheal
+pulse_autoheal: "false"
+
+# homepage
+pulse_homepage_group: "Apps"
+pulse_homepage_icon: "pulse.png"
+pulse_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pulse_port }}"
+pulse_homepage_showStats: "false"
+
+# watchtower
+pulse_watchtower_monitor_only: "true"

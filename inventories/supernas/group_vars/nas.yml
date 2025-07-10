@@ -12,7 +12,7 @@
 plugins_enabled: true
 cleanup_enabled: false
 archive_app_data_enabled: false      # new var
-docker_compose_enabled: true         # new var
+docker_compose_enabled: false         # new var
 docker_compose_directory: "/home/bill/ansible/supernas/docker-compose"  # new var
 nvidia_runtime_enabled: true         # new var
 test_enabled: true
@@ -71,6 +71,7 @@ glances_enabled: true
 glances_available_externally: true
 glances_traefik_whitelist: "{{ lan }}"
 glances_memory: "256m"
+#glances_image_version: "latest"
 glances_homepage_href: "https://{{ glances_hostname }}.{{ ansible_nas_domain }}"
 
 gotify_enabled: true
@@ -222,7 +223,7 @@ traefik_environment_variables:
   CF_DNS_API_TOKEN: Z3BUEN-ioNCFgimn_IXGgQBvl22wG6qdjjvXOQxG
   CF_ZONE_API_TOKEN: Dz8xwdY0OhSgDWhqx_3vqKmKJskCOIABqpy63TOW
 traefik_hostname: "traefik"
-traefik_image_version: "mimolette"
+#traefik_image_version: "mimolette"
 traefik_homepage_group: "Network"
 traefik_autoheal: "true"
 traefik_watchtower_monitor_only: "false"
@@ -259,6 +260,7 @@ youtubedlmaterial_user_id: "1000"
 youtubedlmaterial_group_id: "1001"
 youtubedlmaterial_dl_audio_directory: "{{ downloads_root }}/complete/YOUTUBEDL/audio"
 youtubedlmaterial_dl_video_directory: "{{ downloads_root }}/complete/YOUTUBEDL/video"
+youtubedlmaterial_dl_users_directory: "{{ downloads_root }}/complete/YOUTUBEDL/users"
 youtubedlmaterial_dl_subscriptions_directory: "{{ downloads_root }}/complete/YOUTUBEDL/subscriptions"
 youtubedlmaterial_dl_channels_directory: "{{ podcasts_root }}"
 #youtubedlmaterial_dl_podcasts_directory: "{{ podcasts_root }}"
@@ -1561,3 +1563,30 @@ arcane_homepage_group: "Docker Utils"
 arcane_homepage_href: "https://{{ arcane_hostname }}.{{ ansible_nas_domain }}"
 arcane_public_session_secret: "3262BhhNtgbTs6KSNTCu5FKN1GKh23SUHfrsr3kY5rs="
 arcane_watchtower_monitor_only: "false"
+
+### DumbAssets
+dumbassets_enabled: false
+dumbassets_available_externally: true
+dumbassets_traefik_whitelist: "{{ lan }}"
+dumbassets_pin: "8177"
+dumbassets_homepage_href: "https://{{ dumbassets_hostname }}.{{ ansible_nas_domain }}"
+dumbassets_watchtower_monitor_only: "false"
+
+### LoggiFly
+loggifly_enabled: false
+
+### Pulse for Proxmox VE
+pulse_enabled: true
+pulse_available_externally: true
+pulse_traefik_whitelist: "{{ lan }}"
+pulse_homepage_href: "https://{{ pulse_hostname }}.{{ ansible_nas_domain }}"
+pulse_watchtower_monitor_only: "false"
+
+### YaDNSb
+yadnsb_enabled: false
+yadnsb_available_externally: true
+yadnsb_traefik_whitelist: "{{ lan }}"
+yadnsb_homepage_group: "Network"
+yadnsb_homepage_href: "https://{{ yadnsb_hostname }}.{{ ansible_nas_domain }}"
+yadnsb_watchtower_monitor_only: "false"
+

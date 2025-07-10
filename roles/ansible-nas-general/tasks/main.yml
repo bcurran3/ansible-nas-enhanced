@@ -1,13 +1,18 @@
 ---
 - name: Start Ubuntu 22.04 LTS Specific Setup
   block:
-    - name: Enable Universe repository
-      raw: apt-add-repository universe
-      register: add_repo_result
-      changed_when: "'distribution component enabled for all sources' in add_repo_result.stdout"
-      until: add_repo_result.rc == 0
-      retries: 3
-      delay: 1
+#    - name: Enable Universe repository
+#      raw: apt-add-repository universe
+#      register: add_repo_result
+#      changed_when: "'distribution component enabled for all sources' in add_repo_result.stdout"
+#      until: add_repo_result.rc == 0
+#      retries: 3
+#      delay: 1
+    - name: Add the universe repository
+      apt_repository:
+        repo: 'deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe'
+        state: present
+        filename: 'ubuntu-universe'
   when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
 
 - name: Start Ubuntu 24.04 LTS Specific Setup
