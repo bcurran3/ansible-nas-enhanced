@@ -13,6 +13,7 @@
         name: "{{ cloudcmd_container_name }}"
         image: coderaiser/cloudcmd
         pull: true
+        cpu_shares: "{{ cloudcmd_cpu_shares }}"
         volumes:
           - "{{ cloudcmd_data_directory }}:/config:rw"
           - "{{ cloudcmd_browse_directory }}:/mnt/fs"

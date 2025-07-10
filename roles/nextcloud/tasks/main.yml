@@ -26,6 +26,7 @@
         hostname: "{{ nextcloud_redis_container_name }}"
         image: "{{ nextcloud_redis_image_name }}:{{ nextcloud_redis_image_version }}"
         pull: true
+        cpu_shares: "{{ nextcloud_redis_cpu_shares }}"
         networks:
           - name: "{{ nextcloud_network_name }}"
         network_mode: "{{ nextcloud_network_name }}"
@@ -59,6 +60,7 @@
           - name: "{{ nextcloud_network_name }}"
         network_mode: "{{ nextcloud_network_name }}"
         pull: true
+        cpu_shares: "{{ nextcloud_db_cpu_shares }}"
         volumes:
           - "{{ nextcloud_data_directory }}/mysql/mysql:/var/lib/mysql" # added
           - "{{ nextcloud_data_directory }}/mysql/my.cnf:/etc/my.cnf" # added
@@ -95,6 +97,7 @@
           - name: "{{ nextcloud_network_name }}"
         network_mode: "{{ nextcloud_network_name }}"
         pull: true
+        cpu_shares: "{{ nextcloud_cpu_shares }}"
         volumes:
           - "{{ nextcloud_data_directory }}/nextcloud:/var/www/html:rw"
           - "{{ nextcloud_data_directory }}/nextcloud/pre-installation:/docker-entrypoint-hooks.d/pre-installation" # added

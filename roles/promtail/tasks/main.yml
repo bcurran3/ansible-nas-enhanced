@@ -27,6 +27,7 @@
         name: "{{ promtail_container_name }}"
         image: "{{ promtail_image_name }}:{{ promtail_image_version }}"
         pull: true
+        cpu_shares: "{{ promtail_cpu_shares }}"
         command: "-config.file=/etc/promtail/config.yml"
         ports:
           - "{{ promtail_port }}:9080"

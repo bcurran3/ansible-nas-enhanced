@@ -17,6 +17,7 @@
         name: "{{ mumble_container_name }}"
         image: mumblevoip/mumble-server:latest
         pull: true
+        cpu_shares: "{{ mumble_cpu_shares }}"
         volumes:
           - "{{ mumble_data_directory }}:/data:rw"
         ports:

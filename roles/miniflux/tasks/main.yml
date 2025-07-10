@@ -17,6 +17,7 @@
         name: "{{ miniflux_db_container_name }}"
         image: "{{ miniflux_db_image_name }}:{{ miniflux_db_image_version }}"
         pull: true
+        cpu_shares: "{{ miniflux_db_cpu_shares }}"
         networks:
           - name: "{{ miniflux_network_name }}"
         network_mode: "{{ miniflux_network_name }}"
@@ -36,6 +37,7 @@
         name: "{{ miniflux_container_name }}"
         image: "{{ miniflux_image_name }}:{{ miniflux_image_version }}"
         pull: true
+        cpu_shares: "{{ miniflux_cpu_shares }}"
         networks:
           - name: "{{ miniflux_network_name }}"
         network_mode: "{{ miniflux_network_name }}"

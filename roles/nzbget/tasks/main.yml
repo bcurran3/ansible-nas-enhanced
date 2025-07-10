@@ -13,6 +13,7 @@
         name: "{{ nzbget_container_name }}"
         image: "{{ nzbget_image_name }}:{{ nzbget_image_version }}"
         pull: true
+        cpu_shares: "{{ nzbget_cpu_shares }}"
         volumes:
           - "{{ nzbget_download_directory }}:/downloads:rw"
           - "{{ nzbget_data_directory }}:/config:rw"

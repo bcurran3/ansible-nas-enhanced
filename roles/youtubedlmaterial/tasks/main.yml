@@ -28,6 +28,7 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ youtubedlmaterial_db_cpu_shares }}"
         memory: "{{ youtubedlmaterial_db_memory_limit }}"
         labels:
           autoheal: "{{ youtubedlmaterial_db_autoheal }}"
@@ -57,6 +58,9 @@
           - "{{ youtubedlmaterial_dl_subscriptions_directory }}:/app/subscriptions:rw"
           - "{{ youtubedlmaterial_dl_channels_directory }}:/app/subscriptions/channels:rw"
           - "{{ youtubedlmaterial_dl_users_directory }}:/app/users:rw"
+############ special for me
+          - "{{ podcasts_root }}:/app/users/admin/subscriptions/channels:rw"
+############ special for me
           - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
         network_mode: "bridge"
         ports:
@@ -70,6 +74,7 @@
           GID: "{{ youtubedlmaterial_gid }}"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ youtubedlmaterial_cpu_shares }}"
         memory: "{{ youtubedlmaterial_memory }}"
         links:
           - "{{ youtubedlmaterial_db_container_name }}"

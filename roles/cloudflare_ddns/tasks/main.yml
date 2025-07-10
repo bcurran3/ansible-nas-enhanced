@@ -23,6 +23,7 @@
         hostname: "{{ cloudflare_container_name }}"
         image: "{{ cloudflare_image_name }}:{{ cloudflare_image_version }}"
         pull: true
+        cpu_shares: "{{ cloudflare_cpu_shares }}"
         volumes:
           - "{{ cloudflare_data_directory }}/config.yml:/app/config.yaml"
           - "/etc/timezone:/etc/timezone:ro"

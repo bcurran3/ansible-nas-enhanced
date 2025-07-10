@@ -15,6 +15,7 @@
         hostname: "{{ heimdall_container_name }}"
         image: "{{ heimdall_docker_image }}:{{ heimdall_docker_image_tag }}"
         pull: true
+        cpu_shares: "{{ heimdall_cpu_shares }}"
         volumes:
           - "{{ heimdall_data_directory }}:/config:rw"
         env:

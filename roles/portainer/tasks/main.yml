@@ -19,6 +19,7 @@
         hostname: "{{ portainer_container_name }}"
         image: "{{ portainer_image_name }}:{{ portainer_image_version }}"
         pull: true
+        cpu_shares: "{{ portainer_cpu_shares }}"
         volumes:
           - "{{ portainer_data_directory }}:/data:rw"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"

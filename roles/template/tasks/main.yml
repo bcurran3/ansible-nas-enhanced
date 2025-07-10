@@ -20,7 +20,6 @@
         hostname: "{{ appname_container_name }}"
         image: "{{ appname_image_name }}:{{ appname_image_tag }}"
         pull: true
-        cpu_shares: "{{ appname_cpu_shares }}"
         volumes:
           - "{{ appname_data_directory }}:/"
         ports:
@@ -30,6 +29,7 @@
           PGID: "{{ appname_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ appname_cpu_shares }}"
         memory: "{{ appname_memory }}"
         labels:
           autoheal: "{{ appname_autoheal }}"

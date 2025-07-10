@@ -15,6 +15,7 @@
         hostname: "{{ overseerr_container_name }}"
         image: "{{ overseerr_image_name }}:{{ overseerr_image_version }}"
         pull: true
+        cpu_shares: "{{ overseerr_cpu_shares }}"
         volumes:
           - "{{ overseerr_data_directory }}/config:/config:rw" #changed for linuxserver.io container
         ports:

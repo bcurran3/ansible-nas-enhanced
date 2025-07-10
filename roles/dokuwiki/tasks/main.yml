@@ -13,6 +13,7 @@
         name: "{{ dokuwiki_container_name }}"
         image: linuxserver/dokuwiki:latest
         pull: true
+        cpu_shares: "{{ dokuwiki_cpu_shares }}"
         volumes:
           - "{{ dokuwiki_data_directory }}:/config/dokuwiki/data:rw"
         ports:

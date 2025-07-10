@@ -14,6 +14,7 @@
         hostname: "{{ jellyfin_container_name }}"
         image: "{{ jellyfin_image_name }}:{{ jellyfin_image_version }}"
         pull: true
+        cpu_shares: "{{ jellyfin_cpu_shares }}"
         volumes:
           - "{{ jellyfin_config_directory }}:/config:rw"
           - "{{ jellyfin_movies_directory }}:/movies:{{ jellyfin_movies_permissions }}"

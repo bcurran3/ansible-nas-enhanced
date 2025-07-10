@@ -14,6 +14,7 @@
         name: "{{ get_iplayer_container_name }}"
         image: "{{ get_iplayer_image_name }}:{{ get_iplayer_image_version }}"
         pull: true
+        cpu_shares: "{{ get_iplayer_cpu_shares }}"
         volumes:
           - "{{ get_iplayer_config_directory }}:/root/.get_iplayer:rw"
           - "{{ get_iplayer_download_directory }}:/root/output:rw"

@@ -23,6 +23,7 @@
         name: "{{ paperless_ng_redis_container_name }}"
         image: "{{ paperless_ng_redis_image_name }}:{{ paperless_ng_redis_image_version }}"
         pull: true
+        cpu_shares: "{{ paperless_ng_redis_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ paperless_ng_redis_memory }}"
         networks:
@@ -37,6 +38,7 @@
         name: "{{ paperless_ng_db_container_name }}"
         image: "{{ paperless_ng_db_image_name }}:{{ paperless_ng_db_image_version }}"
         pull: true
+        cpu_shares: "{{ paperless_ng_db_cpu_shares }}"
         volumes:
           - "{{ paperless_ng_postgres_directory }}:/var/lib/postgresql/data"
         env:
@@ -57,6 +59,7 @@
         name: "{{ paperless_ng_uiserver_container_name }}"
         image: "{{ paperless_ng_uiserver_image_name }}:{{ paperless_ng_uiserver_image_version }}"
         pull: true
+        cpu_shares: "{{ paperless_ng_uiserver_cpu_shares }}"
         volumes:
           - "{{ paperless_ng_data_directory }}:/usr/src/paperless/data"
           - "{{ paperless_ng_media_directory }}:/usr/src/paperless/media"

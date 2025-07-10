@@ -14,6 +14,7 @@
         name: "{{ airsonic_container_name }}"
         image: airsonic/airsonic:latest
         pull: true
+        cpu_shares: "{{ airsonic_cpu_shares }}"
         volumes:
           - "{{ airsonic_data_directory }}/data:/airsonic/data:rw"
           - "{{ airsonic_data_directory }}/playlists:/airsonic/playlists:rw"

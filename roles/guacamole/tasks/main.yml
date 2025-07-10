@@ -32,6 +32,7 @@
         name: "{{ guacamole_container_name }}"
         image: "{{ guacamole_image_name }}:{{ guacamole_image_version }}"
         pull: true
+        cpu_shares: "{{ guacamole_cpu_shares }}"
         volumes:
           - "{{ guacamole_data_directory }}/config:/config:rw"
         ports:

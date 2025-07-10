@@ -7,6 +7,7 @@
         hostname: "{{ glances_container_name }}"
         image: "{{ glances_image_name }}:{{ glances_image_version }}"
         pull: true
+        cpu_shares: "{{ glances_cpu_shares }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
 ### only wth NVIDIA runtime
 #        device_requests:

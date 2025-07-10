@@ -30,7 +30,8 @@
           PUID: "{{ pytivo_user_id }}"
           PGID: "{{ pytivo_group_id }}"
         restart_policy: unless-stopped
-        memory: 1g
+        cpu_shares: "{{ pytivo_cpu_shares }}"
+        memory: "{{ pytivo_memory }}"
         labels:
           autoheal: "{{ pytivo_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pytivo_watchtower_monitor_only }}"

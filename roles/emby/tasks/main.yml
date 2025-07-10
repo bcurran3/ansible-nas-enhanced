@@ -13,6 +13,7 @@
         name: "{{ emby_container_name }}"
         image: "{{ emby_image }}:{{ emby_image_tag }}"
         pull: true
+        cpu_shares: "{{ emby_cpu_shares }}"
         volumes:
           - "{{ emby_config_directory }}:/config:rw"
           - "{{ emby_movies_directory }}:/movies:{{ emby_movies_permissions }}"

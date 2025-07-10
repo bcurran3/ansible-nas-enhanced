@@ -18,6 +18,7 @@
         volumes:
           - "{{ silverbullet_data_directory }}:/space"
         restart_policy: unless-stopped
+        cpu_shares: "{{ silverbullet_cpu_shares }}"
         memory: "{{ silverbullet_memory }}"
         env:
           SB_USER: "{{ silverbullet_username }}:{{ silverbullet_password }}"

@@ -61,7 +61,7 @@
           NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility" # added
           GenerateBIFKeyframesOnly: "1"                       # added
           PLEX_DISABLE_SECURITY: "1"                          # added
-        cpu_shares: "10240"                                   # 10x CPU resources added
+        cpu_shares: "{{ plex_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ plex_memory }}"
         labels:

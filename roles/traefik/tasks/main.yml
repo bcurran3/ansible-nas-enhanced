@@ -32,6 +32,7 @@
           - "/var/run/docker.sock:/var/run/docker.sock:ro" # ignores this and uses UTC
         env: "{{ traefik_environment_variables }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ traefik_cpu_shares }}"
         memory: "{{ traefik_memory }}"
         recreate: "{{ template_config is changed }}"
         labels:

@@ -48,7 +48,8 @@
           HOST_RUN: "/hostfs/run"
           HOST_MOUNT_PREFIX: "/hostfs"
         restart_policy: unless-stopped
-        memory: 1g
+        cpu_shares: "{{ telegraf_cpu_shares }}"
+        memory: "{{ telegraph_memory}}"
         restart: "{{ telegraf_config is changed }}"
         labels:
           autoheal: "{{ stats_telegraf_autoheal }}"

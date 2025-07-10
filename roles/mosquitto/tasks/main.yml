@@ -22,6 +22,7 @@
         hostname: "{{ mosquitto_container_name }}"
         image: "{{ mosquitto_image_name }}:{{ mosquitto_image_version }}"
         pull: true
+        cpu_shares: "{{ mosquitto_cpu_shares }}"
         volumes:
           - "{{ mosquitto_data_directory }}/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw"
           - "{{ mosquitto_data_directory }}/data:/mosquitto/data:rw"

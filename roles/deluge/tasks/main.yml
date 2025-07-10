@@ -14,6 +14,7 @@
         name: deluge
         image: linuxserver/deluge
         pull: true
+        cpu_shares: "{{ deluge_cpu_shares }}"
         volumes:
           - "{{ deluge_config_directory }}:/config:rw"
           - "{{ deluge_download_directory }}:/downloads:rw"

@@ -25,9 +25,10 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ sonarr_user_id }}"
           PGID: "{{ sonarr_group_id }}"
-#          DOCKER_MODS: "linuxserver/mods:radarr-striptracks"     # added
-#          DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:sonarr"
+#         DOCKER_MODS: "linuxserver/mods:radarr-striptracks"     # added
+#         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:sonarr"
         restart_policy: unless-stopped
+        cpu_shares: "{{ sonarr_cpu_shares }}"
         memory: "{{ sonarr_memory }}"
         labels:
           autoheal: "{{ sonarr_autoheal }}"

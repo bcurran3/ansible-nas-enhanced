@@ -17,6 +17,7 @@
         hostname: "{{ freshrss_db_container_name }}"
         image: "{{ freshrss_db_image_name }}:{{ freshrss_db_image_version }}"
         pull: true
+        cpu_shares: "{{ freshrss_db_cpu_shares }}"
         volumes:
           - "{{ freshrss_data_directory }}/db:/var/lib/postgresql/data"
 #          - "/etc/timezone:/etc/timezone:ro" # only displays UTC
@@ -47,6 +48,7 @@
         hostname: "{{ freshrss_container_name }}"
         image: "{{ freshrss_image_name }}:{{ freshrss_image_version }}"
         pull: true
+        cpu_shares: "{{ freshrss_cpu_shares }}"
         links:
           - "{{ freshrss_db_container_name }}"
         volumes:

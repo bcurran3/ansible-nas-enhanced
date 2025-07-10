@@ -13,6 +13,7 @@
         image: "{{ netdata_image_name }}:{{ netdata_image_version }}"
         state: started
         pull: true
+        cpu_shares: "{{ netdata_cpu_shares }}"
         ports:
           - "{{ netdata_port }}:19999"
         volumes:

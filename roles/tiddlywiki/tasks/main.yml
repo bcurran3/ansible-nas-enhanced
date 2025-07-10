@@ -21,6 +21,7 @@
           DEBUG: "{{ tiddlywiki_debug_level | default(omit) }}"
         pull: true
         restart_policy: unless-stopped
+        cpu_shares: "{{ tiddlywiki_cpu_shares }}"
         memory: "{{ tiddlywiki_memory }}"
         labels:
           autoheal: "{{ tiddlywiki_autoheal }}"

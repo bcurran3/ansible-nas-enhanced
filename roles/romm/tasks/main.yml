@@ -22,6 +22,7 @@
           MYSQL_USER: "{{ romm_database_username }}"
           MYSQL_PASSWORD: "{{ romm_database_password }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ romm_db_cpu_shares }}"
         memory: "{{ romm_db_memory }}"
         labels:
           autoheal: "{{ romm_db_autoheal }}"
@@ -67,6 +68,7 @@
           ROMM_AUTH_USERNAME: "{{ romm_auth_username }}"
           ROMM_AUTH_PASSWORD: "{{ romm_auth_password }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ romm_cpu_shares }}"
         memory: "{{ romm_memory }}"
         links:
           - "{{ romm_db_container_name }}:db"

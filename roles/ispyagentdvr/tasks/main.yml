@@ -16,6 +16,7 @@
         name: "{{ ispyagentdvr_container_name }}"
         image: mekayelanik/ispyagentdvr:latest
         pull: true
+        cpu_shares: "{{ ispyagentdvr_cpu_shares }}"
         volumes:
           - "{{ ispyagentdvr_config_directory }}:/AgentDVR/Media/XML:rw"
           - "{{ ispyagentdvr_commands_directory }}:/AgentDVR/Commands:rw"

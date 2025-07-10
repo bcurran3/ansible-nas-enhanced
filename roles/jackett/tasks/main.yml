@@ -13,6 +13,8 @@
         name: "{{ jackett_container_name }}"
         hostname: "{{ jackett_container_name }}"
         image: "{{ jackett_image_name }}:{{ jackett_image_version }}"
+        pull: true
+        cpu_shares: "{{ jackett_cpu_shares }}"
         volumes:
           - "{{ jackett_data_directory }}:/config:rw"
           - "/etc/localtime:/etc/localtime:ro"

@@ -15,6 +15,7 @@
         name: "{{ firefly_mysql_container_name }}"
         image: mariadb:10.9
         pull: true
+        cpu_shares: "{{ firefly_db_cpu_shares }}"
         volumes:
           - "{{ firefly_data_directory }}/mariadb:/var/lib/mysql:rw"
         env:
@@ -37,11 +38,12 @@
         name: "{{ firefly_container_name }}"
         image: fireflyiii/core:latest
         pull: true
+        cpu_shares: "{{ firefly_cpu_shares }}"
         volumes:
           - "{{ firefly_data_directory }}/export:/var/www/firefly-iii/storage/export:rw"
           - "{{ firefly_data_directory }}/upload:/var/www/firefly-iii/storage/upload:rw"
         links:
-          - firefly-mysql:db
+          - "{{ firefly_mysql_container_name }}"
         ports:
           - "{{ firefly_port }}:8080"
         env:
@@ -50,7 +52,7 @@
           APP_ENV: "local"
           APP_KEY: "S0m3R@nd0mString0f32Ch@rsEx@ct1y"
           DB_CONNECTION: "mysql"
-          DB_HOST: "db"
+          DB_HOST: "{{ firefly_mysql_container_name }}"
           DB_DATABASE: "firefly"
           DB_USERNAME: "firefly"
           DB_PASSWORD: "firefly"

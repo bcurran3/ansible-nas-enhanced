@@ -34,6 +34,7 @@
         name: "{{ gitlab_container_name }}"
         image: "{{ gitlab_image_name }}:{{ gitlab_image_version }}"
         pull: true
+        cpu_shares: "{{ gitlab_cpu_shares }}"
         volumes:
           - "{{ gitlab_data_directory }}/config:/etc/gitlab:rw"
           - "{{ gitlab_data_directory }}/log:/var/log/gitlab:rw"

@@ -46,7 +46,8 @@
           GF_PLUGINS_ENABLE_ALPHA: "true"
           GF_UNIFIED_ALERTING_ENABLED: "true"
         restart_policy: unless-stopped
-        memory: 1g
+        cpu_shares: "{{ grafana_cpu_shares }}"
+        memory: "{{ grafana_memory}}"
         labels:
           autoheal: "{{ stats_grafana_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stats_grafana_watchtower_monitor_only }}"

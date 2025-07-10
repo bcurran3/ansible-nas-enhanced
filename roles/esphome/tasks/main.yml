@@ -13,6 +13,7 @@
         name: "{{ esphome_container_name }}"
         image: esphome/esphome:latest
         pull: true
+        cpu_shares: "{{ esphome_cpu_shares }}"
         volumes:
           - "{{ esphome_data_directory }}:/config:rw"
           - "/etc/localtime:/etc/localtime:ro"

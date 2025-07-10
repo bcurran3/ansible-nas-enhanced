@@ -23,6 +23,7 @@
         hostname: "{{ ddns_updater_container_name }}"
         image: qmcgaw/ddns-updater:latest
         pull: true
+        cpu_shares: "{{ ddns_updater_cpu_shares }}"
         ports:
           - "{{ ddns_updater_port }}:{{ ddns_updater_port }}" # changed
         volumes:

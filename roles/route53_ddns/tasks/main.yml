@@ -22,6 +22,7 @@
         volumes:
           - "{{ route53_data_directory }}/ddns-route53.yml:/etc/ddns-route53/ddns-route53.yml"
         restart_policy: unless-stopped
+        cpu_shares: "{{ route53_cpu_shares }}"
         memory: "{{ route53_memory }}"
         recreate: "{{ template_config is changed }}"
         labels:

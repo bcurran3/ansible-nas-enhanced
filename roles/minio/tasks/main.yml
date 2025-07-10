@@ -8,12 +8,12 @@
       with_items:
         - "{{ minio_data_directory }}/data"
 
-
     - name: Create minio Docker Container
       community.docker.docker_container:
         name: "{{ minio_container_name }}"
         image: "{{ minio_image_name }}:{{ minio_image_version }}"
         pull: true
+        cpu_shares: "{{ minio_cpu_shares }}"
         ports:
           - "{{ minio_api_port }}:9000"
           - "{{ minio_console_port }}:{{ minio_console_port }}"

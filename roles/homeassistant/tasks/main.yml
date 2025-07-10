@@ -14,6 +14,7 @@
         hostname: "{{ homeassistant_container_name }}"
         image: "{{ homeassistant_image_name }}:{{ homeassistant_image_version }}"
         pull: true
+        cpu_shares: "{{ homeassistant_cpu_shares }}"
         volumes:
           - "{{ homeassistant_data_directory }}/config:/config:rw"
         network_mode: host

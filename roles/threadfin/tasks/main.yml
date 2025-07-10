@@ -18,6 +18,7 @@
         volumes:
           - "{{ threadfin_data_directory }}:/home/threadfin/conf"
         restart_policy: unless-stopped
+        cpu_shares: "{{ threadfin_cpu_shares }}"
         memory: "{{ threadfin_memory }}"
         labels:
           autoheal: "{{ threadfin_autoheal }}"

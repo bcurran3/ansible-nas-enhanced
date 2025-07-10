@@ -23,6 +23,7 @@
         name: "{{ drone_ci_container_name }}"
         image: drone/drone:2
         pull: true
+        cpu_shares: "{{ drone_ci_cpu_shares }}"
         volumes:
           - "{{ drone_ci_data_directory }}:/var/lib/drone:rw"
         ports:
@@ -53,6 +54,7 @@
         name: "{{ drone_ci_runner_container_name }}"
         image: drone/drone-runner-docker:1
         pull: true
+        cpu_shares: "{{ drone_ci_runner_cpu_shares }}"
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:rw"
         ports:

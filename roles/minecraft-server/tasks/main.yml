@@ -13,6 +13,7 @@
         name: "{{ minecraft_server_container_name }}"
         image: "{{ minecraft_server_image_name }}:{{ minecraft_server_image_version }}"
         pull: true
+        cpu_shares: "{{ minecraft_server_cpu_shares }}"
         volumes:
           - "{{ minecraft_server_data_directory }}:/data:rw"
         ports:

@@ -25,6 +25,7 @@
         name: "{{ apcupsd_container_name }}"
         image: gregewing/apcupsd
         pull: true
+        cpu_shares: "{{ apcupsd_cpu_shares }}"
         privileged: true
         volumes:
           - "/var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket"

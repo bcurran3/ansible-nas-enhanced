@@ -24,6 +24,8 @@
           PUID: "{{ sabnzbd_user_id }}"
           PGID: "{{ sabnzbd_group_id }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ sabnzbd_cpu_shares }}"
+        memory: "{{ sabnzbd_memory }}"
         labels:
           autoheal: "{{ sabnzbd_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ sabnzbd_watchtower_monitor_only }}"

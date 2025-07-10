@@ -24,6 +24,7 @@
           TZ: "{{ ansible_nas_timezone }}"
 #         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:prowlarr"
         restart_policy: unless-stopped
+        cpu_shares: "{{ prowlarr_cpu_shares }}"
         memory: "{{ prowlarr_memory }}"
         labels:
           autoheal: "{{ prowlarr_autoheal }}"

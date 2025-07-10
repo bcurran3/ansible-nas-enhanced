@@ -16,6 +16,7 @@
         hostname: "{{ gitea_db_container_name }}"
         image: "{{ gitea_db_image_name }}:{{ gitea_db_image_version }}"
         pull: true
+        cpu_shares: "{{ gitea_db_cpu_shares }}"
         volumes:
           - "{{ gitea_data_directory }}/db:/var/lib/mysql:rw"
           - "/etc/timezone:/etc/timezone:ro"
@@ -49,6 +50,7 @@
         hostname: "{{ gitea_container_name }}"
         image: "{{ gitea_image_name }}:{{ gitea_image_version }}"
         pull: true
+        cpu_shares: "{{ gitea_cpu_shares }}"
         volumes:
           - "{{ gitea_data_directory }}/gitea:/data:rw"
           - "/etc/timezone:/etc/timezone:ro"

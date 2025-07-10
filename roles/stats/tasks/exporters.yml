@@ -11,6 +11,7 @@
         ports:
           - "{{ stats_prometheus_smartctl_port }}:9902"
         restart_policy: unless-stopped
+        cpu_shares: "{{ stats_prometheus_smartctl_cpu_shares }}"
         memory: "{{ stats_prometheus_smartctl_memory }}"
         labels:
           autoheal: "{{ stats_smartctl_autoheal }}"
@@ -42,6 +43,7 @@
         volumes:
           - "/dev:/dev:ro"
         restart_policy: unless-stopped
+        cpu_shares: "{{ stats_hddtemp_cpu_shares }}"
         memory: "{{ stats_hddtemp_memory }}"
         labels:
           autoheal: "{{ stats_hddtemp_autoheal }}"
@@ -67,6 +69,7 @@
         ports:
           "{{ stats_speedtest_exporter_port }}:9798"
         restart_policy: unless-stopped
+        cpu_shares: "{{ stats_speedtest_exporter_cpu_shares }}"
         memory: "{{ stats_speedtest_exporter_memory }}"
         labels:
           autoheal: "{{ stats_speedtest_autoheal }}"
@@ -91,10 +94,12 @@
       community.docker.docker_container:
         name: "{{ stats_smartctl_container_name }}"
         state: absent
+
     - name: Stop Hddtemp
       community.docker.docker_container:
         name: "{{ stats_hddtemp_container_name }}"
         state: absent
+
     - name: Stop Speedtest-Exporter
       community.docker.docker_container:
         name: "{{ stats_speedtest_container_name }}"

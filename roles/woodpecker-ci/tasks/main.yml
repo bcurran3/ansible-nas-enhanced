@@ -39,6 +39,7 @@
           WOODPECKER_GITEA_SECRET: "{{ woodpecker_ci_gitea_secret }}"
           WOODPECKER_LOG_LEVEL: "{{ woodpecker_ci_log_level }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ woodpecker_ci_cpu_shares }}"
         memory: "{{ woodpecker_ci_memory }}"
         labels:
           autoheal: "{{ woodpecker_ci_autoheal }}"
@@ -62,6 +63,7 @@
           WOODPECKER_AGENT_SECRET: "{{ woodpecker_ci_agent_secret }}"
           WOODPECKER_LOG_LEVEL: "{{ woodpecker_ci_log_level }}"
         restart_policy: unless-stopped
+        cpu_shares: "{{ woodpecker_ci_agent_cpu_shares }}"
         memory: "{{ woodpecker_ci_agent_memory }}"
         labels:
           autoheal: "{{ woodpecker_ci_agent_autoheal }}"
@@ -85,3 +87,5 @@
         name: "{{ woodpecker_ci_container_name }}"
         state: absent
   when: woodpecker_ci_enabled is false
+
+# needs stop woodpecker ci agent
