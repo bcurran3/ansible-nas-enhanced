@@ -11,7 +11,7 @@
         name: "{{ magnetico_container_name }}"
       register: result
 
-    - name: Check magnetico is running
+    - name: Check {{ ansible_nas_app_name }} w is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
@@ -22,7 +22,7 @@
         name: "{{ magnetico_container2_name }}"
       register: result
 
-    - name: Check magneticod is running
+    - name: Check {{ ansible_nas_app_name }} d is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

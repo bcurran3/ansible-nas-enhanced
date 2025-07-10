@@ -6,24 +6,24 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove Rocket.Chat
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ rocketchat_container_name }}"
         state: absent
       register: result
 
-    - name: Check Rocket.Chat is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
 
-    - name: Try and stop and remove Rocket.Chat DB
+    - name: Try and stop and remove {{ ansible_nas_app_name }} DB
       community.docker.docker_container:
         name: "{{ rocketchat_db_container_name }}"
         state: absent
       register: result
 
-    - name: Check Rocket.Chat DB is stopped
+    - name: Check {{ ansible_nas_app_name }} DB is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

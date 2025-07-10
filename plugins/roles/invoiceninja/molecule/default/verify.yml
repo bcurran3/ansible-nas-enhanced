@@ -11,7 +11,7 @@
         name: "{{ invoiceninja_container_name }}"
       register: result
 
-    - name: Check Invoice Ninja is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
@@ -22,7 +22,7 @@
         name: "{{ invoiceninja_backend_container_name }}"
       register: result
 
-    - name: Check Invoice Ninja backend is running
+    - name: Check {{ ansible_nas_app_name }} backend is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
@@ -33,7 +33,7 @@
         name: "{{ invoiceninja_db_container_name }}"
       register: result
 
-    - name: Check Invoice Ninja DB is running
+    - name: Check {{ ansible_nas_app_name }} DB is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

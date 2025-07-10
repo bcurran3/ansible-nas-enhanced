@@ -11,7 +11,7 @@
         name: "{{ nvidia_runtime_container_name }}"
       register: result
 
-    - name: Check nvidia_runtime is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

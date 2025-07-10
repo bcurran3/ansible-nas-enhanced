@@ -11,7 +11,7 @@
         name: "{{ fastmusicremover_container_name }}"
       register: result
 
-    - name: Check Fast Music Remover is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

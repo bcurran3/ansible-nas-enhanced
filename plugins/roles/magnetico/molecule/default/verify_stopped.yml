@@ -6,24 +6,24 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove magnetico
+    - name: Try and stop and remove {{ ansible_nas_app_name }} w
       community.docker.docker_container:
         name: "{{ magnetico_container_name }}"
         state: absent
       register: result
 
-    - name: Check magnetico is stopped
+    - name: Check {{ ansible_nas_app_name }} w is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
 
-    - name: Try and stop and remove magneticod
+    - name: Try and stop and remove {{ ansible_nas_app_name }} d
       community.docker.docker_container:
         name: "{{ magnetico_container2_name }}"
         state: absent
       register: result
 
-    - name: Check magneticod is stopped
+    - name: Check {{ ansible_nas_app_name }} d is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

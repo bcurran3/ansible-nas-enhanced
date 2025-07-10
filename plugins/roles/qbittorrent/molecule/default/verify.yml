@@ -11,7 +11,7 @@
         name: "{{ qbittorrent_container_name }}"
       register: result
 
-    - name: Check qBittorrent is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

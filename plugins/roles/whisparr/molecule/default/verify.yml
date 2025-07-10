@@ -11,7 +11,7 @@
         name: "{{ whisparr_container_name }}"
       register: result
 
-    - name: Check Whisparr is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

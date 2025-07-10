@@ -6,35 +6,35 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove Invoice Ninja
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ invoiceninja_container_name }}"
         state: absent
       register: result
 
-    - name: Check Invoice Ninja is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
 
-    - name: Try and stop and remove Invoice Ninja backend
+    - name: Try and stop and remove {{ ansible_nas_app_name }} backend
       community.docker.docker_container:
         name: "{{ invoiceninja_backend_container_name }}"
         state: absent
       register: result
 
-    - name: Check Invoice Ninja backend is stopped
+    - name: Check {{ ansible_nas_app_name }} backend is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
 
-    - name: Try and stop and remove Invoice Ninja DB
+    - name: Try and stop and remove {{ ansible_nas_app_name }} DB
       community.docker.docker_container:
         name: "{{ invoiceninja_db_container_name }}"
         state: absent
       register: result
 
-    - name: Check Invoice Ninja DB is stopped
+    - name: Check {{ ansible_nas_app_name }} DB is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

@@ -6,25 +6,25 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove Ollama
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ ollama_container_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove Ollama
+    - name: Try and stop and remove {{ ansible_nas_app_name }} OpenedAI
       community.docker.docker_container:
         name: "{{ ollama_openedai_container_name }}"
         state: absent
       register: result_openedai
 
-    - name: Try and stop and remove Ollama
+    - name: Try and stop and remove {{ ansible_nas_app_name }} OpenWebUI
       community.docker.docker_container:
         name: "{{ ollama_openwebui_container_name }}"
         state: absent
       register: result_openwebui
 
-    - name: Check Ollama is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

@@ -11,7 +11,7 @@
         name: "{{ rocketchat_container_name }}"
       register: result
 
-    - name: Check Rocket.Chat is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
@@ -22,7 +22,7 @@
         name: "{{ rocketchat_db_container_name }}"
       register: result
 
-    - name: Check Rocket.Chat DB is running
+    - name: Check {{ ansible_nas_app_name }} DB is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

@@ -6,19 +6,19 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove OsClass db
+    - name: Try and stop and remove {{ ansible_nas_app_name }} db
       community.docker.docker_container:
         name: "{{ osclass_container_db_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove OsClass
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ osclass_container_name }}"
         state: absent
       register: result
 
-    - name: Check OsClass is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

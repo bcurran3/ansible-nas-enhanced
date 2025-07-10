@@ -6,35 +6,35 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove Gramps Web
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ grampsweb_container_name }}"
         state: absent
       register: result
 
-    - name: Check Gramps Web is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
 
-    - name: Try and stop and remove Gramps Web Celery
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Celery
       community.docker.docker_container:
         name: "{{ grampsweb_celery_container_name }}"
         state: absent
       register: result
 
-    - name: Check Gramps Web Celery is stopped
+    - name: Check {{ ansible_nas_app_name }} Celery is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
 
-    - name: Try and stop and remove Gramps Web Redis
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Redis
       community.docker.docker_container:
         name: "{{ grampsweb_redis_container_name }}"
         state: absent
       register: result
 
-    - name: Check Gramps Web Redis is stopped
+    - name: Check {{ ansible_nas_app_name }} Redis is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
