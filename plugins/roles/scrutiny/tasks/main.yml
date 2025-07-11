@@ -24,15 +24,24 @@
         dest: "{{ scrutiny_data_directory }}/config/scrutiny.yaml"
       register: template_config
 
-############# to test
-#    - name: Set a fact containing a list of available drives
-#      ansible.builtin.set_fact:
-#        available_drives: "{{ ansible_devices.keys() | list }}"
-#      when: ansible_devices is defined # Ensure ansible_devices fact exists
+############# WIP to automate ssd/hdd/nvme device detection
 
-#    - name: Debug and show the list of available drives
-#      ansible.builtin.debug:
-#        var: available_drives
+    - name: Filter out boot drive and format for Scrutiny
+      set_fact:
+        scrutiny_devices_found: "{{ ansible_devices | dict2items | selectattr('value.partitions', 'defined') | rejectattr('key', 'equalto', 'sda') | map(attribute='key') | map('regex_replace', '^(.*)$', '/dev/\\1:/dev/\\1') | list }}"
+      # Explanation:
+      # - ansible_devices:  Accesses the gathered facts about devices.
+      # - dict2items: Converts the dictionary of devices into a list of dictionaries, making it easier to filter.
+      # - selectattr('value.partitions', 'defined'):  Filters for devices that have partitions (indicating actual disk devices).
+      # - rejectattr('key', 'equalto', 'sda'):  Excludes the boot drive (assuming '/dev/sda' is the boot drive). Adjust if your boot drive is named differently.
+      # - map(attribute='key'): Extracts the device name (e.g., 'sdb', 'sdc') from each dictionary in the list.
+      # - map('regex_replace', '^(.*)$', '/dev/\\1:/dev/\\1'): Formats each device name into the required '/dev/sdx:/dev/sdx' format using a regular expression.
+      # - list:  Ensures the final output is a list.
+
+    - name: Debug the scrutiny_devices_found variable
+      debug:
+        var: scrutiny_devices_found
+
 ###################
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -55,7 +64,7 @@
         devices: "{{ scrutiny_devices }}"
         capabilities:
           - SYS_RAWIO
-          - SYS_ADMIN
+          - SYS_ADMIN # NVMe support
         labels:
           autoheal: "{{ scrutiny_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ scrutiny_watchtower_monitor_only }}"

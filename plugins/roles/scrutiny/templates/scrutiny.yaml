@@ -65,24 +65,26 @@ log:
 # if your username is: "myname@example.com" and your password is "124@34$1"
 # your shoutrrr url will look like: "smtp://myname%40example%2Ecom:124%4034%241@ms.my.domain.com:587"
 
-#notify:
+notify:
   urls:
-#    - "discord://token@channel"
-#    - "telegram://token@telegram?channels=channel-1[,channel-2,...]"
-#    - "pushover://shoutrrr:apiToken@userKey/?priority=1&devices=device1[,device2, ...]"
-#    - "slack://[botname@]token-a/token-b/token-c"
-#    - "smtp://username:password@host:port/?fromAddress=fromAddress&toAddresses=recipient1[,recipient2,...]"
-#    - "teams://token-a/token-b/token-c"
-    - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}/{{ scrutiny_gotify_token }}/?title=Scrutiny+Report&priority=1"
-#    - "pushbullet://api-token[/device/#channel/email]"
-#    - "ifttt://key/?events=event1[,event2,...]&value1=value1&value2=value2&value3=value3"
-#    - "mattermost://[username@]mattermost-host/token[/channel]"
-#    - "ntfy://username:password@host:port/topic"
-#    - "hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz"
-#    - "zulip://bot-mail:bot-key@zulip-domain/?stream=name-or-id&topic=name"
-#    - "join://shoutrrr:api-key@join/?devices=device1[,device2, ...][&icon=icon][&title=title]"
-#    - "script:///file/path/on/disk"
-#    - "https://www.example.com/path"
+#   - "discord://token@channel"
+#   - "telegram://token@telegram?channels=channel-1[,channel-2,...]"
+#   - "pushover://shoutrrr:apiToken@userKey/?priority=1&devices=device1[,device2, ...]"
+#   - "slack://[botname@]token-a/token-b/token-c"
+#   - "smtp://username:password@host:port/?fromAddress=fromAddress&toAddresses=recipient1[,recipient2,...]"
+#   - "teams://token-a/token-b/token-c"
+#   - "gotify://gotify-host/token"
+    - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}/{{ scrutiny_gotify_token }}" # /?title=Scrutiny+Report&priority=1
+#   - "pushbullet://api-token[/device/#channel/email]"
+#   - "ifttt://key/?events=event1[,event2,...]&value1=value1&value2=value2&value3=value3"
+#   - "mattermost://[username@]mattermost-host/token[/channel]"
+#   - "ntfy://username:password@host:port/topic"
+    - "ntfy://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}/{{ scrutiny_ntfy_topic }}"
+#   - "hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz"
+#   - "zulip://bot-mail:bot-key@zulip-domain/?stream=name-or-id&topic=name"
+#   - "join://shoutrrr:api-key@join/?devices=device1[,device2, ...][&icon=icon][&title=title]"
+#   - "script:///file/path/on/disk"
+#   - "https://www.example.com/path"
 
 ########################################################################################################################
 # FEATURES COMING SOON
