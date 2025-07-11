@@ -11,10 +11,18 @@ localai_data_directory: "{{ docker_home }}/localai"
 localai_hostname: "localai"
 localai_port_http: "3006"
 
+# app
+# see the documentation at: https://localai.io/basics/build/index.html
+# See also https://github.com/go-skynet/LocalAI/issues/288
+localai_env_rebuild: "false"
+localai_env_cmake_args: ""
+
 # docker
-localai_container_name: "localai"
+# check images available for GPU at: 
+# https://hub.docker.com/r/localai/localai
+localai_container_name: "local-ai"
 localai_image_name: "localai/localai" # CPU and GPU combined image
-localai_image_tag: "latest"
+localai_image_tag: "latest-cpu" # CPU only image
 localai_cpu_shares: "1024"
 localai_memory: "1g"
 

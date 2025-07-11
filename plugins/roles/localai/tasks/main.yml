@@ -3,13 +3,13 @@
 
 - name: Start {{ ansible_nas_app_name }}
   block:
-    #- name: Create {{ ansible_nas_app_name }} Directories
-    #  file:
-    #    path: "{{ item }}"
-    #    state: directory
-    #  with_items:
-    #    - "{{ localai_data_directory }}"
-    #    - "{{ localai_data_directory }}/some path to models"
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ localai_data_directory }}"
+        - "{{ localai_data_directory }}/models"
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
@@ -18,18 +18,19 @@
         hostname: "{{ localai_container_name }}"
         image: "{{ localai_image_name }}:{{ localai_image_tag }}"
         pull: true
-        cpu_shares: "{{ localai_cpu_shares }}"
         ports:
           - "{{ localai_port_http }}:8080"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
-          - capabilities: [gpu]
+          - driver: nvidia
             count: -1
-#       volumes:
+            capabilities: [gpu]
+#        volumes:
+#          - "{{ localai_data_directory }}/models:/build/models:rw"
         network_mode: bridge
         env:
-          NVIDIA_VISIBLE_DEVICES: "all"
-          NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility"
+          CMAKE_ARGS: "{{ localai_env_cmake_args }}"
+          REBUILD: "{{ localai_env_rebuild }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ localai_autoheal }}"
@@ -52,8 +53,9 @@
           traefik.http.routers.localai.middlewares: "{{ localai_hostname }}@docker"
           traefik.http.middlewares.localai.IPAllowList.sourcerange: "{{ localai_traefik_whitelist }}"
           traefik.http.services.localai.loadbalancer.server.port: "8080"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/mudler/LocalAI/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mudler/LocalAI/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ localai_cpu_shares }}"
         memory: "{{ localai_memory }}"
         restart_policy: unless-stopped
   when: localai_enabled is true

@@ -26,8 +26,9 @@
 #       service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
-          - capabilities: [gpu]
+          - driver: nvidia
             count: -1
+            capabilities: [gpu]
         volumes:
           - "{{ immich_data_directory }}/cache:/cache"
         networks:

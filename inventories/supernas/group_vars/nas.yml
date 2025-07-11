@@ -71,7 +71,7 @@ glances_enabled: true
 glances_available_externally: true
 glances_traefik_whitelist: "{{ lan }}"
 glances_memory: "256m"
-#glances_image_version: "latest"
+glances_image_version: "latest-full"
 glances_homepage_href: "https://{{ glances_hostname }}.{{ ansible_nas_domain }}"
 
 gotify_enabled: true
@@ -1591,3 +1591,12 @@ yadnsb_homepage_group: "Network"
 yadnsb_homepage_href: "https://{{ yadnsb_hostname }}.{{ ansible_nas_domain }}"
 yadnsb_watchtower_monitor_only: "false"
 
+### LocalAI
+localai_enabled: true
+localai_available_externally: true
+localai_traefik_whitelist: "{{ lan }}"
+localai_homepage_href: "https://{{ localai_hostname }}.{{ ansible_nas_domain }}"
+localai_image_tag: "latest-gpu-nvidia-cuda-12"
+localai_watchtower_monitor_only: "false"
+localai_env_rebuild: "true"
+#localai_env_cmake_args: "-DGGML_F16C=OFF -DGGML_AVX512=OFF -DGGML_AVX2=OFF -DGGML_FMA=OFF"

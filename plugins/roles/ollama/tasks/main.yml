@@ -24,8 +24,9 @@
         cpu_shares: "{{ ollama_cpu_shares }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
-          - capabilities: [gpu]
+          - driver: nvidia
             count: -1
+            capabilities: [gpu]
         volumes:
           - "{{ ollama_data_directory }}/ollama:/root/.ollama"
           - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
@@ -60,6 +61,7 @@
         memory: "{{ ollama_memory }}"
         restart_policy: unless-stopped
 
+# check if this container needs nvidia runtime
     - name: Create {{ ansible_nas_app_name }} OpenedAI Speech Container
       docker_container:
         container_default_behavior: "compatibility"
@@ -131,8 +133,9 @@
           TZ: "{{ ansible_nas_timezone }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
-          - capabilities: [gpu]
+          - driver: nvidia
             count: -1
+            capabilities: [gpu]
         labels:
           autoheal: "{{ ollama_openwebui_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openwebui_watchtower_monitor_only }}"
@@ -177,6 +180,27 @@
         name: "{{ ollama_container_name }}"
         state: absent
   when: ollama_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ ollama_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ ollama_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: ollama_enabled is false and archive_app_data_enabled is true
+
 
 ##### WORK IN PROGRESS #####
 

@@ -92,6 +92,27 @@
         state: absent
   when: nextcloudaio_enabled is false
 
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ nextcloudaio_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ nextcloudaio_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: nextcloudaio_enabled is false and archive_app_data_enabled is true
+
+
 # REFS:
 #
 # https://github.com/nextcloud/all-in-one/blob/main/reverse-proxy.md
