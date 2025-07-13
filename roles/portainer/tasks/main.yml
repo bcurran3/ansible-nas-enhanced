@@ -6,12 +6,22 @@
         msg: "Use portainer_ip_allowlist instead of portainer_ip_whitelist! Read https://traefik.io/blog/announcing-traefik-proxy-v2-11/ for more information."
       when: portainer_ip_whitelist is defined
 
+    - name: Check for old config dir
+      stat: 
+        path: "{{ portainer_data_directory }}/config"
+      register: old_config
+
+    - name: Move config dir to data dir
+      command: mv "{{ portainer_data_directory }}/config" "{{ portainer_data_directory }}/data"
+      when: old_config.stat.exists
+
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ portainer_data_directory }}"
+        - "{{ portainer_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -21,7 +31,7 @@
         pull: true
         cpu_shares: "{{ portainer_cpu_shares }}"
         volumes:
-          - "{{ portainer_data_directory }}:/data:rw"
+          - "{{ portainer_data_directory }}/data:/data:rw"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
