@@ -7,7 +7,8 @@
         state: directory
         mode: 0777
       with_items:
-        - "{{ pytivo_config_directory }}"
+        - "{{ pytivo_data_directory }}"
+        - "{{ pytivo_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -16,7 +17,7 @@
         pull: true
         volumes:
           - "/etc/localtime:/etc/localtime:ro"
-          - "{{ pytivo_config_directory }}:/config:rw"
+          - "{{ pytivo_data_directory }}/config:/config:rw"
           - "{{ pytivo_movies_directory }}:/movies:ro"
           - "{{ pytivo_tv_directory }}:/tv:ro"
           - "{{ pytivo_photos_directory }}:/photos:ro"
