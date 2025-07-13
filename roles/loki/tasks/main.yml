@@ -29,7 +29,7 @@
         - "{{ minio_data_directory }}/data/loki-data"
         - "{{ minio_data_directory }}/data/loki-ruler"
 
-    - name: Copy {{ ansible_nas_app_name }} Template config
+    - name: Copy {{ ansible_nas_app_name }} config
       ansible.builtin.template:
         src: config.yml
         dest: "{{ loki_data_directory }}/config.yml"
@@ -79,3 +79,23 @@
         name: "{{ loki_container_name }}"
         state: absent
   when: loki_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ loki_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ loki_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: loki_enabled is false and archive_app_data_enabled is true

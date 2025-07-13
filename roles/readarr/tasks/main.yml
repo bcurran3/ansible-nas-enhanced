@@ -1,4 +1,7 @@
 ---
+  # NOTE: deprecated / retired
+  # https://github.com/linuxserver/docker-readarr
+  # https://github.com/Readarr/Readarr
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -84,8 +87,3 @@
         remove: true
       when: dir_stat.stat.exists
   when: readarr_enabled is false and archive_app_data_enabled is true
-
-
-  # NOTE: deprecated / retired
-  # https://github.com/linuxserver/docker-readarr
-  # https://github.com/Readarr/Readarr
