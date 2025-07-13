@@ -6,7 +6,8 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ utorrent_config_directory }}"
+        - "{{ utorrent_data_directory }}"
+        - "{{ utorrent_data_directory }}/config"
         - "{{ utorrent_download_directory }}"
         - "{{ utorrent_download_directory_active }}"
 
@@ -16,8 +17,8 @@
         image: "{{ utorrent_image_name }}:{{ utorrent_image_version }}"
         pull: true
         volumes:
+          - "{{ utorrent_data_directory }}/config:/utorrent/settings:rw"
           - "{{ utorrent_download_directory }}:/data:rw"
-          - "{{ utorrent_config_directory }}:/utorrent/settings:rw"
           - "{{ torrents_root }}:/utorrent/torrents:rw"
         ports:
           - "{{ utorrent_port_http }}:8080"
