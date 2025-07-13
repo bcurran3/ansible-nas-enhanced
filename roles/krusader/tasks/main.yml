@@ -6,7 +6,8 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ krusader_config_directory }}/krusader"
+        - "{{ krusader_data_directory }}"
+        - "{{ krusader_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -16,7 +17,7 @@
         cpu_shares: "{{ krusader_cpu_shares }}"
         privileged: true
         volumes:
-          - "{{ krusader_config_directory }}:/config:rw"
+          - "{{ krusader_data_directory }}/config:/config:rw"
           - "{{ krusader_browse_directory }}:/mnt/fs"
         ports:
           - "{{ krusader_port_http }}:6080"
