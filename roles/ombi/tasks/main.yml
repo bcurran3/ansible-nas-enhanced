@@ -3,8 +3,11 @@
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
-        path: "{{ ombi_config_directory }}"
+        path: "{{ item }}"
         state: directory
+      with_items:
+        - "{{ ombi_data_directory }}"
+        - "{{ ombi_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -13,7 +16,7 @@
         pull: true
         cpu_shares: "{{ ombi_cpu_shares }}"
         volumes:
-          - "{{ ombi_config_directory }}:/config:rw"
+          - "{{ ombi_data_directory }}/config:/config:rw"
         ports:
           - "{{ ombi_port }}:3579"
         env:
