@@ -6,8 +6,9 @@
         path: "{{ item }}"
         state: directory
       with_items:
+        - "{{ romm_data_directory }}"
         - "{{ romm_data_directory }}/resources"
-        - "{{ romm_db_data_directory }}"
+        - "{{ romm_data_directory }}/db"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -15,7 +16,7 @@
         image: "{{ romm_db_image_name }}:{{ romm_db_image_version }}"
         pull: true
         volumes:
-          - "{{ romm_db_data_directory }}/db:/var/lib/mysql"
+          - "{{ romm_data_directory }}/db:/var/lib/mysql"
         env:
           MYSQL_ROOT_PASSWORD: "{{ romm_database_root_password }}"
           MYSQL_DATABASE: "romm"
@@ -45,8 +46,8 @@
         image: "{{ romm_image_name }}:{{ romm_image_version }}"
         pull: true
         volumes:
-          - "{{ romm_roms_directory }}:/romm/library/roms:rw"
           - "{{ romm_data_directory }}/resources:/romm/resources:rw"
+          - "{{ romm_roms_directory }}:/romm/library/roms:rw"
         ports:
           - "{{ romm_port }}:8080"
         env:
