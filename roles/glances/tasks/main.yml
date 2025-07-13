@@ -14,8 +14,7 @@
             count: -1
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
-          - "/etc/timezone:/etc/timezone:ro"
-          - "/etc/os-release:/etc/os-release:ro"
+#         - "/etc/os-release:/etc/os-release:ro"
         pid_mode: host
         ports:
           - "{{ glances_port_one }}:61208"
@@ -41,6 +40,10 @@
           homepage.container: "{{ glances_container_name }}"
           homepage.showStats: "{{ glances_homepage_showStats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glances_port_one }}"
+#         homepage.widget.type: "glances"
+#         homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glances_port_one }}"
+#         homepage.widget.version: "4"
+#         homepage.widget.metric: "cpu"
           traefik.enable: "{{ glances_available_externally | string }}"
           traefik.http.routers.glances.rule: "Host(`{{ glances_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.glances.tls.certresolver: "letsencrypt"

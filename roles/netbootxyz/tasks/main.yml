@@ -6,8 +6,9 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ netbootxyz_config_directory }}"
-        - "{{ netbootxyz_assets_directory }}"
+        - "{{ netbootxyz_data_directory }}"
+        - "{{ netbootxyz_data_directory }}/assets"
+        - "{{ netbootxyz_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -16,8 +17,8 @@
         image: "{{ netbootxyz_image_name }}:{{ netbootxyz_image_version }}"
         pull: true
         volumes:
-          - "{{ netbootxyz_config_directory }}:/config:rw"
-          - "{{ netbootxyz_assets_directory }}:/assets:rw"
+          - "{{ netbootxyz_data_directory }}/assets:/assets:rw"
+          - "{{ netbootxyz_data_directory }}/config:/config:rw"
         ports:
           - "{{ netbootxyz_port_http }}:{{ netbootxyz_port_http }}" # changed
           - "{{ netbootxyz_port_http2 }}:{{ netbootxyz_port_http2 }}"
