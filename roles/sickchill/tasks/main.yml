@@ -7,7 +7,8 @@
         state: directory
         # mode: 0755
       with_items:
-        - "{{ sickchill_config_directory }}"
+        - "{{ sickchill_data_directory }}"
+        - "{{ sickchill_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -15,7 +16,7 @@
         image: "{{ sickchill_image_name }}:{{ sickchill_image_version }}"
         pull: true
         volumes:
-          - "{{ sickchill_config_directory }}:/config:rw"
+          - "{{ sickchill_data_directory }}/config:/config:rw"
           - "{{ sickchill_downloads_directory }}:/downloads:rw"
           - "{{ sickchill_tv_directory }}:/tv:rw"
         ports:
