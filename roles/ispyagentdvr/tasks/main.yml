@@ -7,8 +7,9 @@
         state: directory
         # mode: 0755
       with_items:
-        - "{{ ispyagentdvr_config_directory }}"
-        - "{{ ispyagentdvr_commands_directory }}"
+        - "{{ ispyagentdvr_data_directory }}"
+        - "{{ ispyagentdvr_data_directory }}/config"
+        - "{{ ispyagentdvr_data_directory }}/commands"
         - "{{ ispyagentdvr_recordings_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -18,8 +19,8 @@
         pull: true
         cpu_shares: "{{ ispyagentdvr_cpu_shares }}"
         volumes:
-          - "{{ ispyagentdvr_config_directory }}:/AgentDVR/Media/XML:rw"
-          - "{{ ispyagentdvr_commands_directory }}:/AgentDVR/Commands:rw"
+          - "{{ ispyagentdvr_data_directory }}/config:/AgentDVR/Media/XML:rw"
+          - "{{ ispyagentdvr_data_directory }}/commands:/AgentDVR/Commands:rw"
           - "{{ ispyagentdvr_recordings_directory }}:/AgentDVR/Media/WebServerRoot/Media:rw"
         ports:
           - "{{ ispyagentdvr_webui_port }}:8090"
