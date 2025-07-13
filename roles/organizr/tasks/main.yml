@@ -1,14 +1,14 @@
 ---
-- name: Start Organizr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Organizr Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ organizr_data_directory }}"
 
-    - name: Create Organizr container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ organizr_container_name }}"
         image: "{{ organizr_image_name }}:{{ organizr_image_version }}"
@@ -36,9 +36,9 @@
           traefik.http.services.organizr.loadbalancer.server.port: "80"
   when: organizr_enabled is true
 
-- name: Stop Organizr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Organizr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ organizr_container_name }}"
         state: absent

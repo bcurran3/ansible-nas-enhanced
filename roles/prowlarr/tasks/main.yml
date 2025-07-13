@@ -1,14 +1,14 @@
 ---
 - name: Start Prowlarr
   block:
-    - name: Create Prowlarr Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ prowlarr_data_directory }}"
 
-    - name: Create Prowlarr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ prowlarr_container_name }}"
         hostname: "{{ prowlarr_container_name }}"
@@ -54,9 +54,9 @@
           wud.link.template: "https://github.com/linuxserver/docker-prowlarr/releases/tag/$${major}.$${minor}.$${patch}"
   when: prowlarr_enabled is true
 
-- name: Stop Prowlarr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Prowlarr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ prowlarr_container_name }}"
         state: absent

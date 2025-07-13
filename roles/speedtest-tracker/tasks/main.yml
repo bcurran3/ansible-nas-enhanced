@@ -1,20 +1,20 @@
 ---
-- name: Start Speedtest-Tracker
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Speedtest-Tracker Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ speedtest_data_directory }}/config"
 
-    - name: Remove old Speedtest-Tracker Docker Container
+    - name: Remove old {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ speedtest_container_name }}"
         state: absent
       tags: molecule-idempotence-notest
 
-    - name: Speedtest-Tracker Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ speedtest_container_name }}"
         hostname: "{{ speedtest_container_name }}"
@@ -60,9 +60,9 @@
           wud.link.template: "https://github.com/henrywhitaker3/Speedtest-Tracker/releases/tag/$${major}.$${minor}.$${patch}"
   when: speedtest_tracker_enabled is true
 
-- name: Stop Speedtest-Tracker
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Speedtest-Tracker Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ speedtest_container_name }}"
         state: absent

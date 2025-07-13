@@ -1,7 +1,7 @@
 ---
-- name: Start Homepage
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Homepage Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ homepage_data_directory }}"
         - "{{ homepage_data_directory }}/images"
 
-    - name: Template config files
+    - name: Copy {{ ansible_nas_app_name }} template config files
       ansible.builtin.template:
         src: "{{ item }}"
         dest: "{{ homepage_data_directory }}/{{ item }}"
@@ -21,7 +21,7 @@
         - widgets.yaml
       register: homepage_config
 
-    - name: Create Homepage Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homepage_container_name }}"
         image: "{{ homepage_image_name }}:{{ homepage_image_tag }}"
@@ -55,9 +55,9 @@
           wud.link.template: "https://github.com/gethomepage/homepage/releases/tag/$${major}.$${minor}.$${patch}"
   when: homepage_enabled is true
 
-- name: Stop Homepage
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Homepage
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homepage_container_name }}"
         state: absent

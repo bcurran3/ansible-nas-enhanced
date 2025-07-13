@@ -18,7 +18,7 @@ version: 1
 
 web:
   listen:
-    port: "{{ scrutiny_port }}"
+    port: "8080"
     host: 0.0.0.0
 
     # if you're using a reverse proxy like apache/nginx, you can override this value to serve scrutiny on a subpath.
@@ -67,24 +67,22 @@ log:
 
 notify:
   urls:
-#   - "discord://token@channel"
-#   - "telegram://token@telegram?channels=channel-1[,channel-2,...]"
-#   - "pushover://shoutrrr:apiToken@userKey/?priority=1&devices=device1[,device2, ...]"
-#   - "slack://[botname@]token-a/token-b/token-c"
-#   - "smtp://username:password@host:port/?fromAddress=fromAddress&toAddresses=recipient1[,recipient2,...]"
-#   - "teams://token-a/token-b/token-c"
-#   - "gotify://gotify-host/token"
-    - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}/{{ scrutiny_gotify_token }}" # /?title=Scrutiny+Report&priority=1
-#   - "pushbullet://api-token[/device/#channel/email]"
-#   - "ifttt://key/?events=event1[,event2,...]&value1=value1&value2=value2&value3=value3"
-#   - "mattermost://[username@]mattermost-host/token[/channel]"
-#   - "ntfy://username:password@host:port/topic"
-    - "ntfy://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}/{{ scrutiny_ntfy_topic }}"
-#   - "hangouts://chat.googleapis.com/v1/spaces/FOO/messages?key=bar&token=baz"
-#   - "zulip://bot-mail:bot-key@zulip-domain/?stream=name-or-id&topic=name"
-#   - "join://shoutrrr:api-key@join/?devices=device1[,device2, ...][&icon=icon][&title=title]"
-#   - "script:///file/path/on/disk"
-#   - "https://www.example.com/path"
+    - "{{ scrutiny_notification_discord }}"
+    - "{{ scrutiny_notification_telegram }}"
+    - "{{ scrutiny_notification_pushover }}"
+    - "{{ scrutiny_notification_slack }}"
+    - "{{ scrutiny_notification_smtp }}"
+    - "{{ scrutiny_notification_teams }}"
+    - "{{ scrutiny_notification_gotify }}"
+    - "{{ scrutiny_notification_pushbullet }}"
+    - "{{ scrutiny_notification_ifttt }}"
+    - "{{ scrutiny_notification_mattermost }}"
+    - "{{ scrutiny_notification_ntfy }}"
+    - "{{ scrutiny_notification_hangouts }}"
+    - "{{ scrutiny_notification_zulip }}"
+    - "{{ scrutiny_notification_shoutrrr }}"
+    - "{{ scrutiny_notification_script }}"
+    - "{{ scrutiny_notification_https }}"
 
 ########################################################################################################################
 # FEATURES COMING SOON

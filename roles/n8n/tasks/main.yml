@@ -1,7 +1,7 @@
 ---
 - name: Start n8n
   block:
-    - name: Create n8n Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
       with_items:
         - "{{ n8n_data_directory }}"
 
-    - name: Create n8n Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ n8n_container_name }}"
         image: "{{ n8n_image_name }}:{{ n8n_image_version }}"
@@ -38,9 +38,9 @@
           traefik.http.services.n8n.loadbalancer.server.port: "5678"
   when: n8n_enabled is true
 
-- name: Stop n8n
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop n8n
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ n8n_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
 - name: Start Duplicacy
   block:
-    - name: Create Duplicacy Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ duplicacy_logs_directory }}"
         - "{{ duplicacy_cache_directory }}"
 
-    - name: Duplicacy Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ duplicacy_container_name }}"
         image: saspus/duplicacy-web:mini
@@ -42,9 +42,9 @@
           traefik.http.services.duplicacy.loadbalancer.server.port: "3875"
   when: duplicacy_enabled is true
 
-- name: Stop Duplicacy
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Duplicacy
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ duplicacy_container_name }}"
         state: absent

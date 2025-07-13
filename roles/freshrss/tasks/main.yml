@@ -1,7 +1,7 @@
 ---
-- name: Start FreshRSS
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create FreshRSS Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ freshrss_data_directory }}/data"
         - "{{ freshrss_data_directory }}/extensions"
 
-    - name: Create FreshRSS PostgreSQL Docker Container
+    - name: Create {{ ansible_nas_app_name }} PostgreSQL Container
       community.docker.docker_container:
         name: "{{ freshrss_db_container_name }}"
         hostname: "{{ freshrss_db_container_name }}"
@@ -20,7 +20,6 @@
         cpu_shares: "{{ freshrss_db_cpu_shares }}"
         volumes:
           - "{{ freshrss_data_directory }}/db:/var/lib/postgresql/data"
-#          - "/etc/timezone:/etc/timezone:ro" # only displays UTC
         container_default_behavior: no_defaults
         env:
           POSTGRES_USER: "freshrss"
@@ -42,7 +41,7 @@
           homepage.showStats: "{{ freshrss_db_homepage_showStats }}"
           traefik.enable: "false"
 
-    - name: Create FreshRSS Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ freshrss_container_name }}"
         hostname: "{{ freshrss_container_name }}"
@@ -78,29 +77,29 @@
           homepage.server: "my-docker"
           homepage.container: "{{ freshrss_container_name }}"
           homepage.showStats: "{{ freshrss_homepage_showStats }}"
-#         homepage.widget.type: "freshrss"
-#         homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
-#         homepage.widget.username: "{{ freshrss_homepage_widget_username }}"
-#         homepage.widget.password: "{{ freshrss_homepage_widget_password }}"
+          homepage.widget.type: "freshrss"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
+          homepage.widget.username: "{{ freshrss_homepage_widget_username }}"
+          homepage.widget.password: "{{ freshrss_homepage_widget_password }}"
           traefik.enable: "{{ freshrss_available_externally | string }}"
           traefik.http.routers.freshrss.rule: "Host(`{{ freshrss_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.freshrss.tls.certresolver: "letsencrypt"
           traefik.http.routers.freshrss.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.freshrss.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-#         traefik.http.routers.frontend.middlewares: "{{ freshrss_hostname }}"
-#         traefik.http.routers.freshrss.middlewares: "{{ freshrss_hostname }}@docker"
+          traefik.http.routers.frontend.middlewares: "{{ freshrss_hostname }}"
+          traefik.http.routers.freshrss.middlewares: "{{ freshrss_hostname }}@docker"
           traefik.http.middlewares.freshrss.IPAllowList.sourcerange: "{{ freshrss_traefik_whitelist }}"
           traefik.http.services.freshrss.loadbalancer.server.port: "80"
   when: freshrss_enabled is true
 
-- name: Stop FreshRSS
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop FreshRSS
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ freshrss_container_name }}"
         state: absent
 
-    - name: Stop FreshRSS PostgreSQL
+    - name: Stop {{ ansible_nas_app_name }} PostgreSQL Container
       community.docker.docker_container:
         name: "freshrss-db"
         state: absent

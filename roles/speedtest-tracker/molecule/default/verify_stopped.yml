@@ -6,13 +6,13 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove speedtest
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
-        name: "{{ speedtest_container_name }}"
+        name: "{{ speedtest_tracker_container_name }}"
         state: absent
       register: result
 
-    - name: Check if speedtest is stopped
+    - name: Check if {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

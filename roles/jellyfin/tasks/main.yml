@@ -1,14 +1,14 @@
 ---
-- name: Start Jellyfin
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Jellyfin Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ jellyfin_config_directory }}"
 
-    - name: Jellyfin Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ jellyfin_container_name }}"
         hostname: "{{ jellyfin_container_name }}"
@@ -61,9 +61,9 @@
           wud.link.template: "https://github.com/jellyfin/jellyfin/releases/tags/$${major}.$${minor}.$${patch}"
   when: jellyfin_enabled is true
 
-- name: Stop Jellyfin
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Jellyfin Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ jellyfin_container_name }}"
         state: absent

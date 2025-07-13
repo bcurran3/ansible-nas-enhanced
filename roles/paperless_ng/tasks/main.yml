@@ -1,9 +1,9 @@
 ---
 # TDL: This was discontinued in 2023 and moved to paperless-ngx
 # convert to https://github.com/paperless-ngx/paperless-ngx
-- name: Start paperless_ng
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create paperless_ng directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -16,11 +16,11 @@
         - "{{ paperless_ng_media_directory }}"
         - "{{ paperless_ng_consume_directory }}"
 
-    - name: Create paperless_ng network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ paperless_ng_network_name }}"
 
-    - name: Create paperless_ng redis broker
+    - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
         name: "{{ paperless_ng_redis_container_name }}"
         image: "{{ paperless_ng_redis_image_name }}:{{ paperless_ng_redis_image_version }}"
@@ -35,7 +35,7 @@
           autoheal: "{{ paperless_ng_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ng_redis_watchtower_monitor_only }}"
 
-    - name: Create paperless_ng postgres Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ paperless_ng_db_container_name }}"
         image: "{{ paperless_ng_db_image_name }}:{{ paperless_ng_db_image_version }}"
@@ -56,7 +56,7 @@
           autoheal: "{{ paperless_ng_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ng_db_watchtower_monitor_only }}"
 
-    - name: Create paperless_ng UI Docker Container
+    - name: Create {{ ansible_nas_app_name }} UI Container
       community.docker.docker_container:
         name: "{{ paperless_ng_uiserver_container_name }}"
         image: "{{ paperless_ng_uiserver_image_name }}:{{ paperless_ng_uiserver_image_version }}"
@@ -91,19 +91,19 @@
           traefik.http.services.paperless_ng.loadbalancer.server.port: "8080"
   when: paperless_ng_enabled is true
 
-- name: Stop paperless_ng
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop paperless_ng
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ paperless_ng_uiserver_container_name }}"
         state: absent
 
-    - name: Stop paperless_ng redis
+    - name: Stop {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
         name: "{{ paperless_ng_redis_container_name }}"
         state: absent
 
-    - name: Stop paperless_ng db
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ paperless_ng_db_container_name }}"
         state: absent

@@ -1,14 +1,14 @@
 ---
-- name: Start Mealie
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Mealie Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ mealie_data_directory }}/data"
 
-    - name: Mealie Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mealie_container_name }}"
         image: "{{ mealie_image_name }}:{{ mealie_image_version }}"
@@ -42,9 +42,9 @@
           traefik.http.services.mealie.loadbalancer.server.port: "9000"
   when: mealie_enabled is true
 
-- name: Stop Mealie
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Mealie
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mealie_container_name }}"
         state: absent

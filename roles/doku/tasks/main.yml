@@ -1,7 +1,7 @@
 ---
-- name: Start Doku
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Doku Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
         name: "{{ doku_container_name }}"
         hostname: "{{ doku_container_name }}"
@@ -43,9 +43,9 @@
           wud.link.template: "https://github.com/amerkurev/doku/releases/tag/$${major}.$${minor}.$${patch}"
   when: doku_enabled is true
 
-- name: Stop Doku
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Doku Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ doku_container_name }}"
         state: absent

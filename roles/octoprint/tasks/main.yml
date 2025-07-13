@@ -1,14 +1,14 @@
 ---
-- name: Start Octoprint
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Octoprint Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ octoprint_data_directory }}"
 
-    - name: Octoprint Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ octoprint_container_name }}"
         image: "{{ octoprint_image_name }}:{{ octoprint_image_version }}"
@@ -38,9 +38,9 @@
           traefik.http.services.octoprint.loadbalancer.server.port: "80"
   when: octoprint_enabled is true
 
-- name: Stop Octoprint
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Octoprint
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ octoprint_container_name }}"
         state: absent

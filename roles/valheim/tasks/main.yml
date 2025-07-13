@@ -1,7 +1,7 @@
 ---
-- name: Start Valheim
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Valheim Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ valheim_data_directory }}/server"
         - "{{ valheim_data_directory }}/backups"
 
-    - name: Valheim Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ valheim_container_name }}"
         image: "{{ valheim_image_name }}:{{ valheim_image_version }}"
@@ -42,9 +42,9 @@
           traefik.http.services.valheim.loadbalancer.server.port: "2456"
   when: valheim_enabled is true
 
-- name: Stop Valheim
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Valheim
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ valheim_container_name }}"
         state: absent

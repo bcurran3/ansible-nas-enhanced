@@ -1,7 +1,7 @@
 ---
-- name: Start Airsonic
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Airsonic Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ airsonic_data_directory }}/data"
         - "{{ airsonic_data_directory }}/playlists"
 
-    - name: Airsonic Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ airsonic_container_name }}"
         image: airsonic/airsonic:latest
@@ -35,9 +35,9 @@
           traefik.http.services.airsonic.loadbalancer.server.port: "4040"
   when: airsonic_enabled is true
 
-- name: Stop Airsonic
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Airsonic
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ airsonic_container_name }}"
         state: absent

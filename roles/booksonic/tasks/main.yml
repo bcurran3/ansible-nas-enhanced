@@ -1,5 +1,5 @@
 ---
-- name: Start Booksonic
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create Booksonic Directories
       ansible.builtin.file:
@@ -10,7 +10,7 @@
         - "{{ booksonic_data_directory }}/data"
         - "{{ booksonic_data_directory }}/playlists"
 
-    - name: Booksonic Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ booksonic_container_name }}"
         image: linuxserver/booksonic-air:latest
@@ -40,9 +40,9 @@
           traefik.http.services.booksonic.loadbalancer.server.port: "4040"
   when: booksonic_enabled is true
 
-- name: Stop Booksonic
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Booksonic
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ booksonic_container_name }}"
         state: absent

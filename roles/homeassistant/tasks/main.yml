@@ -1,14 +1,14 @@
 ---
-- name: Start Homeassistant
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Home Assistant Create Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ homeassistant_data_directory }}/config"
 
-    - name: Home Assistant Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homeassistant_container_name }}"
         hostname: "{{ homeassistant_container_name }}"
@@ -33,8 +33,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ homeassistant_container_name }}"
           homepage.showStats: "false"
-#         homepage.widget.type: "home-assistant"
-#         homepage.widget.url: "https://{{ homeassistant_hostname }}.{{ ansible_nas_domain }}"
+          homepage.widget.type: "homeassistant"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
+          homepage.widget.key: "{{ homeassistant_widget_key }}"
           traefik.enable: "{{ homeassistant_available_externally | string }}"
           traefik.http.routers.homeassistant.rule: "Host(`{{ homeassistant_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.homeassistant.tls.certresolver: "letsencrypt"
@@ -49,9 +50,9 @@
         memory: "{{ homeassistant_memory }}"
   when: homeassistant_enabled is true
 
-- name: Stop Home Assistant
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Home Assistant Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homeassistant_container_name }}"
         state: absent

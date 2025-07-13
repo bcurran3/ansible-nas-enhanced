@@ -1,7 +1,7 @@
 ---
-- name: Start Healthchecks
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Add healthchecks.io cronjob
+    - name: Add {{ ansible_nas_app_name }} cronjob
       ansible.builtin.cron:
         name: healthchecks.io
         minute: "*/{{ healthchecks_ping_minutes }}"
@@ -9,9 +9,9 @@
         job: "curl -m 10 --retry 5 {{ healthchecks_url }}"
   when: healthchecks_enabled is true
 
-#- name: Stop Healthchecks
+#- name: Stop {{ ansible_nas_app_name }}
 #  block:
-#    - name: Remove healthchecks.io cronjob
+#    - name: Remove {{ ansible_nas_app_name }} cronjob
 #      ansible.builtin.cron:
 #        name: healthchecks.io
 #        user: root

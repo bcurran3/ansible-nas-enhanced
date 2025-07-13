@@ -22,9 +22,8 @@
           - "{{ localai_port_http }}:8080"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
-          - driver: nvidia
+          - capabilities: [gpu]
             count: -1
-            capabilities: [gpu]
 #        volumes:
 #          - "{{ localai_data_directory }}/models:/build/models:rw"
         network_mode: bridge

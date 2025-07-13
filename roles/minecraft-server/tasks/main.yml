@@ -1,5 +1,5 @@
 ---
-- name: Start Minecraft Server
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create Minecraft Server Directories
       ansible.builtin.file:
@@ -8,7 +8,7 @@
       with_items:
         - "{{ minecraft_server_data_directory }}"
 
-    - name: Minecraft Server Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minecraft_server_container_name }}"
         image: "{{ minecraft_server_image_name }}:{{ minecraft_server_image_version }}"
@@ -26,9 +26,9 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ minecraft_server_watchtower_monitor_only }}"
   when: minecraft_server_enabled is true
 
-- name: Stop Minecraft Server
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Minecraft Server
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minecraft_server_container_name }}"
         state: absent

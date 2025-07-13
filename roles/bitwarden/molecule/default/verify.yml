@@ -16,7 +16,7 @@
         name: "{{ bitwarden_backup_container_name }}"
       register: result_backup
 
-    - name: Check Bitwarden is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

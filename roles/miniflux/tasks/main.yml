@@ -1,18 +1,18 @@
 ---
-- name: Start Miniflux
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Miniflux Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ miniflux_data_directory }}/postgres"
 
-    - name: Create Miniflux network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ miniflux_network_name }}"
 
-    - name: Create Postgres for Miniflux
+    - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ miniflux_db_container_name }}"
         image: "{{ miniflux_db_image_name }}:{{ miniflux_db_image_version }}"
@@ -32,7 +32,7 @@
           autoheal: "{{ miniflux_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ miniflux_db_watchtower_monitor_only }}"
 
-    - name: Create Miniflux Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ miniflux_container_name }}"
         image: "{{ miniflux_image_name }}:{{ miniflux_image_version }}"
@@ -62,10 +62,15 @@
           traefik.http.services.miniflux.loadbalancer.server.port: "8080"
   when: miniflux_enabled is true
 
-- name: Stop Miniflux
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Miniflux
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ miniflux_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ miniflux_db_container_name }}"
         state: absent
   when: miniflux_enabled is false

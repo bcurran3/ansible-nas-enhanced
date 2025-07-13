@@ -1,7 +1,7 @@
 ---
-- name: Start get_iplayer
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create get_iplayer Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ get_iplayer_config_directory }}"
         - "{{ get_iplayer_download_directory }}"
 
-    - name: Create get_iplayer Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ get_iplayer_container_name }}"
         image: "{{ get_iplayer_image_name }}:{{ get_iplayer_image_version }}"
@@ -27,9 +27,9 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ get_iplayer_watchtower_monitor_only }}"
   when: get_iplayer_enabled is true
 
-- name: Stop get_iplayer
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop get_iplayer
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ get_iplayer_container_name }}"
         state: absent

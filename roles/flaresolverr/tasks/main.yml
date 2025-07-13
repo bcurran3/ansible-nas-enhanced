@@ -1,14 +1,14 @@
 ---
-- name: Start FlareSolverr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create FlareSolverr Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ flaresolverr_config_directory }}"
 
-    - name: FlareSolverr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ flaresolverr_container_name }}"
         hostname: "{{ flaresolverr_container_name }}"
@@ -50,9 +50,9 @@
           wud.link.template: "https://github.com/FlareSolverr/FlareSolverr/releases/tag/$${major}.$${minor}.$${patch}"
   when: flaresolverr_enabled is true
 
-- name: Stop FlareSolverr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop FlareSolverr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ flaresolverr_container_name }}"
         state: absent

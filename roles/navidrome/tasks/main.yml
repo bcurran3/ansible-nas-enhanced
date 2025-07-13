@@ -1,7 +1,7 @@
 ---
-- name: Start Navidrome
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Navidrome Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ navidrome_data_directory }}/data"
         - "{{ navidrome_data_directory }}/playlists"
 
-    - name: Navidrome Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ navidrome_container_name }}"
         image: "{{ navidrome_image_name }}:{{ navidrome_image_version }}"
@@ -40,9 +40,9 @@
           traefik.http.services.navidrome.loadbalancer.server.port: "4533"
   when: navidrome_enabled is true
 
-- name: Stop Navidrome
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Navidrome
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ navidrome_container_name }}"
         state: absent

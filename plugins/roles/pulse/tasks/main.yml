@@ -1,5 +1,6 @@
 ---
 # https://github.com/rcourtman/Pulse
+# https://github.com/rcourtman/Pulse/blob/main/docs/CONFIGURATION.md
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -26,6 +27,15 @@
         ports:
           - "{{ pulse_port }}:7655"
         env:
+          PROXMOX_TOKEN_ID: "{{ pulse_env_proxmox_token_id }}"
+          PROXMOX_TOKEN_SECRET: "{{ pulse_env_proxmox_token_secret }}"
+          ########## secret
+          PBS_HOST: "http://192.168.69.218:8007"
+          PBS_TOKEN_ID: "pulse@pbs!monitoring"
+          PBS_TOKEN_SECRET: "db8ec4a3-0234-4383-a91e-3f6308a41dd8"
+          PBS_ALLOW_SELF_SIGNED_CERTS: "true"
+          PBS_PORT: "8007"
+          ############## secret
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ pulse_memory }}"

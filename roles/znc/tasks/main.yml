@@ -1,7 +1,7 @@
 ---
-- name: Start ZNC
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create ZNC Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,13 +10,13 @@
         - "{{ znc_data_directory }}"
         - "{{ znc_data_directory }}/configs"
 
-    - name: Template Znc config
+    - name: Copy {{ ansible_nas_app_name }} config
       ansible.builtin.template:
         src: znc.conf.j2
         dest: "{{ znc_data_directory }}/configs/znc.conf"
       register: template_config
 
-    - name: Create ZNC Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ znc_container_name }}"
         image: "{{ znc_image_name }}:{{ znc_image_version }}"
@@ -43,9 +43,9 @@
           traefik.http.services.znc.loadbalancer.server.port: "6677"
   when: znc_enabled is true
 
-- name: Stop ZNC
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop ZNC
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ znc_container_name }}"
         state: absent

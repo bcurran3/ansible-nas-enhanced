@@ -1,7 +1,7 @@
 ---
-- name: Start Firefly
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Firefly III Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ firefly_data_directory }}/upload"
         - "{{ firefly_data_directory }}/export"
 
-    - name: Create MySQL container for Firefly
+    - name: Create {{ ansible_nas_app_name }} MySQL Container
       community.docker.docker_container:
         name: "{{ firefly_mysql_container_name }}"
         image: mariadb:10.9
@@ -33,7 +33,7 @@
       ansible.builtin.pause:
         seconds: 30
 
-    - name: Create Firefly III container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ firefly_container_name }}"
         image: fireflyiii/core:latest
@@ -70,14 +70,14 @@
           traefik.http.services.firefly.loadbalancer.server.port: "8080"
   when: firefly_enabled is true
 
-- name: Stop Firefly
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Firefly
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ firefly_container_name }}"
         state: absent
 
-    - name: Stop Firefly MySQL
+    - name: Stop {{ ansible_nas_app_name }} MySQL Container
       community.docker.docker_container:
         name: "{{ firefly_mysql_container_name }}"
         state: absent

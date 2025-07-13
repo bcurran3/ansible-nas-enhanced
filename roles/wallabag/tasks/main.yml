@@ -1,7 +1,7 @@
 ---
-- name: Start wallabag
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create wallabag Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ wallabag_data_directory }}/data/db"
         - "{{ wallabag_data_directory }}/images"
 
-    - name: wallabag Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ wallabag_container_name }}"
         hostname: "{{ wallabag_container_name }}"
@@ -54,9 +54,9 @@
           wud.link.template: "https://github.com/wallabag/wallabag/releases/tag/$${major}.$${minor}.$${patch}"
   when: wallabag_enabled is true
 
-- name: Stop wallabag
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop wallabag Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ wallabag_container_name }}"
         state: absent

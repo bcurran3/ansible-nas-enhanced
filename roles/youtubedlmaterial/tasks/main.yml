@@ -1,10 +1,12 @@
 ---
-- name: Start YoutubeDL-Material
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create YoutubeDL-Material Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+#        owner: "{{ youtubedlmaterial_uid }}"
+#        group: "{{ youtubedlmaterial_gid }}"
         # mode: 0755
       with_items:
         - "{{ youtubedlmaterial_data_directory }}/appdata"
@@ -15,7 +17,7 @@
         - "{{ youtubedlmaterial_dl_channels_directory }}"
         - "{{ youtubedlmaterial_dl_users_directory }}"
 
-    - name: Create YoutubeDL-Material MongoDB Docker Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ youtubedlmaterial_db_container_name }}"
@@ -45,7 +47,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
 
-    - name: Create YoutubeDL-Material Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ youtubedlmaterial_container_name }}"
         hostname: "{{ youtubedlmaterial_container_name }}"
@@ -59,19 +61,19 @@
           - "{{ youtubedlmaterial_dl_channels_directory }}:/app/subscriptions/channels:rw"
           - "{{ youtubedlmaterial_dl_users_directory }}:/app/users:rw"
 ############ special for me
-          - "{{ podcasts_root }}:/app/users/admin/subscriptions/channels:rw"
+#          - "{{ podcasts_root }}:/app/users/admin/subscriptions/channels:rw"
 ############ special for me
-          - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
         network_mode: "bridge"
         ports:
           - "{{ youtubedlmaterial_port_http }}:17442"
         env:
+          USER: "root"
           ALLOW_CONFIG_MUTATIONS: "true"
           ytdl_mongodb_connection_string: "mongodb://{{ youtubedlmaterial_db_container_name }}:27017"
           ytdl_use_local_db: "false"
           write_ytdl_config: "true"
-          UID: "{{ youtubedlmaterial_uid }}"
-          GID: "{{ youtubedlmaterial_gid }}"
+#         UID: "{{ youtubedlmaterial_uid }}"
+#         GID: "{{ youtubedlmaterial_gid }}"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         cpu_shares: "{{ youtubedlmaterial_cpu_shares }}"
@@ -103,14 +105,14 @@
           wud.link.template: "https://github.com/Tzahi12345/YoutubeDL-Material/releases/tags/$${major}.$${minor}.$${patch}"
   when: youtubedlmaterial_enabled is true
 
-- name: Stop YoutubeDL-Material
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop YoutubeDL-Material Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ youtubedlmaterial_container_name }}"
         state: absent
 
-    - name: Stop YoutubeDL-Material DB Docker Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ youtubedlmaterial_db_container_name }}"
         state: absent

@@ -1,19 +1,19 @@
 ---
-- name: Start Portainer
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Check for Deprecated IP Whitelist setting
       ansible.builtin.fail:
         msg: "Use portainer_ip_allowlist instead of portainer_ip_whitelist! Read https://traefik.io/blog/announcing-traefik-proxy-v2-11/ for more information."
       when: portainer_ip_whitelist is defined
 
-    - name: Create Portainer Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ portainer_data_directory }}"
 
-    - name: Portainer Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ portainer_container_name }}"
         hostname: "{{ portainer_container_name }}"
@@ -23,7 +23,6 @@
         volumes:
           - "{{ portainer_data_directory }}:/data:rw"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
-          - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
         env:
           TZ: "{{ ansible_nas_timezone }}"
         ports:
@@ -59,9 +58,9 @@
           wud.link.template: "https://hub.docker.com/r/portainer/portainer-ce/tags/tag/$${major}.$${minor}.$${patch}"
   when: portainer_enabled is true
 
-- name: Stop Portainer
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Portainer
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ portainer_container_name }}"
         state: absent

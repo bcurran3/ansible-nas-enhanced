@@ -11,7 +11,7 @@
         name: "{{ calibreweb_container_name }}"
       register: result
 
-    - name: Check Calibre-web is running
+    - name: Check {{ ansible_nas_app_name }} is running
       assert:
         that:
           - result.container['State']['Status'] == "running"

@@ -1,7 +1,7 @@
 ---
-- name: Start Virtual Desktop
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Virtual Desktop Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ virtual_desktop_data_directory }}"
         - "{{ virtual_desktop_data_directory }}/home"
 
-    - name: Create users file
+    - name: Create {{ ansible_nas_app_name }} users file
       ansible.builtin.template:
         src: "users.txt.j2"
         dest: "{{ virtual_desktop_data_directory }}/users.txt"
 
-    - name: Virtual Desktop Container
+    - name: Create  Container
       community.docker.docker_container:
         name: "{{ virtual_desktop_container_name }}"
         image: "{{ virtual_desktop_image_name }}:{{ virtual_desktop_image_version }}"
@@ -36,9 +36,9 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ virtual_desktop_watchtower_monitor_only }}"
   when: virtual_desktop_enabled is true
 
-- name: Stop Virtual Desktop
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Virtual Desktop
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ virtual_desktop_container_name }}"
         state: absent

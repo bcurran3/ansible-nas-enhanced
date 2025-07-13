@@ -1,14 +1,14 @@
 ---
-- name: Start Radarr
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Radarr Create Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ radarr_data_directory }}"
 
-    - name: Radarr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ radarr_container_name }}"
         hostname: "{{ radarr_container_name }}"
@@ -57,9 +57,9 @@
           wud.link.template: "https://github.com/linuxserver/docker-radarr/releases/tag/$${major}.$${minor}.$${patch}"
   when: radarr_enabled is true
 
-- name: Stop Radarr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Radarr Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ radarr_container_name }}"
         state: absent

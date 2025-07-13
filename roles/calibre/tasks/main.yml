@@ -1,5 +1,5 @@
 ---
-- name: Start Calibre
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create Calibre Directories
       ansible.builtin.file:
@@ -9,7 +9,7 @@
       with_items:
         - "{{ calibre_data_directory }}/data"
 
-    - name: Calibre Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ calibre_container_name }}"
         image: linuxserver/calibre
@@ -42,9 +42,9 @@
           traefik.http.services.calibre.loadbalancer.server.port: "8080"
   when: calibre_enabled is true
 
-- name: Stop Calibre
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Calibre
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ calibre_container_name }}"
         state: absent

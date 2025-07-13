@@ -1,7 +1,7 @@
 ---
-- name: Start uTorrent
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create uTorrent Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ utorrent_download_directory }}"
         - "{{ utorrent_download_directory_active }}"
 
-    - name: Create uTorrent Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ utorrent_container_name }}"
         image: "{{ utorrent_image_name }}:{{ utorrent_image_version }}"
@@ -44,9 +44,9 @@
           traefik.http.services.utorrent.loadbalancer.server.port: "8080"
   when: utorrent_enabled is true
 
-- name: Stop uTorrent
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop uTorrent
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ utorrent_container_name }}"
         state: absent

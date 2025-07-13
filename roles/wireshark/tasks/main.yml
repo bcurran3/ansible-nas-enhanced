@@ -1,7 +1,7 @@
 ---
-- name: Start Wireshark
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Wireshark Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ wireshark_data_directory }}"
         - "{{ wireshark_data_directory }}/config"
 
-    - name: Create Wireshark Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ wireshark_container_name }}"
         image: "{{ wireshark_image_name }}:{{ wireshark_image_version }}"
@@ -37,9 +37,9 @@
           traefik.http.services.wireshark.loadbalancer.server.port: "3000"
   when: wireshark_enabled is true
 
-- name: Stop Wireshark
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Wireshark
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ wireshark_container_name }}"
         state: absent

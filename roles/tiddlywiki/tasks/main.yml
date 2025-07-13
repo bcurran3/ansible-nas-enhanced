@@ -1,12 +1,12 @@
 ---
-- name: Start Tiddlywiki
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Tiddlywiki Directory
+    - name: Create {{ ansible_nas_app_name }} Directory
       ansible.builtin.file:
         path: "{{ tiddlywiki_data_directory }}"
         state: directory
 
-    - name: Create Tiddlywiki Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ tiddlywiki_container_name }}"
         image: "{{ tiddlywiki_image_name }}:{{ tiddlywiki_image_version }}"
@@ -34,9 +34,9 @@
           traefik.http.services.tiddlywiki.loadbalancer.server.port: "8080"
   when: tiddlywiki_enabled is true
 
-- name: Stop Tiddlywiki
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Tiddlywiki
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ tiddlywiki_container_name }}"
         state: absent

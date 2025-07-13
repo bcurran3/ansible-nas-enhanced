@@ -1,7 +1,7 @@
 ---
-- name: Start Plex
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Plex Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ plex_config_directory }}"
         - "{{ plex_logs }}"
 
-    - name: Create Plex Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ plex_container_name }}"
         hostname: "{{ plex_container_name }}"
@@ -36,9 +36,8 @@
 #         - "1900:1900/udp"     # Plex DLNA Server
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
-          - driver: nvidia
+          - capabilities: [gpu]
             count: -1
-            capabilities: [gpu]
         volumes:
           - "{{ plex_config_directory }}:/config:rw"
           - "{{ plex_logs }}:/opt/plex/Library/Application Support/Plex Media Server/Logs:rw"
@@ -93,9 +92,9 @@
           wud.link.template: "https://github.com/linuxserver/docker-plex/releases/tag/$${major}.$${minor}.$${patch}"
   when: plex_enabled is true
 
-- name: Stop Plex
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Plex
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ plex_container_name }}"
         state: absent

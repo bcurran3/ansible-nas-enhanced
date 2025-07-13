@@ -1,14 +1,14 @@
 ---
-- name: Start Silverbullet
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Silverbullet Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ silverbullet_data_directory }}"
 
-    - name: Silverbullet Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ silverbullet_container_name }}"
         image: "{{ silverbullet_image_name }}:{{ silverbullet_image_version }}"
@@ -38,9 +38,9 @@
           homepage.description: Notes for developers
   when: silverbullet_enabled is true
 
-- name: Stop Silverbullet
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop silverbullet
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ silverbullet_container_name }}"
         state: absent

@@ -1,14 +1,14 @@
 ---
-- name: Start Gitlab
+- name: Start {{ ansible_nas_app_name }}
   block:
     # The gitlab uid/gid matches 'git:git' in the Gitlab Docker image.
-    - name: Create Gitlab group account
+    - name: Create {{ ansible_nas_app_name }} group account
       ansible.builtin.group:
         name: gitlab
         gid: 998
         state: present
 
-    - name: Create Gitlab user account
+    - name: Create {{ ansible_nas_app_name }} user account
       ansible.builtin.user:
         name: gitlab
         uid: 998
@@ -18,7 +18,7 @@
         create_home: no
         group: gitlab
 
-    - name: Create Gitlab Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -29,7 +29,7 @@
         - "{{ gitlab_data_directory }}/log"
         - "{{ gitlab_data_directory }}/data"
 
-    - name: Create Gitlab Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ gitlab_container_name }}"
         image: "{{ gitlab_image_name }}:{{ gitlab_image_version }}"
@@ -62,9 +62,9 @@
           traefik.http.services.gitlab.loadbalancer.server.port: "80"
   when: gitlab_enabled is true
 
-- name: Stop Gitlab
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Gitlab
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ gitlab_container_name }}"
         state: absent

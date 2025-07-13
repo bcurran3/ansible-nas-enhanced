@@ -1,7 +1,7 @@
 ---
-- name: Start Calibre-web
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Calibre-web Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ calibreweb_data_directory }}/config"
         - "{{ calibreweb_data_directory }}/data"
 
-    - name: Calibre-web Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ calibreweb_container_name }}"
         image: linuxserver/calibre-web:latest
@@ -39,9 +39,9 @@
           traefik.http.services.calibreweb.loadbalancer.server.port: "8083"
   when: calibreweb_enabled is true
 
-- name: Stop Calibre-web
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Calibre-web
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ calibreweb_container_name }}"
         state: absent

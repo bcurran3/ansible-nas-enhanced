@@ -1,7 +1,7 @@
 ---
-- name: Start Glances
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Glances Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ glances_container_name }}"
         hostname: "{{ glances_container_name }}"
@@ -9,22 +9,20 @@
         pull: true
         cpu_shares: "{{ glances_cpu_shares }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-### only wth NVIDIA runtime
         device_requests:
-          - driver: nvidia
+          - capabilities: [gpu]
             count: -1
-            capabilities: [gpu]
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
           - "/etc/timezone:/etc/timezone:ro"
-          - "/etc/os-release:/etc/os-release:ro" # added
+          - "/etc/os-release:/etc/os-release:ro"
         pid_mode: host
         ports:
           - "{{ glances_port_one }}:61208"
           - "{{ glances_port_two }}:61209"
         privileged: true
         env:
-          GLANCES_OPT: "{{ glances_env_opt }}" # made var
+          GLANCES_OPT: "{{ glances_env_opt }}"
           NVIDIA_VISIBLE_DEVICES: "all"
           NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility"
           TZ: "{{ ansible_nas_timezone }}"
@@ -56,13 +54,10 @@
           wud.link.template: "https://github.com/nicolargo/glances/releases/tag/$${major}.$${minor}.$${patch}"
   when: glances_enabled is true
 
-- name: Stop Glances
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Glances
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ glances_container_name }}"
         state: absent
   when: glances_enabled is false
-
-# NOTE: want to add GPU support
-# https://glances.readthedocs.io/en/develop/docker.html#using-gpu-plugin-with-docker-only-nvidia-gpus

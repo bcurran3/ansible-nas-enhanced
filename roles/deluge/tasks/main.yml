@@ -1,7 +1,7 @@
 ---
-- name: Start Deluge
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Deluge Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ deluge_config_directory }}"
         - "{{ deluge_download_directory }}"
 
-    - name: Deluge Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: deluge
         image: linuxserver/deluge
@@ -44,9 +44,9 @@
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ deluge_port }}"
   when: deluge_enabled is true
 
-- name: Stop Deluge
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Deluge
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ deluge_container_name }}"
         state: absent

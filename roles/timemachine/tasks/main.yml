@@ -1,12 +1,12 @@
 ---
-- name: Start Time Machine
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Time Machine Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ timemachine_data_directory }}"
         state: directory
 
-    - name: Time Machine Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ timemachine_container_name }}"
         image: "{{ timemachine_image_name }}:{{ timemachine_image_version }}"
@@ -37,17 +37,18 @@
       register: result
       until: result is succeeded
 
-    - name: Setup timemachine service for avahi
+    - name: Setup {{ ansible_nas_app_name }} service for avahi
       ansible.builtin.template:
         src: timemachine.service
         dest: "/etc/avahi/services/timemachine.service"
       notify: reload avahi configuration
   when: timemachine_enabled is true
 
-- name: Stop Time Machine
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Time Machine
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ timemachine_container_name }}"
         state: absent
+# Needs avahi removal task here
   when: timemachine_enabled is false

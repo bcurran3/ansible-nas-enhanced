@@ -1,14 +1,14 @@
 ---
-- name: Start Ubooquity
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Ubooquity Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ ubooquity_data_directory }}"
 
-    - name: Ubooquity Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ubooquity_container_name }}"
         image: "{{ ubooquity_image_name }}:{{ ubooquity_image_version }}"
@@ -40,9 +40,9 @@
           traefik.http.services.ubooquity.loadbalancer.server.port: "2202"
   when: ubooquity_enabled is true
 
-- name: Stop Ubooquity
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Ubooquity
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ubooquity_container_name }}"
         state: absent

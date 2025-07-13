@@ -1,7 +1,7 @@
 ---
-- name: Start Pytivo
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Pytivo Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
       with_items:
         - "{{ pytivo_config_directory }}"
 
-    - name: Pytivo
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ pytivo_container_name }}"
         image: "{{ pytivo_image_name }}:{{ pytivo_image_version }}"
@@ -43,9 +43,9 @@
           traefik.http.services.pytivo.loadbalancer.server.port: "9032"
   when: pytivo_enabled is true
 
-- name: Stop Pytivo
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Pytivo
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ pytivo_container_name }}"
         state: absent

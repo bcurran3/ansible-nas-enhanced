@@ -1,7 +1,7 @@
 ---
-- name: Start Sickchill
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Sickchill Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
       with_items:
         - "{{ sickchill_config_directory }}"
 
-    - name: Sickchill Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ sickchill_container_name }}"
         image: "{{ sickchill_image_name }}:{{ sickchill_image_version }}"
@@ -38,9 +38,9 @@
           traefik.http.services.sickchill.loadbalancer.server.port: "8081"
   when: sickchill_enabled is true
 
-- name: Stop Sickchill
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Sickchill
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ sickchill_container_name }}"
         state: absent

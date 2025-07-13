@@ -17,7 +17,7 @@
       register: result_runner
 
 
-    - name: Check Drone CI is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

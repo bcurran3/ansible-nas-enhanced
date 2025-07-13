@@ -1,7 +1,7 @@
 ---
-- name: Start Homebridge
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Homebridge Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
       with_items:
         - "{{ homebridge_config_directory }}"
 
-    - name: Create Homebridge Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homebridge_container_name }}"
         image: "{{ homebridge_image_name }}:{{ homebridge_image_version }}"
@@ -37,9 +37,9 @@
           traefik.http.services.homebridge.loadbalancer.server.port: "8087"
   when: homebridge_enabled is true
 
-- name: Stop Homebridge
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Homebridge
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homebridge_container_name }}"
         state: absent

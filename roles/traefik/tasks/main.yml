@@ -1,7 +1,7 @@
 ---
-- name: Start Traefik
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Traefik Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,14 +10,14 @@
         - "{{ traefik_data_directory }}/data"
         - "{{ traefik_data_directory }}/letsencrypt"
 
-    - name: Template Traefik config.toml
+    - name: Copy {{ ansible_nas_app_name }} Template config.toml
       ansible.builtin.template:
         src: traefik.toml
 #       dest: "{{ traefik_data_directory }}/traefik.toml"
         dest: "{{ traefik_data_directory }}/data/traefik.toml"
       register: template_config
 
-    - name: Traefik Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ traefik_container_name }}"
         hostname: "{{ traefik_container_name }}"
@@ -62,9 +62,9 @@
           wud.link.template: "https://github.com/traefik/traefik/releases/tag/$${major}.$${minor}.$${patch}"
   when: traefik_enabled is true
 
-- name: Stop Traefik
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Traefik Docker Container
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ traefik_container_name }}"
         state: absent

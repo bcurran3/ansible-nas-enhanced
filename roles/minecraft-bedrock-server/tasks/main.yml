@@ -1,14 +1,14 @@
 ---
-- name: Start Minecraft Bedrock Server
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Minecraft Bedrock Server Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ minecraft_bedrock_server_data_directory }}"
 
-    - name: Minecraft Bedrock Server Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minecraft_bedrock_server_container_name }}"
         image: "{{ minecraft_bedrock_server_image }}"
@@ -33,9 +33,9 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ minecraft_bedrock_server_watchtower_monitor_only }}"
   when: minecraft_bedrock_server_enabled is true
 
-- name: Stop Minecraft Bedrock Server
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Minecraft Bedrock Server
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minecraft_bedrock_server_container_name }}"
         state: absent

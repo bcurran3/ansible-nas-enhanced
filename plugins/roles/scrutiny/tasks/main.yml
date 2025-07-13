@@ -26,21 +26,8 @@
 
 ############# WIP to automate ssd/hdd/nvme device detection
 
-    - name: Filter out boot drive and format for Scrutiny
-      set_fact:
-        scrutiny_devices_found: "{{ ansible_devices | dict2items | selectattr('value.partitions', 'defined') | rejectattr('key', 'equalto', 'sda') | map(attribute='key') | map('regex_replace', '^(.*)$', '/dev/\\1:/dev/\\1') | list }}"
-      # Explanation:
-      # - ansible_devices:  Accesses the gathered facts about devices.
-      # - dict2items: Converts the dictionary of devices into a list of dictionaries, making it easier to filter.
-      # - selectattr('value.partitions', 'defined'):  Filters for devices that have partitions (indicating actual disk devices).
-      # - rejectattr('key', 'equalto', 'sda'):  Excludes the boot drive (assuming '/dev/sda' is the boot drive). Adjust if your boot drive is named differently.
-      # - map(attribute='key'): Extracts the device name (e.g., 'sdb', 'sdc') from each dictionary in the list.
-      # - map('regex_replace', '^(.*)$', '/dev/\\1:/dev/\\1'): Formats each device name into the required '/dev/sdx:/dev/sdx' format using a regular expression.
-      # - list:  Ensures the final output is a list.
-
-    - name: Debug the scrutiny_devices_found variable
-      debug:
-        var: scrutiny_devices_found
+#    - debug:
+#        var: scrutiny_devices
 
 ###################
 
@@ -58,10 +45,24 @@
           - "{{ scrutiny_data_directory }}/config:/opt/scrutiny/config"
           - "{{ scrutiny_data_directory }}/influxdb:/opt/scrutiny/influxdb"
           - "/run/udev:/run/udev:ro"
-          - "/etc/timezone:/etc/timezone:ro"
+          - "/dev:/dev:ro"
         ports:
-          - "{{ scrutiny_port }}: 8080"
-        devices: "{{ scrutiny_devices }}"
+          - "{{ scrutiny_port }}:8080"
+#        devices: "{{ scrutiny_devices }}"
+        devices:
+          - /dev/sdd:/dev/sdd
+          - /dev/sde:/dev/sde
+          - /dev/sdf:/dev/sdf
+          - /dev/sdg:/dev/sdg
+          - /dev/sdh:/dev/sdh
+          - /dev/sdi:/dev/sdi
+          - /dev/sdj:/dev/sdj
+          - /dev/sdk:/dev/sdk
+          - /dev/sdl:/dev/sdl
+          - /dev/sdm:/dev/sdm
+          - /dev/sdn:/dev/sdn
+          - /dev/sdo:/dev/sdo
+          - /dev/sdp:/dev/sdp
         capabilities:
           - SYS_RAWIO
           - SYS_ADMIN # NVMe support

@@ -1,5 +1,5 @@
 ---
-- name: Start EspHome
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create EspHome Directories
       ansible.builtin.file:
@@ -8,7 +8,7 @@
       with_items:
         - "{{ esphome_data_directory }}/data"
 
-    - name: EspHome Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ esphome_container_name }}"
         image: esphome/esphome:latest
@@ -36,9 +36,9 @@
           traefik.http.services.esphome.loadbalancer.server.port: "80"
   when: esphome_enabled is true
 
-- name: Stop EspHome
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop EspHome
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ esphome_container_name }}"
         state: absent

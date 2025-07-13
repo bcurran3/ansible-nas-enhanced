@@ -14,7 +14,7 @@ onlyoffice_hostname: "onlyoffice"
 onlyoffice_port_http: "8090"
 
 # app
-onlyoffice_container_ip: "172.23.0.4"
+onlyoffice_container_ip: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ onlyoffice_port_http }}"
 
 # docker
 onlyoffice_container_name: "onlyoffice-document-server"

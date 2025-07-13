@@ -6,13 +6,13 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove organizr
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ organizr_container_name }}"
         state: absent
       register: result
 
-    - name: Check if organizr is stopped
+    - name: Check if organ{{ ansible_nas_app_name }}izr is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

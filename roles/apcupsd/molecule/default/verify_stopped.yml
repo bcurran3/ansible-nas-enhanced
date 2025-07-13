@@ -6,13 +6,13 @@
     - include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove Apcupsd
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       docker_container:
         name: "{{ apcupsd_container_name }}"
         state: absent
       register: result
 
-    - name: Check Apcupsd is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       assert:
         that:
           - not result.changed

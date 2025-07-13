@@ -257,14 +257,15 @@ virtual_desktop_enabled: false
 youtubedlmaterial_enabled: true
 youtubedlmaterial_available_externally: true
 youtubedlmaterial_traefik_whitelist: "{{ lan }}"
-youtubedlmaterial_user_id: "1000"
-youtubedlmaterial_group_id: "1001"
 #youtubedlmaterial_dl_audio_directory: "{{ downloads_root }}/complete/YOUTUBEDL/audio"
 #youtubedlmaterial_dl_video_directory: "{{ downloads_root }}/complete/YOUTUBEDL/video"
 #youtubedlmaterial_dl_users_directory: "{{ downloads_root }}/complete/YOUTUBEDL"
 #youtubedlmaterial_dl_subscriptions_directory: "{{ downloads_root }}/complete/YOUTUBEDL/subscriptions"
 #youtubedlmaterial_dl_channels_directory: "{{ podcasts_root }}"
 #youtubedlmaterial_dl_podcasts_directory: "{{ podcasts_root }}"
+youtubedlmaterial_uid: "0"
+youtubedlmaterial_gid: "1001"
+youtubedlmaterial_dl_users_directory: "{{ podcasts_root }}"
 youtubedlmaterial_memory: "2g"
 youtubedlmaterial_homepage_href: "https://{{ youtubedlmaterial_hostname }}.{{ ansible_nas_domain }}"
 
@@ -1136,7 +1137,9 @@ scrutiny_devices:
  - /dev/sdn:/dev/sdn
  - /dev/sdo:/dev/sdo
  - /dev/sdp:/dev/sdp
-scrutiny_gotify_token: "Ay-GzmabLFEfDm-"
+#scrutiny_gotify_token: "Ay-GzmabLFEfDm-"
+scrutiny_notification_gotify: "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}/Ay-GzmabLFEfDm-"
+scrutiny_notification_ntfy: "ntfy://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}/Scrutiny"
 scrutiny_watchtower_monitor_only: "false"
 
 ###
@@ -1550,7 +1553,7 @@ ollama_homepage_href: "https://{{ ollama_hostname }}.{{ ansible_nas_domain }}"
 ollama_watchtower_monitor_only: "false"
 ollama_openedai_homepage_href: "https://{{ ollama_openedai_hostname }}.{{ ansible_nas_domain }}"
 ollama_openedai_watchtower_monitor_only: "false"
-ollama_openwebui_image_tag: "cuda"
+#ollama_openwebui_image_tag: "main"
 ollama_openwebui_homepage_href: "https://{{ ollama_openwebui_hostname }}.{{ ansible_nas_domain }}"
 ollama_openwebui_watchtower_monitor_only: "false"
 
@@ -1582,6 +1585,7 @@ pulse_available_externally: true
 pulse_traefik_whitelist: "{{ lan }}"
 pulse_homepage_href: "https://{{ pulse_hostname }}.{{ ansible_nas_domain }}"
 pulse_watchtower_monitor_only: "false"
+pulse_env_proxmox_token_secret: "4a53cbe0-deca-4ccd-95dc-202ed4fded42"
 
 ### YaDNSb
 yadnsb_enabled: false

@@ -1,7 +1,7 @@
 ---
-- name: Start Mumble
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Mumble Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
       with_items:
         - "{{ mumble_data_directory }}"
 
-    - name: Create Mumble Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mumble_container_name }}"
         image: mumblevoip/mumble-server:latest
@@ -37,9 +37,9 @@
           traefik.http.services.mumble.loadbalancer.server.port: "64738"
   when: mumble_enabled is true
 
-- name: Stop Mumble
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Mumble
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mumble_container_name }}"
         state: absent

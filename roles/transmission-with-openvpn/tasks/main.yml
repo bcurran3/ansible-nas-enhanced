@@ -1,7 +1,7 @@
 ---
-- name: Start Transmission with OpenVPM
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Transmission Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ transmission_download_directory }}"
         - "{{ transmission_watch_directory }}"
 
-    - name: Transmission with VPN
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ transmission_openvpn_container_name }}"
         image: "{{ transmission_openvpn_image_name }}:{{ transmission_openvpn_image_version }}"
@@ -62,9 +62,9 @@
           traefik.http.services.transmission_openvpn.loadbalancer.server.port: "9091"
   when: transmission_with_openvpn_enabled is true
 
-- name: Stop Transmission with OpenVPM
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Transmission with OpenVPM
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ transmission_openvpn_container_name }}"
         state: absent

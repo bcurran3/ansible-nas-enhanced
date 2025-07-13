@@ -1,7 +1,7 @@
 ---
-- name: Start Piwigo
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Piwigo Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,11 +10,11 @@
         - "{{ piwigo_data_directory }}"
         - "{{ piwigo_photos }}"
 
-    - name: Create Piwigo network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ piwigo_network_name }}"
 
-    - name: Create MySQL container for Piwigo
+    - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ piwigo_db_container_name }}"
         image: "{{ piwigo_db_image_name }}:{{ piwigo_db_image_version }}"
@@ -36,7 +36,7 @@
           autoheal: "{{ piwigo_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ piwigo_db_watchtower_monitor_only }}"
 
-    - name: Piwigo Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ piwigo_container_name }}"
         image: "{{ piwigo_image_name }}:{{ piwigo_image_version }}"
@@ -73,14 +73,14 @@
           homepage.description: Photos client
   when: piwigo_enabled is true
 
-- name: Stop Piwigo
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Piwigo
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ piwigo_container_name }}"
         state: absent
 
-    - name: Stop Piwigo Db
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ piwigo_db_container_name }}"
         state: absent

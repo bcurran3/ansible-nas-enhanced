@@ -6,19 +6,19 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove Bitwarden
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ bitwarden_container_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove Bitwarden Backup
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Backup
       community.docker.docker_container:
         name: "{{ bitwarden_backup_container_name }}"
         state: absent
       register: result_backup
 
-    - name: Check Bitwarden is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

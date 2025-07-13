@@ -1,14 +1,14 @@
 ---
-- name: Start Syncthing
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Syncthing Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ syncthing_data_directory }}"
 
-    - name: Syncthing Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ syncthing_container_name }}"
         image: "{{ syncthing_image_name }}:{{ syncthing_image_version }}"
@@ -36,9 +36,9 @@
           traefik.http.services.syncthing.loadbalancer.server.port: "8384"
   when: syncthing_enabled is true
 
-- name: Stop Syncthing
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Syncthing
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ syncthing_container_name }}"
         state: absent

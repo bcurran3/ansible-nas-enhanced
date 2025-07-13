@@ -1,12 +1,12 @@
 ---
-- name: Start Netdata
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Get docker group id
       ansible.builtin.group:
         name: docker
       register: docker_group
 
-    - name: Netdata Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ netdata_container_name }}"
         hostname: "{{ netdata_container_name }}"
@@ -55,9 +55,9 @@
           wud.link.template: "https://github.com/netdata/netdata/releases/tag/$${major}.$${minor}.$${patch}"
   when: netdata_enabled is true
 
-- name: Stop Netdata
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Netdata
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ netdata_container_name }}"
         state: absent

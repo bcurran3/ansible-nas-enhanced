@@ -1,7 +1,7 @@
 ---
-- name: Start Duplicati
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Duplicati Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ duplicati_data_directory }}"
         - "{{ duplicati_data_directory }}/custom-cont-init.d" # added
 
-    - name: Dupicati Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ duplicati_container_name }}"
         hostname: "{{ duplicati_container_name }}"
@@ -60,9 +60,9 @@
 #         wud.tag.include: '^v\d+\.\d+\.\d+\.\d+-\d+\.\d+\.\d+\.\d+.*$$'
   when: duplicati_enabled is true
 
-- name: Stop Duplicati
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Duplicati
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ duplicati_container_name }}"
         state: absent

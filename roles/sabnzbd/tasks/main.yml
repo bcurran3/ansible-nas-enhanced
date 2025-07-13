@@ -1,14 +1,14 @@
 ---
-- name: Start Sabnzbd
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Sabnzbd Data Directory
+    - name: Create {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ sabnzbd_data_directory }}"
 
-    - name: Sabnzbd
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ sabnzbd_container_name }}"
         image: "{{ sabnzbd_image_name }}:{{ sabnzbd_image_version }}"
@@ -37,9 +37,9 @@
           traefik.http.services.sabnzbd.loadbalancer.server.port: "8080"
   when: sabnzbd_enabled is true
 
-- name: Stop Sabnzbd
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Sabnzbd
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ sabnzbd_container_name }}"
         state: absent

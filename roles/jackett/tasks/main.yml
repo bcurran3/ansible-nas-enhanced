@@ -1,14 +1,14 @@
 ---
-- name: Start Jackett
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Jackett Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ jackett_data_directory }}"
 
-    - name: Jackett Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ jackett_container_name }}"
         hostname: "{{ jackett_container_name }}"
@@ -44,9 +44,9 @@
           traefik.http.services.jackett.loadbalancer.server.port: "9117"
   when: jackett_enabled is true
 
-- name: Stop Jackett
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Jackett
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ jackett_container_name }}"
         state: absent

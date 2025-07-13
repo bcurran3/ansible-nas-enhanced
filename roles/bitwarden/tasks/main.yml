@@ -1,12 +1,12 @@
 ---
-- name: Start Bitwarden
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Check for Deprecated IP Whitelist setting
       ansible.builtin.fail:
         msg: "Use bitwarden_ip_allowlist instead of bitwarden_ip_whitelist! Read https://traefik.io/blog/announcing-traefik-proxy-v2-11/ for more information."
       when: bitwarden_ip_whitelist is defined
 
-    - name: Create Bitwarden Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -14,7 +14,7 @@
       with_items:
         - "{{ bitwarden_data_directory }}"
 
-    - name: Bitwarden Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ bitwarden_container_name }}"
         image: vaultwarden/server:latest
@@ -52,7 +52,7 @@
         memory: "{{ bitwarden_memory }}"
         restart_policy: unless-stopped
 
-    - name: Bitwarden Backup Container
+    - name: Create {{ ansible_nas_app_name }} Backup Container
       community.docker.docker_container:
         name: "{{ bitwarden_backup_container_name }}"
         image: bruceforce/bw_backup:latest
@@ -62,14 +62,14 @@
         memory: "{{ bitwarden_backup_memory }}"
   when: bitwarden_enabled is true
 
-- name: Stop Bitwarden
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Bitwarden
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ bitwarden_container_name }}"
         state: absent
 
-    - name: Stop Bitwarden Backup
+    - name: Stop {{ ansible_nas_app_name }} Backup Container
       community.docker.docker_container:
         name: "{{ bitwarden_backup_container_name }}"
         state: absent

@@ -1,12 +1,12 @@
 ---
-- name: Start Lidarr
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create Lidarr Directory
       ansible.builtin.file:
         path: "{{ lidarr_data_directory }}"
         state: directory
 
-    - name: Lidarr Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ lidarr_container_name }}"
         hostname: "{{ lidarr_container_name }}"
@@ -58,9 +58,9 @@
           wud.link.template: "https://github.com/linuxserver/docker-lidarr/releases/tag/$${major}.$${minor}.$${patch}"
   when: lidarr_enabled is true
 
-- name: Stop Lidarr
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Lidarr
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ lidarr_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start MiniDLNA
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: MiniDLNA Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minidlna_container_name }}"
         image: "{{ minidlna_image_name }}:{{ minidlna_image_version }}"
@@ -23,9 +23,9 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ minidlna_watchtower_monitor_only }}"
   when: minidlna_enabled is true
 
-- name: Stop MiniDLNA
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop MiniDLNA
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minidlna_container_name }}"
         state: absent

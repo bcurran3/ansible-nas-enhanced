@@ -1,14 +1,14 @@
 ---
-- name: Start Minio
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Minio Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ minio_data_directory }}/data"
 
-    - name: Create minio Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minio_container_name }}"
         image: "{{ minio_image_name }}:{{ minio_image_version }}"
@@ -37,9 +37,9 @@
           traefik.http.services.minio.loadbalancer.server.port: "9000"
   when: minio_enabled is true
 
-- name: Stop minio
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop minio
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minio_container_name }}"
         state: absent

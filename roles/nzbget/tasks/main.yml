@@ -1,14 +1,14 @@
 ---
-- name: Start NZBget
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create NZBget Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ nzbget_data_directory }}"
 
-    - name: NZBGet
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ nzbget_container_name }}"
         image: "{{ nzbget_image_name }}:{{ nzbget_image_version }}"
@@ -36,9 +36,9 @@
           traefik.http.services.nzbget.loadbalancer.server.port: "6789"
   when: nzbget_enabled is true
 
-- name: Stop NZBget
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop NZBget
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ nzbget_container_name }}"
         state: absent

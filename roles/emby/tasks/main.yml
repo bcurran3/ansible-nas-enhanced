@@ -1,14 +1,14 @@
 ---
-- name: Start Emby
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Emby Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ emby_config_directory }}"
 
-    - name: Emby Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ emby_container_name }}"
         image: "{{ emby_image }}:{{ emby_image_tag }}"
@@ -39,9 +39,9 @@
           traefik.http.services.emby.loadbalancer.server.port: "8096"
   when: emby_enabled is true
 
-- name: Stop Emby
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Emby
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ emby_container_name }}"
         state: absent

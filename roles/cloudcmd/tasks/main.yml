@@ -1,14 +1,14 @@
 ---
-- name: Start Cloudcmd
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Cloudcmd Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ cloudcmd_data_directory }}"
 
-    - name: Create Cloudcmd Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ cloudcmd_container_name }}"
         image: coderaiser/cloudcmd
@@ -36,9 +36,9 @@
           traefik.http.services.cloudcmd.loadbalancer.server.port: "8000"
   when: cloudcmd_enabled is true
 
-- name: Stop Cloudcmd
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Cloudcmd
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ cloudcmd_container_name }}"
         state: absent

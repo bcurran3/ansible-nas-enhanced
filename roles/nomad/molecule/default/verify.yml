@@ -6,13 +6,13 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get Nomad service state
+    - name: Get {{ ansible_nas_app_name }} service state
       ansible.builtin.systemd:
         name: "{{ nomad_service_name }}"
         state: started
       register: service_result
 
-    - name: Check that Nomad service is running
+    - name: Check that {{ ansible_nas_app_name }} service is running
       ansible.builtin.assert:
         that:
           - service_result.status['ActiveState'] == "active"

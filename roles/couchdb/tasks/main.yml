@@ -1,7 +1,7 @@
 ---
-- name: Start CouchDB
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create CouchDB Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ couchdb_data_directory }}/config"
         - "{{ couchdb_data_directory }}/data"
 
-    - name: CouchDB Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ couchdb_container_name }}"
         image: "{{ couchdb_image_name }}:{{ couchdb_image_version }}"
@@ -36,9 +36,9 @@
           traefik.http.services.couchdb.loadbalancer.server.port: "5984"
   when: couchdb_enabled is true
 
-- name: Stop CouchDB
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop CouchDB
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ couchdb_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start Tautulli
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Tautulli Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ tautulli_config_directory }}"
         - "{{ plex_logs }}"
 
-    - name: Tautulli Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ tautulli_container_name }}"
         image: "{{ tautulli_image_name }}:{{ tautulli_image_version }}"
@@ -52,9 +52,9 @@
           wud.link.template: "https://github.com/linuxserver/docker-tautulli/releases/tag/$${major}.$${minor}.$${patch}"
   when: tautulli_enabled is true
 
-- name: Stop Tautulli
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Tautulli
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ tautulli_container_name }}"
         state: absent

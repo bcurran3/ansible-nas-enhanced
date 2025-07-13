@@ -93,7 +93,8 @@
           homepage.container: "{{ osclass_container_name }}"
           homepage.showStats: "{{ osclass_homepage_showStats }}"
           traefik.enable: "{{ osclass_available_externally | string }}"
-          traefik.http.routers.osclass.rule: "Host(`{{ osclass_hostname }}.{{ ansible_nas_domain }}`)"
+#         traefik.http.routers.osclass.rule: "Host(`{{ osclass_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.osclass.rule: "Host(`classifieds.{{ ansible_nas_domain }}`)"
           traefik.http.routers.osclass.tls.certresolver: "letsencrypt"
           traefik.http.routers.osclass.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.osclass.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
@@ -105,7 +106,6 @@
           wud.link.template: "https://hub.docker.com/r/bitnami/osclass-archived/tags/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ osclass_memory }}"
         restart_policy: unless-stopped
-
   when: osclass_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

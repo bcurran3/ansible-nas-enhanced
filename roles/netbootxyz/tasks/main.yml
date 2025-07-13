@@ -1,7 +1,7 @@
 ---
-- name: Start Netbootxyz
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Netbootxyz Directory
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ netbootxyz_config_directory }}"
         - "{{ netbootxyz_assets_directory }}"
 
-    - name: Netbootxyz Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ netbootxyz_container_name }}"
         hostname: "{{ netbootxyz_container_name }}"
@@ -29,7 +29,7 @@
           PUID: "{{ netbootxyz_user_id }}"
           PGID: "{{ netbootxyz_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-          WEB_APP_PORT: "{{ netbootxyz_port_http }}" # added
+          WEB_APP_PORT: "{{ netbootxyz_port_http }}"
         restart_policy: unless-stopped
         labels:
           autoheal: "{{ netbootxyz_autoheal }}"
@@ -65,9 +65,9 @@
           wud.link.template: "https://github.com/netbootxyz/docker-netbootxyz/releases/tag/$${major}.$${minor}.$${patch}"
   when: netbootxyz_enabled is true
 
-- name: Stop Netbootxyz
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Netbootxyz
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ netbootxyz_container_name }}"
         state: absent

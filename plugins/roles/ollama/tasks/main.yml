@@ -24,9 +24,8 @@
         cpu_shares: "{{ ollama_cpu_shares }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
-          - driver: nvidia
+          - capabilities: [gpu]
             count: -1
-            capabilities: [gpu]
         volumes:
           - "{{ ollama_data_directory }}/ollama:/root/.ollama"
           - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
@@ -133,13 +132,12 @@
           TZ: "{{ ansible_nas_timezone }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
-          - driver: nvidia
+          - capabilities: [gpu]
             count: -1
-            capabilities: [gpu]
         labels:
           autoheal: "{{ ollama_openwebui_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openwebui_watchtower_monitor_only }}"
-          homepage.name: "{{ ansible_nas_app_name }} Open WebUI"
+          homepage.name: "Open WebUI"
           homepage.group: "{{ ollama_openwebui_homepage_group }}"
           homepage.icon: "{{ ollama_openwebui_homepage_icon }}"
           homepage.href: "{{ ollama_openwebui_homepage_href }}"
@@ -149,14 +147,14 @@
           homepage.container: "{{ ollama_openwebui_container_name }}"
           homepage.showStats: "{{ ollama_openwebui_homepage_showStats }}"
           traefik.enable: "{{ ollama_available_externally | string }}"
-          traefik.http.routers.ollamaopenwebui.rule: "Host(`ollamaopenwebui.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.ollamaopenwebui.tls.certresolver: "letsencrypt"
-          traefik.http.routers.ollamaopenwebui.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.ollamaopenwebui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.openwebui.rule: "Host(`openwebui.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.openwebui.tls.certresolver: "letsencrypt"
+          traefik.http.routers.openwebui.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.openwebui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.frontend.middlewares: "{{ ollama_openwebui_hostname }}"
-          traefik.http.routers.ollamaopenwebui.middlewares: "{{ ollama_openwebui_hostname }}@docker"
-          traefik.http.middlewares.ollamaopenwebui.IPAllowList.sourcerange: "{{ ollama_traefik_whitelist }}"
-          traefik.http.services.ollamaopenwebui.loadbalancer.server.port: "8080"
+          traefik.http.routers.openwebui.middlewares: "{{ ollama_openwebui_hostname }}@docker"
+          traefik.http.middlewares.openwebui.IPAllowList.sourcerange: "{{ ollama_traefik_whitelist }}"
+          traefik.http.services.openwebui.loadbalancer.server.port: "8080"
           ollama.tag.include: '^\d+\.\d+\.\d+$$'
           ollama.link.template: "https://github.com/open-webui/open-webui/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ollama_openwebui_memory }}"

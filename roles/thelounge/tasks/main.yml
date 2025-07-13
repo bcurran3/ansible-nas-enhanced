@@ -1,7 +1,7 @@
 ---
-- name: Start The Lounge
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: The Lounge Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,13 +9,13 @@
         - "{{ thelounge_data_directory }}"
         - "{{ thelounge_data_directory }}/users"
 
-    - name: Set up admin user
+    - name: Set up admin user for {{ ansible_nas_app_name }}
       ansible.builtin.copy:
         src: admin.json
         dest: "{{ thelounge_data_directory }}/users/admin.json"
         mode: 0777
 
-    - name: The Lounge Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ thelounge_container_name }}"
         image: "{{ thelounge_image_name }}:{{ thelounge_image_version }}"
@@ -40,9 +40,9 @@
           traefik.http.services.thelounge.loadbalancer.server.port: "9000"
   when: thelounge_enabled is true
 
-- name: Stop The Lounge
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop The Lounge
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ thelounge_container_name }}"
         state: absent

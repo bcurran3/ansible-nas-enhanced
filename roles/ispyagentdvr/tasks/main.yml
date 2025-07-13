@@ -1,7 +1,7 @@
 ---
-- name: Start iSpyAgentDVR
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create iSpyAgentDVR Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ ispyagentdvr_commands_directory }}"
         - "{{ ispyagentdvr_recordings_directory }}"
 
-    - name: Create iSpyAgentDVR Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ispyagentdvr_container_name }}"
         image: mekayelanik/ispyagentdvr:latest
@@ -48,9 +48,9 @@
           homepage.description: Camera Monitoring software
   when: ispyagentdvr_enabled is true
 
-- name: Stop iSpyAgentDVR
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop iSpyAgentDVR
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ispyagentdvr_container_name }}"
         state: absent

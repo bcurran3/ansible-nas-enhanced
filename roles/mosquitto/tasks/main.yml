@@ -1,7 +1,7 @@
 ---
-- name: Start Mosquitto
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Mosquitto Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,13 +10,13 @@
         - "{{ mosquitto_data_directory }}/data"
         - "{{ mosquitto_data_directory }}/log"
 
-    - name: Template mosquitto.conf
+    - name: Copy {{ ansible_nas_app_name }} Template mosquitto.conf
       ansible.builtin.copy:
         src: mosquitto.conf
         dest: "{{ mosquitto_data_directory }}/config/mosquitto.conf"
       register: mosquitto_conf
 
-    - name: Create Mosquitto container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mosquitto_container_name }}"
         hostname: "{{ mosquitto_container_name }}"
@@ -48,9 +48,9 @@
           wud.link.template: "https://hub.docker.com/_/eclipse-mosquitto/tags/tag/$${major}.$${minor}.$${patch}"
   when: mosquitto_enabled is true
 
-- name: Stop Mosquitto
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Mosquitto
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mosquitto_container_name }}"
         state: absent

@@ -6,19 +6,19 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove Firefly
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
         name: "{{ firefly_container_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove Firefly MySql
+    - name: Try and stop and remove {{ ansible_nas_app_name }} MySql
       community.docker.docker_container:
         name: "{{ firefly_mysql_container_name }}"
         state: absent
       register: result_mysql
 
-    - name: Check Firefly is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

@@ -1,5 +1,5 @@
 ---
-- name: Start Dokuwiki
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create DokuWiki Directories
       ansible.builtin.file:
@@ -8,7 +8,7 @@
       with_items:
         - "{{ dokuwiki_data_directory }}/data"
 
-    - name: DokuWiki Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dokuwiki_container_name }}"
         image: linuxserver/dokuwiki:latest
@@ -35,9 +35,9 @@
           traefik.http.services.dokuwiki.loadbalancer.server.port: "80"
   when: dokuwiki_enabled is true
 
-- name: Stop Dokuwiki
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Dokuwiki
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dokuwiki_container_name }}"
         state: absent

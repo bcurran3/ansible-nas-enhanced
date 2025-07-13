@@ -1,5 +1,5 @@
 ---
-- name: Start Loki
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Check for Minio installation
       ansible.builtin.fail:
@@ -14,14 +14,14 @@
     - name: Include Stats variables
       ansible.builtin.include_vars: ../../stats/defaults/main.yml
 
-    - name: Create Loki Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ loki_data_directory }}"
 
-    - name: Create Minio buckets for Loki
+    - name: Create Minio buckets for {{ ansible_nas_app_name }}
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -29,13 +29,13 @@
         - "{{ minio_data_directory }}/data/loki-data"
         - "{{ minio_data_directory }}/data/loki-ruler"
 
-    - name: Template Loki config
+    - name: Copy {{ ansible_nas_app_name }} Template config
       ansible.builtin.template:
         src: config.yml
         dest: "{{ loki_data_directory }}/config.yml"
       register: loki_config
 
-    - name: Create loki Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ loki_container_name }}"
         image: "{{ loki_image_name }}:{{ loki_image_version }}"
@@ -64,7 +64,7 @@
           prometheus.io/port: "3100"
           prometheus.io/path: "/metrics"
 
-    - name: Template Grafana Loki data source
+    - name: Template Grafana {{ ansible_nas_app_name }} data source
       ansible.builtin.template:
         src: grafana-datasource.yml
         dest: "{{ stats_grafana_config_directory }}/provisioning/datasources/loki.yml"
@@ -72,9 +72,9 @@
       notify: restart grafana
   when: loki_enabled is true
 
-- name: Stop loki
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop loki
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ loki_container_name }}"
         state: absent

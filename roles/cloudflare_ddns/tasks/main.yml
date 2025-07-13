@@ -1,23 +1,23 @@
 ---
-- name: Start Cloudflare DDNS
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Check for deprecated API key
       ansible.builtin.fail:
         msg: "Using a Cloudflare global API key is no longer supported. Please unset cloudflare_api_key and set cloudflare_token"
       when: cloudflare_api_key is defined
 
-    - name: Create cloudflare Dynamic DNS Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ cloudflare_data_directory }}"
         state: directory
 
-    - name: Template Cloudflare Dynamic DNS config.yml with scoped token
+    - name: Template {{ ansible_nas_app_name }} config.yml with scoped token
       ansible.builtin.template:
         src: config.yml
         dest: "{{ cloudflare_data_directory }}/config.yml"
       register: template_files_result
 
-    - name: Cloudflare Dynamic DNS Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ cloudflare_container_name }}"
         hostname: "{{ cloudflare_container_name }}"
@@ -48,9 +48,9 @@
           wud.link.template: "https://github.com/joshuaavalon/docker-cloudflare/releases/tag/$${major}.$${minor}.$${patch}"
   when: cloudflare_ddns_enabled is true
 
-- name: Stop Cloudflare DDNS
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Cloudflare DDNS
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ cloudflare_container_name }}"
         state: absent

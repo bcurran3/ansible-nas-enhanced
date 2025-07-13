@@ -1,7 +1,7 @@
 ---
-- name: Start Transmission
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Transmission Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ transmission_download_directory }}"
         - "{{ transmission_watch_directory }}"
 
-    - name: Transmission Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ transmission_container_name }}"
         hostname: "{{ transmission_container_name }}"
@@ -62,9 +62,9 @@
           wud.link.template: "https://github.com/linuxserver/docker-transmission/releases/tag/$${major}.$${minor}.$${patch}"
   when: transmission_enabled is true
 
-- name: Stop Transmission
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Transmission
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ transmission_container_name }}"
         state: absent

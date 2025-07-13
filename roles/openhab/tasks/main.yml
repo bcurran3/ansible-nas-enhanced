@@ -1,13 +1,13 @@
 ---
-- name: Start openHAB
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create openHAB group
+    - name: Create {{ ansible_nas_app_name }} group
       ansible.builtin.group:
         name: openhab
         gid: 9001
         state: present
 
-    - name: Create openHAB user
+    - name: Create {{ ansible_nas_app_name }} user
       ansible.builtin.user:
         name: openhab
         uid: 9001
@@ -17,7 +17,7 @@
         create_home: no
         group: openhab
 
-    - name: Create openHAB Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -29,7 +29,7 @@
         - "{{ openhab_data_directory }}/userdata"
         - "{{ openhab_data_directory }}/addons"
 
-    - name: Create openHAB container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ openhab_container_name }}"
         image: "{{ openhab_image_name }}:{{ openhab_image_version }}"
@@ -58,9 +58,9 @@
           traefik.http.services.openhab.loadbalancer.server.port: "7777"
   when: openhab_enabled is true
 
-- name: Stop openHAB
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop openHAB
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ openhab_container_name }}"
         state: absent

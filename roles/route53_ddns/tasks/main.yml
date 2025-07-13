@@ -1,18 +1,18 @@
 ---
-- name: Start AWS Route53 Dynamic DNS
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create AWS Route53 Dynamic DNS Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ route53_data_directory }}"
         state: directory
 
-    - name: Generate AWS Route53 Dynamic DNS config file
+    - name: Generate {{ ansible_nas_app_name }} config file
       ansible.builtin.template:
         src: config.yml
         dest: "{{ route53_data_directory }}/ddns-route53.yml"
       register: template_config
 
-    - name: AWS Route53 Dynamic DNS Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ route53_container_name }}"
         image: "{{ route53_image_name }}:{{ route53_image_version }}"
@@ -30,9 +30,9 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ route53_watchtower_monitor_only }}"
   when: route53_enabled is true
 
-- name: Stop AWS Route53 Dynamic DNS
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop AWS Route53 Dynamic DNS
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ route53_container_name }}"
         state: absent

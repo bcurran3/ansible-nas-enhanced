@@ -1,23 +1,23 @@
 ---
-- name: Start DDNS Updater
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: DDNS Updater Create Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ ddns_updater_data_directory }}"
         state: directory
 
-    - name: DDNS Updater Check config is defined
+    - name: Check {{ ansible_nas_app_name }} config is defined
       ansible.builtin.fail:
-        msg: "Please configure DDNS Updater by setting ddns_updater_config in your inventory nas.yml."
+        msg: "Please configure {{ ansible_nas_app_name }} by setting ddns_updater_config in your inventory nas.yml."
       when: ddns_updater_config is not defined
 
-    - name: DDNS Updater Generate config.json
+    - name: Generate {{ ansible_nas_app_name }} config.json
       ansible.builtin.copy:
         content: "{{ ddns_updater_config | to_nice_json }}"
         dest: "{{ ddns_updater_data_directory }}/config.json"
       register: ddns_updater_config
 
-    - name: DDNS Updater Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ddns_updater_container_name }}"
         hostname: "{{ ddns_updater_container_name }}"
@@ -30,7 +30,7 @@
           - "{{ ddns_updater_data_directory }}:/updater/data:rw"
         env:
           GOTIFY_TOKEN: "{{ ddns_updater_gotify_token | default('') }}"
-          GOTIFY_URL: "{{ gotify_url | default('') }}"
+          GOTIFY_URL: "{{ ddns_updater_gotify_url | default('') }}"
           PERIOD: "{{ ddns_updater_period }}"
           UPDATE_COOLDOWN_PERIOD: "{{ ddns_updater_cooldown_period }}"
           HTTP_TIMEOUT: "{{ ddns_updater_http_timeout }}"
@@ -61,9 +61,9 @@
           traefik.http.services.ddns_updater.loadbalancer.server.port: "{{ ddns_updater_port }}"
   when: ddns_updater_enabled is true
 
-- name: Stop DDNS Updater
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop DDNS Updater
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ddns_updater_container_name }}"
         state: absent

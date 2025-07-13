@@ -1,9 +1,9 @@
 ---
-- name: Start Woodpecker-CI
+- name: Start {{ ansible_nas_app_name }}
   block:
     - name: Check for Gitea installation
       ansible.builtin.fail:
-        msg: "Woodpecker-CI requires Gitea enabled and running for authentication, please set that up first."
+        msg: "{{ ansible_nas_app_name }} requires Gitea enabled and running for authentication, please set that up first."
       when: gitea_enabled is false
 
     - name: Check for Gitea config
@@ -11,14 +11,14 @@
         msg: "Missing Gitea Oauth2 config! Read https://woodpecker-ci.org/docs/administration/forges/gitea and set woodpecker_ci_gitea_client and woodpecker_ci_gitea_secret."
       when: woodpecker_ci_gitea_client == "notset"
 
-    - name: Create Woodpecker-CI Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ woodpecker_ci_data_directory }}"
 
-    - name: Create Woodpecker-CI container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ woodpecker_ci_container_name }}"
         image: "{{ woodpecker_ci_image_name }}:{{ woodpecker_ci_image_version }}"
@@ -51,7 +51,7 @@
           traefik.http.routers.woodpecker_ci.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.woodpecker_ci.loadbalancer.server.port: "8000"
 
-    - name: Create Woodpecker-CI agent container
+    - name: Create {{ ansible_nas_app_name }} Agent Container
       community.docker.docker_container:
         name: "{{ woodpecker_ci_agent_container_name }}"
         image: "{{ woodpecker_ci_agent_image_name }}:{{ woodpecker_ci_agent_image_version }}"
@@ -80,12 +80,15 @@
       tags: molecule-notest
   when: woodpecker_ci_enabled is true
 
-- name: Stop Woodpecker-CI
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Woodpecker-CI
+    - name: Stop {{ ansible_nas_app_name }} Agent Container
+      community.docker.docker_container:
+        name: "{{ woodpecker_ci_agent_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ woodpecker_ci_container_name }}"
         state: absent
   when: woodpecker_ci_enabled is false
-
-# needs stop woodpecker ci agent

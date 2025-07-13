@@ -1,7 +1,7 @@
 ---
-- name: Start pyLoad
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create pyLoad Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ pyload_config_directory }}"
         - "{{ pyload_download_directory }}"
 
-    - name: Create pyLoad Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ pyload_container_name }}"
         image: "{{ pyload_image_name }}:{{ pyload_image_version }}"
@@ -43,9 +43,9 @@
           homepage.description: Download client
   when: pyload_enabled is true
 
-- name: Stop pyLoad
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop pyLoad
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ pyload_container_name }}"
         state: absent

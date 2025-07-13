@@ -1,7 +1,7 @@
 ---
-- name: Start Joomla
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Joomla Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,11 +9,11 @@
         - "{{ joomla_data_directory }}"
         - "{{ joomla_data_directory }}/db"
 
-    - name: Create Joomla network
+    - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ joomla_network_name }}"
 
-    - name: MySQL Docker Container for Joomla
+    - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ joomla_db_container_name }}"
         image: "{{ joomla_db_image_name }}:{{ joomla_db_image_version }}"
@@ -34,7 +34,7 @@
           autoheal: "{{ joomla_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ joomla_db_watchtower_monitor_only }}"
 
-    - name: Joomla Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ joomla_container_name }}"
         image: "{{ joomla_image_name }}:{{ joomla_image_version }}"
@@ -64,14 +64,14 @@
           traefik.http.services.joomla.loadbalancer.server.port: "80"
   when: joomla_enabled is true
 
-- name: Stop Joomla
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Joomla
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ joomla_container_name }}"
         state: absent
 
-    - name: Stop Joomla DB
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ joomla_db_container_name }}"
         state: absent

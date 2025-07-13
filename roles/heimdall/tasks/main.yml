@@ -1,7 +1,7 @@
 ---
-- name: Start Heimdall
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Heimdall Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
       with_items:
         - "{{ heimdall_data_directory }}"
 
-    - name: Create Heimdall container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ heimdall_container_name }}"
         hostname: "{{ heimdall_container_name }}"
@@ -51,9 +51,9 @@
           wud.link.template: "https://github.com/linuxserver/docker-heimdall/releases/tag/$${major}.$${minor}.$${patch}"
   when: heimdall_enabled is true
 
-- name: Stop Heimdall
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Heimdall
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ heimdall_container_name }}"
         state: absent

@@ -1,14 +1,14 @@
 ---
-- name: Start Hello World
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Hello World Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ hello_world_data_directory }}"
 
-    - name: Hello World Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ hello_world_container_name }}"
         image: crccheck/hello-world
@@ -31,9 +31,9 @@
           traefik.http.services.hello_world.loadbalancer.server.port: "8000"
   when: hello_world_enabled is true
 
-- name: Stop Hello World
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Hello World
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ hello_world_container_name }}"
         state: absent

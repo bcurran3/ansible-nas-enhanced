@@ -1,12 +1,12 @@
 ---
 - name: Start Ombi
   block:
-    - name: Create Ombi Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ ombi_config_directory }}"
         state: directory
 
-    - name: Ombi Docker Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ombi_container_name }}"
         image: "{{ ombi_image_name }}:{{ ombi_image_version }}"
@@ -33,9 +33,9 @@
           traefik.http.services.ombi.loadbalancer.server.port: "3579"
   when: ombi_enabled is true
 
-- name: Stop Ombi
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Ombi
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ombi_container_name }}"
         state: absent

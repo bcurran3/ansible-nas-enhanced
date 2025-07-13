@@ -1,33 +1,33 @@
 ---
-- name: Start Guacamole
+- name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Guacamole directories
+    - name: Create {{ ansible_nas_app_name }} directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ guacamole_data_directory }}/config"
 
-    - name: Remove Old Guacamole Mysql Docker Container
+    - name: Remove Old {{ ansible_nas_app_name }} Mysql Container
       community.docker.docker_container:
         name: guacamole-mysql
         state: absent
         keep_volumes: true
 
-    - name: Remove Old Guacamole guacd Docker Container
+    - name: Remove Old {{ ansible_nas_app_name }} guacd Container
       community.docker.docker_container:
         name: guacamole-guacd
         state: absent
         keep_volumes: true
 
-    - name: Remove old Guacamole directories
+    - name: Remove old {{ ansible_nas_app_name }} directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
       with_items:
         - "{{ guacamole_data_directory }}/mysql"
 
-    - name: Guacamole Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ guacamole_container_name }}"
         image: "{{ guacamole_image_name }}:{{ guacamole_image_version }}"
@@ -49,7 +49,7 @@
           traefik.http.routers.guacamole.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.guacamole.loadbalancer.server.port: "8080"
 
-    - name: Restart Guacamole Container
+    - name: Restart Gua{{ ansible_nas_app_name }}camole Container
       community.docker.docker_container:
         name: "{{ guacamole_container_name }}"
         image: "{{ guacamole_image_name }}:{{ guacamole_image_version }}"
@@ -57,9 +57,9 @@
       tags: molecule-idempotence-notest
   when: guacamole_enabled is true
 
-- name: Stop Guacamole
+- name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop Guacamole
+    - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ guacamole_container_name }}"
         state: absent
