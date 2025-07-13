@@ -7,7 +7,7 @@
         state: directory
         # mode: 0755
       with_items:
-        - "{{ pyload_config_directory }}"
+        - "{{ pyload_data_directory }}"
         - "{{ pyload_download_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -16,7 +16,7 @@
         image: "{{ pyload_image_name }}:{{ pyload_image_version }}"
         pull: true
         volumes:
-          - "{{ pyload_config_directory }}:/opt/pyload/pyload-config:rw"
+          - "{{ pyload_data_directory }}:/opt/pyload/pyload-config:rw"
           - "{{ pyload_download_directory }}:/opt/pyload/Downloads:rw"
         ports:
           - "{{ pyload_port }}:8000"
