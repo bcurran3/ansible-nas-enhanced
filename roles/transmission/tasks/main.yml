@@ -7,7 +7,8 @@
         state: directory
         # mode: 0755
       with_items:
-        - "{{ transmission_config_directory }}"
+        - "{{ transmission_data_directory }}"
+        - "{{ transmission_data_directory }}/config"
         - "{{ transmission_download_directory }}"
         - "{{ transmission_watch_directory }}"
 
@@ -18,7 +19,7 @@
         image: "{{ transmission_image_name }}:{{ transmission_image_version }}"
         pull: true
         volumes:
-          - "{{ transmission_config_directory }}:/config:rw"
+          - "{{ transmission_data_directory }}/config:/config:rw"
           - "{{ transmission_download_directory }}:/downloads:rw"
           - "{{ transmission_watch_directory }}:/watch:rw"
         ports:
