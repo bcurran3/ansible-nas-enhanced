@@ -6,9 +6,10 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ duplicacy_config_directory }}"
-        - "{{ duplicacy_logs_directory }}"
-        - "{{ duplicacy_cache_directory }}"
+        - "{{ duplicacy_data_directory }}"
+        - "{{ duplicacy_data_directory }}/cache"
+        - "{{ duplicacy_data_directory }}/config"
+        - "{{ duplicacy_data_directory }}/logs"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -20,9 +21,9 @@
         ports:
           - "{{ duplicacy_port }}:3875"
         volumes:
-          - "{{ duplicacy_config_directory }}:/config:rw"
-          - "{{ duplicacy_logs_directory }}:/logs:rw"
-          - "{{ duplicacy_cache_directory }}:/cache:rw"
+          - "{{ duplicacy_data_directory }}/cache:/cache:rw"
+          - "{{ duplicacy_data_directory }}/config:/config:rw"
+          - "{{ duplicacy_data_directory }}/logs:/logs:rw"
           - "{{ samba_shares_root }}:/backuproot:{{ duplicacy_data_permissions }}"
         env:
           DUPLICACY_WEB_VERSION: "{{ duplicacy_web_version }}"
