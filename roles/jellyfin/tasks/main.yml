@@ -6,7 +6,8 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ jellyfin_config_directory }}"
+        - "{{ jellyfin_data_directory }}"
+        - "{{ jellyfin_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -16,7 +17,7 @@
         pull: true
         cpu_shares: "{{ jellyfin_cpu_shares }}"
         volumes:
-          - "{{ jellyfin_config_directory }}:/config:rw"
+          - "{{ jellyfin_data_directory }}/config:/config:rw"
           - "{{ jellyfin_movies_directory }}:/movies:{{ jellyfin_movies_permissions }}"
           - "{{ jellyfin_music_directory }}:/music:{{ jellyfin_music_permissions }}"
           - "{{ jellyfin_photos_directory }}:/photos:{{ jellyfin_photos_permissions }}"
