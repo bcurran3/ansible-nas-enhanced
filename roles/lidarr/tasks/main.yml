@@ -3,8 +3,11 @@
   block:
     - name: Create Lidarr Directory
       ansible.builtin.file:
-        path: "{{ lidarr_data_directory }}"
+        path: "{{ item }}"
         state: directory
+      with_items:
+        - "{{ lidarr_data_directory }}"
+        - "{{ lidarr_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -14,9 +17,9 @@
         pull: true
         cpu_shares: "{{ lidarr_cpu_shares }}"
         volumes:
-          - "{{ lidarr_music_directory }}:/music:rw"
+          - "{{ lidarr_data_directory }}/config:/config:rw"
           - "{{ lidarr_downloads_directory }}:/downloads:rw"
-          - "{{ lidarr_data_directory }}:/config:rw"
+          - "{{ lidarr_music_directory }}:/music:rw"
         ports:
           - "{{ lidarr_port }}:8686"
         env:
