@@ -6,8 +6,9 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ piwigo_config_directory }}"
         - "{{ piwigo_data_directory }}"
+        - "{{ piwigo_data_directory }}/config"
+        - "{{ piwigo_data_directory }}/db"
         - "{{ piwigo_photos }}"
 
     - name: Create {{ ansible_nas_app_name }} network
@@ -21,7 +22,7 @@
         pull: true
         cpu_shares: "{{ piwigo_db_cpu_shares }}"
         volumes:
-          - "{{ piwigo_data_directory }}/mysql:/var/lib/mysql:rw"
+          - "{{ piwigo_data_directory }}/db:/var/lib/mysql:rw"
         env:
           MYSQL_DATABASE: "piwigo"
           MYSQL_USER: "{{ piwigo_mysql_user }}"
@@ -43,7 +44,7 @@
         pull: true
         cpu_shares: "{{ piwigo_cpu_shares }}"
         volumes:
-          - "{{ piwigo_config_directory }}:/config:rw"
+          - "{{ piwigo_data_directory }}/config:/config:rw"
           - "{{ piwigo_photos }}:/gallery:rw"
         ports:
           - "{{ piwigo_port }}:80"
