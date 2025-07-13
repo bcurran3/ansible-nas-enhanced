@@ -7,7 +7,8 @@
         state: directory
         # mode: 0755
       with_items:
-        - "{{ homebridge_config_directory }}"
+        - "{{ homebridge_data_directory }}"
+        - "{{ homebridge_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -16,7 +17,7 @@
         pull: true
         cpu_shares: "{{ homebridge_cpu_shares }}"
         volumes:
-          - "{{ homebridge_config_directory }}:/homebridge"
+          - "{{ homebridge_data_directory }}/config:/homebridge"
         network_mode: "host"
         env:
           TZ: "{{ ansible_nas_timezone }}"
