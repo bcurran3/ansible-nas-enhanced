@@ -7,6 +7,7 @@
         state: directory
       with_items:
         - "{{ bazarr_data_directory }}"
+        - "{{ bazarr_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -15,9 +16,9 @@
         pull: true
         cpu_shares: "{{ bazarr_cpu_shares }}"
         volumes:
+          - "{{ bazarr_data_directory }}/config:/config:rw"
           - "{{ bazarr_tv_directory }}:/tv:rw"
           - "{{ bazarr_movies_directory }}:/movies:rw"
-          - "{{ bazarr_data_directory }}:/config:rw"
         ports:
           - "{{ bazarr_port }}:6767"
         env:
