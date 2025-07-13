@@ -7,8 +7,9 @@
         state: directory
         # mode: 0755
       with_items:
-        - "{{ tautulli_config_directory }}"
-        - "{{ plex_logs }}"
+        - "{{ tautulli_data_directory }}"
+        - "{{ tautulli_data_directory }}/config"
+        - "{{ plex_data_directory }}/logs"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -16,8 +17,8 @@
         image: "{{ tautulli_image_name }}:{{ tautulli_image_version }}"
         pull: true
         volumes:
-          - "{{ tautulli_config_directory }}:/config:rw"
-          - "{{ plex_logs }}:/logs:ro"
+          - "{{ tautulli_data_directory }}/config:/config:rw"
+          - "{{ plex_data_directory }}/logs:/logs:ro"
         ports:
           - "{{ tautulli_port }}:8181"
         env:
