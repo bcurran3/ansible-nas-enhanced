@@ -6,7 +6,8 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ deluge_config_directory }}"
+        - "{{ deluge_data_directory }}"
+        - "{{ deluge_data_directory }}/config"
         - "{{ deluge_download_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -16,7 +17,7 @@
         pull: true
         cpu_shares: "{{ deluge_cpu_shares }}"
         volumes:
-          - "{{ deluge_config_directory }}:/config:rw"
+          - "{{ deluge_data_directory }}/config:/config:rw"
           - "{{ deluge_download_directory }}:/downloads:rw"
         ports:
           - "{{ deluge_port }}:8112"
