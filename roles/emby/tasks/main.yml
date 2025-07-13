@@ -6,7 +6,8 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ emby_config_directory }}"
+        - "{{ emby_data_directory }}"
+        - "{{ emby_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -15,9 +16,10 @@
         pull: true
         cpu_shares: "{{ emby_cpu_shares }}"
         volumes:
-          - "{{ emby_config_directory }}:/config:rw"
+          - "{{ emby_data_directory }}/config:/config:rw"
           - "{{ emby_movies_directory }}:/movies:{{ emby_movies_permissions }}"
           - "{{ emby_tv_directory }}:/tv:{{ emby_tv_permissions }}"
+          ## ^^ should add anime support
         ports:
           - "{{ emby_port_http }}:8096"
           - "{{ emby_port_https }}:8920"

@@ -6,7 +6,7 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ get_iplayer_config_directory }}"
+        - "{{ get_iplayer_data_directory }}"
         - "{{ get_iplayer_download_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -16,7 +16,7 @@
         pull: true
         cpu_shares: "{{ get_iplayer_cpu_shares }}"
         volumes:
-          - "{{ get_iplayer_config_directory }}:/root/.get_iplayer:rw"
+          - "{{ get_iplayer_data_directory }}:/root/.get_iplayer:rw"
           - "{{ get_iplayer_download_directory }}:/root/output:rw"
         ports:
           - "{{ get_iplayer_port }}:8181"
