@@ -6,12 +6,12 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ stats_telegraf_config_directory }}"
+        - "{{ stats_telegraf_data_directory }}"
 
     - name: Template telegraf.conf
       ansible.builtin.template:
         src: telegraf.conf.j2
-        dest: "{{ stats_telegraf_config_directory }}/telegraf.conf"
+        dest: "{{ stats_telegraf_data_directory }}/data/telegraf.conf"
       register: telegraf_config
 
     - name: Get Docker daemon uid
@@ -32,7 +32,7 @@
           - "{{ stats_telegraf_port }}:9273"
         user: "telegraf:{{ docker_uid.stdout }}"
         volumes:
-          - "{{ stats_telegraf_config_directory }}:/etc/telegraf/:ro"
+          - "{{ stats_telegraf_data_directory }}/data:/etc/telegraf/:ro"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
           - "/:/hostfs:ro"
           - "/etc:/hostfs/etc:ro"
@@ -73,3 +73,23 @@
         name: "{{ stats_telegraf_container_name }}"
         state: absent
   when: stats_enabled is false
+
+- name: Data Archive Telegraf
+  block:
+    - name: Check for Telegraf Data Directory
+      stat:
+        path: "{{ stats_telegraf_data_directory }}"
+      register: dir_stat
+
+    - name: Archive Telegraf Data Directory
+      ansible.builtin.archive:
+        path: "{{ stats_telegraf_data_directory }}"
+        dest: "{{ docker_home }}/telegraf.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: stats_enabled is false and archive_app_data_enabled is true

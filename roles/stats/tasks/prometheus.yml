@@ -7,7 +7,7 @@
         state: directory
       with_items:
         - "{{ stats_prometheus_data_directory }}"
-        - "{{ stats_prometheus_config_directory }}"
+        - "{{ stats_prometheus_data_directory }}/config"
 
     - name: Create Prometheus Data Directory
       ansible.builtin.file:
@@ -15,13 +15,12 @@
         state: directory
         mode: 0777
       with_items:
-        - "{{ stats_prometheus_data_directory }}"
-        - "{{ stats_prometheus_config_directory }}"
+        - "{{ stats_prometheus_data_directory }}/config"
 
     - name: Template Prometheus config
       ansible.builtin.template:
         src: prometheus.yml.j2
-        dest: "{{ stats_prometheus_config_directory }}/prometheus.yml"
+        dest: "{{ stats_prometheus_data_directory }}/config/prometheus.yml"
       register: prometheus_config
 
     - name: Prometheus Docker Container
@@ -31,8 +30,8 @@
         image: "{{ stats_prometheus_image_name }}:{{ stats_prometheus_image_version }}"
         pull: true
         volumes:
-          - "{{ stats_prometheus_config_directory }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
-          - "{{ stats_prometheus_data_directory }}:/prometheus:rw"
+          - "{{ stats_prometheus_data_directory }}/config/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+          - "{{ stats_prometheus_data_directory }}/data:/prometheus:rw"
           - "/etc/timezone:/etc/timezone:ro"
         ports:
           - "{{ stats_prometheus_port }}:9090"
@@ -74,3 +73,23 @@
         name: "{{ stats_prometheus_container_name }}"
         state: absent
   when: stats_enabled is false
+
+- name: Data Archive Prometheus
+  block:
+    - name: Check for Prometheus Data Directory
+      stat:
+        path: "{{ stats_prometheus_data_directory }}"
+      register: dir_stat
+
+    - name: Archive Prometheus Data Directory
+      ansible.builtin.archive:
+        path: "{{ stats_prometheus_data_directory }}"
+        dest: "{{ docker_home }}/prometheus.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: stats_enabled is false and archive_app_data_enabled is true
