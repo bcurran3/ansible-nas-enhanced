@@ -11,10 +11,10 @@
       with_items:
         - "{{ stats_grafana_data_directory }}"
         - "{{ stats_grafana_data_directory }}/config"
-        - "{{ stats_grafana_data_directory }}/config/dashboards"
-        - "{{ stats_grafana_data_directory }}/config/provisioning
-        - "{{ stats_grafana_data_directory }}/config/provisioning/datasources"
-        - "{{ stats_grafana_data_directory }}/config/provisioning/dashboards"
+        - "{{ stats_grafana_data_directory }}/config:/dashboards"
+        - "{{ stats_grafana_data_directory }}/config:/provisioning"
+        - "{{ stats_grafana_data_directory }}/config:/provisioning/datasources"
+        - "{{ stats_grafana_data_directory }}/config:/provisioning/dashboards"
         - "{{ stats_grafana_data_directory }}/data"
 
     - name: Template Grafana data source

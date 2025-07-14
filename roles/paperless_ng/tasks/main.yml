@@ -9,9 +9,9 @@
         state: directory
       with_items:
         - "{{ paperless_ng_data_directory }}"
+        - "{{ paperless_ng_data_directory }}/data"
         - "{{ paperless_ng_files_directory }}"
         - "{{ paperless_ng_postgres_directory }}"
-        - "{{ paperless_ng_data_directory }}"
         - "{{ paperless_ng_export_directory }}"
         - "{{ paperless_ng_media_directory }}"
         - "{{ paperless_ng_consume_directory }}"
@@ -63,7 +63,7 @@
         pull: true
         cpu_shares: "{{ paperless_ng_uiserver_cpu_shares }}"
         volumes:
-          - "{{ paperless_ng_data_directory }}:/usr/src/paperless/data"
+          - "{{ paperless_ng_data_directory }}/data:/usr/src/paperless/data"
           - "{{ paperless_ng_media_directory }}:/usr/src/paperless/media"
           - "{{ paperless_ng_export_directory }}:/usr/src/paperless/export"
           - "{{ paperless_ng_consume_directory }}:/usr/src/paperless/consume"
