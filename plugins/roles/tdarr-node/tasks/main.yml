@@ -26,6 +26,7 @@
             max-size: 200k
         pull: true
         cpu_shares: "{{ tdarr_node_cpu_shares }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
         device_requests:
           - capabilities: [gpu]
             count: -1
