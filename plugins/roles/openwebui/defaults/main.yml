@@ -1,0 +1,45 @@
+---
+ansible_nas_app_name: "Open WebUI"
+
+#
+openwebui_enabled: false
+openwebui_available_externally: false
+openwebui_traefik_whitelist: "{{ lan }}"
+
+openwebui_data_directory: "{{ docker_home }}/openwebui"
+
+# network
+openwebui_port_http: "11435"
+openwebui_hostname: "openwebui"
+openwebui_openedai_port_http: "11436"
+openwebui_openedai_hostname: "openedai"
+
+# docker
+openwebui_container_name: "open-webui"
+openwebui_image_name: "ghcr.io/open-webui/open-webui"
+openwebui_image_tag: "main"
+openwebui_cpu_shares: "1024"
+openwebui_memory: "16G"
+openwebui_openedai_container_name: "open-webui-openedai"
+openwebui_openedai_image_name: "ghcr.io/matatonic/openedai-speech"
+openwebui_openedai_image_tag: "latest"
+openwebui_openedai_cpu_shares: "1024"
+openwebui_openedai_memory: "1G"
+
+# autoheal
+openwebui_autoheal: "false"
+openwebui_openedai_autoheal: "false"
+
+# homepage
+openwebui_homepage_group: "Apps"
+openwebui_homepage_icon: "open-webui.png"
+openwebui_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openwebui_port_http }}"
+openwebui_homepage_showStats: "false"
+openwebui_openedai_homepage_group: "Misc"
+openwebui_openedai_homepage_icon: "open-webui.png"
+openwebui_openedai_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openwebui_openedai_port_http }}"
+openwebui_openedai_homepage_showStats: "false"
+
+# watchtower
+openwebui_watchtower_monitor_only: "true"
+openwebui_openedai_watchtower_monitor_only: "true"

@@ -1,0 +1,153 @@
+---
+##### WORK IN PROGRESS #####
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Check for Ollama installation
+      ansible.builtin.fail:
+        msg: "{{ ansible_nas_app_name }} requires Ollama enabled to access LLMs, please set that up first."
+      when: ollama_enabled is false
+
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ openwebui_data_directory }}"
+        - "{{ openwebui_data_directory }}/data"
+        - "{{ openwebui_data_directory }}/openedai"
+        - "{{ openwebui_data_directory }}/openedai/config"
+        - "{{ openwebui_data_directory }}/openedai/voices"
+
+# Notice: This software is mostly obsolete and will no longer be updated.
+    - name: Create {{ ansible_nas_app_name }} OpenedAI Speech Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ openwebui_openedai_container_name }}"
+        hostname: "{{ openwebui_openedai_container_name }}"
+        image: "{{ openwebui_openedai_image_name }}:{{ openwebui_openedai_image_tag }}"
+        pull: true
+        cpu_shares: "{{ openwebui_openedai_cpu_shares }}"
+        volumes:
+          - "{{ openwebui_data_directory }}/openedai/config:/app/config"
+          - "{{ openwebui_data_directory }}/openedai/voices:/app/voices"
+        ports:
+          - "{{ openwebui_openedai_port_http }}:8000"
+        env:
+          TTS_HOME: "voices"
+          HF_HOME: "voices"
+          TZ: "{{ ansible_nas_timezone }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
+        device_requests:
+          - capabilities: [gpu]
+            count: -1
+        labels:
+          autoheal: "{{ openwebui_openedai_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ openwebui_openedai_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} OpenedAI Speech"
+          homepage.group: "{{ openwebui_openedai_homepage_group }}"
+          homepage.icon: "{{ openwebui_openedai_homepage_icon }}"
+          homepage.href: "{{ openwebui_openedai_homepage_href }}"
+#         homepage.description: "An OpenAI API compatible text to speech server using Coqui AI's xtts_v2 and/or piper tts as the backend."
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openwebui_openedai_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ openwebui_openedai_container_name }}"
+          homepage.showStats: "{{ openwebui_openedai_homepage_showStats }}"
+          traefik.enable: "{{ openwebui_available_externally | string }}"
+          traefik.http.routers.openedai.rule: "Host(`openedai.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.openedai.tls.certresolver: "letsencrypt"
+          traefik.http.routers.openedai.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.openedai.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ openwebui_openedai_hostname }}"
+          traefik.http.routers.openedai.middlewares: "{{ openwebui_openedai_hostname }}@docker"
+          traefik.http.middlewares.openedai.IPAllowList.sourcerange: "{{ openwebui_traefik_whitelist }}"
+          traefik.http.services.openedai.loadbalancer.server.port: "8000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/matatonic/openedai-speech/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ openwebui_openedai_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ openwebui_container_name }}"
+        hostname: "{{ openwebui_container_name }}"
+        image: "{{ openwebui_image_name }}:{{ openwebui_image_tag }}"
+        pull: true
+        cpu_shares: "{{ openwebui_cpu_shares }}"
+        volumes:
+          - "{{ openwebui_data_directory }}/data:/app/backend/data"
+        ports:
+          - "{{ openwebui_port_http }}:8080"
+        env:
+          OLLAMA_BASE_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_port_http }}"
+#          WEBUI_SECRET_KEY: ""
+#          ENABLE_RAG_WEB_SEARCH: "true"
+#          RAG_WEB_SEARCH_ENGINE: "searxng"
+#          RAG_WEB_SEARCH_RESULT_COUNT: "3"
+#          RAG_WEB_SEARCH_CONCURRENT_REQUESTS: "10"
+#         SEARXNG_QUERY_URL: "http://SearxngIP:port/search?q=<query>"
+#          SEARXNG_QUERY_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openwebui_port_http }}/search?q=<query>"
+          TZ: "{{ ansible_nas_timezone }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
+        device_requests:
+          - capabilities: [gpu]
+            count: -1
+        labels:
+          autoheal: "{{ openwebui_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ openwebui_watchtower_monitor_only }}"
+          homepage.name: "Open WebUI"
+          homepage.group: "{{ openwebui_homepage_group }}"
+          homepage.icon: "{{ openwebui_homepage_icon }}"
+          homepage.href: "{{ openwebui_homepage_href }}"
+#         homepage.description: "User-friendly AI Interface (Supports Ollama, OpenAI API, ...)"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openwebui_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ openwebui_container_name }}"
+          homepage.showStats: "{{ openwebui_homepage_showStats }}"
+          traefik.enable: "{{ openwebui_available_externally | string }}"
+          traefik.http.routers.openwebui.rule: "Host(`openwebui.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.openwebui.tls.certresolver: "letsencrypt"
+          traefik.http.routers.openwebui.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.openwebui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ openwebui_hostname }}"
+          traefik.http.routers.openwebui.middlewares: "{{ openwebui_hostname }}@docker"
+          traefik.http.middlewares.openwebui.IPAllowList.sourcerange: "{{ openwebui_traefik_whitelist }}"
+          traefik.http.services.openwebui.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/open-webui/open-webui/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ openwebui_memory }}"
+        restart_policy: unless-stopped
+  when: openwebui_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} OpenedAI Speech Container
+      community.docker.docker_container:
+        name: "{{ openwebui_openedai_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Open WebUI Container
+      community.docker.docker_container:
+        name: "{{ openwebui_container_name }}"
+        state: absent
+  when: openwebui_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ openwebui_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ openwebui_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: openwebui_enabled is false and archive_app_data_enabled is true

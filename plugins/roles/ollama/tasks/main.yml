@@ -1,5 +1,4 @@
 ---
-##### WORK IN PROGRESS #####
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -8,11 +7,6 @@
         state: directory
       with_items:
         - "{{ ollama_data_directory }}"
-        - "{{ ollama_data_directory }}/ollama"
-        - "{{ ollama_data_directory }}/openwebui"
-        - "{{ ollama_data_directory }}/openedai"
-        - "{{ ollama_data_directory }}/openedai/config"
-        - "{{ ollama_data_directory }}/openedai/voices"
 
     - name: Create {{ ansible_nas_app_name }} Container
       docker_container:
@@ -27,8 +21,7 @@
           - capabilities: [gpu]
             count: -1
         volumes:
-          - "{{ ollama_data_directory }}/ollama:/root/.ollama"
-          - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
+          - "{{ ollama_data_directory }}:/root/.ollama"
         ports:
           - "{{ ollama_port_http }}:11434"
         env:
@@ -55,124 +48,14 @@
           traefik.http.routers.ollama.middlewares: "{{ ollama_hostname }}@docker"
           traefik.http.middlewares.ollama.IPAllowList.sourcerange: "{{ ollama_traefik_whitelist }}"
           traefik.http.services.ollama.loadbalancer.server.port: "11434"
-          ollama.tag.include: '^\d+\.\d+\.\d+$$'
-          ollama.link.template: "https://github.com/ollama/ollama/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/ollama/ollama/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ollama_memory }}"
-        restart_policy: unless-stopped
-
-# check if this container needs nvidia runtime
-    - name: Create {{ ansible_nas_app_name }} OpenedAI Speech Container
-      docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ ollama_openedai_container_name }}"
-        hostname: "{{ ollama_openedai_container_name }}"
-        image: "{{ ollama_openedai_image_name }}:{{ ollama_openedai_image_tag }}"
-        pull: true
-        cpu_shares: "{{ ollama_openedai_cpu_shares }}"
-        volumes:
-          - "{{ ollama_data_directory }}/openedai/config:/app/config"
-          - "{{ ollama_data_directory }}/openedai/voices:/app/voices"
-        ports:
-          - "{{ ollama_openedai_port_http }}:8000"
-        env:
-          TTS_HOME: "voices"
-          HF_HOME: "voices"
-          TZ: "{{ ansible_nas_timezone }}"
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-        device_requests:
-          - capabilities: [gpu]
-            count: -1
-        labels:
-          autoheal: "{{ ollama_openedai_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openedai_watchtower_monitor_only }}"
-          homepage.name: "{{ ansible_nas_app_name }} OpenedAI Speech"
-          homepage.group: "{{ ollama_openedai_homepage_group }}"
-          homepage.icon: "{{ ollama_openedai_homepage_icon }}"
-          homepage.href: "{{ ollama_openedai_homepage_href }}"
-#         homepage.description: "An OpenAI API compatible text to speech server using Coqui AI's xtts_v2 and/or piper tts as the backend."
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_openedai_port_http }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ ollama_openedai_container_name }}"
-          homepage.showStats: "{{ ollama_openedai_homepage_showStats }}"
-          traefik.enable: "{{ ollama_available_externally | string }}"
-          traefik.http.routers.ollamaopenedai.rule: "Host(`ollamaopenedai.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.ollamaopenedai.tls.certresolver: "letsencrypt"
-          traefik.http.routers.ollamaopenedai.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.ollamaopenedai.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ ollama_openedai_hostname }}"
-          traefik.http.routers.ollamaopenedai.middlewares: "{{ ollama_openedai_hostname }}@docker"
-          traefik.http.middlewares.ollamaopenedai.IPAllowList.sourcerange: "{{ ollama_traefik_whitelist }}"
-          traefik.http.services.ollamaopenedai.loadbalancer.server.port: "8000"
-          ollama.tag.include: '^\d+\.\d+\.\d+$$'
-          ollama.link.template: "https://github.com/matatonic/openedai-speech/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: "{{ ollama_openedai_memory }}"
-        restart_policy: unless-stopped
-  
-    - name: Create {{ ansible_nas_app_name }} Open WebUI Container
-      docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ ollama_openwebui_container_name }}"
-        hostname: "{{ ollama_openwebui_container_name }}"
-        image: "{{ ollama_openwebui_image_name }}:{{ ollama_openwebui_image_tag }}"
-        pull: true
-        cpu_shares: "{{ ollama_openwebui_cpu_shares }}"
-        volumes:
-          - "{{ ollama_data_directory }}/openwebui:/app/backend/data"
-        ports:
-          - "{{ ollama_openwebui_port_http }}:8080"
-        env:
-          OLLAMA_BASE_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_port_http }}"
-#          WEBUI_SECRET_KEY: ""
-#          ENABLE_RAG_WEB_SEARCH: "true"
-#          RAG_WEB_SEARCH_ENGINE: "searxng"
-#          RAG_WEB_SEARCH_RESULT_COUNT: "3"
-#          RAG_WEB_SEARCH_CONCURRENT_REQUESTS: "10"
-#         SEARXNG_QUERY_URL: "http://SearxngIP:port/search?q=<query>"
-#          SEARXNG_QUERY_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_openwebui_port_http }}/search?q=<query>"
-          TZ: "{{ ansible_nas_timezone }}"
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-        device_requests:
-          - capabilities: [gpu]
-            count: -1
-        labels:
-          autoheal: "{{ ollama_openwebui_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ ollama_openwebui_watchtower_monitor_only }}"
-          homepage.name: "Open WebUI"
-          homepage.group: "{{ ollama_openwebui_homepage_group }}"
-          homepage.icon: "{{ ollama_openwebui_homepage_icon }}"
-          homepage.href: "{{ ollama_openwebui_homepage_href }}"
-#         homepage.description: "User-friendly AI Interface (Supports Ollama, OpenAI API, ...)"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_openwebui_port_http }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ ollama_openwebui_container_name }}"
-          homepage.showStats: "{{ ollama_openwebui_homepage_showStats }}"
-          traefik.enable: "{{ ollama_available_externally | string }}"
-          traefik.http.routers.openwebui.rule: "Host(`openwebui.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.openwebui.tls.certresolver: "letsencrypt"
-          traefik.http.routers.openwebui.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.openwebui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ ollama_openwebui_hostname }}"
-          traefik.http.routers.openwebui.middlewares: "{{ ollama_openwebui_hostname }}@docker"
-          traefik.http.middlewares.openwebui.IPAllowList.sourcerange: "{{ ollama_traefik_whitelist }}"
-          traefik.http.services.openwebui.loadbalancer.server.port: "8080"
-          ollama.tag.include: '^\d+\.\d+\.\d+$$'
-          ollama.link.template: "https://github.com/open-webui/open-webui/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: "{{ ollama_openwebui_memory }}"
         restart_policy: unless-stopped
   when: ollama_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Open WebUI Container
-      community.docker.docker_container:
-        name: "{{ ollama_openwebui_container_name }}"
-        state: absent
-
-    - name: Stop {{ ansible_nas_app_name }} OpenedAI Speech Container
-      community.docker.docker_container:
-        name: "{{ ollama_openedai_container_name }}"
-        state: absent
-
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ollama_container_name }}"
@@ -198,9 +81,3 @@
         remove: true
       when: dir_stat.stat.exists
   when: ollama_enabled is false and archive_app_data_enabled is true
-
-
-##### WORK IN PROGRESS #####
-
-# https://github.com/NightHawkATL/portainer-template-lists/blob/main/compose-files/Ollama/compose.yaml
-
