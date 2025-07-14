@@ -7,6 +7,7 @@
         state: directory
       with_items:
         - "{{ makemkv_data_directory }}"
+        - "{{ makemkv_data_directory }}/config"
         - "{{ makemkv_output_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -18,7 +19,7 @@
         pull: true
         cpu_shares: "{{ makemkv_cpu_shares }}"
         volumes:
-          - "{{ makemkv_data_directory }}:/config:rw"
+          - "{{ makemkv_data_directory }}/config:/config:rw"
 #         - "{{ makemkv_optical_drive }}: /dev/sr0:ro"
           - "{{ makemkv_storage_directory }}:/storage:ro"
 #         - "{{ makemkv_storagealt_directory }}:/storagealt:rw"
