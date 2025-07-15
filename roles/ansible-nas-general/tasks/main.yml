@@ -1,55 +1,22 @@
 ---
-- name: Start Ubuntu 22.04 LTS Specific Setup
-  block:
-#    - name: Enable Universe repository
-#      raw: apt-add-repository universe
-#      register: add_repo_result
-#      changed_when: "'distribution component enabled for all sources' in add_repo_result.stdout"
-#      until: add_repo_result.rc == 0
-#      retries: 3
-#      delay: 1
-    - name: Add the universe repository
-      apt_repository:
-        repo: 'deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe'
-        state: present
-        filename: 'ubuntu-universe'
-  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
+# DO NOTHING CURRENTLY
+#- name: Start Ubuntu 22.04 LTS Specific Setup
+#  block:
+#  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
 
-- name: Start Ubuntu 24.04 LTS Specific Setup
-  block:
-    - name: Add the universe repository
-      apt_repository:
-        repo: 'deb http://archive.ubuntu.com/ubuntu {{ ansible_distribution_release }} universe'
-        state: present
-        filename: 'ubuntu-universe'
-  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "24.04"
+# DO NOTHING CURRENTLY
+#- name: Start Ubuntu 24.04 LTS Specific Setup
+#  block:
+#  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "24.04"
 
-- name: Update apt-cache
-  apt:
-    update_cache: yes
-    cache_valid_time: 3600
-  register: result
-  until: result is succeeded
+- name: Check if generated login banner exists
+  ansible.builtin.stat:
+    path: roles/ansible-nas-general/files/motd.txt
+  register: motd_exists
 
-- name: Upgrade all packages
-  apt:
-    upgrade: yes
-    state: latest
-  when: keep_packages_updated
-  tags:
-    - skip_ansible_lint
-
-- name: Install some packages
-  apt:
-    name: "{{ ansible_nas_extra_packages }}"
-    state: present
-  register: result
-  until: result is succeeded
-
-#  - name: Configure smartmontools
-
-- name: Generate login banner using figlet
-  shell: "echo \"{{ ansible_nas_hostname }}\" | figlet > roles/ansible-nas-general/files/motd.txt"
+- name: Generate login banner using figlet if it doesn't exist
+  ansible.builtin.shell: "echo \"{{ ansible_nas_hostname }}\" | figlet > roles/ansible-nas-general/files/motd.txt"
+  when: not motd_exists.stat.exists
 
 - name: Add text to generated login banner
   lineinfile:
@@ -62,16 +29,38 @@
     src: motd.txt
     dest: /etc/motd
 
+- name: Update apt-cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  register: result
+  until: result is succeeded
+
+- name: Upgrade all packages # noqa package-latest
+  ansible.builtin.apt:
+    upgrade: yes
+    state: latest
+  when: keep_packages_updated
+  tags:
+    - skip_ansible_lint
+
+- name: Install some packages
+  ansible.builtin.apt:
+    name: "{{ ansible_nas_extra_packages }}"
+    state: present
+  register: result
+  until: result is succeeded
+
 - name: "Set hostname to {{ ansible_nas_hostname }}"
-  hostname:
+  ansible.builtin.hostname:
     name: "{{ ansible_nas_hostname }}"
 
 - name: "Set timezone to {{ ansible_nas_timezone }}"
-  timezone:
+  community.general.timezone:
     name: "{{ ansible_nas_timezone }}"
 
 - name: "Permission share directories"
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     state: directory
     owner: ansible-nas
