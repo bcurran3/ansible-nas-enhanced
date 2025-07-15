@@ -13,7 +13,7 @@
         - "{{ readarr_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         name: "{{ readarr_container_name }}"
         hostname: "{{ readarr_container_name }}"
         image: "{{ readarr_image_name }}:{{ readarr_image_version }}"
