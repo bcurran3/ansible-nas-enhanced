@@ -83,28 +83,6 @@
         name: "{{ item }}"
       with_items: "{{ found_directories.files | map(attribute='path') | list }}"
 
-# WORKS - now where to put it? ansible-nas-docker-compose role??
-#      block:
-    - debug:
-        msg: "TESTING Discovery and Running of docker-compose files"
-
-    - name: Find docker-compose files in "{{ docker_compose_directory }}""
-      ansible.builtin.find:
-        paths: "{{ docker_compose_directory }}"
-        file_type: file
-        patterns: "docker-compose.yml"
-        recurse: yes
-      register: compose_files
-
-    - name: Deploy docker-compose files in "{{ docker_compose_directory }}"
-      community.docker.docker_compose_v2:
-        project_src: "{{ item.path | dirname }}"
-        state: present
-      loop: "{{ compose_files.files }}"
-      loop_control:
-        label: "Deploying {{ item.path | dirname }}"
-#      when: docker_compose_enabled is true
-
 # make ansible-nas-pre role to run first; i.e. hello bill
 # make ansible-nas-post role to run last; i.e. cleanup
 

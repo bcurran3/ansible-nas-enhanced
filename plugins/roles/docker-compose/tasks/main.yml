@@ -1,0 +1,23 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - debug:
+        msg: "EXPERIMENTAL: Discovery and Running of {{ ansible_nas_app_name }} files"
+
+    - name: Find {{ ansible_nas_app_name }} files in "{{ dockercompose_data_directory }}"
+      ansible.builtin.find:
+        paths: "{{ dockercompose_data_directory }}"
+        file_type: file
+        patterns: "docker-compose.yml"
+        recurse: yes
+      register: compose_files
+
+    - name: Bring up {{ ansible_nas_app_name }} files in "{{ dockercompose_data_directory }}"
+      community.docker.docker_compose_v2:
+        project_src: "{{ item.path | dirname }}"
+        state: present
+      loop: "{{ compose_files.files }}"
+      loop_control:
+        label: "Deploying {{ item.path | dirname }}"
+      when: docker_compose_enabled is true
+  when: dockercompose_enabled is true
