@@ -9,26 +9,6 @@
 #  block:
 #  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "24.04"
 
-- name: Check if generated login banner exists
-  ansible.builtin.stat:
-    path: files/motd.txt
-  register: motd_exists
-
-- name: Generate login banner using figlet if it doesn't exist
-  ansible.builtin.shell: "echo \"{{ ansible_nas_hostname }}\" | figlet > files/motd.txt"
-  when: not motd_exists.stat.exists
-
-- name: Add text to generated login banner
-  lineinfile:
-    path: files/motd.txt
-    line: "Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced"
-    create: yes
-
-- name: Set login banner
-  copy:
-    src: files/motd.txt
-    dest: /etc/motd
-
 - name: Update apt-cache
   ansible.builtin.apt:
     update_cache: yes
@@ -68,3 +48,30 @@
     mode: "u=rwX,g=rwX,o=rX"
     recurse: false
   loop: "{{ samba_shares }}"
+
+- name: Install figlet
+  ansible.builtin.apt:
+    name: "figlet"
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: Check if generated login banner exists
+  ansible.builtin.stat:
+    path: files/motd.txt
+  register: motd_exists
+
+- name: Generate login banner using figlet if it doesn't exist
+  ansible.builtin.shell: "echo \"{{ ansible_nas_hostname }}\" | figlet > files/motd.txt"
+  when: not motd_exists.stat.exists
+
+- name: Add text to generated login banner
+  lineinfile:
+    path: files/motd.txt
+    line: "Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced"
+    create: yes
+
+- name: Set login banner
+  copy:
+    src: files/motd.txt
+    dest: /etc/motd
