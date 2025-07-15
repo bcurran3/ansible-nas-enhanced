@@ -11,22 +11,22 @@
 
 - name: Check if generated login banner exists
   ansible.builtin.stat:
-    path: roles/ansible-nas-general/files/motd.txt
+    path: files/motd.txt
   register: motd_exists
 
 - name: Generate login banner using figlet if it doesn't exist
-  ansible.builtin.shell: "echo \"{{ ansible_nas_hostname }}\" | figlet > roles/ansible-nas-general/files/motd.txt"
+  ansible.builtin.shell: "echo \"{{ ansible_nas_hostname }}\" | figlet > files/motd.txt"
   when: not motd_exists.stat.exists
 
 - name: Add text to generated login banner
   lineinfile:
-    path: roles/ansible-nas-general/files/motd.txt
+    path: files/motd.txt
     line: "Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced"
     create: yes
 
 - name: Set login banner
   copy:
-    src: motd.txt
+    src: files/motd.txt
     dest: /etc/motd
 
 - name: Update apt-cache
