@@ -16,7 +16,7 @@
         name: "{{ checkmate_network }}"
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_redis_container_name }}"
         image: "{{ checkmate_redis_image_name }}:{{ checkmate_redis_image_tag }}"
@@ -55,7 +55,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_db_container_name }}"
         hostname: "{{ checkmate_db_container_name }}"
@@ -91,7 +91,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Server Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_server_container_name }}"
         hostname: "{{ checkmate_server_container_name }}"
@@ -139,7 +139,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Client Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_client_container_name }}"
         hostname: "{{ checkmate_client_container_name }}"

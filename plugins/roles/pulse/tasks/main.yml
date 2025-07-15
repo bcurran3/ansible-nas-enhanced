@@ -15,7 +15,7 @@
         - "{{ pulse_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         name: "{{ pulse_container_name }}"
         hostname: "{{ pulse_container_name }}"
         image: "{{ pulse_image_name }}:{{ pulse_image_tag }}"

@@ -16,7 +16,7 @@
 #        name: "{{ osticket_network_name }}"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ osticket_db_container_name }}"
         hostname: "{{ osticket_db_container_name }}"
@@ -53,7 +53,7 @@
           wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ osticket_container_name }}"
         hostname: "{{ osticket_container_name }}"

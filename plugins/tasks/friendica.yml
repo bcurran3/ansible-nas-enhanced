@@ -10,7 +10,7 @@
     - "{{ friendica_data_directory }}/mysql"
 
 - name: Create Friendica MariaDB Docker Container
-  docker_container:
+  community.docker.docker_container:
     image: mariadb
     pull: true
     volumes:
@@ -24,7 +24,7 @@
     restart_policy: unless-stopped
 
 - name: Create Friendica Docker Container
-  docker_container:
+  community.docker.docker_container:
     name: friendica
     image: jesec/friendica:latest
     pull: true

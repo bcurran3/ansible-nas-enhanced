@@ -13,7 +13,7 @@
         - "{{ openeats_data_directory }}/database"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_db_container_name }}"
         image: "{{ openeats_db_image_name }}:{{ openeats_db_image_tag }}"
@@ -43,7 +43,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} API Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_api_container_name }}"
         image: "{{ openeats_api_image_name }}:{{ openeats_api_image_tag }}"
@@ -77,7 +77,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Web Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_container_name }}"
         hostname: "{{ openeats_container_name }}"

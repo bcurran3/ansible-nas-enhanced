@@ -24,7 +24,7 @@
         name: "{{ diskover_network_name }}"
 
     - name: Create {{ ansible_nas_app_name }} Elasticsearch Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_elasticsearch_container_name }}"
         hostname: "{{ diskover_elasticsearch_hostname }}"
@@ -75,7 +75,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Elasticsearch-helper Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: elasticsearch-helper
         hostname: elasticsearch-helper
@@ -93,7 +93,7 @@
           traefik.enable: "false"
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_container_name }}"
         hostname: "{{ diskover_container_name }}"

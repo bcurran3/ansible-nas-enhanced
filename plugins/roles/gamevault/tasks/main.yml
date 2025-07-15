@@ -14,7 +14,7 @@
         - "{{ gamevault_data_directory }}/plugins"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gamevault_db_container_name }}"
         hostname: "{{ gamevault_db_container_name }}"
@@ -45,7 +45,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gamevault_container_name }}"
         hostname: "{{ gamevault_container_name }}"

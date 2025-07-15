@@ -2,7 +2,7 @@
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ sonos_web_container_name }}"
         hostname: "{{ sonos_web_container_name }}"

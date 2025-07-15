@@ -14,7 +14,7 @@
         - "{{ magnetico_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }}d Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ magneticod_container_name }}"
         hostname: "{{ magneticod_container_name }}"
@@ -46,7 +46,7 @@
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
     - name: Create {{ ansible_nas_app_name }}w Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ magneticow_container_name }}"
         image: "{{ magneticow_image_name }}:{{ magneticow_image_tag }}"

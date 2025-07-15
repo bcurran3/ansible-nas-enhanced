@@ -12,7 +12,7 @@
         - "{{ loggifly_data_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         name: "{{ loggifly_container_name }}"
         hostname: "{{ loggifly_container_name }}"
         image: "{{ loggifly_image_name }}:{{ loggifly_image_tag }}"

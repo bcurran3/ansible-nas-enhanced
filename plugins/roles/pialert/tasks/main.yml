@@ -12,7 +12,7 @@
 
     # https://github.com/jokob-sk/Pi.Alert/blob/main/dockerfiles/README.md
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ pialert_container_name }}"
         hostname: "{{ pialert_container_name }}"
@@ -24,8 +24,8 @@
           - "{{ pialert_data_directory }}/db:/home/pi/pialert/db"
         network_mode: host
         env:
-    #    HOST_USER_GID: "1000"
-    #    HOST_USER_ID: "1000"
+#         HOST_USER_GID: "1000"
+#         HOST_USER_ID: "1000"
           PORT: "20211"
           TZ: "{{ ansible_nas_timezone }}"
         labels:

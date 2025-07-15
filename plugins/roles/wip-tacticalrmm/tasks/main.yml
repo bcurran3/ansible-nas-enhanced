@@ -39,7 +39,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Postgres Container
     # postgres database for api service
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -68,7 +68,7 @@
 
     - name: Create {{ ansible_nas_app_name }} MongoDB Container
     # mongodb container for meshcentral
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -98,7 +98,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
     # redis container for celery tasks
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -125,7 +125,7 @@
 
     - name: Create {{ ansible_nas_app_name }} nats Container
     # nats
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -161,7 +161,7 @@
 
     - name: Create {{ ansible_nas_app_name }} MeshCentral Container
       # meshcentral container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -206,7 +206,7 @@
 
     - name: Create {{ ansible_nas_app_name }} init Container
     # used to initialize the docker environment
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -249,7 +249,7 @@
 
     - name: Create {{ ansible_nas_app_name }} vue Container
     # container that hosts vue frontend
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -275,7 +275,7 @@
 
     - name: Create {{ ansible_nas_app_name }} django Container
     # container for django backend
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -306,7 +306,7 @@
 
     - name: Create {{ ansible_nas_app_name }} django websockets Doer Container
     # container for django websockets connections
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -338,7 +338,7 @@
 
     - name: Create {{ ansible_nas_app_name }} celery worker Container
     # container for celery worker service
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -370,7 +370,7 @@
 
     - name: Create {{ ansible_nas_app_name }} celery beat Container
     # container for celery beat service
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -402,7 +402,7 @@
 
     - name: Create {{ ansible_nas_app_name }} web Container
     # container for tactical reverse proxy
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         pull: true
         image: "{{ _image_name }}:{{ _image_tag }}"
@@ -451,7 +451,7 @@
           traefik.http.middlewares.tacticalrmm.IPAllowList.sourcerange: "{{ tacticalrmm_traefik_whitelist }}"
           traefik.http.services.tacticalrmm.loadbalancer.server.port: "8080"
         restart_policy: unless-stopped
-    when: tacticalrmm_enabled is true
+  when: tacticalrmm_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:

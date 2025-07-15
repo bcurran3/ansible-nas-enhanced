@@ -26,7 +26,7 @@
       register: template_config
 
     - name: Create {{ ansible_nas_app_name }} DB Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_db_container_name }}"
         hostname: "{{ invoiceninja_db_container_name }}"
@@ -66,7 +66,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_backend_container_name }}"
         hostname: "{{ invoiceninja_backend_container_name }}"
@@ -127,7 +127,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Web UI Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_container_name }}"
         hostname: "{{ invoiceninja_container_name }}"

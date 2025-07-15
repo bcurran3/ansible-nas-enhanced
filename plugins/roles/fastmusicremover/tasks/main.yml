@@ -2,7 +2,7 @@
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create Fast {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ fastmusicremover_container_name }}"
         hostname: "{{ fastmusicremover_container_name }}"

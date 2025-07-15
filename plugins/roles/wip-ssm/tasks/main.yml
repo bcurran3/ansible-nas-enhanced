@@ -17,7 +17,7 @@
         name: "{{ ssm_network_name }}"
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ssm_redis_container_name }}"
         hostname: "{{ ssm_redis_container_name }}"
@@ -45,7 +45,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ssm_db_container_name }}"
         hostname: "{{ ssm_db_container_name }}"
@@ -71,7 +71,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Client Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ssm_client_container_name }}"
         hostname: "{{ ssm_client_container_name }}"
@@ -104,7 +104,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Server Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ssm_container_name }}"
         hostname: "{{ ssm_container_name }}"

@@ -13,7 +13,7 @@
         - "{{ odoo_data_directory }}/addons"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ odoo_db_container_name }}"
         hostname: "{{ odoo_db_container_name }}"
@@ -42,7 +42,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ odoo_container_name }}"
         hostname: "{{ odoo_container_name }}"

@@ -20,7 +20,7 @@
 
 # Notice: This software is mostly obsolete and will no longer be updated.
     - name: Create {{ ansible_nas_app_name }} OpenedAI Speech Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openwebui_openedai_container_name }}"
         hostname: "{{ openwebui_openedai_container_name }}"
@@ -67,7 +67,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openwebui_container_name }}"
         hostname: "{{ openwebui_container_name }}"

@@ -9,7 +9,7 @@
         - "{{ monitorr_data_directory }}/app"
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ monitorr_container_name }}"
         image: "{{ monitorr_image_name }}:{{ monitorr_image_tag }}"

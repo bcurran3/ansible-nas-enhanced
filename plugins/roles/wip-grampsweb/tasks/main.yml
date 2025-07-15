@@ -19,7 +19,7 @@
 # I don't understand how to create the container below w/no image to pull
 
 #    - name: {{ ansible_nas_app_name }} celery Container
-#      docker_container:
+#      community.docker.docker_container:
 #        container_default_behavior: "compatibility"
 #        name: "{{ grampsweb_celery_container_name }}"
 #        hostname: "{{ grampsweb_celery_container_name }}"
@@ -49,7 +49,7 @@
 #        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ grampsweb_redis_container_name }}"
         hostname: "{{ grampsweb_redis_container_name }}"
@@ -76,7 +76,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ grampsweb_container_name }}"
         hostname: "{{ grampsweb_container_name }}"
