@@ -10,7 +10,7 @@
         - "{{ autobrr_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ autobrr_container_name }}"
         image: "{{ autobrr_image_name }}:{{ autobrr_image_tag }}"

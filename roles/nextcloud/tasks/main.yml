@@ -20,7 +20,7 @@
         name: "{{ nextcloud_network_name }}"
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ nextcloud_redis_container_name }}"
         hostname: "{{ nextcloud_redis_container_name }}"
@@ -208,7 +208,6 @@
         remove: true
       when: dir_stat.stat.exists
   when: nextcloud_enabled is false and archive_app_data_enabled is true
-
 
 # adding redis makes it faster!
 # some changes to make my.cnf persistant

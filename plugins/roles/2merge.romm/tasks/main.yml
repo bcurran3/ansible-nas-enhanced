@@ -14,7 +14,7 @@
         - "{{ romm_data_directory }}/redis"
 
     - name: Create RomM MariaDB Docker Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ romm_db_container_name }}"
         hostname: "{{ romm_db_container_name }}"
@@ -58,7 +58,7 @@
           wud.link.template: "https://mariadb.com/kb/en/mariadb-$${major}$${minor}$${patch}-changelog"
 
     - name: Create RomM Docker Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ romm_container_name }}"
         hostname: "{{ romm_container_name }}"

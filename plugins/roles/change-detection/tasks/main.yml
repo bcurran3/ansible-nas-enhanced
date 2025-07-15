@@ -10,7 +10,7 @@
         - "{{ change_detection_data_directory }}/datastore"
 
     - name: Create {{ ansible_nas_app_name }} Sock Puppet(eer) Browser Docker Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ change_detection_sockpuppet_container_name }}"
         hostname: "{{ change_detection_sockpuppet_container_name }}"
@@ -44,7 +44,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ change_detection_container_name }}"
         hostname: "{{ change_detection_container_name }}"

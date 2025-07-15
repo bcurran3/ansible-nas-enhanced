@@ -18,7 +18,7 @@
     name: "paperlessngx"
 
 - name: Create Paperless-ngx Redis Docker Container
-  docker_container:
+  community.docker.docker_container:
     container_default_behavior: no_defaults
     pull: true
     image: docker.io/library/redis:7
@@ -38,7 +38,7 @@
 #     wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
 - name: Create Paperless-ngx PostgreSQL Docker Container
-  docker_container:
+  community.docker.docker_container:
     image: docker.io/library/postgres:15
     name: paperless-ngx_db
     hostname: "db"
@@ -62,7 +62,7 @@
 #     wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
 
 - name: Create Paperless-ngx Docker Container
-  docker_container:
+  community.docker.docker_container:
     name: "{{ paperlessngx_container_name }}"
     image: ghcr.io/paperless-ngx/paperless-ngx:latest
     pull: true

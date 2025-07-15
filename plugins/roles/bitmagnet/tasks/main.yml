@@ -12,7 +12,7 @@
         - "{{ bitmagnet_data_directory }}/db"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ bitmagnet_db_container_name }}"
         hostname: "{{ bitmagnet_db_container_name }}"
@@ -49,7 +49,7 @@
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
-      docker_container:
+      community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ bitmagnet_container_name }}"
         hostname: "{{ bitmagnet_container_name }}"
