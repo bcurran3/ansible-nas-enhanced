@@ -50,7 +50,15 @@
       community.docker.docker_container:
         name: "{{ timemachine_container_name }}"
         state: absent
-# Needs avahi removal task here
+
+# NOTE: I don't use this and don't know the ramifications - not tested
+#    - name: Remove avahi
+#      ansible.builtin.apt:
+#        name: "avahi-daemon"
+#        state: absent
+#        update_cache: yes
+#      register: result
+#      until: result is succeeded
   when: timemachine_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
