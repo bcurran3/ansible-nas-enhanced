@@ -1,4 +1,7 @@
 #!/bin/bash
+# TODO:
+# change subdir to a variable
+# add ansible-playbook -i inventories/my-ansible-nas/inventory permission_data.yml -b -K
 
 if [[ "$1" == "--enabled" ]]; then
      echo "*** ANE enabled apps:"
