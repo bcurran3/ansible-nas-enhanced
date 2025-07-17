@@ -33,7 +33,7 @@
           homepage.href: "{{ flaresolverr_homepage_href }}"
           homepage.icon: "{{ flaresolverr_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flaresolverr_port }}"
-#         homepage.description: "Proxy server to bypass Cloudflare protection"
+          homepage.description: "{{ 'Proxy server to bypass Cloudflare protection' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ flaresolverr_container_name }}"
           homepage.showStats: "{{ flaresolverr_homepage_showStats }}"

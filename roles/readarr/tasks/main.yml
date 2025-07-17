@@ -39,7 +39,7 @@
           homepage.icon: "{{ readarr_homepage_icon }}"
           homepage.href: "{{ readarr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ readarr_port }}"
-#         homepage.description: "Book Manager and Automation (Sonarr for Ebooks)"
+          homepage.description: "{{ 'Book Manager and Automation (Sonarr for Ebooks)' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ readarr_container_name }}"
           homepage.showStats: "{{ readarr_homepage_showStats }}"

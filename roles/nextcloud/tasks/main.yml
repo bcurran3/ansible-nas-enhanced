@@ -40,10 +40,10 @@
           autoheal: "{{ nextcloud_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_redis_watchtower_monitor_only }}"
           homepage.group: "{{ nextcloud_redis_homepage_group }}"
-          homepage.name: "Nextcloud Redis"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.icon: "{{ nextcloud_redis_homepage_icon }}"
           homepage.href: "{{ nextcloud_homepage_href }}"
-#         homepage.description: "Redis"
+          homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_redis_container_name }}"
           homepage.showStats: "{{ nextcloud_redis_homepage_showStats }}"
@@ -64,7 +64,6 @@
         volumes:
           - "{{ nextcloud_data_directory }}/mysql/mysql:/var/lib/mysql" # added
           - "{{ nextcloud_data_directory }}/mysql/my.cnf:/etc/my.cnf" # added
-          - "/etc/timezone:/etc/timezone:ro" # ignores this and uses UTC
         env:
           MYSQL_DATABASE: "nextcloud"
           MYSQL_USER: "{{ nextcloud_sql_user }}"
@@ -77,10 +76,10 @@
           autoheal: "{{ nextcloud_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_db_watchtower_monitor_only }}"
           homepage.group: "{{ nextcloud_db_homepage_group }}"
-          homepage.name: "Nextcloud MySQL"
+          homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.icon: "{{ nextcloud_db_homepage_icon }}"
           homepage.href: "{{ nextcloud_homepage_href }}"
-#         homepage.description: "MySQL"
+          homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_db_container_name }}"
           homepage.showStats: "{{ nextcloud_db_homepage_showStats }}"
@@ -135,11 +134,11 @@
           autoheal: "{{ nextcloud_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_watchtower_monitor_only }}"
           homepage.group: "{{ nextcloud_homepage_group }}"
-          homepage.name: "Nextcloud"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ nextcloud_homepage_icon }}"
           homepage.href: "{{ nextcloud_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port }}/login"
-#         homepage.description: "Open source dropbox alternative"
+          homepage.description: "{{ 'Open source dropbox alternative' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_container_name }}"
           homepage.showStats: "{{ nextcloud_homepage_showStats }}"

@@ -87,7 +87,7 @@
           homepage.name: Romm
           homepage.icon: romm
           homepage.href: http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port }}
-          homepage.description: Game library manager
+          homepage.description: "{{ 'Game library manager' if homepage_show_description else omit }}"
   when: romm_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

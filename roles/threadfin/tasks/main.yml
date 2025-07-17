@@ -27,7 +27,7 @@
           homepage.name: Threadfin
           homepage.icon: xteve
           homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ threadfin_port }}"
-          homepage.description: IPTV bridge
+          homepage.description: "{{ 'IPTV bridge' if homepage_show_description else omit }}"
           homepage.widget.type: xteve
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ threadfin_port }}"
   when: threadfin_enabled is true

@@ -37,7 +37,7 @@
           homepage.icon: "{{ mylar_homepage_icon }}"
           homepage.href: "{{ mylar_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mylar_port_http }}"
-#         homepage.description: ""
+          homepage.description: "{{ 'comicbook management' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mylar_container_name }}"
           homepage.showStats: "false"

@@ -37,7 +37,7 @@
           homepage.icon: "{{ radarr_homepage_icon }}"
           homepage.href: "{{ radarr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port }}"
-#         homepage.description: "A fork of Sonarr to work with movies"
+          homepage.description: "{{ 'A fork of Sonarr to work with movies' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ radarr_container_name }}"
           homepage.showStats: "{{ radarr_homepage_showStats }}"      

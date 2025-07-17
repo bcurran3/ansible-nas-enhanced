@@ -14,7 +14,7 @@
         src: "users.txt.j2"
         dest: "{{ virtual_desktop_data_directory }}/users.txt"
 
-    - name: Create  Container
+    - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ virtual_desktop_container_name }}"
         image: "{{ virtual_desktop_image_name }}:{{ virtual_desktop_image_version }}"

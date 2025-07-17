@@ -41,7 +41,7 @@
           homepage.href: "{{ transmission_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_webui_port }}"
           homepage.icon: "{{ transmission_homepage_icon }}"
-#         homepage.description: "BitTorrent client"
+          homepage.description: "{{ 'BitTorrent client' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ transmission_container_name }}"
           homepage.showStats: "{{ transmission_homepage_showStats }}"

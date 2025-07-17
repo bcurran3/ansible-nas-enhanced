@@ -29,7 +29,7 @@
           homepage.icon: "home-assistant.png"
           homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
-#         homepage.description: ""
+          homepage.description: "{{'Home Assistant' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ homeassistant_container_name }}"
           homepage.showStats: "false"

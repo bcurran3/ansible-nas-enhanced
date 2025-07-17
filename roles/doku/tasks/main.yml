@@ -26,7 +26,7 @@
           homepage.icon: "{{ doku_homepage_icon }}"
           homepage.href: "{{ doku_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port }}"
-#         homepage.description: "Docker disk space usage"
+          homepage.description: "{{ 'Docker disk space usage' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ doku_container_name }}"
           homepage.showStats: "{{ doku_homepage_showStats }}"

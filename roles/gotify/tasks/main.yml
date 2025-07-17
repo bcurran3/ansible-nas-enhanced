@@ -32,7 +32,7 @@
           homepage.group: "{{ gotify_homepage_group }}"
           homepage.name: "{{ gotify_homepage_name }}"
           homepage.icon: "{{ gotify_homepage_icon }}"
-#         homepage.description: "A simple server for sending and receiving messages in real-time per WebSocket."
+          homepage.description: "{{ 'A simple server for sending and receiving messages in real-time per WebSocket.' if homepage_show_description else omit }}"
           homepage.href: "{{ gotify_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}"
           homepage.server: "my-docker"

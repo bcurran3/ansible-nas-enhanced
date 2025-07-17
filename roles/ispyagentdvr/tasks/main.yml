@@ -46,7 +46,7 @@
           homepage.name: iSpy AgentDVR
           homepage.icon: ispy.png
           homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ispyagentdvr_webui_port }}"
-          homepage.description: Camera Monitoring software
+          homepage.description: "{{ 'Camera Monitoring software' if homepage_show_description else omit }}"
   when: ispyagentdvr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

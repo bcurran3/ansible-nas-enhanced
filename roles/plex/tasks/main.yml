@@ -73,7 +73,7 @@
           homepage.icon: "{{ plex_homepage_icon }}"
           homepage.href: "{{ plex_homepage_href }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400/web"
-#         homepage.description: Plex Media Server
+          homepage.description: "{{ 'Plex Media Server' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ plex_container_name }}"
           homepage.showStats: "{{ plex_homepage_showStats }}"

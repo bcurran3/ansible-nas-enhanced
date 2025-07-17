@@ -40,7 +40,7 @@
           homepage.icon: "{{ netbootxyz_homepage_icon }}"
           homepage.href: "{{ netbootxyz_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbootxyz_port_http }}"
-#         homepage.description: "Your favorite operating systems in one place. A network-based bootable operating system installer based on iPXE."
+          homepage.description: "{{ 'Your favorite operating systems in one place. A network-based bootable operating system installer based on iPXE.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ netbootxyz_container_name }}"
           homepage.showStats: "{{ netbootxyz_homepage_showStats }}"

@@ -11,8 +11,15 @@
         name: "{{ miniflux_container_name }}"
       register: result
 
+    - name: Get {{ ansible_nas_app_name }} DB container state
+      community.docker.docker_container:
+        name: "{{ miniflux_db_container_name }}"
+      register: result_db
+
     - name: Check if {{ ansible_nas_app_name }} containers are running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
           - result.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false

@@ -41,7 +41,7 @@
           homepage.icon: "{{ komga_homepage_icon }}"
           homepage.href: "{{ komga_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
-#         homepage.description: "Media server for comics/mangas/BDs/magazines/eBooks with API, OPDS, Kobo Sync and KOReader Sync support"
+          homepage.description: "{{ 'Media server for comics/mangas/BDs/magazines/eBooks with API, OPDS, Kobo Sync and KOReader Sync support' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ komga_container_name }}"
           homepage.showStats: "{{ komga_homepage_showStats }}"

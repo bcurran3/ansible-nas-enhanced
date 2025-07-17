@@ -35,7 +35,7 @@
           homepage.icon: "{{ prowlarr_homepage_icon }}"
           homepage.href: "{{ prowlarr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port }}"
-#         homepage.description: "Indexer Proxy"
+          homepage.description: "{{ 'Indexer Proxy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ prowlarr_container_name }}"
           homepage.showStats: "{{ prowlarr_homepage_showStats }}"

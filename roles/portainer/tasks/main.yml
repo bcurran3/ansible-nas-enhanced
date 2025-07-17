@@ -47,7 +47,7 @@
           homepage.href: "{{ portainer_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port }}"
           homepage.icon: "{{ portainer_homepage_icon }}"
-#         homepage.description: "Making Docker and Kubernetes management easy."
+          homepage.description: "{{ 'Making Docker and Kubernetes management easy.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ portainer_container_name }}"
           homepage.showStats: "{{ portainer_homepage_showStats }}"

@@ -32,7 +32,7 @@
           homepage.name: Jackett
           homepage.icon: jackett
           homepage.href: http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jackett_port }}
-          homepage.description: API Support for your favorite torrent trackers
+          homepage.description: "{{ 'API Support for your favorite torrent trackers' if homepage_show_description else omit }}"
           traefik.enable: "{{ jackett_available_externally | string }}"
           traefik.http.routers.jackett.rule: "Host(`{{ jackett_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.jackett.tls.certresolver: "letsencrypt"

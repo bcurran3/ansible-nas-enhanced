@@ -34,7 +34,7 @@
           homepage.icon: "{{ heimdall_homepage_icon }}"
           homepage.href: "{{ heimdall_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ heimdall_port_http }}"
-#         homepage.description: "An application dashboard and launcher"
+          homepage.description: "{{ 'An application dashboard and launcher' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ heimdall_container_name }}"
           homepage.showStats: "{{ heimdall_homepage_showStats }}"

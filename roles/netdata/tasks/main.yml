@@ -36,7 +36,7 @@
           homepage.icon: "{{ netdata_homepage_icon }}"
           homepage.href: "{{ netdata_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netdata_port }}"
-#         homepage.description: "The fastest path to AI-powered full stack observability, even for lean teams."
+          homepage.description: "{{ 'The fastest path to AI-powered full stack observability, even for lean teams.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ netdata_container_name }}"
           homepage.showStats: "{{ netdata_homepage_showStats }}"
