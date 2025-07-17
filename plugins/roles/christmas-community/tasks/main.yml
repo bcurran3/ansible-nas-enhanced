@@ -34,7 +34,7 @@
           homepage.href: "{{ christmas_community_homepage_href }}"
           homepage.icon: "{{ christmas_community_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ christmas_community_port_http }}"
-#         homepage.description: "Christmas lists for families"
+          homepage.description: "{{ 'Christmas lists for families' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "christmas-community"
           homepage.showStats: "{{ christmas_community_homepage_showStats }}"

@@ -12,7 +12,28 @@
         state: absent
       register: result
 
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Client
+      community.docker.docker_container:
+        name: "{{ ssm_client_container_name }}"
+        state: absent
+      register: result_client
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} DB
+      community.docker.docker_container:
+        name: "{{ ssm_db_container_name }}"
+        state: absent
+      register: result_db
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Redis
+      community.docker.docker_container:
+        name: "{{ ssm_redis_container_name }}"
+        state: absent
+      register: result_redis
+
     - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
+          - not result_client.changed
+          - not result_db.changed
+          - not result_redis.changed

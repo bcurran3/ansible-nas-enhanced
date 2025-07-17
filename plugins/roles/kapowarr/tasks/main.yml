@@ -33,7 +33,7 @@
           homepage.icon: "{{ kapowarr_homepage_icon }}"
           homepage.href: "{{ kapowarr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kapowarr_port_http }}"
-#         homepage.description: "Kapowarr is a software to build and manage a comic book library, fitting in the *arr suite of software."
+          homepage.description: "{{ 'Kapowarr is a software to build and manage a comic book library, fitting in the *arr suite of software.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ kapowarr_container_name }}"
           homepage.showStats: "{{ kapowarr_homepage_showStats }}"

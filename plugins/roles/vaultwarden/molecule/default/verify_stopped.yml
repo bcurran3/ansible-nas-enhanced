@@ -12,18 +12,14 @@
         state: absent
       register: result
 
-    - name: Check {{ ansible_nas_app_name }} is stopped
-      ansible.builtin.assert:
-        that:
-          - not result.changed
-
     - name: Try and stop and remove {{ ansible_nas_app_name }} Backup
       community.docker.docker_container:
         name: "{{ vaultwarden_backup_container_name }}"
         state: absent
-      register: result
+      register: result_backup
 
-    - name: Check {{ ansible_nas_app_name }} Backup is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
+          - not result_backup.changed

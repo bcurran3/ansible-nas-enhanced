@@ -47,7 +47,7 @@
           homepage.icon: "{{ codeserver_homepgae_icon }}"
           homepage.href: "{{ codeserver_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ codeserver_port_http }}"
-#         homepage.description: "VS Code in the browser"
+          homepage.description: "{{ 'VS Code in the browser' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "code-server"
           homepage.showStats: "{{ codeserver_homepage_showStats }}"

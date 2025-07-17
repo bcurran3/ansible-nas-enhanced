@@ -22,7 +22,7 @@
           homepage.icon: "{{ karaokeforever_homepage_icon }}"
           homepage.href: "{{ karaokeforever_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaokeforever_port_http }}"
-#         homepage.description: "Open karaoke party system"
+          homepage.description: "{{ 'Open karaoke party system' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ karaokeforever_container_name }}"
           homepage.showStats: "{{ karaokeforever_homepage_showStats }}"

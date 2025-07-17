@@ -39,7 +39,7 @@
           homepage.icon: "{{ localai_homepage_icon }}"
           homepage.href: "{{ localai_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ localai_port_http }}"
-#         homepage.description: "LocalAI is the free, Open Source OpenAI alternative."
+          homepage.description: "{{ 'LocalAI is the free, Open Source OpenAI alternative.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ localai_container_name }}"
           homepage.showStats: "{{ localai_homepage_showStats }}"

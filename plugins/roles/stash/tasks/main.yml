@@ -35,7 +35,6 @@
           - "{{ porn_root }}:/porn:ro"
         ports:
           - "{{ stash_http_port }}:9999"
-#        dns_servers: "{{ ansible_nas_dns }}"
         env:
           PUID: "{{ stash_user_id }}"
           PGID: "{{ stash_group_id }}"
@@ -52,7 +51,7 @@
           homepage.icon: "{{ stash_homepage_icon }}"
           homepage.href: "{{ stash_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stash_port_http }}"
-#         homepage.description: ""
+          homepage.description: "{{ 'Stash your porn' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stash_container_name }}"
           homepage.showStats: "{{ stash_homepage_showStats }}"

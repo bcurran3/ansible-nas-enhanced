@@ -12,29 +12,21 @@
         state: absent
       register: result
 
-    - name: Check {{ ansible_nas_app_name }} is stopped
-      ansible.builtin.assert:
-        that:
-          - not result.changed
-
     - name: Try and stop and remove {{ ansible_nas_app_name }} Celery
       community.docker.docker_container:
         name: "{{ grampsweb_celery_container_name }}"
         state: absent
-      register: result
-
-    - name: Check {{ ansible_nas_app_name }} Celery is stopped
-      ansible.builtin.assert:
-        that:
-          - not result.changed
+      register: result_celery
 
     - name: Try and stop and remove {{ ansible_nas_app_name }} Redis
       community.docker.docker_container:
         name: "{{ grampsweb_redis_container_name }}"
         state: absent
-      register: result
+      register: result_redis
 
     - name: Check {{ ansible_nas_app_name }} Redis is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
+          - not result_redis.changed
+          - not result_celery.changed

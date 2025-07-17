@@ -73,7 +73,7 @@
           homepage.group: "{{ scrutiny_homepage_group }}"
           homepage.href: "{{ scrutiny_homepage_href }}"
           homepage.icon: "{{ scrutiny_homepage_icon }}"
-#         homepage.description: "Hard Drive S.M.A.R.T Monitoring, Historical Trends & Real World Failure Thresholds"
+          homepage.description: "{{ 'Hard Drive S.M.A.R.T Monitoring, Historical Trends & Real World Failure Thresholds' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scrutiny_port }}"
           homepage.server: "my-docker"
           homepage.container: "{{ scrutiny_container_name }}"

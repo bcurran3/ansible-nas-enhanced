@@ -34,7 +34,7 @@
           homepage.icon: "{{ cup_homepage_icon }}"
           homepage.href: "{{ cup_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cup_port_http }}"
-    #     homepage.description: "Docker container updates made easy"
+          homepage.description: "{{ 'Docker container updates made easy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ cup_container_name }}"
           homepage.showStats: "{{ cup_homepage_showStats }}"

@@ -36,7 +36,7 @@
           homepage.icon: "{{ whisparr_homepage_icon }}"
           homepage.href: "{{ whisparr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whisparr_port_http }}"
-#         homepage.description: "Whisparr is an adult movie collection manager for Usenet and BitTorrent users. "
+          homepage.description: "{{ 'Whisparr is an adult movie collection manager for Usenet and BitTorrent users.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ whisparr_container_name }}"
           homepage.showStats: "{{ whisparr_homepage_showStats }}"

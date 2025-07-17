@@ -33,7 +33,7 @@
           homepage.icon: "{{ shaarli_homepage_icon }}"
           homepage.href: "{{ shaarli_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ shaarli_port_http }}"
-#         homepage.description: "The personal, minimalist, super-fast, database free, bookmarking service"
+          homepage.description: "{{ 'The personal, minimalist, super-fast, database free, bookmarking service' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ shaarli_container_name }}"
           homepage.showStats: "{{ shaarli_homepage_showStats }}"

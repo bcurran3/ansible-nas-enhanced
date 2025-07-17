@@ -34,7 +34,7 @@
           homepage.icon: "{{ dweebui_homepage_icon }}"
           homepage.href: "{{ dweebui_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dweebui_port_http }}"
-#         homepage.description: "DweebUI is a WebUI for managing your containers. Simple setup, a dynamically updating dashboard, and a multi-user permission system."
+          homepage.description: "{{ 'DweebUI is a WebUI for managing your containers. Simple setup, a dynamically updating dashboard, and a multi-user permission system.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dweebui_container_name }}"
           homepage.showStats: "{{ dweebui_homepage_showStats }}"

@@ -35,7 +35,7 @@
           homepage.group: "{{ homebox_homepage_group }}"
           homepage.icon: "{{ homebox_homepage_icon }}"
           homepage.href: "{{ homebox_homepage_href }}"
-#         homepage.description: "Homebox is the inventory and organization system built for the Home User!"
+          homepage.description: "{{ 'Homebox is the inventory and organization system built for the Home User!' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ homebox_container_name }}"

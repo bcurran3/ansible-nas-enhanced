@@ -35,7 +35,7 @@
           homepage.icon: "{{ filebrowser_homepage_icon }}"
           homepage.href: "{{ filebrowser_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebrowser_port_http }}"
-#         homepage.description: "Web File Browser"
+          homepage.description: "{{ 'Web File Browser' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ filebrowser_container_name }}"
           homepage.showStats: "{{ filebrowser_homepage_showStats }}"

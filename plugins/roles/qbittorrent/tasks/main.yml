@@ -24,7 +24,6 @@
           - "{{ qbittorrent_data_directory }}/custom-cont-init.d:/custom-cont-init.d:ro"
           - "{{ qbittorrent_download_directory }}:/downloads:rw"
           - "{{ qbittorrent_watch_directory }}:/torrents"
-          - "{{ porn_root }}:/porn:rw"   #### check if needed
         ports:
           - "{{ qbittorrent_port_http }}:8113"
           - "{{ qbittorrent_port_bt }}:6881"
@@ -43,7 +42,7 @@
           homepage.href: "{{ qbittorrent_homepage_href }}"
           homepage.icon: "{{ qbittorrent_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qbittorrent_port_http }}"
-#         homepage.description: "qBittorrent BitTorrent client"
+          homepage.description: "{{ 'qBittorrent BitTorrent client' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ qbittorrent_container_name }}"
           homepage.showStats: "{{ qbittorrent_homepage_showStats }}"

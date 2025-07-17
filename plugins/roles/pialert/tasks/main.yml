@@ -36,7 +36,7 @@
           homepage.icon: "{{ pialert_homepage_icon }}"
           homepage.href: "{{ pialert_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pialert_port_http }}"
-#         homepage.description: ""
+          homepage.description: "{{ 'pialert' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pialert_container_name }}"
           homepage.showStats: "{{ pialert_homepage_showStats }}"

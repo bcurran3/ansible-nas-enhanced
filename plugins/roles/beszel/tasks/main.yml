@@ -32,7 +32,7 @@
           homepage.icon: "{{ beszel_homepage_icon }}"
           homepage.href: "{{ beszel_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ beszel_port_http }}"
-#         homepage.description: "Lightweight server monitoring hub with historical data, docker stats, and alerts."
+          homepage.description: "{{ 'Lightweight server monitoring hub with historical data, docker stats, and alerts.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ beszel_container_name }}"
           homepage.showStats: "{{ beszel_homepage_showStats }}"

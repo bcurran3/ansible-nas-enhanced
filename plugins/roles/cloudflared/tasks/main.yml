@@ -20,7 +20,7 @@
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ cloudflared_homepage_icon }}"
           homepage.href: "https://dash.cloudflare.com/login"
-#         homepage.description: "Client for Cloudflare Tunnel, a daemon that exposes private services through the Cloudflare edge."
+          homepage.description: "{{ 'Client for Cloudflare Tunnel, a daemon that exposes private services through the Cloudflare edge.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ cloudflared_container_name }}"
           homepage.showStats: "{{ cloudflared_homepage_showStats }}"

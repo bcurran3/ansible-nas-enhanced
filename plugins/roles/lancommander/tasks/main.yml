@@ -35,7 +35,7 @@
           homepage.icon: "{{ lancommander_homepage_icon }}"
           homepage.href: "{{ lancommander_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lancommander_port_http }}"
-#         homepage.description: "LANCommander is an open-source digital game platform."
+          homepage.description: "{{ 'LANCommander is an open-source digital game platform.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ lancommander_container_name }}"
           homepage.showStats: "{{ lancommander_homepage_showStats }}"

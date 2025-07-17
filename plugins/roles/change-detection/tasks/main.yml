@@ -32,7 +32,7 @@
           homepage.group: "{{ change_detection_sockpuppet_homepage_group }}"
           homepage.icon: "{{ change_detection_sockpuppet_homepage_icon }}"
           homepage.href: "{{ change_detection_sockpuppet_homepage_href }}"
-#         homepage.description: "A scalable server for providing Chrome interfaces where needed"
+          homepage.description: "{{ 'A scalable server for providing Chrome interfaces where needed' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ change_detection_sockpuppet_container_name }}"

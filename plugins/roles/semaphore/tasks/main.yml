@@ -1,5 +1,5 @@
 ---
-# TDL: move env vars to AN vars
+# TDL: move env vars to ANE vars
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -36,7 +36,7 @@
           homepage.icon: "{{ semaphore_homepage_icon }}"
           homepage.href: "{{ semaphore_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ semaphore_port_http }}"
-#         homepage.description: "Modern UI and powerful API for Ansible, Terraform, OpenTofu, PowerShell and other DevOps tools."
+          homepage.description: "{{ 'Modern UI and powerful API for Ansible, Terraform, OpenTofu, PowerShell and other DevOps tools.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ semaphore_container_name }}"
           homepage.showStats: "{{ semaphore_homepage_showStats }}"

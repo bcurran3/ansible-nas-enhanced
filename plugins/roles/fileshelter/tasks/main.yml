@@ -35,7 +35,7 @@
           homepage.icon: "{{ fileshelter_homepage_icon }}"
           homepage.href: "{{ fileshelter_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fileshelter_port_http }}"
-#         homepage.description: "FileShelter is a “one-click” file sharing web application"
+          homepage.description: "{{ 'FileShelter is a “one-click” file sharing web application' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ fileshelter_container_name }}"
           homepage.showStats: "{{ fileshelter_homepage_showStats }}"

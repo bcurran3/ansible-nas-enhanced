@@ -33,7 +33,7 @@
           homepage.group: "{{ hammond_homepage_group }}"
           homepage.icon: "{{ hammond_homepage_icon }}"
           homepage.href: "{{ hammond_homepage_href }}"
-#         homepage.description: "Hammond is a self hosted vehicle management system to track fuel and other expenses related to all of your vehicles."
+          homepage.description: "{{ 'Hammond is a self hosted vehicle management system to track fuel and other expenses related to all of your vehicles.' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hammond_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ hammond_container_name }}"

@@ -33,7 +33,7 @@
           homepage.icon: "{{ fasten_homepage_icon }}"
           homepage.href: "{{ fasten_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fasten_port_http }}"
-#         homepage.description: "Fasten is an open-source, self-hosted, personal/family electronic medical record aggregator, designed to integrate with 100,000's of insurances/hospitals/clinic"
+          homepage.description: "{{ 'Fasten is an open-source, self-hosted, personal/family electronic medical record aggregator, designed to integrate with 100,000's of insurances/hospitals/clinic' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ fasten_container_name }}"
           homepage.showStats: "{{ fasten_homepage_showStats }}"

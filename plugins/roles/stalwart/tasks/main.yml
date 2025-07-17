@@ -38,7 +38,7 @@
           homepage.icon: "{{ stalwart_homepage_icon }}"
           homepage.href: "{{ stalwart_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stalwart_port_http }}"
-#         homepage.description: "Secure & Modern All-in-One Mail Server (IMAP, JMAP, POP3, SMTP)"
+          homepage.description: "{{ 'Secure & Modern All-in-One Mail Server (IMAP, JMAP, POP3, SMTP)' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stalwart_container_name }}"
           homepage.showStats: "{{ stalwart_homepage_showStats }}"

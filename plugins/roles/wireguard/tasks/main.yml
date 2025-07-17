@@ -42,7 +42,7 @@
           homepage.icon: "{{ wireguard_homepage_icon }}"
           homepage.href: "{{ wireguard_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireguard_port_http }}"
-#         homepage.description: "The easiest way to run WireGuard VPN + Web-based Admin UI."
+          homepage.description: "{{ 'The easiest way to run WireGuard VPN + Web-based Admin UI.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wireguard_container_name }}"
           homepage.showStats: "{{ wireguard_homepage_showStats }}"

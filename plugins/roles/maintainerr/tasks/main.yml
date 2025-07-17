@@ -32,7 +32,7 @@
           homepage.icon: "{{ maintainerr_homepage_icon }}"
           homepage.href: "{{ maintainerr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ maintainerr_port_http }}"
-#         homepage.description: "Looks and smells like Overseerr, does the opposite. Maintenance tool for the Plex ecosystem"
+          homepage.description: "{{ 'Looks and smells like Overseerr, does the opposite. Maintenance tool for the Plex ecosystem' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ maintainerr_container_name }}"
           homepage.showStats: "{{ maintainerr_homepage_showStats }}"

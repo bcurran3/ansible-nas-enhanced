@@ -8,22 +8,18 @@
 
     - name: Get container state
       community.docker.docker_container_info:
-        name: "{{ osclass_container_db_name }}"
+        name: "{{ osclass_container_name }}"
       register: result
-
-    - name: Check OsClass DB is running
-      ansible.builtin.assert:
-        that:
-          - result.container['State']['Status'] == "running"
-          - result.container['State']['Restarting'] == false
 
     - name: Get container state
       community.docker.docker_container_info:
-        name: "{{ osclass_container_name }}"
-      register: result
+        name: "{{ osclass_db_container_name }}"
+      register: result_db
 
     - name: Check OsClass is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
           - result.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false

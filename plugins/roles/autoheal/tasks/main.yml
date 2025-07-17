@@ -26,7 +26,7 @@
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ autoheal_homepage_group }}"
           homepage.icon: "{{ autoheal_homepage_icon }}"
-#         homepage.description: "Monitor and restart unhealthy docker containers."
+          homepage.description: "{{ 'Monitor and restart unhealthy docker containers.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ autoheal_container_name }}"
           homepage.showStats: "{{ autoheal_homepage_showStats }}"

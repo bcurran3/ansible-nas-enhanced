@@ -32,7 +32,7 @@
           homepage.icon: "{{ pornvault_homepage_icon }}"
           homepage.href: "{{ pornvault_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pornvault_port_http }}"
-#         homepage.description: "Porn-Vault is a self hosted organizer for adult videos and imagery."
+          homepage.description: "{{ 'Porn-Vault is a self hosted organizer for adult videos and imagery.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pornvault_container_name }}"
           homepage.showStats: "{{ pornvault_homepage_showStats }}"

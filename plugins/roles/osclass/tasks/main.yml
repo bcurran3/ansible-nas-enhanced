@@ -38,7 +38,7 @@
           homepage.group: "{{ osclass_db_homepage_group }}"
           homepage.icon: "{{ osclass_db_homepage_icon }}"
           homepage.href: "{{ osclass_homepage_href }}"
-#         homepage.description: "MariaDB Server is a high performing open source relational database, forked from MySQL."
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ osclass_db_container_name }}"
           homepage.showStats: "{{ osclass_db_homepage_showStats }}"
@@ -58,8 +58,6 @@
         cpu_shares: "{{ osclass_cpu_shares }}"
         network_mode: "bridge"
         networks_cli_compatible: "yes"
-        links:
-          - "{{ osclass_db_container_name }}"
         volumes:
           - "{{ osclass_data_directory }}/data:/bitnami/osclass"
         ports:
@@ -80,6 +78,8 @@
           OSCLASS_PASSWORD: "{{ osclass_admin_password }}"
           OSCLASS_WEB_TITLE: "{{ osclass_hostname }}.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ osclass_db_container_name }}"
         labels:
           autoheal: "{{ osclass_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osclass_watchtower_monitor_only }}"
@@ -88,7 +88,7 @@
           homepage.icon: "{{ osclass_homepage_icon }}"
           homepage.href: "{{ osclass_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osclass_port_http }}"
-#         homepage.description: "classifieds"
+          homepage.description: "{{ 'classifieds' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ osclass_container_name }}"
           homepage.showStats: "{{ osclass_homepage_showStats }}"

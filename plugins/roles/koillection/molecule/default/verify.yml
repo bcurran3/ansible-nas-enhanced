@@ -11,19 +11,15 @@
         name: "{{ koillection_container_name }}"
       register: result
 
-    - name: Check {{ ansible_nas_app_name }} is running
-      ansible.builtin.assert:
-        that:
-          - result.container['State']['Status'] == "running"
-          - result.container['State']['Restarting'] == false
-
-    - name: Get container state
+    - name: Get container state DB
       community.docker.docker_container_info:
         name: "{{ koillection_db_container_name }}"
-      register: result
+      register: result_db
 
     - name: Check {{ ansible_nas_app_name }} DB is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
           - result.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false

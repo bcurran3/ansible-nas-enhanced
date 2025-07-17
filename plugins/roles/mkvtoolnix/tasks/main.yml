@@ -37,7 +37,7 @@
           homepage.icon: "{{ mkvtoolnix_homepage_icon }}"
           homepage.href: "{{ mkvtoolnix_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mkvtoolnix_port_http }}"
-#         homepage.description: "Creating and working with Matroska files"
+          homepage.description: "{{ 'Creating and working with Matroska files' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mkvtoolnix_container_name }}"
           homepage.showStats: "{{ mkvtoolnix_homepage_showStats }}"

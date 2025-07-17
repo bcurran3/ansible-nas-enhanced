@@ -43,7 +43,7 @@
           homepage.group: "{{ crowdsec_homepage_group }}"
           homepage.icon: "{{ crowdsec_homepage_icon }}"
           homepage.href: "{{ crowdsec_homepage_href }}"
-#         homepage.description: "Crowdsec - An open-source, lightweight agent to detect and respond to bad behaviours."
+          homepage.description: "{{ 'Crowdsec - An open-source, lightweight agent to detect and respond to bad behaviours.' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ crowdsec_container_name }}"

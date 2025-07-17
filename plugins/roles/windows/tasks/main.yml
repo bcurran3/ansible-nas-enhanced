@@ -44,7 +44,7 @@
           homepage.icon: "{{ windows_homepage_icon }}"
           homepage.href: "{{ windows_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ windows_port_http }}"
-#         homepage.description: "Windows inside a Docker container."
+          homepage.description: "{{ 'Windows inside a Docker container.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ windows_container_name }}"
           homepage.showStats: "{{ windows_homepage_showStats }}"

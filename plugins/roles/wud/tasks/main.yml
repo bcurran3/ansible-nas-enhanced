@@ -39,7 +39,7 @@
           homepage.group: "{{ wud_homepage_group }}"
           homepage.icon: "{{ wud_homepage_icon }}"
           homepage.href: "{{ wud_homepage_href }}"
-#         homepage.description: "What's Up Docker?"
+          homepage.description: "{{ 'What''s Up Docker?' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wud_container_name }}"

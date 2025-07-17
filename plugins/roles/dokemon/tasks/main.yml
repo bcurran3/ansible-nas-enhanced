@@ -32,7 +32,7 @@
           homepage.icon: "{{ dokemon_homepage_icon }}"
           homepage.href: "{{ dokemon_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dokemon_port_http }}"
-#         homepage.description: "Docker Container Management GUI"
+          homepage.description: "{{ 'Docker Container Management GUI' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dokemon_container_name }}"
           homepage.showStats: "{{ dokemon_homepage_showStats }}"

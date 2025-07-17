@@ -39,7 +39,7 @@
           homepage.icon: "{{ ntfy_homepage_icon }}"
           homepage.href: "{{ ntfy_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}"
-#         homepage.description: "Send push notifications to your phone or desktop using PUT/POST"
+          homepage.description: "{{ 'Send push notifications to your phone or desktop using PUT/POST' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ntfy_container_name }}"
           homepage.showStats: "{{ ntfy_homepage_showStats }}"

@@ -35,7 +35,7 @@
           homepage.icon: "{{ remotely_homepage_icon }}"
           homepage.href: "{{ remotely_homepage_href}}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ remotely_port_http }}"
-#         homepage.description: "A remote control and remote scripting solution, built with .NET 8, Blazor, and SignalR."
+          homepage.description: "{{ 'A remote control and remote scripting solution, built with .NET 8, Blazor, and SignalR.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ remotely_container_name }}"
           homepage.showStats: "{{ remotely_homepage_showStats }}"

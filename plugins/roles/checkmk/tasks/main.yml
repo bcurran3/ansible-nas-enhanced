@@ -36,7 +36,7 @@
           homepage.icon: "{{ checkmk_homepage_icon }}"
           homepage.href: "{{ checkmk_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmk_port_http }}"
-#         homepage.description: "Checkmk - Best-in-class infrastructure & application monitoring"
+          homepage.description: "{{ 'Best-in-class infrastructure & application monitoring' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ checkmk_container_name }}"
           homepage.showStats: "{{ checkmk_homepage_showStats }}"

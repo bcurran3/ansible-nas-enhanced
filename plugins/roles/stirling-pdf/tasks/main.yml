@@ -35,7 +35,7 @@
           homepage.group: "{{ stirling_pdf_homepage_group }}"
           homepage.icon: "{{ stirling_pdf_homepage_icon }}"
           homepage.href: "{{ stirling_pdf_homepage_href }}"
-#         homepage.description: "#1 Locally hosted web application that allows you to perform various operations on PDF files"
+          homepage.description: "{{ '#1 Locally hosted web application that allows you to perform various operations on PDF files' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stirling_pdf_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stirling_pdf_container_name }}"

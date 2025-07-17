@@ -43,7 +43,7 @@
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.href: "{{ idrac6_homepage_href }}"
           homepage.icon: "{{ idrac6_homepage_icon }}"
-#         homepage.description: "iDRAC 6 web interface and VNC proxy"
+          homepage.description: "{{ 'iDRAC 6 web interface and VNC proxy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ idrac6_container_name }}"
           homepage.showStats: "{{ idrac6_homepage_showStats }}"

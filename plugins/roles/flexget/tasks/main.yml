@@ -37,7 +37,7 @@
           homepage.icon: "{{ flexget_homepage_icon }}"
           homepage.href: "{{ flexget_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flexget_port_http }}"
-#         homepage.description: "FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc."
+          homepage.description: "{{ 'FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ flexget_container_name }}"
           homepage.showStats: "{{ flexget_homepage_showStats }}"

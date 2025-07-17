@@ -1,4 +1,5 @@
 ---
+# WIP / TDL: check and add sr0 automatically if found
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -39,7 +40,7 @@
           homepage.icon: "{{ makemkv_homepage_icon }}"
           homepage.href: "{{ makemkv_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ makemkv_port_http }}"
-#         homepage.description: "Backup your Bluray and DVD discs"
+          homepage.description: "{{ 'Backup your Bluray and DVD discs' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ makemkv_container_name }}"
           homepage.showStats: "{{ makemkv_homepage_showStats }}"

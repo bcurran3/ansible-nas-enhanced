@@ -33,7 +33,7 @@
           homepage.icon: "{{ glance_homepage_icon }}"
           homepage.href: "{{ glance_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glance_port_http }}"
-#         homepage.description: "A self-hosted dashboard that puts all your feeds in one place."
+          homepage.description: "{{ 'A self-hosted dashboard that puts all your feeds in one place.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ glance_container_name }}"
           homepage.showStats: "{{ glance_homepage_showStats }}"

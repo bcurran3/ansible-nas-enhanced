@@ -41,7 +41,7 @@
           homepage.icon: "{{ onlyoffice_homepage_icon }}"
           homepage.href: "{{ onlyoffice_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ onlyoffice_port_http }}"
-#         homepage.description: "A free and open source office and productivity suite"
+          homepage.description: "{{ 'A free and open source office and productivity suite' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ onlyoffice_container_name }}"
           homepage.showStats: "{{ onlyoffice_homepage_showStats }}"

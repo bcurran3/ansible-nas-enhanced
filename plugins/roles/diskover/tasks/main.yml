@@ -56,7 +56,7 @@
           homepage.icon: "{{ diskover_elasticsearch_homepage_icon }}"
           homepage.href: "{{ diskover_elasticsearch_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_elasticsearch_port_http }}"
-#         homepage.description: "Free and Open Source, Distributed, RESTful Search Engine"
+          homepage.description: "{{ 'Free and Open Source, Distributed, RESTful Search Engine' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ diskover_elasticsearch_container_name }}"
           homepage.showStats: "{{ diskover_elasticsearch_homepage_showStats }}"
@@ -77,9 +77,9 @@
     - name: Create {{ ansible_nas_app_name }} Elasticsearch-helper Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: elasticsearch-helper
-        hostname: elasticsearch-helper
-        image: alpine:latest
+        name: "{{ diskover_elasticsearch_helper_container_name }}"
+        hostname: "{{ diskover_elasticsearch_helper_container_name }}"
+        image: "{{ diskover_elasticsearch_helper_image_name }}:{{ diskover_elasticsearch_helper_image_tag }}"
         pull: true
         networks:
           - name: "{{ diskover_network_name }}"
@@ -102,7 +102,6 @@
         cpu_shares: "{{ diskover_cpu_shares }}"
         links:
           - "{{ diskover_elasticsearch_container_name }}"
-#          - elasticsearch-helper
         networks:
           - name: "{{ diskover_network_name }}"
         networks_cli_compatible: "yes"
@@ -129,7 +128,7 @@
           homepage.href: "{{ diskover_homepage_href }}"
           homepage.icon: "{{ diskover_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_port_http }}"
-#         homepage.description: "Open source file indexer, file search engine and data management and analytics powered by Elasticsearch"
+          homepage.description: "{{ 'Open source file indexer, file search engine and data management and analytics powered by Elasticsearch' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ diskover_container_name }}"
           homepage.showStats: "{{ diskover_homepage_showStats }}"
@@ -153,6 +152,11 @@
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ diskover_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Elasticsearch HelperContainer
+      community.docker.docker_container:
+        name: "elasticsearch-helper"
         state: absent
 
     - name: Stop {{ ansible_nas_app_name }} Elasticsearch Container

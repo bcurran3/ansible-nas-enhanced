@@ -30,7 +30,7 @@
           homepage.icon: "{{ flood_homepage_icon }}"
           homepage.href: "{{ flood_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flood_port_http }}"
-#         homepage.description: "A modern web UI for various torrent clients with a Node.js backend and React frontend."
+          homepage.description: "{{ 'A modern web UI for various torrent clients with a Node.js backend and React frontend.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ flood_container_name }}"
           homepage.showStats: "{{ flood_homepage_showStats }}"

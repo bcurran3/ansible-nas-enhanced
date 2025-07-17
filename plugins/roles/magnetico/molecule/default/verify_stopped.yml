@@ -12,18 +12,14 @@
         state: absent
       register: result
 
-    - name: Check {{ ansible_nas_app_name }} w is stopped
-      ansible.builtin.assert:
-        that:
-          - not result.changed
-
     - name: Try and stop and remove {{ ansible_nas_app_name }} d
       community.docker.docker_container:
         name: "{{ magnetico_container2_name }}"
         state: absent
-      register: result
+      register: resultb
 
     - name: Check {{ ansible_nas_app_name }} d is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
+          - not resultb.changed

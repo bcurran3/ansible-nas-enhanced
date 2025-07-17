@@ -24,7 +24,7 @@
           homepage.group: "{{ whatsrunning_homepage_group }}"
           homepage.icon: "{{ whatsrunning_homepage_icon }}"
           homepage.href: "{{ whatsrunning_homepage_href }}"
-#         homepage.description: "a barebones webpage showing all docker containers that expose ports"
+          homepage.description: "{{ 'a barebones webpage showing all docker containers that expose ports' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ whatsrunning_container_name }}"

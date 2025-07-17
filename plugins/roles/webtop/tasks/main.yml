@@ -21,10 +21,10 @@
           - "{{ webtop_data_directory }}/config:/config"
           - "/var/run/docker.sock:/var/run/docker.sock" #optional
         env:
-          KEYBOARD: "en-us-qwerty"      #optional
+          KEYBOARD: "{{ webtop_env_keyboard }}"
           PUID: "{{ webtop_user_id }}"
           PGID: "{{ webtop_group_id }}"
-          SUBFOLDER: "/"                #optional
+          SUBFOLDER: "{{ webtop_env_subfolder }}"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ webtop_port_http }}:3000"
@@ -38,7 +38,7 @@
           homepage.icon: "{{ webtop_homepage_icon }}"
           homepage.href: "{{ webtop_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webtop_port_http }}"
-#         homepage.description: "Ubuntu, Alpine, Arch, and Fedora based Webtop images, Linux in a web browser supporting popular desktop environments."
+          homepage.description: "{{ 'Ubuntu, Alpine, Arch, and Fedora based Webtop images, Linux in a web browser supporting popular desktop environments.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ webtop_container_name }}"
           homepage.showStats: "{{ webtop_homepage_showStats }}"

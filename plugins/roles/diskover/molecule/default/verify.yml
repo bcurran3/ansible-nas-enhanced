@@ -11,8 +11,22 @@
         name: "{{ diskover_container_name }}"
       register: result
 
+    - name: Get container state
+      community.docker.docker_container_info:
+        name: "{{ diskover_elasticsearch_container_name }}"
+      register: result_db
+
+    - name: Get container state
+      community.docker.docker_container_info:
+        name: "{{ diskover_elasticsearch_helper_container_name }}"
+      register: result_db_helper
+
     - name: Check Diskover is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
           - result.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false
+          - result_db_helper.container['State']['Status'] == "running"
+          - result_db_helper.container['State']['Restarting'] == false

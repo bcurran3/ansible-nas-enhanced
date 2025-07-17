@@ -34,7 +34,7 @@
           homepage.icon: "{{ crashplanpro_homepage_icon }}"
           homepage.href: "{{ crashplanpro_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crashplanpro_port_http }}"
-#         homepage.description: "Docker container for CrashPlan PRO (aka CrashPlan for Small Business)"
+          homepage.description: "{{ 'Docker container for CrashPlan PRO (aka CrashPlan for Small Business)' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ crashplanpro_container_name }}"
           homepage.showStats: "{{ crashplanpro_homepage_showStats }}"

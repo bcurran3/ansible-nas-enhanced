@@ -32,7 +32,7 @@
           homepage.icon: "{{ huntarr_homepage_icon }}"
           homepage.href: "{{ huntarr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ huntarr_port_http }}"
-#         homepage.description: "A specialized utility that automates discovering missing and upgrading your media collection!"
+          homepage.description: "{{ 'A specialized utility that automates discovering missing and upgrading your media collection!' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ huntarr_container_name }}"
           homepage.showStats: "{{ huntarr_homepage_showStats }}"

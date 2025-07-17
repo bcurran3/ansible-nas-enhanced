@@ -34,7 +34,7 @@
           homepage.icon: "{{ pingvinshare_homepage_icon }}"
           homepage.href: "{{ pingvinshare_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pingvinshare_port_http }}"
-#         homepage.description: "A self-hosted file sharing platform that combines lightness and beauty, perfect for seamless and efficient file sharing."
+          homepage.description: "{{ 'A self-hosted file sharing platform that combines lightness and beauty, perfect for seamless and efficient file sharing.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pingvinshare_container_name }}"
           homepage.showStats: "{{ pingvinshare_homepage_showStats }}"

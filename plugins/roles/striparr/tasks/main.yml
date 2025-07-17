@@ -27,7 +27,7 @@
           homepage.icon: "{{ striparr_homepage_icon }}"
           homepage.href: "{{ striparr_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ striparr_port_http }}"
-#         homepage.description: "Strips metadata from files downloaded by Sonarr and Radarr."
+          homepage.description: "{{ 'Strips metadata from files downloaded by Sonarr and Radarr.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ striparr_container_name }}"
           homepage.showStats: "{{ striparr_homepage_showStats }}"

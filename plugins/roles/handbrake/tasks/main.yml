@@ -52,7 +52,7 @@
           homepage.href: "{{ handbrake_homepage_href }}"
           homepage.icon: "{{ handbrake_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ handbrake_port_http }}"
-#         homepage.description: "HandBrake is an open-source, GPL-licensed, multiplatform video transcoder."
+          homepage.description: "{{ 'an open-source, GPL-licensed, multiplatform video transcoder.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ handbrake_container_name }}"
           homepage.showStats: "{{ handbrake_homepage_showStats }}"

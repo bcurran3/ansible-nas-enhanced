@@ -38,7 +38,7 @@
           homepage.href: "{{ qdirstat_homepage_href }}"
           homepage.icon: "{{ qdirstat_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
-#         homepage.description: "Qt-based directory statistics"
+          homepage.description: "{{ 'Qt-based directory statistics' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ qdirstat_container_name }}"
           homepage.showStats: "{{ qdirstat_homepage_showStats }}"

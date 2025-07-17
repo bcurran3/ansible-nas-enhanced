@@ -1,7 +1,6 @@
 ---
 # WORK IN PROGRESS
 # NEEDS A TEMPLATE TO ADD SOME VALUES
-
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -45,7 +44,7 @@
           homepage.group: "{{ meshcentral_db_homepage_group }}"
           homepage.icon: "{{ meshcentral_db_homepage_icon }}"
           homepage.href: "{{ meshcentral_homepage_href }}"
-#         homepage.description: "The MongoDB Database"
+          homepage.description: "{{ 'The MongoDB Database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ meshcentral_db_container_name }}"
           homepage.showStats: "{{ meshcentral_db_homepage_showStats }}"
@@ -97,7 +96,7 @@
           homepage.group: "{{ meshcentral_homepage_group }}"
           homepage.icon: "{{ meshcentral_homepage_icon }}"
           homepage.href: "{{ meshcentral_homepage_href }}"
-#         homepage.description: "A complete web-based remote monitoring and management web site."
+          homepage.description: "{{ 'A complete web-based remote monitoring and management web site.' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ meshcentral_container_name }}"

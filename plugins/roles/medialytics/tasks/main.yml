@@ -24,7 +24,7 @@
           homepage.icon: "{{ medialytics_homepage_icon }}"
           homepage.href: "{{ medialytics_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ medialytics_port_http }}"
-#         homepage.description: "A basic, free tool that shows information about Plex Media Server content"
+          homepage.description: "{{ 'A basic, free tool that shows information about Plex Media Server content' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ medialytics_container_name }}"
           homepage.showStats: "{{ medialytics_homepage_showStats }}"

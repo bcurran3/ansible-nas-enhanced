@@ -35,6 +35,7 @@
           homepage.group: "{{ gamevault_db_homepage_group }}"
           homepage.icon: "{{ gamevault_db_homepage_icon }}"
           homepage.href: "{{ gamevault_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gamevault_db_container_name }}"
           homepage.showStats: "{{ gamevault_db_homepage_showStats }}"
@@ -59,7 +60,6 @@
           - "{{ gamevault_data_directory }}/media:/media"
           - "{{ gamevault_data_directory }}/plugins:/plugins"
           - "{{ games_root }}:/files"
-          - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
         ports:
           - "{{ gamevault_port_http }}:8080"
         env:
@@ -82,7 +82,7 @@
           homepage.icon: "{{ gamevault_homepage_icon }}"
           homepage.href: "{{ gamevault_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gamevault_port_http }}"
-#         homepage.description: "the self-hosted gaming platform for drm-free games"
+          homepage.description: "{{ 'the self-hosted gaming platform for drm-free games' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gamevault_container_name }}"
           homepage.showStats: "{{ gamevault_homepage_showStats }}"

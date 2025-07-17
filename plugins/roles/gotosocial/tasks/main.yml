@@ -41,7 +41,7 @@
           homepage.icon: "{{ gotosocial_homepage_icon }}"
           homepage.href: "{{ gotosocial_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotosocial_port_http }}"
-#         homepage.description: "Fast, fun, small ActivityPub server."
+          homepage.description: "{{ 'Fast, fun, small ActivityPub server.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gotosocial_container_name }}"
           homepage.showStats: "{{ gotosocial_homepage_showStats }}"

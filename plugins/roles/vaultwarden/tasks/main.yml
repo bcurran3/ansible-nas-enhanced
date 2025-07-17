@@ -8,7 +8,8 @@
         mode: "0755"
       with_items:
         - "{{ vaultwarden_data_directory }}"
-        - "{{ vaultwarden_data_directory }}/backup"
+        - "{{ vaultwarden_data_directory }}/data"
+        - "{{ vaultwarden_data_directory }}/backup" # 0700?
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -22,7 +23,7 @@
           - "{{ vaultwarden_port_http }}:80"
           - "{{ vaultwarden_port_websockets }}:3012"
         volumes:
-          - "{{ vaultwarden_data_directory }}:/data:rw"
+          - "{{ vaultwarden_data_directory }}/data:/data:rw"
         env:
           SIGNUPS_ALLOWED: "{{ vaultwarden_allow_signups | string }}"
           ADMIN_TOKEN: "{{ vaultwarden_admin_token }}"
@@ -45,7 +46,7 @@
           homepage.group: "{{ vaultwarden_homepage_group }}"
           homepage.icon: "{{ vaultwarden_homepage_icon }}"
           homepage.href: "{{ vaultwarden_homepage_href }}"
-#         homepage.description: "Unofficial Bitwarden compatible server written in Rust"
+          homepage.description: "{{ 'Unofficial Bitwarden compatible server written in Rust' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vaultwarden_container_name }}"
@@ -84,7 +85,7 @@
         pull: true
         cpu_shares: "{{ vaultwarden_backup_cpu_shares }}"
         volumes:
-          - "{{ vaultwarden_data_directory }}:/data"
+          - "{{ vaultwarden_data_directory }}/data:/data"
           - "{{ vaultwarden_data_directory }}/backup:/backup"
         env:
           DELETE_AFTER: "30"
@@ -100,7 +101,7 @@
           homepage.group: "{{ vaultwarden_backup_homepage_group }}"
           homepage.icon: "{{ vaultwarden_backup_homepage_icon }}"
           homepage.href: "{{ vaultwarden_backup_homepage_href }}"
-#         homepage.description: "A simple cron powered backup image for vaultwarden."
+          homepage.description: "{{ 'A simple cron powered backup image for vaultwarden.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vaultwarden_backup_container_name }}"
           homepage.showStats: "{{ vaultwarden_backup_homepage_showStats }}"

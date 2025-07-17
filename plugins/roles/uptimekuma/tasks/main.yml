@@ -32,7 +32,7 @@
           homepage.href: "{{ uptimekuma_homepage_href }}"
           homepage.icon: "{{ uptimekuma_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptimekuma_port_http }}"
-#         homepage.description: "A fancy self-hosted monitoring tool"
+          homepage.description: "{{ 'A fancy self-hosted monitoring tool' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ uptimekuma_container_name }}"
           homepage.showStats: "{{ uptimekuma_homepage_showStats }}"

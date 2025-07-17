@@ -34,7 +34,7 @@
           homepage.icon: "{{ seedsync_homepage_icon }}"
           homepage.href: "{{ seedsync_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ seedsync_port_http }}"
-#         homepage.description: "Sync your seedbox. Fast. And more."
+          homepage.description: "{{ 'Sync your seedbox. Fast. And more.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ seedsync_container_name }}"
           homepage.showStats: "{{ seedsync_homepage_showStats }}"

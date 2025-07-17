@@ -8,11 +8,32 @@
 
     - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
-        name: "{{ immich_container_name }}"
+        name: "{{ immich_machinelearning_container_name }}"
+        state: absent
+      register: result_ml
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
+      community.docker.docker_container:
+        name: "{{ immich_postgres_container_name }}"
+        state: absent
+      register: result_db
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
+      community.docker.docker_container:
+        name: "{{ immich_redis_container_name }}"
+        state: absent
+      register: result_redis
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
+      community.docker.docker_container:
+        name: "{{ immich_server_container_name }}"
         state: absent
       register: result
 
     - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
+          - not result_ml.changed
+          - not result_db.changed
+          - not result_redis.changed
           - not result.changed

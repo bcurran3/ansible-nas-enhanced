@@ -45,7 +45,7 @@
           homepage.icon: "{{ kasm_homepage_icon }}"
           homepage.href: "{{ kasm_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kasm_port_http }}"
-#         homepage.description: "Kasm⁠ Workspaces is a docker container streaming platform for delivering browser-based access to desktops, applications, and web services."
+          homepage.description: "{{ 'Kasm⁠ Workspaces is a docker container streaming platform for delivering browser-based access to desktops, applications, and web services.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ kasm_container_name }}"
           homepage.showStats: "{{ kasm_homepage_showStats }}"

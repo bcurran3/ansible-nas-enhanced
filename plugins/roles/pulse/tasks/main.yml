@@ -29,13 +29,11 @@
         env:
           PROXMOX_TOKEN_ID: "{{ pulse_env_proxmox_token_id }}"
           PROXMOX_TOKEN_SECRET: "{{ pulse_env_proxmox_token_secret }}"
-          ########## secret
-          PBS_HOST: "http://192.168.69.218:8007"
-          PBS_TOKEN_ID: "pulse@pbs!monitoring"
-          PBS_TOKEN_SECRET: "db8ec4a3-0234-4383-a91e-3f6308a41dd8"
-          PBS_ALLOW_SELF_SIGNED_CERTS: "true"
-          PBS_PORT: "8007"
-          ############## secret
+          PBS_HOST: "{{ pulse_env_pbs_host }}"
+          PBS_TOKEN_ID: "{{ pulse_env_proxmox_token_id }}"
+          PBS_TOKEN_SECRET: "{{ pulse_env_token_secret }}"
+          PBS_ALLOW_SELF_SIGNED_CERTS: "{{ pulse_env_pbs_allow_self_signed_certs }}"
+          PBS_PORT: "{{ pulse_env_pbs_port }}"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ pulse_memory }}"
@@ -46,7 +44,7 @@
           homepage.group: "{{ pulse_homepage_group }}"
           homepage.icon: "{{ pulse_homepage_icon }}"
           homepage.href: "{{ pulse_homepage_href }}"
-#         homepage.description: "A responsive monitoring application for Proxmox VE that displays real-time metrics across multiple nodes"
+          homepage.description: "{{ 'A responsive monitoring application for Proxmox VE that displays real-time metrics across multiple nodes' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pulse_container_name }}"
           homepage.showStats: "{{ pulse_homepage_showStats }}"

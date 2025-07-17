@@ -33,7 +33,6 @@
         name: "{{ proget_db_container_name}}"
         hostname: "{{ proget_db_container_name}}"
         image: "{{ proget_db_image_name }}:{{ proget_db_image_tag }}"
-#       ports: 1433:1433   # shouldn't be needed
         pull: true
         cpu_shares: "{{ proget_db_cpu_shares }}"
         networks:
@@ -56,7 +55,7 @@
           homepage.group: "{{ proget_db_homepage_group }}"
           homepage.icon: "{{ proget_db_homepage_icon }}"
           homepage.href: "{{ proget_db_homepage_href}}"
-#         homepage.description: "Microsoft SQL Server"
+          homepage.description: "{{ 'Microsoft SQL Server' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ proget_db_container_name }}"
           homepage.showStats: "{{ proget_db_homepage_showStats }}"
@@ -96,7 +95,7 @@
           homepage.icon: "{{ proget_homepage_icon }}"
           homepage.href: "{{ proget_homepage_href}}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proget_port_http }}"
-#         homepage.description: "ProGet"
+          homepage.description: "{{ 'ProGet' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ proget_container_name }}"
           homepage.showStats: "{{ proget_homepage_showStats }}"

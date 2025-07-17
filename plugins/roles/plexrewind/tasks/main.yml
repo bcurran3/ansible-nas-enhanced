@@ -37,7 +37,7 @@
           homepage.icon: "{{ plexrewind_homepage_icon }}"
           homepage.href: "{{ plexrewind_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plexrewind_port_http }}"
-#         homepage.description: "Present Plex user statistics and habits in a beautiful and organized manner."
+          homepage.description: "{{ 'Present Plex user statistics and habits in a beautiful and organized manner.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ plexrewind_container_name }}"
           homepage.showStats: "{{ plexrewind_homepage_showStats }}"

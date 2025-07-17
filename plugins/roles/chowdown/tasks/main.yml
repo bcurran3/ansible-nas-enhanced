@@ -33,7 +33,7 @@
           homepage.icon: "{{ chowdown_homepage_icon }}"
           homepage.href: "{{ chowdown_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chowdown_port_http }}"
-#         homepage.description: "Simple recipes in Markdown format"
+          homepage.description: "{{ 'Simple recipes in Markdown format' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ chowdown_container_name }}"
           homepage.showStats: "{{ chowdown_homepage_showStats }}"

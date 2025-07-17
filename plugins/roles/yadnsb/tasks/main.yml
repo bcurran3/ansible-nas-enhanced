@@ -1,14 +1,6 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
-#    - name: Create {{ ansible_nas_app_name }} Directories
-#      file:
-#        path: "{{ item }}"
-#        state: directory
-#      with_items:
-#        - "{{ yadnsb_data_directory }}"
-#        - "{{ yadnsb_data_directory }}/public/data"
-
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ yadnsb_container_name }}"
@@ -16,8 +8,6 @@
         image: "{{ yadnsb_image_name }}:{{ yadnsb_image_tag }}"
         pull: true
         cpu_shares: "{{ yadnsb_cpu_shares }}"
-#        volumes:
-#          - "{{ yadnsb_data_directory }}:/"
         ports:
           - "{{ yadnsb_port }}:3000"
         env:
@@ -39,7 +29,7 @@
           homepage.group: "{{ yadnsb_homepage_group }}"
           homepage.icon: "{{ yadnsb_homepage_icon }}"
           homepage.href: "{{ yadnsb_homepage_href }}"
-#         homepage.description: "DNS performance benchmarks "
+          homepage.description: "{{ 'DNS performance benchmarks' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ yadnsb_container_name }}"
           homepage.showStats: "{{ yadnsb_homepage_showStats }}"

@@ -22,7 +22,7 @@
           homepage.href: "{{ fastmusicremover_homepage_href }}"
           homepage.icon: "{{ fastmusicremover_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fastmusicremover_port_http }}"
-#         homepage.description: "lightweight music and noise remover for YouTube and other internet media, using DeepFilterNet for audio enhancement"
+          homepage.description: "{{ 'lightweight music and noise remover for YouTube and other internet media, using DeepFilterNet for audio enhancement' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "fastmusicremover"
           homepage.showStats: "{{ fastmusicremover_homepage_showStats }}"

@@ -35,7 +35,7 @@
           homepage.name: "FreshRSS PostgreSQL"
           homepage.icon: "{{ freshrss_db_homepage_icon }}"
           homepage.href: "{{ freshrss_homepage_href }}"
-#         homepage.description: "PostgrSQL"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ freshrss_db_container_name }}"
           homepage.showStats: "{{ freshrss_db_homepage_showStats }}"
@@ -48,8 +48,6 @@
         image: "{{ freshrss_image_name }}:{{ freshrss_image_version }}"
         pull: true
         cpu_shares: "{{ freshrss_cpu_shares }}"
-        links:
-          - "{{ freshrss_db_container_name }}"
         volumes:
           - "{{ freshrss_data_directory }}/data:/var/www/FreshRSS/data:rw"
           - "{{ freshrss_data_directory }}/extensions:/var/www/FreshRSS/extensions:rw"
@@ -65,6 +63,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ freshrss_memory }}"
+        links:
+          - "{{ freshrss_db_container_name }}"
         labels:
           autoheal: "{{ freshrss_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_watchtower_monitor_only }}"
@@ -73,7 +73,7 @@
           homepage.icon: "{{ freshrss_homepage_icon }}"
           homepage.href: "{{ freshrss_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
-#         homepage.description: "A free, self-hostable news aggregator…"
+          homepage.description: "{{ 'A free, self-hostable news aggregator.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ freshrss_container_name }}"
           homepage.showStats: "{{ freshrss_homepage_showStats }}"

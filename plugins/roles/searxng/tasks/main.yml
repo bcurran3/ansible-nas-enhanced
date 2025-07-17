@@ -35,7 +35,7 @@
           homepage.icon: "{{ searxng_homepage_icon }}"
           homepage.href: "{{ searxng_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
-#         homepage.description: "SearXNG is a free internet metasearch engine which aggregates results from various search services and databases."
+          homepage.description: "{{ 'SearXNG is a free internet metasearch engine which aggregates results from various search services and databases.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ searxng_container_name }}"
           homepage.showStats: "{{ searxng_homepage_showStats }}"

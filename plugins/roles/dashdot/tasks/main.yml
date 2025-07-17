@@ -23,7 +23,7 @@
           homepage.icon: "{{ dashdot_homepage_icon }}"
           homepage.href: "{{ dashdot_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dashdot_port_http }}"
-#         homepage.description: "A simple, modern server dashboard, primarily used by smaller private servers"
+          homepage.description: "{{ 'A simple, modern server dashboard, primarily used by smaller private servers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dashdot_container_name }}"
           homepage.showStats: "{{ dashdot_homepage_showStats }}"

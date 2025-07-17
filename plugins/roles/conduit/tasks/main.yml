@@ -41,7 +41,7 @@
           homepage.group: "{{ conduit_homepage_group }}"
           homepage.href: "{{ conduit_homepage_href }}"
           homepage.icon: "{{ conduit_homepage_icon }}"
-#         homepage.description: "Conduit is a simple, fast and reliable chat server powered by Matrix"
+          homepage.description: "{{ 'Conduit is a simple, fast and reliable chat server powered by Matrix' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ conduit_port }}"
           homepage.server: "my-docker"
           homepage.container: "{{ conduit_container_name }}"

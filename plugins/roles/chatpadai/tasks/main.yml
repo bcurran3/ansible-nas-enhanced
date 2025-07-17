@@ -22,7 +22,7 @@
           homepage.icon: "{{ chatpadai_homepage_icon }}"
           homepage.href: "{{ chatpadai_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chatpadai_port_http }}"
-#         homepage.description: "Not just another ChatGPT user-interface!"
+          homepage.description: "{{ 'Not just another ChatGPT user-interface!' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ chatpadai_container_name }}"
           homepage.showStats: "{{ chatpadai_homepage_showStats }}"

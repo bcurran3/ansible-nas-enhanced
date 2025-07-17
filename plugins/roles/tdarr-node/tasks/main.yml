@@ -39,6 +39,7 @@
           - "{{ tdarr_node_port_http }}:8268"
         devices:
           - "/dev/dri/:/dev/dri/"
+          # ^ probably not needed anymore
         env:
           nodeName: "{{ ansible_nas_hostname }} Node"
           serverIP: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
@@ -49,7 +50,6 @@
           PGID: "{{ tdarr_node_group_id }}"
           NVIDIA_DRIVER_CAPABILITIES: "all"
           NVIDIA_VISIBLE_DEVICES: "all"
-          gpus: "all"                 # <----- probably wrong
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ tdarr_node_autoheal }}"
@@ -57,7 +57,7 @@
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ tdarr_node_homepage_group }}"
           homepage.icon: "{{ tdarr_node_homepage_icon }}"
-#         homepage.description: "Tdarr Node"
+          homepage.description: "{{ 'Tdarr Node' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tdarr_node_container_name }}"
           homepage.showStats: "{{ tdarr_node_homepage_showStats }}"

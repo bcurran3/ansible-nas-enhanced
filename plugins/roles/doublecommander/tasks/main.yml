@@ -34,7 +34,7 @@
           homepage.icon: "{{ doublecommander_homepage_icon }}"
           homepage.href: "{{ doublecommander_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doublecommander_port_http }}"
-#         homepage.description: "Double Commander is a free cross platform open source file manager with two panels side by side."
+          homepage.description: "{{ 'Double Commander is a free cross platform open source file manager with two panels side by side.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ doublecommander_container_name }}"
           homepage.showStats: "{{ doublecommander_homepage_showStats }}"

@@ -143,7 +143,7 @@
           homepage.href: "{{ twofauth_homepage_href }}"
           homepage.icon: "{{ twofauth_homepage_icon }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ twofauth_port_http }}"
-#         homepage.description: "A Web app to manage your Two-Factor Authentication (2FA) accounts"
+          homepage.description: "{{ 'A Web app to manage your Two-Factor Authentication (2FA) accounts' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ twofauth_container_name }}"
           homepage.showStats: "{{ twofauth_homepage_showStats }}"

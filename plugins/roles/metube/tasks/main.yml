@@ -29,7 +29,7 @@
           homepage.group: "{{ metube_homepage_group }}"
           homepage.icon: "{{ metube_homepage_icon }}"
           homepage.href: "{{ metube_homepage_href }}"
-#         homepage.description: "Self-hosted YouTube downloader (web UI for youtube-dl / yt-dlp)"
+          homepage.description: "{{ 'Self-hosted YouTube downloader (web UI for youtube-dl / yt-dlp)' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ metube_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ metube_container_name }}"
