@@ -8,33 +8,25 @@
 
     - name: Get container state
       community.docker.docker_container_info:
-        name: "{{ invoiceninja_container_name }}"
-      register: result
-
-    - name: Check {{ ansible_nas_app_name }} is running
-      ansible.builtin.assert:
-        that:
-          - result.container['State']['Status'] == "running"
-          - result.container['State']['Restarting'] == false
-
-    - name: Get container state
-      community.docker.docker_container_info:
-        name: "{{ invoiceninja_backend_container_name }}"
-      register: result
-
-    - name: Check {{ ansible_nas_app_name }} backend is running
-      ansible.builtin.assert:
-        that:
-          - result.container['State']['Status'] == "running"
-          - result.container['State']['Restarting'] == false
+        name: "{{ invoiceninja_app_container_name }}"
+      register: result_app
 
     - name: Get container state
       community.docker.docker_container_info:
         name: "{{ invoiceninja_db_container_name }}"
-      register: result
+      register: result_db
 
-    - name: Check {{ ansible_nas_app_name }} DB is running
+    - name: Get container state
+      community.docker.docker_container_info:
+        name: "{{ invoiceninja_web_container_name }}"
+      register: result_web
+
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
-          - result.container['State']['Status'] == "running"
-          - result.container['State']['Restarting'] == false
+          - result_app.container['State']['Status'] == "running"
+          - result_app.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false
+          - result_web.container['State']['Status'] == "running"
+          - result_web.container['State']['Restarting'] == false

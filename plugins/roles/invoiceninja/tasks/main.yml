@@ -51,7 +51,7 @@
         labels:
           autoheal: "{{ invoiceninja_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_db_watchtower_monitor_only }}"
-          homepage.name: "Invoice Ninja MariaDB"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ invoiceninja_db_homepage_group }}"
           homepage.icon: "{{ invoiceninja_db_homepage_icon }}"
           homepage.href: "{{ invoiceninja_homepage_href }}"
@@ -65,20 +65,19 @@
         memory: "{{ invoiceninja_db_memory }}"
         restart_policy: unless-stopped
 
+# https://invoiceninja.github.io/en/env-variables/
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ invoiceninja_backend_container_name }}"
-        hostname: "{{ invoiceninja_backend_container_name }}"
-        image: "{{ invoiceninja_backend_image_name }}:{{ invoiceninja_backend_image_tag }}"
+        name: "{{ invoiceninja_app_container_name }}"
+        hostname: "{{ invoiceninja_app_container_name }}"
+        image: "{{ invoiceninja_app_image_name }}:{{ invoiceninja_app_image_tag }}"
         pull: true
-        cpu_shares: "{{ invoiceninja_backend_cpu_shares }}"
+        cpu_shares: "{{ invoiceninja_app_cpu_shares }}"
         networks:
           - name: "{{ invoiceninja_network_name }}"
         network_mode: "{{ invoiceninja_network_name }}"
         networks_cli_compatible: "yes"
-        links:
-          - "{{ invoiceninja_db_container_name }}"
         ports:
           - "9099:9000"
         volumes:
@@ -86,18 +85,29 @@
           - "{{ invoiceninja_data_directory }}/storage:/var/www/app/storage"
         env:
           APP_ENV: "production"
-          APP_URL: "https://{{ invoiceninja_hostname }}.{{ ansible_nas_domain }}"
+          APP_URL: "{{ invoiceninja_app_url }}"
           APP_KEY: "{{ invoiceninja_app_key }}"
-          APP_DEBUG: "true"
-          REQUIRE_HTTPS: "false"
+          APP_DEBUG: "{{ invoiceninja_app_debug }}"
+          APP_NAME: "{{ invoiceninja_app_name }}"
+          API_SECRET: "{{ invoiceninja_api_secret }}"
+          REQUIRE_HTTPS: "{{ invoiceninja_require_https }}"
+          LICENSE_KEY:  "{{ invoiceninja_license_key }}"
           PHANTOMJS_PDF_GENERATION: "false"
           PDF_GENERATOR: "snappdf"
           TRUSTED_PROXIES: '*'
+          IS_DOCKER: "TRUE"
+          NINJA_ENVIRONMENT: "selfhost"
+          UPDATE_SECRET: "{{ invoiceninja_update_secret }}"
+          NORDIGEN_SECRET_ID: "{{ invoiceninja_nordigen_secret_id }}"
+          NORDIGEN_SECRET_KEY: "{{ invoiceninja_nordigen_secret_key }}"
+          DELETE_BACKUP_DAYS: "{{ invoiceninja_delete_backup_days}}"
+          ADDITIONAL_UPLOAD_EXTENSIONS: "{{ invoiceninja_additional_upload_extensions }}"
           DB_HOST: "{{ invoiceninja_db_container_name }}"
           DB_PORT: "3306"
           DB_DATABASE: "invoiceninja"
           DB_USERNAME: "invoiceninja"
           DB_PASSWORD: "{{ invoiceninja_db_password }}"
+          ERROR_EMAIL: "{{ invoiceninja_error_email }}"
           IN_USER_EMAIL: "{{ invoiceninja_in_user_email }}"
           IN_PASSWORD: "{{ invoiceninja_in_password }}"
           MAIL_MAILER: "{{ invoiceninja_mail_mailer }}"
@@ -109,31 +119,33 @@
           MAIL_FROM_ADDRESS: "{{ invoiceninja_mail_from_address }}"
           MAIL_FROM_NAME: "{{ invoiceninja_mail_from_name }}"
           TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ invoiceninja_db_container_name }}"
         labels:
-          autoheal: "{{ invoiceninja_backend_autoheal }}"
+          autoheal: "{{ invoiceninja_app_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
-          homepage.name: "{{ ansible_nas_app_name }} (backend)"
-          homepage.group: "{{ invoiceninja_backend_homepage_group }}"
-          homepage.icon: "{{ invoiceninja_backend_homepage_icon }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ invoiceninja_app_homepage_group }}"
+          homepage.icon: "{{ invoiceninja_app_homepage_icon }}"
           homepage.href: "{{ invoiceninja_homepage_href }}"
           homepage.description: "{{ 'A source-available invoice, quote, project and time-tracking app built with Laravel' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ invoiceninja_backend_container_name }}"
-          homepage.showStats: "{{ invoiceninja_backend_homepage_showStats }}"
+          homepage.container: "{{ invoiceninja_app_container_name }}"
+          homepage.showStats: "{{ invoiceninja_app_homepage_showStats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/invoiceninja/invoiceninja/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: "{{ invoiceninja_backend_memory }}"
+        memory: "{{ invoiceninja_app_memory }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Web UI Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ invoiceninja_container_name }}"
-        hostname: "{{ invoiceninja_container_name }}"
+        name: "{{ invoiceninja_web_container_name }}"
+        hostname: "{{ invoiceninja_web_container_name }}"
         image: "{{ invoiceninja_image_name }}:{{ invoiceninja_image_tag }}"
         pull: true
-        cpu_shares: "{{ invoiceninja_cpu_shares }}"
+        cpu_shares: "{{ invoiceninja_web_cpu_shares }}"
         networks:
           - name: "{{ invoiceninja_network_name }}"
         network_mode: "{{ invoiceninja_network_name }}"
@@ -146,18 +158,18 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         links:
-          - "{{ invoiceninja_backend_container_name }}"
+          - "{{ invoiceninja_app_container_name }}"
         labels:
           autoheal: "{{ invoiceninja_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_watchtower_monitor_only }}"
-          homepage.name: "{{ ansible_nas_app_name }} (frontend)"
+          homepage.name: "{{ ansible_nas_app_name }} UI"
           homepage.group: "{{ invoiceninja_homepage_group }}"
           homepage.icon: "invoiceninja.png"
           homepage.href: "{{ invoiceninja_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ invoiceninja_port_http }}"
-#         homepage.description: "the world's most popular Web Server"
+          homepage.description: "{{ 'the world's most popular Web Server' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ invoiceninja_container_name }}"
+          homepage.container: "{{ invoiceninja_web_container_name }}"
           homepage.showStats: "{{ invoiceninja_homepage_showStats }}"
           traefik.enable: "{{ invoiceninja_available_externally | string }}"
           traefik.http.routers.invoiceninja.rule: "Host(`invoiceninja.{{ ansible_nas_domain }}`)"
@@ -170,7 +182,7 @@
           traefik.http.services.invoiceninja.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/nginx/nginx/releases/tag/$${major}.$${minor}.$${patch}"
-        memory: "{{ invoiceninja_memory }}"
+        memory: "{{ invoiceninja_web_memory }}"
         restart_policy: unless-stopped
   when: invoiceninja_enabled is true
 
@@ -178,12 +190,12 @@
   block:
     - name: Stop {{ ansible_nas_app_name }} Web UI Container
       community.docker.docker_container:
-        name: "{{ invoiceninja_container_name }}"
+        name: "{{ invoiceninja_web_container_name }}"
         state: absent
 
     - name: Stop {{ ansible_nas_app_name }} App Container
       community.docker.docker_container:
-        name: "{{ invoiceninja_backend_container_name }}"
+        name: "{{ invoiceninja_app_container_name }}"
         state: absent
 
     - name: Stop {{ ansible_nas_app_name }} DB Container
