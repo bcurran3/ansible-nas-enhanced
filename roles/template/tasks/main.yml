@@ -85,6 +85,96 @@
       when: dir_stat.stat.exists
   when: appname_enabled is false and archive_app_data_enabled is true
 
+    #############################################
+    #  OPTIONAL - remove if not needed          #
+    #   __  __            _       ____  ____    #
+    #  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   #
+    #  | |\/| |/ _` | '__| |/ _` | | | |  _ \   #
+    #  | |  | | (_| | |  | | (_| | |_| | |_) |  #
+    #  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   #
+    #############################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ appname_db_container_name }}"
+        hostname: "{{ appname_db_container_name }}"
+        image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ appname_network_name }}"     # optional
+        network_mode: "{{ appname_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ appname_data_directory }}/appdata/mariadb:/var/lib/mysql"
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          MYSQL_ROOT_PASSWORD: "topsecretroot"
+          MYSQL_DATABASE: "appname"
+          MYSQL_USER: "appname"
+          MYSQL_PASSWORD: "{{ appname_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ appname_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ appname_db_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ appname_db_homepage_group }}"
+          homepage.icon: "{{ appname_db_homepage_icon }}"
+          homepage.href: "{{ appname_homepage_href }}"
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ appname_db_container_name }}"
+          homepage.showStats: "{{ appname_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ appname_db_cpu_shares }}"
+        memory: "{{ appname_db_memory }}"
+        restart_policy: unless-stopped
+
+    ##################################################
+    #  OPTIONAL - remove if not needed               #
+    #   __  __                         ____  ____    #
+    #  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   #
+    #  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   #
+    #  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  #
+    #  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   #
+    #                      |___/                     #
+    ##################################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ appname_db_container_name }}"
+        hostname: "{{ appname_db_container_name }}"
+        image: "{{ appname_db_image_name }}:{{ appname_db_image_version }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ appname_network_name }}"     # optional
+        network_mode: "{{ appname_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ appname_data_directory }}/db:/data/db"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ appname_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ appname_db_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.group: "{{ appname_db_homepage_group }}"
+          homepage.icon: "{{ appname_db_homepage_icon }}"
+          homepage.href: "{{ appname_homepage_href }}"
+          homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ appname_db_container_name }}"
+          homepage.showStats: "{{ appname_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ appname_db_cpu_shares }}"
+        memory: "{{ appname_db_memory }}"
+        restart_policy: unless-stopped
 
     ######################################
     #  OPTIONAL - remove if not needed   #
@@ -102,11 +192,11 @@
         name: "{{ appname_db_container_name }}"
         hostname: "{{ appname_db_container_name }}"
         image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
-        networks:
-          - name: "{{ appname_network_name }}"
-        network_mode: "{{ appname_network_name }}"
         pull: true
-        cpu_shares: "{{ appname_db_cpu_shares }}"
+        networks:                                  # optional
+          - name: "{{ appname_network_name }}"     # optional
+        network_mode: "{{ appname_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
         volumes:
           - "{{ appname_data_directory }}/mysql/mysql:/var/lib/mysql"
           - "{{ appname_data_directory }}/mysql/my.cnf:/etc/my.cnf"
@@ -116,8 +206,6 @@
           MYSQL_PASSWORD: "{{ appname_sql_password }}"
           MYSQL_ROOT_PASSWORD: "{{ appname_sql_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ appname_db_memory }}"
         labels:
           autoheal: "{{ appname_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ appname_db_watchtower_monitor_only }}"
@@ -132,6 +220,9 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ appname_db_cpu_shares }}"
+        memory: "{{ appname_db_memory }}"
+        restart_policy: unless-stopped
 
     ##########################################################
     #  OPTIONAL - remove if not needed                       #
@@ -140,6 +231,7 @@
     #  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      #
     #  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   #
     #  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  #
+    #                     |___/                              #
     ##########################################################
 
     - name: Create {{ ansible_nas_app_name }} PostgreSQL Container
@@ -149,7 +241,10 @@
         hostname: "{{ appname_db_container_name }}"
         image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ appname_db_cpu_shares }}"
+        networks:                                  # optional
+          - name: "{{ appname_network_name }}"     # optional
+        network_mode: "{{ appname_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
         volumes:
           - "{{ appname_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -157,8 +252,6 @@
           POSTGRES_PASSWORD: "appname"
           POSTGRES_DB: "appname"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ appname_db_memory }}"
         labels:
           autoheal: "{{ appname_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ appname_db_watchtower_monitor_only }}"
@@ -171,6 +264,12 @@
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showStats }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://hub.docker.com/_/postgres/tag/$${major}.$${minor}.$${patch}"
+#         ^ needs to be updated
+        cpu_shares: "{{ appname_db_cpu_shares }}"
+        memory: "{{ appname_db_memory }}"
+        restart_policy: unless-stopped
 
     #####################################
     #  OPTIONAL - remove if not needed  #
@@ -188,16 +287,13 @@
         hostname: "{{ appname_redis_container_name }}"
         image: "{{ appname_redis_image_name }}:{{ appname_redis_image_tag }}"
         pull: true
-        cpu_shares: "{{ appname_redis_cpu_shares }}"
-        networks:
-          - name: "{{ appname_network_name }}"
-        network_mode: "{{ appname_network_name }}"
-        networks_cli_compatible: "yes"
+        networks:                                  # optional
+          - name: "{{ appname_network_name }}"     # optional
+        network_mode: "{{ appname_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        command: "redis-server --requirepass topsecret"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ appname_redis_memory }}"
-        command: "redis-server --requirepass topsecret"
         labels:
           autoheal: "{{ appname_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ appname_redis_watchtower_monitor_only }}"
@@ -205,14 +301,13 @@
           homepage.group: "{{ appname_redis_homepage_group }}"
           homepage.icon: "{{ appname_redis_homepage_icon }}"
           homepage.href: "{{ appname_homepage_href }}"
-          homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_redis_container_name }}"
           homepage.showStats: "{{ appname_redis_homepage_showStats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
-
-#          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
-#          homepage.description: "{{ 'The MongoDB Database' if homepage_show_description else omit }}"
-# redis
+        cpu_shares: "{{ appname_redis_cpu_shares }}"
+        memory: "{{ appname_redis_memory }}"
+        restart_policy: unless-stopped
