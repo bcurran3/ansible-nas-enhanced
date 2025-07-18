@@ -8,7 +8,7 @@
 ##
 ##  Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced
 
-if [[ "$1" == "--enabled" ]]; then
+if [ "$1" = "--enabled" ]; then
      echo "*** ANE enabled apps:"
      cat inventories/ANE/group_vars/nas.yml |grep 'enabled: true'
      exit
@@ -24,8 +24,15 @@ fi
 
 # install ANE
 if [ "$1" = "--install" ]; then
+    if [ -d "inventories/ANE" ]; then
+       echo "WARNING: inventories/ANE exists!"
+       echo "         \"rm inventories/ANE -R\" first if you really wish to reset."
+       exit
+    fi
     cp -rfp inventories/sample inventories/ANE
-    echo "You may want to edit your inventory file"
+    echo "Time to configure!"
+    echo "\"./ane.sh --inventory\" to edit your inventory file"
+    echo "\"./ane.sh --settings\" to edit your settings file"
     exit
 fi
 
@@ -35,7 +42,7 @@ if [ "$1" = "--inventory" ]; then
     exit
 fi
 
-# git info
+# git check commits
 if [ "$1" = "--outdated" ]; then
 #TDL: add --updates
     git fetch
@@ -47,7 +54,7 @@ if [ "$1" = "--outdated" ]; then
     exit
 fi
 
-# reset permissions
+# reset shared file permissions
 if [ "$1" = "--permissions" ]; then
     ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
     exit
@@ -60,19 +67,19 @@ if [ "$1" = "--prune" ]; then
     exit
 fi
 
-# install ansible-nas requirements
+# install ANE requirements
 if [ "$1" = "--requirements" ]; then
     ansible-galaxy install -r requirements.yml
     exit
 fi
 
-# edit ansible-nas settings/variables
+# edit ANE settings/variables
 if [ "$1" = "--settings" ]; then
     nano inventories/ANE/group_vars/nas.yml
     exit
 fi
 
-# update ANE with a git pull
+# update ANE files
 if [ "$1" = "--update" ]; then
     git pull
     exit
@@ -99,7 +106,8 @@ if [ "$1" = "--help" ]; then
     echo "    Install/re-install ANE requirements"
     echo "  --settings"
     echo "    Edit ANE settings/overrides"
-    echo "  -t"
+    echo "  -t appname"
+###         ^^^^ going to make this more intuitive
     echo "    Update ANE app"
     echo "  --update"
     echo "    Update ANE files from git"
