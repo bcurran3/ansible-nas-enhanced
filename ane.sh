@@ -45,7 +45,7 @@ fi
 # git check commits
 if [ "$1" = "--outdated" ]; then
 #TDL: add --updates
-    git fetch
+    git fetch --quiet
     BEHIND=$(git rev-list --count HEAD..@{u})
     echo "Your ANE installation is $BEHIND git commits behind."
     if [ $BEHIND -gt 1 ]; then
