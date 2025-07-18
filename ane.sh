@@ -1,11 +1,16 @@
 #!/bin/bash
-# TODO:
-# change subdir to a variable
-# add ansible-playbook -i inventories/my-ansible-nas/inventory permission_data.yml -b -K
+##
+##      _         _   _       _____
+##     / \       | \ | |     | ____|
+##    / _ \ _____|  \| |_____|  _|
+##   / ___ \_____| |\  |_____| |___
+##  /_/   \_\    |_| \_|     |_____|
+##
+##  Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced
 
 if [[ "$1" == "--enabled" ]]; then
      echo "*** ANE enabled apps:"
-     cat inventories/supernas/group_vars/nas.yml |grep 'enabled: true'
+     cat inventories/ANE/group_vars/nas.yml |grep 'enabled: true'
      exit
 fi
 
@@ -19,8 +24,14 @@ fi
 
 # install ANE
 if [ "$1" = "--install" ]; then
-    echo "Not implemented yet. (Sorry!)"
-# copy default group_vars and inventory stuff here
+    cp -rfp inventories/sample inventories/ANE
+    echo "You may want to edit your inventory file"
+    exit
+fi
+
+# edit inventory file
+if [ "$1" = "--inventory" ]; then
+    nano inventories/ANE/inventory
     exit
 fi
 
@@ -32,6 +43,12 @@ if [ "$1" = "--outdated" ]; then
     git rev-list --count HEAD..@{u}
 # TDL: save commits to varialbe and then display the following if greater than 1
     echo "\"./ANE.sh --update\" or \"git pull\" to update"
+    exit
+fi
+
+# reset permissions
+if [ "$1" = "--permissions" ]; then
+    ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
     exit
 fi
 
@@ -48,9 +65,9 @@ if [ "$1" = "--requirements" ]; then
     exit
 fi
 
-# edit ansible-nas variables
+# edit ansible-nas settings/variables
 if [ "$1" = "--settings" ]; then
-    nano inventories/supernas/group_vars/nas.yml
+    nano inventories/ANE/group_vars/nas.yml
     exit
 fi
 
@@ -60,27 +77,33 @@ if [ "$1" = "--update" ]; then
     exit
 fi
 
-# update.sh help menu
+# ANE help menu
 if [ "$1" = "--help" ]; then
-    echo "ANE HELP:"
-    echo "--help"
-    echo "  This menu!"
-    echo "--enabled"
-    echo "  List enabled apps"
-    echo "--install"
-    echo "  Install ANE \(first time or reset\)"
-    echo "--outdated, --updates"
-    echo "  Check # of git commits your install of ANE is behind"
-    echo "--prune"
-    echo "  Prune unused Docker images and volumes"
-    echo "--requirements"
-    echo "  Install/reinstall ANE requirements"
-    echo "--settings"
-    echo "  Edit ANE settings/overrides"
-    echo "--update"
-    echo "  Update ANE files from git"
+    echo "Ansible-NAS-Enhanced (ANE) Help:"
+    echo "  --help"
+    echo "    This menu!"
+    echo "  --enabled"
+    echo "    List ANE enabled apps"
+    echo "  --install"
+    echo "    Install Anisible-NAS-Enhanced (first time or reset)"
+    echo "  --inventory"
+    echo "    Edit ANE inventory file"
+    echo "  --outdated, --updates"
+    echo "    Check # of git commits your install of ANE is behind"
+    echo "  --permissions"
+    echo "    Reset permissions on all shared files"
+    echo "  --prune"
+    echo "    Prune unused Docker images and volumes"
+    echo "  --requirements"
+    echo "    Install/re-install ANE requirements"
+    echo "  --settings"
+    echo "    Edit ANE settings/overrides"
+    echo "  -t"
+    echo "    Update ANE app"
+    echo "  --update"
+    echo "    Update ANE files from git"
     exit
 fi
 
 # --tags "taskname"
-ansible-playbook -i inventories/supernas/inventory nas.yml -b -K $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10}
+ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $1 $2 $3 $4 $5 $6 $7 $8 $9 ${10}

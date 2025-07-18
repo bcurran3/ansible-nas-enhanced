@@ -1,18 +1,20 @@
 ---
-- hosts: all
-
-  pre_tasks:
-    - import_tasks: tasks/users.yml
-      tags: users
+- name: Ansible-NAS-Enhanced
+  hosts: all
 
   roles:
     ###
     ### Requirements
     ###
-#    - role: bertvv.samba
-#      tags:
-#        - samba
-#        - skip_ansible_lint
+    - role: ansible-nas-users
+      tags:
+        - ansible-nas-users
+        - ansible-nas
+
+    - role: vladgh.samba.server
+      tags:
+        - samba
+        - skip_ansible_lint
 
     - role: geerlingguy.nfs
       tags:
@@ -32,15 +34,22 @@
         - ansible-nas-general
         - ansible-nas
 
-############# This messes up Ubuntu 24.xx
 #    - role: ansible-nas-docker
 #      tags:
 #        - ansible-nas-docker
 #        - ansible-nas
 # ^ should be good now but need to officially test
 
-# traefik and portainer prioritized
+    ###
+    ### Stacks
+    ###
+    - role: logging
+      tags:
+        - logging
 
+    ###
+    ### Prioritized Applications
+    ###
     - role: traefik
       tags:
         - traefik

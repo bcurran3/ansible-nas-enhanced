@@ -1,0 +1,42 @@
+---
+##
+##      _         _   _       _____
+##     / \       | \ | |     | ____|
+##    / _ \ _____|  \| |_____|  _|
+##   / ___ \_____| |\  |_____| |___
+##  /_/   \_\    |_| \_|     |_____|
+##
+##  Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced
+
+# Add your all.yml config overrides to this file. See group_vars/all.yml for all possible settings.
+
+# Global variables:
+ansible_nas_hostname: ansible-nas
+ansible_nas_timezone: Etc/UTC
+ansible_nas_user: yourname
+ansible_nas_email: you@example.com
+ansible_nas_domain: example.com
+ansible_nas_dns: 1.1.1.1
+archive_app_data_enabled: false
+docker_home: "/data/docker"
+docker_image_directory: "{{ docker_home }}/_images"
+
+# apt packages to install:
+ansible_nas_extra_packages:
+#  - nfs-common
+#  - samba
+#  - bonnie++
+#  - net-tools
+  - ansible-lint
+  - iputils-ping
+  - nala
+  - nano
+  - rsync
+  - rar
+  - unrar
+  - zip
+  - unzip
+
+## Applications enabled:
+homepage_enabled: true
+portainer_enabled: true
