@@ -38,11 +38,12 @@ fi
 # git info
 if [ "$1" = "--outdated" ]; then
 #TDL: add --updates
-    echo "# of git commits behind:"
     git fetch
-    git rev-list --count HEAD..@{u}
-# TDL: save commits to varialbe and then display the following if greater than 1
-    echo "\"./ANE.sh --update\" or \"git pull\" to update"
+    BEHIND=$(git rev-list --count HEAD..@{u})
+    echo "Your ANE installation is $BEHIND git commits behind."
+    if [ $BEHIND -gt 1 ]; then
+       echo "\"./ane.sh --update\" or \"git pull\" to update"
+    fi
     exit
 fi
 
