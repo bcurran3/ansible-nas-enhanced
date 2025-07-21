@@ -24,6 +24,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homepage_container_name }}"
+        hostname: "{{ homepage_container_name }}"
         image: "{{ homepage_image_name }}:{{ homepage_image_tag }}"
         pull: true
         cpu_shares: "{{ homepage_cpu_shares }}"

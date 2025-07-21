@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ sabnzbd_container_name }}"
+        hostname: "{{ sabnzbd_container_name }}"
         image: "{{ sabnzbd_image_name }}:{{ sabnzbd_image_version }}"
         pull: true
         volumes:

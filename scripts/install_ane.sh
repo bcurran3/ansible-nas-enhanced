@@ -64,13 +64,13 @@ function install_git {
 }
 
 function clone_repo {
-    if [ -d ./ansible-nas-enhanced ]; then
-       print3 "Please remove ./ansible-nas-enhanced and try again."
+    if [ -d ./$INSTALL_DIR ]; then
+       print3 "Please remove ./$INSTALL_DIR and try again."
        exit
     fi
     print1 "Making directory for git files..."
-    mkdir ./ansible-nas-enhanced
-    cd ./ansible-nas-enhanced
+    mkdir ./$INSTALL_DIR
+    cd ./$INSTALL_DIR
     print1 "Cloning ANE repo..."
     git clone $REPO
     print2 "ANE repo cloned."

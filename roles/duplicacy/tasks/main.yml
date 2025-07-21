@@ -14,8 +14,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ duplicacy_container_name }}"
-        image: saspus/duplicacy-web:mini
         hostname: "{{ duplicacy_hostname }}"
+        image: "{{ duplicacy_image_name }}:{{ duplicacy_image_tag }}"
         pull: true
         cpu_shares: "{{ duplicacy_cpu_shares }}"
         ports:

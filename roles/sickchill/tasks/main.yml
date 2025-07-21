@@ -13,6 +13,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ sickchill_container_name }}"
+        hostname: "{{ sickchill_container_name }}"
         image: "{{ sickchill_image_name }}:{{ sickchill_image_version }}"
         pull: true
         volumes:

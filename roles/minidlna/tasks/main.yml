@@ -4,6 +4,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minidlna_container_name }}"
+        hostname: "{{ minidlna_container_name }}"
         image: "{{ minidlna_image_name }}:{{ minidlna_image_version }}"
         pull: true
         cpu_shares: "{{ minidlna_cpu_shares }}"

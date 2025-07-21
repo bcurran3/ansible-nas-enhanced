@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ nzbget_container_name }}"
+        hostname: "{{ nzbget_container_name }}"
         image: "{{ nzbget_image_name }}:{{ nzbget_image_version }}"
         pull: true
         cpu_shares: "{{ nzbget_cpu_shares }}"

@@ -13,9 +13,9 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ homebridge_container_name }}"
+        hostname: "{{ homebridge_container_name }}"
         image: "{{ homebridge_image_name }}:{{ homebridge_image_version }}"
         pull: true
-        cpu_shares: "{{ homebridge_cpu_shares }}"
         volumes:
           - "{{ homebridge_data_directory }}/config:/homebridge"
         network_mode: "host"
@@ -25,8 +25,6 @@
           PUID: "{{ homebridge_user_id }}"
           HOMEBRIDGE_CONFIG_UI: "1"
           HOMEBRIDGE_CONFIG_UI_PORT: "{{ homebridge_port }}"
-        restart_policy: unless-stopped
-        memory: "{{ homebridge_memory }}"
         labels:
           autoheal: "{{ homebridge_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ homebridge_watchtower_monitor_only }}"
@@ -36,6 +34,9 @@
           traefik.http.routers.homebridge.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.homebridge.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.homebridge.loadbalancer.server.port: "8087"
+        cpu_shares: "{{ homebridge_cpu_shares }}"
+        restart_policy: unless-stopped
+        memory: "{{ homebridge_memory }}"
   when: homebridge_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

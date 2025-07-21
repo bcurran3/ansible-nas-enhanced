@@ -12,7 +12,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ cloudcmd_container_name }}"
-        image: coderaiser/cloudcmd
+        hostname: "{{ cloudcmd_container_name }}"
+        image: "{{ cloudcmd_image_name }}:{{ cloudcmd_image_tag }}"
         pull: true
         cpu_shares: "{{ cloudcmd_cpu_shares }}"
         volumes:

@@ -15,7 +15,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mumble_container_name }}"
-        image: mumblevoip/mumble-server:latest
+        hostname: "{{ mumble_container_name }}"
+        image: "{{ mumble_image_name }}:{{ mumble_image_tag }}"
         pull: true
         cpu_shares: "{{ mumble_cpu_shares }}"
         volumes:

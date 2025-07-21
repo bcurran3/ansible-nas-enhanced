@@ -12,7 +12,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ bazarr_container_name }}"
-        image: linuxserver/bazarr
+        hostname: "{{ bazarr_container_name }}"
+        image: "{{ bazarr_image_name }}:{{ bazarr_image_tag }}"
         pull: true
         cpu_shares: "{{ bazarr_cpu_shares }}"
         volumes:

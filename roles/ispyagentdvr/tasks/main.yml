@@ -15,7 +15,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ispyagentdvr_container_name }}"
-        image: mekayelanik/ispyagentdvr:latest
+        hostname: "{{ ispyagentdvr_container_name }}"
+        image: "{{ ispyagentdvr_image_name }}:{{ ispyagentdvr_image_tag }}"
         pull: true
         cpu_shares: "{{ ispyagentdvr_cpu_shares }}"
         volumes:

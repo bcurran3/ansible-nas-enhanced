@@ -14,7 +14,6 @@
         hostname: "{{ flaresolverr_container_name }}"
         image: "{{ flaresolverr_image_name }}:{{ flaresolverr_image_version }}"
         pull: true
-        cpu_shares: "{{ flaresolverr_cpu_shares }}"
         volumes:
           - "{{ flaresolverr_config_directory }}:/config:rw"
         ports:
@@ -23,8 +22,6 @@
           LOG_LEVEL: "info"
           LOG_HTML: "false"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ flaresolverr_memory }}"
         labels:
           autoheal: "{{ flaresolverr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ flaresolverr_watchtower_monitor_only }}"
@@ -48,6 +45,9 @@
           traefik.http.services.flaresolverr.loadbalancer.server.port: "8191"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/FlareSolverr/FlareSolverr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ flaresolverr_cpu_shares }}"
+        memory: "{{ flaresolverr_memory }}"
+        restart_policy: unless-stopped
   when: flaresolverr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

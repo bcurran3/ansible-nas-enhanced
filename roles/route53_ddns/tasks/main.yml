@@ -15,6 +15,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ route53_container_name }}"
+        hostname: "{{ route53_container_name }}"
         image: "{{ route53_image_name }}:{{ route53_image_version }}"
         pull: true
         env:

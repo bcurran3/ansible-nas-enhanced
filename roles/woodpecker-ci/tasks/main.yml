@@ -21,6 +21,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ woodpecker_ci_container_name }}"
+        hostname: "{{ woodpecker_ci_container_name }}"
         image: "{{ woodpecker_ci_image_name }}:{{ woodpecker_ci_image_version }}"
         pull: true
         volumes:

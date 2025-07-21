@@ -10,13 +10,12 @@
         - "{{ gitea_data_directory }}/gitea"
         - "{{ gitea_data_directory }}/db"
 
-    - name: Create {{ ansible_nas_app_name }} MySQL Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ gitea_db_container_name }}"
         hostname: "{{ gitea_db_container_name }}"
         image: "{{ gitea_db_image_name }}:{{ gitea_db_image_version }}"
         pull: true
-        cpu_shares: "{{ gitea_db_cpu_shares }}"
         volumes:
           - "{{ gitea_data_directory }}/db:/var/lib/mysql:rw"
           - "/etc/timezone:/etc/timezone:ro"
@@ -27,8 +26,6 @@
           MYSQL_PASSWORD: "gitea"
           MYSQL_ROOT_PASSWORD: "gitea"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ gitea_db_memory }}"
         labels:
           autoheal: "{{ gitea_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gitea_db_watchtower_monitor_only }}"
@@ -43,6 +40,9 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ gitea_db_cpu_shares }}"
+        memory: "{{ gitea_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -50,7 +50,6 @@
         hostname: "{{ gitea_container_name }}"
         image: "{{ gitea_image_name }}:{{ gitea_image_version }}"
         pull: true
-        cpu_shares: "{{ gitea_cpu_shares }}"
         volumes:
           - "{{ gitea_data_directory }}/gitea:/data:rw"
           - "/etc/timezone:/etc/timezone:ro"
@@ -74,8 +73,6 @@
           USER_UID: "{{ gitea_uid }}"
           USER_GID: "{{ gitea_gid }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ gitea_memory }}"
         labels:
           autoheal: "{{ gitea_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gitea_watchtower_monitor_only }}"
@@ -99,6 +96,9 @@
           traefik.http.services.gitea.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/go-gitea/gitea/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ gitea_cpu_shares }}"
+        memory: "{{ gitea_memory }}"
+        restart_policy: unless-stopped
   when: gitea_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -108,7 +108,7 @@
         name: "{{ gitea_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} MySQL Container
+    - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ gitea_db_container_name }}"
         state: absent

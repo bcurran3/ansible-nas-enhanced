@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ threadfin_container_name }}"
+        hostname: "{{ threadfin_container_name }}"
         image: "{{ threadfin_image_name }}:{{ threadfin_image_version }}"
         pull: true
         ports:

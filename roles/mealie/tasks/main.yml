@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ mealie_container_name }}"
+        hostname: "{{ mealie_container_name }}"
         image: "{{ mealie_image_name }}:{{ mealie_image_version }}"
         pull: true
         cpu_shares: "{{ mealie_cpu_shares }}"

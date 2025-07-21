@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ minio_container_name }}"
+        hostname: "{{ minio_container_name }}"
         image: "{{ minio_image_name }}:{{ minio_image_version }}"
         pull: true
         cpu_shares: "{{ minio_cpu_shares }}"

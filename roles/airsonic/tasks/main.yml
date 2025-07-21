@@ -12,7 +12,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ airsonic_container_name }}"
-        image: airsonic/airsonic:latest
+        hostname: "{{ airsonic_container_name }}"
+        image: "{{ airsonic_image_name }}:{{ airsonic_image_tag }}"
         pull: true
         cpu_shares: "{{ airsonic_cpu_shares }}"
         volumes:

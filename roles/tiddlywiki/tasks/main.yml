@@ -9,6 +9,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ tiddlywiki_container_name }}"
+        hostname: "{{ tiddlywiki_container_name }}"
         image: "{{ tiddlywiki_image_name }}:{{ tiddlywiki_image_version }}"
         ports:
           - "{{ tiddlywiki_port }}:8080"

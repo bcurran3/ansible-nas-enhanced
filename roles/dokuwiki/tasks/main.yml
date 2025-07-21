@@ -11,7 +11,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dokuwiki_container_name }}"
-        image: linuxserver/dokuwiki:latest
+        hostname: "{{ dokuwiki_container_name }}"
+        image: "{{ dokuwiki_image_name }}:{{ dokuwiki_image_tag }}"
         pull: true
         cpu_shares: "{{ dokuwiki_cpu_shares }}"
         volumes:

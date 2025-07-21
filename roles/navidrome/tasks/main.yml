@@ -13,6 +13,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ navidrome_container_name }}"
+        hostname: "{{ navidrome_container_name }}"
         image: "{{ navidrome_image_name }}:{{ navidrome_image_version }}"
         pull: true
         cpu_shares: "{{ navidrome_cpu_shares }}"

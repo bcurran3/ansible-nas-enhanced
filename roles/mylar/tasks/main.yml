@@ -15,7 +15,6 @@
         hostname: "{{ mylar_container_name }}"
         image: "{{ mylar_image_name }}:{{ mylar_image_version }}"
         pull: true
-        cpu_shares: "{{ mylar_cpu_shares }}"
         volumes:
           - "{{ mylar_comics_directory }}:/comics:rw"
           - "{{ mylar_downloads_directory }}:/downloads:rw"
@@ -27,8 +26,6 @@
           PUID: "{{ mylar_user_id }}"
           PGID: "{{ mylar_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ mylar_memory }}"
         labels:
           autoheal: "{{ mylar_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mylar_watchtower_monitor_only }}"
@@ -53,6 +50,9 @@
           traefik.http.routers.mylar.middlewares: "{{ mylar_hostname }}@docker"
           traefik.http.middlewares.mylar.IPAllowList.sourcerange: "{{ mylar_traefik_whitelist }}"
           traefik.http.services.mylar.loadbalancer.server.port: "8090"
+        cpu_shares: "{{ mylar_cpu_shares }}"
+        memory: "{{ mylar_memory }}"
+        restart_policy: unless-stopped
   when: mylar_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

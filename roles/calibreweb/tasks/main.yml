@@ -12,7 +12,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ calibreweb_container_name }}"
-        image: linuxserver/calibre-web:latest
+        hostname: "{{ calibreweb_container_name }}"
+        image: "{{ calibreweb_image_name }}:{{ calibreweb_image_tag }}"
         pull: true
         cpu_shares: "{{ calibreweb_cpu_shares }}"
         volumes:

@@ -14,6 +14,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ tautulli_container_name }}"
+        hostname: "{{ tautulli_container_name }}"
         image: "{{ tautulli_image_name }}:{{ tautulli_image_version }}"
         pull: true
         volumes:

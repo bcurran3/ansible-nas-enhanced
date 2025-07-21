@@ -32,6 +32,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ gitlab_container_name }}"
+        hostname: "{{ gitlab_container_name }}"
         image: "{{ gitlab_image_name }}:{{ gitlab_image_version }}"
         pull: true
         cpu_shares: "{{ gitlab_cpu_shares }}"

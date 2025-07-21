@@ -15,6 +15,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ valheim_container_name }}"
+        hostname: "{{ valheim_container_name }}"
         image: "{{ valheim_image_name }}:{{ valheim_image_version }}"
         pull: true
         volumes:

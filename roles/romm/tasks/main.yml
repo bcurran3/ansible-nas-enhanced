@@ -13,6 +13,7 @@
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ romm_db_container_name }}"
+        hostname: "{{ romm_db_container_name }}"
         image: "{{ romm_db_image_name }}:{{ romm_db_image_version }}"
         pull: true
         volumes:
@@ -32,6 +33,7 @@
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
         name: "{{ romm_redis_container_name }}"
+        hostname: "{{ romm_redis_container_name }}"
         image: "{{ romm_redis_image_name }}:{{ romm_redis_image_version }}"
         pull: true
         restart_policy: unless-stopped
@@ -43,6 +45,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ romm_container_name }}"
+        hostname: "{{ romm_container_name }}"
         image: "{{ romm_image_name }}:{{ romm_image_version }}"
         pull: true
         volumes:
@@ -52,7 +55,7 @@
           - "{{ romm_port }}:8080"
         env:
           ROMM_DB_DRIVER: "mariadb"
-          DB_HOST: "db"
+          DB_HOST: "{{ romm_db_container_name }}"
           DB_PORT: "3306"
           DB_USER: "{{ romm_database_username }}"
           DB_PASSWD: "{{ romm_database_password }}"
@@ -60,7 +63,7 @@
           ROMM_AUTH_ENABLED: "true"
           ROMM_AUTH_SECRET_KEY: "{{ romm_auth_secret_key }}"
           ENABLE_EXPERIMENTAL_REDIS: "true"
-          REDIS_HOST: "redis"
+          REDIS_HOST: "{{ romm_redis_container_name }}"
           REDIS_PORT: "6379"
           IGDB_CLIENT_ID: "{{ romm_igdb_client_id }}"
           IGDB_CLIENT_SECRET: "{{ romm_igdb_client_secret }}"

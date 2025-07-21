@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ ubooquity_container_name }}"
+        hostname: "{{ ubooquity_container_name }}"
         image: "{{ ubooquity_image_name }}:{{ ubooquity_image_version }}"
         pull: true
         volumes:

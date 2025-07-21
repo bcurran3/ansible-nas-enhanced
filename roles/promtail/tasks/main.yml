@@ -25,6 +25,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ promtail_container_name }}"
+        hostname: "{{ promtail_container_name }}"
         image: "{{ promtail_image_name }}:{{ promtail_image_version }}"
         pull: true
         cpu_shares: "{{ promtail_cpu_shares }}"

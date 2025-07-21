@@ -12,8 +12,9 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: deluge
-        image: linuxserver/deluge
+        name: "{{ deluge_container_name }}"
+        hostname: "{{ deluge_container_name }}"
+        image: "{{ deluge_image_name }}:{{ deluge_image_tag }}"
         pull: true
         cpu_shares: "{{ deluge_cpu_shares }}"
         volumes:

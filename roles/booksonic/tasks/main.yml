@@ -13,7 +13,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ booksonic_container_name }}"
-        image: linuxserver/booksonic-air:latest
+        hostname: "{{ booksonic_container_name }}"
+        image: "{{ booksonic_image_name }}:{{ booksonic_image_tag }}"
         pull: true
         cpu_shares: "{{ books_root_cpu_shares }}"
         volumes:

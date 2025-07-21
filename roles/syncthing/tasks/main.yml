@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ syncthing_container_name }}"
+        hostname: "{{ syncthing_container_name }}"
         image: "{{ syncthing_image_name }}:{{ syncthing_image_version }}"
         pull: true
         ports:

@@ -12,7 +12,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ calibre_container_name }}"
-        image: linuxserver/calibre
+        hostname: "{{ calibre_container_name }}"
         pull: true
         cpu_shares: "{{ calibre_cpu_shares }}"
         volumes:

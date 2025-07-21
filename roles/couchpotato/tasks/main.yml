@@ -13,7 +13,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ couchpotato_container_name }}"
-        image: linuxserver/couchpotato
+        hostname: "{{ couchpotato_container_name }}"
+        image: "{{ couchpotato_image_name }}:{{ couchpotato_image_tag }}"
         pull: true
         cpu_shares: "{{ couchpotato_cpu_shares }}"
         volumes:

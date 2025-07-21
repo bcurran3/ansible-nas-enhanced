@@ -17,7 +17,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dashy_container_name }}"
-        image: lissy93/dashy:latest
+        hostname: "{{ dashy_container_name }}"
+        image: "{{ dashy_image_name }}:{{ dashy_image_tag }}"
         pull: true
         cpu_shares: "{{ dashy_cpu_shares }}"
         ports:

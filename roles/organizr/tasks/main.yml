@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ organizr_container_name }}"
+        hostname: "{{ organizr_container_name }}"
         image: "{{ organizr_image_name }}:{{ organizr_image_version }}"
         pull: true
         cpu_shares: "{{ organizr_cpu_shares }}"

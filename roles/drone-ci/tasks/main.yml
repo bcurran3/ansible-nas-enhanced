@@ -21,7 +21,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ drone_ci_container_name }}"
-        image: drone/drone:2
+        hostname: "{{ drone_ci_container_name }}"
+        image: "{{ drone_ci_image_name }}:{{ drone_ci_image_tag }}"
         pull: true
         cpu_shares: "{{ drone_ci_cpu_shares }}"
         volumes:

@@ -11,7 +11,8 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ esphome_container_name }}"
-        image: esphome/esphome:latest
+        hostname: "{{ esphome_container_name }}"
+        image: "{{ esphome_image_name }}:{{ esphome_image_tag }}"
         pull: true
         cpu_shares: "{{ esphome_cpu_shares }}"
         volumes:

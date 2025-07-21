@@ -11,6 +11,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ silverbullet_container_name }}"
+        hostname: "{{ silverbullet_container_name }}"
         image: "{{ silverbullet_image_name }}:{{ silverbullet_image_version }}"
         pull: true
         ports:

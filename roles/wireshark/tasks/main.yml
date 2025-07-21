@@ -12,6 +12,7 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ wireshark_container_name }}"
+        hostname: "{{ wireshark_container_name }}"
         image: "{{ wireshark_image_name }}:{{ wireshark_image_version }}"
         pull: true
         volumes:
