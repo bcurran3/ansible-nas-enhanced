@@ -35,9 +35,10 @@
     mode: 0755
     state: directory
 
-- name: Add user account to Docker group
-  user:
+- name: Add {{ ansible_nas_user }} to docker group
+  ansible.builtin.user:
     name: "{{ ansible_nas_user }}"
+    state: present
     groups: docker
     append: yes
 
