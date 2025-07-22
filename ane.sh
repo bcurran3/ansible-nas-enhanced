@@ -1,5 +1,6 @@
 #!/bin/bash
-##
+# Ansible-NAS-Enhanced helper script
+
 ##      _    _   _ _____
 ##     / \  | \ | | ____|
 ##    / _ \ |  \| |  _|
@@ -38,13 +39,13 @@ function help {
     exit
 }
 
-# offer help when no switches given
+# offer help when no switches provided
 if [[ -z "$1" ]]; then
        echo "  ** Run \"./ane.sh --help\" for help :-)"
      exit 1
 fi
 
-# install/update specified ANE apps
+# Install/update only specified ANE apps
 if [[ "$1" = "--app" || "$1" = "-app" ||  "$1" = "--apps" || "$1" = "-apps" ]]; then
      if [ "$2" = '' ]; then
         echo "  ** You need to specify at least one app name/tag."
@@ -59,7 +60,7 @@ if [[ "$1" = "--app" || "$1" = "-app" ||  "$1" = "--apps" || "$1" = "-apps" ]]; 
    exit
 fi
 
-# git check commits ANE is behind
+# Check git commits ANE is behind
 if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" || "$1" = "--updates" || "$1" = "-updates" ]]; then
     git fetch --quiet
     BEHIND=$(git rev-list --count HEAD..@{u})
@@ -110,13 +111,13 @@ if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
     exit
 fi
 
-# reset ANE shared file permissions
+# Reset ANE shared file permissions
 if [[ "$1" = "permissions" || "$1" = "-permissions" ]]; then
     ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
     exit
 fi
 
-# prune docker stuff to save space
+# Prune docker stuff to save space
 if [[ "$1" = "--prune" || "$1" = "-prune" ]]; then
     echo "  ** Pruning images..."
     docker image prune -f
@@ -125,7 +126,7 @@ if [[ "$1" = "--prune" || "$1" = "-prune" ]]; then
     exit
 fi
 
-# install ANE requirements
+# Install ANE requirements
 if [[ "$1" = "--requirements" || "$1" = "-requirements" ]]; then
     ansible-galaxy install -r requirements.yml --force
     exit
@@ -137,19 +138,19 @@ if [[ "$1" = "--run" || "$1" = "-run" || "$1" = "--update" || "$1" = "-update" ]
     exit
 fi
 
-# edit ANE settings/variables
+# Edit ANE settings/variables
 if [[ "$1" = "--settings" || "$1" = "-settings" ]]; then
     nano inventories/ANE/group_vars/nas.yml
     exit
 fi
 
-# update ANE files
+# Update ANE files
 if [[ "$1" = "--pull" || "$1" = "-pull" ]]; then
     git pull
     exit
 fi
 
-# show help for all bad arguments
+# Show help for all bad arguments
 echo "  ** Ansible-NAS-Enhanced (ANE) unrecognized switch."
 echo "  ** Run \"./ane.sh --help\" for help :-)"
 exit 1

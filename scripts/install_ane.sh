@@ -81,10 +81,16 @@ function clone_repo {
 
 function install_packages {
     print1 "Installing ANE required packages (Ansible and nano)..."
+    if [[ "$VER" = "22.04" ]]; then
         sudo apt-add-repository ppa:ansible/ansible -y
-        sudo apt update && sudo apt install ansible nano -y
         if [ $? -ne 0 ]; then print3 "Aborting..."; fi
     fi
+    if [[ "$VER" = "24.04" ]]; then
+        sudo apt-add-repository ppa:ansible/ansible -y
+        if [ $? -ne 0 ]; then print3 "Aborting..."; fi
+    fi
+        sudo apt update && sudo apt install ansible nano -y
+        if [ $? -ne 0 ]; then print3 "Aborting..."; fi
     print2 "Required packages installed."
 }
 
