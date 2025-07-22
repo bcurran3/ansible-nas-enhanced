@@ -15,26 +15,26 @@ function help {
     echo "    What you see now!"
     echo "  --app, --apps <app_name> <app_name> <app_name> <app_name>"
     echo "    Install/Update apps by tag."
+    echo "  --behind, --outdated, --updates"
+    echo "    Check # of git commits behind your install of ANE is."
     echo "  --enabled"
     echo "    List ANE enabled apps."
     echo "  --install"
     echo "    Install ANE (first time or reset)."
     echo "  --inventory"
     echo "    Edit ANE inventory file."
-    echo "  --outdated, --updates"
-    echo "    Check # of git commits your install of ANE is behind."
     echo "  --permissions"
     echo "    Reset permissions on all shared files."
     echo "  --prune"
     echo "    Prune unused Docker images and volumes."
+    echo "  --pull"
+    echo "    Update ANE files from git"
     echo "  --requirements"
     echo "    Install/Re-install ANE requirements."
-    echo "  --run"
+    echo "  --run, --update"
     echo "    Run ANE full playbook."
     echo "  --settings"
     echo "    Edit ANE settings/overrides."
-    echo "  --update"
-    echo "    Update ANE files from git"
     exit
 }
 
@@ -44,18 +44,8 @@ if [[ -z "$1" ]]; then
      exit 1
 fi
 
-# install/update ANE apps specifically chosen
-if [[ "$1" = "--app" || "$1" = "-app" ]]; then
-     if [ "$2" = '' ]; then
-        echo "  ** You need to specify an app name/tag."
-        exit 1
-     fi
-     ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t $2
-     exit
-fi
-
 # install/update specified ANE apps
-if [[ "$1" = "--apps" || "$1" = "-apps" ||  "$1" = "--app" || "$1" = "-app" ]]; then
+if [[ "$1" = "--app" || "$1" = "-app" ||  "$1" = "--apps" || "$1" = "-apps" ]]; then
      if [ "$2" = '' ]; then
         echo "  ** You need to specify at least one app name/tag."
         exit 1
@@ -67,6 +57,17 @@ if [[ "$1" = "--apps" || "$1" = "-apps" ||  "$1" = "--app" || "$1" = "-app" ]]; 
     done
    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $appslist
    exit
+fi
+
+# git check commits ANE is behind
+if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" || "$1" = "--updates" || "$1" = "-updates" ]]; then
+    git fetch --quiet
+    BEHIND=$(git rev-list --count HEAD..@{u})
+    echo "  ** Your ANE installation is $BEHIND git commits behind."
+    if [ $BEHIND -gt 0 ]; then
+       echo "  ** \"./ane.sh --update\" or \"git pull\" to update"
+    fi
+    exit
 fi
 
 # List ANE enabled apps
@@ -84,9 +85,11 @@ if [[ "$1" = "--gitforcepull" || "$1" = "-gitforcepull" ]]; then
     exit
 fi
 
-if [[ "$1" = "--help" || "$1" = "-help" ]]; then
+# Display ANE help menu
+if [[ "$1" = "--help" || "$1" = "-help" || "$1" = "--?" || "$1" = "-?" ]]; then
    help
 fi
+
 # Install ANE (or reset)
 if [[ "$1" = "--install" || "$1" = "-install" ]]; then
     if [ -d "inventories/ANE" ]; then
@@ -104,18 +107,6 @@ fi
 # Edit ANE inventory file
 if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
     nano inventories/ANE/inventory
-    exit
-fi
-
-# git check commits ANE is behind
-if [[ "$1" = "--outdated" || "$1" = "-outdated" || "$1" = "--updates" || "$1" = "-updates" ]]; then
-#TDL: add --updates
-    git fetch --quiet
-    BEHIND=$(git rev-list --count HEAD..@{u})
-    echo "  ** Your ANE installation is $BEHIND git commits behind."
-    if [ $BEHIND -gt 1 ]; then
-       echo "  ** \"./ane.sh --update\" or \"git pull\" to update"
-    fi
     exit
 fi
 
@@ -141,7 +132,7 @@ if [[ "$1" = "--requirements" || "$1" = "-requirements" ]]; then
 fi
 
 # Run ANE full playbook
-if [[ "$1" = "--run" || "$1" = "-run" ]]; then
+if [[ "$1" = "--run" || "$1" = "-run" || "$1" = "--update" || "$1" = "-update" ]]; then
     ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $2 $3 $4 $5 $6 $7 $8 $9 ${10}
     exit
 fi
@@ -153,7 +144,7 @@ if [[ "$1" = "--settings" || "$1" = "-settings" ]]; then
 fi
 
 # update ANE files
-if [[ "$1" = "--update" || "$1" = "-update" ]]; then
+if [[ "$1" = "--pull" || "$1" = "-pull" ]]; then
     git pull
     exit
 fi
