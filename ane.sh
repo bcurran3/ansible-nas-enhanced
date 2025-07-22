@@ -13,12 +13,8 @@ function help {
     echo "Ansible-NAS-Enhanced (ANE) Help:"
     echo "  --help"
     echo "    What you see now!"
-############ should probably merge this to just one switch
-    echo "  --app <app_name>"
-    echo "    Install/Update one app by tag."
-    echo "  --apps <app_name> <app_name> <app_name> <app_name>"
-    echo "    Install/Update multiple apps by tag."
-############
+    echo "  --app, --apps <app_name> <app_name> <app_name> <app_name>"
+    echo "    Install/Update apps by tag."
     echo "  --enabled"
     echo "    List ANE enabled apps."
     echo "  --install"
@@ -42,42 +38,38 @@ function help {
     exit
 }
 
+# offer help when no switches given
 if [[ -z "$1" ]]; then
        echo "  ** Run \"./ane.sh --help\" for help :-)"
-     exit
+     exit 1
 fi
 
-if [[ "$1" = "--ap" || "$1" = "-ap" || "$1" = "--aps" || "$1" = "-aps" ]]; then
-     echo "  ** You typoed! :-("
-     exit
-fi
-
+# install/update ANE apps specifically chosen
 if [[ "$1" = "--app" || "$1" = "-app" ]]; then
      if [ "$2" = '' ]; then
         echo "  ** You need to specify an app name/tag."
-        exit
+        exit 1
      fi
      ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t $2
      exit
 fi
 
-if [[ "$1" = "--apps" || "$1" = "-apps" ]]; then
+# install/update specified ANE apps
+if [[ "$1" = "--apps" || "$1" = "-apps" ||  "$1" = "--app" || "$1" = "-app" ]]; then
      if [ "$2" = '' ]; then
-        echo "  ** You need to specify an app name/tag."
-        exit
+        echo "  ** You need to specify at least one app name/tag."
+        exit 1
      fi
-   appslist=""
-   for arg in "$@"; do
-     if [[ "$1" = "--apps" || "$1" = "-apps" ]]; then
-       continue
-     fi
-       appslist+="-t $arg "
-   done
-   appslist=$(echo "$appslist" | sed 's/ $//')
+    appslist=""
+    shift
+    for arg in "$@"; do
+        appslist+=" -t $arg"
+    done
    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $appslist
    exit
 fi
 
+# List ANE enabled apps
 if [[ "$1" = "--enabled" || "$1" = "-enabled" ]]; then
      echo "ANE enabled apps:"
      cat inventories/ANE/group_vars/nas.yml |grep 'enabled: true'
@@ -95,12 +87,12 @@ fi
 if [[ "$1" = "--help" || "$1" = "-help" ]]; then
    help
 fi
-# Install ANE
+# Install ANE (or reset)
 if [[ "$1" = "--install" || "$1" = "-install" ]]; then
     if [ -d "inventories/ANE" ]; then
        echo "  ** WARNING: inventories/ANE exists!"
        echo "  ** \"rm inventories/ANE -R\" first if you really wish to reset."
-       exit
+       exit 1
     fi
     cp -rfp inventories/sample inventories/ANE
     echo "  ** Time to configure!"
@@ -109,13 +101,13 @@ if [[ "$1" = "--install" || "$1" = "-install" ]]; then
     exit
 fi
 
-# Edit inventory file
+# Edit ANE inventory file
 if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
     nano inventories/ANE/inventory
     exit
 fi
 
-# git check commits
+# git check commits ANE is behind
 if [[ "$1" = "--outdated" || "$1" = "-outdated" || "$1" = "--updates" || "$1" = "-updates" ]]; then
 #TDL: add --updates
     git fetch --quiet
@@ -127,7 +119,7 @@ if [[ "$1" = "--outdated" || "$1" = "-outdated" || "$1" = "--updates" || "$1" = 
     exit
 fi
 
-# reset shared file permissions
+# reset ANE shared file permissions
 if [[ "$1" = "permissions" || "$1" = "-permissions" ]]; then
     ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
     exit
@@ -169,3 +161,4 @@ fi
 # show help for all bad arguments
 echo "  ** Ansible-NAS-Enhanced (ANE) unrecognized switch."
 echo "  ** Run \"./ane.sh --help\" for help :-)"
+exit 1
