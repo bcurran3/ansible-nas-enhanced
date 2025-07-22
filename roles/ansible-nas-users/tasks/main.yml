@@ -14,9 +14,9 @@
     group: ansible-nas
     shell: /usr/sbin/nologin
 
-# NEW
 - name: Add {{ ansible_nas_user }} to ansible-nas and docker groups
   ansible.builtin.user:
     name: "{{ ansible_nas_user }}"
     state: present
     groups: ansible-nas,docker
+    append: yes
