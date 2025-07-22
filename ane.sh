@@ -136,7 +136,7 @@ fi
 
 # install ANE requirements
 if [[ "$1" = "--requirements" || "$1" = "-requirements" ]]; then
-    ansible-galaxy install -r requirements.yml
+    ansible-galaxy install -r requirements.yml --force
     exit
 fi
 
