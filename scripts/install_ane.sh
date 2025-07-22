@@ -11,7 +11,8 @@
 
 ### VARS
 
-REPO="https://gitea.mrbillsabode.org/bill/supernas"
+REPO="https://gitea.mrbillsabode.org/bill/ansible-nas-enhanced"
+#REPO="https://github.com/bcurran3/ansible-nas-enhanced"
 INSTALL_DIR="ANE"
 
 ### FUNCTIONS
