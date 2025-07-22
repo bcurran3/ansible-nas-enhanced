@@ -1,0 +1,73 @@
+---
+ansible_nas_app_name: "Paperless-ngx"
+
+paperless_ngx_enabled: false
+paperless_ngx_available_externally: false
+paperless_ngx_traefik_whitelist: "{{ lan }}"
+
+# directories
+paperless_ngx_data_directory: "{{ docker_home }}/paperlessngx"
+paperless_ngx_files_directory: "{{ documents_root }}/paperless"
+
+paperless_ngx_postgres_directory: "{{ paperless_ngx_data_directory }}/postgres"
+paperless_ngx_export_directory: "{{ paperless_ngx_data_directory }}/export"
+paperless_ngx_media_directory: "{{ paperless_ngx_files_directory }}/media"
+paperless_ngx_consume_directory: "{{ paperless_ngx_files_directory }}/consume"
+
+# network
+paperless_ngx_port: "16922"
+paperless_ngx_hostname: "paperlessngx"
+paperless_ngx_network_name: "paperless-ngx"
+
+# postgres
+paperless_ngx_postgres_db: "paperless"
+paperless_ngx_postgres_user: "paperless"
+paperless_ngx_postgres_password: "paperless"
+
+# container names
+paperless_ngx_container_name: "paperlessngx"
+paperless_ngx_image_name: "ghcr.io/paperless-ngx/paperless-ngx"
+paperless_ngx_image_version: "latest"
+paperless_ngx_redis_container_name: "paperlessngx-redis"
+paperless_ngx_redis_image_name: "docker.io/library/redis"
+paperless_ngx_redis_image_version: "8"
+paperless_ngx_db_container_name: "paperlessngx-db"
+paperless_ngx_db_image_name: "docker.io/library/postgres"
+paperless_ngx_db_image_version: "17"
+
+# uid/guid
+paperless_ngx_user_id: "1000"
+paperless_ngx_group_id: "1000"
+
+# settings
+paperless_ngx_languages: "deu eng"
+
+# specs
+paperless_ngx_memory: 1g
+paperless_ngx_cpu_shares: 1024
+paperless_ngx_db_memory: 1g
+paperless_ngx_db_cpu_shares: 1024
+paperless_ngx_redis_memory: 1g
+paperless_ngx_redis_cpu_shares: 1024
+
+# autoheal
+paperless_ngx_autoheal: "false"
+paperless_ngx_db_autoheal: "false"
+paperless_ngx_redis_autoheal: "false"
+
+# homepage
+paperless_ngx_homepage_group: "Apps"
+paperless_ngx_homepage_icon: "paperless-ngx.png"
+paperless_ngx_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ paperless_ngx_port }}"
+paperless_ngx_homepage_showStats: "false"
+paperless_ngx_db_homepage_group: "DBs"
+paperless_ngx_db_homepage_icon: "postgres.png"
+paperless_ngx_db_homepage_showStats: "false"
+paperless_ngx_redis_homepage_group: "DBs"
+paperless_ngx_redis_homepage_icon: "redis.png"
+paperless_ngx_redis_homepage_showStats: "false"
+
+# watchtower
+paperless_ngx_watchtower_monitor_only: "true"
+paperless_ngx_db_watchtower_monitor_only: "true"
+paperless_ngx_redis_watchtower_monitor_only: "true"

@@ -1,0 +1,173 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ paperless_ngx_data_directory }}"
+        - "{{ paperless_ngx_data_directory }}/data"
+        - "{{ paperless_ngx_files_directory }}"
+        - "{{ paperless_ngx_postgres_directory }}"
+        - "{{ paperless_ngx_export_directory }}"
+        - "{{ paperless_ngx_media_directory }}"
+        - "{{ paperless_ngx_consume_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} network
+      community.docker.docker_network:
+        name: "{{ paperless_ngx_network_name }}"
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        name: "{{ paperless_ngx_redis_container_name }}"
+        hostname: "{{ paperless_ngx_redis_container_name }}"
+        image: "{{ paperless_ngx_redis_image_name }}:{{ paperless_ngx_redis_image_version }}"
+        pull: true
+        networks:
+          - name: "{{ paperless_ngx_network_name }}"
+        network_mode: "{{ paperless_ngx_network_name }}"
+        labels:
+          traefik.enable: "false"
+          autoheal: "{{ paperless_ngx_redis_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_redis_watchtower_monitor_only }}"
+          homepage.group: "{{ paperless_ngx_redis_homepage_group }}"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.icon: "{{ paperless_ngx_redis_homepage_icon }}"
+          homepage.href: "{{ paperless_ngx_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ paperless_ngx_redis_container_name }}"
+          homepage.showStats: "{{ paperless_ngx_redis_homepage_showStats }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ paperless_ngx_redis_cpu_shares }}"
+        restart_policy: unless-stopped
+        memory: "{{ paperless_ngx_redis_memory }}"
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ paperless_ngx_db_container_name }}"
+        hostname: "{{ paperless_ngx_db_container_name }}"
+        image: "{{ paperless_ngx_db_image_name }}:{{ paperless_ngx_db_image_version }}"
+        pull: true
+        volumes:
+          - "{{ paperless_ngx_postgres_directory }}:/var/lib/postgresql/data"
+        env:
+          POSTGRES_DB: "{{ paperless_ngx_postgres_db }}"
+          POSTGRES_USER: "{{ paperless_ngx_postgres_user }}"
+          POSTGRES_PASSWORD: "{{ paperless_ngx_postgres_password }}"
+        networks:
+          - name: "{{ paperless_ngx_network_name }}"
+        network_mode: "{{ paperless_ngx_network_name }}"
+        labels:
+          traefik.enable: "false"
+          autoheal: "{{ paperless_ngx_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_db_watchtower_monitor_only }}"
+          homepage.group: "{{ paperless_ngx_db_homepage_group }}"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.icon: "{{ paperless_ngx_db_homepage_icon }}"
+          homepage.href: "{{ paperless_ngx_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ paperless_ngx_db_container_name }}"
+          homepage.showStats: "{{ paperless_ngx_db_homepage_showStats }}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://hub.docker.com/_/postgres/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ paperless_ngx_db_cpu_shares }}"
+        restart_policy: unless-stopped
+        memory: "{{ paperless_ngx_db_memory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ paperless_ngx_container_name }}"
+        hostname: "{{ paperless_ngx_container_name }}"
+        image: "{{ paperless_ngx_image_name }}:{{ paperless_ngx_image_version }}"
+        pull: true
+        volumes:
+          - "{{ paperless_ngx_data_directory }}/data:/usr/src/paperless/data"
+          - "{{ paperless_ngx_media_directory }}:/usr/src/paperless/media"
+          - "{{ paperless_ngx_export_directory }}:/usr/src/paperless/export"
+          - "{{ paperless_ngx_consume_directory }}:/usr/src/paperless/consume"
+        ports:
+          - "{{ paperless_ngx_port }}:8000"
+        env:
+          PAPERLESS_REDIS: "redis://{{ paperless_ngx_redis_container_name | string }}:6379"
+          PAPERLESS_DBHOST: "{{ paperless_ngx_db_container_name | string }}"
+          PAPERLESS_OCR_LANGUAGES: "{{ paperless_ngx_languages }}"
+#         PAPERLESS_CSRF_TRUSTED_ORIGINS: "{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}"
+          PAPERLESS_URL: "https://{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}"
+          CORS_ALLOWED_ORIGINS: "*"
+          USERMAP_UID: "{{ paperless_ngx_user_id }}"
+          USERMAP_GID: "{{ paperless_ngx_group_id }}"
+        networks:
+          - name: "{{ paperless_ngx_network_name }}"
+        network_mode: "{{ paperless_ngx_network_name }}"
+        links:
+          - "{{ paperless_ngx_db_container_name }}"
+          - "{{ paperless_ngx_redis_container_name }}"
+        labels:
+          autoheal: "{{ paperless_ngx_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_watchtower_monitor_only }}"
+          homepage.group: "{{ paperless_ngx_homepage_group }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.icon: "{{ paperless_ngx_homepage_icon }}"
+          homepage.href: "{{ paperless_ngx_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ paperless_ngx_port }}"
+          homepage.description: "{{ 'Open source dropbox alternative' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ paperless_ngx_container_name }}"
+          homepage.showStats: "{{ paperless_ngx_homepage_showStats }}"
+          traefik.enable: "{{ paperless_ngx_available_externally | string }}"
+          traefik.http.routers.paperless_ngx.rule: "Host(`{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.paperless_ngx.tls.certresolver: "letsencrypt"
+          traefik.http.routers.paperless_ngx.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.paperless_ngx.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ paperless_ngx_hostname }}"
+          traefik.http.routers.paperless_ngx.middlewares: "paperless_ngx@docker"
+          traefik.http.middlewares.paperless_ngx.IPAllowList.sourcerange: "{{ paperless_ngx_traefik_whitelist }}"
+          traefik.http.services.paperless_ngx.loadbalancer.server.port: "8000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/paperless-ngx/paperless-ngx/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ paperless_ngx_cpu_shares }}"
+        memory: "{{ paperless_ngx_memory }}"
+        restart_policy: unless-stopped
+  when: paperless_ngx_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ paperless_ngx_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        name: "{{ paperless_ngx_redis_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ paperless_ngx_db_container_name }}"
+        state: absent
+  when: paperless_ngx_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ paperless_ngx_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ paperless_ngx_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: paperless_ngx_enabled is false and archive_app_data_enabled is true

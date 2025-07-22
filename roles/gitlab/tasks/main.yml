@@ -35,7 +35,6 @@
         hostname: "{{ gitlab_container_name }}"
         image: "{{ gitlab_image_name }}:{{ gitlab_image_version }}"
         pull: true
-        cpu_shares: "{{ gitlab_cpu_shares }}"
         volumes:
           - "{{ gitlab_data_directory }}/config:/etc/gitlab:rw"
           - "{{ gitlab_data_directory }}/log:/var/log/gitlab:rw"
@@ -49,9 +48,6 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ gitlab_user_id }}"
           PGID: "{{ gitlab_group_id }}"
-        restart_policy: unless-stopped
-        hostname: "{{ gitlab_hostname }}.{{ ansible_nas_domain }}"
-        memory: "{{ gitlab_memory }}"
         labels:
           autoheal: "{{ gitlab_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gitlab_watchtower_monitor_only }}"
@@ -61,6 +57,9 @@
           traefik.http.routers.gitlab.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gitlab.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.gitlab.loadbalancer.server.port: "80"
+        cpu_shares: "{{ gitlab_cpu_shares }}"
+        memory: "{{ gitlab_memory }}"
+        restart_policy: unless-stopped
   when: gitlab_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
