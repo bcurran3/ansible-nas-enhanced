@@ -66,7 +66,7 @@ if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-o
     BEHIND=$(git rev-list --count HEAD..@{u})
     echo "  ** Your ANE installation is $BEHIND git commits behind."
     if [ $BEHIND -gt 0 ]; then
-       echo "  ** \"./ane.sh --update\" or \"git pull\" to update"
+       echo "  ** \"./ane.sh --pull\" or \"git pull\" to update"
     fi
     exit
 fi

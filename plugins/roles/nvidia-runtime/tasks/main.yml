@@ -1,10 +1,6 @@
 ---
 ### WORK IN PROGRESS
 
-# LOOK AT THIS:
-# https://github.com/NVIDIA/ansible-role-nvidia-driver
-
-
 - name: Check if nvidia-container-runtime executable exists
   ansible.builtin.stat:
     path: /usr/bin/nvidia-container-runtime
@@ -18,29 +14,24 @@
 - name: Install NVIDIA Container Runtime
   block:
     - name: Enable NVIDIA sources 1
-      shell: "curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg"
+      ansible.builtin.shell:
+        cmd: "curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg"
 
     - name: Enable NVIDIA sources 2
-      shell: "sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list"
+      ansible.builtin.shell:
+        cmd: "curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list"
 
     - name: Update apt-cache
-      apt:
+      ansible.builtin.apt:
         update_cache: yes
-        cache_valid_time: 3600
-      register: result
-      until: result is succeeded
 
     - name: Install nvidia-container-toolkit Package
-      apt:
-        name: "nvidia-container-toolkit"
-        state: present
-      register: result
-      until: result is succeeded
-
-# not necessary after doing the /etc/docker/daemon.json config already
-#    - name: Configure runtime
-#      shell: nvidia-ctk runtime configure --runtime=docker
-#      register: docker_config
+      ansible.builtin.apt:
+        pkg:
+        - nvidia-container-toolkit
+        - nvidia-container-toolkit-base
+        - libnvidia-container-tools
+        - libnvidia-container1
 
     - name: Restart Docker
       service:

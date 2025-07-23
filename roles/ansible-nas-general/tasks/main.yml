@@ -1,13 +1,18 @@
 ---
-# DO NOTHING CURRENTLY
 #- name: Start Ubuntu 22.04 LTS Specific Setup
 #  block:
+#    DO NOTHING CURRENTLY
 #  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
 
-# DO NOTHING CURRENTLY
 #- name: Start Ubuntu 24.04 LTS Specific Setup
 #  block:
+#    DO NOTHING CURRENTLY
 #  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "24.04"
+
+#- name: Start Ubuntu 26.04 LTS Specific Setup
+#  block:
+#    DO NOTHING CURRENTLY
+#  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "26.04"
 
 - name: Update apt-cache
   ansible.builtin.apt:
@@ -16,7 +21,7 @@
   register: result
   until: result is succeeded
 
-- name: Upgrade all packages # noqa package-latest
+- name: Upgrade all packages
   ansible.builtin.apt:
     upgrade: yes
     state: latest
@@ -24,7 +29,7 @@
   tags:
     - skip_ansible_lint
 
-- name: Install some packages
+- name: Install extra packages
   ansible.builtin.apt:
     name: "{{ ansible_nas_extra_packages }}"
     state: present
