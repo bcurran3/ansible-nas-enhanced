@@ -27,9 +27,9 @@
       args:
         creates: /etc/apt/sources.list.d/nvidia-container-toolkit.list
 
-    - name: Update apt-cache
-      ansible.builtin.apt:
-        update_cache: yes
+#    - name: Update apt-cache
+#      ansible.builtin.apt:
+#        update_cache: yes
 
     - name: Install NVIDIA runtime packages
       ansible.builtin.apt:
@@ -38,6 +38,7 @@
         - nvidia-container-toolkit-base
         - libnvidia-container-tools
         - libnvidia-container1
+      update_cache: yes
 
     - name: Restart Docker
       ansible.builtin.service:
@@ -46,7 +47,7 @@
       when: docker_config.changed
       tags:
         - skip_ansible_lint
-  when: nvidia_runtime_enabled is true and {{ nvidia_runtime_executable.stat.exists }} is false
+  when: nvidia_runtime_enabled is true and not nvidia_runtime_executable.stat.exists
 
 ######################
 ### WORK IN PROGRESS
