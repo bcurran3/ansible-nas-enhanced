@@ -46,7 +46,7 @@
 - name: Check for NVIDIA driver
   ansible.builtin.stat:
     path: /usr/bin/nvidia-smi
-  register: nvidia_smi_check
+  register: nvidia_smi
   check_mode: false
   when: nvidia_runtime_enabled is true
 
@@ -60,12 +60,12 @@
 - name: Warn if NVIDIA drivers are not installed for NVIDIA Container Runtime
   ansible.builtin.pause:
     prompt: "  ** ANE cannot install the NVIDIA Container Runtime unless you install the NVIDIA drivers first. Hit a key to continue."
-  when: nvidia_smi_check.stat.exists is false and nvidia_runtime_enabled is true
+  when: nvidia_smi.stat.exists is false and nvidia_runtime_enabled is true
 
 - name: Install NVIDIA Container Runtime
-  block:
   # This can be better done using ansible.builtin.apt_repository
   # https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_key_module.html
+  block:
     - name: Add NVIDIA Container Toolkit GPG key
       ansible.builtin.shell: |
         curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
@@ -89,14 +89,25 @@
           - libnvidia-container1
         update_cache: yes
         state: present
-  when: nvidia_runtime_enabled is true and nvidia_smi_check.stat.exists and not nvidia_runtime_executable.stat.exists
+  when: nvidia_runtime_enabled is true and nvidia_smi.stat.exists and not nvidia_runtime_executable.stat.exists
 
 - name: Generate Docker daemon.json with NVIDIA runtime
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     content: "{{ docker_daemon_with_nvidia_json | to_nice_json }}"
   register: docker_config
-  when: nvidia_runtime_enabled is true
+  when: nvidia_runtime_enabled is true and nvidia_smi.stat.exists and nvidia_runtime_executable.stat.exists
+
+- name: Remove NVIDIA Container Runtime packages
+  ansible.builtin.apt:
+    pkg:
+      - nvidia-container-toolkit
+      - nvidia-container-toolkit-base
+      - libnvidia-container-tools
+      - libnvidia-container1
+    update_cache: no
+    state: absent
+  when: nvidia_runtime_enabled is false
 
 - name: Restart Docker
   ansible.builtin.service:
