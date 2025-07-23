@@ -61,7 +61,7 @@
 - name: Set nvidia_runtime_enabled to false when enviroment will not allow it
   set_fact:
     nvidia_runtime_enabled: false
-  when: nvidia_smi.stat.exists is false or nvidia_runtime_executable.stat.exists is false
+  when: (not nvidia_smi.stat.exists) or (not nvidia_runtime_executable.stat.exists)
 
 # how to install NVIDIA drivers
 # https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/
