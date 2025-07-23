@@ -15,17 +15,17 @@
   block:
     - name: Enable NVIDIA sources 1
       ansible.builtin.shell:
-        cmd: "curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg"
+        cmd: 'curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg'
 
     - name: Enable NVIDIA sources 2
       ansible.builtin.shell:
-        cmd: "curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list"
+        cmd: 'curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | sed ''s#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g'' | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list'
 
     - name: Update apt-cache
       ansible.builtin.apt:
         update_cache: yes
 
-    - name: Install nvidia-container-toolkit Package
+    - name: Install NVIDIA runtime packages
       ansible.builtin.apt:
         pkg:
         - nvidia-container-toolkit
@@ -34,7 +34,7 @@
         - libnvidia-container1
 
     - name: Restart Docker
-      service:
+      ansible.builtin.service:
         name: docker
         state: restarted
       when: docker_config.changed
