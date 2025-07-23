@@ -7,10 +7,6 @@
   register: nvidia_runtime_executable
   check_mode: false
 
-- name: Check NVIDIA Container Runtime result
-  ansible.builtin.debug:
-    msg: "NVIDIA Container Runtime executable exists: {{ nvidia_runtime_executable.stat.exists }}"
-
 - name: Install NVIDIA Container Runtime
   block:
     - name: Add NVIDIA Container Toolkit GPG key
@@ -36,21 +32,22 @@
           - libnvidia-container1
         update_cache: yes
         state: present
-
-    - name: Generate Docker daemon.json with NVIDIA runtime
-      copy:
-        dest: /etc/docker/daemon.json
-        content: "{{ docker_daemon_with_nvidia_json | to_nice_json }}"
-      register: docker_config
-      when: nvidia_runtime_enabled is true
-
-    - name: Restart Docker
-      ansible.builtin.service:
-        name: docker
-        state: restarted
-      tags:
-        - skip_ansible_lint
   when: nvidia_runtime_enabled is true and not nvidia_runtime_executable.stat.exists
+
+- name: Generate Docker daemon.json with NVIDIA runtime
+  copy:
+    dest: /etc/docker/daemon.json
+    content: "{{ docker_daemon_with_nvidia_json | to_nice_json }}"
+  register: docker_config
+  when: nvidia_runtime_enabled is true
+
+- name: Restart Docker
+  service:
+    name: docker
+    state: restarted
+  when: docker_config.changed
+  tags:
+    - skip_ansible_lint
 
 ######################
 ### WORK IN PROGRESS
