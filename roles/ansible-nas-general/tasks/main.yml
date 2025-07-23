@@ -29,6 +29,17 @@
   tags:
     - skip_ansible_lint
 
+- name: Install app data archiving support
+  ansible.builtin.apt:
+    pkg:
+    - lzma
+    - unzip
+    - zip
+    state: present
+  register: result
+  until: result is succeeded
+  when: archive_app_data_enabled is true
+
 - name: Install extra packages
   ansible.builtin.apt:
     name: "{{ ansible_nas_extra_packages }}"
@@ -56,7 +67,8 @@
 
 - name: Install figlet
   ansible.builtin.apt:
-    name: "figlet"
+    pkg:
+    - figlet
     state: present
   register: result
   until: result is succeeded

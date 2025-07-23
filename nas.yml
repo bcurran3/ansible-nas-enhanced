@@ -22,6 +22,13 @@
         - skip_ansible_lint
 
     - role: geerlingguy.docker
+      vars:
+        docker_apt_release_channel: stable
+        docker_apt_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+        docker_apt_repository: "deb [arch={{ docker_apt_arch }}{{' signed-by=/etc/apt/keyrings/docker.asc' if add_repository_key is not failed}}] {{ docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
+        docker_apt_ignore_key_error: True
+        docker_apt_gpg_key: "{{ docker_repo_url }}/{{ ansible_distribution | lower }}/gpg"
+        docker_apt_filename: "docker"
       tags:
         - docker
         - skip_ansible_lint
@@ -34,11 +41,13 @@
         - ansible-nas-general
         - ansible-nas
 
-#    - role: ansible-nas-docker
-#      tags:
-#        - ansible-nas-docker
-#        - ansible-nas
-# ^ should be good now but need to officially test
+    - role: ansible-nas-docker
+      tags:
+        - ansible-nas-docker
+        - ansible-nas
+        - nvidia-runtime
+        - nvidia_runtime
+        - nvidiaruntime
 
     ###
     ### Stacks
@@ -72,10 +81,6 @@
     - role: bazarr
       tags:
         - bazarr
-
-#    - role: bitwarden
-#      tags:
-#        - bitwarden
 
     - role: booksonic
       tags:
@@ -474,11 +479,6 @@
     - role: timemachine
       tags:
         - timemachine
-
-# moved to top
-#    - role: traefik
-#      tags:
-#        - traefik
 
     - role: transmission
       tags:
