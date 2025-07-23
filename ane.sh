@@ -9,6 +9,8 @@
 ##
 ##  Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced
 
+EDITOR="nano"
+
 function help {
 # ANE help menu
     echo "Ansible-NAS-Enhanced (ANE) Help:"
@@ -43,6 +45,15 @@ function help {
 if [[ -z "$1" ]]; then
        echo "  ** Run \"./ane.sh --help\" for help :-)"
      exit 1
+fi
+
+# check for nano or other editor
+$EDITOR --version 2> /dev/null
+if [ $? -ne 0 ]; then
+   echo "  ** ERROR:"
+   echo "  ** $EDITOR not installed. \"sudo apt install $EDITOR\" to install."
+   echo "  ** OR you can edit the script and change the EDITOR env var to your preferred editor."
+   exit 1
 fi
 
 # Install/update only specified ANE apps
@@ -107,7 +118,7 @@ fi
 
 # Edit ANE inventory file
 if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
-    nano inventories/ANE/inventory
+    $EDITOR inventories/ANE/inventory
     exit
 fi
 
@@ -140,7 +151,7 @@ fi
 
 # Edit ANE settings/variables
 if [[ "$1" = "--settings" || "$1" = "-settings" ]]; then
-    nano inventories/ANE/group_vars/nas.yml
+    $EDITOR inventories/ANE/group_vars/nas.yml
     exit
 fi
 
