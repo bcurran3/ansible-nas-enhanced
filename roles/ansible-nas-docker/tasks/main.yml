@@ -57,6 +57,11 @@
   check_mode: false
   when: nvidia_runtime_enabled is true
 
+- name: Warn if NVIDIA drivers are not installed for NVIDIA Container Runtime
+  ansible.builtin.pause:
+    prompt: "ANE cannot install the NVIDIA Container Runtime unless you install the NVIDIA drivers first."
+  when: not nvidia_smi_check.stat.exists and nvidia_runtime_enabled is true
+
 - name: Install NVIDIA Container Runtime
   block:
   # This can be better done using ansible.builtin.apt_repository
