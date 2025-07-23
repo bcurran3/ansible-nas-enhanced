@@ -48,7 +48,7 @@ if [[ -z "$1" ]]; then
 fi
 
 # check for nano or other editor
-$EDITOR --version 2> /dev/null
+$EDITOR --version > /dev/null
 if [ $? -ne 0 ]; then
    echo "  ** ERROR:"
    echo "  ** $EDITOR not installed. \"sudo apt install $EDITOR\" to install."
