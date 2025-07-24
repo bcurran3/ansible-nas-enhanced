@@ -41,14 +41,12 @@
     path: /usr/bin/nvidia-smi
   register: nvidia_smi
   check_mode: false
-  when: nvidia_runtime_enabled is true
 
 - name: Check for NVIDIA Container Runtime
   ansible.builtin.stat:
     path: /usr/bin/nvidia-container-runtime
   register: nvidia_runtime_executable
   check_mode: false
-  when: nvidia_runtime_enabled is true
 
 - name: Warn if NVIDIA drivers are not installed for NVIDIA Container Runtime
   ansible.builtin.pause:
@@ -60,10 +58,10 @@
   when: (not nvidia_smi.stat.exists) and (nvidia_runtime_enabled is true)
 
 # This doesn't appear to work in other roles
-#- name: Set nvidia_runtime_enabled to false when enviroment will not allow it
-#  ansible.builtin.set_fact:
-#    nvidia_runtime_enabled: false
-#  when: (not nvidia_smi.stat.exists) or (not nvidia_runtime_executable.stat.exists)
+- name: Set nvidia_runtime_enabled to false when enviroment will not allow it
+  ansible.builtin.set_fact:
+    nvidia_runtime_enabled: false
+  when: (not nvidia_smi.stat.exists) or (not nvidia_runtime_executable.stat.exists)
 
 # how to install NVIDIA drivers
 # https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/
