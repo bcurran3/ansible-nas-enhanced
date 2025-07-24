@@ -36,6 +36,15 @@
     groups: docker
     append: yes
 
+# Maybe move all the NVIDIA stuff into a block after checking for the card
+- name: Check for NVIDIA card
+  ansible.builtin.shell: "lspci | grep NVIDIA"
+  register: nvidia_card
+  changed_when: false
+  failed_when: nvidia_card.rc != 0 and nvidia_card.rc != 8
+  tags:
+    - nvidia_card
+
 - name: Check for NVIDIA driver
   ansible.builtin.stat:
     path: /usr/bin/nvidia-smi
