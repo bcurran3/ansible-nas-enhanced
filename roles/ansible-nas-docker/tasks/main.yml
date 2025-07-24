@@ -63,6 +63,11 @@
   when: (not nvidia_smi_presence.stat.exists) and (nvidia_card_presence.rc == 0) and (nvidia_runtime_enabled is true)
 # TESTING
 
+- name: Set nvidia_runtime_enabled to false when enviroment will not allow it
+  ansible.builtin.set_fact:
+    nvidia_runtime_enabled: false
+  when: (not nvidia_smi_presence.stat.exists)
+
 - name: Check for NVIDIA Container Runtime
   ansible.builtin.stat:
     path: /usr/bin/nvidia-container-runtime
@@ -76,11 +81,6 @@
       ** You must install the NVIDIA driver first.
       ** Press ENTER to continue or CTRL+C and A to abort...
   when: (not nvidia_smi_presence.stat.exists) and (nvidia_runtime_enabled is true)
-
-- name: Set nvidia_runtime_enabled to false when enviroment will not allow it
-  ansible.builtin.set_fact:
-    nvidia_runtime_enabled: false
-  when: (not nvidia_smi_presence.stat.exists) or (not nvidia_runtime_presence.stat.exists)
 
 # how to install NVIDIA drivers
 # https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/
