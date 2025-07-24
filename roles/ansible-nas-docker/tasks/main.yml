@@ -21,7 +21,7 @@
         state: present
       register: result
       until: result is succeeded
-  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "22.04"
+  when: (ansible_distribution == "Ubuntu") and (ansible_distribution_version == "22.04")
 
 - name: Create Docker home directory
   ansible.builtin.file:
@@ -56,10 +56,10 @@
       ** ANE cannot install the NVIDIA Container Runtime.
       ** You must install the NVIDIA driver first.
       ** Press ENTER to continue or CTRL+C and A to abort...
-  when: nvidia_smi.stat.exists is false and nvidia_runtime_enabled is true
+  when: (not nvidia_smi.stat.exists) and (nvidia_runtime_enabled is true)
 
 - name: Set nvidia_runtime_enabled to false when enviroment will not allow it
-  set_fact:
+  ansible.builtin.set_fact:
     nvidia_runtime_enabled: false
   when: (not nvidia_smi.stat.exists) or (not nvidia_runtime_executable.stat.exists)
 
@@ -96,21 +96,21 @@
           - libnvidia-container1
         update_cache: yes
         state: present
-  when: nvidia_runtime_enabled is true and nvidia_smi.stat.exists and not nvidia_runtime_executable.stat.exists
+  when: (nvidia_runtime_enabled is true) and (nvidia_smi.stat.exists) and (not nvidia_runtime_executable.stat.exists)
 
 - name: Generate Docker daemon.json
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     content: "{{ docker_daemon_json | to_nice_json }}"
   register: docker_config
-  when: nvidia_runtime_enabled is false or nvidia_smi.stat.exists is false
+  when: (nvidia_runtime_enabled is false) or (not nvidia_smi.stat.exists)
 
 - name: Generate Docker daemon.json with NVIDIA runtime
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     content: "{{ docker_daemon_with_nvidia_json | to_nice_json }}"
   register: docker_config
-  when: nvidia_runtime_enabled is true and nvidia_smi.stat.exists and nvidia_runtime_executable.stat.exists
+  when: (nvidia_runtime_enabled is true) and (nvidia_smi.stat.exists) and (nvidia_runtime_executable.stat.exists)
 
 - name: Remove NVIDIA Container Runtime packages
   ansible.builtin.apt:
@@ -121,7 +121,7 @@
       - libnvidia-container1
     update_cache: no
     state: absent
-  when: nvidia_runtime_enabled is false or nvidia_smi.stat.exists is false
+  when: (nvidia_runtime_enabled is false) or (not nvidia_smi.stat.exists)
 
 - name: Restart Docker
   ansible.builtin.service:
