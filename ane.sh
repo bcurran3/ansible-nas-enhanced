@@ -1,50 +1,55 @@
 #!/bin/bash
 # Ansible-NAS-Enhanced helper script
 
-##      _    _   _ _____
-##     / \  | \ | | ____|
-##    / _ \ |  \| |  _|
-##   / ___ \| |\  | |___
-##  /_/   \_\_| \_|_____|
-##
-##  Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced
-
 EDITOR="nano"
+
+function print_logo {
+echo "      _    _   _ _____"
+echo "     / \  | \ | | ____|"
+echo "    / _ \ |  \| |  _|"
+echo "   / ___ \| |\  | |___"
+echo "  /_/   \_\_| \_|_____|"
+echo
+echo  Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced
+echo
+}
 
 function help {
 # ANE help menu
     echo "Ansible-NAS-Enhanced (ANE) Help:"
     echo "  --help"
-    echo "    What you see now!"
-    echo "  --app, --apps <app_name> <app_name> <app_name> <app_name>"
-    echo "    Install/Update apps by tag."
-    echo "  --behind, --outdated, --updates"
-    echo "    Check # of git commits behind your install of ANE is."
+    echo "      What you see now!"
+    echo "  --app, --apps, -a, --tag, --tags, -t <app_name> <app_name> <app_name> <app_name>"
+    echo "      Install or update apps by tag."
+    echo "  --behind, --outdated"
+    echo "      Check if your ANE files are up-to-date."
     echo "  --enabled"
-    echo "    List ANE enabled apps."
+    echo "      List ANE enabled apps."
     echo "  --install"
-    echo "    Install ANE (first time or reset)."
+    echo "      Install or reset ANE config files."
     echo "  --inventory"
-    echo "    Edit ANE inventory file."
+    echo "      Edit ANE inventory file."
     echo "  --permissions"
-    echo "    Reset permissions on all shared files."
+    echo "      Reset permissions on all shared files."
     echo "  --prune"
-    echo "    Prune unused Docker images and volumes."
-    echo "  --pull"
-    echo "    Update ANE files from git"
+    echo "      Prune unused Docker images and volumes."
+    echo "  --upgrade, --pull"
+    echo "      Upgrade ANE files from git"
     echo "  --requirements"
-    echo "    Install/Re-install ANE requirements."
-    echo "  --run, --update"
-    echo "    Run ANE full playbook."
-    echo "  --settings"
-    echo "    Edit ANE settings/overrides."
+    echo "      Install or re-install ANE requirements."
+    echo "  --run, -r, --update"
+    echo "      Run ANE full playbook."
+    echo "  --settings, -s"
+    echo "      Edit ANE settings/overrides."
     exit
 }
 
 # offer help when no switches provided
 if [[ -z "$1" ]]; then
-       echo "  ** Run \"./ane.sh --help\" for help :-)"
-     exit 1
+    print_logo  
+    echo "  ** Run \"./ane.sh --help\" for help :-)"
+    echo 
+    exit 1
 fi
 
 # check for nano or other editor
@@ -57,7 +62,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Install/update only specified ANE apps
-if [[ "$1" = "--app" || "$1" = "-app" ||  "$1" = "--apps" || "$1" = "-apps" ]]; then
+if [[ "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--tag" || "$1" = "--tags" || "$1" = "-t" ]]; then
      if [ "$2" = '' ]; then
         echo "  ** You need to specify at least one app name/tag."
         exit 1
@@ -72,13 +77,13 @@ if [[ "$1" = "--app" || "$1" = "-app" ||  "$1" = "--apps" || "$1" = "-apps" ]]; 
 fi
 
 # Check git commits ANE is behind
-if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" || "$1" = "--updates" || "$1" = "-updates" ]]; then
+if [[ "$1" = "--behind" || "$1" = "--outdated" ]]; then
     git fetch --quiet
     if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
     BEHIND=$(git rev-list --count HEAD..@{u})
     echo "  ** Your ANE installation is $BEHIND git commits behind."
     if [ $BEHIND -gt 0 ]; then
-       echo "  ** \"./ane.sh --pull\" or \"git pull\" to update"
+       echo "  ** \"./ane.sh --upgrade\" or \"git pull\" to update"
     fi
     exit
 fi
@@ -146,19 +151,19 @@ if [[ "$1" = "--requirements" || "$1" = "-requirements" ]]; then
 fi
 
 # Run ANE full playbook
-if [[ "$1" = "--run" || "$1" = "-run" || "$1" = "--update" || "$1" = "-update" ]]; then
+if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" ]]; then
     ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $2 $3 $4 $5 $6 $7 $8 $9 ${10}
     exit
 fi
 
 # Edit ANE settings/variables
-if [[ "$1" = "--settings" || "$1" = "-settings" ]]; then
+if [[ "$1" = "--settings" || "$1" = "-s" ]]; then
     $EDITOR inventories/ANE/group_vars/nas.yml
     exit
 fi
 
-# Update ANE files
-if [[ "$1" = "--pull" || "$1" = "-pull" ]]; then
+# Upgrade ANE files
+if [[ "$1" = "--upgrade" || "$1" = "--pull" ]]; then
     git pull
     exit
 fi
