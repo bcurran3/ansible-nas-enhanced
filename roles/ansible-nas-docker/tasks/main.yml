@@ -23,7 +23,7 @@
       until: result is succeeded
   when: (ansible_distribution == "Ubuntu") and (ansible_distribution_version == "22.04")
 
-- name: Create Docker home directory
+- name: Create docker_home directory
   ansible.builtin.file:
     path: "{{ docker_home }}"
     mode: 0755
@@ -43,19 +43,19 @@
   failed_when: nvidia_card_presence.rc == 9999 # fake code to ignore exit code
   ignore_errors: true
 
-- name: Report NVIDIA card if found
+- name: Report NVIDIA graphics card if found
   ansible.builtin.debug:
     msg: "{{ nvidia_card_presence.stdout }}"
   ignore_errors: true
   when: nvidia_card_presence.rc == 0
 
-- name: Set nvidia_runtime_enabled to false when NVIDIA card not found
+- name: Set nvidia_runtime_enabled to false when NVIDIA graphics card not found
   ansible.builtin.set_fact:
     nvidia_runtime_enabled: false
   when: nvidia_card_presence.rc != 0
 
 # BEGIN NVIDIA STUFF
-- name: Install NVIDIA driver and container runtime
+- name: Install NVIDIA driver and NVIDIA Container Runtime
   block:
     # how to install NVIDIA drivers
     # https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/
@@ -101,6 +101,7 @@
           - nvidia-container-toolkit-base
           - libnvidia-container-tools
           - libnvidia-container1
+        update_cache: yes
         state: present
       register: nvidia_container_result
       until: nvidia_container_result is succeeded
