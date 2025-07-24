@@ -36,34 +36,37 @@
     groups: docker
     append: yes
 
-# Maybe move all the NVIDIA stuff into a block after checking for the card
-- name: Check for NVIDIA card
-  ansible.builtin.shell: "lspci | grep NVIDIA"
-  register: nvidia_card
-  changed_when: false
-  failed_when: nvidia_card.rc != 0 and nvidia_card.rc != 8
-  tags:
-    - nvidia_card
+# MAYBE move all the NVIDIA stuff into a block after checking for the card
+- name: Check for NVIDIA graphics card
+  ansible.builtin.shell: "lspci -nn | grep NVIDIA"
+  register: nvidia_card_presence  # (nvidia_card_presence.rc == 0) eq present
+  ignore_errors: true
+
+- name: Report NVIDIA card presence
+  ansible.builtin.debug:
+    msg: "{{ nvidia_card_presence.stdout }}"
+  when: nvidia_card_presence.rc == 0
 
 - name: Check for NVIDIA driver
   ansible.builtin.stat:
     path: /usr/bin/nvidia-smi
-  register: nvidia_smi
+  register: nvidia_smi_presence
   check_mode: false
 
-# TESTING - maybe do lspci | grep NVIDIA to check existance first
+# TESTING
 - name: Install NVIDIA driver ({{ nvidia_driver_ver }})
   ansible.builtin.apt:
     name: "{{ nvidia_driver_ver }}"
     state: present
   register: result
   until: result is succeeded
-  when: (not nvidia_smi.stat.exists) and (nvidia_runtime_enabled is true)
+  when: (not nvidia_smi_presence.stat.exists) and (nvidia_card_presence.rc == 0) and (nvidia_runtime_enabled is true)
+# TESTING
 
 - name: Check for NVIDIA Container Runtime
   ansible.builtin.stat:
     path: /usr/bin/nvidia-container-runtime
-  register: nvidia_runtime_executable
+  register: nvidia_runtime_presence
   check_mode: false
 
 - name: Warn if NVIDIA drivers are not installed for NVIDIA Container Runtime
@@ -72,12 +75,12 @@
       ** ANE cannot install the NVIDIA Container Runtime.
       ** You must install the NVIDIA driver first.
       ** Press ENTER to continue or CTRL+C and A to abort...
-  when: (not nvidia_smi.stat.exists) and (nvidia_runtime_enabled is true)
+  when: (not nvidia_smi_presence.stat.exists) and (nvidia_runtime_enabled is true)
 
 - name: Set nvidia_runtime_enabled to false when enviroment will not allow it
   ansible.builtin.set_fact:
     nvidia_runtime_enabled: false
-  when: (not nvidia_smi.stat.exists) or (not nvidia_runtime_executable.stat.exists)
+  when: (not nvidia_smi_presence.stat.exists) or (not nvidia_runtime_presence.stat.exists)
 
 # how to install NVIDIA drivers
 # https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/
@@ -112,21 +115,21 @@
           - libnvidia-container1
         update_cache: yes
         state: present
-  when: (nvidia_runtime_enabled is true) and (nvidia_smi.stat.exists) and (not nvidia_runtime_executable.stat.exists)
+  when: (nvidia_runtime_enabled is true) and (nvidia_smi_presence.stat.exists) and (not nvidia_runtime_presence.stat.exists)
 
 - name: Generate Docker daemon.json
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     content: "{{ docker_daemon_json | to_nice_json }}"
   register: docker_config
-  when: (nvidia_runtime_enabled is false) or (not nvidia_smi.stat.exists)
+  when: (nvidia_runtime_enabled is false) or (not nvidia_smi_presence.stat.exists)
 
 - name: Generate Docker daemon.json with NVIDIA runtime
   ansible.builtin.copy:
     dest: /etc/docker/daemon.json
     content: "{{ docker_daemon_with_nvidia_json | to_nice_json }}"
   register: docker_config
-  when: (nvidia_runtime_enabled is true) and (nvidia_smi.stat.exists) and (nvidia_runtime_executable.stat.exists)
+  when: (nvidia_runtime_enabled is true) and (nvidia_smi_presence.stat.exists) and (nvidia_runtime_presence.stat.exists)
 
 - name: Remove NVIDIA Container Runtime packages
   ansible.builtin.apt:
@@ -137,7 +140,7 @@
       - libnvidia-container1
     update_cache: no
     state: absent
-  when: (nvidia_runtime_enabled is false) or (not nvidia_smi.stat.exists)
+  when: (nvidia_runtime_enabled is false) or (not nvidia_smi_presence.stat.exists)
 
 - name: Restart Docker
   ansible.builtin.service:
