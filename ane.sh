@@ -74,6 +74,7 @@ fi
 # Check git commits ANE is behind
 if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" || "$1" = "--updates" || "$1" = "-updates" ]]; then
     git fetch --quiet
+    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
     BEHIND=$(git rev-list --count HEAD..@{u})
     echo "  ** Your ANE installation is $BEHIND git commits behind."
     if [ $BEHIND -gt 0 ]; then
@@ -93,6 +94,7 @@ fi
 # DO NOT USE! - for dev use only
 if [[ "$1" = "--gitforcepull" || "$1" = "-gitforcepull" ]]; then
     git fetch --all
+    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
     git reset --hard origin/main
     exit
 fi
