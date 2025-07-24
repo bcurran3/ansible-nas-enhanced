@@ -87,10 +87,11 @@
           RAG_WEB_SEARCH_CONCURRENT_REQUESTS: "10"
           SEARXNG_QUERY_URL: "{{ 'http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + searxng_port_http if searxng_enabled else omit }}"
           TZ: "{{ ansible_nas_timezone }}"
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-        device_requests:
-          - capabilities: [gpu]
-            count: -1
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
         labels:
           autoheal: "{{ openwebui_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openwebui_watchtower_monitor_only }}"

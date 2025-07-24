@@ -25,7 +25,7 @@
         ports:
           - "{{ plex_port }}:32400"
           - "32400:32400/udp"
-#         - "5353:5353/udp"     # older Bonjour/Avahi network discovery
+          - "5353:5353/udp"     # older Bonjour/Avahi network discovery
           - "8324:8324"         # controlling Plex for Roku via Plex Companion
           - "32410:32410/udp"   # GDM network discovery
           - "32412:32412/udp"   # GDM network discovery
@@ -34,11 +34,12 @@
           - "32469:32469"       # access to the Plex DLNA Server
           - "32469:32469/udp"   # access to the Plex DLNA Server
           - "33400:33400"       # Plex Web Tools
-#         - "1900:1900/udp"     # Plex DLNA Server
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-        device_requests:
-          - capabilities: [gpu]
-            count: -1
+          - "1900:1900/udp"     # Plex DLNA Server
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
         volumes:
           - "{{ plex_data_directory }}/config:/config:rw"
           - "{{ plex_data_directory }}/logs:/opt/plex/Library/Application Support/Plex Media Server/Logs:rw"

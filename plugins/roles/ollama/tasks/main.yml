@@ -16,10 +16,11 @@
         image: "{{ ollama_image_name }}:{{ ollama_image_tag }}"
         pull: true
         cpu_shares: "{{ ollama_cpu_shares }}"
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-        device_requests:
-          - capabilities: [gpu]
-            count: -1
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
         volumes:
           - "{{ ollama_data_directory }}:/root/.ollama"
         ports:

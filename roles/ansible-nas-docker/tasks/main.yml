@@ -59,6 +59,12 @@
       ** Press ENTER to continue or CTRL+C and A to abort...
   when: (not nvidia_smi.stat.exists) and (nvidia_runtime_enabled is true)
 
+# This doesn't appear to work in other roles
+#- name: Set nvidia_runtime_enabled to false when enviroment will not allow it
+#  ansible.builtin.set_fact:
+#    nvidia_runtime_enabled: false
+#  when: (not nvidia_smi.stat.exists) or (not nvidia_runtime_executable.stat.exists)
+
 # how to install NVIDIA drivers
 # https://documentation.ubuntu.com/server/how-to/graphics/install-nvidia-drivers/
 
@@ -106,7 +112,8 @@
     dest: /etc/docker/daemon.json
     content: "{{ docker_daemon_with_nvidia_json | to_nice_json }}"
   register: docker_config
-  when: (nvidia_runtime_enabled is true) and (nvidia_smi.stat.exists) and (nvidia_runtime_executable.stat.exists)
+#  when: (nvidia_runtime_enabled is true) and (nvidia_smi.stat.exists) and (nvidia_runtime_executable.stat.exists)
+  when: (nvidia_runtime_enabled is true) and (nvidia_runtime_executable.stat.exists)
 
 - name: Remove NVIDIA Container Runtime packages
   ansible.builtin.apt:

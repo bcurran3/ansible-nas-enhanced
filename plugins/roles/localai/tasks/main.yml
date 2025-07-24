@@ -20,10 +20,12 @@
         pull: true
         ports:
           - "{{ localai_port_http }}:8080"
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-        device_requests:
-          - capabilities: [gpu]
-            count: -1
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
+# make the LLMs persistent - need to find them
 #        volumes:
 #          - "{{ localai_data_directory }}/models:/build/models:rw"
         network_mode: bridge
