@@ -109,16 +109,16 @@
       ansible.builtin.copy:
         dest: /etc/docker/daemon.json
         content: "{{ docker_daemon_with_nvidia_json | to_nice_json }}"
-      register: docker_config
+      register: docker_config_nvidia
 
     - name: Warn if reboot required
       ansible.builtin.debug:
-        msg: "A reboot is required for the NVIDIA drivers and runtime to function."
-      when: nvidia_driver_result.changed or nvidia_container_result.changed
+        msg: "A reboot is required after NVIDIA driver installation."
+      when: nvidia_driver_result.changed
   when: nvidia_runtime_enabled is true
 # END NVIDIA STUFF
 
-- name: Remove NVIDIA Container Runtime packages
+- name: Remove NVIDIA Container Runtime
   ansible.builtin.apt:
     pkg:
       - nvidia-container-toolkit
@@ -140,4 +140,4 @@
   ansible.builtin.service:
     name: docker
     state: restarted
-  when: docker_config.changed
+  when: docker_config.changed or docker_config_nvidia.changed
