@@ -6,22 +6,22 @@
     ###
     ### Requirements
     ###
-    - role: ansible-nas-users
+    - role: ansible-nas-users # not an app
       tags:
         - ansible-nas-users
         - ansible-nas
 
-    - role: vladgh.samba.server
+    - role: vladgh.samba.server # not an app
       tags:
         - samba
         - skip_ansible_lint
 
-    - role: geerlingguy.nfs
+    - role: geerlingguy.nfs # not an app
       tags:
         - nfs
         - skip_ansible_lint
 
-    - role: geerlingguy.docker
+    - role: geerlingguy.docker # not an app
       vars:
         docker_apt_release_channel: stable
         docker_apt_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
@@ -36,12 +36,12 @@
     ###
     ### Ansible-NAS Roles
     ###
-    - role: ansible-nas-general
+    - role: ansible-nas-general # not an app
       tags:
         - ansible-nas-general
         - ansible-nas
 
-    - role: ansible-nas-docker
+    - role: ansible-nas-docker # not an app
       tags:
         - ansible-nas-docker
         - ansible-nas
@@ -196,7 +196,7 @@
       tags:
         - guacamole
 
-    - role: healthchecks.io
+    - role: healthchecks.io # not an app
       tags:
         - healthchecks-io
         - healthchecks_io
@@ -257,10 +257,6 @@
       tags:
         - lidarr
 
-    - role: logging
-      tags:
-        - logging
-
     - role: loki
       tags:
         - loki
@@ -313,7 +309,7 @@
 
     - role: n8n
       tags:
-        - n8n_enabled
+        - n8n
 
     - role: navidrome
       tags:
@@ -375,10 +371,7 @@
     - role: plex
       tags:
         - plex
-
-#    - role: portainer
-#      tags:
-#        - portainer
+        - pms
 
     - role: promtail
       tags:
@@ -543,7 +536,7 @@
 ### MY PLUGINS
 ###
 
-    - role: ansible-nas-plugins
+    - role: ansible-nas-plugins # not an app
       tags:
         - plugins
       when: (plugins_enabled | default(False))

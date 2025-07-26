@@ -21,6 +21,8 @@ function help {
     echo "      What you see now!"
     echo "  --app, --apps, -a, --tag, --tags, -t <app_name> <app_name> <app_name> <app_name>"
     echo "      Install or update apps by tag."
+    echo "  --available"
+    echo "      List ANE available apps."
     echo "  --behind, --outdated"
     echo "      Check if your ANE files are up-to-date."
     echo "  --enabled"
@@ -74,6 +76,13 @@ if [[ "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--tag" || "$1"
     done
    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $appslist
    exit
+fi
+
+# List ANE available apps
+if [[ "$1" = "--available" || "$1" = "-available" ]]; then
+     echo "ANE available apps:"
+     cat nas.yml |grep 'role:'
+     exit
 fi
 
 # Check git commits ANE is behind
