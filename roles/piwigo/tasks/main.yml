@@ -70,6 +70,9 @@
           traefik.http.routers.piwigo.tls.certresolver: "letsencrypt"
           traefik.http.routers.piwigo.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.piwigo.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ piwigo_hostname }}"
+          traefik.http.routers.piwigo.middlewares: "{{ piwigo_hostname }}@docker"
+          traefik.http.middlewares.piwigo.IPAllowList.sourcerange: "{{ piwigo_traefik_whitelist }}"
           traefik.http.services.piwigo.loadbalancer.server.port: "80"
           homepage.group: Photos
           homepage.name: Piwigo

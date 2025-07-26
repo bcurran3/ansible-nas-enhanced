@@ -35,6 +35,9 @@
           traefik.http.routers.organizr.tls.certresolver: "letsencrypt"
           traefik.http.routers.organizr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.organizr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ organizr_hostname }}"
+          traefik.http.routers.organizr.middlewares: "{{ organizr_hostname }}@docker"
+          traefik.http.middlewares.organizr.IPAllowList.sourcerange: "{{ organizr_traefik_whitelist }}"
           traefik.http.services.organizr.loadbalancer.server.port: "80"
   when: organizr_enabled is true
 

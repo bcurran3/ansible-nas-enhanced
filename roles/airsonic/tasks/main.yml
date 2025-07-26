@@ -33,6 +33,9 @@
           traefik.http.routers.airsonic.tls.certresolver: "letsencrypt"
           traefik.http.routers.airsonic.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.airsonic.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ airsonic_hostname }}"
+          traefik.http.routers.airsonic.middlewares: "{{ airsonic_hostname }}@docker"
+          traefik.http.middlewares.airsonic.IPAllowList.sourcerange: "{{ airsonic_traefik_whitelist }}"
           traefik.http.services.airsonic.loadbalancer.server.port: "4040"
   when: airsonic_enabled is true
 

@@ -39,6 +39,9 @@
           traefik.http.routers.thelounge.tls.certresolver: "letsencrypt"
           traefik.http.routers.thelounge.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.thelounge.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ thelounge_hostname }}"
+          traefik.http.routers.thelounge.middlewares: "{{ thelounge_hostname }}@docker"
+          traefik.http.middlewares.thelounge.IPAllowList.sourcerange: "{{ thelounge_traefik_whitelist }}"
           traefik.http.services.thelounge.loadbalancer.server.port: "9000"
   when: thelounge_enabled is true
 

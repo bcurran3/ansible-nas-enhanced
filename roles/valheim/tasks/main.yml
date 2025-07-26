@@ -41,6 +41,9 @@
           traefik.http.routers.valheim.tls.certresolver: "letsencrypt"
           traefik.http.routers.valheim.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.valheim.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ valheim_hostname }}"
+          traefik.http.routers.valheim.middlewares: "{{ valheim_hostname }}@docker"
+          traefik.http.middlewares.valheim.IPAllowList.sourcerange: "{{ valheim_traefik_whitelist }}"
           traefik.http.services.valheim.loadbalancer.server.port: "2456"
   when: valheim_enabled is true
 

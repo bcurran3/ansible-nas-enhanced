@@ -38,6 +38,9 @@
           traefik.http.routers.sickchill.tls.certresolver: "letsencrypt"
           traefik.http.routers.sickchill.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.sickchill.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ sickchill_hostname }}"
+          traefik.http.routers.sickchill.middlewares: "{{ sickchill_hostname }}@docker"
+          traefik.http.middlewares.sickchill.IPAllowList.sourcerange: "{{ sickchill_traefik_whitelist }}"
           traefik.http.services.sickchill.loadbalancer.server.port: "8081"
   when: sickchill_enabled is true
 

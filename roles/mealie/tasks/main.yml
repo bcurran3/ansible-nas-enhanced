@@ -41,6 +41,9 @@
           traefik.http.routers.mealie.tls.certresolver: "letsencrypt"
           traefik.http.routers.mealie.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.mealie.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ mealie_hostname }}"
+          traefik.http.routers.mealie.middlewares: "{{ mealie_hostname }}@docker"
+          traefik.http.middlewares.mealie.IPAllowList.sourcerange: "{{ mealie_traefik_whitelist }}"
           traefik.http.services.mealie.loadbalancer.server.port: "9000"
   when: mealie_enabled is true
 

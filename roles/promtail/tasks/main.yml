@@ -47,6 +47,9 @@
           traefik.http.routers.promtail.tls.certresolver: "letsencrypt"
           traefik.http.routers.promtail.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.promtail.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ promtail_hostname }}"
+          traefik.http.routers.promtail.middlewares: "{{ promtail_hostname }}@docker"
+          traefik.http.middlewares.promtail.IPAllowList.sourcerange: "{{ promtail_traefik_whitelist }}"
           traefik.http.services.promtail.loadbalancer.server.port: "9080"
   when: promtail_enabled is true
 

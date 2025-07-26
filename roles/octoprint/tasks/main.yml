@@ -37,6 +37,9 @@
           traefik.http.routers.octoprint.tls.certresolver: "letsencrypt"
           traefik.http.routers.octoprint.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.octoprint.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ octoprint_hostname }}"
+          traefik.http.routers.octoprint.middlewares: "{{ octoprint_hostname }}@docker"
+          traefik.http.middlewares.octoprint.IPAllowList.sourcerange: "{{ octoprint_traefik_whitelist }}"
           traefik.http.services.octoprint.loadbalancer.server.port: "80"
   when: octoprint_enabled is true
 

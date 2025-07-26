@@ -49,6 +49,9 @@
           traefik.http.routers.drone_ci.tls.certresolver: "letsencrypt"
           traefik.http.routers.drone_ci.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.drone_ci.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ drone_ci_hostname }}"
+          traefik.http.routers.drone_ci.middlewares: "{{ drone_ci_hostname }}@docker"
+          traefik.http.middlewares.drone_ci.IPAllowList.sourcerange: "{{ drone_ci_traefik_whitelist }}"
           traefik.http.services.drone_ci.loadbalancer.server.port: "80"
 
     - name: Create {{ ansible_nas_app_name }} Runner Container

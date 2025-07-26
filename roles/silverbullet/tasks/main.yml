@@ -32,6 +32,9 @@
           traefik.http.routers.silverbullet.tls.certresolver: "letsencrypt"
           traefik.http.routers.silverbullet.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.silverbullet.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ silverbullet_hostname }}"
+          traefik.http.routers.silverbullet.middlewares: "{{ silverbullet_hostname }}@docker"
+          traefik.http.middlewares.silverbullet.IPAllowList.sourcerange: "{{ silverbullet_traefik_whitelist }}"
           traefik.http.services.silverbullet.loadbalancer.server.port: "3000"
           homepage.group: Productivity
           homepage.name: Silverbullet

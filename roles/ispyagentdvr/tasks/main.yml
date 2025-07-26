@@ -43,6 +43,9 @@
           traefik.http.routers.ispyagentdvr.tls.certresolver: "letsencrypt"
           traefik.http.routers.ispyagentdvr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ispyagentdvr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ ispyagentdvr_hostname }}"
+          traefik.http.routers.ispyagentdvr.middlewares: "{{ ispyagentdvr_hostname }}@docker"
+          traefik.http.middlewares.ispyagentdvr.IPAllowList.sourcerange: "{{ ispyagentdvr_traefik_whitelist }}"
           traefik.http.services.ispyagentdvr.loadbalancer.server.port: "8097"
           homepage.group: Monitoring
           homepage.name: iSpy AgentDVR

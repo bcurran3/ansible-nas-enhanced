@@ -41,6 +41,9 @@
           traefik.http.routers.krusader.tls.certresolver: "letsencrypt"
           traefik.http.routers.krusader.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.krusader.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ krusader_hostname }}"
+          traefik.http.routers.krusader.middlewares: "{{ krusader_hostname }}@docker"
+          traefik.http.middlewares.krusader.IPAllowList.sourcerange: "{{ krusader_traefik_whitelist }}"
           traefik.http.services.krusader.loadbalancer.server.port: "6080"
   when: krusader_enabled is true
 

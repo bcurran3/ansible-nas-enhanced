@@ -43,6 +43,9 @@
           traefik.http.routers.pytivo.tls.certresolver: "letsencrypt"
           traefik.http.routers.pytivo.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.pytivo.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ pytivo_hostname }}"
+          traefik.http.routers.pytivo.middlewares: "{{ pytivo_hostname }}@docker"
+          traefik.http.middlewares.pytivo.IPAllowList.sourcerange: "{{ pytivo_traefik_whitelist }}"
           traefik.http.services.pytivo.loadbalancer.server.port: "9032"
   when: pytivo_enabled is true
 

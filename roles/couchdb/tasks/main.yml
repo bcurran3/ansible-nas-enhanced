@@ -35,6 +35,9 @@
           traefik.http.routers.couchdb.tls.certresolver: "letsencrypt"
           traefik.http.routers.couchdb.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.couchdb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ couchdb_hostname }}"
+          traefik.http.routers.couchdb.middlewares: "{{ couchdb_hostname }}@docker"
+          traefik.http.middlewares.couchdb.IPAllowList.sourcerange: "{{ couchdb_traefik_whitelist }}"
           traefik.http.services.couchdb.loadbalancer.server.port: "5984"
   when: couchdb_enabled is true
 

@@ -36,6 +36,9 @@
           traefik.http.routers.cloudcmd.tls.certresolver: "letsencrypt"
           traefik.http.routers.cloudcmd.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.cloudcmd.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ cloudcmd_hostname }}"
+          traefik.http.routers.cloudcmd.middlewares: "{{ cloudcmd_hostname }}@docker"
+          traefik.http.middlewares.cloudcmd.IPAllowList.sourcerange: "{{ cloudcmd_traefik_whitelist }}"
           traefik.http.services.cloudcmd.loadbalancer.server.port: "8000"
   when: cloudcmd_enabled is true
 

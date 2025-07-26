@@ -39,6 +39,9 @@
           traefik.http.routers.booksonic.tls.certresolver: "letsencrypt"
           traefik.http.routers.booksonic.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.booksonic.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ booksonic_hostname }}"
+          traefik.http.routers.booksonic.middlewares: "{{ booksonic_hostname }}@docker"
+          traefik.http.middlewares.booksonic.IPAllowList.sourcerange: "{{ booksonic_traefik_whitelist }}"
           traefik.http.services.booksonic.loadbalancer.server.port: "4040"
   when: booksonic_enabled is true
 

@@ -36,6 +36,9 @@
           traefik.http.routers.mumble.tls.certresolver: "letsencrypt"
           traefik.http.routers.mumble.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.mumble.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ mumble_hostname }}"
+          traefik.http.routers.mumble.middlewares: "{{ mumble_hostname }}@docker"
+          traefik.http.middlewares.mumble.IPAllowList.sourcerange: "{{ mumble_traefik_whitelist }}"
           traefik.http.services.mumble.loadbalancer.server.port: "64738"
   when: mumble_enabled is true
 

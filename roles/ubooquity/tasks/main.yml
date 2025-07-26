@@ -39,6 +39,9 @@
           traefik.http.routers.ubooquity.tls.certresolver: "letsencrypt"
           traefik.http.routers.ubooquity.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ubooquity.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ ubooquity_hostname }}"
+          traefik.http.routers.ubooquity.middlewares: "{{ ubooquity_hostname }}@docker"
+          traefik.http.middlewares.ubooquity.IPAllowList.sourcerange: "{{ ubooquity_traefik_whitelist }}"
           traefik.http.services.ubooquity.loadbalancer.server.port: "2202"
   when: ubooquity_enabled is true
 

@@ -38,6 +38,9 @@
           traefik.http.routers.calibreweb.tls.certresolver: "letsencrypt"
           traefik.http.routers.calibreweb.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.calibreweb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ calibreweb_hostname }}"
+          traefik.http.routers.calibreweb.middlewares: "{{ calibreweb_hostname }}@docker"
+          traefik.http.middlewares.calibreweb.IPAllowList.sourcerange: "{{ calibreweb_traefik_whitelist }}"
           traefik.http.services.calibreweb.loadbalancer.server.port: "8083"
   when: calibreweb_enabled is true
 

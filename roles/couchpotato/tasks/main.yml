@@ -39,6 +39,9 @@
           traefik.http.routers.couchpotato.tls.certresolver: "letsencrypt"
           traefik.http.routers.couchpotato.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.couchpotato.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ couchpotato_hostname }}"
+          traefik.http.routers.couchpotato.middlewares: "{{ couchpotato_hostname }}@docker"
+          traefik.http.middlewares.couchpotato.IPAllowList.sourcerange: "{{ couchpotato_traefik_whitelist }}"
           traefik.http.services.couchpotato.loadbalancer.server.port: "5050"
   when: couchpotato_enabled is true
 

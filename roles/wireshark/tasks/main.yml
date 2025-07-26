@@ -36,6 +36,9 @@
           traefik.http.routers.wireshark.tls.certresolver: "letsencrypt"
           traefik.http.routers.wireshark.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.wireshark.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ wireshark_hostname }}"
+          traefik.http.routers.wireshark.middlewares: "{{ wireshark_hostname }}@docker"
+          traefik.http.middlewares.wireshark.IPAllowList.sourcerange: "{{ wireshark_traefik_whitelist }}"
           traefik.http.services.wireshark.loadbalancer.server.port: "3000"
   when: wireshark_enabled is true
 

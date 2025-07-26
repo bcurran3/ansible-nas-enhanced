@@ -35,6 +35,9 @@
           traefik.http.routers.nzbget.tls.certresolver: "letsencrypt"
           traefik.http.routers.nzbget.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.nzbget.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ nzbget_hostname }}"
+          traefik.http.routers.nzbget.middlewares: "{{ nzbget_hostname }}@docker"
+          traefik.http.middlewares.nzbget.IPAllowList.sourcerange: "{{ nzbget_traefik_whitelist }}"
           traefik.http.services.nzbget.loadbalancer.server.port: "6789"
   when: nzbget_enabled is true
 

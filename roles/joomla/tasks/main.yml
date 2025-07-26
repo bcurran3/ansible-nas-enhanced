@@ -65,6 +65,9 @@
           traefik.http.routers.joomla.tls.certresolver: "letsencrypt"
           traefik.http.routers.joomla.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.joomla.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ joomla_hostname }}"
+          traefik.http.routers.joomla.middlewares: "{{ joomla_hostname }}@docker"
+          traefik.http.middlewares.joomla.IPAllowList.sourcerange: "{{ joomla_traefik_whitelist }}"
           traefik.http.services.joomla.loadbalancer.server.port: "80"
   when: joomla_enabled is true
 

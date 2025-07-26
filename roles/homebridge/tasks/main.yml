@@ -34,6 +34,9 @@
           traefik.http.routers.homebridge.tls.certresolver: "letsencrypt"
           traefik.http.routers.homebridge.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.homebridge.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ homebridge_hostname }}"
+          traefik.http.routers.homebridge.middlewares: "{{ homebridge_hostname }}@docker"
+          traefik.http.middlewares.homebridge.IPAllowList.sourcerange: "{{ homebridge_traefik_whitelist }}"
           traefik.http.services.homebridge.loadbalancer.server.port: "8087"
         cpu_shares: "{{ homebridge_cpu_shares }}"
         restart_policy: unless-stopped
