@@ -10,6 +10,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ flaresolverr_container_name }}"
         hostname: "{{ flaresolverr_container_name }}"
         image: "{{ flaresolverr_image_name }}:{{ flaresolverr_image_version }}"

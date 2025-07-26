@@ -13,13 +13,13 @@
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ freshrss_db_container_name }}"
         hostname: "{{ freshrss_db_container_name }}"
         image: "{{ freshrss_db_image_name }}:{{ freshrss_db_image_version }}"
         pull: true
         volumes:
           - "{{ freshrss_data_directory }}/db:/var/lib/postgresql/data"
-        container_default_behavior: no_defaults
         env:
           POSTGRES_USER: "freshrss"
           POSTGRES_PASSWORD: "freshrss"
@@ -43,6 +43,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ freshrss_container_name }}"
         hostname: "{{ freshrss_container_name }}"
         image: "{{ freshrss_image_name }}:{{ freshrss_image_version }}"
@@ -52,7 +53,6 @@
           - "{{ freshrss_data_directory }}/extensions:/var/www/FreshRSS/extensions:rw"
         ports:
           - "{{ freshrss_port }}:80"
-        container_default_behavior: no_defaults
         env:
           CRON_MIN: "1,31"
           DB_HOST: "{{ freshrss_container_name }}"

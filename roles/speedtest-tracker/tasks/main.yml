@@ -10,12 +10,14 @@
 
     - name: Remove old {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ speedtest_tracker_container_name }}"
         state: absent
       tags: molecule-idempotence-notest
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ speedtest_tracker_container_name }}"
         hostname: "{{ speedtest_tracker_container_name }}"
         image: "{{ speedtest_tracker_image_name }}:{{ speedtest_tracker_image_version }}"

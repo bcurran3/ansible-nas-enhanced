@@ -8,6 +8,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ netdata_container_name }}"
         hostname: "{{ netdata_container_name }}"
         image: "{{ netdata_image_name }}:{{ netdata_image_version }}"

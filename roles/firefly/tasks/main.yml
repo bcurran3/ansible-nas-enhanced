@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ firefly_db_container_name }}"
         hostname: "{{ firefly_db_container_name }}"
         image: "{{ firefly_db_image_name }}:{{ firefly_db_image_tag }}"

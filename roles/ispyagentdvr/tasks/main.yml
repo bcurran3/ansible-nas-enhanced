@@ -14,6 +14,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ ispyagentdvr_container_name }}"
         hostname: "{{ ispyagentdvr_container_name }}"
         image: "{{ ispyagentdvr_image_name }}:{{ ispyagentdvr_image_tag }}"

@@ -13,6 +13,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ utorrent_container_name }}"
         hostname: "{{ utorrent_container_name }}"
         image: "{{ utorrent_image_name }}:{{ utorrent_image_version }}"

@@ -10,6 +10,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ dokuwiki_container_name }}"
         hostname: "{{ dokuwiki_container_name }}"
         image: "{{ dokuwiki_image_name }}:{{ dokuwiki_image_tag }}"

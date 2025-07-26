@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ homebridge_container_name }}"
         hostname: "{{ homebridge_container_name }}"
         image: "{{ homebridge_image_name }}:{{ homebridge_image_version }}"

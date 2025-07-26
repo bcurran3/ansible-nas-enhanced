@@ -3,6 +3,7 @@
   block:
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ yadnsb_container_name }}"
         hostname: "{{ yadnsb_container_name }}"
         image: "{{ yadnsb_image_name }}:{{ yadnsb_image_tag }}"

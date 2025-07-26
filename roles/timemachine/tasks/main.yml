@@ -8,6 +8,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ timemachine_container_name }}"
         hostname: "{{ timemachine_container_name }}"
         image: "{{ timemachine_image_name }}:{{ timemachine_image_version }}"

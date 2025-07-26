@@ -20,6 +20,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ paperless_ngx_redis_container_name }}"
         hostname: "{{ paperless_ngx_redis_container_name }}"
         image: "{{ paperless_ngx_redis_image_name }}:{{ paperless_ngx_redis_image_version }}"
@@ -47,6 +48,7 @@
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ paperless_ngx_db_container_name }}"
         hostname: "{{ paperless_ngx_db_container_name }}"
         image: "{{ paperless_ngx_db_image_name }}:{{ paperless_ngx_db_image_version }}"
@@ -80,6 +82,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ paperless_ngx_container_name }}"
         hostname: "{{ paperless_ngx_container_name }}"
         image: "{{ paperless_ngx_image_name }}:{{ paperless_ngx_image_version }}"

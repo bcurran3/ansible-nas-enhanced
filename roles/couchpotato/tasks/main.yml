@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ couchpotato_container_name }}"
         hostname: "{{ couchpotato_container_name }}"
         image: "{{ couchpotato_image_name }}:{{ couchpotato_image_tag }}"

@@ -20,6 +20,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ drone_ci_container_name }}"
         hostname: "{{ drone_ci_container_name }}"
         image: "{{ drone_ci_image_name }}:{{ drone_ci_image_tag }}"
@@ -52,6 +53,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Runner Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ drone_ci_runner_container_name }}"
         image: drone/drone-runner-docker:1
         pull: true

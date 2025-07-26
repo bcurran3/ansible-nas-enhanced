@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ overseerr_container_name }}"
         hostname: "{{ overseerr_container_name }}"
         image: "{{ overseerr_image_name }}:{{ overseerr_image_version }}"

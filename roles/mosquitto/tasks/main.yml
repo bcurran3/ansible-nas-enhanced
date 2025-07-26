@@ -18,6 +18,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ mosquitto_container_name }}"
         hostname: "{{ mosquitto_container_name }}"
         image: "{{ mosquitto_image_name }}:{{ mosquitto_image_version }}"

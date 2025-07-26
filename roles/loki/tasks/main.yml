@@ -37,6 +37,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ loki_container_name }}"
         hostname: "{{ loki_container_name }}"
         image: "{{ loki_image_name }}:{{ loki_image_version }}"

@@ -19,6 +19,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ traefik_container_name }}"
         hostname: "{{ traefik_container_name }}"
         image: "{{ traefik_image_name }}:{{ traefik_image_version }}"

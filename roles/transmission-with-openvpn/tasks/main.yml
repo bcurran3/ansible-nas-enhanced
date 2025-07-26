@@ -14,6 +14,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ transmission_openvpn_container_name }}"
         image: "{{ transmission_openvpn_image_name }}:{{ transmission_openvpn_image_version }}"
         pull: true

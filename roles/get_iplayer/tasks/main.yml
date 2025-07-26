@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ get_iplayer_container_name }}"
         hostname: "{{ get_iplayer_container_name }}"
         image: "{{ get_iplayer_image_name }}:{{ get_iplayer_image_version }}"

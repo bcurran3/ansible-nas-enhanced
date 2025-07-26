@@ -7,8 +7,8 @@
       file:
         path: "{{ item }}"
         state: directory
-        owner: 1000
-        group: 1000
+        owner: "1000"
+        group: "1000"
       with_items:
         - "{{ pulse_data_directory }}"
         - "{{ pulse_data_directory }}/config"
@@ -16,6 +16,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ pulse_container_name }}"
         hostname: "{{ pulse_container_name }}"
         image: "{{ pulse_image_name }}:{{ pulse_image_tag }}"
@@ -27,6 +28,7 @@
         ports:
           - "{{ pulse_port }}:7655"
         env:
+          ADMIN_PASSWORD: "{{ pulse_env_admin_password }}"
           PROXMOX_TOKEN_ID: "{{ pulse_env_proxmox_token_id }}"
           PROXMOX_TOKEN_SECRET: "{{ pulse_env_proxmox_token_secret }}"
           PBS_HOST: "{{ pulse_env_pbs_host }}"
@@ -34,6 +36,7 @@
           PBS_TOKEN_SECRET: "{{ pulse_env_token_secret }}"
           PBS_ALLOW_SELF_SIGNED_CERTS: "{{ pulse_env_pbs_allow_self_signed_certs }}"
           PBS_PORT: "{{ pulse_env_pbs_port }}"
+          SECURITY_MODE: "private"
           TZ: "{{ ansible_nas_timezone }}"
         restart_policy: unless-stopped
         memory: "{{ pulse_memory }}"

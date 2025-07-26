@@ -19,6 +19,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ ddns_updater_container_name }}"
         hostname: "{{ ddns_updater_container_name }}"
         image: "{{ ddns_updater_image_name }}:{{ ddns_updater_image_tag }}"

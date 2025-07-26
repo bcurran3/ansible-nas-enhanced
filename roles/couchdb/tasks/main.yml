@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ couchdb_container_name }}"
         hostname: "{{ couchdb_container_name }}"
         image: "{{ couchdb_image_name }}:{{ couchdb_image_version }}"

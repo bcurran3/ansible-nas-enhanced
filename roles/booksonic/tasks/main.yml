@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ booksonic_container_name }}"
         hostname: "{{ booksonic_container_name }}"
         image: "{{ booksonic_image_name }}:{{ booksonic_image_tag }}"

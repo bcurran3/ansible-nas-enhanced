@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ pytivo_container_name }}"
         hostname: "{{ pytivo_container_name }}"
         image: "{{ pytivo_image_name }}:{{ pytivo_image_version }}"

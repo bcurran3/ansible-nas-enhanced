@@ -10,6 +10,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ minecraft_server_container_name }}"
         hostname: "{{ minecraft_server_container_name }}"
         image: "{{ minecraft_server_image_name }}:{{ minecraft_server_image_version }}"

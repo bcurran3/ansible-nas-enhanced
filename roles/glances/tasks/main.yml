@@ -3,6 +3,7 @@
   block:
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ glances_container_name }}"
         hostname: "{{ glances_container_name }}"
         image: "{{ glances_image_name }}:{{ glances_image_version }}"

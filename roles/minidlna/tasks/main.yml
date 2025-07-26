@@ -3,6 +3,7 @@
   block:
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ minidlna_container_name }}"
         hostname: "{{ minidlna_container_name }}"
         image: "{{ minidlna_image_name }}:{{ minidlna_image_version }}"

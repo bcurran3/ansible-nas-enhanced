@@ -13,6 +13,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ tautulli_container_name }}"
         hostname: "{{ tautulli_container_name }}"
         image: "{{ tautulli_image_name }}:{{ tautulli_image_version }}"

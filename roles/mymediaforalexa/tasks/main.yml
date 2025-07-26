@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ mymediaforalexa_container_name }}"
         image: "{{ mymediaforalexa_image_name }}:{{ mymediaforalexa_image_version }}"
         pull: true

@@ -19,6 +19,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ cloudflare_container_name }}"
         hostname: "{{ cloudflare_container_name }}"
         image: "{{ cloudflare_image_name }}:{{ cloudflare_image_version }}"

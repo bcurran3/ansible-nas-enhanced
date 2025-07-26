@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ sickchill_container_name }}"
         hostname: "{{ sickchill_container_name }}"
         image: "{{ sickchill_image_name }}:{{ sickchill_image_version }}"

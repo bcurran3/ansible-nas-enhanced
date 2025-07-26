@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ komga_container_name }}"
         hostname: "{{ komga_container_name }}"
         image: "{{ komga_image_name }}:{{ komga_image_version }}"

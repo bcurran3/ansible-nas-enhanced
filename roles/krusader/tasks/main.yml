@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ krusader_container_name }}"
         hostname: "{{ krusader_container_name }}"
         image: "{{ krusader_image_name }}:{{ krusader_image_version }}"

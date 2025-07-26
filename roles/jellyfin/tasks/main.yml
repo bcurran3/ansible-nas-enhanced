@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ jellyfin_container_name }}"
         hostname: "{{ jellyfin_container_name }}"
         image: "{{ jellyfin_image_name }}:{{ jellyfin_image_version }}"

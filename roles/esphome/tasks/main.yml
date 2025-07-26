@@ -10,6 +10,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ esphome_container_name }}"
         hostname: "{{ esphome_container_name }}"
         image: "{{ esphome_image_name }}:{{ esphome_image_tag }}"

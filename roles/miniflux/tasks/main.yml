@@ -14,6 +14,7 @@
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ miniflux_db_container_name }}"
         hostname: "{{ miniflux_db_container_name }}"
         image: "{{ miniflux_db_image_name }}:{{ miniflux_db_image_version }}"
@@ -35,6 +36,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ miniflux_container_name }}"
         hostname: "{{ miniflux_container_name }}"
         image: "{{ miniflux_image_name }}:{{ miniflux_image_version }}"

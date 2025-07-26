@@ -31,6 +31,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ openhab_container_name }}"
         hostnamename: "{{ openhab_container_name }}"
         image: "{{ openhab_image_name }}:{{ openhab_image_version }}"

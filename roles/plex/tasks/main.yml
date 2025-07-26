@@ -12,16 +12,17 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ plex_container_name }}"
         hostname: "{{ plex_container_name }}"
         image: "{{ plex_image_name }}:{{ plex_image_version }}"
         pull: true
-#       healthcheck:
-#         test: curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity
-#         interval: 1m00s
-#         timeout: 15s
-#         retries: 3
-#         start_period: 1m00s
+        healthcheck:
+          test: curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity
+          interval: 1m00s
+          timeout: 15s
+          retries: 3
+          start_period: 1m00s
         ports:
           - "{{ plex_port }}:32400"
           - "32400:32400/udp"

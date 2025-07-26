@@ -3,6 +3,7 @@
   block:
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ watchtower_container_name }}"
         hostname: "{{ watchtower_container_name }}"
         image: "{{ watchtower_image_name }}:{{ watchtower_image_version }}"

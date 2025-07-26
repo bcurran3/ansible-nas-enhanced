@@ -24,6 +24,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ promtail_container_name }}"
         hostname: "{{ promtail_container_name }}"
         image: "{{ promtail_image_name }}:{{ promtail_image_version }}"

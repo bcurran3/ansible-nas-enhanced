@@ -14,6 +14,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ transmission_container_name }}"
         hostname: "{{ transmission_container_name }}"
         image: "{{ transmission_image_name }}:{{ transmission_image_version }}"

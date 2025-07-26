@@ -20,6 +20,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ woodpecker_ci_container_name }}"
         hostname: "{{ woodpecker_ci_container_name }}"
         image: "{{ woodpecker_ci_image_name }}:{{ woodpecker_ci_image_version }}"
@@ -54,6 +55,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Agent Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ woodpecker_ci_agent_container_name }}"
         image: "{{ woodpecker_ci_agent_image_name }}:{{ woodpecker_ci_agent_image_version }}"
         pull: true

@@ -14,6 +14,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ mumble_container_name }}"
         hostname: "{{ mumble_container_name }}"
         image: "{{ mumble_image_name }}:{{ mumble_image_tag }}"

@@ -25,6 +25,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ portainer_container_name }}"
         hostname: "{{ portainer_container_name }}"
         image: "{{ portainer_image_name }}:{{ portainer_image_version }}"

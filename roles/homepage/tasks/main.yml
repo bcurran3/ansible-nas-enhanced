@@ -23,6 +23,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ homepage_container_name }}"
         hostname: "{{ homepage_container_name }}"
         image: "{{ homepage_image_name }}:{{ homepage_image_tag }}"

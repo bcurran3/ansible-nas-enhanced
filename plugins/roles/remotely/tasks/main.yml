@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ remotely_container_name }}"
         hostname: "{{ remotely_container_name }}"
         image: "{{ remotely_image_name }}:{{ remotely_image_tag }}"
@@ -20,7 +21,6 @@
           - "{{ remotely_port_http }}:5000"
         volumes:
           - "{{ remotely_data_directory }}/data:/app/AppData"
-        container_default_behavior: no_defaults
         env:
           ASPNETCORE_ENVIRONMENT: "Production"
           ASPNETCORE_HTTP_PORTS: "5000"

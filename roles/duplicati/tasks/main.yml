@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ duplicati_container_name }}"
         hostname: "{{ duplicati_container_name }}"
         image: "{{ duplicati_image_name }}:{{ duplicati_image_tag }}"
@@ -25,9 +26,9 @@
           - "{{ docker_home }}:/source/docker:{{ duplicati_data_permissions }}"
           - "{{ duplicati_data_directory }}/custom-cont-init.d:/custom-cont-init.d:ro" # added
           - "/etc/timezone:/etc/timezone:ro"
-        capabilities: # added
-          - NET_ADMIN # added
-          - DAC_READ_SEARCH # added
+        capabilities:
+          - NET_ADMIN
+          - DAC_READ_SEARCH
         env:
           DOCKER_MODS: "linuxserver/mods:universal-package-install" # added
           INSTALL_PACKAGES: "smbclient|cifs-utils" # added

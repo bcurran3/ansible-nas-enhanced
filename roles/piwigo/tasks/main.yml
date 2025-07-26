@@ -17,6 +17,7 @@
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ piwigo_db_container_name }}"
         hostname: "{{ piwigo_db_container_name }}"
         image: "{{ piwigo_db_image_name }}:{{ piwigo_db_image_version }}"
@@ -40,6 +41,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ piwigo_container_name }}"
         hostname: "{{ piwigo_container_name }}"
         image: "{{ piwigo_image_name }}:{{ piwigo_image_version }}"

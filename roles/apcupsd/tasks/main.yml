@@ -22,6 +22,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ apcupsd_container_name }}"
         hostname: "{{ apcupsd_container_name }}"
         image: "{{ apcupsd_image_name }}:{{ apcupsd_image_tag }}"

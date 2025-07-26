@@ -10,11 +10,11 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ minio_container_name }}"
         hostname: "{{ minio_container_name }}"
         image: "{{ minio_image_name }}:{{ minio_image_version }}"
         pull: true
-        cpu_shares: "{{ minio_cpu_shares }}"
         ports:
           - "{{ minio_api_port }}:9000"
           - "{{ minio_console_port }}:{{ minio_console_port }}"
@@ -25,8 +25,6 @@
           MINIO_ROOT_USER: "{{ minio_admin_username }}"
           MINIO_ROOT_PASSWORD: "{{ minio_admin_password }}"
           MINIO_PROMETHEUS_AUTH_TYPE: public
-        restart_policy: unless-stopped
-        memory: "{{ minio_memory }}"
         labels:
           autoheal: "{{ minio_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ minio_watchtower_monitor_only }}"
@@ -36,6 +34,9 @@
           traefik.http.routers.minio.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.minio.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.minio.loadbalancer.server.port: "9000"
+        cpu_shares: "{{ minio_cpu_shares }}"
+        memory: "{{ minio_memory }}"
+        restart_policy: unless-stopped
   when: minio_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

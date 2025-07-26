@@ -16,11 +16,11 @@
 
     - name: Create {{ ansible_nas_app_name }} Machine Learning Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ immich_machinelearning_container_name }}"
         image: "{{ immich_machinelearning_image }}:{{ immich_machinelearning_tag }}"
         pull: true
         cpu_shares: "{{ immich_machinelearning_cpu_shares }}"
-        container_default_behavior: no_defaults
 #       extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
 #       file: hwaccel.ml.yml
 #       service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
@@ -55,6 +55,7 @@
 
     - name: Create {{ ansible_nas_app_name }} PostgreSQL Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ immich_postgres_container_name }}"
         image: "{{ immich_postgres_image }}:{{ immich_postgres_tag }}"
         pull: true
@@ -66,7 +67,6 @@
           - name: "{{ immich_network_name }}"
         network_mode: "bridge"
         networks_cli_compatible: "yes"
-        container_default_behavior: no_defaults
         env:
           POSTGRES_PASSWORD: "{{ immich_db_password }}"
           POSTGRES_USER: "{{ immich_db_username }}"
@@ -100,11 +100,11 @@
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ immich_redis_container_name }}"
         image: "{{ immich_redis_image }}:{{ immich_redis_tag }}"
         pull: true
         cpu_shares: "{{ immich_redis_cpu_shares }}"
-        container_default_behavior: no_defaults
         networks:
           - name: "{{ immich_network_name }}"
         network_mode: "bridge"
@@ -132,12 +132,12 @@
 
     - name: Create {{ ansible_nas_app_name }} Server Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ immich_server_container_name }}"
         hostname: "{{ immich_server_container_name }}"
         image: "{{ immich_server_image }}:{{ immich_server_tag }}"
         pull: true
         cpu_shares: "{{ immich_server_cpu_shares }}"
-        container_default_behavior: no_defaults
         volumes:
           - "{{ immich_upload_directory }}:/usr/src/app/upload"
         networks:

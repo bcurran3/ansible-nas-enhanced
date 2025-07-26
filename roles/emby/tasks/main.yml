@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ emby_container_name }}"
         hostname: "{{ emby_container_name }}"
         image: "{{ emby_image }}:{{ emby_image_tag }}"

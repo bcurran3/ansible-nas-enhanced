@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ sonarr_container_name }}"
         hostname: "{{ sonarr_container_name }}"
         image: "{{ sonarr_image_name }}:{{ sonarr_image_version }}"

@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ netbootxyz_container_name }}"
         hostname: "{{ netbootxyz_container_name }}"
         image: "{{ netbootxyz_image_name }}:{{ netbootxyz_image_version }}"

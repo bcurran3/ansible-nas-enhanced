@@ -8,6 +8,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ tiddlywiki_container_name }}"
         hostname: "{{ tiddlywiki_container_name }}"
         image: "{{ tiddlywiki_image_name }}:{{ tiddlywiki_image_version }}"

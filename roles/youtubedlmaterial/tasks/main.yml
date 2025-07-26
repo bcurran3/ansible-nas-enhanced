@@ -48,6 +48,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ youtubedlmaterial_container_name }}"
         hostname: "{{ youtubedlmaterial_container_name }}"
         image: "{{ youtubedlmaterial_image_name }}:{{ youtubedlmaterial_image_version }}"

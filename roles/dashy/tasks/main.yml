@@ -16,6 +16,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ dashy_container_name }}"
         hostname: "{{ dashy_container_name }}"
         image: "{{ dashy_image_name }}:{{ dashy_image_tag }}"

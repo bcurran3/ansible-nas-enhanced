@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ deluge_container_name }}"
         hostname: "{{ deluge_container_name }}"
         image: "{{ deluge_image_name }}:{{ deluge_image_tag }}"

@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ ombi_container_name }}"
         hostname: "{{ ombi_container_name }}"
         image: "{{ ombi_image_name }}:{{ ombi_image_version }}"

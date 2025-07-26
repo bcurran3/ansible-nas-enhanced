@@ -12,6 +12,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ pyload_container_name }}"
         hostname: "{{ pyload_container_name }}"
         image: "{{ pyload_image_name }}:{{ pyload_image_version }}"

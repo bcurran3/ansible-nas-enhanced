@@ -14,6 +14,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ wallabag_container_name }}"
         hostname: "{{ wallabag_container_name }}"
         image: "{{ wallabag_image_name }}:{{ wallabag_image_version }}"

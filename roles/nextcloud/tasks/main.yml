@@ -53,6 +53,7 @@
 
     - name: Create {{ ansible_nas_app_name }} MySQL Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ nextcloud_db_container_name }}"
         hostname: "{{ nextcloud_db_container_name }}"
         image: "{{ nextcloud_db_image_name }}:{{ nextcloud_db_image_version }}"
@@ -89,6 +90,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ nextcloud_container_name }}"
         hostname: "{{ nextcloud_container_name }}"
         image: "{{ nextcloud_image_name }}:{{ nextcloud_image_version }}"

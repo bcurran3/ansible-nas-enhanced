@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ mylar_container_name }}"
         hostname: "{{ mylar_container_name }}"
         image: "{{ mylar_image_name }}:{{ mylar_image_version }}"

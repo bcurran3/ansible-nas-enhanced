@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ cloudcmd_container_name }}"
         hostname: "{{ cloudcmd_container_name }}"
         image: "{{ cloudcmd_image_name }}:{{ cloudcmd_image_tag }}"

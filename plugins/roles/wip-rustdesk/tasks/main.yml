@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Relay Server Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ rustdesk_hbbr_container_name }}"
         hostname: "{{ rustdesk_hbbr_container_name }}"
         image: "{{ rustdesk_hbbr_image_name }}:{{ rustdesk_hbbr_image_tag }}"
@@ -22,7 +23,6 @@
           - "21119:21119" # web client support
         volumes:
           - "{{ rustdesk_data_directory }}/data:/root"
-        container_default_behavior: no_defaults
         command: "hbbr"
         env:
           TZ: "{{ ansible_nas_timezone }}"
@@ -46,6 +46,7 @@
 
     - name: Create {{ ansible_nas_app_name }} ID Server Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ rustdesk_hbbs_container_name }}"
         hostname: "{{ rustdesk_hbbs_container_name }}"
         image: "{{ rustdesk_hbbs_image_name }}:{{ rustdesk_hbbs_image_tag }}"
@@ -60,7 +61,6 @@
           - "21118:21118"         # web client support
         volumes:
           - "{{ rustdesk_data_directory }}/data:/root"
-        container_default_behavior: no_defaults
         command: "hbbs"
         env:
           TZ: "{{ ansible_nas_timezone }}"
@@ -86,6 +86,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Web Client Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ rustdesk_web_container_name }}"
         hostname: "{{ rustdesk_web_container_name }}"
         image: "{{ rustdesk_web_image_name }}:{{ rustdesk_web_image_tag }}"
@@ -94,7 +95,6 @@
         network_mode: bridge
         ports:
           - "{{ rustdesk_web_port_http }}:5000"
-        container_default_behavior: no_defaults
         env:
           TZ: "{{ ansible_nas_timezone }}"
         links:

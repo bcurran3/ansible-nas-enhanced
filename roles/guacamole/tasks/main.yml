@@ -29,6 +29,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ guacamole_container_name }}"
         hostname: "{{ guacamole_container_name }}"
         image: "{{ guacamole_image_name }}:{{ guacamole_image_version }}"

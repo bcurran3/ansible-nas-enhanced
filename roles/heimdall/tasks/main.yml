@@ -11,6 +11,7 @@
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
+        container_default_behavior: "compatibility"
         name: "{{ heimdall_container_name }}"
         hostname: "{{ heimdall_container_name }}"
         image: "{{ heimdall_docker_image }}:{{ heimdall_docker_image_tag }}"
