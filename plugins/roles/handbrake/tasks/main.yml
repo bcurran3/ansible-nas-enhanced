@@ -26,6 +26,11 @@
           - "{{ handbrake_output_directory }}:/output:rw"
         ports:
           - "{{ handbrake_port_http }}:5800"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
         env:
           AUTOMATED_CONVERSION_PRESET: "{{ handbrake_automated_conversion_preset }}"
           AUTOMATED_CONVERSION_FORMAT: "{{ handbrake_automated_conversion_format }}"
