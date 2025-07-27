@@ -1,0 +1,34 @@
+---
+ansible_nas_app_name: "Node-RED"
+
+node_red_enabled: false
+node_red_available_externally: false
+node_red_traefik_whitelist: "{{ lan }}"
+
+# directories
+node_red_data_directory: "{{ docker_home }}/node-red"
+
+# docker
+node_red_container_name: "nodered"
+node_red_image_name: "nodered/node-red"
+node_red_image_tag: "latest"
+
+# network
+node_red_port: "1880"
+node_red_hostname: "nodered"
+
+# specs
+node_red_cpu_shares: "1024"
+node_red_memory: 1g
+
+# autoheal
+node_red_autoheal: "false"
+
+# homepage
+node_red_homepage_group: "Apps"
+node_red_homepage_icon: "node-red.png"
+node_red_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ node_red_port }}"
+node_red_homepage_showStats: "false"
+
+# watchtower
+node_red_watchtower_monitor_only: "true"
