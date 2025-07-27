@@ -1,0 +1,128 @@
+---
+# WORK IN PROGRESS
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ filebot_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ filebot_container_name }}"
+        hostname: "{{ filebot_container_name }}"
+        image: "{{ filebot_image_name }}:{{ filebot_image_tag }}"
+        pull: true
+        cpu_shares: "{{ filebot_cpu_shares }}"
+        volumes:
+          - "{{ filebot_data_directory }}:/data:rw"
+          - "{{ filebot_download_directory }}:/downloads:rw"
+    #      - "{{ filebot_movies_directory }}:/movies:rw"
+    #      - "{{ filebot_music_directory }}:/music:rw"
+    #      - "{{ filebot_tv_directory }}:/tv:rw"
+        command: sysinfo
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+          PUID: "{{ filebot_user_id }}"
+          PGID: "{{ filebot_group_id }}"
+        labels:
+          autoheal: "{{ filebot_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+        memory: "{{ filebot_memory }}" # Probably can be tweaked
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Node Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ filebot_node_container_name }}"
+        hostname: "{{ filebot_node_container_name }}"
+        image: "{{ filebot_node_image_name }}:{{ filebot_node_image_tag }}"
+        pull: true
+        cpu_shares: "{{ filebot_cpu_shares }}"
+        ports:
+          - "5452:5452"
+        volumes_from: filebot
+        labels:
+          autoheal: "{{ filebot_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+          homepage.name: "FileBot"
+          homepage.group: "{{ filebot_homepage_group }}"
+          homepage.icon: "{{ filebot_homepage_icon }}"
+          homepage.href: "{{ filebot_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ 5452 }}"
+#         homepage.description: ""
+          homepage.server: "my-docker"
+          homepage.container: "{{ filebot_container_name }}"
+          homepage.showStats: "{{ filebot_homepage_showStats }}"
+          traefik.enable: "{{ filebot_available_externally | string }}"
+          traefik.http.routers.filebot.rule: "Host(`filebot.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.filebot.tls.certresolver: "letsencrypt"
+          traefik.http.routers.filebot.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.filebot.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.middlewares.filebot.IPAllowList.sourcerange: "{{ filebot_traefik_whitelist }}"
+          traefik.http.services.filebot.loadbalancer.server.port: "5452"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+        memory: "{{ filebot_node_memory }}" # Probably can be tweaked
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Watcher Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ filebot_watcher_container_name }}"
+        hostname: "{{ filebot_watcher_container_name }}"
+        image: "{{ filebot_watcher_image_name }}:{{ filebot_watcher_image_tag }}"
+        pull: true
+        cpu_shares: "{{ filebot_cpu_shares }}"
+        volumes_from: filebot
+        labels:
+          autoheal: "{{ filebot_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+        memory: "{{ filebot_watcher_memor }}" # Probably can be tweaked
+        restart_policy: unless-stopped
+  when: filebot_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Watcher
+      community.docker.docker_container:
+        name: "filebot-watcher"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }}
+      community.docker.docker_container:
+        name: "{{ filebot_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Node
+      community.docker.docker_container:
+        name: "filebot-node"
+        state: absent
+  when: filebot_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ filebot_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ filebot_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: filebot_enabled is false and archive_app_data_enabled is true

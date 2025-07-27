@@ -1,0 +1,156 @@
+---
+- name: Start RomM 
+  block:
+    - name: Create RomM Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ romm_data_directory }}"
+        - "{{ romm_data_directory }}/assets"
+        - "{{ romm_data_directory }}/config"
+        - "{{ romm_data_directory }}/db"
+        - "{{ romm_data_directory }}/resources"
+        - "{{ romm_data_directory }}/redis"
+
+    - name: Create RomM MariaDB Docker Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ romm_db_container_name }}"
+        hostname: "{{ romm_db_container_name }}"
+        image: mariadb:latest
+        pull: true
+        network_mode: "bridge"
+        networks_cli_compatible: "yes"
+        volumes:
+          - "{{ romm_data_directory }}/db:/var/lib/mysql"
+        env:
+          MARIADB_ROOT_PASSWORD: "Ansible-NAS"
+          MARIADB_DATABASE: "romm"
+          MARIADB_USER: "romm-user"
+          MARIADB_PASSWORD: "{{ romm_db_password }}"
+          MYSQL_ROOT_PASSWORD: "Ansible-NAS" # Use a unique, secure password
+          MYSQL_DATABASE: "romm"
+          MYSQL_USER: "romm-user"
+          MYSQL_PASSWORD: "{{ romm_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ romm_db_memory_limit }}"
+        healthcheck:
+          test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+          start_period: "30s"
+#          start_interval: "10s"
+          interval: "10s"
+          timeout: "5s"
+          retries: "5"
+        labels:
+          autoheal: "{{ romm_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ romm_db_watchtower_monitor_only }}"
+          homepage.name: "RomM MariaDB"
+          homepage.group: "{{ romm_db_homepage_group }}"
+          homepage.icon: "{{ romm_db_homepage_icon }}"
+          homepage.href: "{{ romm_db_homepage_href }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ romm_db_container_name }}"
+          homepage.showStats: "{{ romm_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.link.template: "https://mariadb.com/kb/en/mariadb-$${major}$${minor}$${patch}-changelog"
+
+    - name: Create RomM Docker Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ romm_container_name }}"
+        hostname: "{{ romm_container_name }}"
+        image: rommapp/romm:latest
+        pull: true
+        network_mode: "bridge"
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ romm_port_http }}:8080"
+        volumes:
+          - "{{ romm_data_directory }}/config:/config"
+          - "{{ romm_data_directory }}/resources:/romm/resources" # Resources fetched from IGDB (covers, screenshots, etc.)
+          - "{{ romm_data_directory }}/redis:/redis-data" # Cached data for background tasks
+          - "{{ roms_root }}:/romm/library" # Your game library
+          - "{{ romm_data_directory }}/assets:/romm/assets" # Uploaded saves, states, etc.
+          - "{{ romm_data_directory }}/config:/romm/config" # Path where config.yml is stored
+        env:
+          DB_HOST: "{{ romm_db_container_name }}"
+          DB_NAME: "romm" # Should match MYSQL_DATABASE in mariadb
+          DB_USER: "romm-user" # Should match MYSQL_USER in mariadb
+          DB_PASSWD: "{{ romm_db_password }}" # Should match MYSQL_PASSWORD in mariadb
+          IGDB_CLIENT_ID: "{{ romm_igdb_client_id }}" # Generate an ID and SECRET in IGDB
+          IGDB_CLIENT_SECRET: "{{ romm_igdb_client_secret }}" # https://api-docs.igdb.com/#account-creation
+          MOBYGAMES_API_KEY: "{{ romm_mobygames_api_key }}" # https://www.mobygames.com/info/api/
+          ROMM_AUTH_SECRET_KEY: "{{ romm_auth_secret_key }}" # Generate a key with `openssl rand -hex 32`
+          ROMM_AUTH_USERNAME: "{{ romm_auth_username }}"
+          ROMM_AUTH_PASSWORD: "{{ romm_auth_password }}"
+          STEAMGRIDDB_API_KEY: "{{ romm_steamgriddb_api_key }}" # https://github.com/rommapp/romm/wiki/Generate-API-Keys#steamgriddb
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        memory: "{{ romm_memory_limit }}"
+        links:
+          - "{{ romm_db_container_name }}"
+        labels:
+          autoheal: "{{ romm_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ romm_watchtower_monitor_only }}"
+          homepage.name: "RomM"
+          homepage.group: "{{ romm_homepage_group }}"
+          homepage.icon: "{{ romm_homepage_icon }}"
+          homepage.href: "{{ romm_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port_http }}"
+#         homepage.description: "A beautiful, powerful, self-hosted rom manager"
+          homepage.server: "my-docker"
+          homepage.container: "{{ romm_container_name }}"
+          homepage.showStats: "{{ romm_homepage_showStats }}"
+          homepage.widget.type: "romm"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port_http }}"
+          homepage.widget.username: "{{ romm_homepage_widget_username }}"
+          homepage.widget.password: "{{ romm_homepage_widget_password }}"
+#         homepage.widget.fields: "{{ romm_homepage_widget_fields }}"
+          traefik.enable: "{{ romm_available_externally | string }}"
+          traefik.http.routers.romm.rule: "Host(`{{ romm_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.romm.tls.certresolver: "letsencrypt"
+          traefik.http.routers.romm.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.romm.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ romm_hostname }}"
+          traefik.http.routers.romm.middlewares: "{{ romm_hostname }}@docker"
+          traefik.http.middlewares.romm.IPAllowList.sourcerange: "{{ romm_traefik_whitelist }}"
+          traefik.http.services.romm.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+  when: romm_enabled is true
+
+- name: Stop RomM
+  block:
+    - name: Stop RomM Docker Container
+      community.docker.docker_container:
+        name: "{{ romm_container_name }}"
+        state: absent
+
+    - name: Stop RomM MariaDB Docker Container
+      community.docker.docker_container:
+        name: "{{ romm_db_container_name }}"
+        state: absent
+  when: romm_enabled is false
+
+  - name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ romm_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ romm_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: romm_enabled is false and archive_app_data_enabled is true

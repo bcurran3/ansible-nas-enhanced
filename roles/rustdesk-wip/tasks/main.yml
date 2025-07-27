@@ -1,0 +1,166 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ rustdesk_data_directory }}"
+        - "{{ rustdesk_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Relay Server Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ rustdesk_hbbr_container_name }}"
+        hostname: "{{ rustdesk_hbbr_container_name }}"
+        image: "{{ rustdesk_hbbr_image_name }}:{{ rustdesk_hbbr_image_tag }}"
+        pull: true
+        cpu_shares: "{{ rustdesk_hbbr_cpu_shares }}"
+        network_mode: bridge
+        ports:
+          - "21117:21117" # Relay services
+          - "21119:21119" # web client support
+        volumes:
+          - "{{ rustdesk_data_directory }}/data:/root"
+        command: "hbbr"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ rustdesk_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} Relay Server"
+          homepage.group: "{{ rustdesk_hbbr_homepage_group }}"
+          homepage.icon: "{{ rustdesk_hbbr_homepage_icon }}"
+          homepage.href: "{{ rustdesk_hbbr_homepage_href }}"
+#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+#         homepage.description: "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer."
+          homepage.server: "my-docker"
+          homepage.container: "{{ rustdesk_hbbr_container_name }}"
+          homepage.showStats: "{{ rustdesk_hbbr_homepage_showStats }}"
+          trafik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ rustdesk_hbbr_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} ID Server Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ rustdesk_hbbs_container_name }}"
+        hostname: "{{ rustdesk_hbbs_container_name }}"
+        image: "{{ rustdesk_hbbs_image_name }}:{{ rustdesk_hbbs_image_tag }}"
+        pull: true
+        cpu_shares: "{{ rustdesk_hbbs_cpu_shares }}"
+        network_mode: bridge
+        ports:
+          - "21114:21114"         # web console - Pro only
+          - "21115:21115"         # NAT type test
+          - "21116:21116"         # ID registration and heartbeat service
+          - "21116/udp:21116/udp" # TCP hole punching and connection service
+          - "21118:21118"         # web client support
+        volumes:
+          - "{{ rustdesk_data_directory }}/data:/root"
+        command: "hbbs"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ rustdesk_hbbr_container_name }}"
+        labels:
+          autoheal: "{{ rustdesk_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} ID Server"
+          homepage.group: "{{ rustdesk_hbbs_homepage_group }}"
+          homepage.icon: "{{ rustdesk_hbbs_homepage_icon }}"
+          homepage.href: "{{ rustdesk_hbbs_homepage_href }}"
+#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+#         homepage.description: "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer."
+          homepage.server: "my-docker"
+          homepage.container: "{{ rustdesk_hbbs_container_name }}"
+          homepage.showStats: "{{ rustdesk_hbbs_homepage_showStats }}"
+          trafik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ rustdesk_hbbs_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Web Client Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ rustdesk_web_container_name }}"
+        hostname: "{{ rustdesk_web_container_name }}"
+        image: "{{ rustdesk_web_image_name }}:{{ rustdesk_web_image_tag }}"
+        pull: true
+        cpu_shares: "{{ rustdesk_web_cpu_shares }}"
+        network_mode: bridge
+        ports:
+          - "{{ rustdesk_web_port_http }}:5000"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ rustdesk_hbbs_container_name }}"
+          - "{{ rustdesk_hbbr_container_name }}"
+        labels:
+          autoheal: "{{ rustdesk_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} Web Client"
+          homepage.group: "{{ rustdesk_web_homepage_group }}"
+          homepage.icon: "{{ rustdesk_web_homepage_icon }}"
+          homepage.href: "{{ rustdesk_web_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_web_port_http }}"
+#         homepage.description: "RustDesk Web Client"
+          homepage.server: "my-docker"
+          homepage.container: "{{ rustdesk_web_container_name }}"
+          homepage.showStats: "{{ rustdesk_web_homepage_showStats }}"
+          traefik.enable: "{{ rustdesk_available_externally | string }}"
+          traefik.http.routers.rustdesk.rule: "Host(`{{ rustdesk_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.rustdesk.tls.certresolver: "letsencrypt"
+          traefik.http.routers.rustdesk.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.rustdesk.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ rustdesk_hostname }}"
+          traefik.http.routers.rustdesk.middlewares: "{{ rustdesk_hostname }}@docker"
+          traefik.http.middlewares.rustdesk.IPAllowList.sourcerange: "{{ rustdesk_traefik_whitelist }}"
+          traefik.http.services.rustdesk.loadbalancer.server.port: "5000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://hub.docker.com/r/keyurbhole/flutter_web_desk/tags/$${major}.$${minor}.$${patch}"
+        memory: "{{ rustdesk_web_memory }}"
+        restart_policy: unless-stopped
+  when: rustdesk_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Web Client Container
+      community.docker.docker_container:
+        name: "{{ rustdesk_web_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} ID Server Container
+      community.docker.docker_container:
+        name: "{{ rustdesk_hbbr_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Relay Server Container
+      community.docker.docker_container:
+        name: "{{ rustdesk_hbbs_container_name }}"
+        state: absent
+  when: rustdesk_enabled is false
+  
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ rustdesk_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ rustdesk_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: rustdesk_enabled is false and archive_app_data_enabled is true

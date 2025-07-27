@@ -1,0 +1,49 @@
+---
+ansible_nas_app_name: "RustDesk"
+
+#
+rustdesk_enabled: false
+rustdesk_available_externally: false
+rustdesk_traefik_whitelist: "{{ lan }}"
+rustdesk_data_directory: "{{ docker_home }}/rustdesk"
+
+# network
+rustdesk_hostname: "rustdesk"
+rustdesk_web_port_http: "3027"
+
+# docker
+rustdesk_hbbs_container_name: "rustdesk-hbbs"
+rustdesk_hbbs_image_name: "rustdesk/rustdesk-server"
+rustdesk_hbbs_image_tag: "latest"
+rustdesk_hbbs_cpu_shares: "1024"
+rustdesk_hbbs_memory_limit: "1g"
+rustdesk_hbbr_container_name: "rustdesk-hbbr"
+rustdesk_hbbr_image_name: "rustdesk/rustdesk-server"
+rustdesk_hbbr_image_tag: "latest"
+rustdesk_hbbr_cpu_shares: "1024"
+rustdesk_hbbr_memory_limit: "1g"
+rustdesk_web_container_name: "rustdesk-web"
+rustdesk_web_image_name: "keyurbhole/flutter_web_desk"
+rustdesk_web_image_tag: "v1.0.0"
+rustdesk_web_cpu_shares: "1024"
+rustdesk_web_memory_limit: "1g"
+
+# autoheal
+rustdesk_autoheal: "false" # only one while WIP
+
+# homepage
+rustdesk_hbbs_homepage_group: "Misc"
+rustdesk_hbbs_homepage_icon: "rustdesk.png"
+rustdesk_hbbs_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_web_port_http }}"
+rustdesk_hbbs_homepage_showStats: "false"
+rustdesk_hbbr_homepage_group: "Misc"
+rustdesk_hbbr_homepage_icon: "rustdesk.png"
+rustdesk_hbbr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_web_port_http }}"
+rustdesk_hbbr_homepage_showStats: "false"
+rustdesk_web_homepage_group: "Apps"
+rustdesk_web_homepage_icon: "rustdesk.png"
+rustdesk_web_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_web_port_http }}"
+rustdesk_web_homepage_showStats: "false"
+
+# watchtower
+rustdesk_watchtower_monitor_only: "true"

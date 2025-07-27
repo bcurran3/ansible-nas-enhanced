@@ -1,0 +1,42 @@
+---
+ansible_nas_app_name: "Calibre-Web"
+
+calibreweb_enabled: false
+calibreweb_available_externally: false
+calibreweb_traefik_whitelist: "{{ lan }}"
+
+# uid / gid
+calibreweb_user_id: "0"
+calibreweb_group_id: "0"
+
+# directories
+calibreweb_data_directory: "{{ docker_home }}/calibreweb"
+calibreweb_books_root: "{{ books_root }}"
+
+# other
+calibreweb_ebook_conversion: "linuxserver/calibre-web:calibre"
+
+# network
+calibreweb_port: "8084"
+calibreweb_hostname: "calibreweb"
+
+# specs
+calibreweb_memory: 1g
+
+# docker
+calibreweb_container_name: calibre-web
+calibreweb_cpu_shares: 1024
+calibreweb_image_name: "linuxserver/calibre-web"
+calibreweb_image_tag: "latest"
+
+# autoheal
+calibreweb_autoheal: "false"
+
+# homepage
+calibreweb_homepage_group: "Apps"
+calibreweb_homepage_icon: "calibreweb.png"
+calibreweb_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibreweb_port }}"
+calibreweb_homepage_showStats: "false"
+
+# watchtower
+calibreweb_watchtower_monitor_only: "true"

@@ -1,0 +1,169 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ grampsweb_data_directory }}"
+        - "{{ grampsweb_data_directory }}/cache"
+        - "{{ grampsweb_data_directory }}/db"
+        - "{{ grampsweb_data_directory }}/index"
+        - "{{ grampsweb_data_directory }}/media"
+        - "{{ grampsweb_data_directory }}/secret"
+        - "{{ grampsweb_data_directory }}/thumb_cache"
+        - "{{ grampsweb_data_directory }}/tmp"
+        - "{{ grampsweb_data_directory }}/users"
+
+# I don't understand how to create the container below w/no image to pull
+
+#    - name: {{ ansible_nas_app_name }} celery Container
+#      community.docker.docker_container:
+#        container_default_behavior: "compatibility"
+#        name: "{{ grampsweb_celery_container_name }}"
+#        hostname: "{{ grampsweb_celery_container_name }}"
+#        image: "{{ grampsweb_celery_image_name }}:{{ grampsweb_celery_image_tag }}"
+#        image: ??????????????????????????????
+#        pull: true
+#        cpu_shares: "{{ gramsweb_celery_cpu_shares }}"
+#        networks_cli_compatible: "yes"
+#        env:
+#          TZ: "{{ ansible_nas_timezone }}"
+#        command: "celery -A gramps_webapi.celery worker --loglevel=INFO --concurrency=2"
+#        labels:
+#          autoheal: "{{ grampsweb_celery_autoheal }}"
+#          com.centurylinklabs.watchtower.enable: "false"
+#          com.centurylinklabs.watchtower.monitor-only: "true"
+#          homepage.name: "Gramps Web Celery"
+#          homepage.group: "{{ grampsweb_celery_homepage_group }}"
+#          homepage.icon: "{{ grampsweb_celery_homepage_icon }}"
+#          homepage.href: "{{ grampsweb_celery_homepage_href }}"
+#          homepage.description: "{{ 'celery' if homepage_show_description else omit }}"
+#          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
+#          homepage.server: "my-docker"
+#          homepage.container: "{{ grampsweb_celery_container_name }}"
+#          homepage.showStats: "{{ grampsweb_celery_homepage_showStats }}"
+#          traefik.enable: "false"
+#        memory: "{{ grampsweb_celery_memory }}"
+#        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ grampsweb_redis_container_name }}"
+        hostname: "{{ grampsweb_redis_container_name }}"
+        image: "{{ grampsweb_redis_image_name }}:{{ grampsweb_redis_image_tag }}"
+        pull: true
+        cpu_shares: "{{ grampsweb_redis_cpu_shares }}"
+        networks_cli_compatible: "yes"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ grampsweb_redis_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "true"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ grampsweb_redis_homepage_group }}"
+          homepage.icon: "{{ grampsweb_redis_homepage_icon }}"
+          homepage.href: "{{ grampsweb_redis_homepage_href }}"
+          homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ grampsweb_redis_container_name }}"
+          homepage.showStats: "{{ grampsweb_redis_homepage_showStats }}"
+          traefik.enable: "false"
+        memory: "{{ grampsweb_redis_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ grampsweb_container_name }}"
+        hostname: "{{ grampsweb_container_name }}"
+        image: "{{ grampsweb_image_name }}:{{ grampsweb_image_tag }}"
+        pull: true
+        cpu_shares: "{{ grampsweb_cpu_shares }}"
+        volumes:
+          - "{{ grampsweb_data_directory }}/users:/app/users"  # persist user database
+          - "{{ grampsweb_data_directory }}/index:/app/indexdir"  # persist search index
+          - "{{ grampsweb_data_directory }}/thumb_cache:/app/thumbnail_cache"  # persist thumbnails
+          - "{{ grampsweb_data_directory }}/cache:/app/cache"  # persist export and report caches
+          - "{{ grampsweb_data_directory }}/secret:/app/secret"  # persist flask secret
+          - "{{ grampsweb_data_directory }}/db:/root/.gramps/grampsdb"  # persist Gramps database
+          - "{{ grampsweb_data_directory }}/media:/app/media"  # persist media files
+          - "{{ grampsweb_data_directory }}/tmp:/tmp"
+        ports:
+          - "{{ grampsweb_port_http }}:5000"
+        env:
+          GRAMPSWEB_TREE: "Gramps Web"  # will create a new tree if not exists
+          GRAMPSWEB_CELERY_CONFIG__broker_url: "redis://{{ grampsweb_redis_container_name }}:6379/0"
+          GRAMPSWEB_CELERY_CONFIG__result_backend: "redis://{{ grampsweb_redis_container_name }}:6379/0"
+          GRAMPSWEB_RATELIMIT_STORAGE_URI: redis://{{ grampsweb_redis_container_name }}:6379/1
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+#          - "{{ grampsweb_celery_container_name }}"
+          - "{{ grampsweb_redis_container_name }}"
+        labels:
+          autoheal: "{{ grampsweb_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ grampsweb_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ grampsweb_homepage_group }}"
+          homepage.icon: "{{ grampsweb_homepage_icon }}"
+          homepage.href: "{{ grampsweb_homepage_href }}"
+          homepage.description: "{{ 'Open Source Online Genealogy System' if homepage_show_description else omit }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ grampsweb_container_name }}"
+          homepage.showStats: "{{ grampsweb_homepage_showStats }}"
+          traefik.enable: "{{ grampsweb_available_externally | string }}"
+          traefik.http.routers.grampsweb.rule: "Host(`grampsweb.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.grampsweb.tls.certresolver: "letsencrypt"
+          traefik.http.routers.grampsweb.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.grampsweb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ grampsweb_hostname }}"
+          traefik.http.routers.grampsweb.middlewares: "{{ grampsweb_hostname }}@docker"
+          traefik.http.middlewares.grampsweb.IPAllowList.sourcerange: "{{ grampsweb_traefik_whitelist }}"
+          traefik.http.services.grampsweb.loadbalancer.server.port: "5000"
+          grampsweb.tag.include: '^\d+\.\d+\.\d+$$'
+          grampsweb.link.template: "https://github.com/Casvt/grampsweb/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ grampsweb_memory }}"
+        restart_policy: unless-stopped
+  when: grampsweb_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ grampsweb_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Celery Container
+      community.docker.docker_container:
+        name: "{{ grampsweb_celery_container_name }}"
+        state: absent
+    
+    - name: Stop {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        name: "{{ grampsweb_redis_container_name }}"
+        state: absent
+  when: grampsweb_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ grampsweb_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ grampsweb_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: grampsweb_enabled is false and archive_app_data_enabled is true

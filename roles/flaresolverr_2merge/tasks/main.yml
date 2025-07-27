@@ -1,0 +1,70 @@
+---
+- name: Start FlareSolverr
+  block:
+    - name: Create FlareSolverr Docker Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ flaresolverr_container_name }}"
+        hostname: "{{ flaresolverr_container_name }}"
+        image: ghcr.io/flaresolverr/flaresolverr:latest
+        pull: true
+        ports:
+          - "{{ flaresolverr_port_http }}:8191"
+        env:
+          LOG_LEVEL: "info"
+          LOG_HTML: "false"
+          TZ: "{{ ansible_nas_timezone }}"
+        restart_policy: unless-stopped
+        labels:
+          autoheal: "{{ flaresolverr_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ flaresolverr_watchtower_monitor_only }}"
+          homepage.name: "FlareSolverr"
+          homepage.group: "{{ flaresolverr_homepage_group }}"
+          homepage.href: "{{ flaresolverr_homepage_href }}"
+          homepage.icon: "{{ flaresolverr_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flaresolverr_port_http }}"
+#         homepage.description: "Proxy server to bypass Cloudflare protection"
+          homepage.server: "my-docker"
+          homepage.container: "{{ flaresolverr_container_name }}"
+          homepage.showStats: "{{ flaresolverr_homepage_showStats }}"
+          traefik.enable: "{{ flaresolverr_available_externally | string }}"
+          traefik.http.routers.flaresolverr.rule: "Host(`flaresolverr.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.flaresolverr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.flaresolverr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.flaresolverr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ flaresolverr_hostname }}"
+          traefik.http.routers.flaresolverr.middlewares: "{{ flaresolverr_hostname }}@docker"
+          traefik.http.middlewares.flaresolverr.IPAllowList.sourcerange: "{{ flaresolverr_traefik_whitelist }}"
+          traefik.http.services.flaresolverr.loadbalancer.server.port: "8191"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/FlareSolverr/FlareSolverr/releases/tag/$${major}.$${minor}.$${patch}"
+        memory: "{{ flaresolverr_memory }}"
+  when: flaresolverr_enabled is true
+
+- name: Stop FlareSolverr
+  block:
+    - name: Stop FlareSolverr
+      community.docker.docker_container:
+        name: "{{ flaresolverr_container_name }}"
+        state: absent
+  when: flaresolverr_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ flaresolverr_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ flaresolverr_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: flaresolverr_enabled is false and archive_app_data_enabled is true

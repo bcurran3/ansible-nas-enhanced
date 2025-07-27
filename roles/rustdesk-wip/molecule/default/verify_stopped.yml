@@ -1,0 +1,32 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} HBBS
+      community.docker.docker_container:
+        name: "{{ rustdesk_hbbs_container_name }}"
+        state: absent
+      register: result_hbbs
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} HBBR
+      community.docker.docker_container:
+        name: "{{ rustdesk_hbbr_container_name }}"
+        state: absent
+      register: result_hbbr
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Client
+      community.docker.docker_container:
+        name: "{{ rustdesk_client_container_name }}"
+        state: absent
+      register: result_client
+
+    - name: Check {{ ansible_nas_app_name }} is stopped
+      ansible.builtin.assert:
+        that:
+          - not result_hbbs.changed
+          - not result_hbbr.changed
+          - not result_client.changed

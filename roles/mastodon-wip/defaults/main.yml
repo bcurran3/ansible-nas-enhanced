@@ -1,0 +1,49 @@
+---
+ansible_nas_app_name: "Mastodon"
+
+# enable or disable the application
+mastodon_enabled: false
+mastodon_available_externally: false
+mastodon_traefik_whitelist: "{{ lan }}"
+
+# directories
+mastodon_data_directory: "{{ docker_home }}/mastodon"
+
+# network
+mastodon_port_http: "3013"
+mastodon_port_https: "3014"
+mastodon_hostname: "mastodon"
+mastodon_network_name: "mastodon"
+
+# docker
+mastodon_container_name: "mastodon"
+mastodon_image_name: "ghcr.io/mastodon/mastodon"
+mastodon_image_tag: "v4.3.0"
+mastodon_cpu_shares: "1024"
+mastodon_memory_limit: "1g"
+mastodon_db_container_name: "mastodon-db"
+mastodon_db_image_name: "postgres"
+mastodon_db_image_tag: "14-alpine"
+mastodon_db_cpu_shares: "1024"
+mastodon_db_memory_limit: "1g"
+mastodon_redris_container_name: "mastodon-redris"
+mastodon_redis_image_name: "redis"
+mastodon_redis_image_tag: "7-alpine"
+mastodon_redris_cpu_shares: "1024"
+mastodon_redris_memory_limit: "1g"
+
+# autoheal
+mastodon_autoheal: "false"
+mastodon_db_autoheal: "false"
+mastodon_redis_autoheal: "false"
+
+# homepage
+mastodon_homepage_group: "Apps"
+mastodon_homepage_icon: "mastodon.png"
+mastodon_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mastodon_port_http }}"
+mastodon_homepage_showStats: "false"
+
+# watchtower
+mastodon_watchtower_monitor_only: "true"
+mastodon_db_watchtower_monitor_only: "true"
+mastodon_redis_watchtower_monitor_only: "true"
