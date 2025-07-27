@@ -14,6 +14,7 @@
         container_default_behavior: "compatibility"
         name: "{{ calibre_container_name }}"
         hostname: "{{ calibre_container_name }}"
+        image: "{{ calibre_image_name }}:{{ calibre_image_tag }}"
         pull: true
         volumes:
           - "{{ calibre_data_directory }}/data:/config:rw"
@@ -36,7 +37,7 @@
           homepage.group: "{{ calibre_homepage_group }}"
           homepage.icon: "{{ calibre_homepage_icon }}"
           homepage.href: "{{ calibre_homepage_href }}"
-          homepage.description: "{{ 'calibre description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'a powerful and easy to use e-book manager' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ calibre_container_name }}"
           homepage.showStats: "{{ calibre_homepage_showStats }}"

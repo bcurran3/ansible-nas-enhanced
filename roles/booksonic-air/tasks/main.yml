@@ -49,7 +49,7 @@
           traefik.http.routers.booksonic.middlewares: "{{ booksonic_hostname }}@docker"
           traefik.http.middlewares.booksonic.IPAllowList.sourcerange: "{{ booksonic_traefik_whitelist }}"
           traefik.http.services.booksonic.loadbalancer.server.port: "4040"
-        cpu_shares: "{{ books_root_cpu_shares }}"
+        cpu_shares: "{{ booksonic_cpu_shares }}"
         memory: "{{ booksonic_memory }}"
         restart_policy: unless-stopped
   when: booksonic_enabled is true

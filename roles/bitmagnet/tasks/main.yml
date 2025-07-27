@@ -18,7 +18,6 @@
         hostname: "{{ bitmagnet_db_container_name }}"
         image: "{{ bitmagnet_db_image_name }}:{{ bitmagnet_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ bigmagnet_db_cpu_shares }}"
         volumes:
           - "{{ bitmagnet_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -46,6 +45,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/postgres/postgres/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ bitmagnet_db_cpu_shares }}"
         memory: "{{ bitmagnet_db_memory }}"
         restart_policy: unless-stopped
 
@@ -56,7 +56,6 @@
         hostname: "{{ bitmagnet_container_name }}"
         image: "{{ bitmagnet_image_name }}:{{ bitmagnet_image_tag }}"
         pull: true
-        cpu_shares: "{{ bitmagnet_cpu_shares }}"
         volumes:
           - "{{ bitmagnet_data_directory }}/config:/root/.config/bitmagnet"
         links:
@@ -94,6 +93,7 @@
           traefik.http.services.bitmagnet.loadbalancer.server.port: "3333"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/bitmagnet-io/bitmagnet/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ bitmagnet_cpu_shares }}"
         memory: "{{ bitmagnet_memory }}"
         restart_policy: unless-stopped
   when: bitmagnet_enabled is true
