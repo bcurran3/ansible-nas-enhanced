@@ -14,7 +14,6 @@
         image: "{{ netdata_image_name }}:{{ netdata_image_version }}"
         state: started
         pull: true
-        cpu_shares: "{{ netdata_cpu_shares }}"
         ports:
           - "{{ netdata_port }}:19999"
         volumes:
@@ -27,13 +26,11 @@
           - SYS_PTRACE
         security_opts:
           - apparmor:unconfined
-        restart_policy: unless-stopped
-        memory: "{{ netdata_memory }}"
         labels:
           autoheal: "{{ netdata_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ netdata_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ netdata_homepage_group }}"
-          homepage.name: "Netdata"
           homepage.icon: "{{ netdata_homepage_icon }}"
           homepage.href: "{{ netdata_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netdata_port }}"
@@ -54,6 +51,9 @@
           traefik.http.services.netdata.loadbalancer.server.port: "19999"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/netdata/netdata/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ netdata_cpu_shares }}"
+        memory: "{{ netdata_memory }}"
+        restart_policy: unless-stopped
   when: netdata_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

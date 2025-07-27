@@ -8,7 +8,6 @@
         hostname: "{{ doku_container_name }}"
         image: "{{ doku_image_name }}:{{ doku_image_version }}"
         pull: true
-        cpu_shares: "{{ doku_cpu_shares }}"
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
           - "{{ docker_home }}:/hostroot:ro"
@@ -17,8 +16,6 @@
         env:
           PORT: "{{ doku_port }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ doku_memory }}"
         labels:
           autoheal: "{{ doku_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ doku_watchtower_monitor_only }}"
@@ -42,6 +39,9 @@
           traefik.http.services.doku.loadbalancer.server.port: "{{ doku_port }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/amerkurev/doku/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ doku_cpu_shares }}"
+        memory: "{{ doku_memory }}"
+        restart_policy: unless-stopped
   when: doku_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

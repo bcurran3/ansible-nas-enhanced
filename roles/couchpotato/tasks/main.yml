@@ -17,7 +17,6 @@
         hostname: "{{ couchpotato_container_name }}"
         image: "{{ couchpotato_image_name }}:{{ couchpotato_image_tag }}"
         pull: true
-        cpu_shares: "{{ couchpotato_cpu_shares }}"
         volumes:
           - "{{ couchpotato_data_directory }}/config:/config:rw"
           - "{{ couchpotato_downloads_directory }}:/downloads:rw"
@@ -29,11 +28,18 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ couchpotato_user_id }}"
           PGID: "{{ couchpotato_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ couchpotato_memory }}"
         labels:
           autoheal: "{{ couchpotato_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ couchpotato_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ couchpotato_homepage_group }}"
+          homepage.icon: "{{ couchpotato_homepage_icon }}"
+          homepage.href: "{{ couchpotato_homepage_href }}"
+          homepage.description: "{{ 'couchpotato description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ couchpotato_container_name }}"
+          homepage.showStats: "{{ couchpotato_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ couchpotato_port }}"
           traefik.enable: "{{ couchpotato_available_externally | string }}"
           traefik.http.routers.couchpotato.rule: "Host(`couchpotato.{{ ansible_nas_domain }}`)"
           traefik.http.routers.couchpotato.tls.certresolver: "letsencrypt"
@@ -43,6 +49,9 @@
           traefik.http.routers.couchpotato.middlewares: "{{ couchpotato_hostname }}@docker"
           traefik.http.middlewares.couchpotato.IPAllowList.sourcerange: "{{ couchpotato_traefik_whitelist }}"
           traefik.http.services.couchpotato.loadbalancer.server.port: "5050"
+        cpu_shares: "{{ couchpotato_cpu_shares }}"
+        memory: "{{ couchpotato_memory }}"
+        restart_policy: unless-stopped
   when: couchpotato_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

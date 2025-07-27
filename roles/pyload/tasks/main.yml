@@ -26,12 +26,18 @@
           TZ: "{{ ansible_nas_timezone }}"
           UID: "{{ pyload_user_id }}"
           GID: "{{ pyload_group_id }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ pyload_cpu_shares }}"
-        memory: "{{ pyload_memory }}"
         labels:
           autoheal: "{{ pyload_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pyload_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ pyload_homepage_group }}"
+          homepage.icon: "{{ pyload_homepage_icon }}"
+          homepage.href: "{{ pyload_homepage_href }}"
+          homepage.description: "{{ 'Download client' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ pyload_container_name }}"
+          homepage.showStats: "{{ pyload_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pyload_port }}"
           traefik.enable: "{{ pyload_available_externally | string }}"
           traefik.http.routers.pyload.rule: "Host(`{{ pyload_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pyload.tls.certresolver: "letsencrypt"
@@ -41,11 +47,9 @@
           traefik.http.routers.pyload.middlewares: "{{ pyload_hostname }}@docker"
           traefik.http.middlewares.pyload.IPAllowList.sourcerange: "{{ pyload_traefik_whitelist }}"
           traefik.http.services.pyload.loadbalancer.server.port: "8000"
-          homepage.group: Download Tools
-          homepage.name: PyLoad
-          homepage.icon: pyload.png
-          homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pyload_port }}"
-          homepage.description: "{{ 'Download client' if homepage_show_description else omit }}"
+        cpu_shares: "{{ pyload_cpu_shares }}"
+        memory: "{{ pyload_memory }}"
+        restart_policy: unless-stopped
   when: pyload_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

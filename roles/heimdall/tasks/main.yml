@@ -16,7 +16,6 @@
         hostname: "{{ heimdall_container_name }}"
         image: "{{ heimdall_docker_image }}:{{ heimdall_docker_image_tag }}"
         pull: true
-        cpu_shares: "{{ heimdall_cpu_shares }}"
         volumes:
           - "{{ heimdall_data_directory }}:/config:rw"
         env:
@@ -25,13 +24,11 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ heimdall_port_http }}:80"
-        restart_policy: unless-stopped
-        memory: "{{ heimdall_memory }}"
         labels:
           autoheal: "{{ heimdall_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ heimdall_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ heimdall_homepage_group }}"
-          homepage.name: "Heimdall"
           homepage.icon: "{{ heimdall_homepage_icon }}"
           homepage.href: "{{ heimdall_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ heimdall_port_http }}"
@@ -50,6 +47,9 @@
           traefik.http.services.heimdall.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-heimdall/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ heimdall_cpu_shares }}"
+        memory: "{{ heimdall_memory }}"
+        restart_policy: unless-stopped
   when: heimdall_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

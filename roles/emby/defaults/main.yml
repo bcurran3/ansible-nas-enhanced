@@ -7,11 +7,13 @@ emby_traefik_whitelist: "{{ lan }}"
 
 # directories
 emby_data_directory: "{{ docker_home }}/emby"
+emby_anime_directory: "{{ anime_root }}"
 emby_movies_directory: "{{ movies_root }}"
 emby_tv_directory: "{{ tv_root }}"
 
 # If you're paranoid, set permissions to "ro" so Emby won't ever be able to
 # delete your files
+emby_anime_permissions: "rw"
 emby_movies_permissions: "rw"
 emby_tv_permissions: "rw"
 
@@ -39,6 +41,12 @@ emby_cpu_shares: 1024
 
 # autoheal
 emby_autoheal: "false"
+
+# homepage
+emby_homepage_group: "Media Servers"
+emby_homepage_icon: "emby.png"
+emby_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ emby_port }}"
+emby_homepage_showStats: "false"
 
 # watchtower
 emby_watchtower_monitor_only: "true"

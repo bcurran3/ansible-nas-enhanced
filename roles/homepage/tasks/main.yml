@@ -28,7 +28,6 @@
         hostname: "{{ homepage_container_name }}"
         image: "{{ homepage_image_name }}:{{ homepage_image_tag }}"
         pull: true
-        cpu_shares: "{{ homepage_cpu_shares }}"
         volumes:
           - "{{ homepage_data_directory }}:/app/config"
           - "{{ homepage_data_directory }}/images:/app/public/images"
@@ -38,9 +37,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ homepage_port }}:3000"
-        restart_policy: unless-stopped
         restart: "{{ homepage_config is changed }}"
-        memory: "{{ homepage_memory }}"
         labels:
           autoheal: "{{ homepage_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ homepage_watchtower_monitor_only }}"
@@ -55,6 +52,9 @@
           traefik.http.services.homepage.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/gethomepage/homepage/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ homepage_cpu_shares }}"
+        memory: "{{ homepage_memory }}"
+        restart_policy: unless-stopped
   when: homepage_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

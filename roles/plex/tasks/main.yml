@@ -64,14 +64,11 @@
           NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility" # added
           GenerateBIFKeyframesOnly: "1"                       # added
           PLEX_DISABLE_SECURITY: "1"                          # added
-        cpu_shares: "{{ plex_cpu_shares }}"
-        restart_policy: unless-stopped
-        memory: "{{ plex_memory }}"
         labels:
           autoheal: "{{ plex_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ plex_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ plex_homepage_group }}"
-          homepage.name: "Plex Media Server"
           homepage.icon: "{{ plex_homepage_icon }}"
           homepage.href: "{{ plex_homepage_href }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400/web"
@@ -93,6 +90,9 @@
           traefik.http.services.plex.loadbalancer.server.port: "32400"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-plex/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ plex_cpu_shares }}"
+        memory: "{{ plex_memory }}"
+        restart_policy: unless-stopped
   when: plex_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

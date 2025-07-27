@@ -17,7 +17,6 @@
         hostname: "{{ navidrome_container_name }}"
         image: "{{ navidrome_image_name }}:{{ navidrome_image_version }}"
         pull: true
-        cpu_shares: "{{ navidrome_cpu_shares }}"
         volumes:
           - "{{ navidrome_data_directory }}/data:/navidrome/data:rw"
           - "{{ navidrome_music_directory }}:/navidrome/music:rw"
@@ -29,11 +28,19 @@
           ND_SCANSCHEDULE: "{{ navidrome_scan_schedule }}"
           ND_LOGLEVEL: "{{ navidrome_log_level }}"
           ND_SESSIONTIMEOUT: "{{ navidrome_session_timeout }}"
-        restart_policy: unless-stopped
-        memory: "{{ navidrome_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ navidrome_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ navidrome_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ navidrome_homepage_group }}"
+          homepage.icon: "{{ navidrome_homepage_icon }}"
+          homepage.href: "{{ navidrome_homepage_href }}"
+          homepage.description: "{{ 'navidrome description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ navidrome_container_name }}"
+          homepage.showStats: "{{ navidrome_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ navidrome_port }}"
           traefik.enable: "{{ navidrome_available_externally | string }}"
           traefik.http.routers.navidrome.rule: "Host(`{{ navidrome_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.navidrome.tls.certresolver: "letsencrypt"
@@ -43,6 +50,9 @@
           traefik.http.routers.navidrome.middlewares: "{{ navidrome_hostname }}@docker"
           traefik.http.middlewares.navidrome.IPAllowList.sourcerange: "{{ navidrome_traefik_whitelist }}"
           traefik.http.services.navidrome.loadbalancer.server.port: "4533"
+        cpu_shares: "{{ navidrome_cpu_shares }}"
+        memory: "{{ navidrome_memory }}"
+        restart_policy: unless-stopped
   when: navidrome_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -23,13 +23,20 @@
         env:
           PUID: "{{ syncthing_user_id }}"
           PGID: "{{ syncthing_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         volumes: "{{ syncthing_volumes }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ syncthing_cpu_shares }}"
-        memory: "{{ syncthing_memory }}"
         labels:
           autoheal: "{{ syncthing_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ syncthing_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ syncthing_homepage_group }}"
+          homepage.icon: "{{ syncthing_homepage_icon }}"
+          homepage.href: "{{ syncthing_homepage_href }}"
+          homepage.description: "{{ 'syncthing description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ syncthing_container_name }}"
+          homepage.showStats: "{{ syncthing_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ syncthing_port }}"
           traefik.enable: "{{ syncthing_available_externally | string }}"
           traefik.http.routers.syncthing.rule: "Host(`{{ syncthing_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.syncthing.tls.certresolver: "letsencrypt"
@@ -39,6 +46,9 @@
           traefik.http.routers.syncthing.middlewares: "{{ syncthing_hostname }}@docker"
           traefik.http.middlewares.syncthing.IPAllowList.sourcerange: "{{ syncthing_traefik_whitelist }}"
           traefik.http.services.syncthing.loadbalancer.server.port: "8384"
+        cpu_shares: "{{ syncthing_cpu_shares }}"
+        memory: "{{ syncthing_memory }}"
+        restart_policy: unless-stopped
   when: syncthing_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

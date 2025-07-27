@@ -33,10 +33,9 @@
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openhab_container_name }}"
-        hostnamename: "{{ openhab_container_name }}"
+        hostname: "{{ openhab_container_name }}"
         image: "{{ openhab_image_name }}:{{ openhab_image_version }}"
         pull: true
-        cpu_shares: "{{ openhab_cpu_shares }}"
         network_mode: "host"
         volumes:
           - "{{ openhab_data_directory }}/conf:/openhab/conf:rw"
@@ -47,11 +46,21 @@
         env:
           OPENHAB_HTTP_PORT: "{{ openhab_port_http }}"
           OPENHAB_HTTPS_PORT: "{{ openhab_port_https }}"
-        restart_policy: unless-stopped
-        memory: "{{ openhab_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ openhab_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openhab_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ openhab_homepage_group }}"
+          homepage.icon: "{{ openhab_homepage_icon }}"
+          homepage.href: "{{ openhab_homepage_href }}"
+          homepage.description: "{{ 'openhab description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ openhab_container_name }}"
+          homepage.showStats: "{{ openhab_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openhab_port }}"
+# NOTE: Since this is in host mode, why add Traefik labels?
+# TDL:  Attempt to bridge app
           traefik.enable: "{{ openhab_available_externally | string }}"
           traefik.http.routers.openhab.rule: "Host(`{{ openhab_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.openhab.tls.certresolver: "letsencrypt"
@@ -61,6 +70,9 @@
           traefik.http.routers.openhab.middlewares: "{{ openhab_hostname }}@docker"
           traefik.http.middlewares.openhab.IPAllowList.sourcerange: "{{ openhab_traefik_whitelist }}"
           traefik.http.services.openhab.loadbalancer.server.port: "7777"
+        cpu_shares: "{{ openhab_cpu_shares }}"
+        memory: "{{ openhab_memory }}"
+        restart_policy: unless-stopped
   when: openhab_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

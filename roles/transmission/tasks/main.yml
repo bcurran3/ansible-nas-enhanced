@@ -28,16 +28,13 @@
           - "{{ transmission_external_port }}:51413"
           - "{{ transmission_external_port }}:51413/udp"
         env:
-          TZ: "{{ transmission_timezone }}"
           PUID: "{{ transmission_user_id }}"
           PGID: "{{ transmission_group_id }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ transmission_cpu_shares }}"
-        memory: "{{ transmission_memory }}"
+          TZ: "{{ transmission_timezone }}"
         labels:
           autoheal: "{{ transmission_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ transmission_watchtower_monitor_only }}"
-          homepage.name: "Transmission"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ transmission_homepage_group }}"
           homepage.href: "{{ transmission_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_webui_port }}"
@@ -46,7 +43,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ transmission_container_name }}"
           homepage.showStats: "{{ transmission_homepage_showStats }}"
-          homepage.weight: "15"
+#         homepage.weight: "15"
           homepage.widget.type: "transmission"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_webui_port }}"
           homepage.widget.user: "{{ transmission_homepage_widget_user }}"
@@ -62,6 +59,9 @@
           traefik.http.services.transmission.loadbalancer.server.port: "9091"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-transmission/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ transmission_cpu_shares }}"
+        memory: "{{ transmission_memory }}"
+        restart_policy: unless-stopped
   when: transmission_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

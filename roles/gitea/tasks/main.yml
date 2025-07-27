@@ -30,10 +30,10 @@
         labels:
           autoheal: "{{ gitea_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gitea_db_watchtower_monitor_only }}"
-          homepage.group: "{{ gitea_db_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} DB"
+          homepage.group: "{{ gitea_db_homepage_group }}"
           homepage.icon: "{{ gitea_db_homepage_icon }}"
-          homepage.href: "{{ gitea_homepage_href }}"
+          homepage.href: "{{ gitea_db_homepage_href }}"
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gitea_db_container_name }}"
@@ -77,8 +77,8 @@
         labels:
           autoheal: "{{ gitea_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gitea_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ gitea_homepage_group }}"
-          homepage.name: "Gitea"
           homepage.icon: "{{ gitea_homepage_icon }}"
           homepage.href: "{{ gitea_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"

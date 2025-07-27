@@ -38,6 +38,15 @@
         labels:
           autoheal: "{{ ispyagentdvr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ispyagentdvr_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ ispyagentdvr_homepage_group }}"
+          homepage.icon: "{{ ispyagentdvr_homepage_icon }}"
+          homepage.href: "{{ ispyagentdvr_homepage_href }}"
+          homepage.description: "{{ 'Camera Monitoring software' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ ispyagentdvr_container_name }}"
+          homepage.showStats: "{{ ispyagentdvr_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ispyagentdvr_port }}"
           traefik.enable: "{{ ispyagentdvr_available_externally | string }}"
           traefik.http.routers.ispyagentdvr.rule: "Host(`ispyagentdvr.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ispyagentdvr.tls.certresolver: "letsencrypt"
@@ -47,11 +56,6 @@
           traefik.http.routers.ispyagentdvr.middlewares: "{{ ispyagentdvr_hostname }}@docker"
           traefik.http.middlewares.ispyagentdvr.IPAllowList.sourcerange: "{{ ispyagentdvr_traefik_whitelist }}"
           traefik.http.services.ispyagentdvr.loadbalancer.server.port: "8097"
-          homepage.group: Monitoring
-          homepage.name: iSpy AgentDVR
-          homepage.icon: ispy.png
-          homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ispyagentdvr_webui_port }}"
-          homepage.description: "{{ 'Camera Monitoring software' if homepage_show_description else omit }}"
   when: ispyagentdvr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -24,14 +24,11 @@
         hostname: "{{ cloudflare_container_name }}"
         image: "{{ cloudflare_image_name }}:{{ cloudflare_image_version }}"
         pull: true
-        cpu_shares: "{{ cloudflare_cpu_shares }}"
         volumes:
           - "{{ cloudflare_data_directory }}/config.yml:/app/config.yaml"
           - "/etc/timezone:/etc/timezone:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ cloudflare_memory }}"
         recreate: "{{ template_files_result is changed }}"
         labels:
           autoheal: "{{ cloudflare_autoheal }}"
@@ -47,6 +44,9 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/joshuaavalon/docker-cloudflare/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ cloudflare_cpu_shares }}"
+        restart_policy: unless-stopped
+        memory: "{{ cloudflare_memory }}"
   when: cloudflare_ddns_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -15,7 +15,6 @@
         hostname: "{{ minecraft_bedrock_server_container_name }}"
         image: "{{ minecraft_bedrock_server_image }}"
         pull: true
-        cpu_shares: "{{ minecraft_bedrock_server_cpu_shares }}"
         volumes:
           - "{{ minecraft_bedrock_server_data_directory }}:/data:rw"
         ports:
@@ -29,10 +28,22 @@
           OPS: "{{ minecraft_bedrock_server_ops }}"
           MEMBERS: "{{ minecraft_bedrock_server_members }}"
           VISITORS: "{{ minecraft_bedrock_server_visitors }}"
-        restart_policy: unless-stopped
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ minecraft_bedrock_server_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ minecraft_bedrock_server_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ minecraft_bedrock_server_homepage_group }}"
+          homepage.icon: "{{ minecraft_bedrock_server_homepage_icon }}"
+          homepage.href: "{{ minecraft_bedrock_server_homepage_href }}"
+          homepage.description: "{{ 'minecraft_bedrock_server description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ minecraft_bedrock_server_container_name }}"
+          homepage.showStats: "{{ minecraft_bedrock_server_homepage_showStats }}"
+          traefik.enable: "false"
+        cpu_shares: "{{ minecraft_bedrock_server_cpu_shares }}"
+        memory: "{{ minecraft_bedrock_server_memory }}"
+        restart_policy: unless-stopped
   when: minecraft_bedrock_server_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

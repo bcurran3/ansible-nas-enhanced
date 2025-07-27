@@ -21,15 +21,24 @@
         pull: true
         env:
           SCHEDULE: "{{ route53_schedule | string }}"
+          TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ route53_data_directory }}/ddns-route53.yml:/etc/ddns-route53/ddns-route53.yml"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ route53_cpu_shares }}"
-        memory: "{{ route53_memory }}"
-        recreate: "{{ template_config is changed }}"
         labels:
           autoheal: "{{ route53_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ route53_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ route53_homepage_group }}"
+          homepage.icon: "{{ route53_homepage_icon }}"
+          homepage.description: "{{ 'route53 description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ route53_container_name }}"
+          homepage.showStats: "{{ route53_homepage_showStats }}"
+          traefik.enable: "false"
+        cpu_shares: "{{ route53_cpu_shares }}"
+        memory: "{{ route53_memory }}"
+        recreate: "{{ template_config is changed }}"
+        restart_policy: unless-stopped
   when: route53_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

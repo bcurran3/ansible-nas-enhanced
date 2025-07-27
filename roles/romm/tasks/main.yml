@@ -24,12 +24,24 @@
           MYSQL_DATABASE: "romm"
           MYSQL_USER: "{{ romm_database_username }}"
           MYSQL_PASSWORD: "{{ romm_database_password }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ romm_db_cpu_shares }}"
-        memory: "{{ romm_db_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ romm_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ romm_db_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} MySQL"
+          homepage.group: "{{ romm_db_homepage_group }}"
+          homepage.icon: "{{ romm_db_homepage_icon }}"
+          homepage.href: "{{ romm_homepage_href }}"
+          homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ romm_db_container_name }}"
+          homepage.showStats: "{{ romm_db_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ romm_db_cpu_shares }}"
+        memory: "{{ romm_db_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
@@ -38,11 +50,25 @@
         hostname: "{{ romm_redis_container_name }}"
         image: "{{ romm_redis_image_name }}:{{ romm_redis_image_version }}"
         pull: true
-        restart_policy: unless-stopped
-        memory: "{{ romm_redis_memory }}"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ romm_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ romm_redis_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ romm_redis_homepage_group }}"
+          homepage.icon: "{{ romm_redis_homepage_icon }}"
+          homepage.href: "{{ romm_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ romm_redis_container_name }}"
+          homepage.showStats: "{{ romm_redis_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ romm_redis_cpu_shares }}"
+        memory: "{{ romm_redis_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -74,15 +100,22 @@
           STEAMGRIDDB_API_KEY: "{{ romm_steamgriddb_client_id }}"
           ROMM_AUTH_USERNAME: "{{ romm_auth_username }}"
           ROMM_AUTH_PASSWORD: "{{ romm_auth_password }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ romm_cpu_shares }}"
-        memory: "{{ romm_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ romm_db_container_name }}:db"
           - "{{ romm_redis_container_name }}:redis"
         labels:
           autoheal: "{{ romm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ romm_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ romm_homepage_group }}"
+          homepage.icon: "{{ romm_homepage_icon }}"
+          homepage.href: "{{ romm_homepage_href }}"
+          homepage.description: "{{ 'Game library manager' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ romm_container_name }}"
+          homepage.showStats: "{{ romm_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port }}"
           traefik.enable: "{{ romm_available_externally | string }}"
           traefik.http.routers.romm.rule: "Host(`{{ romm_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.romm.tls.certresolver: "letsencrypt"
@@ -92,11 +125,9 @@
           traefik.http.routers.romm.middlewares: "{{ romm_hostname }}@docker"
           traefik.http.middlewares.romm.IPAllowList.sourcerange: "{{ romm_traefik_whitelist }}"
           traefik.http.services.romm.loadbalancer.server.port: "8080"
-          homepage.group: Media
-          homepage.name: Romm
-          homepage.icon: romm
-          homepage.href: http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port }}
-          homepage.description: "{{ 'Game library manager' if homepage_show_description else omit }}"
+        cpu_shares: "{{ romm_cpu_shares }}"
+        memory: "{{ romm_memory }}"
+        restart_policy: unless-stopped
   when: romm_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -24,9 +24,8 @@
         hostname: "{{ ddns_updater_container_name }}"
         image: "{{ ddns_updater_image_name }}:{{ ddns_updater_image_tag }}"
         pull: true
-        cpu_shares: "{{ ddns_updater_cpu_shares }}"
         ports:
-          - "{{ ddns_updater_port }}:{{ ddns_updater_port }}" # changed
+          - "{{ ddns_updater_port }}:{{ ddns_updater_port }}"
         volumes:
           - "{{ ddns_updater_data_directory }}:/updater/data:rw"
         env:
@@ -36,21 +35,21 @@
           UPDATE_COOLDOWN_PERIOD: "{{ ddns_updater_cooldown_period }}"
           HTTP_TIMEOUT: "{{ ddns_updater_http_timeout }}"
           TZ: "{{ ansible_nas_timezone }}"
-          BACKUP_PERIOD: "24h" # added
-          LISTENING_PORT: "{{ ddns_updater_port }}" # added
+          BACKUP_PERIOD: "72h"
+          LISTENING_PORT: "{{ ddns_updater_port }}"
         restart_policy: unless-stopped
-        restart: "{{ ddns_updater_config is changed }}"
-        memory: "{{ ddns_updater_memory }}"
         labels:
           autoheal: "{{ ddns_updater_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ddns_updater_watchtower_monitor_only }}"
-          homepage.group: "Network"
-          homepage.name: "DDNS Updater"
-          homepage.icon: "/images/ddns_updater.png"
-          homepage.description: "{{ 'DDNS Updater' if homepage_show_description else omit }}"
-          homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ ddns_updater_homepage_group }}"
+          homepage.icon: "{{ ddns_updater_homepage_icon }}"
+          homepage.href: "{{ ddns_updater_homepage_href }}"
+          homepage.description: "{{ 'ddns_updater description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "ddns-updater"
+          homepage.container: "{{ ddns_updater_container_name }}"
+          homepage.showStats: "{{ ddns_updater_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port }}"
           traefik.enable: "{{ ddns_updater_available_externally | string }}"
           traefik.http.routers.ddns_updater.rule: "Host(`{{ ddns_updater_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ddns_updater.tls.certresolver: "letsencrypt"
@@ -60,6 +59,9 @@
           traefik.http.routers.ddns_updater.middlewares: "ddns_updater@docker"
           traefik.http.middlewares.ddns_updater.IPAllowList.sourcerange: "{{ ddns_updater_traefik_whitelist }}"
           traefik.http.services.ddns_updater.loadbalancer.server.port: "{{ ddns_updater_port }}"
+        cpu_shares: "{{ ddns_updater_cpu_shares }}"
+        memory: "{{ ddns_updater_memory }}"
+        restart: "{{ ddns_updater_config is changed }}"
   when: ddns_updater_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

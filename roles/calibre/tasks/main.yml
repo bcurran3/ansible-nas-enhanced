@@ -15,7 +15,6 @@
         name: "{{ calibre_container_name }}"
         hostname: "{{ calibre_container_name }}"
         pull: true
-        cpu_shares: "{{ calibre_cpu_shares }}"
         volumes:
           - "{{ calibre_data_directory }}/data:/config:rw"
           - "{{ calibre_books_directory }}:/books:rw"
@@ -30,11 +29,18 @@
           - "{{ calibre_port }}:8080"
           - "{{ calibre_webserver_port }}:8081"
         security_opts: "{{ calibre_security_opts }}"
-        restart_policy: unless-stopped
-        memory: "{{ calibre_memory }}"
         labels:
           autoheal: "{{ calibre_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ calibre_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ calibre_homepage_group }}"
+          homepage.icon: "{{ calibre_homepage_icon }}"
+          homepage.href: "{{ calibre_homepage_href }}"
+          homepage.description: "{{ 'calibre description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ calibre_container_name }}"
+          homepage.showStats: "{{ calibre_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_port }}"
           traefik.enable: "{{ calibre_available_externally | string }}"
           traefik.http.routers.calibre.rule: "Host(`{{ calibre_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.calibre.tls.certresolver: "letsencrypt"
@@ -44,6 +50,9 @@
           traefik.http.routers.calibre.middlewares: "{{ calibre_hostname }}@docker"
           traefik.http.middlewares.calibre.IPAllowList.sourcerange: "{{ calibre_traefik_whitelist }}"
           traefik.http.services.calibre.loadbalancer.server.port: "8080"
+        cpu_shares: "{{ calibre_cpu_shares }}"
+        memory: "{{ calibre_memory }}"
+        restart_policy: unless-stopped
   when: calibre_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

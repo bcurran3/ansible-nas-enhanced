@@ -21,16 +21,22 @@
         hostname: "{{ dashy_container_name }}"
         image: "{{ dashy_image_name }}:{{ dashy_image_tag }}"
         pull: true
-        cpu_shares: "{{ dashy_cpu_shares }}"
         ports:
           - "{{ dashy_port }}:80"
-        restart_policy: unless-stopped
-        memory: "{{ dashy_memory }}"
         volumes:
           - "{{ dashy_data_directory }}/conf.yml:/app/public/conf.yml:rw"
         labels:
           autoheal: "{{ dashy_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dashy_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ dashy_homepage_group }}"
+          homepage.icon: "{{ dashy_homepage_icon }}"
+          homepage.href: "{{ dashy_homepage_href }}"
+          homepage.description: "{{ 'dashy description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dashy_container_name }}"
+          homepage.showStats: "{{ dashy_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dashy_port }}"
           traefik.enable: "{{ dashy_available_externally | string }}"
           traefik.http.routers.dashy.rule: "Host(`{{ dashy_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.dashy.tls.certresolver: "letsencrypt"
@@ -40,6 +46,9 @@
           traefik.http.routers.dashy.middlewares: "{{ dashy_hostname }}@docker"
           traefik.http.middlewares.dashy.IPAllowList.sourcerange: "{{ dashy_traefik_whitelist }}"
           traefik.http.services.dashy.loadbalancer.server.port: "80"
+        cpu_shares: "{{ dashy_cpu_shares }}"
+        memory: "{{ dashy_memory }}"
+        restart_policy: unless-stopped
   when: dashy_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

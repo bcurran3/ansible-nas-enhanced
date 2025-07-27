@@ -40,12 +40,19 @@
           WOODPECKER_GITEA_CLIENT: "{{ woodpecker_ci_gitea_client }}"
           WOODPECKER_GITEA_SECRET: "{{ woodpecker_ci_gitea_secret }}"
           WOODPECKER_LOG_LEVEL: "{{ woodpecker_ci_log_level }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ woodpecker_ci_cpu_shares }}"
-        memory: "{{ woodpecker_ci_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ woodpecker_ci_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ woodpecker_ci_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ woodpecker_ci_homepage_group }}"
+          homepage.icon: "{{ woodpecker_ci_homepage_icon }}"
+          homepage.href: "{{ woodpecker_ci_homepage_href }}"
+          homepage.description: "{{ 'woodpecker_ci description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ woodpecker_ci_container_name }}"
+          homepage.showStats: "{{ woodpecker_ci_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port }}"
           traefik.enable: "{{ woodpecker_ci_available_externally | string }}"
           traefik.http.routers.woodpecker_ci.rule: "Host(`{{ woodpecker_ci_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.woodpecker_ci.tls.certresolver: "letsencrypt"
@@ -55,6 +62,9 @@
           traefik.http.routers.woodpecker_ci.middlewares: "{{ woodpecker_ci_hostname }}@docker"
           traefik.http.middlewares.woodpecker_ci.IPAllowList.sourcerange: "{{ woodpecker_ci_traefik_whitelist }}"
           traefik.http.services.woodpecker_ci.loadbalancer.server.port: "8000"
+        cpu_shares: "{{ woodpecker_ci_cpu_shares }}"
+        memory: "{{ woodpecker_ci_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Agent Container
       community.docker.docker_container:

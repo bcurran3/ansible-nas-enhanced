@@ -22,11 +22,17 @@ esphome_memory: 1g
 # docker
 esphome_container_name: esphome
 esphome_cpu_shares: 1024
-_image_name: "esphome/esphome"
-_image_tag: "latest"
+esphome_image_name: "esphome/esphome"
+esphome_image_tag: "latest"
 
 # autoheal
 esphome_autoheal: "false"
+
+# homepage
+esphome_homepage_group: "Apps"
+esphome_homepage_icon: "esphome.png"
+esphome_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ esphome_port }}"
+esphome_homepage_showStats: "false"
 
 # watchtower
 esphome_watchtower_monitor_only: "true"

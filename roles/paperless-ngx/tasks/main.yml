@@ -25,6 +25,8 @@
         hostname: "{{ paperless_ngx_redis_container_name }}"
         image: "{{ paperless_ngx_redis_image_name }}:{{ paperless_ngx_redis_image_version }}"
         pull: true
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
         networks:
           - name: "{{ paperless_ngx_network_name }}"
         network_mode: "{{ paperless_ngx_network_name }}"
@@ -32,8 +34,8 @@
           traefik.enable: "false"
           autoheal: "{{ paperless_ngx_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_redis_watchtower_monitor_only }}"
-          homepage.group: "{{ paperless_ngx_redis_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ paperless_ngx_redis_homepage_group }}"
           homepage.icon: "{{ paperless_ngx_redis_homepage_icon }}"
           homepage.href: "{{ paperless_ngx_homepage_href }}"
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
@@ -59,6 +61,7 @@
           POSTGRES_DB: "{{ paperless_ngx_postgres_db }}"
           POSTGRES_USER: "{{ paperless_ngx_postgres_user }}"
           POSTGRES_PASSWORD: "{{ paperless_ngx_postgres_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
         networks:
           - name: "{{ paperless_ngx_network_name }}"
         network_mode: "{{ paperless_ngx_network_name }}"
@@ -66,8 +69,8 @@
           traefik.enable: "false"
           autoheal: "{{ paperless_ngx_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_db_watchtower_monitor_only }}"
-          homepage.group: "{{ paperless_ngx_db_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ paperless_ngx_db_homepage_group }}"
           homepage.icon: "{{ paperless_ngx_db_homepage_icon }}"
           homepage.href: "{{ paperless_ngx_homepage_href }}"
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
@@ -103,6 +106,7 @@
           CORS_ALLOWED_ORIGINS: "*"
           USERMAP_UID: "{{ paperless_ngx_user_id }}"
           USERMAP_GID: "{{ paperless_ngx_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         networks:
           - name: "{{ paperless_ngx_network_name }}"
         network_mode: "{{ paperless_ngx_network_name }}"
@@ -112,8 +116,8 @@
         labels:
           autoheal: "{{ paperless_ngx_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_watchtower_monitor_only }}"
-          homepage.group: "{{ paperless_ngx_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ paperless_ngx_homepage_group }}"
           homepage.icon: "{{ paperless_ngx_homepage_icon }}"
           homepage.href: "{{ paperless_ngx_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ paperless_ngx_port }}"

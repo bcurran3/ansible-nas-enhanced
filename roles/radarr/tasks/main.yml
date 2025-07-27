@@ -27,13 +27,10 @@
           PGID: "{{ radarr_group_id }}"
 #         DOCKER_MODS: "linuxserver/mods:radarr-striptracks"   # added
 #         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:radarr"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ radarr_cpu_shares }}"
-        memory: "{{ radarr_memory }}"
         labels:
           autoheal: "{{ radarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ radarr_watchtower_monitor_only }}"
-          homepage.name: "Radarr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ radarr_homepage_group }}"
           homepage.icon: "{{ radarr_homepage_icon }}"
           homepage.href: "{{ radarr_homepage_href }}"
@@ -56,6 +53,9 @@
           traefik.http.services.radarr.loadbalancer.server.port: "7878"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-radarr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ radarr_cpu_shares }}"
+        memory: "{{ radarr_memory }}"
+        restart_policy: unless-stopped
   when: radarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

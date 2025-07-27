@@ -23,7 +23,6 @@
         hostname: "{{ mosquitto_container_name }}"
         image: "{{ mosquitto_image_name }}:{{ mosquitto_image_version }}"
         pull: true
-        cpu_shares: "{{ mosquitto_cpu_shares }}"
         volumes:
           - "{{ mosquitto_data_directory }}/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:rw"
           - "{{ mosquitto_data_directory }}/data:/mosquitto/data:rw"
@@ -32,13 +31,11 @@
           - "{{ mosquitto_port_a }}:1883"
           - "{{ mosquitto_port_b }}:9001"
         restart_policy: unless-stopped
-        restart: "{{ mosquitto_conf is changed }}"
-        memory: 1g
         labels:
           autoheal: "{{ mosquitto_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mosquitto_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mosquitto_homepage_group }}"
-          homepage.name: "Mosquitto"
           homepage.icon: "{{ mosquitto_homepage_icon }}"
           homepage.description: "{{ 'An open source MQTT broker' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
@@ -47,6 +44,9 @@
           traefik_enabled: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/_/eclipse-mosquitto/tags/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ mosquitto_cpu_shares }}"
+        restart: "{{ mosquitto_conf is changed }}"
+        memory: "{{ mosquitto_memory }}"
   when: mosquitto_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

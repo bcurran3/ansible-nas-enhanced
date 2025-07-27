@@ -15,7 +15,6 @@
         hostname: "{{ dokuwiki_container_name }}"
         image: "{{ dokuwiki_image_name }}:{{ dokuwiki_image_tag }}"
         pull: true
-        cpu_shares: "{{ dokuwiki_cpu_shares }}"
         volumes:
           - "{{ dokuwiki_data_directory }}:/config/dokuwiki/data:rw"
         ports:
@@ -24,11 +23,18 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ dokuwiki_user_id }}"
           PGID: "{{ dokuwiki_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ dokuwiki_memory }}"
         labels:
           autoheal: "{{ dokuwiki_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dokuwiki_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ dokuwiki_homepage_group }}"
+          homepage.icon: "{{ dokuwiki_homepage_icon }}"
+          homepage.href: "{{ dokuwiki_homepage_href }}"
+          homepage.description: "{{ 'dokuwiki description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dokuwiki_container_name }}"
+          homepage.showStats: "{{ dokuwiki_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dokuwiki_port }}"
           traefik.enable: "{{ dokuwiki_available_externally | string }}"
           traefik.http.routers.dokuwiki.rule: "Host(`{{ dokuwiki_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.dokuwiki.tls.certresolver: "letsencrypt"
@@ -38,6 +44,9 @@
           traefik.http.routers.dokuwiki.middlewares: "{{ dokuwiki_hostname }}@docker"
           traefik.http.middlewares.dokuwiki.IPAllowList.sourcerange: "{{ dokuwiki_traefik_whitelist }}"
           traefik.http.services.dokuwiki.loadbalancer.server.port: "80"
+        cpu_shares: "{{ dokuwiki_cpu_shares }}"
+        memory: "{{ dokuwiki_memory }}"
+        restart_policy: unless-stopped
   when: dokuwiki_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

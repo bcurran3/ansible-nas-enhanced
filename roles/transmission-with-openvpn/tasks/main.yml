@@ -45,22 +45,35 @@
           PGID: "{{ transmission_openvpn_group_id }}"
           LOCAL_NETWORK: "{{ transmission_openvpn_local_network }}"
           ENABLE_UFW: "false"
+          TZ: "{{ ansible_nas_timezone }}"
         devices:
           - /dev/net/tun
         capabilities:
           - NET_ADMIN
-        restart_policy: unless-stopped
-        cpu_shares: "{{ transmission_openvpn_cpu_shares }}"
-        memory: "{{ transmission_openvpn_memory }}"
         labels:
           autoheal: "{{ transmission_openvpn_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ transmission_openvpn_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ transmission_openvpn_homepage_group }}"
+          homepage.icon: "{{ transmission_openvpn_homepage_icon }}"
+          homepage.href: "{{ transmission_openvpn_homepage_href }}"
+          homepage.description: "{{ 'transmission_openvpn description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ transmission_openvpn_container_name }}"
+          homepage.showStats: "{{ transmission_openvpn_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_openvpn_port }}"
           traefik.enable: "{{ transmission_with_openvpn_available_externally | string }}"
           traefik.http.routers.transmission_openvpn.rule: "Host(`{{ transmission_openvpn_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.transmission_openvpn.tls.certresolver: "letsencrypt"
           traefik.http.routers.transmission_openvpn.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.transmission_openvpn.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ transmission_openvpn_hostname }}"
+          traefik.http.routers.transmission_openvpn.middlewares: "{{ transmission_openvpn_hostname }}@docker"
+          traefik.http.middlewares.transmission_openvpn.IPAllowList.sourcerange: "{{ transmission_openvpn_traefik_whitelist }}"
           traefik.http.services.transmission_openvpn.loadbalancer.server.port: "9091"
+        restart_policy: unless-stopped
+        cpu_shares: "{{ transmission_openvpn_cpu_shares }}"
+        memory: "{{ transmission_openvpn_memory }}"
   when: transmission_with_openvpn_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

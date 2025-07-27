@@ -17,7 +17,6 @@
         hostname: "{{ booksonic_container_name }}"
         image: "{{ booksonic_image_name }}:{{ booksonic_image_tag }}"
         pull: true
-        cpu_shares: "{{ books_root_cpu_shares }}"
         volumes:
           - "{{ booksonic_data_directory }}/data:/booksonic/data:rw"
           - "{{ booksonic_data_directory }}/playlists:/booksonic/playlists:rw"
@@ -29,11 +28,18 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ booksonic_user_id }}"
           PGID: "{{ booksonic_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ booksonic_memory }}"
         labels:
           autoheal: "{{ booksonic_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ booksonic_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ booksonic_homepage_group }}"
+          homepage.icon: "{{ booksonic_homepage_icon }}"
+          homepage.href: "{{ booksonic_homepage_href }}"
+          homepage.description: "{{ 'booksonic description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ booksonic_container_name }}"
+          homepage.showStats: "{{ booksonic_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ booksonic_port }}"
           traefik.enable: "{{ booksonic_available_externally | string }}"
           traefik.http.routers.booksonic.rule: "Host(`{{ booksonic_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.booksonic.tls.certresolver: "letsencrypt"
@@ -43,6 +49,9 @@
           traefik.http.routers.booksonic.middlewares: "{{ booksonic_hostname }}@docker"
           traefik.http.middlewares.booksonic.IPAllowList.sourcerange: "{{ booksonic_traefik_whitelist }}"
           traefik.http.services.booksonic.loadbalancer.server.port: "4040"
+        cpu_shares: "{{ books_root_cpu_shares }}"
+        memory: "{{ booksonic_memory }}"
+        restart_policy: unless-stopped
   when: booksonic_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

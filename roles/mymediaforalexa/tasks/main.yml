@@ -15,16 +15,24 @@
         name: "{{ mymediaforalexa_container_name }}"
         image: "{{ mymediaforalexa_image_name }}:{{ mymediaforalexa_image_version }}"
         pull: true
-        cpu_shares: "{{ mymediaforalexa_cpu_shares }}"
         volumes:
           - "{{ mymediaforalexa_media_directory }}:/medialibrary:rw"
           - "{{ mymediaforalexa_data_directory }}:/datadir:rw"
         network_mode: host
-        restart_policy: unless-stopped
-        memory: "{{ mymediaforalexa_memory }}"
         labels:
           autoheal: "{{ mymediaforalexa_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mymediaforalexa_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ mymediaforalex_homepage_group }}"
+          homepage.icon: "{{ mymediaforalex_homepage_icon }}"
+          homepage.description: "{{ 'mymediaforalex description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ mymediaforalex_container_name }}"
+          homepage.showStats: "{{ mymediaforalex_homepage_showStats }}"
+          traefik.enable: "false"
+        cpu_shares: "{{ mymediaforalexa_cpu_shares }}"
+        memory: "{{ mymediaforalexa_memory }}"
+        restart_policy: unless-stopped
   when: mymediaforalexa_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

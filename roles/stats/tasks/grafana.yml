@@ -47,9 +47,7 @@
         env:
           GF_PLUGINS_ENABLE_ALPHA: "true"
           GF_UNIFIED_ALERTING_ENABLED: "true"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ grafana_cpu_shares }}"
-        memory: "{{ grafana_memory}}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ stats_grafana_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stats_grafana_watchtower_monitor_only }}"
@@ -72,6 +70,9 @@
           traefik.http.services.grafana.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/grafana/grafana/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ grafana_cpu_shares }}"
+        memory: "{{ grafana_memory}}"
+        restart_policy: unless-stopped
   when: stats_enabled is true
 
 - name: Stop Grafana

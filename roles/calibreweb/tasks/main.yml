@@ -16,7 +16,6 @@
         hostname: "{{ calibreweb_container_name }}"
         image: "{{ calibreweb_image_name }}:{{ calibreweb_image_tag }}"
         pull: true
-        cpu_shares: "{{ calibreweb_cpu_shares }}"
         volumes:
           - "{{ calibreweb_data_directory }}/config:/config"
           - "{{ calibreweb_books_root }}:/books"
@@ -28,10 +27,17 @@
           DOCKER_MODS: "{{ calibreweb_ebook_conversion }}"
         ports:
           - "{{ calibreweb_port }}:8083"
-        restart_policy: unless-stopped
-        memory: "{{ calibreweb_memory }}"
         labels:
           autoheal: "{{ calibreweb_autoheal }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ appname_homepage_group }}"
+          homepage.icon: "{{ appname_homepage_icon }}"
+          homepage.href: "{{ appname_homepage_href }}"
+          homepage.description: "{{ 'appname description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ appname_container_name }}"
+          homepage.showStats: "{{ appname_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ appname_port }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ calibreweb_watchtower_monitor_only }}"
           traefik.enable: "{{ calibreweb_available_externally | string }}"
           traefik.http.routers.calibreweb.rule: "Host(`{{ calibreweb_hostname }}.{{ ansible_nas_domain }}`)"
@@ -42,6 +48,9 @@
           traefik.http.routers.calibreweb.middlewares: "{{ calibreweb_hostname }}@docker"
           traefik.http.middlewares.calibreweb.IPAllowList.sourcerange: "{{ calibreweb_traefik_whitelist }}"
           traefik.http.services.calibreweb.loadbalancer.server.port: "8083"
+        cpu_shares: "{{ calibreweb_cpu_shares }}"
+        memory: "{{ calibreweb_memory }}"
+        restart_policy: unless-stopped
   when: calibreweb_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

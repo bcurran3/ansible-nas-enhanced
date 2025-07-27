@@ -16,7 +16,6 @@
         hostname: "{{ couchdb_container_name }}"
         image: "{{ couchdb_image_name }}:{{ couchdb_image_version }}"
         pull: true
-        cpu_shares: "{{ couchdb_cpu_shares }}"
         env:
           COUCHDB_USER: "{{ couchdb_admin_user }}"
           COUCHDB_PASSWORD: "{{ couchdb_admin_password }}"
@@ -25,11 +24,18 @@
         volumes:
           - "{{ couchdb_data_directory }}/config:/opt/couchdb/etc/local.d"
           - "{{ couchdb_data_directory }}/data:/opt/couchdb/data"
-        restart_policy: unless-stopped
-        memory: "{{ couchdb_memory }}"
         labels:
           autoheal: "{{ couchdb_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ couchdb_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ couchdb_homepage_group }}"
+          homepage.icon: "{{ couchdb_homepage_icon }}"
+          homepage.href: "{{ couchdb_homepage_href }}"
+          homepage.description: "{{ 'couchdb description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ couchdb_container_name }}"
+          homepage.showStats: "{{ couchdb_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ couchdb_port }}"
           traefik.enable: "{{ couchdb_available_externally | string }}"
           traefik.http.routers.couchdb.rule: "Host(`{{ couchdb_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.couchdb.tls.certresolver: "letsencrypt"
@@ -39,6 +45,9 @@
           traefik.http.routers.couchdb.middlewares: "{{ couchdb_hostname }}@docker"
           traefik.http.middlewares.couchdb.IPAllowList.sourcerange: "{{ couchdb_traefik_whitelist }}"
           traefik.http.services.couchdb.loadbalancer.server.port: "5984"
+        cpu_shares: "{{ couchdb_cpu_shares }}"
+        restart_policy: unless-stopped
+        memory: "{{ couchdb_memory }}"
   when: couchdb_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

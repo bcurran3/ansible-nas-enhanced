@@ -31,12 +31,19 @@
         env:
           PUID: "{{ znc_user_id }}"
           PGID: "{{ znc_group_id }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ znc_cpu_shares }}"
-        memory: "{{ znc_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ znc_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ znc_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ znc_homepage_group }}"
+          homepage.icon: "{{ znc_homepage_icon }}"
+          homepage.href: "{{ znc_homepage_href }}"
+          homepage.description: "{{ 'znc description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ znc_container_name }}"
+          homepage.showStats: "{{ znc_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ znc_port }}"
           traefik.enable: "{{ znc_available_externally | string }}"
           traefik.http.routers.znc.rule: "Host(`{{ znc_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.znc.tls.certresolver: "letsencrypt"
@@ -46,6 +53,9 @@
           traefik.http.routers.znc.middlewares: "{{ znc_hostname }}@docker"
           traefik.http.middlewares.znc.IPAllowList.sourcerange: "{{ znc_traefik_whitelist }}"
           traefik.http.services.znc.loadbalancer.server.port: "6677"
+        cpu_shares: "{{ znc_cpu_shares }}"
+        memory: "{{ znc_memory }}"
+        restart_policy: unless-stopped
   when: znc_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

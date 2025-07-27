@@ -30,7 +30,6 @@
         hostname: "{{ portainer_container_name }}"
         image: "{{ portainer_image_name }}:{{ portainer_image_version }}"
         pull: true
-        cpu_shares: "{{ portainer_cpu_shares }}"
         volumes:
           - "{{ portainer_data_directory }}/data:/data:rw"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
@@ -38,12 +37,10 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ portainer_port }}:9000"
-        restart_policy: unless-stopped
-        memory: "{{ portainer_memory }}"
         labels:
           autoheal: "{{ portainer_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ portainer_watchtower_monitor_only }}"
-          homepage.name: "Portainer"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ portainer_homepage_group }}"
           homepage.href: "{{ portainer_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port }}"
@@ -67,6 +64,9 @@
           traefik.http.services.portainer.loadbalancer.server.port: "9000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/portainer/portainer-ce/tags/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ portainer_cpu_shares }}"
+        memory: "{{ portainer_memory }}"
+        restart_policy: unless-stopped
   when: portainer_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

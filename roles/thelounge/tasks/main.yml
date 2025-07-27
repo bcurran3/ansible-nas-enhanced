@@ -25,15 +25,23 @@
         ports:
           - "{{ thelounge_port_one }}:9001"
           - "{{ thelounge_port_two }}:9000"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ thelounge_data_directory }}:/var/opt/thelounge"
           - "/var/run/dbus:/var/run/dbus"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ thelounge_cpu_shares }}"
-        memory: "{{ thelounge_memory }}"
         labels:
           autoheal: "{{ thelounge_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ thelounge_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ thelounge_homepage_group }}"
+          homepage.icon: "{{ thelounge_homepage_icon }}"
+          homepage.href: "{{ thelounge_homepage_href }}"
+          homepage.description: "{{ 'thelounge description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ thelounge_container_name }}"
+          homepage.showStats: "{{ thelounge_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ thelounge_port }}"
           traefik.enable: "{{ thelounge_available_externally | string }}"
           traefik.http.routers.thelounge.rule: "Host(`{{ thelounge_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.thelounge.tls.certresolver: "letsencrypt"
@@ -43,6 +51,9 @@
           traefik.http.routers.thelounge.middlewares: "{{ thelounge_hostname }}@docker"
           traefik.http.middlewares.thelounge.IPAllowList.sourcerange: "{{ thelounge_traefik_whitelist }}"
           traefik.http.services.thelounge.loadbalancer.server.port: "9000"
+        cpu_shares: "{{ thelounge_cpu_shares }}"
+        memory: "{{ thelounge_memory }}"
+        restart_policy: unless-stopped
   when: thelounge_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

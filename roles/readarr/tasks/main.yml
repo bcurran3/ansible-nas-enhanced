@@ -19,7 +19,6 @@
         hostname: "{{ readarr_container_name }}"
         image: "{{ readarr_image_name }}:{{ readarr_image_version }}"
         pull: true
-        cpu_shares: "{{ readarr_cpu_shares }}"
         volumes:
           - "{{ readarr_data_directory }}/config:/config:rw"
           - "{{ books_root }}:/books:rw"
@@ -31,11 +30,10 @@
 #         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:readarr"
         ports:
           - "{{ readarr_port }}:8787"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ readarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ readarr_watchtower_monitor_only }}"
-          homepage.name: "Readarr"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ readarr_homepage_group }}"
           homepage.icon: "{{ readarr_homepage_icon }}"
           homepage.href: "{{ readarr_homepage_href }}"
@@ -58,7 +56,9 @@
           traefik.http.services.readarr.loadbalancer.server.port: "8787"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-readarr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ readarr_cpu_shares }}"
         memory: "{{ readarr_memory }}"
+        restart_policy: unless-stopped
   when: readarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -24,12 +24,21 @@
         ulimits:
           - "nofile:1048576:1048576"
         network_mode: bridge
-        restart_policy: unless-stopped
-        cpu_shares: "{{ timemachine_cpu_shares }}"
-        memory: "{{ timemachine_memory }}"
         labels:
           autoheal: "{{ timemachine_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ timemachine_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ timemachine_homepage_group }}"
+          homepage.icon: "{{ timemachine_homepage_icon }}"
+          homepage.href: "{{ timemachine_homepage_href }}"
+          homepage.description: "{{ 'timemachine description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ timemachine_container_name }}"
+          homepage.showStats: "{{ timemachine_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ timemachine_port }}"
+        cpu_shares: "{{ timemachine_cpu_shares }}"
+        memory: "{{ timemachine_memory }}"
+        restart_policy: unless-stopped
 
     - name: Install avahi
       ansible.builtin.apt:

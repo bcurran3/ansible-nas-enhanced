@@ -21,19 +21,25 @@
           - "{{ comics_root }}:/comics"
           - "{{ books_root }}:/books"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ ubooquity_user_id }}"
           PGID: "{{ ubooquity_group_id }}"
           MAXMEM: "1024"
+          TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ ubooquity_port_webui }}:2202"
           - "{{ ubooquity_port_admin }}:2203"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ ubooquity_cpu_shares }}"
-        memory: "{{ ubooquity_memory }}"
         labels:
           autoheal: "{{ ubooquity_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ubooquity_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ ubooquity_homepage_group }}"
+          homepage.icon: "{{ ubooquity_homepage_icon }}"
+          homepage.href: "{{ ubooquity_homepage_href }}"
+          homepage.description: "{{ 'ubooquity description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ ubooquity_container_name }}"
+          homepage.showStats: "{{ ubooquity_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ubooquity_port }}"
           traefik.enable: "{{ ubooquity_available_externally | string }}"
           traefik.http.routers.ubooquity.rule: "Host(`{{ ubooquity_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ubooquity.tls.certresolver: "letsencrypt"
@@ -43,6 +49,9 @@
           traefik.http.routers.ubooquity.middlewares: "{{ ubooquity_hostname }}@docker"
           traefik.http.middlewares.ubooquity.IPAllowList.sourcerange: "{{ ubooquity_traefik_whitelist }}"
           traefik.http.services.ubooquity.loadbalancer.server.port: "2202"
+        cpu_shares: "{{ ubooquity_cpu_shares }}"
+        memory: "{{ ubooquity_memory }}"
+        restart_policy: unless-stopped
   when: ubooquity_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

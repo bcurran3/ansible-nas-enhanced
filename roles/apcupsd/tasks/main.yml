@@ -27,7 +27,6 @@
         hostname: "{{ apcupsd_container_name }}"
         image: "{{ apcupsd_image_name }}:{{ apcupsd_image_tag }}"
         pull: true
-        cpu_shares: "{{ apcupsd_cpu_shares }}"
         privileged: true
         volumes:
           - "/var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket"
@@ -38,11 +37,20 @@
           - "{{ apcupsd_device }}:{{ apcupsd_device }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ apcupsd_memory }}"
         labels:
           autoheal: "{{ apcupsd_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ apcupsd_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ apcupsd_homepage_group }}"
+          homepage.icon: "{{ apcupsd_homepage_icon }}"
+          homepage.description: "{{ 'apcupsd description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ apcupsd_container_name }}"
+          homepage.showStats: "{{ apcupsd_homepage_showStats }}"
+          traefik.enable: "false"
+        cpu_shares: "{{ apcupsd_cpu_shares }}"
+        memory: "{{ apcupsd_memory }}"
+        restart_policy: unless-stopped
   when: apcupsd_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

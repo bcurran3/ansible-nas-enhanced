@@ -20,12 +20,20 @@
           - "{{ rssbridge_data_directory }}/data:/config:rw"
         ports:
           - "{{ rssbridge_port }}:80"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ rssbridge_cpu_shares }}"
-        memory: "{{ rssbridge_memory }}"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ rssbridge_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rssbridge_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ rssbridge_homepage_group }}"
+          homepage.icon: "{{ rssbridge_homepage_icon }}"
+          homepage.href: "{{ rssbridge_homepage_href }}"
+          homepage.description: "{{ 'rssbridge description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ rssbridge_container_name }}"
+          homepage.showStats: "{{ rssbridge_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rssbridge_port }}"
           traefik.enable: "{{ rssbridge_available_externally | string }}"
           traefik.http.routers.rssbridge.rule: "Host(`{{ rssbridge_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.rssbridge.tls.certresolver: "letsencrypt"
@@ -35,6 +43,9 @@
           traefik.http.routers.rssbridge.middlewares: "{{ rssbridge_hostname }}@docker"
           traefik.http.middlewares.rssbridge.IPAllowList.sourcerange: "{{ rssbridge_traefik_whitelist }}"
           traefik.http.services.rssbridge.loadbalancer.server.port: "80"
+        cpu_shares: "{{ rssbridge_cpu_shares }}"
+        memory: "{{ rssbridge_memory }}"
+        restart_policy: unless-stopped
   when: rssbridge_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -22,7 +22,6 @@
         hostname: "{{ piwigo_db_container_name }}"
         image: "{{ piwigo_db_image_name }}:{{ piwigo_db_image_version }}"
         pull: true
-        cpu_shares: "{{ piwigo_db_cpu_shares }}"
         volumes:
           - "{{ piwigo_data_directory }}/db:/var/lib/mysql:rw"
         env:
@@ -30,14 +29,25 @@
           MYSQL_USER: "{{ piwigo_mysql_user }}"
           MYSQL_PASSWORD: "{{ piwigo_mysql_password }}"
           MYSQL_ROOT_PASSWORD: "{{ piwigo_mysql_root_password }}"
-        restart_policy: unless-stopped
-        memory: "{{ piwigo_mysql_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         networks:
           - name: "{{ piwigo_network_name }}"
         network_mode: "{{ piwigo_network_name }}"
         labels:
           autoheal: "{{ piwigo_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ piwigo_db_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} MySQL"
+          homepage.group: "{{ piwigo_db_homepage_group }}"
+          homepage.icon: "{{ piwigo_db_homepage_icon }}"
+          homepage.href: "{{ piwigo_homepage_href }}"
+          homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ piwigo_db_container_name }}"
+          homepage.showStats: "{{ piwigo_db_homepage_showStats }}"
+          traefik.enable: "false"
+        cpu_shares: "{{ piwigo_db_cpu_shares }}"
+        memory: "{{ piwigo_mysql_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -46,25 +56,31 @@
         hostname: "{{ piwigo_container_name }}"
         image: "{{ piwigo_image_name }}:{{ piwigo_image_version }}"
         pull: true
-        cpu_shares: "{{ piwigo_cpu_shares }}"
         volumes:
           - "{{ piwigo_data_directory }}/config:/config:rw"
           - "{{ piwigo_photos }}:/gallery:rw"
         ports:
           - "{{ piwigo_port }}:80"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ piwigo_user_id }}"
           PGID: "{{ piwigo_group_id }}"
           VERSION: "{{ piwigo_version }}"
-        restart_policy: unless-stopped
-        memory: "{{ piwigo_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         networks:
           - name: "{{ piwigo_network_name }}"
         network_mode: "{{ piwigo_network_name }}"
         labels:
           autoheal: "{{ piwigo_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ piwigo_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ piwigo_homepage_group }}"
+          homepage.icon: "{{ piwigo_homepage_icon }}"
+          homepage.href: "{{ piwigo_homepage_href }}"
+          homepage.description: "{{ 'Photos client' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ piwigo_container_name }}"
+          homepage.showStats: "{{ piwigo_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ piwigo_port }}"
           traefik.enable: "{{ piwigo_available_externally | string }}"
           traefik.http.routers.piwigo.rule: "Host(`{{ piwigo_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.piwigo.tls.certresolver: "letsencrypt"
@@ -74,11 +90,9 @@
           traefik.http.routers.piwigo.middlewares: "{{ piwigo_hostname }}@docker"
           traefik.http.middlewares.piwigo.IPAllowList.sourcerange: "{{ piwigo_traefik_whitelist }}"
           traefik.http.services.piwigo.loadbalancer.server.port: "80"
-          homepage.group: Photos
-          homepage.name: Piwigo
-          homepage.icon: piwigo.png
-          homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ piwigo_port }}"
-          homepage.description: Photos client
+        cpu_shares: "{{ piwigo_cpu_shares }}"
+        restart_policy: unless-stopped
+        memory: "{{ piwigo_memory }}"
   when: piwigo_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -16,25 +16,37 @@
         hostname: "{{ emby_container_name }}"
         image: "{{ emby_image }}:{{ emby_image_tag }}"
         pull: true
-        cpu_shares: "{{ emby_cpu_shares }}"
         volumes:
           - "{{ emby_data_directory }}/config:/config:rw"
           - "{{ emby_movies_directory }}:/movies:{{ emby_movies_permissions }}"
           - "{{ emby_tv_directory }}:/tv:{{ emby_tv_permissions }}"
-          ## ^^ should add anime support
+          - "{{ emby_anime_directory }}:/anime:{{ emby_anime_permissions }}"
+          # should add porn support
         ports:
           - "{{ emby_port_http }}:8096"
           - "{{ emby_port_https }}:8920"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
         devices: "{{ emby_devices | default(omit) }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ emby_user_id }}"
           PGID: "{{ emby_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ emby_memory }}"
         labels:
           autoheal: "{{ emby_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ emby_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ emby_homepage_group }}"
+          homepage.icon: "{{ emby_homepage_icon }}"
+          homepage.href: "{{ emby_homepage_href }}"
+          homepage.description: "{{ 'emby description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ emby_container_name }}"
+          homepage.showStats: "{{ emby_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ emby_port }}"
           traefik.enable: "{{ emby_available_externally | string }}"
           traefik.http.routers.emby.rule: "Host(`{{ emby_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.emby.tls.certresolver: "letsencrypt"
@@ -44,6 +56,9 @@
           traefik.http.routers.emby.middlewares: "{{ emby_hostname }}@docker"
           traefik.http.middlewares.emby.IPAllowList.sourcerange: "{{ emby_traefik_whitelist }}"
           traefik.http.services.emby.loadbalancer.server.port: "8096"
+        cpu_shares: "{{ emby_cpu_shares }}"
+        memory: "{{ emby_memory }}"
+        restart_policy: unless-stopped
   when: emby_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

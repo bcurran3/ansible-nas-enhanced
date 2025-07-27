@@ -42,7 +42,6 @@
         hostname: "{{ loki_container_name }}"
         image: "{{ loki_image_name }}:{{ loki_image_version }}"
         pull: true
-        cpu_shares: "{{ loki_cpu_shares }}"
         command: "-config.file=/etc/loki/config.yml"
         ports:
           - "{{ loki_http_port }}:3100"
@@ -50,12 +49,18 @@
           - 9095
         volumes:
           - "{{ loki_data_directory }}/config.yml:/etc/loki/config.yml"
-        restart_policy: unless-stopped
-        memory: "{{ loki_memory }}"
-        restart: "{{ loki_config is changed }}"
         labels:
           autoheal: "{{ loki_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ loki_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ loki_homepage_group }}"
+          homepage.icon: "{{ loki_homepage_icon }}"
+          homepage.href: "{{ loki_homepage_href }}"
+          homepage.description: "{{ 'loki description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ loki_container_name }}"
+          homepage.showStats: "{{ loki_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ loki_port }}"
           traefik.enable: "{{ loki_available_externally | string }}"
           traefik.http.routers.loki.rule: "Host(`{{ loki_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.loki.tls.certresolver: "letsencrypt"
@@ -68,6 +73,10 @@
           prometheus.io/scrape: "true"
           prometheus.io/port: "3100"
           prometheus.io/path: "/metrics"
+        cpu_shares: "{{ loki_cpu_shares }}"
+        memory: "{{ loki_memory }}"
+        restart: "{{ loki_config is changed }}"
+        restart_policy: unless-stopped
 
     - name: Template Grafana {{ ansible_nas_app_name }} data source
       ansible.builtin.template:

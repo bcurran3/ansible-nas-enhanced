@@ -13,7 +13,7 @@ homeassistant_port: "8123"
 homeassistant_hostname: "homeassistant"
 
 # docker
-homeassistant_container_name: "homeassistant"
+homeassistant_container_name: "home-assistant"
 homeassistant_image_name: "homeassistant/home-assistant"
 homeassistant_image_version: latest
 homeassistant_cpu_shares: 1024
@@ -25,8 +25,11 @@ homeassistant_memory: 1g
 homeassistant_autoheal: "false"
 
 # homepage
+homeassistant_homepage_group: "Apps"
+homeassistant_homepage_icon: "home-assistant.png"
+homeassistant_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homeassistant_port }}"
+homeassistant_homepage_showStats: "false"
 homeassistant_widget_key: "your_key_here"
-# ^ many more to add
 
 # watchtower
 homeassistant_watchtower_monitor_only: "true"

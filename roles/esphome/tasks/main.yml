@@ -15,7 +15,6 @@
         hostname: "{{ esphome_container_name }}"
         image: "{{ esphome_image_name }}:{{ esphome_image_tag }}"
         pull: true
-        cpu_shares: "{{ esphome_cpu_shares }}"
         volumes:
           - "{{ esphome_data_directory }}:/config:rw"
           - "/etc/localtime:/etc/localtime:ro"
@@ -25,11 +24,18 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ esphome_user_id }}"
           PGID: "{{ esphome_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ esphome_memory }}"
         labels:
           autoheal: "{{ esphome_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ esphome_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ esphome_homepage_group }}"
+          homepage.icon: "{{ esphome_homepage_icon }}"
+          homepage.href: "{{ esphome_homepage_href }}"
+          homepage.description: "{{ 'esphome description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ esphome_container_name }}"
+          homepage.showStats: "{{ esphome_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ esphome_port }}"
           traefik.enable: "{{ esphome_available_externally | string }}"
           traefik.http.routers.esphome.rule: "Host(`{{ esphome_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.esphome.tls.certresolver: "letsencrypt"
@@ -39,6 +45,9 @@
           traefik.http.routers.esphome.middlewares: "{{ esphome_hostname }}@docker"
           traefik.http.middlewares.esphome.IPAllowList.sourcerange: "{{ esphome_traefik_whitelist }}"
           traefik.http.services.esphome.loadbalancer.server.port: "80"
+        cpu_shares: "{{ esphome_cpu_shares }}"
+        memory: "{{ esphome_memory }}"
+        restart_policy: unless-stopped
   when: esphome_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

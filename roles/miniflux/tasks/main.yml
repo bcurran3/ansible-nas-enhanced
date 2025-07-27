@@ -19,7 +19,6 @@
         hostname: "{{ miniflux_db_container_name }}"
         image: "{{ miniflux_db_image_name }}:{{ miniflux_db_image_version }}"
         pull: true
-        cpu_shares: "{{ miniflux_db_cpu_shares }}"
         networks:
           - name: "{{ miniflux_network_name }}"
         network_mode: "{{ miniflux_network_name }}"
@@ -28,11 +27,22 @@
         env:
           POSTGRES_USER: "miniflux"
           POSTGRES_PASSWORD: "supersecure"
-        restart_policy: unless-stopped
-        memory: "{{ miniflux_postgres_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ miniflux_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ miniflux_db_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ miniflux_db_homepage_group }}"
+          homepage.icon: "{{ miniflux_db_homepage_icon }}"
+          homepage.href: "{{ miniflux_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ miniflux_db_container_name }}"
+          homepage.showStats: "{{ miniflux_db_homepage_showStats }}"
+          traefik.enable: "false"
+        cpu_shares: "{{ miniflux_db_cpu_shares }}"
+        memory: "{{ miniflux_postgres_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -41,7 +51,6 @@
         hostname: "{{ miniflux_container_name }}"
         image: "{{ miniflux_image_name }}:{{ miniflux_image_version }}"
         pull: true
-        cpu_shares: "{{ miniflux_cpu_shares }}"
         networks:
           - name: "{{ miniflux_network_name }}"
         network_mode: "{{ miniflux_network_name }}"
@@ -53,11 +62,18 @@
           CREATE_ADMIN: "1"
           ADMIN_USERNAME: "{{ miniflux_admin_username }}"
           ADMIN_PASSWORD: "{{ miniflux_admin_password }}"
-        restart_policy: unless-stopped
-        memory: "{{ miniflux_memory }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ miniflux_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ miniflux_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ miniflux_homepage_group }}"
+          homepage.icon: "{{ miniflux_homepage_icon }}"
+          homepage.href: "{{ miniflux_homepage_href }}"
+          homepage.description: "{{ 'miniflux description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ miniflux_container_name }}"
+          homepage.showStats: "{{ miniflux_homepage_showStats }}"
           traefik.enable: "{{ miniflux_available_externally | string }}"
           traefik.http.routers.miniflux.rule: "Host(`{{ miniflux_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.miniflux.tls.certresolver: "letsencrypt"
@@ -67,6 +83,9 @@
           traefik.http.routers.miniflux.middlewares: "{{ miniflux_hostname }}@docker"
           traefik.http.middlewares.miniflux.IPAllowList.sourcerange: "{{ miniflux_traefik_whitelist }}"
           traefik.http.services.miniflux.loadbalancer.server.port: "8080"
+        cpu_shares: "{{ miniflux_cpu_shares }}"
+        memory: "{{ miniflux_memory }}"
+        restart_policy: unless-stopped
   when: miniflux_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
