@@ -2,21 +2,21 @@
 # https://webmin.com/download/
 - name: Install {{ ansible_nas_app_name }}
   block:
-    - name: Download {{ ansible_nas_app_name }} GPG key
+    - name: Create directory for APT keyrings
+      ansible.builtin.file:
+        path: /usr/share/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Download {{ ansible_nas_app_name }} GPG key to a dedicated keyring file
       ansible.builtin.get_url:
         url: https://download.webmin.com/jcameron-key.asc
-        dest: /etc/apt/trusted.gpg.d/jcameron-key.asc
+        dest: /usr/share/keyrings/webmin-archive-keyring.asc
         mode: '0644'
-        force: true
 
-    - name: Add {{ ansible_nas_app_name }} GPG key to APT keyring
-      ansible.builtin.apt_key:
-        file: /etc/apt/trusted.gpg.d/jcameron-key.asc
-        state: present
-
-    - name: Add {{ ansible_nas_app_name }} apt repository
+    - name: Add {{ ansible_nas_app_name }} APT repository with signed-by option
       ansible.builtin.apt_repository:
-        repo: "deb https://download.webmin.com/download/repository {{ ansible_facts['lsb']['codename'] }} main"
+        repo: "deb [signed-by=/usr/share/keyrings/webmin-archive-keyring.asc] https://download.webmin.com/download/repository sarge contrib"
         state: present
         filename: webmin
 
@@ -32,5 +32,17 @@
         - name: Uninstall {{ ansible_nas_app_name }}
           ansible.builtin.apt:
             name: webmin
+            state: absent
+            autoremove: yes
+
+        - name: Remove {{ ansible_nas_app_name }} APT repository
+          ansible.builtin.apt_repository:
+            repo: "deb [signed-by=/usr/share/keyrings/webmin-archive-keyring.asc] https://download.webmin.com/download/repository sarge contrib"
+            state: absent
+            filename: webmin
+
+        - name: Remove {{ ansible_nas_app_name }} GPG key
+          ansible.builtin.file:
+            path: /usr/share/keyrings/webmin-archive-keyring.asc
             state: absent
   when: webmin_enabled is false
