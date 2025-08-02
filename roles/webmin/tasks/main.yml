@@ -2,23 +2,21 @@
 # https://webmin.com/download/
 - name: Install {{ ansible_nas_app_name }}
   block:
-    - name: Create directory for APT keyrings
-      ansible.builtin.file:
-        path: /usr/share/keyrings
-        state: directory
+    - name: Download {{ ansible_nas_app_name }} setup repository script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/webmin/webmin/master/webmin-setup-repo.sh
+        dest: scripts/webmin-setup-repo.sh
         mode: '0755'
 
-    - name: Download {{ ansible_nas_app_name }} GPG key to a dedicated keyring file
-      ansible.builtin.get_url:
-        url: https://download.webmin.com/jcameron-key.asc
-        dest: /usr/share/keyrings/webmin-archive-keyring.asc
-        mode: '0644'
+    - name: Run {{ ansible_nas_app_name }} setup repository script
+      ansible.builtin.shell: scripts/webmin-setup-repo.sh
+      register: webmin_setup_script_output
+      changed_when: webmin_setup_script_output.rc != 0 or "added" in webmin_setup_script_output.stdout or "installed" in webmin_setup_script_output.stdout
 
-    - name: Add {{ ansible_nas_app_name }} APT repository with signed-by option
-      ansible.builtin.apt_repository:
-        repo: "deb [signed-by=/usr/share/keyrings/webmin-archive-keyring.asc] https://download.webmin.com/download/repository sarge contrib"
-        state: present
-        filename: webmin
+    - name: Display {{ ansible_nas_app_name }} setup script output (optional for debugging)
+      ansible.builtin.debug:
+        var: webmin_setup_script_output.stdout_lines
+      when: webmin_enabled is true and webmin_setup_script_output is defined
 
     - name: Install {{ ansible_nas_app_name }}
       ansible.builtin.apt:
@@ -35,14 +33,19 @@
             state: absent
             autoremove: yes
 
-        - name: Remove {{ ansible_nas_app_name }} APT repository
-          ansible.builtin.apt_repository:
-            repo: "deb [signed-by=/usr/share/keyrings/webmin-archive-keyring.asc] https://download.webmin.com/download/repository sarge contrib"
-            state: absent
-            filename: webmin
-
-        - name: Remove {{ ansible_nas_app_name }} GPG key
+        - name: Remove {{ ansible_nas_app_name }} APT repository file
           ansible.builtin.file:
-            path: /usr/share/keyrings/webmin-archive-keyring.asc
+            path: /etc/apt/sources.list.d/webmin.list # Assuming the script creates this file
+            state: absent
+
+        - name: Remove {{ ansible_nas_app_name }} GPG key (if script added it to a specific file)
+          ansible.builtin.file:
+            path: /etc/apt/trusted.gpg.d/jcameron-key.asc
+            state: absent
+          ignore_errors: true
+
+        - name: Remove the downloaded setup script
+          ansible.builtin.file:
+            path: scripts/webmin-setup-repo.sh
             state: absent
   when: webmin_enabled is false
