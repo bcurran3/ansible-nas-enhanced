@@ -24,8 +24,11 @@
           - "{{ qbittorrent_data_directory }}/custom-cont-init.d:/custom-cont-init.d:ro"
           - "{{ qbittorrent_download_directory }}:/downloads:rw"
           - "{{ qbittorrent_watch_directory }}:/torrents"
+######### ME
+          - "{{ porn_root }}:/porn"
+######### ME
         ports:
-          - "{{ qbittorrent_port_http }}:8113"
+          - "{{ qbittorrent_port_http }}:{{ qbittorrent_port_http }}"
           - "{{ qbittorrent_port_bt }}:6881"
           - "{{ qbittorrent_port_bt }}:6881/udp"
         env:

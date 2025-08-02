@@ -1,0 +1,31 @@
+---
+# https://webmin.com/download/
+- name: Install {{ ansible_nas_app_name }}
+  block:
+    - name: Add {{ ansible_nas_app_name }} GPG key
+      ansible.builtin.get_url:
+        url: https://download.webmin.com/jcameron-key.asc
+        dest: /etc/apt/trusted.gpg.d/jcameron-key.asc
+        mode: '0644'
+        force: true
+
+    - name: Add {{ ansible_nas_app_name }} apt repository
+      ansible.builtin.apt_repository:
+        repo: "deb https://download.webmin.com/download/repository {{ ansible_facts['lsb']['codename'] }} main"
+        state: present
+        filename: webmin
+
+    - name: Install {{ ansible_nas_app_name }}
+      ansible.builtin.apt:
+        name: webmin
+        state: present
+        update_cache: yes
+  when: webmin_enabled is true
+
+- name: Remove {{ ansible_nas_app_name }}
+  block:
+        - name: Uninstall {{ ansible_nas_app_name }}
+          ansible.builtin.apt:
+            name: webmin
+            state: absent
+  when: webmin_enabled is false
