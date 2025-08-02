@@ -2,12 +2,17 @@
 # https://webmin.com/download/
 - name: Install {{ ansible_nas_app_name }}
   block:
-    - name: Add {{ ansible_nas_app_name }} GPG key
+    - name: Download {{ ansible_nas_app_name }} GPG key
       ansible.builtin.get_url:
         url: https://download.webmin.com/jcameron-key.asc
         dest: /etc/apt/trusted.gpg.d/jcameron-key.asc
         mode: '0644'
         force: true
+
+    - name: Add {{ ansible_nas_app_name }} GPG key to APT keyring
+      ansible.builtin.apt_key:
+        file: /etc/apt/trusted.gpg.d/jcameron-key.asc
+        state: present
 
     - name: Add {{ ansible_nas_app_name }} apt repository
       ansible.builtin.apt_repository:
