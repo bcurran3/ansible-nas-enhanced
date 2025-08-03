@@ -48,6 +48,8 @@
           traefik.http.routers.sickchill.middlewares: "{{ sickchill_hostname }}@docker"
           traefik.http.middlewares.sickchill.IPAllowList.sourcerange: "{{ sickchill_traefik_whitelist }}"
           traefik.http.services.sickchill.loadbalancer.server.port: "8081"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-sickchill/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ sickchill_cpu_shares }}"
         memory: "{{ sickchill_memory }}"
         restart_policy: unless-stopped

@@ -51,6 +51,8 @@
           traefik.http.routers.mealie.middlewares: "{{ mealie_hostname }}@docker"
           traefik.http.middlewares.mealie.IPAllowList.sourcerange: "{{ mealie_traefik_whitelist }}"
           traefik.http.services.mealie.loadbalancer.server.port: "9000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mealie-recipes/mealie/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ mealie_cpu_shares }}"
         memory: "{{ mealie_memory }}"
         restart_policy: unless-stopped

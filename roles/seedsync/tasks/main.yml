@@ -47,8 +47,8 @@
           traefik.http.routers.seedsync.middlewares: "{{ seedsync_hostname }}@docker"
           traefik.http.middlewares.seedsync.IPAllowList.sourcerange: "{{ seedsync_traefik_whitelist }}"
           traefik.http.services.seedsync.loadbalancer.server.port: "8800"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "hhttps://github.com/ipsingh06/seedsync/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ seedsync_memory }}"
         restart_policy: unless-stopped
   when: seedsync_enabled is true

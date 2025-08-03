@@ -56,6 +56,8 @@
           traefik.http.routers.emby.middlewares: "{{ emby_hostname }}@docker"
           traefik.http.middlewares.emby.IPAllowList.sourcerange: "{{ emby_traefik_whitelist }}"
           traefik.http.services.emby.loadbalancer.server.port: "8096"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/MediaBrowser/Emby/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ emby_cpu_shares }}"
         memory: "{{ emby_memory }}"
         restart_policy: unless-stopped

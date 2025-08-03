@@ -51,6 +51,8 @@
           traefik.http.routers.valheim.middlewares: "{{ valheim_hostname }}@docker"
           traefik.http.middlewares.valheim.IPAllowList.sourcerange: "{{ valheim_traefik_whitelist }}"
           traefik.http.services.valheim.loadbalancer.server.port: "2456"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mbround18/valheim-docker/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ valheim_cpu_shares }}"
         memory: "{{ valheim_memory }}"
         restart_policy: unless-stopped

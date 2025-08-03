@@ -44,6 +44,8 @@
           traefik.http.routers.tiddlywiki.middlewares: "{{ tiddlywiki_hostname }}@docker"
           traefik.http.middlewares.tiddlywiki.IPAllowList.sourcerange: "{{ tiddlywiki_traefik_whitelist }}"
           traefik.http.services.tiddlywiki.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/TiddlyWiki/TiddlyWiki5/tags/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ tiddlywiki_cpu_shares }}"
         memory: "{{ tiddlywiki_memory }}"
         restart_policy: unless-stopped

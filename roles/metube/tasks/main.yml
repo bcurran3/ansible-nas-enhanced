@@ -44,7 +44,8 @@
           traefik.http.middlewares.metube.IPAllowList.sourcerange: "{{ metube_traefik_whitelist }}"
           traefik.http.services.metube.loadbalancer.server.port: "8081"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://hub.docker.com/r/alexta69/metube/tags/$${major}.$${minor}.$${patch}"
+#         ^ wrong format, example: 2025.07.31
+#         wud.link.template: "https://github.com/alexta69/metube/releases/tags/$${major}.$${minor}.$${patch}"
         memory: "{{ metube_memory }}"
         restart_policy: unless-stopped
   when: metube_enabled is true

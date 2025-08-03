@@ -49,7 +49,8 @@
           traefik.http.middlewares.searxng.IPAllowList.sourcerange: "{{ searxng_traefik_whitelist }}"
           traefik.http.services.searxng.loadbalancer.server.port: "8080"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+#         wud.link.template: "https://github.com/searxng/searxng/pkgs/container/searxng/tag/$${major}.$${minor}.$${patch}"
+#         ^ tags are in format: 2025.8.1-3d96414
         memory: "{{ searxng_memory_limit }}"
         restart_policy: unless-stopped
   when: searxng_enabled is true

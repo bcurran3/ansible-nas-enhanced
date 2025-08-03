@@ -53,8 +53,8 @@
           traefik.http.routers.resilio_sync.middlewares: "resilio_sync@docker"
           traefik.http.middlewares.resilio_sync.IPAllowList.sourcerange: "{{ resilio_sync_traefik_whitelist }}"
           traefik.http.services.resilio_sync.loadbalancer.server.port: "8888"
-          resilio_sync.tag.include: '^\d+\.\d+\.\d+$$'
-          resilio_sync.link.template: "https://github.com/linuxserver/docker-resilio-sync/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-resilio-sync/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ resilio_sync_memory }}"
         restart_policy: unless-stopped
   when: resilio_sync_enabled is true

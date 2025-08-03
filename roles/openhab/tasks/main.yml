@@ -70,6 +70,8 @@
           traefik.http.routers.openhab.middlewares: "{{ openhab_hostname }}@docker"
           traefik.http.middlewares.openhab.IPAllowList.sourcerange: "{{ openhab_traefik_whitelist }}"
           traefik.http.services.openhab.loadbalancer.server.port: "7777"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/openhab/openhab-distro/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ openhab_cpu_shares }}"
         memory: "{{ openhab_memory }}"
         restart_policy: unless-stopped

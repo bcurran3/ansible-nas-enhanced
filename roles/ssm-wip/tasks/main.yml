@@ -39,8 +39,8 @@
           autoheal: "{{ ssm_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_redis_watchtower_monitor_only }}"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ssm_redis_memory }}"
         restart_policy: unless-stopped
 
@@ -67,6 +67,8 @@
           autoheal: "{{ ssm_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_db_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ssm_db_memory }}"
         restart_policy: unless-stopped
 
@@ -98,8 +100,8 @@
           traefik.http.routers.ssm.middlewares: "{{ ssm_hostname }}@docker"
           traefik.http.middlewares.ssm.IPAllowList.sourcerange: "{{ ssm_traefik_whitelist }}"
           traefik.http.services.ssm.loadbalancer.server.port: "8000"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+#          wud.tag.include: '^\d+\.\d+\.\d+$$'
+#          wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ssm_client_memory }}"
         restart_policy: unless-stopped
 
@@ -135,7 +137,7 @@
           autoheal: "{{ ssm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ssm_watchtower_monitor_only }}"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ ssm_memory }}"
         restart_policy: unless-stopped
   when: ssm_enabled is true

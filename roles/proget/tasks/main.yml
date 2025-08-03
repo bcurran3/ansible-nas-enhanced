@@ -84,8 +84,7 @@
         ports:
           - "{{ proget_port_http }}:80"
         env:
-          PROGET_SQL_CONNECTION_STRING: "Data Source=proget-db; Initial Catalog=ProGet; User ID=sa; Password=t0ps3cr3t!pw"
-          # ^ change to the variables
+          PROGET_SQL_CONNECTION_STRING: "{{ proget_env_sql_connection_string }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ proget_autoheal }}"

@@ -39,12 +39,14 @@
           homepage.group: "{{ virtual_desktop_homepage_group }}"
           homepage.icon: "{{ virtual_desktop_homepage_icon }}"
           homepage.href: "{{ virtual_desktop_homepage_href }}"
-          homepage.description: "{{ 'virtual_desktop description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'Ubuntu with XRDP and MATE' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ virtual_desktop_container_name }}"
           homepage.showStats: "{{ virtual_desktop_homepage_showStats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtual_desktop_port }}"
           traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/RattyDAVE/docker-ubuntu-xrdp-mate-custom/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ virtual_desktop_cpu_shares }}"
         memory: "{{ virtual_desktop_memory }}"
         restart_policy: unless-stopped

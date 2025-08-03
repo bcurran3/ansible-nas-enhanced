@@ -59,6 +59,8 @@
           traefik.http.routers.ddns_updater.middlewares: "ddns_updater@docker"
           traefik.http.middlewares.ddns_updater.IPAllowList.sourcerange: "{{ ddns_updater_traefik_whitelist }}"
           traefik.http.services.ddns_updater.loadbalancer.server.port: "{{ ddns_updater_port }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/qdm12/ddns-updater/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ ddns_updater_cpu_shares }}"
         memory: "{{ ddns_updater_memory }}"
         restart: "{{ ddns_updater_config is changed }}"

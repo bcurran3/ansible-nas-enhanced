@@ -39,7 +39,7 @@
           homepage.group: "{{ znc_homepage_group }}"
           homepage.icon: "{{ znc_homepage_icon }}"
           homepage.href: "{{ znc_homepage_href }}"
-          homepage.description: "{{ 'znc description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'IRC bouncer' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ znc_container_name }}"
           homepage.showStats: "{{ znc_homepage_showStats }}"
@@ -53,6 +53,9 @@
           traefik.http.routers.znc.middlewares: "{{ znc_hostname }}@docker"
           traefik.http.middlewares.znc.IPAllowList.sourcerange: "{{ znc_traefik_whitelist }}"
           traefik.http.services.znc.loadbalancer.server.port: "6677"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/znc/znc/tags/tag/$${major}.$${minor}.$${patch}"
+#         ^ probably needs updating for format: znc-1.10.1
         cpu_shares: "{{ znc_cpu_shares }}"
         memory: "{{ znc_memory }}"
         restart_policy: unless-stopped

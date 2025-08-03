@@ -78,8 +78,8 @@
           traefik.http.routers.nextcloudaio.middlewares: "{{ nextcloudaio_hostname }}@docker"
           traefik.http.middlewares.nextcloudaio.IPAllowList.sourcerange: "{{ nextcloudaio_traefik_whitelist }}"
           traefik.http.services.nextcloudaio.loadbalancer.server.port: "8080"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/nextcloud/all-in-one/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ nextcloudaio_memory }}"
         restart_policy: unless-stopped
   when: nextcloudaio_enabled is true

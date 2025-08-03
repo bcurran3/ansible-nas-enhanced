@@ -50,7 +50,8 @@
           traefik.http.middlewares.pialert.IPAllowList.sourcerange: "{{ pialert_traefik_whitelist }}"
           traefik.http.services.pialert.loadbalancer.server.port: "20211"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+#         wud.link.template: "https://github.com/leiweibau/Pi.Alert/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ need to match format example: v2025-07-30
         memory: "{{ pialert_memory }}"
         restart_policy: unless-stopped
   when: pialert_enabled is true

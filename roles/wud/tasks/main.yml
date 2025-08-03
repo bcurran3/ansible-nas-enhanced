@@ -57,6 +57,8 @@
           traefik.http.routers.wud.middlewares: "{{ wud_hostname }}@docker"
           traefik.http.middlewares.wud.IPAllowList.sourcerange: "{{ wud_traefik_whitelist }}"
           traefik.http.services.wud.loadbalancer.server.port: "3000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/getwud/wud/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ wud_memory }}"
         restart_policy: unless-stopped
   when: wud_enabled is true

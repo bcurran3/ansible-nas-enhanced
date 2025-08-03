@@ -51,8 +51,8 @@
           traefik.http.routers.stalwart.middlewares: "{{ stalwart_hostname }}@docker"
           traefik.http.middlewares.stalwart.IPAllowList.sourcerange: "{{ stalwart_traefik_whitelist }}"
           traefik.http.services.stalwart.loadbalancer.server.port: "8080"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/stalwartlabs/stalwart/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ stalwart_memory }}"
         restart_policy: unless-stopped
   when: stalwart_enabled is true

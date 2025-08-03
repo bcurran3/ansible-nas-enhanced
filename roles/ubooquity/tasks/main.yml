@@ -49,6 +49,8 @@
           traefik.http.routers.ubooquity.middlewares: "{{ ubooquity_hostname }}@docker"
           traefik.http.middlewares.ubooquity.IPAllowList.sourcerange: "{{ ubooquity_traefik_whitelist }}"
           traefik.http.services.ubooquity.loadbalancer.server.port: "2202"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-ubooquity/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ ubooquity_cpu_shares }}"
         memory: "{{ ubooquity_memory }}"
         restart_policy: unless-stopped

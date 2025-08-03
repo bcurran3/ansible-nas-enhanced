@@ -48,6 +48,8 @@
           traefik.http.routers.calibreweb.middlewares: "{{ calibreweb_hostname }}@docker"
           traefik.http.middlewares.calibreweb.IPAllowList.sourcerange: "{{ calibreweb_traefik_whitelist }}"
           traefik.http.services.calibreweb.loadbalancer.server.port: "8083"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/janeczku/calibre-web/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ calibreweb_cpu_shares }}"
         memory: "{{ calibreweb_memory }}"
         restart_policy: unless-stopped

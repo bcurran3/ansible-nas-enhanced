@@ -48,8 +48,8 @@
           homepage.container: "{{ phpbb_db_container_name }}"
           homepage.showStats: "{{ phpbb_db_container_homepage_showStats }}"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ phpbb_db_memory }}"
         restart_policy: unless-stopped
 
@@ -101,7 +101,8 @@
           traefik.http.middlewares.phpbb.IPAllowList.sourcerange: "{{ phpbb_traefik_whitelist }}"
           traefik.http.services.phpbb.loadbalancer.server.port: "8080"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+#         wud.link.template: "https://github.com/phpbb/phpbb/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ no releases, need to match tags
         memory: "{{ phpbb_memory }}"
         restart_policy: unless-stopped
   when: phpbb_enabled is true

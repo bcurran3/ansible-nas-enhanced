@@ -49,8 +49,8 @@
           traefik.http.routers.whisparr.middlewares: "{{ whisparr_hostname }}@docker"
           traefik.http.middlewares.whisparr.IPAllowList.sourcerange: "{{ whisparr_traefik_whitelist }}"
           traefik.http.services.whisparr.loadbalancer.server.port: "6969"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/thespad/docker-whisparr/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ whisparr_memory }}"
         restart_policy: unless-stopped
   when: whisparr_enabled is true

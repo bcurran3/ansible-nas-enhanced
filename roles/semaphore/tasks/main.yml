@@ -49,8 +49,8 @@
           traefik.http.routers.semaphore.middlewares: "{{ semaphore_hostname }}@docker"
           traefik.http.middlewares.semaphore.IPAllowList.sourcerange: "{{ semaphore_traefik_whitelist }}"
           traefik.http.services.semaphore.loadbalancer.server.port: "3000"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/semaphoreui/semaphore/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ semaphore_memory }}"
         restart_policy: unless-stopped
   when: semaphore_enabled is true

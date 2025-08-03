@@ -56,6 +56,8 @@
           traefik.http.routers.ispyagentdvr.middlewares: "{{ ispyagentdvr_hostname }}@docker"
           traefik.http.middlewares.ispyagentdvr.IPAllowList.sourcerange: "{{ ispyagentdvr_traefik_whitelist }}"
           traefik.http.services.ispyagentdvr.loadbalancer.server.port: "8097"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
   when: ispyagentdvr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

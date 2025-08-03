@@ -46,6 +46,8 @@
           traefik.http.routers.airsonic.middlewares: "{{ airsonic_hostname }}@docker"
           traefik.http.middlewares.airsonic.IPAllowList.sourcerange: "{{ airsonic_traefik_whitelist }}"
           traefik.http.services.airsonic.loadbalancer.server.port: "4040"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/airsonic/airsonic/releases/tag/$${major}.$${minor}.$${patch}"
   when: airsonic_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

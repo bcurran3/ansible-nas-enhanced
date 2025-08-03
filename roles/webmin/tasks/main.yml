@@ -35,16 +35,16 @@
 
         - name: Remove {{ ansible_nas_app_name }} APT repository file
           ansible.builtin.file:
-            path: /etc/apt/sources.list.d/webmin.list # Assuming the script creates this file
+            path: /etc/apt/sources.list.d/webmin.list
             state: absent
 
-        - name: Remove {{ ansible_nas_app_name }} GPG key (if script added it to a specific file)
+        - name: Remove {{ ansible_nas_app_name }} GPG key
           ansible.builtin.file:
             path: /etc/apt/trusted.gpg.d/jcameron-key.asc
             state: absent
           ignore_errors: true
 
-        - name: Remove the downloaded setup script
+        - name: Remove downloaded {{ ansible_nas_app_name }} setup script
           ansible.builtin.file:
             path: scripts/webmin-setup-repo.sh
             state: absent

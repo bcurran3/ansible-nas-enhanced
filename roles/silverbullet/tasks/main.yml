@@ -43,6 +43,8 @@
           traefik.http.routers.silverbullet.middlewares: "{{ silverbullet_hostname }}@docker"
           traefik.http.middlewares.silverbullet.IPAllowList.sourcerange: "{{ silverbullet_traefik_whitelist }}"
           traefik.http.services.silverbullet.loadbalancer.server.port: "3000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/silverbulletmd/silverbullet/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ silverbullet_cpu_shares }}"
         memory: "{{ silverbullet_memory }}"
         restart_policy: unless-stopped

@@ -32,7 +32,7 @@
           homepage.group: "{{ syncthing_homepage_group }}"
           homepage.icon: "{{ syncthing_homepage_icon }}"
           homepage.href: "{{ syncthing_homepage_href }}"
-          homepage.description: "{{ 'syncthing description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'Open Source Continuous File Synchronization' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ syncthing_container_name }}"
           homepage.showStats: "{{ syncthing_homepage_showStats }}"
@@ -46,6 +46,8 @@
           traefik.http.routers.syncthing.middlewares: "{{ syncthing_hostname }}@docker"
           traefik.http.middlewares.syncthing.IPAllowList.sourcerange: "{{ syncthing_traefik_whitelist }}"
           traefik.http.services.syncthing.loadbalancer.server.port: "8384"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/syncthing/syncthing/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ syncthing_cpu_shares }}"
         memory: "{{ syncthing_memory }}"
         restart_policy: unless-stopped

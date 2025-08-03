@@ -64,6 +64,8 @@
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} MongoDB Container
@@ -94,6 +96,8 @@
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
@@ -121,6 +125,8 @@
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} nats Container
@@ -157,6 +163,8 @@
     #      traefik.http.routers.tacticalrmm.middlewares: "{{ tacticalrmm_api_hostname }}@docker"
     #      traefik.http.middlewares.tacticalrmm.IPAllowList.sourcerange: "{{ tacticalrmm_traefik_whitelist }}"
     #      traefik.http.services.tacticalrmm.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} MeshCentral Container
@@ -202,6 +210,8 @@
     #      traefik.http.routers.tacticalrmm.middlewares: "{{ tacticalrmm_mesh_hostname }}@docker"
     #      traefik.http.middlewares.tacticalrmm.IPAllowList.sourcerange: "{{ tacticalrmm_traefik_whitelist }}"
     #      traefik.http.services.tacticalrmm.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} init Container
@@ -241,6 +251,8 @@
           autoheal: "false"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         links:
           - tactical-postgres
           - tactical-meshcentral
@@ -271,6 +283,8 @@
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} django Container
@@ -300,6 +314,8 @@
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         links:
           - tactical-postgres
         restart_policy: unless-stopped
@@ -331,6 +347,8 @@
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         links:
           - tactical-postgres
           - tactical-backend
@@ -363,6 +381,8 @@
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         links:
           - tactical-postgres
           - tactical-redis
@@ -395,6 +415,8 @@
           autoheal: "{{ tacticalrmm_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tacticalrmm_watchtower_monitor_only }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         restart_policy: unless-stopped
         links:
           - tactical-postgres
@@ -450,6 +472,8 @@
           traefik.http.routers.tacticalrmm.middlewares: "{{ tacticalrmm_hostname }}@docker"
           traefik.http.middlewares.tacticalrmm.IPAllowList.sourcerange: "{{ tacticalrmm_traefik_whitelist }}"
           traefik.http.services.tacticalrmm.loadbalancer.server.port: "8080"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         restart_policy: unless-stopped
   when: tacticalrmm_enabled is true
 

@@ -1,4 +1,5 @@
 ---
+# This repository was archived by the owner on Jun 29, 2025. It is now read-only.
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -47,8 +48,8 @@
           traefik.http.routers.pingvinshare.middlewares: "{{ pingvinshare_hostname }}@docker"
           traefik.http.middlewares.pingvinshare.IPAllowList.sourcerange: "{{ pingvinshare_traefik_whitelist }}"
           traefik.http.services.pingvinshare.loadbalancer.server.port: "3000"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "hhttps://github.com/stonith404/pingvin-share/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ pingvinshare_memory }}"
         restart_policy: unless-stopped
   when: pingvinshare_enabled is true

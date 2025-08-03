@@ -49,6 +49,8 @@
           traefik.http.routers.mumble.middlewares: "{{ mumble_hostname }}@docker"
           traefik.http.middlewares.mumble.IPAllowList.sourcerange: "{{ mumble_traefik_whitelist }}"
           traefik.http.services.mumble.loadbalancer.server.port: "64738"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/mumble-voip/mumble/releases/tag/$${major}.$${minor}.$${patch}"
   when: mumble_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

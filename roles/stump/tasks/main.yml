@@ -46,8 +46,8 @@
           traefik.http.routers.stump.middlewares: "{{ stump_hostname }}@docker"
           traefik.http.middlewares.stump.IPAllowList.sourcerange: "{{ stump_traefik_whitelist }}"
           traefik.http.services.stump.loadbalancer.server.port: "10801"
-          stump.tag.include: '^\d+\.\d+\.\d+$$'
-          stump.link.template: "https://github.com/stumpapp/stump/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/stumpapp/stump/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ stump_memory }}"
         restart_policy: unless-stopped
   when: stump_enabled is true

@@ -49,6 +49,9 @@
           traefik.http.routers.deluge.middlewares: "{{ deluge_hostname }}@docker"
           traefik.http.middlewares.deluge.IPAllowList.sourcerange: "{{ deluge_traefik_whitelist }}"
           traefik.http.services.deluge.loadbalancer.server.port: "8112"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/deluge-torrent/deluge/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ most likely wrong          
         cpu_shares: "{{ deluge_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ deluge_memory }}"

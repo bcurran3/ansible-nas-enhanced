@@ -45,6 +45,8 @@
           traefik.http.routers.ombi.middlewares: "{{ ombi_hostname }}@docker"
           traefik.http.middlewares.ombi.IPAllowList.sourcerange: "{{ ombi_traefik_whitelist }}"
           traefik.http.services.ombi.loadbalancer.server.port: "3579"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-ombi/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ ombi_cpu_shares }}"
         memory: "{{ ombi_memory }}"
         restart_policy: unless-stopped

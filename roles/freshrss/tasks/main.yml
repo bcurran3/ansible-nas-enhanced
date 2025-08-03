@@ -37,6 +37,8 @@
           homepage.container: "{{ freshrss_db_container_name }}"
           homepage.showStats: "{{ freshrss_db_homepage_showStats }}"
           traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ freshrss_db_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ freshrss_db_memory }}"
@@ -87,6 +89,8 @@
           traefik.http.routers.freshrss.middlewares: "{{ freshrss_hostname }}@docker"
           traefik.http.middlewares.freshrss.IPAllowList.sourcerange: "{{ freshrss_traefik_whitelist }}"
           traefik.http.services.freshrss.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/FreshRSS/FreshRSS/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ freshrss_cpu_shares }}"
         memory: "{{ freshrss_memory }}"
         restart_policy: unless-stopped

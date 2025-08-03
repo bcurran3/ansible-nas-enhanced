@@ -31,11 +31,14 @@
           homepage.group: "{{ timemachine_homepage_group }}"
           homepage.icon: "{{ timemachine_homepage_icon }}"
           homepage.href: "{{ timemachine_homepage_href }}"
-          homepage.description: "{{ 'timemachine description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'Docker Container to run a TimeMachine Backup target' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ timemachine_container_name }}"
           homepage.showStats: "{{ timemachine_homepage_showStats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ timemachine_port }}"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ no published releases or tags on github
         cpu_shares: "{{ timemachine_cpu_shares }}"
         memory: "{{ timemachine_memory }}"
         restart_policy: unless-stopped

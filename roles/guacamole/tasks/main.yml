@@ -59,6 +59,8 @@
           traefik.http.routers.guacamole.middlewares: "{{ guacamole_hostname }}@docker"
           traefik.http.middlewares.guacamole.IPAllowList.sourcerange: "{{ guacamole_traefik_whitelist }}"
           traefik.http.services.guacamole.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/oznu/docker-guacamole/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ guacamole_cpu_shares }}"
         memory: "{{ guacamole_memory }}"
         restart_policy: unless-stopped

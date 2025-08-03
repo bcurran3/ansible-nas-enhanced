@@ -50,8 +50,8 @@
           traefik.http.routers.plexrewind.middlewares: "{{ plexrewind_hostname }}@docker"
           traefik.http.middlewares.plexrewind.IPAllowList.sourcerange: "{{ plexrewind_traefik_whitelist }}"
           traefik.http.services.plexrewind.loadbalancer.server.port: "8383"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/RaunoT/plex-rewind/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ plexrewind_memory_limit }}"
         restart_policy: unless-stopped
   when: plexrewind_enabled is true

@@ -53,8 +53,8 @@
           traefik.http.routers.makemkv.middlewares: "{{ makemkv_hostname }}@docker"
           traefik.http.middlewares.makemkv.IPAllowList.sourcerange: "{{ makemkv_traefik_whitelist }}"
           traefik.http.services.makemkv.loadbalancer.server.port: "5800"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/jlesage/docker-makemkv/releases/tag/$${major}.$${minor}.$${patch}"
         memory: "{{ makemkv_memory }}"
         restart_policy: unless-stopped
   when: makemkv_enabled is true

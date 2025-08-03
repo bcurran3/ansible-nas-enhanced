@@ -45,6 +45,8 @@
           traefik.http.routers.couchdb.middlewares: "{{ couchdb_hostname }}@docker"
           traefik.http.middlewares.couchdb.IPAllowList.sourcerange: "{{ couchdb_traefik_whitelist }}"
           traefik.http.services.couchdb.loadbalancer.server.port: "5984"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/apache/couchdb/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ couchdb_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ couchdb_memory }}"

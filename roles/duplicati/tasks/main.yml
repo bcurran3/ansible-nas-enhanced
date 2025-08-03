@@ -56,7 +56,9 @@
           traefik.http.routers.duplicati.middlewares: "{{ duplicati_hostname }}@docker"
           traefik.http.middlewares.duplicati.IPAllowList.sourcerange: "{{ duplicati_traefik_whitelist }}"
           traefik.http.services.duplicati.loadbalancer.server.port: "8200"
-#         wud.tag.include: '^v\d+\.\d+\.\d+\.\d+-\d+\.\d+\.\d+\.\d+.*$$'
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         ^ This needs work, example: v2.1.0.125_canary_2025-07-15
+#         wud.link.template: "https://github.com/duplicati/duplicati/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ duplicati_cpu_shares }}"
         memory: "{{ duplicati_memory }}"
         restart_policy: unless-stopped

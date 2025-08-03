@@ -37,6 +37,8 @@
           homepage.showStats: "{{ firefly_db_homepage_showStats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_db_port }}"
           traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ firefly_db_cpu_shares }}"
         memory: "{{ firefly_db_memory }}"
         restart_policy: unless-stopped
@@ -90,6 +92,8 @@
           traefik.http.routers.firefly.middlewares: "{{ firefly_hostname }}@docker"
           traefik.http.middlewares.firefly.IPAllowList.sourcerange: "{{ firefly_traefik_whitelist }}"
           traefik.http.services.firefly.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/firefly-iii/firefly-iii/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ firefly_cpu_shares }}"
         memory: "{{ firefly_memory }}"
         restart_policy: unless-stopped

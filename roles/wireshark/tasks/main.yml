@@ -38,6 +38,8 @@
           homepage.showStats: "{{ wireshark_homepage_showStats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireshark_port }}"
           traefik.enable: "false" # host mode
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/linuxserver/docker-wireshark/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ wireshark_cpu_shares }}"
         memory: "{{ wireshark_memory }}"
         restart_policy: unless-stopped
