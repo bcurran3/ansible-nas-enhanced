@@ -1,9 +1,3 @@
-############################## comments ##############################
-# REF: https://docs.ansible.com/ansible/2.5/modules/docker_module.html
-# All comments here
-#
-# consider making wud lables variables - if the image changes, so would the link
-############################## comments ##############################
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
@@ -39,7 +33,7 @@
           homepage.group: "{{ appname_homepage_group }}"
           homepage.icon: "{{ appname_homepage_icon }}"
           homepage.href: "{{ appname_homepage_href }}"
-          homepage.description: "{{ 'The personal, minimalist, super-fast, no-database delicious clone.' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'appname description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_container_name }}"
           homepage.showStats: "{{ appname_homepage_showStats }}"
@@ -54,7 +48,7 @@
           traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ appname_traefik_whitelist }}"
           traefik.http.services.appname.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/shaarli/Shaarli/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.link.template: "https://github.com/devname/appname/releases/tag/$${major}.$${minor}.$${patch}"
   when: appname_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
