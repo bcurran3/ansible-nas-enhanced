@@ -21,10 +21,9 @@
         hostname: "{{ pulse_container_name }}"
         image: "{{ pulse_image_name }}:{{ pulse_image_tag }}"
         pull: true
-        cpu_shares: "{{ pulse_cpu_shares }}"
         volumes:
-          - "{{ pulse_data_directory }}/config:/usr/src/app/config"
-          - "{{ pulse_data_directory }}/data:/usr/src/app/data"
+#          - "{{ pulse_data_directory }}/config:/etc/pulse" v4.0.0
+          - "{{ pulse_data_directory }}/data:/data"
         ports:
           - "{{ pulse_port }}:7655"
         env:
@@ -38,8 +37,12 @@
           PBS_PORT: "{{ pulse_env_pbs_port }}"
           SECURITY_MODE: "private"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ pulse_memory }}"
+        healthcheck:
+          test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7655"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+          start_period: 30s
         labels:
           autoheal: "{{ pulse_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pulse_watchtower_monitor_only }}"
@@ -63,6 +66,9 @@
           traefik.http.services.pulse.loadbalancer.server.port: "7655"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/rcourtman/Pulse/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ pulse_cpu_shares }}"
+        memory: "{{ pulse_memory }}"
+        restart_policy: unless-stopped
   when: pulse_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
