@@ -1,0 +1,52 @@
+---
+ansible_nas_app_name: "Blinko"
+
+blinko_enabled: false
+blinko_available_externally: false
+blinko_traefik_whitelist: "{{ lan }}"
+
+# directories
+blinko_data_directory: "{{ docker_home }}/blinko"
+
+# docker
+blinko_container_name: "blinko"
+blinko_image_name: "blinkospace/blinko"
+blinko_image_tag: "latest"
+blinko_db_container_name: "blinko-db"
+blinko_db_image_name: "postgres"
+blinko_db_image_tag: "14"
+
+# network
+blinko_port: "1111"
+blinko_hostname: "blinko"
+
+# specs
+blinko_cpu_shares: "1024"
+blinko_memory: 1g
+blinko_db_cpu_shares: "1024"
+blinko_db_memory: 1g
+
+# app
+blinko_env_postgress_user: "blinko"
+blinko_env_postgress_password: "blinko"
+# generate a secret
+# openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32 && echo
+blinko_env_nextauth_secret: "xDyFaPiH7H8NRNgz18zFYyKUAN40LaQT"
+
+# autoheal
+blinko_autoheal: "false"
+blinko_db_autoheal: "false"
+
+# homepage
+blinko_homepage_group: "Apps"
+blinko_homepage_icon: "sh-blinko"
+blinko_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ blinko_port }}"
+blinko_homepage_showStats: "false"
+blinko_db_homepage_group: "DBs"
+blinko_db_homepage_icon: "postgres.png"
+blinko_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ blinko_port }}"
+blinko_db_homepage_showStats: "false"
+
+# watchtower
+blinko_watchtower_monitor_only: "true"
+blinko_db_watchtower_monitor_only: "true"

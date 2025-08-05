@@ -1,0 +1,137 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ blinko_data_directory }}"
+        - "{{ blinko_data_directory }}/blinko"
+        - "{{ blinko_data_directory }}/db"
+
+    - name: Create {{ ansible_nas_app_name }} PostgreSQL Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ blinko_db_container_name }}"
+        hostname: "{{ blinko_db_container_name }}"
+        image: "{{ blinko_db_image_name }}:{{ blinko_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ blinko_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "{{ blinko_env_postgress_user }}"
+          POSTGRES_PASSWORD: "{{ blinko_env_postgress_password }}"
+          POSTGRES_DB: "blinko_db"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test:
+            ["CMD", "pg_isready", "-U", "{{ blinko_env_postgress_user }}", "-d", "blinko_db"]
+          interval: 5s
+          timeout: 10s
+          retries: 5
+        labels:
+          autoheal: "{{ blinko_db_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ blinko_db_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ blinko_db_homepage_group }}"
+          homepage.icon: "{{ blinko_db_homepage_icon }}"
+          homepage.href: "{{ blinko_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ blinko_db_container_name }}"
+          homepage.showStats: "{{ blinko_db_homepage_showStats }}"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://hub.docker.com/_/postgres/tag/$${major}.$${minor}.$${patch}"
+#         ^ needs to be updated
+        cpu_shares: "{{ blinko_db_cpu_shares }}"
+        memory: "{{ blinko_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ blinko_container_name }}"
+        hostname: "{{ blinko_container_name }}"
+        image: "{{ blinko_image_name }}:{{ blinko_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ blinko_data_directory }}/blinko:/app/.blinko"
+        ports:
+          - "{{ blinko_port }}:1111"
+        env:
+          NODE_ENV: "production"
+        # NEXTAUTH_URL: http://localhost:1111
+        # NEXT_PUBLIC_BASE_URL: http://localhost:1111
+          NEXTAUTH_SECRET: "{{ blinko_env_nextauth_secret }}"
+          DATABASE_URL: "postgresql://{{ blinko_env_postgress_user }}:{{ blinko_env_postgress_password }}@{{ blinko_db_container_name }}:5432/blinko_db"
+          TZ: "{{ ansible_nas_timezone }}"
+# curl not in container! 08/05/25
+#        healthcheck:
+#          test: ["CMD", "curl", "-f", "http://{{ blinko_container_name }}:1111/"]
+#          interval: 30s 
+#          timeout: 10s   
+#          retries: 5     
+#          start_period: 30s
+        log_driver: json-file
+        log_options:
+            max-size: "10m"
+            max-file: "3"
+        links:
+          - "{{ blinko_db_container_name }}"
+        labels:
+          autoheal: "{{ blinko_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ blinko_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ blinko_homepage_group }}"
+          homepage.icon: "{{ blinko_homepage_icon }}"
+          homepage.href: "{{ blinko_homepage_href }}"
+          homepage.description: "{{ 'An open-source, self-hosted personal AI note tool prioritizing privacy, built using TypeScript .' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ blinko_container_name }}"
+          homepage.showStats: "{{ blinko_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ blinko_port }}"
+          traefik.enable: "{{ blinko_available_externally | string }}"
+          traefik.http.routers.blinko.rule: "Host(`{{ blinko_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.blinko.tls.certresolver: "letsencrypt"
+          traefik.http.routers.blinko.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.blinko.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ blinko_hostname }}"
+          traefik.http.routers.blinko.middlewares: "{{ blinko_hostname }}@docker"
+          traefik.http.middlewares.blinko.IPAllowList.sourcerange: "{{ blinko_traefik_whitelist }}"
+          traefik.http.services.blinko.loadbalancer.server.port: "1111"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/blinkospace/blinko/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ blinko_cpu_shares }}"
+        memory: "{{ blinko_memory }}"
+        restart_policy: unless-stopped
+  when: blinko_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ blinko_container_name }}"
+        state: absent
+  when: blinko_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ blinko_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ blinko_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: blinko_enabled is false and archive_app_data_enabled is true
