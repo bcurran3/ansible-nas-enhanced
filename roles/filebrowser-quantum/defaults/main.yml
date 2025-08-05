@@ -1,0 +1,38 @@
+---
+ansible_nas_app_name: "FileBrowser Quantum"
+
+filebrowser_quantum_enabled: false
+filebrowser_quantum_available_externally: false
+filebrowser_quantum_traefik_whitelist: "{{ lan }}"
+
+# directories
+filebrowser_quantum_data_directory: "{{ docker_home }}/filebrowser-quantum"
+
+# docker
+filebrowser_quantum_container_name: "filebrowser-quantum"
+filebrowser_quantum_image_name: "gtstef/filebrowser"
+filebrowser_quantum_image_tag: "latest"
+
+# network
+filebrowser_quantum_port: "8086"
+filebrowser_quantum_hostname: "filebrowser"
+
+# specs
+filebrowser_quantum_cpu_shares: "1024"
+filebrowser_quantum_memory: 1g
+
+# app
+filebrowser_quantum_folder: "/"
+filebrowser_quantum_env_filebrowser_admin_password: "topsecret"
+
+# autoheal
+filebrowser_quantum_autoheal: "false"
+
+# homepage
+filebrowser_quantum_homepage_group: "Apps"
+filebrowser_quantum_homepage_icon: "filebrowser-quantum.png"
+filebrowser_quantum_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebrowser_quantum_port }}"
+filebrowser_quantum_homepage_showStats: "false"
+
+# watchtower
+filebrowser_quantum_watchtower_monitor_only: "true"

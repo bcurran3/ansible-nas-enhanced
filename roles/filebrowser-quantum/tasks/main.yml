@@ -1,0 +1,90 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ filebrowser_quantum_data_directory }}"
+        - "{{ filebrowser_quantum_data_directory }}/data"
+
+    - name: Generate {{ ansible_nas_app_name }} config file
+      ansible.builtin.template:
+        src: config.yaml
+        dest: "{{ filebrowser_quantum_data_directory }}/data/config.yaml"
+      register: template_config
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ filebrowser_quantum_container_name }}"
+        hostname: "{{ filebrowser_quantum_container_name }}"
+        image: "{{ filebrowser_quantum_image_name }}:{{ filebrowser_quantum_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ filebrowser_quantum_data_directory }}/data:/home/filebrowser/data"
+          - "{{ filebrowser_quantum_folder }}:/{{ ansible_nas_hostname }}"
+        ports:
+          - "{{ filebrowser_quantum_port }}:80"
+        env:
+          FILEBROWSER_CONFIG: "data/config.yaml"
+          FILEBROWSER_ADMIN_PASSWORD: "{{ filebrowser_quantum_env_filebrowser_admin_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ filebrowser_quantum_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ filebrowser_quantum_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ filebrowser_quantum_homepage_group }}"
+          homepage.icon: "{{ filebrowser_quantum_homepage_icon }}"
+          homepage.href: "{{ filebrowser_quantum_homepage_href }}"
+          homepage.description: "{{ 'The best free self-hosted web-based file manager.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ filebrowser_quantum_container_name }}"
+          homepage.showStats: "{{ filebrowser_quantum_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebrowser_quantum_port }}"
+          traefik.enable: "{{ filebrowser_quantum_available_externally | string }}"
+          traefik.http.routers.filebrowser.rule: "Host(`{{ filebrowser_quantum_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.filebrowser.tls.certresolver: "letsencrypt"
+          traefik.http.routers.filebrowser.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.filebrowser.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ filebrowser_quantum_hostname }}"
+          traefik.http.routers.filebrowser.middlewares: "{{ filebrowser_quantum_hostname }}@docker"
+          traefik.http.middlewares.filebrowser.IPAllowList.sourcerange: "{{ filebrowser_quantum_traefik_whitelist }}"
+          traefik.http.services.filebrowser.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/gtsteffaniak/filebrowser/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ needs to be changed to format: v0.7.18-beta
+        cpu_shares: "{{ filebrowser_quantum_cpu_shares }}"
+        memory: "{{ filebrowser_quantum_memory }}"
+        recreate: "{{ template_config is changed }}"
+        restart_policy: unless-stopped
+  when: filebrowser_quantum_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ filebrowser_quantum_container_name }}"
+        state: absent
+  when: filebrowser_quantum_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ filebrowser_quantum_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ filebrowser_quantum_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: filebrowser_quantum_enabled is false and archive_app_data_enabled is true
