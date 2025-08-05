@@ -10,7 +10,7 @@ echo "    / _ \ |  \| |  _|"
 echo "   / ___ \| |\  | |___"
 echo "  /_/   \_\_| \_|_____|"
 echo
-echo  Ansible-NAS-Enhanced - https://github.com/bcurran3/ansible-nas-enhanced
+echo "   Ansible-NAS-Enhanced"
 echo
 }
 
