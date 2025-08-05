@@ -1,0 +1,75 @@
+---
+ansible_nas_app_name: "Linkwarden"
+
+linkwarden_enabled: false
+linkwarden_available_externally: false
+linkwarden_traefik_whitelist: "{{ lan }}"
+
+# directories
+linkwarden_data_directory: "{{ docker_home }}/linkwarden"
+
+# docker
+linkwarden_container_name: "linkwarden"
+linkwarden_image_name: "ghcr.io/linkwarden/linkwarden"
+linkwarden_image_tag: "latest"
+linkwarden_db_container_name: "linkwarden-db"
+linkwarden_db_image_name: "postgres"
+linkwarden_db_image_tag: "16-alpine"
+linkwarden_search_container_name: "linkwarden-search"
+linkwarden_search_image_name: "getmeili/meilisearch"
+linkwarden_search_image_tag: "v1.12.8"
+
+
+# network
+linkwarden_port: "8990"
+linkwarden_hostname: "linkwarden"
+linkwarden_db_hostname: "linkwarden-db"
+linkwarden_search_hostname: "linkwarden-search"
+
+# specs
+linkwarden_cpu_shares: "1024"
+linkwarden_memory: 1g
+linkwarden_db_cpu_shares: "1024"
+linkwarden_db_memory: 1g
+linkwarden_search_cpu_shares: "1024"
+linkwarden_search_memory: 1g
+
+# app
+# enviromental variables:
+# https://docs.linkwarden.app/self-hosting/environment-variables
+linkwarden_env_next_public_disable_registration: "false"
+linkwarden_env_next_public_email_provider: "false"
+linkwarden_env_email_from: "" # "linkwarden@{{ ansible_nas_domain }}"
+linkwarden_env_email_server: "" # "smtp://user:password@host:port"
+linkwarden_env_base_url: ""
+# generate a secret
+# openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32 && echo
+linkwarden_env_meili_master_key: "2rbQOk9coKHYxtJV5YMMxtorZVBePA8U"
+linkwarden_env_nextauth_secret: "GrK3u5Ajv6ra2JINwQsL9UsWbhbb2YTo"
+linkwarden_env_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}/api/v1/auth"
+linkwarden_env_postgres_user: "postgres"
+linkwarden_env_postgres_password: "linkwarden"
+
+# autoheal
+linkwarden_autoheal: "false"
+linkwarden_db_autoheal: "false"
+linkwarden_search_autoheal: "false"
+
+# homepage
+linkwarden_homepage_group: "Apps"
+linkwarden_homepage_icon: "linkwarden.png"
+linkwarden_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}"
+linkwarden_homepage_showStats: "false"
+linkwarden_db_homepage_group: "DBs"
+linkwarden_db_homepage_icon: "postgres.png"
+linkwarden_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}"
+linkwarden_db_homepage_showStats: "false"
+linkwarden_search_homepage_group: "Misc"
+linkwarden_search_homepage_icon: "meilisearch.png"
+linkwarden_search_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}"
+linkwarden_search_homepage_showStats: "false"
+
+# watchtower
+linkwarden_watchtower_monitor_only: "true"
+linkwarden_db_watchtower_monitor_only: "true"
+linkwarden_search_watchtower_monitor_only: "true"
