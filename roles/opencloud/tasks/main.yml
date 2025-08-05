@@ -1,0 +1,125 @@
+---
+# https://github.com/opencloud-eu/opencloud-compose/blob/main/docker-compose.yml
+### WORK IN PROGRESS
+# login error
+# see https://github.com/opencloud-eu/opencloud/issues/818
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: 1000
+        group: 1000
+        mode: 0755
+      with_items:
+        - "{{ opencloud_data_directory }}"
+        - "{{ opencloud_data_directory }}/config"
+        - "{{ opencloud_data_directory }}/data"
+
+    - name: Get {{ ansible_nas_app_name }} config status
+      ansible.builtin.stat:
+        path: "{{ opencloud_data_directory }}/config/opencloud.yaml"
+      register: config_status
+
+    - name: Initialize {{ ansible_nas_app_name }}
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ opencloud_container_name }}"
+        image: "{{ opencloud_image_name }}:{{ opencloud_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ opencloud_data_directory }}/config:/etc/opencloud"
+          - "{{ opencloud_data_directory }}/data:/var/lib/opencloud"
+        env:
+          IDM_ADMIN_PASSWORD: "{{ opencloud_env_idm_admin_password }}"
+        entrypoint:
+          - /bin/sh
+        command: ["-c", "yes | opencloud init"]
+      when: not config_status.stat.exists
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ opencloud_container_name }}"
+        hostname: "{{ opencloud_container_name }}"
+        image: "{{ opencloud_image_name }}:{{ opencloud_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ opencloud_data_directory }}/config:/etc/opencloud"
+          - "{{ opencloud_data_directory }}/data:/var/lib/opencloud"
+        ports:
+          - "{{ opencloud_port }}:9200"
+        env:
+          OC_URL: "{{ opencloud_env_oc_url }}"
+          OC_INSECURE: "true"
+          OC_LOG_LEVEL: "info"
+          OC_LOG_COLOR: "true"
+          OC_LOG_PRETTY: "true"
+          PROXY_HTTP_ADDR: "0.0.0.0:9200"
+          PROXY_TLS: "false"
+#         email server (if configured)
+#         NOTIFICATIONS_SMTP_HOST: "${SMTP_HOST}"
+#         NOTIFICATIONS_SMTP_PORT: "${SMTP_PORT}"
+#         NOTIFICATIONS_SMTP_SENDER: "${SMTP_SENDER:-OpenCloud notifications <notifications@${OC_DOMAIN:-cloud.opencloud.test}>}"
+#         NOTIFICATIONS_SMTP_USERNAME: "${SMTP_USERNAME}"
+#         NOTIFICATIONS_SMTP_PASSWORD: "${SMTP_PASSWORD}"
+#         NOTIFICATIONS_SMTP_INSECURE: "${SMTP_INSECURE}"
+#         NOTIFICATIONS_SMTP_AUTHENTICATION: "${SMTP_AUTHENTICATION}"
+#         NOTIFICATIONS_SMTP_ENCRYPTION: "${SMTP_TRANSPORT_ENCRYPTION:-none}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ opencloud_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ opencloud_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ opencloud_homepage_group }}"
+          homepage.icon: "{{ opencloud_homepage_icon }}"
+          homepage.href: "{{ opencloud_homepage_href }}"
+          homepage.description: "{{ 'OpenCloud is an open-source project that gives you a secure and private way to store, access, and share your files.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ opencloud_container_name }}"
+          homepage.showStats: "{{ opencloud_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port }}"
+          traefik.enable: "{{ opencloud_available_externally | string }}"
+          traefik.http.routers.opencloud.rule: "Host(`{{ opencloud_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.opencloud.tls.certresolver: "letsencrypt"
+          traefik.http.routers.opencloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.opencloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ opencloud_hostname }}"
+          traefik.http.routers.opencloud.middlewares: "{{ opencloud_hostname }}@docker"
+          traefik.http.middlewares.opencloud.IPAllowList.sourcerange: "{{ opencloud_traefik_whitelist }}"
+          traefik.http.services.opencloud.loadbalancer.server.port: "9200"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/opencloud-eu/opencloud/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ opencloud_cpu_shares }}"
+        memory: "{{ opencloud_memory }}"
+        restart_policy: unless-stopped
+  when: opencloud_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ opencloud_container_name }}"
+        state: absent
+  when: opencloud_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ opencloud_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ opencloud_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: opencloud_enabled is false and archive_app_data_enabled is true
