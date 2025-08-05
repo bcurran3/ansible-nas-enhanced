@@ -1,0 +1,34 @@
+---
+ansible_nas_app_name: "Dockge"
+
+dockge_enabled: false
+dockge_available_externally: false
+dockge_traefik_whitelist: "{{ lan }}"
+
+# directories
+dockge_data_directory: "{{ docker_home }}/dockge"
+
+# docker
+dockge_container_name: "dockge"
+dockge_image_name: "louislam/dockge"
+dockge_image_tag: "1"
+
+# network
+dockge_port: "5001"
+dockge_hostname: "dockge"
+
+# specs
+dockge_cpu_shares: "1024"
+dockge_memory: 1g
+
+# autoheal
+dockge_autoheal: "false"
+
+# homepage
+dockge_homepage_group: "Apps"
+dockge_homepage_icon: "dockge.png"
+dockge_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockge_port }}"
+dockge_homepage_showStats: "false"
+
+# watchtower
+dockge_watchtower_monitor_only: "true"
