@@ -1,0 +1,34 @@
+---
+ansible_nas_app_name: "IT-Tools"
+
+ittools_enabled: false
+ittools_available_externally: false
+ittools_traefik_whitelist: "{{ lan }}"
+
+# directories
+ittools_data_directory: "{{ docker_home }}/ittools"
+
+# docker
+ittools_container_name: "it-tools"
+ittools_image_name: "corentinth/it-tools"
+ittools_image_tag: "latest"
+
+# network
+ittools_port: "8991"
+ittools_hostname: "ittools"
+
+# specs
+ittools_cpu_shares: "1024"
+ittools_memory: 1g
+
+# autoheal
+ittools_autoheal: "false"
+
+# homepage
+ittools_homepage_group: "Apps"
+ittools_homepage_icon: "it-tools.png"
+ittools_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ittools_port }}"
+ittools_homepage_showStats: "false"
+
+# watchtower
+ittools_watchtower_monitor_only: "true"
