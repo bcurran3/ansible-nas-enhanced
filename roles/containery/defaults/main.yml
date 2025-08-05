@@ -1,0 +1,34 @@
+---
+ansible_nas_app_name: "Containery"
+
+containery_enabled: false
+containery_available_externally: false
+containery_traefik_whitelist: "{{ lan }}"
+
+# directories
+containery_data_directory: "{{ docker_home }}/containery"
+
+# docker
+containery_container_name: "containery"
+containery_image_name: "ghcr.io/danylo829/containery"
+containery_image_tag: "latest"
+
+# network
+containery_port: "5000"
+containery_hostname: "containery"
+
+# specs
+containery_cpu_shares: "1024"
+containery_memory: 1g
+
+# autoheal
+containery_autoheal: "false"
+
+# homepage
+containery_homepage_group: "Apps"
+containery_homepage_icon: "https://raw.githubusercontent.com/danylo829/containery/master/src/app/static/images/Containery-white.png"
+containery_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ containery_port }}"
+containery_homepage_showStats: "false"
+
+# watchtower
+containery_watchtower_monitor_only: "true"
