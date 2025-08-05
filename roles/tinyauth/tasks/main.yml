@@ -1,0 +1,60 @@
+---
+### WORK IN PROGRESS
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tinyauth_container_name }}"
+        hostname: "{{ tinyauth_container_name }}"
+        image: "{{ tinyauth_image_name }}:{{ tinyauth_image_tag }}"
+        pull: true
+        ports:
+          - "{{ tinyauth_port }}:{{ tinyauth_port }}"
+        env:
+          APP_URL: "https://{{ tinyauth_hostname }}.{{ ansible_nas_domain }}"
+          PORT: "{{ tinyauth_port }}"
+          SECRET: "{{ tinyauth_env_secret }}"
+          USERS: "{{ tinyauth_env_users }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        labels:
+          autoheal: "{{ tinyauth_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ tinyauth_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ tinyauth_homepage_group }}"
+          homepage.icon: "{{ tinyauth_homepage_icon }}"
+          homepage.href: "{{ tinyauth_homepage_href }}"
+          homepage.description: "{{ 'The simplest way to protect your apps with a login screen.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tinyauth_container_name }}"
+          homepage.showStats: "{{ tinyauth_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tinyauth_port }}"
+          traefik.enable: "{{ tinyauth_available_externally | string }}"
+          traefik.http.routers.tinyauth.rule: "Host(`{{ tinyauth_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.tinyauth.tls.certresolver: "letsencrypt"
+          traefik.http.routers.tinyauth.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.tinyauth.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ tinyauth_hostname }}"
+          traefik.http.routers.tinyauth.middlewares: "{{ tinyauth_hostname }}@docker"
+          traefik.http.middlewares.tinyauth.IPAllowList.sourcerange: "{{ tinyauth_traefik_whitelist }}"
+          traefik.http.middlewares.tinyauth.forwardauth.address: "http://tinyauth:{{ tinyauth_port }}/api/auth/traefik"
+          traefik.http.services.tinyauth.loadbalancer.server.port: "{{ tinyauth_port }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/steveiliop56/tinyauth/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ tinyauth_cpu_shares }}"
+        memory: "{{ tinyauth_memory }}"
+        restart_policy: unless-stopped
+  when: tinyauth_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ tinyauth_container_name }}"
+        state: absent
+  when: tinyauth_enabled is false
+
+# below middleware doesn't work with IPAllowList middleware
+#          traefik.http.middlewares.tinyauth.forwardauth.address: "http://tinyauth:{{ tinyauth_port }}/api/auth/traefik"

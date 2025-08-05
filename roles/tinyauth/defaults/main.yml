@@ -1,0 +1,43 @@
+---
+ansible_nas_app_name: "Tinyauth"
+
+tinyauth_enabled: false
+tinyauth_available_externally: false
+tinyauth_traefik_whitelist: "{{ lan }}"
+
+# directories
+tinyauth_data_directory: "{{ docker_home }}/tinyauth"
+
+# docker
+tinyauth_container_name: "tinyauth"
+tinyauth_image_name: "ghcr.io/steveiliop56/tinyauth"
+tinyauth_image_tag: "latest"
+
+# network
+tinyauth_port: "8999"
+tinyauth_hostname: "tinyauth"
+
+# specs
+tinyauth_cpu_shares: "1024"
+tinyauth_memory: 1g
+
+# app
+# use below to create your own secret:
+# openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32 && echo
+tinyauth_env_secret: "jbOzK46As0IbppC2cPaW4W2QaolO1TsM"
+# create your users using this example:
+# docker exec -it tinyauth ./tinyauth user create --username ANE --password topsecret
+tinyauth_env_users: 'ANE:$2a$10$5hM2ALnuL54LGoU.kJLYsuJwoZ6dC5DivjxABHHPgqw3RwklYgESO'
+# more info: https://tinyauth.app/docs/reference/configuration
+
+# autoheal
+tinyauth_autoheal: "false"
+
+# homepage
+tinyauth_homepage_group: "Apps"
+tinyauth_homepage_icon: "tinyauth.png"
+tinyauth_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tinyauth_port }}"
+tinyauth_homepage_showStats: "false"
+
+# watchtower
+tinyauth_watchtower_monitor_only: "true"
