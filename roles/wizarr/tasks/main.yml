@@ -1,0 +1,83 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ wizarr_data_directory }}"
+        - "{{ wizarr_data_directory }}/db"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wizarr_container_name }}"
+        hostname: "{{ wizarr_container_name }}"
+        image: "{{ wizarr_image_name }}:{{ wizarr_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ wizarr_data_directory }}/db:/data/database"
+        ports:
+          - "{{ wizarr_port }}:5690"
+        env:
+          DISABLE_BUILTIN_AUTH: "{{ wizarr_env_disable_builtin_auth }}"
+          PUID: "{{ wizarr_user_id }}"
+          PGID: "{{ wizarr_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wizarr_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ wizarr_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ wizarr_homepage_group }}"
+          homepage.icon: "{{ wizarr_homepage_icon }}"
+          homepage.href: "{{ wizarr_homepage_href }}"
+          homepage.description: "{{ ' an advanced user invitation and management system for Jellyfin, Plex, Emby etc.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wizarr_container_name }}"
+          homepage.showStats: "{{ wizarr_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wizarr_port }}"
+          traefik.enable: "{{ wizarr_available_externally | string }}"
+          traefik.http.routers.wizarr.rule: "Host(`{{ wizarr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.wizarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.wizarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.wizarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ wizarr_hostname }}"
+          traefik.http.routers.wizarr.middlewares: "{{ wizarr_hostname }}@docker"
+          traefik.http.middlewares.wizarr.IPAllowList.sourcerange: "{{ wizarr_traefik_whitelist }}"
+          traefik.http.services.wizarr.loadbalancer.server.port: "5690"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/wizarrrr/wizarr/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ needs to be changed to format: 2025.8.1
+        cpu_shares: "{{ wizarr_cpu_shares }}"
+        memory: "{{ wizarr_memory }}"
+        restart_policy: unless-stopped
+  when: wizarr_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ wizarr_container_name }}"
+        state: absent
+  when: wizarr_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ wizarr_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ wizarr_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: wizarr_enabled is false and archive_app_data_enabled is true
