@@ -8,7 +8,6 @@
       with_items:
         - "{{ dockge_data_directory }}"
         - "{{ dockge_data_directory }}/data"
-        - "{{ dockge_data_directory }}/stacks"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -19,7 +18,6 @@
         pull: true
         volumes:
           - "{{ dockge_data_directory }}/data:/app/data"
-#          - "{{ dockge_data_directory }}/stacks:/opt/stacks"
           - "{{ dockercompose_data_directory }}:/opt/stacks"
           - "/var/run/docker.sock:/var/run/docker.sock"
         # If you want to use private registries, you need to share the auth file with Dockge:
