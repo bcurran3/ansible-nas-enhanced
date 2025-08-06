@@ -1,0 +1,38 @@
+---
+ansible_nas_app_name: "WatchState"
+
+watchstate_enabled: false
+watchstate_available_externally: false
+watchstate_traefik_whitelist: "{{ lan }}"
+
+# directories
+watchstate_data_directory: "{{ docker_home }}/watchstate"
+
+# docker
+watchstate_container_name: "watchstate"
+watchstate_image_name: "ghcr.io/arabcoders/watchstate"
+watchstate_image_tag: "latest"
+
+# uid / gid
+watchstate_user_id: "1000"
+watchstate_group_id: "1000"
+
+# network
+watchstate_port: "8992"
+watchstate_hostname: "watchstate"
+
+# specs
+watchstate_cpu_shares: "1024"
+watchstate_memory: 1g
+
+# autoheal
+watchstate_autoheal: "false"
+
+# homepage
+watchstate_homepage_group: "Apps"
+watchstate_homepage_icon: "sh-watchstate.png"
+watchstate_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port }}"
+watchstate_homepage_showStats: "false"
+
+# watchtower
+watchstate_watchtower_monitor_only: "true"

@@ -1,0 +1,83 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ watchstate_user_id }}"
+        group: "{{ watchstate_group_id }}"
+        mode: 0775
+      with_items:
+        - "{{ watchstate_data_directory }}"
+        - "{{ watchstate_data_directory }}/config"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ watchstate_container_name }}"
+        hostname: "{{ watchstate_container_name }}"
+        image: "{{ watchstate_image_name }}:{{ watchstate_image_tag }}"
+        pull: true
+        user: "{{ watchstate_user_id }}:{{ watchstate_group_id }}"
+        volumes:
+          - "{{ watchstate_data_directory }}/config:/config"
+        ports:
+          - "{{ watchstate_port }}:8080"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ watchstate_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ watchstate_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ watchstate_homepage_group }}"
+          homepage.icon: "{{ watchstate_homepage_icon }}"
+          homepage.href: "{{ watchstate_homepage_href }}"
+          homepage.description: "{{ 'Self-hosted service to sync your plex, jellyfin and emby play state.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ watchstate_container_name }}"
+          homepage.showStats: "{{ watchstate_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port }}"
+          traefik.enable: "{{ watchstate_available_externally | string }}"
+          traefik.http.routers.watchstate.rule: "Host(`{{ watchstate_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.watchstate.tls.certresolver: "letsencrypt"
+          traefik.http.routers.watchstate.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.watchstate.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ watchstate_hostname }}"
+          traefik.http.routers.watchstate.middlewares: "{{ watchstate_hostname }}@docker"
+          traefik.http.middlewares.watchstate.IPAllowList.sourcerange: "{{ watchstate_traefik_whitelist }}"
+          traefik.http.services.watchstate.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/arabcoders/watchstate/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ watchstate_cpu_shares }}"
+        memory: "{{ watchstate_memory }}"
+        restart_policy: unless-stopped
+  when: watchstate_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ watchstate_container_name }}"
+        state: absent
+  when: watchstate_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ watchstate_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ watchstate_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: watchstate_enabled is false and archive_app_data_enabled is true
