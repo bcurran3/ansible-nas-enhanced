@@ -1,0 +1,91 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ dockflare_data_directory }}"
+        - "{{ dockflare_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dockflare_container_name }}"
+        hostname: "{{ dockflare_container_name }}"
+        image: "{{ dockflare_image_name }}:{{ dockflare_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dockflare_data_directory }}/data:/app/data"
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        ports:
+          - "{{ dockflare_port }}:5000"
+        env:
+          CF_API_TOKEN: "{{ dockflare_env_cf_api_token }}"
+          CF_ACCOUNT_ID: "{{ dockflare_env_cf_account_id }}"
+          CF_ZONE_ID: "{{ dockflare_env_cf_zone_id }}"
+          TUNNEL_NAME: "{{ dockflare_env_tunnel_name }}"
+          SCAN_ALL_NETWORKS: "{{ dockflare_env_scan_all_networks }}"
+          USE_EXTERNAL_CLOUDFLARED: "{{ dockflare_env_use_external_cloudflared }}"
+          EXTERNAL_TUNNEL_ID: "{{ dockflare_env_external_tunnel_id }}"
+          STATE_FILE_PATH: "/app/data/state.json"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ dockflare_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ dockflare_watchtower_monitor_only }}"
+#         dockflare.enable: "true"
+#         dockflare.hostname: "{{ dockflare_hostname }}.{{ ansible_nas_domain }}"
+#         dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ dockflare_homepage_group }}"
+          homepage.icon: "{{ dockflare_homepage_icon }}"
+          homepage.href: "{{ dockflare_homepage_href }}"
+          homepage.description: "{{ 'Automate Cloudflare Tunnels with Docker Labels' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dockflare_container_name }}"
+          homepage.showStats: "{{ dockflare_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
+          traefik.enable: "{{ dockflare_available_externally | string }}"
+          traefik.http.routers.dockflare.rule: "Host(`{{ dockflare_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.dockflare.tls.certresolver: "letsencrypt"
+          traefik.http.routers.dockflare.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.dockflare.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ dockflare_hostname }}"
+          traefik.http.routers.dockflare.middlewares: "{{ dockflare_hostname }}@docker"
+          traefik.http.middlewares.dockflare.IPAllowList.sourcerange: "{{ dockflare_traefik_whitelist }}"
+          traefik.http.services.dockflare.loadbalancer.server.port: "5000"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/ChrispyBacon-dev/DockFlare/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ dockflare_cpu_shares }}"
+        memory: "{{ dockflare_memory }}"
+        restart_policy: unless-stopped
+  when: dockflare_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ dockflare_container_name }}"
+        state: absent
+  when: dockflare_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ dockflare_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ dockflare_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: dockflare_enabled is false and archive_app_data_enabled is true

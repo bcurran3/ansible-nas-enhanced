@@ -1,0 +1,44 @@
+---
+ansible_nas_app_name: "DockFlare"
+
+dockflare_enabled: false
+dockflare_available_externally: false
+dockflare_traefik_whitelist: "{{ lan }}"
+
+# directories
+dockflare_data_directory: "{{ docker_home }}/dockflare"
+
+# docker
+dockflare_container_name: "dockflare"
+dockflare_image_name: "alplat/dockflare"
+dockflare_image_tag: "stable"
+
+# network
+dockflare_port: "5000"
+dockflare_hostname: "dockflare"
+
+# specs
+dockflare_cpu_shares: "1024"
+dockflare_memory: 512mb
+
+# app
+# https://raw.githubusercontent.com/ChrispyBacon-dev/DockFlare/refs/heads/stable/env.example
+dockflare_env_cf_api_token: "your_cloudflare_api_token_here"
+dockflare_env_cf_account_id: "your_cloudflare_account_id_here"
+dockflare_env_cf_zone_id: "your_default_cloudflare_zone_id_here"
+dockflare_env_tunnel_name: "DockFlare-Tunnel"
+dockflare_env_scan_all_networks: "true"
+dockflare_env_use_external_cloudflared: "false"
+dockflare_env_external_tunnel_id: "your_external_tunnel_uuid_here"
+
+# autoheal
+dockflare_autoheal: "false"
+
+# homepage
+dockflare_homepage_group: "Network"
+dockflare_homepage_icon: "https://raw.githubusercontent.com/ChrispyBacon-dev/DockFlare/refs/heads/stable/images/bannertr.png"
+dockflare_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
+dockflare_homepage_showStats: "false"
+
+# watchtower
+dockflare_watchtower_monitor_only: "true"
