@@ -36,6 +36,7 @@
     groups: docker
     append: yes
 
+##### BEGIN NVIDIA STUFF #####
 - name: Check for NVIDIA graphics card
   ansible.builtin.shell: "lspci -nn | grep NVIDIA"
   register: nvidia_card_presence  # (nvidia_card_presence.rc == 0) eq present
@@ -54,7 +55,6 @@
     nvidia_runtime_enabled: false
   when: nvidia_card_presence.rc != 0
 
-# BEGIN NVIDIA STUFF
 - name: Install NVIDIA driver and NVIDIA Container Runtime
   block:
     # how to install NVIDIA drivers
@@ -72,9 +72,6 @@
       register: nvidia_runtime_presence
       check_mode: false
 
-# This can be better done using ansible.builtin.apt_repository
-# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/apt_key_module.html
-
     - name: Install NVIDIA Container Runtime
       block:
     # how to install NVIDIA Container Toolkit
@@ -86,12 +83,21 @@
             creates: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
 
         - name: Add NVIDIA Container Toolkit repository to APT sources
-          ansible.builtin.shell: |
-            curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
-            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
-            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
-          args:
-            creates: /etc/apt/sources.list.d/nvidia-container-toolkit.list
+          ansible.builtin.apt_repository:
+            repo: "deb [arch={{ nvidia_runtime_arch }}] https://nvidia.github.io/libnvidia-container/stable/deb/all /"
+            state: present
+            filename: nvidia-container-toolkit
+            signed_by: /etc/apt/keyrings/nvidia-container-toolkit-keyring.gpg
+            update_cache: yes
+# ^ untested
+# my old, less Ansible-ly way:
+#        - name: Add NVIDIA Container Toolkit repository to APT sources
+#          ansible.builtin.shell: |
+#            curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+#            sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+#            sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+#          args:
+#            creates: /etc/apt/sources.list.d/nvidia-container-toolkit.list
       when: not nvidia_runtime_presence.stat.exists
 
     - name: Install NVIDIA Container Runtime packages
@@ -117,7 +123,6 @@
         msg: "A reboot is required after NVIDIA driver installation."
       when: nvidia_driver_result.changed
   when: nvidia_runtime_enabled is true
-# END NVIDIA STUFF
 
 - name: Remove NVIDIA Container Runtime
   ansible.builtin.apt:
@@ -129,6 +134,7 @@
     update_cache: no
     state: absent
   when: nvidia_runtime_enabled is false
+##### END NVIDIA STUFF #####
 
 - name: Generate Docker daemon.json
   ansible.builtin.copy:
