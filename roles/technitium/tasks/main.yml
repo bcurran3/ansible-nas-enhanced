@@ -22,6 +22,7 @@
       ansible.builtin.copy:
         src: /etc/resolv.conf
         dest: /etc/resolv.conf.bak
+      ignore_errors: yes
 
     - name: Remove /etc/resolv.conf
       ansible.builtin.file:
@@ -120,6 +121,7 @@
       ansible.builtin.file:
         path: /etc/resolv.conf
         state: absent
+      ignore_errors: yes
 
     - name: Restore /etc/resolv.conf
       ansible.builtin.copy:
