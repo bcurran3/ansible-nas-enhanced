@@ -1,5 +1,3 @@
-# NOTE: This got changed in May 2025 (v15) and may need to be revised further
-# https://github.com/wg-easy/wg-easy/blob/master/docker-compose.yml
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
@@ -17,23 +15,23 @@
         hostname: "{{ wireguard_container_name }}"
         image: "{{ wireguard_image_name }}:{{ wireguard_image_tag }}"
         pull: true
-        cpu_shares: "{{ wireguard_cpu_shares }}"
         env:
+          PORT: "{{ wireguard_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ wireguard_data_directory }}:/etc/wireguard"
         ports:
-          - "{{ wireguard_port_udp }}: 51820/udp"
-          - "{{ wireguard_port_http }}: 51821"
+          - "{{ wireguard_port_udp }}:51820/udp"
+          - "{{ wireguard_port_http }}:{{ wireguard_port_http }}"
         capabilities:
           - NET_ADMIN
           - SYS_MODULE
         sysctls:
           net.ipv4.conf.all.src_valid_mark=1
           net.ipv4.ip_forward=1
-#         net.ipv6.conf.all.disable_ipv6=0
-#         net.ipv6.conf.all.forwarding=1
-#         net.ipv6.conf.default.forwarding=1
+          net.ipv6.conf.all.disable_ipv6=0
+          net.ipv6.conf.all.forwarding=1
+          net.ipv6.conf.default.forwarding=1
         labels:
           autoheal: "{{ wireguard_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ wireguard_watchtower_monitor_only }}"
@@ -54,9 +52,10 @@
           traefik.http.routers.frontend.middlewares: "{{ wireguard_hostname }}"
           traefik.http.routers.wireguard.middlewares: "{{ wireguard_hostname }}@docker"
           traefik.http.middlewares.wireguard.IPAllowList.sourcerange: "{{ wireguard_traefik_whitelist }}"
-          traefik.http.services.wireguard.loadbalancer.server.port: "51821"
+          traefik.http.services.wireguard.loadbalancer.server.port: "{{ wireguard_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/wg-easy/wg-easy/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ wireguard_cpu_shares }}"
         memory: "{{ wireguard_memory }}"
         restart_policy: unless-stopped
   when: wireguard_enabled is true
