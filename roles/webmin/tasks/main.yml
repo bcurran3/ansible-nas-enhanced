@@ -9,7 +9,7 @@
         mode: '0755'
 
     - name: Run {{ ansible_nas_app_name }} setup repository script
-      ansible.builtin.shell: scripts/webmin-setup-repo.sh
+      ansible.builtin.shell: echo y | scripts/webmin-setup-repo.sh
       register: webmin_setup_script_output
       changed_when: webmin_setup_script_output.rc != 0 or "added" in webmin_setup_script_output.stdout or "installed" in webmin_setup_script_output.stdout
 
@@ -23,6 +23,12 @@
         name: webmin
         state: present
         update_cache: yes
+
+    - name: Start {{ ansible_nas_app_name }} service if not running
+      ansible.builtin.service:
+        name: webmin
+        state: started
+        enabled: true
   when: webmin_enabled is true
 
 - name: Remove {{ ansible_nas_app_name }}
@@ -32,17 +38,6 @@
             name: webmin
             state: absent
             autoremove: yes
-
-        - name: Remove {{ ansible_nas_app_name }} APT repository file
-          ansible.builtin.file:
-            path: /etc/apt/sources.list.d/webmin.list
-            state: absent
-
-        - name: Remove {{ ansible_nas_app_name }} GPG key
-          ansible.builtin.file:
-            path: /etc/apt/trusted.gpg.d/jcameron-key.asc
-            state: absent
-          ignore_errors: true
 
         - name: Remove downloaded {{ ansible_nas_app_name }} setup script
           ansible.builtin.file:
