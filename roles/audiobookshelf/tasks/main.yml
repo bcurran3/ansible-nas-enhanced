@@ -1,0 +1,83 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ audiobookshelf_data_directory }}"
+        - "{{ audiobookshelf_data_directory }}/config"
+        - "{{ audiobookshelf_data_directory }}/metadata"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ audiobookshelf_container_name }}"
+        hostname: "{{ audiobookshelf_container_name }}"
+        image: "{{ audiobookshelf_image_name }}:{{ audiobookshelf_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ audiobookshelf_data_directory }}/config:/config"
+          - "{{ audiobookshelf_data_directory }}/metadata:/metadata"
+          - "{{ audiobookshelf_audiobooks_directory }}:/audiobooks"
+          - "{{ audiobookshelf_podcasts_directory }}:/podcasts"
+        ports:
+          - "{{ audiobookshelf_port }}:80"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ audiobookshelf_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ audiobookshelf_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ audiobookshelf_homepage_group }}"
+          homepage.icon: "{{ audiobookshelf_homepage_icon }}"
+          homepage.href: "{{ audiobookshelf_homepage_href }}"
+          homepage.description: "{{ 'Self-hosted audiobook and podcast server' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ audiobookshelf_container_name }}"
+          homepage.showStats: "{{ audiobookshelf_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ audiobookshelf_port }}"
+          traefik.enable: "{{ audiobookshelf_available_externally | string }}"
+          traefik.http.routers.audiobookshelf.rule: "Host(`{{ audiobookshelf_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.audiobookshelf.tls.certresolver: "letsencrypt"
+          traefik.http.routers.audiobookshelf.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.audiobookshelf.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ audiobookshelf_hostname }}"
+          traefik.http.routers.audiobookshelf.middlewares: "{{ audiobookshelf_hostname }}@docker"
+          traefik.http.middlewares.audiobookshelf.IPAllowList.sourcerange: "{{ audiobookshelf_traefik_whitelist }}"
+          traefik.http.services.audiobookshelf.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/advplyr/audiobookshelf/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ audiobookshelf_cpu_shares }}"
+        memory: "{{ audiobookshelf_memory }}"
+        restart_policy: unless-stopped
+  when: audiobookshelf_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ audiobookshelf_container_name }}"
+        state: absent
+  when: audiobookshelf_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ audiobookshelf_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ audiobookshelf_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: audiobookshelf_enabled is false and archive_app_data_enabled is true

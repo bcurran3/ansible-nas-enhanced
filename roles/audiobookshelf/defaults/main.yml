@@ -1,0 +1,37 @@
+---
+ansible_nas_app_name: "Audiobookshelf"
+
+audiobookshelf_enabled: false
+audiobookshelf_available_externally: false
+audiobookshelf_traefik_whitelist: "{{ lan }}"
+
+# directories
+audiobookshelf_data_directory: "{{ docker_home }}/audiobookshelf"
+audiobookshelf_audiobooks_directory: "{{ audiobooks_root }}"
+audiobookshelf_podcasts_directory: "{{ podcasts_root }}"
+
+# docker
+audiobookshelf_container_name: "audiobookshelf"
+audiobookshelf_image_name: "ghcr.io/advplyr/audiobookshelf"
+audiobookshelf_image_tag: "latest"
+
+# network
+audiobookshelf_port: "13378"
+audiobookshelf_hostname: "audiobookshelf"
+
+# specs
+audiobookshelf_cpu_shares: "1024"
+audiobookshelf_memory: 1g
+
+# autoheal
+audiobookshelf_autoheal: "false"
+
+# homepage
+audiobookshelf_homepage_group: "Media Servers"
+audiobookshelf_homepage_icon: "audiobookshelf.png"
+audiobookshelf_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ audiobookshelf_port }}"
+audiobookshelf_homepage_showStats: "false"
+
+# watchtower
+audiobookshelf_watchtower_monitor_only: "true"
+
