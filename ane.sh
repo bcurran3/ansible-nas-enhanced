@@ -1,7 +1,7 @@
 #!/bin/bash
 # Ansible-NAS-Enhanced helper script
 
-EDITOR="nano"
+ANE_EDITOR="nano"
 
 function print_logo {
 echo "      _    _   _ _____"
@@ -43,6 +43,8 @@ function help {
     echo "      Run ANE full playbook."
     echo "  --settings, -s"
     echo "      Edit ANE settings/overrides."
+    echo "  --stop"
+    echo "      Stop all running containers."
     exit
 }
 
@@ -55,11 +57,11 @@ if [[ -z "$1" ]]; then
 fi
 
 # check for nano or other editor
-$EDITOR --version > /dev/null
+$ANE_EDITOR --version > /dev/null
 if [ $? -ne 0 ]; then
    echo "  ** ERROR:"
-   echo "  ** $EDITOR not installed. \"sudo apt install $EDITOR\" to install."
-   echo "  ** OR you can edit the script and change the EDITOR env var to your preferred editor."
+   echo "  ** $ANE_EDITOR not installed. \"sudo apt install $ANE_EDITOR\" to install."
+   echo "  ** OR you can edit the script and change the ANE_EDITOR env var to your preferred editor."
    exit 1
 fi
 
@@ -134,7 +136,7 @@ fi
 
 # Edit ANE inventory file
 if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
-    $EDITOR inventories/ANE/inventory
+    $ANE_EDITOR inventories/ANE/inventory
     exit
 fi
 
@@ -167,7 +169,13 @@ fi
 
 # Edit ANE settings/variables
 if [[ "$1" = "--settings" || "$1" = "-s" ]]; then
-    $EDITOR inventories/ANE/group_vars/nas.yml
+    $ANE_EDITOR inventories/ANE/group_vars/nas.yml
+    exit
+fi
+
+# Stop all Docker containers
+if [[ "$1" = "--stop" || "$1" = "-stop" ]]; then
+    docker stop $(docker ps -q)
     exit
 fi
 
