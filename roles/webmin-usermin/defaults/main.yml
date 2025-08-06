@@ -1,0 +1,21 @@
+---
+ansible_nas_app_name: "Webmin/Usermin"
+
+usermin_enabled: false
+webmin_enabled: false
+
+###
+### BELOW for info and possible homepage future integration
+###
+
+# network
+usermin_port: "20000"
+webmin_port: "10000"
+
+# homepage
+usermin_homepage_group: "Apps"
+usermin_homepage_icon: "usermin.png"
+usermin_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ usermin_port }}"
+webmin_homepage_group: "Apps"
+webmin_homepage_icon: "webmin.png"
+webmin_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webmin_port }}"

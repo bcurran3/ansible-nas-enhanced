@@ -1,0 +1,21 @@
+---
+- name: Install Usermin
+  ansible.builtin.apt:
+    name: usermin
+    state: present
+    update_cache: yes
+  when: usermin_enabled is true
+
+- name: Start Usermin service
+  ansible.builtin.service:
+    name: usermin
+    state: started
+    enabled: true
+  when: usermin_enabled is true
+
+- name: Uninstall Usermin
+  ansible.builtin.apt:
+    name: usermin
+    state: absent
+    autoremove: yes
+  when: usermin_enabled is false

@@ -1,0 +1,21 @@
+---
+- name: Install Webmin
+  ansible.builtin.apt:
+    name: webmin
+    state: present
+    update_cache: yes
+  when: webmin_enabled is true
+
+- name: Start Webmin service
+  ansible.builtin.service:
+    name: webmin
+    state: started
+    enabled: true
+  when: webmin_enabled is true
+
+- name: Uninstall Webmin
+  ansible.builtin.apt:
+    name: webmin
+    state: absent
+    autoremove: yes
+  when: webmin_enabled is false
