@@ -21,7 +21,7 @@
     - name: Backup /etc/resolv.conf
       ansible.builtin.copy:
         src: /etc/resolv.conf
-        dest: /etc/resolv.conf.bak
+        dest: /etc/resolv.conf.bak.technitium
       ignore_errors: yes
 
     - name: Remove /etc/resolv.conf
@@ -117,26 +117,41 @@
         name: "{{ technitium_container_name }}"
         state: absent
 
+    - name: Get file status of resolve.conf.bak.technitium
+      ansible.builtin.stat:
+        path: /etc/resolv.conf.bak.technitium
+      register: resolvconfbak_status
+
     - name: Remove /etc/resolv.conf
       ansible.builtin.file:
         path: /etc/resolv.conf
         state: absent
       ignore_errors: yes
+      when: resolvconfbak_status.stat is true
 
     - name: Restore /etc/resolv.conf
       ansible.builtin.copy:
-        src: /etc/resolv.conf.bak
+        src: /etc/resolv.conf.bak.technitium
         dest: /etc/resolv.conf
+      when: resolvconfbak_status.stat is true
 
     - name: Enable systemd-resolved service
       ansible.builtin.systemd_service:
         name: systemd-resolved
         enabled: true
+      when: resolvconfbak_status.stat is true
 
     - name: Start systemd-resolved service
       ansible.builtin.systemd_service:
         name: systemd-resolved
-        state: started
+            state: started
+      when: resolvconfbak_status.stat is true
+
+    - name: Remove /etc/resolv.conf.bak.technitium
+      ansible.builtin.file:
+        path: /etc/resolv.conf.bak.technitium
+        state: absent
+      when: resolvconfbak_status.stat is true
   when: technitium_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
