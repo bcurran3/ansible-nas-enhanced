@@ -19,8 +19,13 @@
 - ansible.builtin.import_tasks: usermin.yml
 - ansible.builtin.import_tasks: webmin.yml
 
+- name: Get file status of scripts/webmin-setup-repo.sh
+  ansible.builtin.stat:
+    path: scripts/webmin-setup-repo.sh
+  register: repo_script_status
+
 - name: Remove downloaded {{ ansible_nas_app_name }} repo setup script
   ansible.builtin.file:
     path: scripts/webmin-setup-repo.sh
     state: absent
-  when: webmin_enabled is false and usermin_enabled is false
+  when: webmin_enabled is false and usermin_enabled is false and not repo_script_status.stat.exist
