@@ -20,7 +20,7 @@
         name: systemd-resolved
         enabled: false
 
-    - name: Get file status of resolve.conf.bak.adguardhome
+    - name: Check for resolve.conf.bak.adguardhome
       ansible.builtin.stat:
         path: /etc/resolv.conf.bak.adguardhome
       register: resolvconfbak
@@ -116,7 +116,7 @@
         name: "{{ adguardhome_container_name }}"
         state: absent
 
-    - name: Get file status of resolve.conf.bak.adguardhome
+    - name: Check for resolve.conf.bak.adguardhome
       ansible.builtin.stat:
         path: /etc/resolv.conf.bak.adguardhome
       register: resolvconfbak

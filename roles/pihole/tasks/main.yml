@@ -18,32 +18,33 @@
         name: systemd-resolved
         enabled: false
 
-    - name: Get file status of resolve.conf.bak.pihole
+    - name: Check for resolve.conf.bak.pihole
       ansible.builtin.stat:
         path: /etc/resolv.conf.bak.pihole
-      register: resolvconfbak_status
+      register: resolvconfbak
 
-    - name: Backup /etc/resolv.conf
-      ansible.builtin.copy:
-        src: /etc/resolv.conf
-        dest: /etc/resolv.conf.bak.pihole
-      ignore_errors: yes
-      when: resolvconfbak_status.stat is false
+    - name: Handle resolve.conf
+      block:
+        - name: Backup /etc/resolv.conf
+          ansible.builtin.copy:
+            remote_src: yes
+            src: /etc/resolv.conf
+            dest: /etc/resolv.conf.bak.pihole
+          ignore_errors: yes
 
-    - name: Remove /etc/resolv.conf
-      ansible.builtin.file:
-        path: /etc/resolv.conf
-        state: absent
-      when: resolvconfbak_status.stat is false
+        - name: Remove /etc/resolv.conf
+          ansible.builtin.file:
+            path: /etc/resolv.conf
+            state: absent
 
-    - name: Create new resolv.conf
-      ansible.builtin.template:
-        src: resolv.conf
-        dest: /etc/resolv.conf
-        owner: root
-        group: root
-        mode: '0644'
-      when: resolvconfbak_status.stat is false
+        - name: Create new resolv.conf from template
+          ansible.builtin.template:
+            src: resolv.conf
+            dest: /etc/resolv.conf
+            owner: root
+            group: root
+            mode: '0644'
+      when: resolvconfbak.stat.exists is false
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -112,41 +113,40 @@
         name: "{{ pihole_container_name }}"
         state: absent
 
-    - name: Get file status of resolve.conf.bak.pihole
+    - name: Check for resolve.conf.bak.pihole
       ansible.builtin.stat:
         path: /etc/resolv.conf.bak.pihole
-      register: resolvconfbak_status
+      register: resolvconfbak
 
-    - name: Remove /etc/resolv.conf
-      ansible.builtin.file:
-        path: /etc/resolv.conf
-        state: absent
-      ignore_errors: yes
-      when: resolvconfbak_status.stat is true
+    - name: Handle resolve.conf.bak.pihole
+      block:
+        - name: Remove /etc/resolv.conf
+          ansible.builtin.file:
+            path: /etc/resolv.conf
+            state: absent
+          ignore_errors: yes
 
-    - name: Restore /etc/resolv.conf
-      ansible.builtin.copy:
-        src: /etc/resolv.conf.bak.pihole
-        dest: /etc/resolv.conf
-      when: resolvconfbak_status.stat is true
+        - name: Restore /etc/resolv.conf
+          ansible.builtin.copy:
+            remote_src: yes
+            src: /etc/resolv.conf.bak.pihole
+            dest: /etc/resolv.conf
 
-    - name: Enable systemd-resolved service
-      ansible.builtin.systemd_service:
-        name: systemd-resolved
-        enabled: true
-      when: resolvconfbak_status.stat is true
+        - name: Enable systemd-resolved service
+          ansible.builtin.systemd_service:
+            name: systemd-resolved
+            enabled: true
 
-    - name: Start systemd-resolved service
-      ansible.builtin.systemd_service:
-        name: systemd-resolved
-        state: started
-      when: resolvconfbak_status.stat is true
+        - name: Start systemd-resolved service
+          ansible.builtin.systemd_service:
+            name: systemd-resolved
+            state: started
 
-    - name: Remove /etc/resolv.conf.bak.pihole
-      ansible.builtin.file:
-        path: /etc/resolv.conf.bak.pihole
-        state: absent
-      when: resolvconfbak_status.stat is true
+        - name: Remove /etc/resolv.conf.bak.pihole
+          ansible.builtin.file:
+            path: /etc/resolv.conf.bak.pihole
+            state: absent
+      when: resolvconfbak.stat.exists is true
   when: pihole_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
