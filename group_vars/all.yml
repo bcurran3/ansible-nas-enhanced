@@ -1,5 +1,4 @@
 ---
-##
 ##      _    _   _ _____
 ##     / \  | \ | | ____|
 ##    / _ \ |  \| |  _|
@@ -35,8 +34,17 @@ archive_app_data_enabled: false
 # NVIDIA runtime support
 nvidia_runtime_enabled: false
 
+# Where to store Docker volumes
+docker_home: /data/docker
+
+# Where to store Docker images
+docker_image_directory: "{{ docker_home }}/_images"
+
 # docker-compose support
 docker_compose_enabled: false
+
+# Where to keep Docker Compose files (that you provide)
+docker_compose_data_directory: "/home/{{ ansible_nas_user }}/docker-compose"
 
 # define LAN and WAN for traefik IP whitelisting
 # you can easily add multiple networks to whitelist, just define them and add them to lan; e.g.:

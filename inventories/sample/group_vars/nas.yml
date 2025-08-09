@@ -11,20 +11,14 @@
 # See group_vars/all.yml for all possible settings.
 
 # Defaults you want to customize:
-ansible_nas_hostname: ANE
-ansible_nas_timezone: Etc/UTC
-ansible_nas_user: yourname
-ansible_nas_email: you@example.com
-ansible_nas_domain: example.com
-ansible_nas_dns: 1.1.1.1
-# Where you want to store Docker volumes.
-docker_home: /data/docker
-# Where you want to store Docker images.
-docker_image_directory: "{{ docker_home }}/_images"
-# If you have an NVIDIA GPU for AI or transcoding
-nvidia_runtime_enabled: false
+ansible_nas_hostname: ANE # hostname to use for your ANE server
+ansible_nas_timezone: Etc/UTC # timezone to use for your ANE server
+ansible_nas_user: yourname # your login account for your ANE server
+ansible_nas_email: you@example.com # your e-mail address
+ansible_nas_domain: example.com # your domain
+ansible_nas_dns: 1.1.1.1 # DNS server for ANE server to use
 
-# Extra apt packages you want installed:
+# List of APT packages you want installed
 ansible_nas_extra_packages:
   - ansible-lint
   - iputils-ping
@@ -34,6 +28,6 @@ ansible_nas_extra_packages:
 #  - bonnie++
 #  - net-tools
 
-## Applications to enable:
+### Applications to enable: ###
 homepage_enabled: true
 portainer_enabled: true
