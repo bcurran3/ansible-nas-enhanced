@@ -1,0 +1,170 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ pihole_data_directory }}"
+
+    - name: Stop systemd-resolved service
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: stopped
+
+    - name: Disable systemd-resolved service
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        enabled: false
+
+    - name: Get file status of resolve.conf.bak.pihole
+      ansible.builtin.stat:
+        path: /etc/resolv.conf.bak.pihole
+      register: resolvconfbak_status
+
+    - name: Backup /etc/resolv.conf
+      ansible.builtin.copy:
+        src: /etc/resolv.conf
+        dest: /etc/resolv.conf.bak.pihole
+      ignore_errors: yes
+      when: resolvconfbak_status.stat is false
+
+    - name: Remove /etc/resolv.conf
+      ansible.builtin.file:
+        path: /etc/resolv.conf
+        state: absent
+      when: resolvconfbak_status.stat is false
+
+    - name: Create new resolv.conf
+      ansible.builtin.template:
+        src: resolv.conf
+        dest: /etc/resolv.conf
+        owner: root
+        group: root
+        mode: '0644'
+      when: resolvconfbak_status.stat is false
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ pihole_container_name }}"
+        hostname: "{{ pihole_container_name }}"
+        image: "{{ pihole_image_name }}:{{ pihole_image_tag }}"
+        pull: true
+        dns_servers: "{{ pihole_dns }}"
+        ports:
+          - "{{ pihole_port }}:80"
+          - "53:53/udp"
+          - "53:53/tcp"
+          - "67:67/udp"
+          - "123:123/udp"
+        volumes:
+          - "{{ pihole_data_directory }}:/etc/dnsmasq.d"
+        env:
+          ADDITIONAL_PACKAGES: "{{ pihole_env_additional_packages }}"
+          FTLCONF_dns_listeningMode: 'all'
+          FTLCONF_webserver_api_password: "{{ pihole_env_ftlconf_webserver_api_password }}"
+          PIHOLE_UID: "{{ pihole_user_id }}"
+          PIHOLE_GID: "{{ pihole_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        capabilities:
+          - NET_ADMIN
+          - SYS_TIME
+          - SYS_NICE
+        labels:
+          autoheal: "{{ pihole_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ pihole_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ pihole_homepage_group }}"
+          homepage.icon: "{{ pihole_homepage_icon }}"
+          homepage.href: "{{ pihole_homepage_href }}"
+          homepage.description: "{{ 'Network-wide Ad Blocking' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ pihole_container_name }}"
+          homepage.showStats: "{{ pihole_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port }}"
+          homepage.widget.type: "pihole"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port }}"
+          homepage.widget.version: "6"
+          homepage.widget.key: "{{ pihole_homepage_widget_key }}"
+          traefik.enable: "{{ pihole_available_externally | string }}"
+          traefik.http.routers.pihole.rule: "Host(`{{ pihole_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.pihole.tls.certresolver: "letsencrypt"
+          traefik.http.routers.pihole.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.pihole.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ pihole_hostname }}"
+          traefik.http.routers.pihole.middlewares: "{{ pihole_hostname }}@docker"
+          traefik.http.middlewares.pihole.IPAllowList.sourcerange: "{{ pihole_traefik_whitelist }}"
+          traefik.http.services.pihole.loadbalancer.server.port: "80"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/pi-hole/docker-pi-hole/releases/tags/tag/$${major}.$${minor}.$${patch}"
+#         ^ needs to be modified to date form; e.g. 2025.08.0
+        cpu_shares: "{{ pihole_cpu_shares }}"
+        memory: "{{ pihole_memory }}"
+        restart_policy: unless-stopped
+  when: pihole_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ pihole_container_name }}"
+        state: absent
+
+    - name: Get file status of resolve.conf.bak.pihole
+      ansible.builtin.stat:
+        path: /etc/resolv.conf.bak.pihole
+      register: resolvconfbak_status
+
+    - name: Remove /etc/resolv.conf
+      ansible.builtin.file:
+        path: /etc/resolv.conf
+        state: absent
+      ignore_errors: yes
+      when: resolvconfbak_status.stat is true
+
+    - name: Restore /etc/resolv.conf
+      ansible.builtin.copy:
+        src: /etc/resolv.conf.bak.pihole
+        dest: /etc/resolv.conf
+      when: resolvconfbak_status.stat is true
+
+    - name: Enable systemd-resolved service
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        enabled: true
+      when: resolvconfbak_status.stat is true
+
+    - name: Start systemd-resolved service
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: started
+      when: resolvconfbak_status.stat is true
+
+    - name: Remove /etc/resolv.conf.bak.pihole
+      ansible.builtin.file:
+        path: /etc/resolv.conf.bak.pihole
+        state: absent
+      when: resolvconfbak_status.stat is true
+  when: pihole_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ pihole_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ pihole_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: pihole_enabled is false and archive_app_data_enabled is true

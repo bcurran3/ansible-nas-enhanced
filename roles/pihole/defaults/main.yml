@@ -1,0 +1,44 @@
+---
+ansible_nas_app_name: "Pi-hole"
+
+pihole_enabled: false
+pihole_available_externally: false
+pihole_traefik_whitelist: "{{ lan }}"
+
+# directories
+pihole_data_directory: "{{ docker_home }}/pihole"
+
+# docker
+pihole_container_name: "pihole"
+pihole_image_name: "pihole/pihole"
+pihole_image_tag: "latest"
+
+# uid / gid
+pihole_user_id: "1000"
+pihole_group_id: "1000"
+
+# network
+pihole_port: "8888"
+pihole_hostname: "pihole"
+pihole_dns: "{{ ansible_nas_dns }}"
+
+# specs
+pihole_cpu_shares: "1024"
+pihole_memory: 1g
+
+# app
+pihole_env_additional_packages: "" # dig, ping, nslookup already in the image
+pihole_env_ftlconf_webserver_api_password: "topsecret"
+
+# autoheal
+pihole_autoheal: "false"
+
+# homepage
+pihole_homepage_group: "Network"
+pihole_homepage_icon: "pi-hole.png"
+pihole_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port }}/admin"
+pihole_homepage_showStats: "false"
+pihole_homepage_widget_key: "{{ pihole_env_ftlconf_webserver_api_password }}"
+
+# watchtower
+pihole_watchtower_monitor_only: "true"
