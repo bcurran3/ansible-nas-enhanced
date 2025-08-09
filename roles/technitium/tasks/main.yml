@@ -18,16 +18,23 @@
         name: systemd-resolved
         enabled: false
 
+    - name: Get file status of resolve.conf.bak.technitium
+      ansible.builtin.stat:
+        path: /etc/resolv.conf.bak.technitium
+      register: resolvconfbak_status
+
     - name: Backup /etc/resolv.conf
       ansible.builtin.copy:
         src: /etc/resolv.conf
         dest: /etc/resolv.conf.bak.technitium
       ignore_errors: yes
+      when: resolvconfbak_status.stat is false
 
     - name: Remove /etc/resolv.conf
       ansible.builtin.file:
         path: /etc/resolv.conf
         state: absent
+      when: resolvconfbak_status.stat is false
 
     - name: Create new resolv.conf
       ansible.builtin.template:
@@ -36,6 +43,7 @@
         owner: root
         group: root
         mode: '0644'
+      when: resolvconfbak_status.stat is false
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -44,12 +52,11 @@
         hostname: "{{ technitium_container_name }}"
         image: "{{ technitium_image_name }}:{{ technitium_image_tag }}"
         pull: true
-        volumes:
-          - "{{ technitium_data_directory }}:/etc/dns"
+        dns_servers: "{{ technitium_dns }}"
         ports:
+          - "{{ technitium_port }}:{{ {{ technitium_port }}"
           - "53:53/udp"
           - "53:53/tcp"
-          - "{{ technitium_port }}:{{ {{ technitium_port }}"
         # - "53443:53443/tcp" #DNS web console (HTTPS)
         # - "853:853/udp" #DNS-over-QUIC service
         # - "853:853/tcp" #DNS-over-TLS service
@@ -60,9 +67,11 @@
         # - "67:67/udp" #DHCP service
         sysctls:
           net.ipv4.ip_local_port_range: 1024 65000
+        volumes:
+          - "{{ technitium_data_directory }}:/etc/dns"
         env:
           DNS_SERVER_DOMAIN: "{{ technitium_env_dns_server_domain }}"
-          DNS_SERVER_WEB_SERVICE_HTTP_PORT: "{{ {{ technitium_port }}"
+          DNS_SERVER_WEB_SERVICE_HTTP_PORT: "{{ technitium_port }}"
       # - DNS_SERVER_ADMIN_PASSWORD=password #DNS web console admin user password.
       # - DNS_SERVER_ADMIN_PASSWORD_FILE=password.txt #The path to a file that contains a plain text password for the DNS web console admin user.
       # - DNS_SERVER_PREFER_IPV6=false #DNS Server will use IPv6 for querying whenever possible with this option enabled.
