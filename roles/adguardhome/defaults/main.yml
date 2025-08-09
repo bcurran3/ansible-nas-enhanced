@@ -1,0 +1,37 @@
+---
+ansible_nas_app_name: "AdGuard Home"
+
+adguardhome_enabled: false
+adguardhome_available_externally: false
+adguardhome_traefik_whitelist: "{{ lan }}"
+
+# directories
+adguardhome_data_directory: "{{ docker_home }}/adguardhome"
+
+# docker
+adguardhome_container_name: "adguardhome"
+adguardhome_image_name: "adguard/adguardhome"
+adguardhome_image_tag: "latest"
+
+# network
+adguardhome_port: "8844"
+adguardhome_hostname: "adguardhome"
+adguardhome_dns: "{{ ansible_nas_dns }}"
+
+# specs
+adguardhome_cpu_shares: "1024"
+adguardhome_memory: 1g
+
+# autoheal
+adguardhome_autoheal: "false"
+
+# homepage
+adguardhome_homepage_group: "Network"
+adguardhome_homepage_icon: "adguard-home.png"
+adguardhome_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ adguardhome_port }}"
+adguardhome_homepage_showStats: "false"
+adguardhome_homepage_widget_username: "admin"
+adguardhome_homepage_widget_password: "topsecret"
+
+# watchtower
+adguardhome_watchtower_monitor_only: "true"

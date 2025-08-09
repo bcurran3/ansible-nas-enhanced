@@ -1,0 +1,173 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ adguardhome_data_directory }}"
+        - "{{ adguardhome_data_directory }}/conf"
+        - "{{ adguardhome_data_directory }}/work"
+
+    - name: Stop systemd-resolved service
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: stopped
+
+    - name: Disable systemd-resolved service
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        enabled: false
+
+    - name: Get file status of resolve.conf.bak.adguardhome
+      ansible.builtin.stat:
+        path: /etc/resolv.conf.bak.adguardhome
+      register: resolvconfbak
+
+    - name: Handle resolve.conf
+      block:
+        - name: Backup /etc/resolv.conf
+          ansible.builtin.copy:
+            remote_src: yes
+            src: /etc/resolv.conf
+            dest: /etc/resolv.conf.bak.adguardhome
+          ignore_errors: yes
+
+        - name: Remove /etc/resolv.conf
+          ansible.builtin.file:
+            path: /etc/resolv.conf
+            state: absent
+
+        - name: Create new resolv.conf from template
+          ansible.builtin.template:
+            src: resolv.conf
+            dest: /etc/resolv.conf
+            owner: root
+            group: root
+            mode: '0644'
+      when: resolvconfbak.stat.exists is false
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ adguardhome_container_name }}"
+        hostname: "{{ adguardhome_container_name }}"
+        image: "{{ adguardhome_image_name }}:{{ adguardhome_image_tag }}"
+        pull: true
+        dns_servers: "{{ adguardhome_dns }}"
+        ports:
+          - "{{ adguardhome_port }}:80"
+          - "53:53/udp" # DNS
+          - "53:53/tcp" # DNS
+          - "67:67/udp" # DHCP
+          - "68:68/tcp" # DHCP
+          - "68:68/udp" # DHCP
+#         - "80:80/tcp" # DNS-over-TLS (not with proxy enabled)
+#         - "443:443/tcp" # DNS-over-TLS (not with proxy enabled)
+#         - "443:443/udp" # DNS-over-TLS (not with proxy enabled)
+          - "784:784/udp" # DNS-over-QUIC
+          - "853:853/udp" # DNS-over-QUIC
+          - "853:853/tcp" # DNS-over-TLS
+          - "5443:5443/tcp" # DNSCrypt
+          - "5443:5443/udp" # DNSCrypt
+          - "8853:8853/udp" # DNS-over-QUIC
+        volumes:
+          - "{{ adguardhome_data_directory }}/conf:/opt/adguardhome/conf"
+          - "{{ adguardhome_data_directory }}/work://opt/adguardhome/work"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ adguardhome_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ adguardhome_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ adguardhome_homepage_group }}"
+          homepage.icon: "{{ adguardhome_homepage_icon }}"
+          homepage.href: "{{ adguardhome_homepage_href }}"
+          homepage.description: "{{ 'Network-wide Ad Blocking' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ adguardhome_container_name }}"
+          homepage.showStats: "{{ adguardhome_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ adguardhome_port }}"
+          homepage.widget.type: "adguard"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ adguardhome_port }}"
+          homepage.widget.username: "{{ adguardhome_homepage_widget_username }}"
+          homepage.widget.password: "{{ adguardhome_homepage_widget_password }}"
+          traefik.enable: "{{ adguardhome_available_externally | string }}"
+          traefik.http.routers.adguardhome.rule: "Host(`{{ adguardhome_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.adguardhome.tls.certresolver: "letsencrypt"
+          traefik.http.routers.adguardhome.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.adguardhome.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ adguardhome_hostname }}"
+          traefik.http.routers.adguardhome.middlewares: "{{ adguardhome_hostname }}@docker"
+          traefik.http.middlewares.adguardhome.IPAllowList.sourcerange: "{{ adguardhome_traefik_whitelist }}"
+          traefik.http.services.adguardhome.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/AdguardTeam/AdGuardHome/releases/tags/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ adguardhome_cpu_shares }}"
+        memory: "{{ adguardhome_memory }}"
+        restart_policy: unless-stopped
+  when: adguardhome_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ adguardhome_container_name }}"
+        state: absent
+
+    - name: Get file status of resolve.conf.bak.adguardhome
+      ansible.builtin.stat:
+        path: /etc/resolv.conf.bak.adguardhome
+      register: resolvconfbak
+
+    - name: Handle resolve.conf.bak.adguardhome
+      block:
+        - name: Remove /etc/resolv.conf
+          ansible.builtin.file:
+            path: /etc/resolv.conf
+            state: absent
+          ignore_errors: yes
+
+        - name: Restore /etc/resolv.conf
+          ansible.builtin.copy:
+            remote_src: yes
+            src: /etc/resolv.conf.bak.adguardhome
+            dest: /etc/resolv.conf
+
+        - name: Enable systemd-resolved service
+          ansible.builtin.systemd_service:
+            name: systemd-resolved
+            enabled: true
+
+        - name: Start systemd-resolved service
+          ansible.builtin.systemd_service:
+            name: systemd-resolved
+            state: started
+
+        - name: Remove /etc/resolv.conf.bak.adguardhome
+          ansible.builtin.file:
+            path: /etc/resolv.conf.bak.adguardhome
+            state: absent
+      when: resolvconfbak.stat.exists is true
+  when: adguardhome_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ adguardhome_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ adguardhome_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: adguardhome_enabled is false and archive_app_data_enabled is true
