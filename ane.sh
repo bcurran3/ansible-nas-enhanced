@@ -88,7 +88,7 @@ if [[ "$1" = "--available" || "$1" = "-available" ]]; then
 fi
 
 # Check git commits ANE is behind
-if [[ "$1" = "--behind" || "$1" = "--outdated" ]]; then
+if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" ]]; then
     git fetch --quiet
     if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
     BEHIND=$(git rev-list --count HEAD..@{u})
@@ -141,7 +141,7 @@ if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
 fi
 
 # Reset ANE shared file permissions
-if [[ "$1" = "permissions" || "$1" = "-permissions" ]]; then
+if [[ "$1" = "--permissions" || "$1" = "-permissions" ]]; then
     ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
     exit
 fi
@@ -162,7 +162,7 @@ if [[ "$1" = "--requirements" || "$1" = "-requirements" ]]; then
 fi
 
 # Run ANE full playbook
-if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" ]]; then
+if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" || "$1" = "-update" ]]; then
     ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $2 $3 $4 $5 $6 $7 $8 $9 ${10}
     exit
 fi
@@ -180,7 +180,7 @@ if [[ "$1" = "--stop" || "$1" = "-stop" ]]; then
 fi
 
 # Upgrade ANE files
-if [[ "$1" = "--upgrade" || "$1" = "--pull" ]]; then
+if [[ "$1" = "--upgrade" || "$1" = "-upgrade" || "$1" = "--pull" || "$1" = "-pull" ]]; then
     git pull
     exit
 fi
