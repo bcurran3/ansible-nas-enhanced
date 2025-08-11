@@ -55,7 +55,7 @@
         pull: true
         dns_servers: "{{ technitium_dns }}"
         ports:
-          - "{{ technitium_port }}:{{ {{ technitium_port }}"
+          - "{{ technitium_port }}:{{ technitium_port }}"
           - "53:53/udp" # DNS
           - "53:53/tcp" # DNS
           - "67:67/udp" # DHCP service
@@ -104,6 +104,10 @@
           homepage.container: "{{ technitium_container_name }}"
           homepage.showStats: "{{ technitium_homepage_showStats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port }}"
+          homepage.widget.type: "technitium"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port }}"
+          homepage.widget.key: "{{ technitium_homepage_widget_key }}"
+          homepage.widget.range: "{{ technitium_homepage_widget_range }}"
           traefik.enable: "{{ technitium_available_externally | string }}"
           traefik.http.routers.technitium.rule: "Host(`{{ technitium_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.technitium.tls.certresolver: "letsencrypt"
@@ -112,7 +116,7 @@
           traefik.http.routers.frontend.middlewares: "{{ technitium_hostname }}"
           traefik.http.routers.technitium.middlewares: "{{ technitium_hostname }}@docker"
           traefik.http.middlewares.technitium.IPAllowList.sourcerange: "{{ technitium_traefik_whitelist }}"
-          traefik.http.services.technitium.loadbalancer.server.port: "{{ {{ technitium_port }}"
+          traefik.http.services.technitium.loadbalancer.server.port: "{{ technitium_port }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/technitium/dns-server/tags/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ technitium_cpu_shares }}"

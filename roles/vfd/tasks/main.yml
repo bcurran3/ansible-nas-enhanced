@@ -16,7 +16,6 @@
         hostname: "{{ vfd_container_name }}"
         image: "{{ vfd_image_name }}:{{ vfd_image_tag }}"
         pull: true
-        cpu_shares: "{{ vfd_cpu_shares }}"
         volumes:
           - "{{ vfd_data_directory }}/data:/app/data"
         ports:
@@ -56,6 +55,7 @@
           traefik.http.services.vfd.loadbalancer.server.port: "{{ vfd_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/kiinami/vfd/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ vfd_cpu_shares }}"
         memory: "{{ vfd_memory }}"
         restart_policy: unless-stopped
   when: vfd_enabled is true
