@@ -11,9 +11,8 @@
 #       - "{{ invoiceninja_data_directory }}/logo"
         - "{{ invoiceninja_data_directory }}/public"
         - "{{ invoiceninja_data_directory }}/storage"
-        - "{{ invoiceninja_data_directory }}/appdata"
-        - "{{ invoiceninja_data_directory }}/appdata/nginx"
-        - "{{ invoiceninja_data_directory }}/appdata/mariadb"
+        - "{{ invoiceninja_data_directory }}/nginx"
+        - "{{ invoiceninja_data_directory }}/db"
 
     - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
@@ -22,7 +21,7 @@
     - name: Template nginx conf
       template:
         src: in-vhost.conf
-        dest: "{{ invoiceninja_data_directory }}/appdata/nginx/in-vhost.conf"
+        dest: "{{ invoiceninja_data_directory }}/nginx/in-vhost.conf"
       register: template_config
 
     - name: Create {{ ansible_nas_app_name }} DB Container
@@ -38,8 +37,8 @@
         network_mode: "{{ invoiceninja_network_name }}"
         networks_cli_compatible: "yes"
         volumes:
-#          - "{{ invoiceninja_data_directory }}/appdata/mariadb:/config"
-          - "{{ invoiceninja_data_directory }}/appdata/mariadb:/var/lib/mysql"
+#          - "{{ invoiceninja_data_directory }}/db:/config"
+          - "{{ invoiceninja_data_directory }}/db:/var/lib/mysql"
         env:
           PUID: "1000"
           PGID: "1000"
@@ -78,8 +77,8 @@
           - name: "{{ invoiceninja_network_name }}"
         network_mode: "{{ invoiceninja_network_name }}"
         networks_cli_compatible: "yes"
-        ports:
-          - "9099:9000"
+#        ports:
+#          - "{{ invoiceninja_port_http }}:9000"
         volumes:
           - "{{ invoiceninja_data_directory }}/public:/var/www/app/public"
           - "{{ invoiceninja_data_directory }}/storage:/var/www/app/storage"
@@ -153,14 +152,15 @@
         ports:
           - "{{ invoiceninja_port_http }}:80"
         volumes:
-          - "{{ invoiceninja_data_directory }}/appdata/nginx/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro"
+          - "{{ invoiceninja_data_directory }}/nginx/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro"
           - "{{ invoiceninja_data_directory }}/public:/var/www/app/public:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ invoiceninja_app_container_name }}"
+          - "{{ invoiceninja_db_container_name }}"
         labels:
-          autoheal: "{{ invoiceninja_autoheal }}"
+          autoheal: "{{ invoiceninja_web_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_web_watchtower_monitor_only }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ invoiceninja_web_homepage_group }}"
