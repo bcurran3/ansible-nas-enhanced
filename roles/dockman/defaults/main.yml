@@ -1,0 +1,41 @@
+---
+ansible_nas_app_name: "Dockman"
+
+dockman_enabled: false
+dockman_available_externally: false
+dockman_traefik_whitelist: "{{ lan }}"
+
+# directories
+dockman_data_directory: "{{ docker_home }}/dockman"
+dockman_docker_compose_data_directory: "{{ docker_compose_data_directory }}"
+
+# docker
+dockman_container_name: "dockman"
+dockman_image_name: "ghcr.io/ra341/dockman"
+dockman_image_tag: "latest"
+
+# network
+dockman_port: "8866"
+dockman_hostname: "dockman"
+
+# specs
+dockman_cpu_shares: "1024"
+dockman_memory: 1g
+
+# app
+dockman_env_dockman_origins: "*"
+dockman_env_dockman_auth_enabled: "true"
+dockman_env_dockman_auth_username: "admin"
+dockman_env_dockman_auth_password: "topsecret"
+
+# autoheal
+dockman_autoheal: "false"
+
+# homepage
+dockman_homepage_group: "Apps"
+dockman_homepage_icon: "https://raw.githubusercontent.com/RA341/dockman/refs/heads/main/ui/public/dockman.svg"
+dockman_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockman_port }}"
+dockman_homepage_showStats: "false"
+
+# watchtower
+dockman_watchtower_monitor_only: "true"

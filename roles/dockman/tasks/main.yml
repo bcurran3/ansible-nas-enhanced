@@ -1,0 +1,88 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ dockman_data_directory }}"
+        - "{{ dockman_data_directory }}/config"
+        - "{{ dockman_docker_compose_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dockman_container_name }}"
+        hostname: "{{ dockman_container_name }}"
+        image: "{{ dockman_image_name }}:{{ dockman_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dockman_data_directory }}/config:/config"
+          - "{{ dockman_docker_compose_data_directory }}:/stacks"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+          - "{{ dockman_port }}:{{ dockman_port }}"
+        env:
+          DOCKMAN_COMPOSE_ROOT: "/stacks"
+          DOCKMAN_PORT: "{{ dockman_port }}"
+          DOCKMAN_ORIGINS: "{{ dockman_env_dockman_origins }}"
+          DOCKMAN_AUTH_ENABLE: "{{ dockman_env_dockman_auth_enabled }}"
+          DOCKMAN_AUTH_USERNAME: "{{ dockman_env_dockman_auth_username }}"
+          DOCKMAN_AUTH_PASSWORD: "{{ dockman_env_dockman_auth_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ dockman_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ dockman_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ dockman_homepage_group }}"
+          homepage.icon: "{{ dockman_homepage_icon }}"
+          homepage.href: "{{ dockman_homepage_href }}"
+          homepage.description: "{{ 'Yet another docker compose manager for homelabs' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dockman_container_name }}"
+          homepage.showStats: "{{ dockman_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockman_port }}"
+          traefik.enable: "{{ dockman_available_externally | string }}"
+          traefik.http.routers.dockman.rule: "Host(`{{ dockman_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.dockman.tls.certresolver: "letsencrypt"
+          traefik.http.routers.dockman.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.dockman.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ dockman_hostname }}"
+          traefik.http.routers.dockman.middlewares: "{{ dockman_hostname }}@docker"
+          traefik.http.middlewares.dockman.IPAllowList.sourcerange: "{{ dockman_traefik_whitelist }}"
+          traefik.http.services.dockman.loadbalancer.server.port: "{{ dockman_port }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/RA341/dockman/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ dockman_cpu_shares }}"
+        memory: "{{ dockman_memory }}"
+        restart_policy: unless-stopped
+  when: dockman_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ dockman_container_name }}"
+        state: absent
+  when: dockman_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ dockman_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ dockman_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: dockman_enabled is false and archive_app_data_enabled is true
