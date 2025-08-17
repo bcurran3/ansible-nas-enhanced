@@ -1,0 +1,88 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ offlineu_data_directory }}"
+        - "{{ offlineu_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ offlineu_container_name }}"
+        hostname: "{{ offlineu_container_name }}"
+        image: "{{ offlineu_image_name }}:{{ offlineu_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ offlineu_data_directory }}/data:/app/data"
+          - "{{ offlineu_courses }}:/app/courses"
+        ports:
+          - "{{ offlineu_port }}:5000"
+        env:
+          FLASK_ENV: "production"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:5000/"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+          start_period: 40s 
+        labels:
+          autoheal: "{{ offlineu_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ offlineu_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ offlineu_homepage_group }}"
+          homepage.icon: "{{ offlineu_homepage_icon }}"
+          homepage.href: "{{ offlineu_homepage_href }}"
+          homepage.description: "{{ 'a sleek, self-hosted web app designed to load and view your offline video, audio, text, and quiz-based training courses' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ offlineu_container_name }}"
+          homepage.showStats: "{{ offlineu_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ offlineu_port }}"
+          traefik.enable: "{{ offlineu_available_externally | string }}"
+          traefik.http.routers.offlineu.rule: "Host(`{{ offlineu_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.offlineu.tls.certresolver: "letsencrypt"
+          traefik.http.routers.offlineu.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.offlineu.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ offlineu_hostname }}"
+          traefik.http.routers.offlineu.middlewares: "{{ offlineu_hostname }}@docker"
+          traefik.http.middlewares.offlineu.IPAllowList.sourcerange: "{{ offlineu_traefik_whitelist }}"
+          traefik.http.services.offlineu.loadbalancer.server.port: "5000"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/WhiskeyCoder/OfflineU/releases/tag/$${major}.$${minor}.$${patch}"
+#         ^ no published releases
+        cpu_shares: "{{ offlineu_cpu_shares }}"
+        memory: "{{ offlineu_memory }}"
+        restart_policy: unless-stopped
+  when: offlineu_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ offlineu_container_name }}"
+        state: absent
+  when: offlineu_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ offlineu_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ offlineu_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: offlineu_enabled is false and archive_app_data_enabled is true

@@ -1,0 +1,35 @@
+---
+ansible_nas_app_name: "OfflineU"
+
+offlineu_enabled: false
+offlineu_available_externally: false
+offlineu_traefik_whitelist: "{{ lan }}"
+
+# directories
+offlineu_data_directory: "{{ docker_home }}/offlineu"
+offlineu_courses: "{{ courses_root }}"
+
+# docker
+offlineu_container_name: "offlineu"
+offlineu_image_name: "ghcr.io/skippysteve/offlineu"
+offlineu_image_tag: "main"
+
+# network
+offlineu_port: "5000"
+offlineu_hostname: "offlineu"
+
+# specs
+offlineu_cpu_shares: "1024"
+offlineu_memory: 1g
+
+# autoheal
+offlineu_autoheal: "false"
+
+# homepage
+offlineu_homepage_group: "Apps"
+offlineu_homepage_icon: "mdi-school-outline"
+offlineu_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ offlineu_port }}"
+offlineu_homepage_showStats: "false"
+
+# watchtower
+offlineu_watchtower_monitor_only: "true"

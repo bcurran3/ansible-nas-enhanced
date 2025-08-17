@@ -88,6 +88,9 @@ audiobooks_root: "{{ samba_shares_root }}/audiobooks"
 # Where your comics are stored
 comics_root: "{{ samba_shares_root }}/comics"
 
+# Where your CBT courses are stored
+courses_root: "{{ samba_shares_root }}/courses"
+
 # Where photos are stored
 photos_root: "{{ samba_shares_root }}/photos"
 
@@ -214,6 +217,14 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ comics_root }}"
+
+  - name: courses
+    comment: "Courses"
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ courses_root }}"
 
   - name: documents
     comment: "Documents"
