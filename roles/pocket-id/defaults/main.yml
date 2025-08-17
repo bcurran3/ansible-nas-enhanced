@@ -1,0 +1,42 @@
+---
+ansible_nas_app_name: "Pocket ID"
+
+pocketid_enabled: false
+pocketid_available_externally: false
+pocketid_traefik_whitelist: "{{ lan }}"
+
+# directories
+pocketid_data_directory: "{{ docker_home }}/pocketid"
+
+# docker
+pocketid_container_name: "pocketid"
+pocketid_image_name: "ghcr.io/pocket-id/pocket-id"
+pocketid_image_tag: "v1"
+
+# uid / gid
+pocketid_user_id: "1000"
+pocketid_group_id: "1000"
+
+# network
+pocketid_port: "1411"
+pocketid_hostname: "pocketid"
+
+# specs
+pocketid_cpu_shares: "1024"
+pocketid_memory: 1g
+
+# app
+pocketid_env_trust_proxy: "false" # set true if behind Traefik
+pocketid_env_maxmind_license_key: "" # https://www.maxmind.com/en/geolite2/signup
+
+# autoheal
+pocketid_autoheal: "false"
+
+# homepage
+pocketid_homepage_group: "Apps"
+pocketid_homepage_icon: "pocket-id.png"
+pocketid_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pocketid_port }}"
+pocketid_homepage_showStats: "false"
+
+# watchtower
+pocketid_watchtower_monitor_only: "true"
