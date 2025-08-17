@@ -1,0 +1,83 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ checkcle_data_directory }}"
+        - "{{ checkcle_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ checkcle_container_name }}"
+        hostname: "{{ checkcle_container_name }}"
+        image: "{{ checkcle_image_name }}:{{ checkcle_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ checkcle_data_directory }}/data:/mnt/pb_data"
+        ports:
+          - "{{ checkcle_port }}:8090"
+        env:
+          PUID: "{{ checkcle_user_id }}"
+          PGID: "{{ checkcle_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        ulimits:
+          - "nofile:4096:8192"
+        labels:
+          autoheal: "{{ checkcle_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ checkcle_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ checkcle_homepage_group }}"
+          homepage.icon: "{{ checkcle_homepage_icon }}"
+          homepage.href: "{{ checkcle_homepage_href }}"
+          homepage.description: "{{ 'a self-hosted, open-source monitoring platform for seamless, real-time full-stack systems, applications, and infrastructure' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ checkcle_container_name }}"
+          homepage.showStats: "{{ checkcle_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkcle_port }}"
+          traefik.enable: "{{ checkcle_available_externally | string }}"
+          traefik.http.routers.checkcle.rule: "Host(`{{ checkcle_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.checkcle.tls.certresolver: "letsencrypt"
+          traefik.http.routers.checkcle.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.checkcle.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ checkcle_hostname }}"
+          traefik.http.routers.checkcle.middlewares: "{{ checkcle_hostname }}@docker"
+          traefik.http.middlewares.checkcle.IPAllowList.sourcerange: "{{ checkcle_traefik_whitelist }}"
+          traefik.http.services.checkcle.loadbalancer.server.port: "8090"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/operacle/checkcle/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ checkcle_cpu_shares }}"
+        memory: "{{ checkcle_memory }}"
+        restart_policy: unless-stopped
+  when: checkcle_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ checkcle_container_name }}"
+        state: absent
+  when: checkcle_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ checkcle_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ checkcle_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: checkcle_enabled is false and archive_app_data_enabled is true

@@ -1,0 +1,38 @@
+---
+ansible_nas_app_name: "CheckCle"
+
+checkcle_enabled: false
+checkcle_available_externally: false
+checkcle_traefik_whitelist: "{{ lan }}"
+
+# directories
+checkcle_data_directory: "{{ docker_home }}/checkcle"
+
+# docker
+checkcle_container_name: "checkcle"
+checkcle_image_name: "operacle/checkcle"
+checkcle_image_tag: "latest"
+
+# uid / gid
+checkcle_user_id: "0"
+checkcle_group_id: "0"
+
+# network
+checkcle_port: "8093"
+checkcle_hostname: "checkcle"
+
+# specs
+checkcle_cpu_shares: "1024"
+checkcle_memory: 1g
+
+# autoheal
+checkcle_autoheal: "false"
+
+# homepage
+checkcle_homepage_group: "Apps"
+checkcle_homepage_icon: "sh-checkcle.png"
+checkcle_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkcle_port }}"
+checkcle_homepage_showStats: "false"
+
+# watchtower
+checkcle_watchtower_monitor_only: "true"
