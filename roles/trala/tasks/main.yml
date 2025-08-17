@@ -1,0 +1,90 @@
+---
+### WORK IN PROGRESS ###
+### WORK ON HOLD? Needs to be in same container as Traefik?
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ trala_data_directory }}"
+        - "{{ trala_data_directory }}/config"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ trala_container_name }}"
+        hostname: "{{ trala_container_name }}"
+        image: "{{ trala_image_name }}:{{ trala_image_tag }}"
+        pull: true
+        volumes:
+          # Optional: Mount a local file to override icons. See "Icon Overrides" section below.
+          #- "{{ trala_data_directory }}/config:/config/icon_overrides.yml:ro"
+        ports:
+          - "{{ trala_port }}:8080"
+        env:
+        # Required: The internal Docker network address for the Traefik API
+          TRAEFIK_API_HOST: "http://traefik:8080"
+        # Optional: Change refresh interval
+          REFRESH_INTERVAL_SECONDS: "30"
+        # Optional: Change the search engine
+          SEARCH_ENGINE_URL: "https://duckduckgo.com/?q="
+        # Optional: Set to "debug" for verbose icon-finding logs
+          LOG_LEVEL: "info"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ trala_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ trala_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ trala_homepage_group }}"
+          homepage.icon: "{{ trala_homepage_icon }}"
+          homepage.href: "{{ trala_homepage_href }}"
+          homepage.description: "{{ 'A simple, modern, and dynamic dashboard for your Traefik services.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ trala_container_name }}"
+          homepage.showStats: "{{ trala_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ trala_port }}"
+          traefik.enable: "{{ trala_available_externally | string }}"
+          traefik.http.routers.trala.rule: "Host(`{{ trala_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.trala.tls.certresolver: "letsencrypt"
+          traefik.http.routers.trala.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.trala.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ trala_hostname }}"
+          traefik.http.routers.trala.middlewares: "{{ trala_hostname }}@docker"
+          traefik.http.middlewares.trala.IPAllowList.sourcerange: "{{ trala_traefik_whitelist }}"
+          traefik.http.services.trala.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/dannybouwers/trala/tags/v$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ trala_cpu_shares }}"
+        memory: "{{ trala_memory }}"
+        restart_policy: unless-stopped
+  when: trala_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ trala_container_name }}"
+        state: absent
+  when: trala_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ trala_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ trala_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: trala_enabled is false and archive_app_data_enabled is true
