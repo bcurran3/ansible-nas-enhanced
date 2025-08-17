@@ -18,12 +18,9 @@
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ immich_machinelearning_container_name }}"
+        hostname: "{{ immich_machinelearning_container_name }}"
         image: "{{ immich_machinelearning_image }}:{{ immich_machinelearning_tag }}"
         pull: true
-        cpu_shares: "{{ immich_machinelearning_cpu_shares }}"
-#       extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
-#       file: hwaccel.ml.yml
-#       service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
         device_requests: "{{
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
@@ -50,30 +47,38 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/immich-app/immich/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ immich_machinelearning_cpu_shares }}"
         memory: "{{ immich_machinelearning_memory }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} PostgreSQL Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ immich_postgres_container_name }}"
+        hostname: "{{ immich_postgres_container_name }}"
         image: "{{ immich_postgres_image }}:{{ immich_postgres_tag }}"
         pull: true
-        cpu_shares: "{{ immich_postgres_cpu_shares }}"
         volumes:
           - "{{ immich_data_directory }}/database:/var/lib/postgresql/data"
-          - "/etc/timezone:/etc/timezone:ro" # ignores this and reports UTC
         networks:
           - name: "{{ immich_network_name }}"
         network_mode: "bridge"
         networks_cli_compatible: "yes"
         env:
+          DB_STORAGE_TYPE: "{{ immich_db_storage_type }}"
           POSTGRES_PASSWORD: "{{ immich_db_password }}"
           POSTGRES_USER: "{{ immich_db_username }}"
           POSTGRES_DB: "{{ immich_db_name }}"
           POSTGRES_INITDB_ARGS: '--data-checksums'
           PG_DATA: "/var/lib/postgresql/data"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -d {{ immich_db_name }} -U {{ immich_db_username }}"]
+          interval: 5m
+          start_interval: 30s
+          start_period: 5m
+          retries: 5
+          timeout: 5s
         labels:
           autoheal: "{{ immich_postgres_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
@@ -86,25 +91,20 @@
           homepage.container: "{{ immich_postgres_container_name }}"
           homepage.showStats: "false"
           traefik.enable: "false"
-#          wud.tag.include: '^\d+\.\d+\.\d+$$'
-#          wud.link.template: ""
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: ""
+        cpu_shares: "{{ immich_postgres_cpu_shares }}"
         memory: "{{ immich_postgres_memory }}"
         restart_policy: always
-#        healthcheck:
-#          test: ["CMD-SHELL", "pg_isready -d {{ immich_db_name }} -U {{ immich_db_username }}"]
-#          interval: 5m
-#          start_interval: 30s
-#          start_period: 5m
-#          retries: 5
-#          timeout: 5s
+        shm_size: 128MB
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ immich_redis_container_name }}"
+        hostname: "{{ immich_redis_container_name }}"
         image: "{{ immich_redis_image }}:{{ immich_redis_tag }}"
         pull: true
-        cpu_shares: "{{ immich_redis_cpu_shares }}"
         networks:
           - name: "{{ immich_network_name }}"
         network_mode: "bridge"
@@ -127,6 +127,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ immich_redis_cpu_shares }}"
         memory: "{{ immich_redis_memory }}"
         restart_policy: always
 
@@ -137,9 +138,10 @@
         hostname: "{{ immich_server_container_name }}"
         image: "{{ immich_server_image }}:{{ immich_server_tag }}"
         pull: true
-        cpu_shares: "{{ immich_server_cpu_shares }}"
         volumes:
-          - "{{ immich_upload_directory }}:/usr/src/app/upload"
+#          - "{{ immich_upload_directory }}:/usr/src/app/upload"
+          - "{{ immich_upload_directory }}:/data" #v1.137.0
+          - "/etc/localtime:/etc/localtime:ro"
         networks:
           - name: "{{ immich_network_name }}"
         network_mode: "bridge"
@@ -154,12 +156,11 @@
           DB_DATABASE_NAME: "{{ immich_db_name }}"
           UPLOAD_LOCATION: "./library"
           TZ: "{{ ansible_nas_timezone }}"
-#        links:
-#          - "{{ immich_machinelearning_container_name }}"
-#          - "{{ immich_postgres_container_name }}"
-#          - "{{ immich_redis_container_name }}"
-#        healthcheck:
-#          disable: "false"
+        links:
+          - "{{ immich_postgres_container_name }}"
+          - "{{ immich_redis_container_name }}"
+#       healthcheck:
+#         disable: "false"
         labels:
           autoheal: "{{ immich_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
@@ -187,6 +188,7 @@
           traefik.http.services.immich.loadbalancer.server.port: "2283"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/immich-app/immich/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ immich_server_cpu_shares }}"
         memory: "{{ immich_server_memory }}"
         restart_policy: unless-stopped
   when: immich_enabled is true
