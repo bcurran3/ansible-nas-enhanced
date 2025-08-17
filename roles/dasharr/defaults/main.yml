@@ -1,0 +1,45 @@
+---
+ansible_nas_app_name: "Dasharr"
+
+dasharr_enabled: false
+dasharr_available_externally: false
+dasharr_traefik_whitelist: "{{ lan }}"
+
+# directories
+dasharr_data_directory: "{{ docker_home }}/dasharr"
+
+# docker
+dasharr_container_name: "dasharr"
+dasharr_image_name: "schenanigans/dasharr"
+dasharr_image_tag: "latest"
+
+# uid / gid
+dasharr_user_id: "1000"
+dasharr_group_id: "1000"
+
+# network
+dasharr_port: "3035"
+dasharr_hostname: "dasharr"
+
+# specs
+dasharr_cpu_shares: "1024"
+dasharr_memory: 1g
+
+# app
+# https://dasharr.io/docs/configuration
+dasharr_env_app_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dasharr_port }}" # Full URL where the application is accessible -  Used for generating absolute URLs
+dasharr_env_trust_proxy: "false" # Set to true if using nginx, Caddy, Cloudflare, etc.
+# You can generate one using: openssl rand -base64 32
+dasharr_env_session_secret: "gKSGrTKtl1ZMIKmYkcUMmPp7/b9jsGy1WTPs7KYGKS4="
+
+# autoheal
+dasharr_autoheal: "false"
+
+# homepage
+dasharr_homepage_group: "Apps"
+dasharr_homepage_icon: "sh-dasharr.png"
+dasharr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dasharr_port }}"
+dasharr_homepage_showStats: "false"
+
+# watchtower
+dasharr_watchtower_monitor_only: "true"
