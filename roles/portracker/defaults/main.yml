@@ -1,0 +1,34 @@
+---
+ansible_nas_app_name: "portracker"
+
+portracker_enabled: false
+portracker_available_externally: false
+portracker_traefik_whitelist: "{{ lan }}"
+
+# directories
+portracker_data_directory: "{{ docker_home }}/portracker"
+
+# docker
+portracker_container_name: "portracker"
+portracker_image_name: "mostafawahied/portracker"
+portracker_image_tag: "latest"
+
+# network
+portracker_port: "4999"
+portracker_hostname: "portracker"
+
+# specs
+portracker_cpu_shares: "1024"
+portracker_memory: 1g
+
+# autoheal
+portracker_autoheal: "false"
+
+# homepage
+portracker_homepage_group: "Apps"
+portracker_homepage_icon: "sh-portracker.png"
+portracker_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portracker_port }}"
+portracker_homepage_showStats: "false"
+
+# watchtower
+portracker_watchtower_monitor_only: "true"

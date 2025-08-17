@@ -1,0 +1,83 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ portracker_data_directory }}"
+        - "{{ portracker_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ portracker_container_name }}"
+        hostname: "{{ portracker_container_name }}"
+        image: "{{ portracker_image_name }}:{{ portracker_image_tag }}"
+        pull: true
+        pid_mode: host
+        volumes:
+          - "{{ portracker_data_directory }}/data:/data"
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        ports:
+          - "{{ portracker_port }}:{{ portracker_port }}"
+        env:
+          DATABASE_PATH: "/data/portracker.db"
+          PORT: "{{ portracker_port }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ portracker_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ portracker_watchtower_monitor_only }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ portracker_homepage_group }}"
+          homepage.icon: "{{ portracker_homepage_icon }}"
+          homepage.href: "{{ portracker_homepage_href }}"
+          homepage.description: "{{ 'real-time port monitoring and discovery tool' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ portracker_container_name }}"
+          homepage.showStats: "{{ portracker_homepage_showStats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portracker_port }}"
+          traefik.enable: "{{ portracker_available_externally | string }}"
+          traefik.http.routers.portracker.rule: "Host(`{{ portracker_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.portracker.tls.certresolver: "letsencrypt"
+          traefik.http.routers.portracker.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.portracker.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ portracker_hostname }}"
+          traefik.http.routers.portracker.middlewares: "{{ portracker_hostname }}@docker"
+          traefik.http.middlewares.portracker.IPAllowList.sourcerange: "{{ portracker_traefik_whitelist }}"
+          traefik.http.services.portracker.loadbalancer.server.port: "{{ portracker_port }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$$'
+          wud.link.template: "https://github.com/Mostafa-Wahied/portracker/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ portracker_cpu_shares }}"
+        memory: "{{ portracker_memory }}"
+        restart_policy: unless-stopped
+  when: portracker_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ portracker_container_name }}"
+        state: absent
+  when: portracker_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ portracker_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ portracker_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: portracker_enabled is false and archive_app_data_enabled is true
