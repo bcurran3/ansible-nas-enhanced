@@ -6,22 +6,18 @@
     ###
     ### Requirements
     ###
-    - role: ansible-nas-users # not an app
-      tags:
-        - ansible-nas-users
-        - ansible-nas
 
-    - role: vladgh.samba.server # not an app
+    - role: vladgh.samba.server        # ANE requirement
       tags:
         - samba
         - skip_ansible_lint
 
-    - role: geerlingguy.nfs # not an app
+    - role: geerlingguy.nfs            # ANE requirement
       tags:
         - nfs
         - skip_ansible_lint
 
-    - role: geerlingguy.docker # not an app
+    - role: geerlingguy.docker         # ANE requirement
       vars:
         docker_apt_release_channel: stable
         docker_apt_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
@@ -34,17 +30,26 @@
         - skip_ansible_lint
 
     ###
-    ### Ansible-NAS Roles
+    ### Ansible-NAS-Enhanced Core Roles
     ###
-    - role: ansible-nas-general # not an app
+
+    - role: ansible-nas-users          # ANE core
+      tags:
+        - ansible-nas-users
+        - ansible-nas
+        - ansible-nas-enhanced
+
+    - role: ansible-nas-general        # ANE core
       tags:
         - ansible-nas-general
         - ansible-nas
+        - ansible-nas-enhanced
 
-    - role: ansible-nas-docker # not an app
+    - role: ansible-nas-docker         # ANE core
       tags:
         - ansible-nas-docker
         - ansible-nas
+        - ansible-nas-enhanced
         - nvidia-runtime
         - nvidia_runtime
         - nvidiaruntime
@@ -52,13 +57,15 @@
     ###
     ### Stacks
     ###
-    - role: logging
+
+    - role: logging                    # ANE stack (Grafana, MinIO, Loki, Promtail)
       tags:
         - logging
 
     ###
     ### Prioritized Applications
     ###
+
     - role: traefik
       tags:
         - traefik
@@ -225,7 +232,7 @@
       tags:
        - commafeed
 
-    - role: controlr-wip
+    - role: controlr-wip               # WIP
       tags:
        - controlr
 
@@ -361,9 +368,10 @@
         - fast_music_remover
         - fastmusicremover
 
-    - role: filebot-wip
-      tags:
-       - filebot
+# This will probably never get done
+#   - role: filebot-wip                # WIP
+#     tags:
+#      - filebot
 
     - role: filebrowser
       tags:
@@ -463,7 +471,7 @@
       tags:
        - gotosocial
 
-    - role: grampsweb-wip
+    - role: grampsweb-wip              # WIP
       tags:
         - gramps-web
         - gramps_web
@@ -485,7 +493,7 @@
       tags:
        - handbrake
 
-    - role: healthchecks.io # not an app
+    - role: healthchecks.io
       tags:
         - healthchecks-io
         - healthchecks_io
@@ -651,7 +659,7 @@
       tags:
         - makemkv
 
-    - role: mastodon-wip
+    - role: mastodon-wip               # WIP
       tags:
         - mastodon
 
@@ -758,7 +766,7 @@
       tags:
         - nextcloud
 
-    - role: nextcloudaio-wip
+    - role: nextcloudaio-wip           # WIP
       tags:
         - nextcloud-aio
         - nextcloud_aio
@@ -994,7 +1002,7 @@
         - rss_bridge
         - rssbridge
 
-    - role: rustdesk-wip
+    - role: rustdesk-wip               # WIP
       tags:
         - rustdesk
 
@@ -1051,7 +1059,7 @@
         - speedtesttracker
         - speedtest
 
-    - role: ssm-wip
+    - role: ssm-wip                    # WIP
       tags:
         - ssm
 
@@ -1085,12 +1093,12 @@
       tags:
         - syncthing
 
-  # This is probably never going to get done
-  #  - role: tacticalrmm-wip
-  #    tags:
-  #    - tactical-rmm
-  #    - tactical_rmm
-  #    - tacticalrmm
+# This is probably never going to get done
+#   - role: tacticalrmm-wip            # WIP
+#     tags:
+#     - tactical-rmm
+#     - tactical_rmm
+#     - tacticalrmm
 
     - role: tasksmd
       tags:
@@ -1124,7 +1132,7 @@
       tags:
         - technitium
 
-#   - role: template
+#   - role: template                   # ANE app template
 #     tags:
 #       - template
 
@@ -1275,18 +1283,30 @@
       tags:
         - znc
 
-# KEEP THIS LAST
-    - role: docker-compose # not an app
+    ###
+    ### Ansible-NAS-Enhanced Features
+    ###
+
+    - role: ansible-nas-docker-compose # ANE feature
       tags:
+        - ansible-nas-docker-compose
+        - ansible-nas-enhanced-docker-compose
+        - ansible-nas-dockercompose
+        - ansible-nas-enhanced-dockercompose
         - docker-compose
         - docker_compose
         - dockercompose
 
-###
-### MY PLUGINS
-###
-
-    - role: ansible-nas-plugins # not an app
+    - role: ansible-nas-plugins        # ANE feature
       tags:
+        - ansible-nas-plugins
+        - ansible-nas-enhanced-plugins
         - plugins
-      when: (plugins_enabled | default(False))
+      when: (ansible_nas_plugins_enabled | default(False))
+
+    - role: ansible-nas-post           # ANE feature
+      tags:
+        - ansible-nas-post
+        - ansible-nas-enhanced-post
+        - post
+      when: (ansible_nas_post_enabled | default(False))

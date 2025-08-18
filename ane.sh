@@ -80,8 +80,8 @@ if [[ "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--tag" || "$1"
    exit
 fi
 
-# List ANE available apps
-if [[ "$1" = "--available" || "$1" = "-available" ]]; then
+# List ANE available apps (roles)
+if [[ "$1" = "--available" || "$1" = "-available" || "$1" = "--roles" || "$1" = "-roles" ]]; then
      echo "ANE available apps:"
      cat nas.yml |grep 'role:'
      exit

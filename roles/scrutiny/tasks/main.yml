@@ -38,7 +38,6 @@
         hostname: "{{ scrutiny_container_name }}"
         image: "{{ scrutiny_image_name }}:{{ scrutiny_image_tag }}"
         pull: true
-        cpu_shares: "{{ scrutiny_cpu_shares }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
@@ -48,24 +47,6 @@
           - "/dev:/dev:ro"
         ports:
           - "{{ scrutiny_port }}:8080"
-#        devices: "{{ scrutiny_devices }}"
-        devices:
-          - /dev/sdd:/dev/sdd
-          - /dev/sde:/dev/sde
-          - /dev/sdf:/dev/sdf
-          - /dev/sdg:/dev/sdg
-          - /dev/sdh:/dev/sdh
-          - /dev/sdi:/dev/sdi
-          - /dev/sdj:/dev/sdj
-          - /dev/sdk:/dev/sdk
-          - /dev/sdl:/dev/sdl
-          - /dev/sdm:/dev/sdm
-          - /dev/sdn:/dev/sdn
-          - /dev/sdo:/dev/sdo
-          - /dev/sdp:/dev/sdp
-        capabilities:
-          - SYS_RAWIO
-          - SYS_ADMIN # NVMe support
         labels:
           autoheal: "{{ scrutiny_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ scrutiny_watchtower_monitor_only }}"
@@ -91,6 +72,11 @@
           traefik.http.services.scrutiny.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/AnalogJ/scrutiny/releases/tag/$${major}.$${minor}.$${patch}"
+        capabilities:
+          - SYS_RAWIO
+          - SYS_ADMIN # NVMe support
+        cpu_shares: "{{ scrutiny_cpu_shares }}"
+        devices: "{{ scrutiny_devices }}"
         memory: "{{ scrutiny_memory }}"
         restart_policy: unless-stopped
   when: scrutiny_enabled is true

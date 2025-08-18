@@ -31,9 +31,27 @@
 #    - debug:
 #        msg: "Ansible-NAS is {{ commits_behind_number.stdout }} commits behind master. Here's what you're missing {{ commits_behind.stdout }}"
 
+
+# ^^^^^^ UPDATE ABOVE to do BELOW
+
+
+# Check git commits ANE is behind
+#if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" ]]; then
+#    git fetch --quiet
+#    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
+#    BEHIND=$(git rev-list --count HEAD..@{u})
+#    echo "  ** Your ANE installation is $BEHIND git commits behind."
+#    if [ $BEHIND -gt 0 ]; then
+#       echo "  ** \"./ane.sh --upgrade\" or \"git pull\" to update"
+#    fi
+#    exit
+#fi
+
+
+
     - name: find roles directories
       ansible.builtin.find:
-        paths: apps/
+        paths: plugins/
         recurse: no
         file_type: directory
       register: found_directories
@@ -60,11 +78,11 @@
 
 ########## eventually move to it's own role
     - debug:
-        msg: "TESTING Discovery and Running of Roles in Apps Directory"
+        msg: "TESTING Discovery and Running of Roles in plugins Directory"
 
-    - name: Find roles in apps Directory
+    - name: Find roles in plugins Directory
       ansible.builtin.find:
-        paths: apps/
+        paths: plugins/
         file_type: directory
         use_regex: yes
         patterns: "^[a-zA-Z0-9_]+$"

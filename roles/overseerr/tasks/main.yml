@@ -16,7 +16,6 @@
         hostname: "{{ overseerr_container_name }}"
         image: "{{ overseerr_image_name }}:{{ overseerr_image_version }}"
         pull: true
-        cpu_shares: "{{ overseerr_cpu_shares }}"
         volumes:
           - "{{ overseerr_data_directory }}/config:/config:rw" #changed for linuxserver.io container
         ports:
@@ -25,8 +24,6 @@
           PUID: "{{ overseerr_user_id }}"
           PGID: "{{ overseerr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ overseerr_memory }}"
         labels:
           autoheal: "{{ overseerr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ overseerr_watchtower_monitor_only }}"
@@ -53,6 +50,9 @@
           traefik.http.services.overseerr.loadbalancer.server.port: "5055"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-overseerr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ overseerr_cpu_shares }}"
+        memory: "{{ overseerr_memory }}"
+        restart_policy: unless-stopped
   when: overseerr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

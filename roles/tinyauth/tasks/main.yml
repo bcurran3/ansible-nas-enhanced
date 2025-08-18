@@ -39,7 +39,6 @@
           traefik.http.routers.frontend.middlewares: "{{ tinyauth_hostname }}"
           traefik.http.routers.tinyauth.middlewares: "{{ tinyauth_hostname }}@docker"
           traefik.http.middlewares.tinyauth.IPAllowList.sourcerange: "{{ tinyauth_traefik_whitelist }}"
-          traefik.http.middlewares.tinyauth.forwardauth.address: "http://tinyauth:{{ tinyauth_port }}/api/auth/traefik"
           traefik.http.services.tinyauth.loadbalancer.server.port: "{{ tinyauth_port }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/steveiliop56/tinyauth/releases/tag/$${major}.$${minor}.$${patch}"
