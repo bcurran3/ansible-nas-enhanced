@@ -25,7 +25,7 @@ function help {
     echo "      List ANE available apps."
     echo "  --behind, --outdated"
     echo "      Check if your ANE files are up-to-date."
-    echo "  --enabled"
+    echo "  --enabled, --installed"
     echo "      List ANE enabled apps."
     echo "  --install"
     echo "      Install or reset ANE config files."
@@ -35,16 +35,16 @@ function help {
     echo "      Reset permissions on all shared files."
     echo "  --prune"
     echo "      Prune unused Docker images and volumes."
-    echo "  --upgrade, --pull"
-    echo "      Upgrade ANE files from git"
     echo "  --requirements"
     echo "      Install or re-install ANE requirements."
-    echo "  --run, -r, --update"
+    echo "  --run, -r, --update, -u"
     echo "      Run ANE full playbook."
     echo "  --settings, -s"
     echo "      Edit ANE settings/overrides."
     echo "  --stop"
     echo "      Stop all running containers."
+    echo "  --upgrade, --pull"
+    echo "      Upgrade ANE files from git"
     exit
 }
 
@@ -100,7 +100,7 @@ if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-o
 fi
 
 # List ANE enabled apps
-if [[ "$1" = "--enabled" || "$1" = "-enabled" ]]; then
+if [[ "$1" = "--enabled" || "$1" = "-enabled" || "$1" = "--installed" || "$1" = "-installed" ]]; then
      echo "ANE enabled apps:"
      cat inventories/ANE/group_vars/nas.yml |grep 'enabled: true'
      exit
@@ -162,7 +162,7 @@ if [[ "$1" = "--requirements" || "$1" = "-requirements" ]]; then
 fi
 
 # Run ANE full playbook
-if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" || "$1" = "-update" ]]; then
+if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" || "$1" = "-update" || "$1" = "-u" ]]; then
     ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $2 $3 $4 $5 $6 $7 $8 $9 ${10}
     exit
 fi
