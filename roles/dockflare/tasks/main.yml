@@ -23,6 +23,8 @@
           - "{{ dockflare_port }}:5000"
         env:
           STATE_FILE_PATH: "/app/data/state.json"
+          USE_EXTERNAL_CLOUDFLARED: "{{ dockflare_env_use_external_cloudflared }}"
+          EXTERNAL_TUNNEL_ID: "{{ dockflare_env_external_tunnel_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ dockflare_autoheal }}"
