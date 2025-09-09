@@ -14,7 +14,6 @@
         name: "{{ filebrowser_container_name }}"
         hostname: "{{ filebrowser_container_name }}"
         image: "{{ filebrowser_image_name }}:{{ filebrowser_image_tag }}"
-        cpu_shares: "{{ filebrowser_cpu_shares }}"
         pull: true
         volumes:
           - "{{ filebrowser_root_dir }}:/srv"
@@ -30,6 +29,10 @@
         labels:
           autoheal: "{{ filebrowser_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ filebrowser_watchtower_monitor_only }}"
+          dockflare.enable: "{{ filebrowser_dockflare_tunnel }}"
+          dockflare.access.group: "{{ filebrowser_dockflare_access_group }}"
+          dockflare.hostname: "{{ filebrowser_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebrowser_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ filebrowser_homepage_group }}"
           homepage.icon: "{{ filebrowser_homepage_icon }}"
@@ -50,6 +53,7 @@
           traefik.http.services.filebrowser.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/filebrowser/filebrowser/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ filebrowser_cpu_shares }}"
         memory: "{{ filebrowser_memory }}"
         restart_policy: unless-stopped
   when: filebrowser_enabled is true

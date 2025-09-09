@@ -15,7 +15,6 @@
         hostname: "{{ dumbassets_container_name }}"
         image: "{{ dumbassets_image_name }}:{{ dumbassets_image_tag }}"
         pull: true
-        cpu_shares: "{{ dumbassets_cpu_shares }}"
         volumes:
           - "{{ dumbassets_data_directory }}:/app/data"
         ports:
@@ -32,11 +31,13 @@
           CURRENCY_CODE: "{{ dumbassets_currency_code}}"
           CURRENCY_LOCALE: "{{ dumbassets_locale }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ dumbassets_memory }}"
         labels:
           autoheal: "{{ dumbassets_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dumbassets_watchtower_monitor_only }}"
+          dockflare.enable: "{{ dumbassets_dockflare_tunnel }}"
+          dockflare.access.group: "{{ dumbassets_dockflare_access_group }}"
+          dockflare.hostname: "{{ dumbassets_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dumbassets_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dumbassets_homepage_group }}"
           homepage.icon: "{{ dumbassets_homepage_icon }}"
@@ -57,6 +58,9 @@
           traefik.http.services.dumbassets.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/DumbWareio/DumbAssets/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ dumbassets_cpu_shares }}"
+        memory: "{{ dumbassets_memory }}"
+        restart_policy: unless-stopped
   when: dumbassets_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

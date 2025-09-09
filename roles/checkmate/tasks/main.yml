@@ -34,6 +34,7 @@
         labels:
           autoheal: "{{ checkmate_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ checkmate_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ checkmate_db_homepage_group }}"
           homepage.icon: "{{ checkmate_db_homepage_icon }}"
@@ -72,6 +73,10 @@
         labels:
           autoheal: "{{ checkmate_server_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ checkmate_server_watchtower_monitor_only }}"
+          dockflare.enable: "{{ checkmate_server_dockflare_tunnel }}"
+          dockflare.access.group: "{{ checkmate_server_dockflare_access_group }}"
+          dockflare.hostname: "{{ checkmate_server_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_server_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ checkmate_server_homepage_group }}"
           homepage.icon: "{{ checkmate_server_homepage_icon }}"

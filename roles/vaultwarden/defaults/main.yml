@@ -26,16 +26,15 @@ vaultwarden_backup_image_tag: "latest"
 vaultwarden_backup_cpu_shares: "1024"
 vaultwarden_backup_memory: "512m"
 
+# app
 # Keep this token secret, this is password to access admin area of your server!
 # This token can be anything, but it's recommended to use a long, randomly generated string of characters,
 # for example running openssl rand -base64 48
 vaultwarden_admin_token: Dkgp/XHTYIQCFlCTqxpii9yiaSrjxWEZo/ctQBthxwrWuarHc2qyYpt4jlVKA+YU
-
 # To create a user set this to "true", and reprovision the container by re-running the anarion-nas playbook.
 # Once you have created your user, set to "false" and run one more time.
 # Target just Vaultwarden by running: ansible-playbook -i inventory nas.yml -b -K -t vaultwarden
 vaultwarden_allow_signups: false
-
 ## Mail specific settings, set SMTP_FROM and either SMTP_HOST or USE_SENDMAIL to enable the mail service.
 ## To make sure the email links are pointing to the correct host, set the DOMAIN variable.
 ## Note: if SMTP_USERNAME is specified, SMTP_PASSWORD is mandatory
@@ -47,12 +46,14 @@ vaultwarden_SMTP_port: "587"          # Ports 587 (submission) and 25 (smtp) are
 vaultwarden_SMTP_username: "username"
 vaultwarden_SMTP_password: "password"
 vaultwarden_SMTP_timeout: "15"
-
 vaultwarden_websocket_enabled: "false"
 
 # autoheal
 vaultwarden_autoheal: "false"
 vaultwarden_backup_autoheal: "false"
+
+# dockflare
+vaultwarden_dockflare_tunnel: "false"
 
 # homepage
 vaultwarden_homepage_group: "Apps"

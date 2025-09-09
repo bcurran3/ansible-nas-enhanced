@@ -15,7 +15,6 @@
         hostname: "{{ dokemon_container_name }}"
         image: "{{ dokemon_image_name }}:{{ dokemon_image_tag }}"
         pull: true
-        cpu_shares: "{{ dokemon_cpu_shares }}"
         ports:
           - "{{ dokemon_port_http }}:9090"
         volumes:
@@ -27,6 +26,10 @@
         labels:
           autoheal: "{{ dokemon_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dokemon_watchtower_monitor_only }}"
+          dockflare.enable: "{{ dokemon_dockflare_tunnel }}"
+          dockflare.access.group: "{{ dokemon_dockflare_access_group }}"
+          dockflare.hostname: "{{ dokemon_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dokemon_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dokemon_homepage_group }}"
           homepage.icon: "{{ dokemon_homepage_icon }}"
@@ -47,6 +50,7 @@
           traefik.http.services.dokemon.loadbalancer.server.port: "9090"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/productiveops/dokemon/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ dokemon_cpu_shares }}"
         memory: "{{ dokemon_memory }}"
         restart_policy: unless-stopped
   when: dokemon_enabled is true

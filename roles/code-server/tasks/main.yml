@@ -24,7 +24,6 @@
         hostname: "{{ codeserver_container_name }}"
         image: "{{ codeserver_image_name }}:{{ codeserver_image_tag }}"
         pull: true
-        cpu_shares: "{{ codeserver_cpu_shares }}"
         ports:
           - "{{ codeserver_port_http }}:8080"
         volumes:
@@ -42,6 +41,10 @@
         labels:
           autoheal: "{{ codeserver_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ codeserver_watchtower_monitor_only }}"
+          dockflare.enable: "{{ codeserver_dockflare_tunnel }}"
+          dockflare.access.group: "{{ codeserver_dockflare_access_group }}"
+          dockflare.hostname: "{{ codeserver_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ codeserver_port_http }}"
           homepage.group: "{{ codeserver_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ codeserver_homepgae_icon }}"
@@ -62,6 +65,7 @@
           traefik.http.services.codeserver.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/codercom/code-server/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ codeserver_cpu_shares }}"
         memory: "{{ codeserver_memory }}"
         restart_policy: unless-stopped
   when: codeserver_enabled is true

@@ -30,7 +30,6 @@
         hostname: "{{ diskover_elasticsearch_hostname }}"
         image: "{{ diskover_elasticsearch_image_name }}:{{ diskover_elasticsearch_image_tag }}"
         pull: true
-        cpu_shares: "{{ diskover_elasticsearch_cpu_shares }}"
         networks:
           - name: "{{ diskover_network_name }}"
         networks_cli_compatible: "yes"
@@ -51,6 +50,10 @@
         labels:
           autoheal: "{{ diskover_elasticsearch_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ diskover_elasticsearch_watchtower_monitor_only }}"
+          dockflare.enable: "{{ diskover_dockflare_tunnel }}"
+          dockflare.access.group: "{{ diskover_dockflare_access_group }}"
+          dockflare.hostname: "{{ diskover_elasticsearch_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_elasticsearch_port_http }}"
           homepage.group: "{{ diskover_elasticsearch_homepage_group }}"
           homepage.name: "Elasticsearch"
           homepage.icon: "{{ diskover_elasticsearch_homepage_icon }}"
@@ -71,6 +74,7 @@
           traefik.http.services.elasticsearch.loadbalancer.server.port: "9200"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://gallery.ecr.aws/elastic/elasticsearch/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ diskover_elasticsearch_cpu_shares }}"
         memory: "{{ diskover_elasticsearch_memory }}"
         restart_policy: unless-stopped
 
@@ -90,6 +94,7 @@
         labels:
           autoheal: "false"
           com.centurylinklabs.watchtower.monitor-only: "{{ diskover_elasticsearch_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           traefik.enable: "false"
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -99,7 +104,6 @@
         hostname: "{{ diskover_container_name }}"
         image: "{{ diskover_image_name }}:{{ diskover_image_tag }}"
         pull: true
-        cpu_shares: "{{ diskover_cpu_shares }}"
         links:
           - "{{ diskover_elasticsearch_container_name }}"
         networks:
@@ -123,6 +127,10 @@
         labels:
           autoheal: "{{ diskover_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ diskover_watchtower_monitor_only }}"
+          dockflare.enable: "{{ diskover_dockflare_tunnel }}"
+          dockflare.access.group: "{{ diskover_dockflare_access_group }}"
+          dockflare.hostname: "{{ diskover_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ diskover_homepage_group }}"
           homepage.href: "{{ diskover_homepage_href }}"
@@ -143,6 +151,7 @@
           traefik.http.services.diskover.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-diskover/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ diskover_cpu_shares }}"
         memory: "{{ diskover_memory }}"
         restart_policy: unless-stopped
   when: diskover_enabled is true

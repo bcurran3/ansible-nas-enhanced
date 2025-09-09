@@ -27,6 +27,9 @@
         labels:
           autoheal: "{{ overseerr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ overseerr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ overseerr_dockflare_tunnel }}"
+          dockflare.hostname: "{{ overseerr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ overseerr_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ overseerr_homepage_group }}"
           homepage.icon: "{{ overseerr_homepage_icon }}"

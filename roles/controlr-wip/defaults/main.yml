@@ -26,67 +26,9 @@ controlr_memory: "1g"
 # autoheal
 controlr_autoheal: "false"
 
+# dockflare
+controlr_dockflare_tunnel: "false"
+controlr_dockflare_access_group: ""
+
 # watchtower
 controlr_watchtower_monitor_only: "true"
-
-
-
-##############################################################
-###  OPTIONAL - remove if not needed                       ###
-###   ____           _                 ____   ___  _       ###
-###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
-###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
-###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
-###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
-###                     |___/                              ###
-##############################################################
-
-# docker
-controlr_db_container_name: "controlr-db"
-controlr_db_image_name: "postgres"
-controlr_db_image_tag: "16-alpine"
-
-# specs
-controlr_db_cpu_shares: "1024"
-controlr_db_memory: 1g
-
-# autoheal
-controlr_db_autoheal: "false"
-
-# homepage
-controlr_db_homepage_group: "DBs"
-controlr_db_homepage_icon: "postgres.png"
-controlr_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ controlr_port }}"
-controlr_db_homepage_showStats: "false"
-
-# watchtower
-controlr_db_watchtower_monitor_only: "true"
-
-###
-### Aspire
-###
-
-# network
-controlr_aspire_hostname: "aspire"
-controlr_aspire_port_http: "18888"
-
-# docker
-controlr_aspire_container_name: "aspire"
-controlr_aspire_image_name: "mcr.microsoft.com/dotnet/aspire-dashboard"
-controlr_aspire_image_tag: "9.2"
-
-# specs
-controlr_aspire_cpu_shares: "1024"
-controlr_aspire_memory: 1g
-
-# autoheal
-controlr_aspire_autoheal: "false"
-
-# homepage
-controlr_aspire_homepage_group: "DBs"
-controlr_aspire_homepage_icon: "aspire.png"
-controlr_aspire_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ aspire_port }}"
-controlr_aspire_homepage_showStats: "false"
-
-# watchtower
-controlr_aspire_watchtower_monitor_only: "true"

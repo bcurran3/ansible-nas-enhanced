@@ -8,21 +8,19 @@
         hostname: "{{ beszel_agent_container_name }}"
         image: "{{ beszel_agent_image_name }}:{{ beszel_agent_image_tag }}"
         pull: true
-        cpu_shares: "{{ beszel_agent_cpu_shares }}"
-#        ports:
-#          - "{{ beszel_agent_port_http }}:45876"
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
 #           monitor other disks / partitions by mounting a folder in /extra-filesystems
 #         - /mnt/disk/.beszel:/extra-filesystems/sda1:ro
         network_mode: host
         env:
-          PORT: "45876"
+          PORT: "{{ beszel_agent_port_http }}"
           KEY: "{{ beszel_agent_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ beszel_agent_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ beszel_agent_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ beszel_agent_homepage_group }}"
           homepage.icon: "{{ beszel_agent_homepage_icon }}"
@@ -34,6 +32,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/henrygd/beszel/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ beszel_agent_cpu_shares }}"
         memory: "{{ beszel_agent_memory }}"
         restart_policy: unless-stopped
   when: beszel_agent_enabled is true

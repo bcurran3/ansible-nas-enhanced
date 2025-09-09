@@ -18,7 +18,6 @@
         hostname: "{{ focalboard_container_name }}"
         image: "{{ focalboard_image_name }}:{{ focalboard_image_tag }}"
         pull: true
-        cpu_shares: "{{ focalboard_cpu_shares }}"
         ports:
           - "{{ focalboard_port_http }}:8000"
         volumes:
@@ -31,6 +30,10 @@
         labels:
           autoheal: "{{ focalboard_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ focalboard_watchtower_monitor_only }}"
+          dockflare.enable: "{{ focalboard_dockflare_tunnel }}"
+          dockflare.access.group: "{{ focalboard_dockflare_access_group }}"
+          dockflare.hostname: "{{ focalboard_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ focalboard_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ focalboard_homepage_group }}"
           homepage.icon: "{{ focalboard_homepage_icon }}"
@@ -51,6 +54,7 @@
           traefik.http.services.focalboard.loadbalancer.server.port: "8000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mattermost-community/focalboard/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ focalboard_cpu_shares }}"
         memory: "{{ focalboard_memory }}"
         restart_policy: unless-stopped
   when: focalboard_enabled is true

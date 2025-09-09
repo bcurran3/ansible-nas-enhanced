@@ -15,7 +15,6 @@
         name: "{{ dailytxt_container_name }}"
         image: "{{ dailytxt_image_name }}:{{ dailytxt_image_tag }}"
         pull: true
-        cpu_shares: "{{ dailytxt_cpu_shares }}"
         volumes:
           - "{{ dailytxt_data_directory }}/data:/app/data:rw"
         ports:
@@ -30,6 +29,10 @@
         labels:
           autoheal: "{{ dailytxt_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dailytxt_watchtower_monitor_only }}"
+          dockflare.enable: "{{ dailytxt_dockflare_tunnel }}"
+          dockflare.access.group: "{{ dailytxt_dockflare_access_group }}"
+          dockflare.hostname: "{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dailytxt_homepage_group }}"
           homepage.href: "{{ dailytxt_homepage_href }}"
@@ -50,6 +53,7 @@
           traefik.http.services.dailytxt.loadbalancer.server.port: "8766"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/phitux/dailytxt/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ dailytxt_cpu_shares }}"
         memory: "{{ dailytxt_memory }}"
         restart_policy: unless-stopped
   when: dailytxt_enabled is true

@@ -83,6 +83,10 @@
         labels:
           autoheal: "{{ blinko_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ blinko_watchtower_monitor_only }}"
+          dockflare.enable: "{{ blinko_dockflare_tunnel }}"
+          dockflare.access.group: "{{ blinko_dockflare_access_group }}"
+          dockflare.hostname: "{{ blinko_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ blinko_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ blinko_homepage_group }}"
           homepage.icon: "{{ blinko_homepage_icon }}"

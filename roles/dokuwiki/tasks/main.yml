@@ -26,6 +26,10 @@
         labels:
           autoheal: "{{ dokuwiki_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ dokuwiki_watchtower_monitor_only }}"
+          dockflare.enable: "{{ dokuwiki_dockflare_tunnel }}"
+          dockflare.access.group: "{{ dokuwiki_dockflare_access_group }}"
+          dockflare.hostname: "{{ dokuwiki_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dokuwiki_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dokuwiki_homepage_group }}"
           homepage.icon: "{{ dokuwiki_homepage_icon }}"

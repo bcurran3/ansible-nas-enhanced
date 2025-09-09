@@ -28,6 +28,7 @@
         labels:
           autoheal: "{{ freshrss_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.group: "{{ freshrss_db_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.icon: "{{ freshrss_db_homepage_icon }}"
@@ -38,7 +39,7 @@
           homepage.showStats: "{{ freshrss_db_homepage_showStats }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
+#         wud.link.template: "https://github.com/dev/freshrss/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ freshrss_db_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ freshrss_db_memory }}"
@@ -67,9 +68,10 @@
         labels:
           autoheal: "{{ freshrss_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_watchtower_monitor_only }}"
-          dockflare.enable: "{{ freshrss_dockflare_enable }}"
+          dockflare.enable: "{{ freshrss_dockflare_tunnel }}"
+          dockflare.access.group: "{{ freshrss_dockflare_access_group }}"
           dockflare.hostname: "{{ freshrss_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
           homepage.group: "{{ freshrss_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ freshrss_homepage_icon }}"

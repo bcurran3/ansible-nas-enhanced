@@ -34,6 +34,10 @@
         labels:
           autoheal: "{{ filebrowser_quantum_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ filebrowser_quantum_watchtower_monitor_only }}"
+          dockflare.enable: "{{ filebrowser_quantum_dockflare_tunnel }}"
+          dockflare.access.group: "{{ filebrowser_quantum_dockflare_access_group }}"
+          dockflare.hostname: "{{ filebrowser_quantum_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebrowser_quantum_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ filebrowser_quantum_homepage_group }}"
           homepage.icon: "{{ filebrowser_quantum_homepage_icon }}"

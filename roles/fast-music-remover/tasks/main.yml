@@ -8,7 +8,6 @@
         hostname: "{{ fastmusicremover_container_name }}"
         image: "{{ fastmusicremover_image_name }}:{{ fastmusicremover_image_tag }}"
         pull: true
-        cpu_shares: "{{ fastmusicremover_cpu_shares }}"
         ports:
           - "{{ fastmusicremover_port_http }}:8080"
         network_mode: "bridge"
@@ -17,6 +16,10 @@
         labels:
           autoheal: "{{ fastmusicremover_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ fastmusicremover_watchtower_monitor_only }}"
+          dockflare.enable: "{{ fastmusicremover_dockflare_tunnel }}"
+          dockflare.access.group: "{{ fastmusicremover_dockflare_access_group }}"
+          dockflare.hostname: "{{ fastmusicremover_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fastmusicremover_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ fastmusicremover_homepage_group }}"
           homepage.href: "{{ fastmusicremover_homepage_href }}"
@@ -38,6 +41,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/omeryusufyagci/fast-music-remover/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ no releases info published
+        cpu_shares: "{{ fastmusicremover_cpu_shares }}"
         memory: "{{ fastmusicremover_memory }}"
         restart_policy: unless-stopped
   when: fastmusicremover_enabled is true

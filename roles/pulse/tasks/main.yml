@@ -11,7 +11,6 @@
         group: "1000"
       with_items:
         - "{{ pulse_data_directory }}"
-        - "{{ pulse_data_directory }}/config"
         - "{{ pulse_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -22,27 +21,15 @@
         image: "{{ pulse_image_name }}:{{ pulse_image_tag }}"
         pull: true
         volumes:
-#          - "{{ pulse_data_directory }}/config:/etc/pulse" v4.0.0
           - "{{ pulse_data_directory }}/data:/data"
         ports:
-          - "{{ pulse_port }}:7655"
+          - "{{ pulse_port }}:{{ pulse_port }}"
         env:
-          ADMIN_PASSWORD: "{{ pulse_env_admin_password }}"
-          PROXMOX_TOKEN_ID: "{{ pulse_env_proxmox_token_id }}"
-          PROXMOX_TOKEN_SECRET: "{{ pulse_env_proxmox_token_secret }}"
-          PBS_HOST: "{{ pulse_env_pbs_host }}"
-          PBS_TOKEN_ID: "{{ pulse_env_proxmox_token_id }}"
-          PBS_TOKEN_SECRET: "{{ pulse_env_token_secret }}"
-          PBS_ALLOW_SELF_SIGNED_CERTS: "{{ pulse_env_pbs_allow_self_signed_certs }}"
-          PBS_PORT: "{{ pulse_env_pbs_port }}"
-          SECURITY_MODE: "private"
+          ALLOWED_ORIGINS: "*"
+          DISCOVERY_SUBNET: "{{ pulse_env_discovery_subnet }}"
+          FRONTEND_PORT: "{{ pulse_port }}"
+          PORT: "{{ pulse_port }}"
           TZ: "{{ ansible_nas_timezone }}"
-        healthcheck:
-          test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7655"]
-          interval: 30s
-          timeout: 10s
-          retries: 3
-          start_period: 30s
         labels:
           autoheal: "{{ pulse_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pulse_watchtower_monitor_only }}"
@@ -63,7 +50,7 @@
           traefik.http.routers.frontend.middlewares: "{{ pulse_hostname }}"
           traefik.http.routers.pulse.middlewares: "{{ pulse_hostname }}@docker"
           traefik.http.middlewares.pulse.IPAllowList.sourcerange: "{{ pulse_traefik_whitelist }}"
-          traefik.http.services.pulse.loadbalancer.server.port: "7655"
+          traefik.http.services.pulse.loadbalancer.server.port: "{{ pulse_port }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/rcourtman/Pulse/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ pulse_cpu_shares }}"
