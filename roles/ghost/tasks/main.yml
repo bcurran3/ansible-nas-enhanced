@@ -22,7 +22,6 @@
         hostname: "{{ ghost_db_container_name }}"
         image: "{{ ghost_db_image_name }}:{{ ghost_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ ghost_db_cpu_shares }}"
         networks:
           - name: "{{ ghost_network }}"
         networks_cli_compatible: "yes"
@@ -35,6 +34,7 @@
         labels:
           autoheal: "{{ ghost_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ghost_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ ghost_db_homepage_group }}"
           homepage.icon: "{{ ghost_db_homepage_icon }}"
@@ -46,6 +46,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ ghost_db_cpu_shares }}"
         memory: "{{ ghost_db_memory }}"
         restart_policy: unless-stopped
 
@@ -56,7 +57,6 @@
         hostname: "{{ ghost_container_name }}"
         image: "{{ ghost_image_name }}:{{ ghost_image_tag }}"
         pull: true
-        cpu_shares: "{{ ghost_cpu_shares }}"
         networks:
           - name: "{{ ghost_network }}"
         networks_cli_compatible: "yes"
@@ -75,8 +75,7 @@
           mail__options__host: "{{ ghost_mail_options_host }}"
           mail__options__port: "{{ ghost_mail_options_port }}"
           NODE_ENV: "production"
-          # this url value is just an example, and is likely wrong for your environment!
-          url: "https://{{ ghost_hostname }}.{{ ansible_nas_domain }}"
+          url: "{{ ghost_url }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ ghost_data_directory }}/content:/var/lib/ghost/content"
@@ -86,7 +85,11 @@
         labels:
           autoheal: "{{ ghost_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ghost_watchtower_monitor_only }}"
-          homepage.name: "Ghost"
+          dockflare.enable: "{{ ghost_dockflare_tunnel }}"
+          dockflare.access.group: "{{ ghost_dockflare_access_group }}"
+          dockflare.hostname: "{{ ghost_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ ghost_homepage_group }}"
           homepage.icon: "{{ ghost_homepage_icon }}"
           homepage.href: "{{ ghost_homepage_href }}"
@@ -106,6 +109,7 @@
           traefik.http.services.ghost.loadbalancer.server.port: "2368"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/TryGhost/Ghost/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ ghost_cpu_shares }}"
         memory: "{{ ghost_memory }}"
         restart_policy: unless-stopped
   when: ghost_enabled is true

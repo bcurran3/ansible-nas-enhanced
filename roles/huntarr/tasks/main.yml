@@ -16,7 +16,6 @@
         hostname: "{{ huntarr_container_name }}"
         image: "{{ huntarr_image_name }}:{{ huntarr_image_tag }}"
         pull: true
-        cpu_shares: "{{ huntarr_cpu_shares }}"
         ports:
           - "{{ huntarr_port_http }}:9705"
         volumes:
@@ -27,6 +26,10 @@
         labels:
           autoheal: "{{ huntarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ huntarr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ huntarr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ huntarr_dockflare_access_group }}"
+          dockflare.hostname: "{{ huntarr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ huntarr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ huntarr_homepage_group }}"
           homepage.icon: "{{ huntarr_homepage_icon }}"
@@ -47,6 +50,7 @@
           traefik.http.services.huntarr.loadbalancer.server.port: "9705"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/plexguide/Huntarr.io/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ huntarr_cpu_shares }}"
         memory: "{{ huntarr_memory }}"
         restart_policy: unless-stopped
   when: huntarr_enabled is true

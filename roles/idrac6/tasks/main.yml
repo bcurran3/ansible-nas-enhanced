@@ -18,7 +18,6 @@
         hostname: "{{ idrac6_container_name }}"
         image: "{{ idrac6_image_name }}:{{ idrac6_image_tag }}"
         pull: true
-        cpu_shares: "{{ idrac6_cpu_shares }}"
         network_mode: "bridge"
         ports:
           - "{{ idrac6_port_web }}:5800"
@@ -39,6 +38,7 @@
         labels:
           autoheal: "{{ idrac6_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ idrac6_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.group: "{{ idrac6_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.href: "{{ idrac6_homepage_href }}"
@@ -59,6 +59,7 @@
           traefik.http.services.idrac6.loadbalancer.server.port: "5800"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/DomiStyle/docker-idrac6/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ idrac6_cpu_shares }}"
         memory: "{{ idrac6_memory }}"
         restart_policy: unless-stopped
   when: idrac6_enabled is true

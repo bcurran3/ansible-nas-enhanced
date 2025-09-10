@@ -19,7 +19,6 @@
         hostname: "{{ ispyagentdvr_container_name }}"
         image: "{{ ispyagentdvr_image_name }}:{{ ispyagentdvr_image_tag }}"
         pull: true
-        cpu_shares: "{{ ispyagentdvr_cpu_shares }}"
         volumes:
           - "{{ ispyagentdvr_data_directory }}/config:/AgentDVR/Media/XML:rw"
           - "{{ ispyagentdvr_data_directory }}/commands:/AgentDVR/Commands:rw"
@@ -33,11 +32,13 @@
           WEBUI_PORT: "{{ ispyagentdvr_webui_port }}"
           PUID: "{{ ispyagentdvr_user_id }}"
           PGID: "{{ ispyagentdvr_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ ispyagentdvr_memory }}"
         labels:
           autoheal: "{{ ispyagentdvr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ispyagentdvr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ ispyagentdvr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ ispyagentdvr_dockflare_access_group }}"
+          dockflare.hostname: "{{ ispyagentdvr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ispyagentdvr_webui_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ ispyagentdvr_homepage_group }}"
           homepage.icon: "{{ ispyagentdvr_homepage_icon }}"
@@ -57,7 +58,10 @@
           traefik.http.middlewares.ispyagentdvr.IPAllowList.sourcerange: "{{ ispyagentdvr_traefik_whitelist }}"
           traefik.http.services.ispyagentdvr.loadbalancer.server.port: "8097"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
+#         wud.link.template: "https://github.com/dev/ispyagentdvr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ ispyagentdvr_cpu_shares }}"
+        memory: "{{ ispyagentdvr_memory }}"
+        restart_policy: unless-stopped
   when: ispyagentdvr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

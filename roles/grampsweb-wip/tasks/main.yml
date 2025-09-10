@@ -26,7 +26,6 @@
 #        image: "{{ grampsweb_celery_image_name }}:{{ grampsweb_celery_image_tag }}"
 #        image: ??????????????????????????????
 #        pull: true
-#        cpu_shares: "{{ gramsweb_celery_cpu_shares }}"
 #        networks_cli_compatible: "yes"
 #        env:
 #          TZ: "{{ ansible_nas_timezone }}"
@@ -34,6 +33,7 @@
 #        labels:
 #          autoheal: "{{ grampsweb_celery_autoheal }}"
 #          com.centurylinklabs.watchtower.enable: "false"
+#          dockflare.enable: "false"
 #          com.centurylinklabs.watchtower.monitor-only: "true"
 #          homepage.name: "Gramps Web Celery"
 #          homepage.group: "{{ grampsweb_celery_homepage_group }}"
@@ -45,6 +45,7 @@
 #          homepage.container: "{{ grampsweb_celery_container_name }}"
 #          homepage.showStats: "{{ grampsweb_celery_homepage_showStats }}"
 #          traefik.enable: "false"
+#        cpu_shares: "{{ gramsweb_celery_cpu_shares }}"
 #        memory: "{{ grampsweb_celery_memory }}"
 #        restart_policy: unless-stopped
 
@@ -55,13 +56,13 @@
         hostname: "{{ grampsweb_redis_container_name }}"
         image: "{{ grampsweb_redis_image_name }}:{{ grampsweb_redis_image_tag }}"
         pull: true
-        cpu_shares: "{{ grampsweb_redis_cpu_shares }}"
         networks_cli_compatible: "yes"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ grampsweb_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ grampsweb_redis_homepage_group }}"
           homepage.icon: "{{ grampsweb_redis_homepage_icon }}"
@@ -72,6 +73,7 @@
           homepage.container: "{{ grampsweb_redis_container_name }}"
           homepage.showStats: "{{ grampsweb_redis_homepage_showStats }}"
           traefik.enable: "false"
+        cpu_shares: "{{ grampsweb_redis_cpu_shares }}"
         memory: "{{ grampsweb_redis_memory }}"
         restart_policy: unless-stopped
 
@@ -82,7 +84,6 @@
         hostname: "{{ grampsweb_container_name }}"
         image: "{{ grampsweb_image_name }}:{{ grampsweb_image_tag }}"
         pull: true
-        cpu_shares: "{{ grampsweb_cpu_shares }}"
         volumes:
           - "{{ grampsweb_data_directory }}/users:/app/users"  # persist user database
           - "{{ grampsweb_data_directory }}/index:/app/indexdir"  # persist search index
@@ -106,6 +107,10 @@
         labels:
           autoheal: "{{ grampsweb_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ grampsweb_watchtower_monitor_only }}"
+          dockflare.enable: "{{ grampsweb_dockflare_tunnel }}"
+          dockflare.access.group: "{{ grampsweb_dockflare_access_group }}"
+          dockflare.hostname: "{{ grampsweb_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ grampsweb_homepage_group }}"
           homepage.icon: "{{ grampsweb_homepage_icon }}"
@@ -126,6 +131,7 @@
           traefik.http.services.grampsweb.loadbalancer.server.port: "5000"
           grampsweb.tag.include: '^\d+\.\d+\.\d+$$'
           grampsweb.link.template: "https://github.com/Casvt/grampsweb/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ grampsweb_cpu_shares }}"
         memory: "{{ grampsweb_memory }}"
         restart_policy: unless-stopped
   when: grampsweb_enabled is true

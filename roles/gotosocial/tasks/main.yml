@@ -18,7 +18,6 @@
         hostname: "{{ gotosocial_container_name }}"
         image: "{{ gotosocial_image_name }}:{{ gotosocial_image_tag }}"
         pull: true
-        cpu_shares: "{{ gotosocial_cpu_shares }}"
         user: 1000:1000
         ports:
           - "{{ gotosocial_port_http }}:8080"
@@ -30,13 +29,17 @@
           GTS_DB_TYPE: "sqlite"
           GTS_DB_ADDRESS: "/gotosocial/storage/sqlite.db"
           GTS_LETSENCRYPT_ENABLED: "false"
-          GTS_LETSENCRYPT_EMAIL_ADDRESS: ""
+#         GTS_LETSENCRYPT_EMAIL_ADDRESS: ""
           GTS_WAZERO_COMPILATION_CACHE: "/gotosocial/.cache"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ gotosocial_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gotosocial_watchtower_monitor_only }}"
-          homepage.name: "GoToSocial"
+          dockflare.enable: "{{ gotosocial_dockflare_tunnel }}"
+          dockflare.access.group: "{{ gotosocial_dockflare_access_group }}"
+          dockflare.hostname: "{{ gotosocial_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotosocial_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ gotosocial_homepage_group }}"
           homepage.icon: "{{ gotosocial_homepage_icon }}"
           homepage.href: "{{ gotosocial_homepage_href }}"
@@ -56,6 +59,7 @@
           traefik.http.services.gotosocial.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/superseriousbusiness/gotosocial/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ gotosocial_cpu_shares }}"
         memory: "{{ gotosocial_memory }}"
         restart_policy: unless-stopped
   when: gotosocial_enabled is true

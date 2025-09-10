@@ -16,7 +16,6 @@
         hostname: "{{ jellyfin_container_name }}"
         image: "{{ jellyfin_image_name }}:{{ jellyfin_image_version }}"
         pull: true
-        cpu_shares: "{{ jellyfin_cpu_shares }}"
         volumes:
           - "{{ jellyfin_data_directory }}/config:/config:rw"
           - "{{ jellyfin_movies_directory }}:/movies:{{ jellyfin_movies_permissions }}"
@@ -31,11 +30,13 @@
           PUID: "{{ jellyfin_user_id }}"
           PGID: "{{ jellyfin_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ jellyfin_memory }}"
         labels:
           autoheal: "{{ jellyfin_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ jellyfin_watchtower_monitor_only }}"
+          dockflare.enable: "{{ jellyfin_dockflare_tunnel }}"
+          dockflare.access.group: "{{ jellyfin_dockflare_access_group }}"
+          dockflare.hostname: "{{ jellyfin_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyfin_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ jellyfin_homepage_group }}"
           homepage.icon: "{{ jellyfin_homepage_icon }}"
@@ -61,6 +62,9 @@
           traefik.http.services.jellyfin.loadbalancer.server.port: "8096"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/jellyfin/jellyfin/releases/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ jellyfin_cpu_shares }}"
+        memory: "{{ jellyfin_memory }}"
+        restart_policy: unless-stopped
   when: jellyfin_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

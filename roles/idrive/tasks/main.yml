@@ -16,7 +16,6 @@
         hostname: "{{ idrive_container_name }}"
         image: "{{ idrive_image_name }}:{{ idrive_image_tag }}"
         pull: true
-        cpu_shares: "{{ idrive_cpu_shares }}"
         volumes:
           - "{{ idrive_data_directory }}/idriveIt:/opt/IDriveForLinux/idriveIt"
           - "{{ idrive_backup_source }}:/source:ro"
@@ -25,6 +24,7 @@
         labels:
           autoheal: "{{ idrive_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ idrive_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ idrive_homepage_group }}"
           homepage.href: "{{ idrive_homepage_href }}"
@@ -33,8 +33,10 @@
           homepage.server: "my-docker"
           homepage.container: "{{ idrive_container_name }}"
           homepage.showStats: "{{ idrive_homepage_showStats }}"
+          traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/RenoFischa/idrive/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ idrive_cpu_shares }}"
         memory: "{{ idrive_memory }}"
         restart_policy: unless-stopped
   when: idrive_enabled is true

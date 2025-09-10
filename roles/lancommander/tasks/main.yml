@@ -16,7 +16,6 @@
         hostname: "{{ lancommander_container_name }}"
         image: "{{ lancommander_image_name }}:{{ lancommander_image_tag }}"
         pull: true
-        cpu_shares: "{{ lancommander_cpu_shares }}"
         ports:
           - "{{ lancommander_port_http }}:1337"
           - "35891:35891/udp"
@@ -30,6 +29,10 @@
         labels:
           autoheal: "{{ lancommander_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ lancommander_watchtower_monitor_only }}"
+          dockflare.enable: "{{ lancommander_dockflare_tunnel }}"
+          dockflare.access.group: "{{ lancommander_dockflare_access_group }}"
+          dockflare.hostname: "{{ lancommander_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lancommander_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ lancommander_homepage_group }}"
           homepage.icon: "{{ lancommander_homepage_icon }}"
@@ -50,6 +53,7 @@
           traefik.http.services.lancommander.loadbalancer.server.port: "1337"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/LANCommander/LANCommander/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ lancommander_cpu_shares }}"
         memory: "{{ lancommander_memory_limit }}"
         restart_policy: unless-stopped
   when: lancommander_enabled is true

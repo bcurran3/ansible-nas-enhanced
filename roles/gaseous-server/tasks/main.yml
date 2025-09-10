@@ -21,7 +21,6 @@
         hostname: "{{ gaseous_server_db_container_name }}"
         image: "{{ gaseous_server_db_image_name }}:{{ gaseous_server_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ gaseous_server_db_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ gaseous_server_network_name }}"
@@ -43,6 +42,7 @@
         labels:
           autoheal: "{{ gaseous_server_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gaseous_server_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.description: "{{ 'The open source relational database' if homepage_show_description else omit }}"
           homepage.group: "{{ gaseous_server_db_homepage_group }}"
@@ -54,6 +54,7 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/MariaDB/mariadb-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ gaseous_server_db_cpu_shares }}"
         memory: "{{ gaseous_server_db_memory }}"
         restart_policy: unless-stopped
 
@@ -64,7 +65,6 @@
         hostname: "{{ gaseous_server_container_name }}"
         image: "{{ gaseous_server_image_name }}:{{ gaseous_server_image_tag }}"
         pull: true
-        cpu_shares: "{{ gaseous_server_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ gaseous_server_network_name }}"
@@ -75,15 +75,19 @@
           - "{{ gaseous_server_data_directory }}/gaseous-server:/root/.gaseous-server"
         env:
           dbhost: "{{ gaseous_server_db_container_name }}"
-#          dbname: "gaseous"
+#         dbname: "gaseous"
           dbuser: "root"
           dbpass: "{{ gaseous_server_db_password }}"
-          igdbclientid: "{{ gaseous_server_igdb_client_id }}" # Generate an ID and SECRET in IGDB
+          igdbclientid: "{{ gaseous_server_igdb_client_id }}"
           igdbclientsecret: "{{ gaseous_server_igdb_client_secret }}" # https://api-docs.igdb.com/#account-creation
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ gaseous_server_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gaseous_server_watchtower_monitor_only }}"
+          dockflare.enable: "{{ gaseous_server_dockflare_tunnel }}"
+          dockflare.access.group: "{{ gaseous_server_dockflare_access_group }}"
+          dockflare.hostname: "{{ gaseous_server_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
           homepage.name: "Gaseous Server"
           homepage.group: "{{ gaseous_server_homepage_group }}"
           homepage.icon: "{{ gaseous_server_homepage_icon }}"
@@ -104,6 +108,7 @@
           traefik.http.services.gaseous_server.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/gaseous-project/gaseous-server/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ gaseous_server_cpu_shares }}"
         memory: "{{ gaseous_server_memory }}"
         restart_policy: unless-stopped
   when: gaseous_server_enabled is true

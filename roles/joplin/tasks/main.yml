@@ -16,7 +16,6 @@
         hostname: "{{ joplin_db_container_name }}"
         image: "{{ joplin_db_image_name }}:{{ joplin_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ joplin_db_cpu_shares }}"
         volumes:
           - "{{ joplin_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -27,6 +26,7 @@
         labels:
           autoheal: "{{ joplin_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ joplin_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ joplin_db_homepage_group }}"
           homepage.icon: "{{ joplin_db_homepage_icon }}"
@@ -38,6 +38,7 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
+        cpu_shares: "{{ joplin_db_cpu_shares }}"
         memory: "{{ joplin_db_memory }}"
         restart_policy: unless-stopped
 
@@ -48,7 +49,6 @@
         hostname: "{{ joplin_container_name }}"
         image: "{{ joplin_image_name }}:{{ joplin_image_tag }}"
         pull: true
-        cpu_shares: "{{ joplin_cpu_shares }}"
         links:
           - "{{ joplin_db_container_name }}"
         ports:
@@ -66,6 +66,10 @@
         labels:
           autoheal: "{{ joplin_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ joplin_watchtower_monitor_only }}"
+          dockflare.enable: "{{ joplin_dockflare_tunnel }}"
+          dockflare.access.group: "{{ joplin_dockflare_access_group }}"
+          dockflare.hostname: "{{ joplin_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joplin_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ joplin_homepage_group }}"
           homepage.icon: "{{ joplin_homepage_icon }}"
@@ -86,6 +90,7 @@
           traefik.http.services.joplin.loadbalancer.server.port: "22300"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/laurent22/joplin/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ joplin_cpu_shares }}"
         memory: "{{ joplin_memory }}"
         restart_policy: unless-stopped
   when: joplin_enabled is true

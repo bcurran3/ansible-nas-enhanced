@@ -17,7 +17,6 @@
         hostname: "{{ glpi_db_container_name }}"
         image: "{{ glpi_db_image_name }}:{{ glpi_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ glpi_db_cpu_shares }}"
         volumes:
           - "{{ glpi_data_directory }}/db:/var/lib/mysql"
         env:
@@ -29,6 +28,7 @@
         labels:
           autoheal: "{{ glpi_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glpi_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ glpi_db_homepage_group }}"
           homepage.icon: "{{ glpi_db_homepage_icon }}"
@@ -40,6 +40,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ glpi_db_cpu_shares }}"
         memory: "{{ glpi_db_memory }}"
         restart_policy: unless-stopped
 
@@ -50,7 +51,6 @@
         hostname: "{{ glpi_container_name }}"
         image: "{{ glpi_image_name }}:{{ glpi_image_tag }}"
         pull: true
-        cpu_shares: "{{ glpi_cpu_shares }}"
         volumes:
           - "/etc/timezone:/etc/timezone:ro"
           - "/etc/localtime:/etc/localtime:ro"
@@ -65,6 +65,10 @@
         labels:
           autoheal: "{{ glpi_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glpi_watchtower_monitor_only }}"
+          dockflare.enable: "{{ glpi_dockflare_tunnel }}"
+          dockflare.access.group: "{{ glpi_dockflare_access_group }}"
+          dockflare.hostname: "{{ glpi_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ glpi_homepage_group }}"
           homepage.icon: "{{ glpi_homepage_icon }}"
@@ -86,6 +90,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/glpi-project/glpi/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ may not be in sync with container maintainer
+        cpu_shares: "{{ glpi_cpu_shares }}"
         memory: "{{ glpi_memory }}"
         restart_policy: unless-stopped
   when: glpi_enabled is true

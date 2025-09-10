@@ -16,7 +16,6 @@
         hostname: "{{ glance_container_name }}"
         image: "{{ glance_image_name }}:{{ glance_image_tag }}"
         pull: true
-        cpu_shares: "{{ glance_cpu_shares }}"
         ports:
           - "{{ glance_port_http }}:8080"
         volumes:
@@ -28,6 +27,10 @@
         labels:
           autoheal: "{{ glance_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ glance_watchtower_monitor_only }}"
+          dockflare.enable: "{{ glance_dockflare_tunnel }}"
+          dockflare.access.group: "{{ glance_dockflare_access_group }}"
+          dockflare.hostname: "{{ glance_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glance_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ glance_homepage_group }}"
           homepage.icon: "{{ glance_homepage_icon }}"
@@ -48,6 +51,7 @@
           traefik.http.services.glance.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/glanceapp/glance/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ glance_cpu_shares }}"
         memory: "{{ glance_memory }}"
         restart_policy: unless-stopped
   when: glance_enabled is true

@@ -19,12 +19,13 @@
           - "{{ hello_world_data_directory }}:/hello_world:rw"
         ports:
           - "{{ hello_world_port }}:8000"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ hello_world_cpu_shares }}"
-        memory: "{{ hello_world_memory }}"
         labels:
           autoheal: "{{ hello_world_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ hello_world_watchtower_monitor_only }}"
+          dockflare.enable: "{{ hello_world_dockflare_tunnel }}"
+          dockflare.access.group: "{{ hello_world_dockflare_access_group }}"
+          dockflare.hostname: "{{ hello_world_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hello_world_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ hello_world_homepage_group }}"
           homepage.icon: "{{ hello_world_homepage_icon }}"
@@ -45,6 +46,9 @@
           traefik.http.services.hello_world.loadbalancer.server.port: "8000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/crccheck/docker-hello-world/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ hello_world_cpu_shares }}"
+        memory: "{{ hello_world_memory }}"
+        restart_policy: unless-stopped
   when: hello_world_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

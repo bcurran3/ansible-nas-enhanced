@@ -22,6 +22,7 @@
           - "{{ gotify_data_directory }}:/app/data:rw"
         env:
           GOTIFY_SERVER_PORT: "{{ gotify_port }}"
+          GOTIFY_SERVER_CORS_ALLOWORIGINS: "{{ gotify_env_gotify_server_cors_alloworigins }}"
           GOTIFY_SERVER_TRUSTEDPROXIES: "[{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}]"
           PUID: "{{ gotify_user_id }}"
           PGID: "{{ gotify_group_id }}"

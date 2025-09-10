@@ -44,7 +44,7 @@
         pull: true
         command: "-config.file=/etc/loki/config.yml"
         ports:
-          - "{{ loki_http_port }}:3100"
+          - "{{ loki_port_http }}:3100"
           - 7946
           - 9095
         volumes:
@@ -52,6 +52,10 @@
         labels:
           autoheal: "{{ loki_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ loki_watchtower_monitor_only }}"
+          dockflare.enable: "{{ loki_dockflare_tunnel }}"
+          dockflare.access.group: "{{ loki_dockflare_access_group }}"
+          dockflare.hostname: "{{ loki_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ loki_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ loki_homepage_group }}"
           homepage.icon: "{{ loki_homepage_icon }}"

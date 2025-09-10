@@ -19,14 +19,18 @@
         volumes:
           - "{{ heimdall_data_directory }}:/config:rw"
         env:
-#         PUID: "{{ heimdall_puid }}"    # unknown effects on existing installs
-#         PGID: "{{ heimdall_pgid }}"    # unknown effects on existing installs
+#         PUID: "{{ heimdall_puid }}"
+#         PGID: "{{ heimdall_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ heimdall_port_http }}:80"
         labels:
           autoheal: "{{ heimdall_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ heimdall_watchtower_monitor_only }}"
+          dockflare.enable: "{{ heimdall_dockflare_tunnel }}"
+          dockflare.access.group: "{{ heimdall_dockflare_access_group }}"
+          dockflare.hostname: "{{ heimdall_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ heimdall_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ heimdall_homepage_group }}"
           homepage.icon: "{{ heimdall_homepage_icon }}"

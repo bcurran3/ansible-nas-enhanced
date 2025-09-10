@@ -31,13 +31,12 @@
         hostname: "{{ invoiceninja_db_container_name }}"
         image: "{{ invoiceninja_db_image_name }}:{{ invoiceninja_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ invoiceninja_db_cpu_shares }}"
         networks:
           - name: "{{ invoiceninja_network_name }}"
         network_mode: "{{ invoiceninja_network_name }}"
         networks_cli_compatible: "yes"
         volumes:
-#          - "{{ invoiceninja_data_directory }}/db:/config"
+#         - "{{ invoiceninja_data_directory }}/db:/config"
           - "{{ invoiceninja_data_directory }}/db:/var/lib/mysql"
         env:
           PUID: "1000"
@@ -50,6 +49,7 @@
         labels:
           autoheal: "{{ invoiceninja_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ invoiceninja_db_homepage_group }}"
           homepage.icon: "{{ invoiceninja_db_homepage_icon }}"
@@ -61,10 +61,10 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ invoiceninja_db_cpu_shares }}"
         memory: "{{ invoiceninja_db_memory }}"
         restart_policy: unless-stopped
 
-# https://invoiceninja.github.io/en/env-variables/
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -72,13 +72,10 @@
         hostname: "{{ invoiceninja_app_container_name }}"
         image: "{{ invoiceninja_app_image_name }}:{{ invoiceninja_app_image_tag }}"
         pull: true
-        cpu_shares: "{{ invoiceninja_app_cpu_shares }}"
         networks:
           - name: "{{ invoiceninja_network_name }}"
         network_mode: "{{ invoiceninja_network_name }}"
         networks_cli_compatible: "yes"
-#        ports:
-#          - "{{ invoiceninja_port_http }}:9000"
         volumes:
           - "{{ invoiceninja_data_directory }}/public:/var/www/app/public"
           - "{{ invoiceninja_data_directory }}/storage:/var/www/app/storage"
@@ -123,6 +120,7 @@
         labels:
           autoheal: "{{ invoiceninja_app_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_app_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ invoiceninja_app_homepage_group }}"
           homepage.icon: "{{ invoiceninja_app_homepage_icon }}"
@@ -134,6 +132,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/invoiceninja/invoiceninja/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ invoiceninja_app_cpu_shares }}"
         memory: "{{ invoiceninja_app_memory }}"
         restart_policy: unless-stopped
 
@@ -144,7 +143,6 @@
         hostname: "{{ invoiceninja_web_container_name }}"
         image: "{{ invoiceninja_web_image_name }}:{{ invoiceninja_web_image_tag }}"
         pull: true
-        cpu_shares: "{{ invoiceninja_web_cpu_shares }}"
         networks:
           - name: "{{ invoiceninja_network_name }}"
         network_mode: "{{ invoiceninja_network_name }}"
@@ -162,6 +160,10 @@
         labels:
           autoheal: "{{ invoiceninja_web_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_web_watchtower_monitor_only }}"
+          dockflare.enable: "{{ invoiceninja_dockflare_tunnel }}"
+          dockflare.access.group: "{{ invoiceninja_dockflare_access_group }}"
+          dockflare.hostname: "{{ invoiceninja_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ invoiceninja_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ invoiceninja_web_homepage_group }}"
           homepage.icon: "invoiceninja.png"
@@ -182,6 +184,7 @@
           traefik.http.services.invoiceninja.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/nginx/nginx/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ invoiceninja_web_cpu_shares }}"
         memory: "{{ invoiceninja_web_memory }}"
         restart_policy: unless-stopped
   when: invoiceninja_enabled is true

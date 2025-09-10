@@ -15,7 +15,6 @@
         hostname: "{{ kapowarr_container_name }}"
         image: "{{ kapowarr_image_name }}:{{ kapowarr_image_tag }}"
         pull: true
-        cpu_shares: "{{ kapowarr_cpu_shares }}"
         volumes:
           - "{{ kapowarr_comics_directory }}:/comics:rw"
           - "{{ kapowarr_downloads_directory }}:/downloads:rw"
@@ -28,6 +27,10 @@
         labels:
           autoheal: "{{ kapowarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ kapowarr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ kapowarr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ kapowarr_dockflare_access_group }}"
+          dockflare.hostname: "{{ kapowarr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kapowarr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ kapowarr_homepage_group }}"
           homepage.icon: "{{ kapowarr_homepage_icon }}"
@@ -48,6 +51,7 @@
           traefik.http.services.kapowarr.loadbalancer.server.port: "5656"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Casvt/Kapowarr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ kapowarr_cpu_shares }}"
         memory: "{{ kapowarr_memory }}"
         restart_policy: unless-stopped
   when: kapowarr_enabled is true

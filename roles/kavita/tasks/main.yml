@@ -16,7 +16,6 @@
         hostname: "{{ kavita_container_name }}"
         image: "{{ kavita_image_name }}:{{ kavita_image_tag }}"
         pull: true
-        cpu_shares: "{{ kavita_cpu_shares }}"
         volumes:
           - "{{ kavita_data_directory }}/config:/kavita/config"
           - "{{ kavita_books_directory }}:/books:ro"
@@ -29,6 +28,10 @@
         labels:
           autoheal: "{{ kavita_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ kavita_watchtower_monitor_only }}"
+          dockflare.enable: "{{ kavita_dockflare_tunnel }}"
+          dockflare.access.group: "{{ kavita_dockflare_access_group }}"
+          dockflare.hostname: "{{ kavita_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kavita_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ kavita_homepage_group }}"
           homepage.icon: "{{ kavita_homepage_icon }}"
@@ -49,6 +52,7 @@
           traefik.http.services.kavita.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Kareadita/Kavita/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ kavita_cpu_shares }}"
         memory: "{{ kavita_memory }}"
         restart_policy: unless-stopped
   when: kavita_enabled is true

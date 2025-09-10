@@ -36,6 +36,7 @@
         labels:
           autoheal: "{{ immich_machinelearning_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
+          dockflare.enable: "false"
           homepage.group: "{{ immich_machinelearning_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} Machine Learning"
           homepage.icon: "{{ immich_machinelearning_homepage_icon }}"
@@ -82,6 +83,7 @@
         labels:
           autoheal: "{{ immich_postgres_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
+          dockflare.enable: "false"
           homepage.group: "{{ immich_postgres_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.icon: "{{ immich_postgres_homepage_icon }}"
@@ -116,6 +118,7 @@
         labels:
           autoheal: "{{ immich_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ immich_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.group: "{{ immich_redis_homepage_group }}"
           homepage.name: "Immich Redis"
           homepage.icon: "{{ immich_redis_homepage_icon }}"
@@ -165,6 +168,7 @@
           autoheal: "{{ immich_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "true"
           dockflare.enable: "{{ immich_dockflare_tunnel }}"
+          dockflare.access.group: "{{ immich_dockflare_access_group }}"
           dockflare.hostname: "{{ immich_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"

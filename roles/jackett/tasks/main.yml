@@ -15,7 +15,6 @@
         hostname: "{{ jackett_container_name }}"
         image: "{{ jackett_image_name }}:{{ jackett_image_version }}"
         pull: true
-        cpu_shares: "{{ jackett_cpu_shares }}"
         volumes:
           - "{{ jackett_data_directory }}:/config:rw"
           - "/etc/localtime:/etc/localtime:ro"
@@ -24,11 +23,13 @@
           - "{{ jackett_port }}:9117"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ jackett_memory }}"
         labels:
           autoheal: "{{ jackett_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ jackett_watchtower_monitor_only }}"
+          dockflare.enable: "{{ jackett_dockflare_tunnel }}"
+          dockflare.access.group: "{{ jackett_dockflare_access_group }}"
+          dockflare.hostname: "{{ jackett_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jackett_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ jackett_homepage_group }}"
           homepage.icon: "{{ jackett_homepage_icon }}"
@@ -49,6 +50,9 @@
           traefik.http.services.jackett.loadbalancer.server.port: "9117"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Jackett/Jackett/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ jackett_cpu_shares }}"
+        memory: "{{ jackett_memory }}"
+        restart_policy: unless-stopped
   when: jackett_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

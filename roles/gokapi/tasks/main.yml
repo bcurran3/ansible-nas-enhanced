@@ -17,7 +17,6 @@
         hostname: "{{ gokapi_container_name }}"
         image: "{{ gokapi_image_name }}:{{ gokapi_image_tag }}"
         pull: true
-        cpu_shares: "{{ gokapi_cpu_shares }}"
         volumes:
           - "{{ gokapi_data_directory }}/config:/app/config"
           - "{{ gokapi_data_directory }}/data:/app/data"
@@ -28,6 +27,10 @@
         labels:
           autoheal: "{{ gokapi_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ gokapi_watchtower_monitor_only }}"
+          dockflare.enable: "{{ gokapi_dockflare_tunnel }}"
+          dockflare.access.group: "{{ gokapi_dockflare_access_group }}"
+          dockflare.hostname: "{{ gokapi_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gokapi_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ gokapi_homepage_group }}"
           homepage.icon: "{{ gokapi_homepage_icon }}"
@@ -48,6 +51,7 @@
           traefik.http.services.gokapi.loadbalancer.server.port: "53842"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Forceu/Gokapi/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ gokapi_cpu_shares }}"
         memory: "{{ gokapi_memory }}"
         restart_policy: unless-stopped
   when: gokapi_enabled is true
