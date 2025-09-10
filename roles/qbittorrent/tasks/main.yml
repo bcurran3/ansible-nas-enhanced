@@ -18,15 +18,12 @@
         hostname: "{{ qbittorrent_container_name }}"
         image: "{{ qbittorrent_image_name }}:{{ qbittorrent_image_tag }}"
         pull: true
-        cpu_shares: "{{ qbittorrent_cpu_shares }}"
         volumes:
           - "{{ qbittorrent_data_directory }}/config:/config:rw"
           - "{{ qbittorrent_data_directory }}/custom-cont-init.d:/custom-cont-init.d:ro"
           - "{{ qbittorrent_download_directory }}:/downloads:rw"
-          - "{{ qbittorrent_watch_directory }}:/torrents"
-######### ME ONLY
-          - "{{ porn_root }}:/porn"
-######### ME ONLY
+          - "{{ qbittorrent_watch_directory }}:/torrents:rw"
+          - "{{ qbittorrent_extra_directory_mapping if qbittorrent_extra_directory_mapping is defined else omit }}"
         ports:
           - "{{ qbittorrent_port_http }}:{{ qbittorrent_port_http }}"
           - "{{ qbittorrent_port_bt }}:6881"
@@ -40,6 +37,10 @@
         labels:
           autoheal: "{{ qbittorrent_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ qbittorrent_watchtower_monitor_only }}"
+          dockflare.enable: "{{ qbittorrent_dockflare_tunnel }}"
+          dockflare.access.group: "{{ qbittorrent_dockflare_access_group }}"
+          dockflare.hostname: "{{ qbittorrent_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qbittorrent_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ qbittorrent_homepage_group }}"
           homepage.href: "{{ qbittorrent_homepage_href }}"
@@ -64,6 +65,7 @@
           traefik.http.services.qbittorrent.loadbalancer.server.port: "8113"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-qbittorrent/releases/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ qbittorrent_cpu_shares }}"
         memory: "{{ qbittorrent_memory }}"
         restart_policy: unless-stopped
   when: qbittorrent_enabled is true

@@ -16,7 +16,6 @@
         hostname: "{{ maintainerr_container_name }}"
         image: "{{ maintainerr_image_name }}:{{ maintainerr_image_tag }}"
         pull: true
-        cpu_shares: "{{ maintainerr_cpu_shares }}"
         ports:
           - "{{ maintainerr_port }}:80"
         volumes:
@@ -27,6 +26,10 @@
         labels:
           autoheal: "{{ maintainerr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ maintainerr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ maintainerr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ maintainerr_dockflare_access_group }}"
+          dockflare.hostname: "{{ maintainerr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ maintainerr_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ maintainerr_homepage_group }}"
           homepage.icon: "{{ maintainerr_homepage_icon }}"
@@ -47,6 +50,7 @@
           traefik.http.services.maintainerr.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/jorenn92/Maintainerr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ maintainerr_cpu_shares }}"
         memory: "{{ maintainerr_memory }}"
         restart_policy: unless-stopped
   when: maintainerr_enabled is true

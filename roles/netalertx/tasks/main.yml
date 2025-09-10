@@ -17,7 +17,6 @@
         hostname: "{{ netalertx_container_name }}"
         image: "{{ netalertx_image_name }}:{{ netalertx_image_tag }}"
         pull: true
-        cpu_shares: "{{ netalertx_cpu_shares }}"
         volumes:
           - "{{ netalertx_data_directory }}/config:/app/config"
           - "{{ netalertx_data_directory }}/db:/app/db"
@@ -27,6 +26,10 @@
         labels:
           autoheal: "{{ netalertx_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ netalertx_watchtower_monitor_only }}"
+          dockflare.enable: "{{ netalertx_dockflare_tunnel }}"
+          dockflare.access.group: "{{ netalertx_dockflare_access_group }}"
+          dockflare.hostname: "{{ netalertx_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ netalertx_homepage_group }}"
           homepage.icon: "{{ netalertx_homepage_icon }}"
@@ -50,6 +53,7 @@
           traefik.http.services.netalertx.loadbalancer.server.port: "20211"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/jokob-sk/NetAlertX/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ netalertx_cpu_shares }}"
         memory: "{{ netalertx_memory }}"
         restart_policy: unless-stopped
   when: netalertx_enabled is true

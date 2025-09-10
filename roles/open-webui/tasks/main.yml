@@ -1,5 +1,5 @@
 ---
-##### WORK IN PROGRESS #####
+# Notice: This software is mostly obsolete and will no longer be updated.
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Check for Ollama installation
@@ -18,7 +18,6 @@
         - "{{ openwebui_data_directory }}/openedai/config"
         - "{{ openwebui_data_directory }}/openedai/voices"
 
-# Notice: This software is mostly obsolete and will no longer be updated.
     - name: Create {{ ansible_nas_app_name }} OpenedAI Speech Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -26,7 +25,6 @@
         hostname: "{{ openwebui_openedai_container_name }}"
         image: "{{ openwebui_openedai_image_name }}:{{ openwebui_openedai_image_tag }}"
         pull: true
-        cpu_shares: "{{ openwebui_openedai_cpu_shares }}"
         volumes:
           - "{{ openwebui_data_directory }}/openedai/config:/app/config"
           - "{{ openwebui_data_directory }}/openedai/voices:/app/voices"
@@ -43,6 +41,10 @@
         labels:
           autoheal: "{{ openwebui_openedai_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openwebui_openedai_watchtower_monitor_only }}"
+          dockflare.enable: "{{ openwebui_openedai_dockflare_tunnel }}"
+          dockflare.access.group: "{{ openwebui_openedai_dockflare_access_group }}"
+          dockflare.hostname: "{{ openwebui_openedai_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openwebui_openedai_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }} OpenedAI Speech"
           homepage.group: "{{ openwebui_openedai_homepage_group }}"
           homepage.icon: "{{ openwebui_openedai_homepage_icon }}"
@@ -63,6 +65,7 @@
           traefik.http.services.openedai.loadbalancer.server.port: "8000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/matatonic/openedai-speech/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ openwebui_openedai_cpu_shares }}"
         memory: "{{ openwebui_openedai_memory }}"
         restart_policy: unless-stopped
 
@@ -73,7 +76,6 @@
         hostname: "{{ openwebui_container_name }}"
         image: "{{ openwebui_image_name }}:{{ openwebui_image_tag }}"
         pull: true
-        cpu_shares: "{{ openwebui_cpu_shares }}"
         volumes:
           - "{{ openwebui_data_directory }}/data:/app/backend/data"
         ports:
@@ -95,7 +97,11 @@
         labels:
           autoheal: "{{ openwebui_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openwebui_watchtower_monitor_only }}"
-          homepage.name: "Open WebUI"
+          dockflare.enable: "{{ openwebui_dockflare_tunnel }}"
+          dockflare.access.group: "{{ openwebui_dockflare_access_group }}"
+          dockflare.hostname: "{{ openwebui_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openwebui_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ openwebui_homepage_group }}"
           homepage.icon: "{{ openwebui_homepage_icon }}"
           homepage.href: "{{ openwebui_homepage_href }}"
@@ -115,6 +121,7 @@
           traefik.http.services.openwebui.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/open-webui/open-webui/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ openwebui_cpu_shares }}"
         memory: "{{ openwebui_memory }}"
         restart_policy: unless-stopped
   when: openwebui_enabled is true

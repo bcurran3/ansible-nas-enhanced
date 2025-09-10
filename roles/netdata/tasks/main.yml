@@ -29,6 +29,10 @@
         labels:
           autoheal: "{{ netdata_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ netdata_watchtower_monitor_only }}"
+          dockflare.enable: "{{ netdata_dockflare_tunnel }}"
+          dockflare.access.group: "{{ netdata_dockflare_access_group }}"
+          dockflare.hostname: "{{ netdata_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netdata_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ netdata_homepage_group }}"
           homepage.icon: "{{ netdata_homepage_icon }}"

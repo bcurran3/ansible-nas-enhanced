@@ -28,7 +28,6 @@
 #       hostname: "{{ meshcentral_db_container_name }}"
         image: "{{ meshcentral_db_image_name }}:{{ meshcentral_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ meshcentral_db_cpu_shares }}"
         networks:
           - name: "{{ meshcentral_network }}"
         networks_cli_compatible: "yes"
@@ -40,6 +39,7 @@
         labels:
           autoheal: "{{ meshcentral_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ meshcentral_db_homepage_group }}"
           homepage.icon: "{{ meshcentral_db_homepage_icon }}"
@@ -51,6 +51,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ meshcentral_db_cpu_shares }}"
         memory: "{{ meshcentral_db_memory }}"
         restart_policy: unless-stopped
 
@@ -61,7 +62,6 @@
         hostname: "{{ meshcentral_container_name }}"
         image: "{{ meshcentral_image_name }}:{{ meshcentral_image_tag }}"
         pull: true
-        cpu_shares: "{{ meshcentral_cpu_shares }}"
         networks:
           - name: "{{ meshcentral_network }}"
         networks_cli_compatible: "yes"
@@ -92,6 +92,10 @@
         labels:
           autoheal: "{{ meshcentral_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ meshcentral_watchtower_monitor_only }}"
+          dockflare.enable: "{{ meshcentral_dockflare_tunnel }}"
+          dockflare.access.group: "{{ meshcentral_dockflare_access_group }}"
+          dockflare.hostname: "{{ meshcentral_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ meshcentral_homepage_group }}"
           homepage.icon: "{{ meshcentral_homepage_icon }}"
@@ -113,6 +117,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/Typhonragewind/meshcentral-docker/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ no releases on github
+        cpu_shares: "{{ meshcentral_cpu_shares }}"
         memory: "{{ meshcentral_memory }}"
         restart_policy: unless-stopped
   when: meshcentral_enabled is true

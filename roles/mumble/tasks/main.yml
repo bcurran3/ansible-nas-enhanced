@@ -19,7 +19,6 @@
         hostname: "{{ mumble_container_name }}"
         image: "{{ mumble_image_name }}:{{ mumble_image_tag }}"
         pull: true
-        cpu_shares: "{{ mumble_cpu_shares }}"
         volumes:
           - "{{ mumble_data_directory }}:/data:rw"
         ports:
@@ -27,10 +26,13 @@
           - "{{ mumble_udp_port }}:64738/udp"
         env:
           MUMBLE_CONFIG_SERVER_PASSWORD: "{{ mumble_server_password }}"
-        restart_policy: unless-stopped
         labels:
           autoheal: "{{ mumble_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mumble_watchtower_monitor_only }}"
+          dockflare.enable: "{{ mumble_dockflare_tunnel }}"
+          dockflare.access.group: "{{ mumble_dockflare_access_group }}"
+          dockflare.hostname: "{{ mumble_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_tcp_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mumble_homepage_group }}"
           homepage.icon: "{{ mumble_homepage_icon }}"
@@ -51,6 +53,9 @@
           traefik.http.services.mumble.loadbalancer.server.port: "64738"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mumble-voip/mumble/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ mumble_cpu_shares }}"
+        memory: "{{ mumble_memory }}"
+        restart_policy: unless-stopped
   when: mumble_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

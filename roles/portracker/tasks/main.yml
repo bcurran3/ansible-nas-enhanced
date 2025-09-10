@@ -29,6 +29,10 @@
         labels:
           autoheal: "{{ portracker_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ portracker_watchtower_monitor_only }}"
+          dockflare.enable: "{{ portracker_dockflare_tunnel }}"
+          dockflare.access.group: "{{ portracker_dockflare_access_group }}"
+          dockflare.hostname: "{{ portracker_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portracker_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ portracker_homepage_group }}"
           homepage.icon: "{{ portracker_homepage_icon }}"

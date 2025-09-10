@@ -33,6 +33,10 @@
         labels:
           autoheal: "{{ netbootxyz_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ netbootxyz_watchtower_monitor_only }}"
+          dockflare.enable: "{{ netbootxyz_dockflare_tunnel }}"
+          dockflare.access.group: "{{ netbootxyz_dockflare_access_group }}"
+          dockflare.hostname: "{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbootxyz_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ netbootxyz_homepage_group }}"
           homepage.icon: "{{ netbootxyz_homepage_icon }}"
@@ -51,12 +55,12 @@
           traefik.http.routers.netbootxyz.middlewares: "{{ netbootxyz_hostname }}@docker"
           traefik.http.middlewares.netbootxyz.IPAllowList.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
           traefik.http.services.netbootxyz.loadbalancer.server.port: "{{ netbootxyz_port_http }}"
-# WIP for adding the 2nd site (assets) - need to rename frontend router
+# TDL add the 2nd site (assets) - need to rename frontend router
 #          traefik.http.routers.netbootxyz2.rule: "Host(`{{ netbootxyz_hostname2 }}.{{ ansible_nas_domain }}`)"
 #          traefik.http.routers.netbootxyz2.tls.certresolver: "letsencrypt"
 #          traefik.http.routers.netbootxyz2.tls.domains[0].main: "{{ ansible_nas_domain }}"
 #          traefik.http.routers.netbootxyz2.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-##          traefik.http.routers.frontend.middlewares: "{{ netbootxyz_hostname2 }}"
+#          traefik.http.routers.frontend.middlewares: "{{ netbootxyz_hostname2 }}"
 #          traefik.http.routers.netbootxyz2.middlewares: "{{ netbootxyz_hostname2 }}@docker"
 #          traefik.http.middlewares.netbootxyz2.IPAllowList.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
 #          traefik.http.services.netbootxyz2.loadbalancer.server.port: "{{ netbootxyz_port_http2 }}"

@@ -18,7 +18,6 @@
         hostname: "{{ osclass_db_container_name }}"
         image: "{{ osclass_db_image_name }}:{{ osclass_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ osclass_db_cpu_shares }}"
         network_mode: "bridge"
         networks_cli_compatible: "yes"
         volumes:
@@ -34,6 +33,7 @@
         labels:
           autoheal: "{{ osclass_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ osclass_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ osclass_db_homepage_group }}"
           homepage.icon: "{{ osclass_db_homepage_icon }}"
@@ -45,6 +45,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.link.template: "https://mariadb.com/kb/en/mariadb-$${major}$${minor}$${patch}-changelog"
+        cpu_shares: "{{ osclass_db_cpu_shares }}"
         memory: "{{ osclass_db_memory }}"
         restart_policy: unless-stopped
 
@@ -55,7 +56,6 @@
         hostname: "{{ osclass_container_name }}"
         image: "{{ osclass_image_name }}:{{ osclass_image_tag }}"
         pull: true
-        cpu_shares: "{{ osclass_cpu_shares }}"
         network_mode: "bridge"
         networks_cli_compatible: "yes"
         volumes:
@@ -108,6 +108,7 @@
           traefik.http.services.osclass.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/bitnami/osclass-archived/tags/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ osclass_cpu_shares }}"
         memory: "{{ osclass_memory }}"
         restart_policy: unless-stopped
   when: osclass_enabled is true

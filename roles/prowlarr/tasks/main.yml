@@ -28,6 +28,10 @@
         labels:
           autoheal: "{{ prowlarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ prowlarr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ prowlarr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ prowlarr_dockflare_access_group }}"
+          dockflare.hostname: "{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ prowlarr_homepage_group }}"
           homepage.icon: "{{ prowlarr_homepage_icon }}"

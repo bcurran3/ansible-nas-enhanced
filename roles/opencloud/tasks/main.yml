@@ -58,6 +58,7 @@
           OC_LOG_PRETTY: "true"
           PROXY_HTTP_ADDR: "0.0.0.0:9200"
           PROXY_TLS: "false"
+# TDL: add these variables
 #         email server (if configured)
 #         NOTIFICATIONS_SMTP_HOST: "${SMTP_HOST}"
 #         NOTIFICATIONS_SMTP_PORT: "${SMTP_PORT}"
@@ -71,6 +72,10 @@
         labels:
           autoheal: "{{ opencloud_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ opencloud_watchtower_monitor_only }}"
+          dockflare.enable: "{{ opencloud_dockflare_tunnel }}"
+          dockflare.access.group: "{{ opencloud_dockflare_access_group }}"
+          dockflare.hostname: "{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ opencloud_homepage_group }}"
           homepage.icon: "{{ opencloud_homepage_icon }}"

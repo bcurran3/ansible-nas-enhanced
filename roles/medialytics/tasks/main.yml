@@ -8,17 +8,20 @@
         hostname: "{{ medialytics_container_name }}"
         image: "{{ medialytics_image_name }}:{{ medialytics_image_tag }}"
         pull: true
-        cpu_shares: "{{ medialytics_cpu_shares }}"
         ports:
           - "{{ medialytics_port_http }}:80"
         network_mode: bridge
         env:
-          SERVER_IP: "xxx.xxx.xxx.xxx public ip here" ##############
-          SERVER_TOKEN: "{{ medialytics_plex_token }}"
+          SERVER_IP: "{{ medialytics_env_server_ip }}"
+          SERVER_TOKEN: "{{ medialytics_env_server_token }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ medialytics_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ medialytics_watchtower_monitor_only }}"
+          dockflare.enable: "{{ medialytics_dockflare_tunnel }}"
+          dockflare.access.group: "{{ medialytics_dockflare_access_group }}"
+          dockflare.hostname: "{{ medialytics_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ medialytics_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ medialytics_homepage_group }}"
           homepage.icon: "{{ medialytics_homepage_icon }}"
@@ -39,6 +42,7 @@
           traefik.http.services.medialytics.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/Drewpeifer/medialytics/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ medialytics_cpu_shares }}"
         memory: "{{ medialytics_memory_limit }}"
         restart_policy: unless-stopped
   when: medialytics_enabled is true

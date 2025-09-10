@@ -15,7 +15,6 @@
         hostname: "{{ nzbget_container_name }}"
         image: "{{ nzbget_image_name }}:{{ nzbget_image_version }}"
         pull: true
-        cpu_shares: "{{ nzbget_cpu_shares }}"
         volumes:
           - "{{ nzbget_download_directory }}:/downloads:rw"
           - "{{ nzbget_data_directory }}:/config:rw"
@@ -25,11 +24,13 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ nzbget_user_id }}"
           PGID: "{{ nzbget_group_id }}"
-        restart_policy: unless-stopped
-        memory: "{{ nzbget_memory }}"
         labels:
           autoheal: "{{ nzbget_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nzbget_watchtower_monitor_only }}"
+          dockflare.enable: "{{ nzbget_dockflare_tunnel }}"
+          dockflare.access.group: "{{ nzbget_dockflare_access_group }}"
+          dockflare.hostname: "{{ nzbget_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nzbget_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ nzbget_homepage_group }}"
           homepage.icon: "{{ nzbget_homepage_icon }}"
@@ -50,6 +51,9 @@
           traefik.http.services.nzbget.loadbalancer.server.port: "6789"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/nzbget/nzbget/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ nzbget_cpu_shares }}"
+        memory: "{{ nzbget_memory }}"
+        restart_policy: unless-stopped
   when: nzbget_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

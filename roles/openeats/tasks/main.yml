@@ -18,7 +18,6 @@
         name: "{{ openeats_db_container_name }}"
         image: "{{ openeats_db_image_name }}:{{ openeats_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ openeats_db_cpu_shares }}"
         volumes:
           - "{{ openeats_data_directory }}/database:/var/lib/mysql"
         ports:
@@ -29,6 +28,7 @@
         labels:
           autoheal: "{{ openeats_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openeats_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ openeats_db_homepage_group }}"
           homepage.icon: "{{ openeats_db_homepage_icon }}"
@@ -39,6 +39,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ openeats_db_cpu_shares }}"
         memory: "{{ openeats_db_memory }}"
         restart_policy: unless-stopped
 
@@ -48,7 +49,6 @@
         name: "{{ openeats_api_container_name }}"
         image: "{{ openeats_api_image_name }}:{{ openeats_api_image_tag }}"
         pull: true
-        cpu_shares: "{{ openeats_api_cpu_shares }}"
         links:
           - "{{ openeats_db_container_name }}"
         volumes:
@@ -63,6 +63,7 @@
         labels:
           autoheal: "{{ openeats_api_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openeats_api_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} API"
           homepage.group: "{{ openeats_api_homepage_group }}"
           homepage.icon: "{{ openeats_api_homepage_icon }}"
@@ -73,6 +74,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/open-eats/openeats-api/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ openeats_api_cpu_shares }}"
         memory: "{{ openeats_api_memory }}"
         restart_policy: unless-stopped
 
@@ -83,7 +85,6 @@
         hostname: "{{ openeats_container_name }}"
         image: "{{ openeats_image_name }}:{{ openeats_image_tag }}"
         pull: true
-        cpu_shares: "{{ openeats_cpu_shares }}"
         links:
           - "{{ openeats_api_container_name }}"
         volumes:
@@ -95,6 +96,10 @@
         labels:
           autoheal: "{{ openeats_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openeats_watchtower_monitor_only }}"
+          dockflare.enable: "{{ openeats_dockflare_tunnel }}"
+          dockflare.access.group: "{{ openeats_dockflare_access_group }}"
+          dockflare.hostname: "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ openeats_homepage_group }}"
           homepage.icon: "{{ openeats_homepage_icon }}"
@@ -115,6 +120,7 @@
           traefik.http.services.openeats.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/open-eats/OpenEats/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ openeats_cpu_shares }}"
         memory: "{{ openeats_memory }}"
         restart_policy: unless-stopped
   when: openeats_enabled is true

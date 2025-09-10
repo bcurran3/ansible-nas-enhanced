@@ -18,7 +18,6 @@
         hostname: "{{ pialert_container_name }}"
         image: "{{ pialert_image_name }}:{{ pialert_image_tag }}"
         pull: true
-        cpu_shares: "{{ pialert_cpu_shares }}"
         volumes:
           - "{{ pialert_data_directory }}/config:/home/pi/pialert/config"
           - "{{ pialert_data_directory }}/db:/home/pi/pialert/db"
@@ -26,11 +25,15 @@
         env:
 #         HOST_USER_GID: "1000"
 #         HOST_USER_ID: "1000"
-          PORT: "20211"
+          PORT: "{{ pialert_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ pialert_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ pialert_watchtower_monitor_only }}"
+          dockflare.enable: "{{ pialert_dockflare_tunnel }}"
+          dockflare.access.group: "{{ pialert_dockflare_access_group }}"
+          dockflare.hostname: "{{ pialert_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pialert_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pialert_homepage_group }}"
           homepage.icon: "{{ pialert_homepage_icon }}"
@@ -49,9 +52,9 @@
           traefik.http.routers.pialert.middlewares: "{{ pialert_hostname }}@docker"
           traefik.http.middlewares.pialert.IPAllowList.sourcerange: "{{ pialert_traefik_whitelist }}"
           traefik.http.services.pialert.loadbalancer.server.port: "20211"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/leiweibau/Pi.Alert/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ need to match format example: v2025-07-30
+          wud.tag.include: "^v\\d{4}-\\d{2}-\\d{2}$"
+          wud.link.template: "https://github.com/jokobsk/Pi.Alert/releases/tag/$${tag}"
+        cpu_shares: "{{ pialert_cpu_shares }}"
         memory: "{{ pialert_memory }}"
         restart_policy: unless-stopped
   when: pialert_enabled is true

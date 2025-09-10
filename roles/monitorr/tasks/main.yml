@@ -12,17 +12,15 @@
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ monitorr_container_name }}"
+        hostname: "{{ monitorr_container_name }}"
         image: "{{ monitorr_image_name }}:{{ monitorr_image_tag }}"
         pull: true
-        cpu_shares: "{{ monitorr_cpu_shares }}"
         volumes:
           - "{{ monitorr_data_directory }}/app:/app:rw"
           - "{{ samba_shares_root }}:/shares:ro"
           - "{{ samba_shares_other_root }}:/other:ro"
         ports:
           - "{{ monitorr_port_http }}:80"
-        dns_servers: "{{ ansible_nas_dns }}"
-        hostname: "monitorr"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ monitorr_user_id }}"
@@ -30,6 +28,10 @@
         labels:
           autoheal: "{{ monitorr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ monitorr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ monitorr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ monitorr_dockflare_access_group }}"
+          dockflare.hostname: "{{ monitorr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ monitorr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ monitorr_homepage_group }}"
           homepage.icon: "{{ monitorr_homepage_icon }}"
@@ -48,9 +50,9 @@
           traefik.http.routers.monitorr.middlewares: "{{ monitorr_hostname }}@docker"
           traefik.http.middlewares.monitorr.IPAllowList.sourcerange: "{{ monitorr_traefik_whitelist }}"
           traefik.http.services.monitorr.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+m$$'
-#         ^ correct?
-          wud.link.template: "https://github.com/Monitorr/Monitorr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: "^\\d+\\.\\d+\\.\\d+m$"
+          wud.link.template: "https://github.com/Monitorr/Monitorr/releases/tag/$${major}.$${minor}.$${patch}m"
+        cpu_shares: "{{ monitorr_cpu_shares }}"
         memory: "{{ monitorr_memory }}"
         restart_policy: unless-stopped
   when: monitorr_enabled is true

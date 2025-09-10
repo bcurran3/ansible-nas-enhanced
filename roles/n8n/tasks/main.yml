@@ -17,14 +17,11 @@
         hostname: "{{ n8n_container_name }}"
         image: "{{ n8n_image_name }}:{{ n8n_image_version }}"
         pull: true
-        cpu_shares: "{{ n8n_cpu_shares }}"
         ports:
           - "{{ n8n_port }}:5678"
         volumes:
           - "{{ n8n_data_directory }}:/home/node/.n8n:rw"
           - "/etc/timezone:/etc/timezone:ro"
-        restart_policy: unless-stopped
-        memory: "{{ n8n_memory }}"
         env:
           N8N_BASIC_AUTH_ACTIVE: "true"
           N8N_BASIC_AUTH_USER: "{{ n8n_basic_auth_user }}"
@@ -32,6 +29,10 @@
         labels:
           autoheal: "{{ n8n_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ n8n_watchtower_monitor_only }}"
+          dockflare.enable: "{{ n8n_dockflare_tunnel }}"
+          dockflare.access.group: "{{ n8n_dockflare_access_group }}"
+          dockflare.hostname: "{{ n8n_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ n8n_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ n8n_homepage_group }}"
           homepage.icon: "{{ n8n_homepage_icon }}"
@@ -50,9 +51,11 @@
           traefik.http.routers.n8n.middlewares: "{{ n8n_hostname }}@docker"
           traefik.http.middlewares.n8n.IPAllowList.sourcerange: "{{ n8n_traefik_whitelist }}"
           traefik.http.services.n8n.loadbalancer.server.port: "5678"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/n8n-io/n8n/releases/tag/$${major}.$${minor}.$${patch}"
-#         tags are in format: n8n@1.105.2
+          wud.tag.include: "^n8n@\\d+\\.\\d+\\.\\d+$"
+          wud.link.template: "https://github.com/n8n-io/n8n/releases/tag/n8n@$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ n8n_cpu_shares }}"
+        memory: "{{ n8n_memory }}"
+        restart_policy: unless-stopped
   when: n8n_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

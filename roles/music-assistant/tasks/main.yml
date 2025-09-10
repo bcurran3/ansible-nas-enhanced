@@ -16,7 +16,6 @@
         hostname: "{{ musicassistant_container_name }}"
         image: "{{ musicassistant_image_name }}:{{ musicassistant_image_tag }}"
         pull: true
-        cpu_shares: "{{ musicassistant_cpu_shares }}"
         privileged: true
         volumes:
           - "{{ musicassistant_data_directory }}/data:/data"
@@ -27,6 +26,7 @@
         labels:
           autoheal: "{{ musicassistant_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ musicassistant_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ musicassistant_homepage_group }}"
           homepage.icon: "{{ musicassistant_homepage_icon }}"
@@ -37,6 +37,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/music-assistant/server/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ musicassistant_cpu_shares }}"
         memory: "{{ musicassistant_memory }}"
         restart_policy: unless-stopped
   when: musicassistant_enabled is true

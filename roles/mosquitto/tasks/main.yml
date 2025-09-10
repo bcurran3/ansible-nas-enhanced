@@ -34,6 +34,7 @@
         labels:
           autoheal: "{{ mosquitto_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ mosquitto_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mosquitto_homepage_group }}"
           homepage.icon: "{{ mosquitto_homepage_icon }}"
@@ -45,8 +46,8 @@
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/_/eclipse-mosquitto/tags/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ mosquitto_cpu_shares }}"
-        restart: "{{ mosquitto_conf is changed }}"
         memory: "{{ mosquitto_memory }}"
+        restart: "{{ mosquitto_conf is changed }}"
   when: mosquitto_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

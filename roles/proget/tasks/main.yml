@@ -34,7 +34,6 @@
         hostname: "{{ proget_db_container_name}}"
         image: "{{ proget_db_image_name }}:{{ proget_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ proget_db_cpu_shares }}"
         networks:
           - name: "{{ proget_network_name }}"
         networks_cli_compatible: "yes"
@@ -51,6 +50,7 @@
         labels:
           autoheal: "{{ proget_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ proget_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MSSQL"
           homepage.group: "{{ proget_db_homepage_group }}"
           homepage.icon: "{{ proget_db_homepage_icon }}"
@@ -60,8 +60,8 @@
           homepage.container: "{{ proget_db_container_name }}"
           homepage.showStats: "{{ proget_db_homepage_showStats }}"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: ""
+          wud.ignore.tags: "true"
+        cpu_shares: "{{ proget_db_cpu_shares }}"
         memory: "{{ proget_db_memory }}"
         restart_policy: unless-stopped
 
@@ -72,7 +72,6 @@
         hostname: "{{ proget_container_name }}"
         image: "{{ proget_image_name }}:{{ proget_image_tag }}"
         pull: true
-        cpu_shares: "{{ proget_cpu_shares }}"
         networks:
           - name: "{{ proget_network_name }}"
         networks_cli_compatible: "yes"
@@ -89,6 +88,10 @@
         labels:
           autoheal: "{{ proget_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ proget_watchtower_monitor_only }}"
+          dockflare.enable: "{{ proget_dockflare_tunnel }}"
+          dockflare.access.group: "{{ proget_dockflare_access_group }}"
+          dockflare.hostname: "{{ proget_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proget_port_http }}"
           homepage.group: "{{ proget_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ proget_homepage_icon }}"
@@ -107,8 +110,9 @@
           traefik.http.routers.proget.middlewares: "proget@docker"
           traefik.http.middlewares.proget.IPAllowList.sourcerange: "{{ proget_traefik_whitelist }}"
           traefik.http.services.proget.loadbalancer.server.port: "80"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: ""
+          wud.tag.include: "^\\d+\\.\\d+\\.\\d+$"
+          wud.link.template: "https://inedo.com/proget/whats-new/v$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ proget_cpu_shares }}"
         memory: "{{ proget_memory }}"
         restart_policy: unless-stopped
   when: proget_enabled is true

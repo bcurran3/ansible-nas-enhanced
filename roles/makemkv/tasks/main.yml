@@ -1,5 +1,4 @@
 ---
-# WIP / TDL: check and add sr0 automatically if found
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -11,6 +10,11 @@
         - "{{ makemkv_data_directory }}/config"
         - "{{ makemkv_output_directory }}"
 
+    - name: Check for optical drive device
+      ansible.builtin.stat:
+        path: "{{ makemkv_optical_drive }}"
+      register: optical_drive_stat
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -18,16 +22,13 @@
         hostname: "{{ makemkv_container_name }}"
         image: "{{ makemkv_image_name }}:{{ makemkv_image_tag }}"
         pull: true
-        cpu_shares: "{{ makemkv_cpu_shares }}"
         volumes:
           - "{{ makemkv_data_directory }}/config:/config:rw"
-#         - "{{ makemkv_optical_drive }}: /dev/sr0:ro"
+          - "{{ (makemkv_optical_drive + ':/dev/sr0:ro') if optical_drive_stat.stat.exists | default(false) else omit }}"
           - "{{ makemkv_storage_directory }}:/storage:ro"
-#         - "{{ makemkv_storagealt_directory }}:/storagealt:rw"
           - "{{ makemkv_output_directory }}:/output:rw"
         ports:
           - "{{ makemkv_port_http }}:5800"
-        dns_servers: "{{ ansible_nas_dns }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           USER_ID: "{{ makemkv_user_id }}"
@@ -35,6 +36,10 @@
         labels:
           autoheal: "{{ makemkv_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ makemkv_watchtower_monitor_only }}"
+          dockflare.enable: "{{ makemkv_dockflare_tunnel }}"
+          dockflare.access.group: "{{ makemkv_dockflare_access_group }}"
+          dockflare.hostname: "{{ makemkv_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ makemkv_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ makemkv_homepage_group }}"
           homepage.icon: "{{ makemkv_homepage_icon }}"
@@ -55,6 +60,7 @@
           traefik.http.services.makemkv.loadbalancer.server.port: "5800"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/jlesage/docker-makemkv/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ makemkv_cpu_shares }}"
         memory: "{{ makemkv_memory }}"
         restart_policy: unless-stopped
   when: makemkv_enabled is true

@@ -36,6 +36,7 @@
         labels:
           autoheal: "{{ nextcloud_redis_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_redis_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ nextcloud_redis_homepage_group }}"
           homepage.icon: "{{ nextcloud_redis_homepage_icon }}"
@@ -73,6 +74,7 @@
         labels:
           autoheal: "{{ nextcloud_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ nextcloud_db_homepage_group }}"
           homepage.icon: "{{ nextcloud_db_homepage_icon }}"
@@ -105,7 +107,7 @@
           - "{{ nextcloud_data_directory }}/nextcloud/pre-upgrade:/docker-entrypoint-hooks.d/pre-upgrade" # added
           - "{{ nextcloud_data_directory }}/nextcloud/post-upgrade:/docker-entrypoint-hooks.d/post-upgrade" # added
           - "{{ nextcloud_data_directory }}/nextcloud/before-starting:/docker-entrypoint-hooks.d/before-starting" # added
-# Could make a nextcloud_media_enable to add access to media
+# TDL: make a nextcloud_media_enable to add access to media
 #         - "{{ audiobooks_root }}:/media/audiobooks:ro"
 #         - "{{ books_root }}:/media/books:ro"
 #         - "{{ comics_root }}:/media/comics:ro"
@@ -123,8 +125,8 @@
           REDIS_HOST: "{{ nextcloud_redis_container_name }}" # added
           REDIS_PORT: "6379"               # added
           REDIS_HOST_PASSWORD: "topsecret" # added
-#         NEXTCLOUD_INIT_HTACCESS: "true"
-#         ^^^ added localhost
+          NEXTCLOUD_INIT_HTACCESS: "{{ nextcloud_env_nextcloud_init_htaccess }}" # added
+          # ^^^ may need to add localhost
           APACHE_DISABLE_REWRITE_IP: "1"   # added
           TZ: "{{ ansible_nas_timezone }}" # added
         links:
@@ -134,6 +136,7 @@
           autoheal: "{{ nextcloud_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_watchtower_monitor_only }}"
           dockflare.enable: "{{ nextcloud_dockflare_tunnel }}"
+          dockflare.access.group: "{{ nextcloud_dockflare_access_group }}"
           dockflare.hostname: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"

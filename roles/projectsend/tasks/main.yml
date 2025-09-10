@@ -18,7 +18,6 @@
         hostname: "{{ projectsend_db_container_name }}"
         image: "{{ projectsend_db_image_name }}:{{ projectsend_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ projectsend_db_cpu_shares }}"
         network_mode: "bridge"
         volumes:
           - "{{ projectsend_data_directory }}/db:/config/databases"
@@ -31,6 +30,7 @@
         labels:
           autoheal: "{{ projectsend_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ projectsend_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ projectsend_db_homepage_group }}"
           homepage.icon: "{{ projectsend_db_homepage_icon }}"
@@ -42,6 +42,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ projectsend_db_cpu_shares }}"
         memory: "{{ projectsend_db_memory }}"
         restart_policy: unless-stopped
 
@@ -53,7 +54,6 @@
         image: "{{ projectsend_image_name }}:{{ projectsend_image_tag }}"
         network_mode: "bridge"
         pull: true
-        cpu_shares: "{{ projectsend_cpu_shares }}"
         volumes:
           - "{{ projectsend_data_directory }}/config:/config"
           - "{{ projectsend_data_directory }}/data:/data"
@@ -69,6 +69,10 @@
         labels:
           autoheal: "{{ projectsend_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ projectsend_watchtower_monitor_only }}"
+          dockflare.enable: "{{ projectsend_dockflare_tunnel }}"
+          dockflare.access.group: "{{ projectsend_dockflare_access_group }}"
+          dockflare.hostname: "{{ projectsend_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ projectsend_homepage_group }}"
           homepage.href: "{{ projectsend_homepage_href }}"
@@ -87,9 +91,9 @@
           traefik.http.routers.projectsend.middlewares: "{{ projectsend_hostname }}@docker"
           traefik.http.middlewares.projectsend.IPAllowList.sourcerange: "{{ projectsend_traefik_whitelist }}"
           traefik.http.services.projectsend.loadbalancer.server.port: "80"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/projectsend/projectsend/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ need to update for tag format: r1720
+          wud.tag.include: "^r\\d+$"
+          wud.link.template: "https://github.com/projectsend/projectsend/releases/tag/$${tag}"
+        cpu_shares: "{{ projectsend_cpu_shares }}"
         memory: "{{ projectsend_memory }}"
         restart_policy: unless-stopped
   when: projectsend_enabled is true

@@ -36,6 +36,7 @@
         labels:
           autoheal: "{{ piwigo_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ piwigo_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ piwigo_db_homepage_group }}"
           homepage.icon: "{{ piwigo_db_homepage_icon }}"
@@ -74,6 +75,10 @@
         labels:
           autoheal: "{{ piwigo_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ piwigo_watchtower_monitor_only }}"
+          dockflare.enable: "{{ piwigo_dockflare_tunnel }}"
+          dockflare.access.group: "{{ piwigo_dockflare_access_group }}"
+          dockflare.hostname: "{{ piwigo_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ piwigo_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ piwigo_homepage_group }}"
           homepage.icon: "{{ piwigo_homepage_icon }}"

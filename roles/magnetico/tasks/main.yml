@@ -20,7 +20,6 @@
         hostname: "{{ magneticod_container_name }}"
         image: "{{ magneticod_image_name }}:{{ magneticod_image_tag }}"
         pull: true
-        cpu_shares: "{{ magneticod_cpu_shares }}"
         volumes:
           - "{{ magnetico_data_directory }}/config:/root/.config/magneticod"
           - "{{ magnetico_data_directory }}/data:/root/.local/share/magneticod"
@@ -28,11 +27,10 @@
           TZ: "{{ ansible_nas_timezone }}"
         command:
           - "--indexer-addr=0.0.0.0:1212"
-        restart_policy: unless-stopped
-        memory: 1g
         labels:
           autoheal: "{{ magneticod_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ magnetico_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}d"
           homepage.group: "{{ magneticod_homepage_group }}"
           homepage.icon: "{{ magneticod_homepage_icon }}"
@@ -44,6 +42,9 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ magneticod_cpu_shares }}"
+        memory: "{{ magneticod_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }}w Container
       community.docker.docker_container:
@@ -51,7 +52,6 @@
         name: "{{ magneticow_container_name }}"
         image: "{{ magneticow_image_name }}:{{ magneticow_image_tag }}"
         pull: true
-        cpu_shares: "{{ magneticow_cpu_shares }}"
         links:
           - "{{ magnetico_container2_name }}"
         volumes:
@@ -63,11 +63,13 @@
         hostname: "{{ magneticow_container_name }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: 1g
         labels:
           autoheal: "{{ magneticow_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ magnetico_watchtower_monitor_only }}"
+          dockflare.enable: "{{ magnetico_dockflare_tunnel }}"
+          dockflare.access.group: "{{ magnetico_dockflare_access_group }}"
+          dockflare.hostname: "{{ magnetico_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ magnetico_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ magnetico_homepage_group }}"
           homepage.icon: "{{ magnetico_homepage_icon }}"
@@ -88,6 +90,9 @@
           traefik.http.services.magnetico.loadbalancer.server.port: "8080"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ magneticow_cpu_shares }}"
+        memory: "{{ magneticow_memory }}"
+        restart_policy: unless-stopped
   when: magnetico_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

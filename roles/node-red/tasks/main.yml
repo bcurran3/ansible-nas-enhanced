@@ -23,12 +23,13 @@
           - "{{ node_red_port }}:1880"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ node_red_cpu_shares }}"
-        memory: "{{ node_red_memory }}"
         labels:
           autoheal: "{{ node_red_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ node_red_watchtower_monitor_only }}"
+          dockflare.enable: "{{ node_red_dockflare_tunnel }}"
+          dockflare.access.group: "{{ node_red_dockflare_access_group }}"
+          dockflare.hostname: "{{ node_red_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ node_red_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ node_red_homepage_group }}"
           homepage.icon: "{{ node_red_homepage_icon }}"
@@ -49,6 +50,9 @@
           traefik.http.services.node_red.loadbalancer.server.port: "1880"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/node-red/node-red/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ node_red_cpu_shares }}"
+        memory: "{{ node_red_memory }}"
+        restart_policy: unless-stopped
   when: node_red_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -29,6 +29,10 @@
         labels:
           autoheal: "{{ octoprint_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ octoprint_watchtower_monitor_only }}"
+          dockflare.enable: "{{ octoprint_dockflare_tunnel }}"
+          dockflare.access.group: "{{ octoprint_dockflare_access_group }}"
+          dockflare.hostname: "{{ octoprint_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ octoprint_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ octoprint_homepage_group }}"
           homepage.icon: "{{ octoprint_homepage_icon }}"

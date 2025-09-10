@@ -11,15 +11,18 @@
         volumes:
           - "{{ minidlna_media_directory1 }}:/media1:rw"
           - "{{ minidlna_media_directory2 }}:/media2:rw"
+          - "{{ minidlna_media_directory3 }}:/media3:rw"
         env:
           MINIDLNA_MEDIA_DIR1: "/media1"
           MINIDLNA_MEDIA_DIR2: "/media2"
+          MINIDLNA_MEDIA_DIR3: "/media3"
           MINIDLNA_FRIENDLY_NAME: "{{ minidlna_friendly_name }}"
           MINIDLNA_PORT: "{{ minidlna_port }}"
         network_mode: host
         labels:
           autoheal: "{{ minidlna_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ minidlna_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ minidlna_homepage_group }}"
           homepage.icon: "{{ minidlna_homepage_icon }}"
@@ -28,8 +31,8 @@
           homepage.container: "{{ minidlna_container_name }}"
           homepage.showStats: "{{ minidlna_homepage_showStats }}"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: "^\\d+\\.\\d+\\.\\d+$"
+          wud.link.template: "https://github.com/vladgh/docker_base_images/releases/tag/v$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ minidlna_cpu_shares }}"
         memory: "{{ minidlna_memory }}"
         restart_policy: unless-stopped

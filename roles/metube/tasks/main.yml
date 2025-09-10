@@ -15,7 +15,6 @@
         hostname: "{{ metube_container_name }}"
         image: "{{ metube_image_name }}:{{ metube_image_tag }}"
         pull: true
-        cpu_shares: "{{ metube_cpu_shares }}"
         volumes:
           - "{{ metube_dl_directory }}:/downloads"
         ports:
@@ -25,6 +24,10 @@
         labels:
           autoheal: "{{ metube_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ metube_watchtower_monitor_only }}"
+          dockflare.enable: "{{ metube_dockflare_tunnel }}"
+          dockflare.access.group: "{{ metube_dockflare_access_group }}"
+          dockflare.hostname: "{{ metube_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ metube_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ metube_homepage_group }}"
           homepage.icon: "{{ metube_homepage_icon }}"
@@ -43,9 +46,9 @@
           traefik.http.routers.metube.middlewares: "{{ metube_hostname }}@docker"
           traefik.http.middlewares.metube.IPAllowList.sourcerange: "{{ metube_traefik_whitelist }}"
           traefik.http.services.metube.loadbalancer.server.port: "8081"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         ^ wrong format, example: 2025.07.31
-#         wud.link.template: "https://github.com/alexta69/metube/releases/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: "^\\d{4}\\.\\d{2}\\.\\d{2}$"
+          wud.link.template: "https://github.com/alexta69/metube/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ metube_cpu_shares }}"
         memory: "{{ metube_memory }}"
         restart_policy: unless-stopped
   when: metube_enabled is true

@@ -24,7 +24,6 @@
         hostname: "{{ openemr_db_container_name }}"
         image: "{{ openemr_db_image_name }}:{{ openemr_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ openemr_db_cpu_shares }}"
 #       command: ['mariadb','--character-set-server=utf8mb4']
         network_mode: "bridge"
         networks:
@@ -44,6 +43,7 @@
         labels:
           autoheal: "{{ openemr_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openemr_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ openemr_db_homepage_group }}"
           homepage.icon: "{{ openemr_db_homepage_icon }}"
@@ -55,6 +55,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ openemr_db_cpu_shares }}"
         memory: "{{ openemr_db_memory }}"
         restart_policy: unless-stopped
 
@@ -91,6 +92,10 @@
         labels:
           autoheal: "{{ openemr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ openemr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ openemr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ openemr_dockflare_access_group }}"
+          dockflare.hostname: "{{ openemr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ openemr_homepage_group }}"
           homepage.icon: "{{ openemr_homepage_icon }}"
