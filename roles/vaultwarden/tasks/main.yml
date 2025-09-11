@@ -17,7 +17,6 @@
         hostname: "{{ vaultwarden_container_name }}"
         image: "{{ vaultwarden_image_name }}:{{ vaultwarden_image_tag }}"
         pull: true
-        cpu_shares: "{{ vaultwarden_cpu_shares }}"
         ports:
           - "{{ vaultwarden_port_http }}:80"
           - "{{ vaultwarden_port_websockets }}:3012"
@@ -42,6 +41,7 @@
           autoheal: "{{ vaultwarden_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_watchtower_monitor_only }}"
           dockflare.enable: "{{ vaultwarden_dockflare_tunnel }}"
+          dockflare.access.group: "{{ vaultwarden_dockflare_access_group }}"
           dockflare.hostname: "{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
@@ -74,8 +74,9 @@
 #         traefik.http.services.vaultwarden-ws.loadbalancer.server.port: "3012"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/dani-garcia/vaultwarden/releases/tag/$${major}.$${minor}.$${patch}"
-        restart_policy: unless-stopped
+        cpu_shares: "{{ vaultwarden_cpu_shares }}"
         memory: "{{ vaultwarden_memory }}"
+        restart_policy: unless-stopped
       when: vaultwarden_enabled is true
 
     - name: Create {{ ansible_nas_app_name }} Backup Container Directory
@@ -93,7 +94,6 @@
         hostname: "{{ vaultwarden_backup_container_name }}"
         image: "{{ vaultwarden_backup_image_name }}:{{ vaultwarden_backup_image_tag }}"
         pull: true
-        cpu_shares: "{{ vaultwarden_backup_cpu_shares }}"
         volumes:
           - "{{ vaultwarden_data_directory }}/data:/data"
           - "{{ vaultwarden_data_directory }}/backup:/backup"
@@ -107,6 +107,7 @@
         labels:
           autoheal: "{{ vaultwarden_backup_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_backup_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Backup"
           homepage.group: "{{ vaultwarden_backup_homepage_group }}"
           homepage.icon: "{{ vaultwarden_backup_homepage_icon }}"
@@ -118,6 +119,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://gitlab.com/1O/vaultwarden-backup/-/releases/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ vaultwarden_backup_cpu_shares }}"
         memory: "{{ vaultwarden_backup_memory }}"
         restart_policy: unless-stopped
   when: vaultwarden_enabled is true

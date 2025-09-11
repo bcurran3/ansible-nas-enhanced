@@ -5,10 +5,9 @@
       file:
         path: "{{ item }}"
         state: directory
-#        user: appuser
-#        group: appgroup
       with_items:
         - "{{ reubah_data_directory }}"
+        - "{{ reubah_data_directory }}/tmp"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -17,9 +16,8 @@
         hostname: "{{ reubah_container_name }}"
         image: "{{ reubah_image_name }}:{{ reubah_image_tag }}"
         pull: true
-        cpu_shares: "{{ reubah_cpu_shares }}"
-#        volumes:
-#          - "{{ reubah_data_directory }}/tmp:/tmp"
+        volumes:
+          - "{{ reubah_data_directory }}/tmp:/tmp"
         ports:
           - "{{ reubah_port_http }}:{{ reubah_port_http }}"
 #        security_opts:
@@ -32,6 +30,10 @@
         labels:
           autoheal: "{{ reubah_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ reubah_watchtower_monitor_only }}"
+          dockflare.enable: "{{ reubah_dockflare_tunnel }}"
+          dockflare.access.group: "{{ reubah_dockflare_access_group }}"
+          dockflare.hostname: "{{ reubah_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ reubah_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ reubah_homepage_group }}"
           homepage.icon: "{{ reubah_homepage_icon }}"
@@ -53,6 +55,7 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/dendianugerah/reubah/releases/tag/$${major}.$${minor}.$${patch}"
 #         ^ no published releases or tags on github
+        cpu_shares: "{{ reubah_cpu_shares }}"
         memory: "{{ reubah_memory }}"
         restart_policy: unless-stopped
   when: reubah_enabled is true

@@ -15,7 +15,6 @@
         hostname: "{{ windows_container_name }}"
         image: "{{ windows_image_name }}:{{ windows_image_tag }}"
         pull: true
-        cpu_shares: "{{ windows_cpu_shares }}"
         capabilities:
           - NET_ADMIN
         devices:
@@ -39,6 +38,10 @@
         labels:
           autoheal: "{{ windows_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ windows_watchtower_monitor_only }}"
+          dockflare.enable: "{{ windows_dockflare_tunnel }}"
+          dockflare.access.group: "{{ windows_dockflare_access_group }}"
+          dockflare.hostname: "{{ windows_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ windows_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ windows_homepage_group }}"
           homepage.icon: "{{ windows_homepage_icon }}"
@@ -59,6 +62,7 @@
           traefik.http.services.windows.loadbalancer.server.port: "8006"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/dockur/windows/pkgs/container/windows/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ windows_cpu_shares }}"
         memory: "{{ windows_memory_size }}"
         restart_policy: unless-stopped
   when: windows_enabled is true

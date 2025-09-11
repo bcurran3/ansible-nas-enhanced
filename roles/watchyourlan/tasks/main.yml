@@ -7,7 +7,6 @@
         hostname: "{{ watchyourlan_container_name }}"
         image: "{{ watchyourlan_image_name }}:{{ watchyourlan_image_tag }}"
         pull: true
-        cpu_shares: "{{ watchyourlan_cpu_shares }}"
         network_mode: host
         env:
           IFACES: "{{ watchyourlan_ifaces }}"  # required: 1 or more interface
@@ -21,6 +20,7 @@
         labels:
           autoheal: "{{ watchyourlan_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ watchyourlan_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ watchyourlan_homepage_group }}"
           homepage.icon: "{{ watchyourlan_homepage_icon }}"
@@ -33,6 +33,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/aceberg/WatchYourLAN/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ watchyourlan_cpu_shares }}"
         memory: "{{ watchyourlan_memory }}"
         restart_policy: unless-stopped
   when: watchyourlan_enabled is true

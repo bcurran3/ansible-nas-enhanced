@@ -34,6 +34,10 @@
         labels:
           autoheal: "{{ transmission_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ transmission_watchtower_monitor_only }}"
+          dockflare.enable: "{{ transmission_dockflare_tunnel }}"
+          dockflare.access.group: "{{ transmission_dockflare_access_group }}"
+          dockflare.hostname: "{{ transmission_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_webui_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ transmission_homepage_group }}"
           homepage.href: "{{ transmission_homepage_href }}"

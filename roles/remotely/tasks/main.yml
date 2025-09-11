@@ -16,7 +16,6 @@
         hostname: "{{ remotely_container_name }}"
         image: "{{ remotely_image_name }}:{{ remotely_image_tag }}"
         pull: true
-        cpu_shares: "{{ remotely_cpu_shares }}"
         ports:
           - "{{ remotely_port_http }}:5000"
         volumes:
@@ -30,6 +29,10 @@
         labels:
           autoheal: "{{ remotely_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ remotely_watchtower_monitor_only }}"
+          dockflare.enable: "{{ remotely_dockflare_tunnel }}"
+          dockflare.access.group: "{{ remotely_dockflare_access_group }}"
+          dockflare.hostname: "{{ remotely_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ remotely_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ remotely_homepage_group }}"
           homepage.icon: "{{ remotely_homepage_icon }}"
@@ -50,6 +53,7 @@
           traefik.http.services.remotely.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/immybot/remotely/tags/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ remotely_cpu_shares }}"
         memory: "{{ remotely_memory }}"
         restart_policy: unless-stopped
   when: remotely_enabled is true

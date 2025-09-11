@@ -1,7 +1,6 @@
 ---
+# ANE
 ansible_nas_app_name: "What's Running"
-
-#
 whatsrunning_enabled: false
 whatsrunning_available_externally: false
 whatsrunning_traefik_whitelist: "{{ lan }}"
@@ -19,11 +18,14 @@ whatsrunning_cpu_shares: "1024"
 whatsrunning_memory: "256m"
 
 # app
-whatsrunning_host_hostname: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-#whatsrunning_host_hostname: "https://{{ whatsrunning_hostname }}.{{ ansible_nas_domain }}"
+whatsrunning_env_host_hostname: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
 
 # autoheal
 whatsrunning_autoheal: "false"
+
+# dockflare
+whatsrunning_dockflare_tunnel: "false"
+whatsrunning_dockflare_access_group: ""
 
 # homepage
 whatsrunning_homepage_group: "Apps"

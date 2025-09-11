@@ -16,7 +16,6 @@
         hostname: "{{ uptimekuma_container_name }}"
         image: "{{ uptimekuma_image_name }}:{{ uptimekuma_image_tag }}"
         pull: true
-        cpu_shares: "{{ uptimekuma_cpu_shares }}"
         volumes:
           - "{{ uptimekuma_data_directory }}/data:/app/data"
           - "/var/run/docker.sock:/var/run/docker.sock"
@@ -27,6 +26,10 @@
         labels:
           autoheal: "{{ uptimekuma_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ uptimekuma_watchtower_monitor_only }}"
+          dockflare.enable: "{{ uptimekuma_dockflare_tunnel }}"
+          dockflare.access.group: "{{ uptimekuma_dockflare_access_group }}"
+          dockflare.hostname: "{{ uptimekuma_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptimekuma_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ uptimekuma_homepage_group }}"
           homepage.href: "{{ uptimekuma_homepage_href }}"
@@ -50,6 +53,7 @@
           traefik.http.services.uptimekuma.loadbalancer.server.port: "3001"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/louislam/uptime-kuma/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ uptimekuma_cpu_shares }}"
         memory: "{{ uptimekuma_memory }}"
         restart_policy: unless-stopped
   when: uptimekuma_enabled is true

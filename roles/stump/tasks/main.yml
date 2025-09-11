@@ -16,7 +16,6 @@
         hostname: "{{ stump_container_name }}"
         image: "{{ stump_image_name }}:{{ stump_image_tag }}"
         pull: true
-        cpu_shares: "{{ stump_cpu_shares }}"
         volumes:
           - "{{ stump_data_directory }}/config:/config"
           - "{{ stump_comics_directory }}:/data/comics:ro"
@@ -28,6 +27,10 @@
         labels:
           autoheal: "{{ stump_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stump_watchtower_monitor_only }}"
+          dockflare.enable: "{{ stump_dockflare_tunnel }}"
+          dockflare.access.group: "{{ stump_dockflare_access_group }}"
+          dockflare.hostname: "{{ stump_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stump_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ stump_homepage_group }}"
           homepage.icon: "{{ stump_homepage_icon }}"
@@ -48,6 +51,7 @@
           traefik.http.services.stump.loadbalancer.server.port: "10801"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/stumpapp/stump/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ stump_cpu_shares }}"
         memory: "{{ stump_memory }}"
         restart_policy: unless-stopped
   when: stump_enabled is true

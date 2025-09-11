@@ -21,7 +21,6 @@
         hostname: "{{ stash_container_name }}"
         image: "{{ stash_image_name }}:{{ stash_image_tag }}"
         pull: true
-        cpu_shares: "{{ stash_cpu_shares }}"
         log_driver: "json-file"
         log_options:
             max-size: "10m"
@@ -34,7 +33,7 @@
           - "{{ stash_data_directory }}/metadata:/metadata:rw"
           - "{{ porn_root }}:/porn:ro"
         ports:
-          - "{{ stash_http_port }}:9999"
+          - "{{ stash_port_http }}:9999"
         env:
           PUID: "{{ stash_user_id }}"
           PGID: "{{ stash_group_id }}"
@@ -46,6 +45,10 @@
         labels:
           autoheal: "{{ stash_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ stash_watchtower_monitor_only }}"
+          dockflare.enable: "{{ stash_dockflare_tunnel }}"
+          dockflare.access.group: "{{ stash_dockflare_access_group }}"
+          dockflare.hostname: "{{ stash_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stash_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ stash_homepage_group }}"
           homepage.icon: "{{ stash_homepage_icon }}"
@@ -70,6 +73,7 @@
           traefik.http.services.stash.loadbalancer.server.port: "9999"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/stashapp/stash/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ stash_cpu_shares }}"
         memory: "{{ stash_memory }}"
         restart_policy: unless-stopped
   when: stash_enabled is true

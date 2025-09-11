@@ -16,7 +16,6 @@
         hostname: "{{ rustdesk_hbbr_container_name }}"
         image: "{{ rustdesk_hbbr_image_name }}:{{ rustdesk_hbbr_image_tag }}"
         pull: true
-        cpu_shares: "{{ rustdesk_hbbr_cpu_shares }}"
         network_mode: bridge
         ports:
           - "21117:21117" # Relay services
@@ -29,6 +28,7 @@
         labels:
           autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Relay Server"
           homepage.group: "{{ rustdesk_hbbr_homepage_group }}"
           homepage.icon: "{{ rustdesk_hbbr_homepage_icon }}"
@@ -41,6 +41,7 @@
           trafik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ rustdesk_hbbr_cpu_shares }}"
         memory: "{{ rustdesk_hbbr_memory }}"
         restart_policy: unless-stopped
 
@@ -51,7 +52,6 @@
         hostname: "{{ rustdesk_hbbs_container_name }}"
         image: "{{ rustdesk_hbbs_image_name }}:{{ rustdesk_hbbs_image_tag }}"
         pull: true
-        cpu_shares: "{{ rustdesk_hbbs_cpu_shares }}"
         network_mode: bridge
         ports:
           - "21114:21114"         # web console - Pro only
@@ -69,6 +69,7 @@
         labels:
           autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} ID Server"
           homepage.group: "{{ rustdesk_hbbs_homepage_group }}"
           homepage.icon: "{{ rustdesk_hbbs_homepage_icon }}"
@@ -81,6 +82,7 @@
           trafik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ rustdesk_hbbs_cpu_shares }}"
         memory: "{{ rustdesk_hbbs_memory }}"
         restart_policy: unless-stopped
 
@@ -91,7 +93,6 @@
         hostname: "{{ rustdesk_web_container_name }}"
         image: "{{ rustdesk_web_image_name }}:{{ rustdesk_web_image_tag }}"
         pull: true
-        cpu_shares: "{{ rustdesk_web_cpu_shares }}"
         network_mode: bridge
         ports:
           - "{{ rustdesk_web_port_http }}:5000"
@@ -103,6 +104,10 @@
         labels:
           autoheal: "{{ rustdesk_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rustdesk_watchtower_monitor_only }}"
+          dockflare.enable: "{{ rustdesk_dockflare_tunnel }}"
+          dockflare.access.group: "{{ rustdesk_dockflare_access_group }}"
+          dockflare.hostname: "{{ rustdesk_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_web_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }} Web Client"
           homepage.group: "{{ rustdesk_web_homepage_group }}"
           homepage.icon: "{{ rustdesk_web_homepage_icon }}"
@@ -123,6 +128,7 @@
           traefik.http.services.rustdesk.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/r/keyurbhole/flutter_web_desk/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ rustdesk_web_cpu_shares }}"
         memory: "{{ rustdesk_web_memory }}"
         restart_policy: unless-stopped
   when: rustdesk_enabled is true

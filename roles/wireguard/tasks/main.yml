@@ -21,8 +21,8 @@
         volumes:
           - "{{ wireguard_data_directory }}:/etc/wireguard"
         ports:
-          - "{{ wireguard_port_udp }}:51820/udp"
           - "{{ wireguard_port_http }}:{{ wireguard_port_http }}"
+          - "{{ wireguard_port_udp }}:51820/udp"
         capabilities:
           - NET_ADMIN
           - SYS_MODULE
@@ -35,6 +35,10 @@
         labels:
           autoheal: "{{ wireguard_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ wireguard_watchtower_monitor_only }}"
+          dockflare.enable: "{{ wireguard_dockflare_tunnel }}"
+          dockflare.access.group: "{{ wireguard_dockflare_access_group }}"
+          dockflare.hostname: "{{ wireguard_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireguard_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ wireguard_homepage_group }}"
           homepage.icon: "{{ wireguard_homepage_icon }}"

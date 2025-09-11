@@ -19,7 +19,6 @@
         hostname: "{{ resilio_sync_container_name }}"
         image: "{{ resilio_sync_image_name }}:{{ resilio_sync_image_tag }}"
         pull: true
-        cpu_shares: "{{ resilio_sync_cpu_shares }}"
         volumes:
           - "{{ resilio_sync_data_directory }}:/config"
           - "{{ resilio_sync_data_directory }}:/downloads"
@@ -35,6 +34,10 @@
         labels:
           autoheal: "{{ resilio_sync_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ resilio_sync_watchtower_monitor_only }}"
+          dockflare.enable: "{{ resilio_sync_dockflare_tunnel }}"
+          dockflare.access.group: "{{ resilio_sync_dockflare_access_group }}"
+          dockflare.hostname: "{{ resilio_sync_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ resilio_sync_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ resilio_sync_homepage_group }}"
           homepage.icon: "{{ resilio_sync_homepage_icon }}"
@@ -55,6 +58,7 @@
           traefik.http.services.resilio_sync.loadbalancer.server.port: "8888"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-resilio-sync/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ resilio_sync_cpu_shares }}"
         memory: "{{ resilio_sync_memory }}"
         restart_policy: unless-stopped
   when: resilio_sync_enabled is true

@@ -8,7 +8,6 @@
         hostname: "{{ striparr_container_name }}"
         image: "{{ striparr_image_name }}:{{ striparr_image_tag }}"
         pull: true
-        cpu_shares: "{{ striparr_cpu_shares }}"
         volumes:
           - "{{ sonarr_tv_directory }}:/tv:rw"
           - "{{ radarr_movies_directory }}:/movies:rw"
@@ -22,6 +21,7 @@
         labels:
           autoheal: "{{ striparr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ striparr_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ striparr_homepage_group }}"
           homepage.icon: "{{ striparr_homepage_icon }}"
@@ -34,6 +34,7 @@
           traefik.enable:: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mikenye/docker-striparr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ striparr_cpu_shares }}"
         memory: "{{ striparr_memory }}"
         restart_policy: unless-stopped
   when: striparr_enabled is true

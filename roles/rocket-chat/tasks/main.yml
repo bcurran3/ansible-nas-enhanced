@@ -33,7 +33,6 @@
         hostname: "{{ rocketchat_db_container_name }}"
         image: "{{ rocketchat_db_image_name }}:{{ rocketchat_db_image_tag }}"
         pull: true
-        cpu_shares: "{{ rocketchat_db_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ rocketchat_network_name }}"
@@ -55,6 +54,7 @@
         labels:
           autoheal: "{{ rocketchat_db_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rocketchat_db_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ rocketchat_db_homepage_group }}"
           homepage.icon: "{{ rocketchat_db_homepage_icon }}"
@@ -66,6 +66,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ rocketchat_db_cpu_shares }}"
         memory: "{{ rocketchat_db_memory }}"
         restart_policy: unless-stopped
 
@@ -76,7 +77,6 @@
         hostname: "{{ rocketchat_container_name }}"
         image: "{{ rocketchat_image_name }}:{{ rocketchat_image_tag }}"
         pull: true
-        cpu_shares: "{{ rocketchat_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ rocketchat_network_name }}"
@@ -84,7 +84,7 @@
         links:
           - "{{ rocketchat_db_container_name }}"
         ports:
-          - "{{ rocketchat_http_port }}:3000"
+          - "{{ rocketchat_port_http }}:3000"
         env:
           MONGO_URL: "mongodb://{{ rocketchat_db_container_name }}:27017/rocketchat"
           ROOT_URL: "https://{{ rocketchat_hostname }}.{{ ansible_nas_domain }}"
@@ -99,6 +99,10 @@
         labels:
           autoheal: "{{ rocketchat_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ rocketchat_watchtower_monitor_only }}"
+          dockflare.enable: "{{ rocketchat_dockflare_tunnel }}"
+          dockflare.access.group: "{{ rocketchat_dockflare_access_group }}"
+          dockflare.hostname: "{{ rocketchat_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocketchat_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ rocketchat_homepage_group }}"
           homepage.icon: "{{ rocketchat_homepage_icon }}"
@@ -119,6 +123,7 @@
           traefik.http.services.rocketchat.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/RocketChat/Rocket.Chat/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ rocketchat_cpu_shares }}"
         memory: "{{ rocketchat_memory }}"
         restart_policy: unless-stopped
   when: rocketchat_enabled is true

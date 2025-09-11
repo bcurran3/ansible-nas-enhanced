@@ -16,7 +16,6 @@
         hostname: "{{ whisparr_container_name }}"
         image: "{{ whisparr_image_name }}:{{ whisparr_image_tag }}"
         pull: true
-        cpu_shares: "{{ whisparr_cpu_shares }}"
         ports:
           - "{{ whisparr_port_http }}:6969"
         volumes:
@@ -31,6 +30,10 @@
         labels:
           autoheal: "{{ whisparr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ whisparr_watchtower_monitor_only }}"
+          dockflare.enable: "{{ whisparr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ whisparr_dockflare_access_group }}"
+          dockflare.hostname: "{{ whisparr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whisparr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ whisparr_homepage_group }}"
           homepage.icon: "{{ whisparr_homepage_icon }}"
@@ -51,6 +54,7 @@
           traefik.http.services.whisparr.loadbalancer.server.port: "6969"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/thespad/docker-whisparr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ whisparr_cpu_shares }}"
         memory: "{{ whisparr_memory }}"
         restart_policy: unless-stopped
   when: whisparr_enabled is true

@@ -22,6 +22,10 @@
         labels:
           autoheal: "{{ tinyauth_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ tinyauth_watchtower_monitor_only }}"
+          dockflare.enable: "{{ tinyauth_dockflare_tunnel }}"
+          dockflare.access.group: "{{ tinyauth_dockflare_access_group }}"
+          dockflare.hostname: "{{ tinyauth_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tinyauth_port }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ tinyauth_homepage_group }}"
           homepage.icon: "{{ tinyauth_homepage_icon }}"

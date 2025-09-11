@@ -16,7 +16,6 @@
         hostname: "{{ recyclarr_container_name }}"
         image: "{{ recyclarr_image_name }}:{{ recyclarr_image_tag }}"
         pull: true
-        cpu_shares: "{{ recyclarr_cpu_shares }}"
         volumes:
           - "{{ recyclarr_data_directory }}/config:/config"
         env:
@@ -24,6 +23,7 @@
         labels:
           autoheal: "{{ recyclarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ recyclarr_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ recyclarr_homepage_group }}"
           homepage.icon: "{{ recyclarr_homepage_icon }}"
@@ -34,6 +34,7 @@
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: https://github.com/recyclarr/recyclarr/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ recyclarr_cpu_shares }}"
         memory: "{{ recyclarr_memory }}"
         restart_policy: unless-stopped
   when: recyclarr_enabled is true

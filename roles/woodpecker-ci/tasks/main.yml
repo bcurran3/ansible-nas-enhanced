@@ -44,6 +44,10 @@
         labels:
           autoheal: "{{ woodpecker_ci_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ woodpecker_ci_watchtower_monitor_only }}"
+          dockflare.enable: "{{ woodpecker_ci_dockflare_tunnel }}"
+          dockflare.access.group: "{{ woodpecker_ci_dockflare_access_group }}"
+          dockflare.hostname: "{{ woodpecker_ci_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port_ui }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ woodpecker_ci_homepage_group }}"
           homepage.icon: "{{ woodpecker_ci_homepage_icon }}"
@@ -52,7 +56,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ woodpecker_ci_container_name }}"
           homepage.showStats: "{{ woodpecker_ci_homepage_showStats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port_ui }}"
           traefik.enable: "{{ woodpecker_ci_available_externally | string }}"
           traefik.http.routers.woodpecker_ci.rule: "Host(`{{ woodpecker_ci_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.woodpecker_ci.tls.certresolver: "letsencrypt"
@@ -80,15 +84,16 @@
           WOODPECKER_SERVER: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port_grpc }}"
           WOODPECKER_AGENT_SECRET: "{{ woodpecker_ci_agent_secret }}"
           WOODPECKER_LOG_LEVEL: "{{ woodpecker_ci_log_level }}"
-        restart_policy: unless-stopped
-        cpu_shares: "{{ woodpecker_ci_agent_cpu_shares }}"
-        memory: "{{ woodpecker_ci_agent_memory }}"
         labels:
           autoheal: "{{ woodpecker_ci_agent_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ woodpecker_ci_agent_watchtower_monitor_only }}"
+          dockflare.enable: "false"
           traefik.enable: false
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/woodpecker-ci/woodpecker/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ woodpecker_ci_agent_cpu_shares }}"
+        memory: "{{ woodpecker_ci_agent_memory }}"
+        restart_policy: unless-stopped
 
     - name: Add webhook allowed hosts to Gitea
       ansible.builtin.blockinfile:

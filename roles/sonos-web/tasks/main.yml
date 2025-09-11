@@ -8,7 +8,6 @@
         hostname: "{{ sonos_web_container_name }}"
         image: "{{ sonos_web_image_name }}:{{ sonos_web_image_tag }}"
         pull: true
-        cpu_shares: "{{ sonos_web_cpu_shares }}"
 #        ports:
 #          - "{{ sonos_web_port_http }}:5050"
         network_mode: host
@@ -18,6 +17,10 @@
         labels:
           autoheal: "{{ sonos_web_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ sonos_web_watchtower_monitor_only }}"
+          dockflare.enable: "{{ sonos_web_dockflare_tunnel }}"
+          dockflare.access.group: "{{ sonos_web_dockflare_access_group }}"
+          dockflare.hostname: "{{ sonos_web_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonos_web_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ sonos_web_homepage_group }}"
           homepage.icon: "{{ sonos_web_homepage_icon }}"
@@ -38,6 +41,7 @@
 #          traefik.http.services.sonos_web.loadbalancer.server.port: "5050"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/sonos-web/sonos-web/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ sonos_web_cpu_shares }}"
         memory: "{{ sonos_web_memory }}"
         restart_policy: unless-stopped
   when: sonos_web_enabled is true
