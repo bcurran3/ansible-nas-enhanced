@@ -50,8 +50,9 @@
           traefik.http.routers.appname.middlewares: "{{ appname_hostname }}@docker"
           traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ appname_traefik_whitelist }}"
           traefik.http.services.appname.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/devname/appname/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/dev/app/releases/tag/{{tag}}"
         cpu_shares: "{{ appname_cpu_shares }}"
         memory: "{{ appname_memory }}"
         restart_policy: unless-stopped
@@ -139,8 +140,9 @@
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ appname_db_cpu_shares }}"
         memory: "{{ appname_db_memory }}"
         restart_policy: unless-stopped
@@ -183,9 +185,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showStats }}"
-          traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mongo"
         cpu_shares: "{{ appname_db_cpu_shares }}"
         memory: "{{ appname_db_memory }}"
         restart_policy: unless-stopped
@@ -234,8 +236,9 @@
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mysql"
         cpu_shares: "{{ appname_db_cpu_shares }}"
         memory: "{{ appname_db_memory }}"
         restart_policy: unless-stopped
@@ -282,9 +285,9 @@
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showStats }}"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://hub.docker.com/_/postgres/tag/$${major}.$${minor}.$${patch}"
-#         ^ needs to be updated
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ appname_db_cpu_shares }}"
         memory: "{{ appname_db_memory }}"
         restart_policy: unless-stopped
@@ -326,8 +329,9 @@
           homepage.container: "{{ appname_redis_container_name }}"
           homepage.showStats: "{{ appname_redis_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ appname_redis_cpu_shares }}"
         memory: "{{ appname_redis_memory }}"
         restart_policy: unless-stopped
