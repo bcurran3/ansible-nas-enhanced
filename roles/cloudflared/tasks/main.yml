@@ -29,8 +29,9 @@
           homepage.widget.tunnelid: "{{ cloudflared_homepage_widget_tunnelid }}"
           homepage.widget.key: "{{ cloudflared_homepage_widget_key }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/cloudflare/cloudflared/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/cloudflare/cloudflared"
         cpu_shares: "{{ cloudflared_cpu_shares }}"
         memory: "{{ cloudflared_memory }}"
         restart_policy: unless-stopped

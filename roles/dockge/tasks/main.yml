@@ -52,8 +52,9 @@
           traefik.http.routers.dockge.middlewares: "{{ dockge_hostname }}@docker"
           traefik.http.middlewares.dockge.IPAllowList.sourcerange: "{{ dockge_traefik_whitelist }}"
           traefik.http.services.dockge.loadbalancer.server.port: "5001"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/louislam/dockge/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/louislam/dockge"
         cpu_shares: "{{ dockge_cpu_shares }}"
         memory: "{{ dockge_memory }}"
         restart_policy: unless-stopped

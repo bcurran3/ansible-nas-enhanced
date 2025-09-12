@@ -52,8 +52,9 @@
           traefik.http.routers.homebox.middlewares: "{{ homebox_hostname }}@docker"
           traefik.http.middlewares.homebox.IPAllowList.sourcerange: "{{ homebox_traefik_whitelist }}"
           traefik.http.services.homebox.loadbalancer.server.port: "7745"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/hay-kot/homebox/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/hay-kot/homebox/releases"
         cpu_shares: "{{ homebox_cpu_shares }}"
         memory: "{{ homebox_memory }}"
         restart_policy: unless-stopped

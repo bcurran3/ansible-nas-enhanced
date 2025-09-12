@@ -16,7 +16,6 @@
         hostname: "{{ beszel_container_name }}"
         image: "{{ beszel_image_name }}:{{ beszel_image_tag }}"
         pull: true
-        cpu_shares: "{{ beszel_cpu_shares }}"
         ports:
           - "{{ beszel_port_http }}:8090"
         volumes:
@@ -49,8 +48,10 @@
           traefik.http.routers.beszel.middlewares: "{{ beszel_hostname }}@docker"
           traefik.http.middlewares.beszel.IPAllowList.sourcerange: "{{ beszel_traefik_whitelist }}"
           traefik.http.services.beszel.loadbalancer.server.port: "8090"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/henrygd/beszel/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/henrygd/beszel"
+        cpu_shares: "{{ beszel_cpu_shares }}"
         memory: "{{ beszel_memory }}"
         restart_policy: unless-stopped
   when: beszel_enabled is true

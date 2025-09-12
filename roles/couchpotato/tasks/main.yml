@@ -53,9 +53,8 @@
           traefik.http.routers.couchpotato.middlewares: "{{ couchpotato_hostname }}@docker"
           traefik.http.middlewares.couchpotato.IPAllowList.sourcerange: "{{ couchpotato_traefik_whitelist }}"
           traefik.http.services.couchpotato.loadbalancer.server.port: "5050"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         ^ this is the wrong format. Example to match: 7260c12f-ls82
-#         wud.link.template: "https://github.com/linuxserver-archive/docker-couchpotato/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/linuxserver/couchpotato"
         cpu_shares: "{{ couchpotato_cpu_shares }}"
         memory: "{{ couchpotato_memory }}"
         restart_policy: unless-stopped

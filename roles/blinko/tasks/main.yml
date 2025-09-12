@@ -105,8 +105,9 @@
           traefik.http.routers.blinko.middlewares: "{{ blinko_hostname }}@docker"
           traefik.http.middlewares.blinko.IPAllowList.sourcerange: "{{ blinko_traefik_whitelist }}"
           traefik.http.services.blinko.loadbalancer.server.port: "1111"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/blinkospace/blinko/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/blinkospace/blinko"
         cpu_shares: "{{ blinko_cpu_shares }}"
         memory: "{{ blinko_memory }}"
         restart_policy: unless-stopped

@@ -56,8 +56,9 @@
           traefik.http.routers.dockman.middlewares: "{{ dockman_hostname }}@docker"
           traefik.http.middlewares.dockman.IPAllowList.sourcerange: "{{ dockman_traefik_whitelist }}"
           traefik.http.services.dockman.loadbalancer.server.port: "{{ dockman_port }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/RA341/dockman/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/ra341/Dockman/releases"
         cpu_shares: "{{ dockman_cpu_shares }}"
         memory: "{{ dockman_memory }}"
         restart_policy: unless-stopped

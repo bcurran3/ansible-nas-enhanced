@@ -157,8 +157,9 @@
           traefik.http.routers.twofauth.middlewares: "{{ twofauth_hostname }}@docker"
           traefik.http.middlewares.twofauth.IPAllowList.sourcerange: "{{ twofauth_traefik_whitelist }}"
           traefik.http.services.twofauth.loadbalancer.server.port: "8000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Bubka/2FAuth/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/2FAuth/2FAuth/releases"
         cpu_shares: "{{ twofauth_cpu_shares }}"
         memory: "{{ twofauth_memory_limit }}"
         restart_policy: unless-stopped

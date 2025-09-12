@@ -49,8 +49,9 @@
           traefik.http.routers.glance.middlewares: "{{ glance_hostname }}@docker"
           traefik.http.middlewares.glance.IPAllowList.sourcerange: "{{ glance_traefik_whitelist }}"
           traefik.http.services.glance.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/glanceapp/glance/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/glanceapp/glance"
         cpu_shares: "{{ glance_cpu_shares }}"
         memory: "{{ glance_memory }}"
         restart_policy: unless-stopped

@@ -55,8 +55,9 @@
           traefik.http.routers.duplicacy.middlewares: "{{ duplicacy_hostname }}@docker"
           traefik.http.middlewares.duplicacy.IPAllowList.sourcerange: "{{ duplicacy_traefik_whitelist }}"
           traefik.http.services.duplicacy.loadbalancer.server.port: "3875"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/gilbertchen/duplicacy/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.display.name: "Duplicacy Web"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/saspus/duplicacy-web"
         cpu_shares: "{{ duplicacy_cpu_shares }}"
         memory: "{{ duplicacy_memory }}"
         restart_policy: unless-stopped

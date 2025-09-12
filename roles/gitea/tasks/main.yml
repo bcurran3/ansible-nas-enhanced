@@ -100,8 +100,9 @@
           traefik.http.routers.gitea.middlewares: "{{ gitea_hostname }}@docker"
           traefik.http.middlewares.gitea.IPAllowList.sourcerange: "{{ gitea_traefik_whitelist }}"
           traefik.http.services.gitea.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/go-gitea/gitea/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/gitea/gitea"
         cpu_shares: "{{ gitea_cpu_shares }}"
         memory: "{{ gitea_memory }}"
         restart_policy: unless-stopped

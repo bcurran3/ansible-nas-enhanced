@@ -50,9 +50,8 @@
           traefik.http.routers.doublecommander.middlewares: "{{ doublecommander_hostname }}@docker"
           traefik.http.middlewares.doublecommander.IPAllowList.sourcerange: "{{ doublecommander_traefik_whitelist }}"
           traefik.http.services.doublecommander.loadbalancer.server.port: "3000"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         ^ wrong, format example: 14973b17-ls262
-#         wud.link.template: "https://github.com/linuxserver/docker-doublecommander/releases/tag/$${commit}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://lscr.io/linuxserver/doublecommander"
         cpu_shares: "{{ doublecommander_cpu_shares }}"
         memory: "{{ doublecommander_memory }}"
         restart_policy: unless-stopped

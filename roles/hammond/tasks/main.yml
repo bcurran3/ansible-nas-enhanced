@@ -17,7 +17,6 @@
         hostname: "{{ hammond_container_name }}"
         image: "{{ hammond_image_name }}:{{ hammond_image_tag }}"
         pull: true
-        cpu_shares: "{{ hammond_cpu_shares }}"
         volumes:
           - "{{ hammond_data_directory }}/assets:/assets"
           - "{{ hammond_data_directory }}/config:/config"
@@ -51,8 +50,10 @@
           traefik.http.routers.hammond.middlewares: "{{ hammond_hostname }}@docker"
           traefik.http.middlewares.hammond.IPAllowList.sourcerange: "{{ hammond_traefik_whitelist }}"
           traefik.http.services.hammond.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/AlfHou/hammond/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/alfhou/hammond"
+        cpu_shares: "{{ hammond_cpu_shares }}"
         memory: "{{ hammond_memory }}"
         restart_policy: unless-stopped
   when: hammond_enabled is true

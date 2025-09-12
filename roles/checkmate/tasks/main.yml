@@ -44,8 +44,9 @@
           homepage.container: "{{ checkmate_db_container_name }}"
           homepage.showStats: "{{ checkmate_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/bluewave-labs/Checkmate/pkgs/container/checkmate-mongo/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/BlueWave-Labs/CheckMate-Backend/releases"
         cpu_shares: "{{ checkmate_db_cpu_shares }}"
         memory: "{{ checkmate_db_memory }}"
         restart_policy: unless-stopped
@@ -95,12 +96,12 @@
           traefik.http.routers.checkmate.middlewares: "{{ checkmate_server_hostname }}@docker"
           traefik.http.middlewares.checkmate.IPAllowList.sourcerange: "{{ checkmate_traefik_whitelist }}"
           traefik.http.services.checkmate.loadbalancer.server.port: "52345"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/bluewave-labs/Checkmate/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/BlueWave-Labs/CheckMate-Backend/releases"
         cpu_shares: "{{ checkmate_server_cpu_shares }}"
         memory: "{{ checkmate_server_memory }}"
         restart_policy: unless-stopped
-
   when: checkmate_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

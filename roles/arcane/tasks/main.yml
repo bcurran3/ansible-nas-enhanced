@@ -52,8 +52,9 @@
           traefik.http.routers.arcane.middlewares: "{{ arcane_hostname }}@docker"
           traefik.http.middlewares.arcane.IPAllowList.sourcerange: "{{ arcane_traefik_whitelist }}"
           traefik.http.services.arcane.loadbalancer.server.port: "3000"
-          arcane.tag.include: '^\d+\.\d+\.\d+$$'
-          arcane.link.template: "https://github.com/ofkm/arcane/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/OFKM/Arcane/releases"
         cpu_shares: "{{ arcane_cpu_shares }}"
         memory: "{{ arcane_memory }}"
         restart_policy: unless-stopped

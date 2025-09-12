@@ -129,8 +129,9 @@
           traefik.http.routers.grampsweb.middlewares: "{{ grampsweb_hostname }}@docker"
           traefik.http.middlewares.grampsweb.IPAllowList.sourcerange: "{{ grampsweb_traefik_whitelist }}"
           traefik.http.services.grampsweb.loadbalancer.server.port: "5000"
-          grampsweb.tag.include: '^\d+\.\d+\.\d+$$'
-          grampsweb.link.template: "https://github.com/Casvt/grampsweb/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/gramps-project/GrampsWeb/releases"
         cpu_shares: "{{ grampsweb_cpu_shares }}"
         memory: "{{ grampsweb_memory }}"
         restart_policy: unless-stopped

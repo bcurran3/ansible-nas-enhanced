@@ -50,8 +50,9 @@
           traefik.http.routers.dweebui.middlewares: "{{ dweebui_hostname }}@docker"
           traefik.http.middlewares.dweebui.IPAllowList.sourcerange: "{{ dweebui_traefik_whitelist }}"
           traefik.http.services.dweebui.loadbalancer.server.port: "{{ dweebui_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/lllllllillllllillll/DweebUI/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/lllllllillllllillll/dweebui"
         cpu_shares: "{{ dweebui_cpu_shares }}"
         memory: "{{ dweebui_memory }}"
         restart_policy: unless-stopped

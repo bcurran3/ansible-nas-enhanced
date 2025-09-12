@@ -57,8 +57,9 @@
           traefik.http.routers.gotosocial.middlewares: "{{ gotosocial_hostname }}@docker"
           traefik.http.middlewares.gotosocial.IPAllowList.sourcerange: "{{ gotosocial_traefik_whitelist }}"
           traefik.http.services.gotosocial.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/superseriousbusiness/gotosocial/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/superseriousbusiness/gotosocial"
         cpu_shares: "{{ gotosocial_cpu_shares }}"
         memory: "{{ gotosocial_memory }}"
         restart_policy: unless-stopped

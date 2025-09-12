@@ -51,8 +51,9 @@
           traefik.http.routers.fileshelter.middlewares: "{{ fileshelter_hostname }}@docker"
           traefik.http.middlewares.fileshelter.IPAllowList.sourcerange: "{{ fileshelter_traefik_whitelist }}"
           traefik.http.services.fileshelter.loadbalancer.server.port: "5091"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/epoupon/fileshelter/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/epoupon/fileshelter"
         cpu_shares: "{{ fileshelter_cpu_shares }}"
         memory: "{{ fileshelter_memory_limit }}"
         restart_policy: unless-stopped

@@ -50,6 +50,9 @@
           traefik.http.routers.dashy.middlewares: "{{ dashy_hostname }}@docker"
           traefik.http.middlewares.dashy.IPAllowList.sourcerange: "{{ dashy_traefik_whitelist }}"
           traefik.http.services.dashy.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/lissy93/dashy"
         cpu_shares: "{{ dashy_cpu_shares }}"
         memory: "{{ dashy_memory }}"
         restart_policy: unless-stopped

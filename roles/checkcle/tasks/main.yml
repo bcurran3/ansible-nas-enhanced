@@ -51,8 +51,9 @@
           traefik.http.routers.checkcle.middlewares: "{{ checkcle_hostname }}@docker"
           traefik.http.middlewares.checkcle.IPAllowList.sourcerange: "{{ checkcle_traefik_whitelist }}"
           traefik.http.services.checkcle.loadbalancer.server.port: "8090"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/operacle/checkcle/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/operacle/checkcle"
         cpu_shares: "{{ checkcle_cpu_shares }}"
         memory: "{{ checkcle_memory }}"
         restart_policy: unless-stopped

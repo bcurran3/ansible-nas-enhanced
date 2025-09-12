@@ -96,8 +96,9 @@
           traefik.http.routers.bitmagnet.middlewares: "{{ bitmagnet_hostname }}@docker"
           traefik.http.middlewares.bitmagnet.IPAllowList.sourcerange: "{{ bitmagnet_traefik_whitelist }}"
           traefik.http.services.bitmagnet.loadbalancer.server.port: "3333"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/bitmagnet-io/bitmagnet/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/bitmagnet-io/bitmagnet/releases"
         cpu_shares: "{{ bitmagnet_cpu_shares }}"
         memory: "{{ bitmagnet_memory }}"
         restart_policy: unless-stopped

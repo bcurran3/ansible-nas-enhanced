@@ -50,8 +50,9 @@
           traefik.http.routers.cloudcmd.middlewares: "{{ cloudcmd_hostname }}@docker"
           traefik.http.middlewares.cloudcmd.IPAllowList.sourcerange: "{{ cloudcmd_traefik_whitelist }}"
           traefik.http.services.cloudcmd.loadbalancer.server.port: "8000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/coderaiser/cloudcmd/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/coderaiser/cloudcmd"
         cpu_shares: "{{ cloudcmd_cpu_shares }}"
         memory: "{{ cloudcmd_memory }}"
         restart_policy: unless-stopped

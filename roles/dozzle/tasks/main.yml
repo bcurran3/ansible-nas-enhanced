@@ -40,8 +40,9 @@
           traefik.http.routers.dozzle.middlewares: "{{ dozzle_hostname }}@docker"
           traefik.http.middlewares.dozzle.IPAllowList.sourcerange: "{{ dozzle_traefik_whitelist }}"
           traefik.http.services.dozzle.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/amir20/dozzle/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/amir20/dozzle"
         cpu_shares: "{{ dozzle_cpu_shares }}"
         memory: "{{ dozzle_memory }}"
         restart_policy: unless-stopped

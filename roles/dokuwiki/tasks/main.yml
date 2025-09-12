@@ -48,9 +48,8 @@
           traefik.http.routers.dokuwiki.middlewares: "{{ dokuwiki_hostname }}@docker"
           traefik.http.middlewares.dokuwiki.IPAllowList.sourcerange: "{{ dokuwiki_traefik_whitelist }}"
           traefik.http.services.dokuwiki.loadbalancer.server.port: "80"
-#          wud.tag.include: '^\d+\.\d+\.\d+$$'
-#          ^ wrong, needs to be date format; example: release-2025-05-14a
-#          wud.link.template: "https://github.com/dokuwiki/dokuwiki/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/linuxserver/dokuwiki"
         cpu_shares: "{{ dokuwiki_cpu_shares }}"
         memory: "{{ dokuwiki_memory }}"
         restart_policy: unless-stopped

@@ -48,8 +48,9 @@
           traefik.http.routers.huntarr.middlewares: "{{ huntarr_hostname }}@docker"
           traefik.http.middlewares.huntarr.IPAllowList.sourcerange: "{{ huntarr_traefik_whitelist }}"
           traefik.http.services.huntarr.loadbalancer.server.port: "9705"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/plexguide/Huntarr.io/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/plexguide/Huntarr.io/releases/tag/{{tag}}"
         cpu_shares: "{{ huntarr_cpu_shares }}"
         memory: "{{ huntarr_memory }}"
         restart_policy: unless-stopped

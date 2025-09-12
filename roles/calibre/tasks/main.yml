@@ -55,8 +55,9 @@
           traefik.http.routers.calibre.middlewares: "{{ calibre_hostname }}@docker"
           traefik.http.middlewares.calibre.IPAllowList.sourcerange: "{{ calibre_traefik_whitelist }}"
           traefik.http.services.calibre.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/kovidgoyal/calibre/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/linuxserver/calibre"
         cpu_shares: "{{ calibre_cpu_shares }}"
         memory: "{{ calibre_memory }}"
         restart_policy: unless-stopped

@@ -50,8 +50,9 @@
           traefik.http.routers.jackett.middlewares: "{{ homepage_hostname }}@docker"
           traefik.http.middlewares.jackett.IPAllowList.sourcerange: "{{ homepage_traefik_whitelist }}"
           traefik.http.services.homepage.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/gethomepage/homepage/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/gethomepage/homepage/releases"
         cpu_shares: "{{ homepage_cpu_shares }}"
         memory: "{{ homepage_memory }}"
         restart_policy: unless-stopped

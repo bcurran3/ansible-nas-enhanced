@@ -48,8 +48,9 @@
           traefik.http.routers.homarr.middlewares: "{{ homarr_hostname }}@docker"
           traefik.http.middlewares.homarr.IPAllowList.sourcerange: "{{ homarr_traefik_whitelist }}"
           traefik.http.services.homarr.loadbalancer.server.port: "7575"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/homarr-labs/homarr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/Homarr/Homarr/releases"
         cpu_shares: "{{ homarr_cpu_shares }}"
         memory: "{{ homarr_memory }}"
         restart_policy: unless-stopped

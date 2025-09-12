@@ -50,9 +50,8 @@
           traefik.frontend.rule: "Host:chowdown.{{ ansible_nas_domain }}"
           traefik.enable: "{{ chowdown_available_externally | string }}"
           traefik.port: "4000"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/GregYankovoy/docker-chowdown/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ no releases or tags available
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/gregyankovoy/chowdown"
         memory: "{{ chowdown_memory }}"
         restart_policy: unless-stopped
   when: chowdown_enabled is true

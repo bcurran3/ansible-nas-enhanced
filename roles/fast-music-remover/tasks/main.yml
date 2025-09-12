@@ -38,9 +38,8 @@
           traefik.http.routers.fastmusicremover.middlewares: "{{ fastmusicremover_hostname }}@docker"
           traefik.http.middlewares.fastmusicremover.IPAllowList.sourcerange: "{{ fastmusicremover_traefik_whitelist }}"
           traefik.http.services.fastmusicremover.loadbalancer.server.port: "8080"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/omeryusufyagci/fast-music-remover/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ no releases info published
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/omeryusufyagci/fast-music-remover"
         cpu_shares: "{{ fastmusicremover_cpu_shares }}"
         memory: "{{ fastmusicremover_memory }}"
         restart_policy: unless-stopped

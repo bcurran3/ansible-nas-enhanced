@@ -44,8 +44,8 @@
           traefik.http.routers.hello_world.middlewares: "{{ hello_world_hostname }}@docker"
           traefik.http.middlewares.hello_world.IPAllowList.sourcerange: "{{ hello_world_traefik_whitelist }}"
           traefik.http.services.hello_world.loadbalancer.server.port: "8000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/crccheck/docker-hello-world/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/crccheck/hello-world"
         cpu_shares: "{{ hello_world_cpu_shares }}"
         memory: "{{ hello_world_memory }}"
         restart_policy: unless-stopped

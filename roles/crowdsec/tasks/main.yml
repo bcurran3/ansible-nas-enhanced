@@ -18,7 +18,6 @@
         hostname: "{{ crowdsec_container_name }}"
         image: "{{ crowdsec_image_name }}:{{ crowdsec_image_tag }}"
         pull: true
-        cpu_shares: "{{ crowdsec_cpu_shares }}"
         volumes:
           - "{{ crowdsec_data_directory }}/config:/etc/crowdsec"
           - "{{ crowdsec_data_directory }}/config/acquis.d:/etc/crowdsec/acquis.d"
@@ -67,8 +66,10 @@
 #         traefik.http.routers.crowdsec.middlewares: "{{ crowdsec_hostname }}@docker"
 #         traefik.http.middlewares.crowdsec.IPAllowList.sourcerange: "{{ crowdsec_traefik_whitelist }}"
 #         traefik.http.services.crowdsec.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Casvt/crowdsec/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/crowdsecurity/crowdsec"
+        cpu_shares: "{{ crowdsec_cpu_shares }}"
         memory: "{{ crowdsec_memory }}"
         restart_policy: unless-stopped
   when: crowdsec_enabled is true

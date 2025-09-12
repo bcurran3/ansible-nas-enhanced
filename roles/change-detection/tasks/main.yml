@@ -38,8 +38,9 @@
           homepage.container: "{{ change_detection_sockpuppet_container_name }}"
           homepage.showStats: "{{ change_detection_sockpuppet_homepage_showStats }}"
           traefik.enable: "false"
-          change_detection.tag.include: '^\d+\.\d+\.\d+$$'
-          change_detection.link.template: "https://github.com/dgtlmoon/sockpuppetbrowser/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/dgtlmoon/sockpuppetbrowser"
         cpu_shares: "{{ change_detection_sockpuppet_cpu_shares }}"
         memory: "{{ change_detection_sockpuppet_memory }}"
         restart_policy: unless-stopped
@@ -91,8 +92,9 @@
           traefik.http.routers.change_detection.middlewares: "change_detection@docker"
           traefik.http.middlewares.change_detection.IPAllowList.sourcerange: "{{ change_detection_traefik_whitelist }}"
           traefik.http.services.change_detection.loadbalancer.server.port: "{{ change_detection_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/dgtlmoon/changedetection.io/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/dgtlmoon/changedetection.io/releases"
         cpu_shares: "{{ change_detection_cpu_shares }}"
         memory: "{{ change_detection_memory }}"
         restart_policy: unless-stopped

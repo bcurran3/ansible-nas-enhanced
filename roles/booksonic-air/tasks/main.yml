@@ -53,8 +53,9 @@
           traefik.http.routers.booksonic.middlewares: "{{ booksonic_hostname }}@docker"
           traefik.http.middlewares.booksonic.IPAllowList.sourcerange: "{{ booksonic_traefik_whitelist }}"
           traefik.http.services.booksonic.loadbalancer.server.port: "4040"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/popeen/Booksonic-Air/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/linuxserver/booksonic-air"
         cpu_shares: "{{ booksonic_cpu_shares }}"
         memory: "{{ booksonic_memory }}"
         restart_policy: unless-stopped

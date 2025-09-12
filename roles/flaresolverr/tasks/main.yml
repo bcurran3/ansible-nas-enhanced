@@ -48,8 +48,9 @@
           traefik.http.routers.flaresolverr.middlewares: "{{ flaresolverr_hostname }}@docker"
           traefik.http.middlewares.flaresolverr.IPAllowList.sourcerange: "{{ flaresolverr_traefik_whitelist }}"
           traefik.http.services.flaresolverr.loadbalancer.server.port: "8191"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/FlareSolverr/FlareSolverr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/FlareSolverr/FlareSolverr/releases"
         cpu_shares: "{{ flaresolverr_cpu_shares }}"
         memory: "{{ flaresolverr_memory }}"
         restart_policy: unless-stopped

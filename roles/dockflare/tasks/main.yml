@@ -51,8 +51,8 @@
           traefik.http.routers.dockflare.middlewares: "{{ dockflare_hostname }}@docker"
           traefik.http.middlewares.dockflare.IPAllowList.sourcerange: "{{ dockflare_traefik_whitelist }}"
           traefik.http.services.dockflare.loadbalancer.server.port: "5000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/ChrispyBacon-dev/DockFlare/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/alplat/dockflare"
         cpu_shares: "{{ dockflare_cpu_shares }}"
         memory: "{{ dockflare_memory }}"
         restart_policy: unless-stopped

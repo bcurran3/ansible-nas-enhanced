@@ -50,8 +50,9 @@
           traefik.http.routers.flood.middlewares: "{{ flood_hostname }}@docker"
           traefik.http.middlewares.flood.IPAllowList.sourcerange: "{{ flood_traefik_whitelist }}"
           traefik.http.services.flood.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/jesec/flood/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/jesec/flood"
         cpu_shares: "{{ flood_cpu_shares }}"
         memory: "{{ flood_memory }}"
         restart_policy: unless-stopped

@@ -49,9 +49,9 @@
           traefik.http.routers.esphome.middlewares: "{{ esphome_hostname }}@docker"
           traefik.http.middlewares.esphome.IPAllowList.sourcerange: "{{ esphome_traefik_whitelist }}"
           traefik.http.services.esphome.loadbalancer.server.port: "80"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         ^ Not correct, format example: 2025.7.4
-#         wud.link.template: "https://github.com/esphome/esphome/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/esphome/esphome"
         cpu_shares: "{{ esphome_cpu_shares }}"
         memory: "{{ esphome_memory }}"
         restart_policy: unless-stopped

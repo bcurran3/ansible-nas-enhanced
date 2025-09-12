@@ -59,9 +59,8 @@
           traefik.http.routers.dasharr.middlewares: "{{ dasharr_hostname }}@docker"
           traefik.http.middlewares.dasharr.IPAllowList.sourcerange: "{{ dasharr_traefik_whitelist }}"
           traefik.http.services.dasharr.loadbalancer.server.port: "{{ dasharr_port }}"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/taslabs-net/dasharr/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ no published releases
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/schenanigans/dasharr"
         cpu_shares: "{{ dasharr_cpu_shares }}"
         memory: "{{ dasharr_memory }}"
         restart_policy: unless-stopped

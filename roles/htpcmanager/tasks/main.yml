@@ -51,8 +51,8 @@
           traefik.http.routers.htpcmanager.middlewares: "{{ htpcmanager_hostname }}@docker"
           traefik.http.middlewares.htpcmanager.IPAllowList.sourcerange: "{{ htpcmanager_traefik_whitelist }}"
           traefik.http.services.htpcmanager.loadbalancer.server.port: "8085"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Hellowlol/HTPC-Manager/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://lscr.io/linuxserver/htpcmanager"
         cpu_shares: "{{ htpcmanager_cpu_shares }}"
         memory: "{{ htpcmanager_memory }}"
         restart_policy: unless-stopped

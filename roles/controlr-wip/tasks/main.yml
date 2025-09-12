@@ -20,12 +20,6 @@
         - "{{ controlr_data_directory }}"
         - "{{ controlr_data_directory }}/data"
 
-    - name: Create {{ ansible_nas_app_name }} network
-      community.docker.docker_network:
-        name: "{{ controlr_network_name }}"
-        ipam_config:
-          - subnet: "{{ controlr_network_subnet }}"
-
     - name: Create {{ ansible_nas_app_name }} Aspire Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -35,10 +29,6 @@
         pull: true
         ports:
           - "18888:18888"
-        networks:                                  # optional
-          - name: "{{ controlr_network_name }}"     # optional
-        network_mode: "{{ controlr_network_name }}" # optional
-        networks_cli_compatible: "yes"             # optional
         env:
           DOTNET_DASHBOARD_OTLP_ENDPOINT_URL: "http://aspire:18889"
           Dashboard__Frontend__BrowserToken: "aspireToken"
@@ -70,10 +60,6 @@
         hostname: "{{ controlr_db_container_name }}"
         image: "{{ controlr_db_image_name }}:{{ controlr_db_image_tag }}"
         pull: true
-        networks:                                  # optional
-          - name: "{{ controlr_network_name }}"     # optional
-        network_mode: "{{ controlr_network_name }}" # optional
-        networks_cli_compatible: "yes"             # optional
         volumes:
           - "{{ controlr_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -108,9 +94,6 @@
         hostname: "{{ controlr_container_name }}"
         image: "{{ controlr_image_name }}:{{ controlr_image_tag }}"
         pull: true
-        networks:
-          - name: "{{ controlr_network_name }}"
-        networks_cli_compatible: "yes"
         network_mode: "bridge"
         ports:
           - "{{ controlr_port_http }}:{{ controlr_port_http }}"
@@ -202,8 +185,9 @@
           traefik.http.routers.controlr.middlewares: "{{ controlr_hostname }}@docker"
           traefik.http.middlewares.controlr.IPAllowList.sourcerange: "{{ controlr_traefik_whitelist }}"
           traefik.http.services.controlr.loadbalancer.server.port: "{{ controlr_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/bitbound/ControlR/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: "^v[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/bitbound/ControlR/releases/tag/{{tag}}"
         cpu_shares: "{{ controlr_cpu_shares }}"
         memory: "{{ controlr_memory }}"
         restart_policy: unless-stopped
@@ -214,11 +198,6 @@
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ controlr_container_name }}"
-        state: absent
-
-    - name: Delete {{ ansible_nas_app_name }} Network
-      community.docker.docker_network:
-        name: "{{ controlr_network_name }}"
         state: absent
   when: controlr_enabled is false
 

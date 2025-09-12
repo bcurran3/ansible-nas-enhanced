@@ -51,8 +51,9 @@
           traefik.http.routers.filebrowser.middlewares: "{{ filebrowser_hostname }}@docker"
           traefik.http.middlewares.filebrowser.IPAllowList.sourcerange: "{{ filebrowser_traefik_whitelist }}"      
           traefik.http.services.filebrowser.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/filebrowser/filebrowser/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/filebrowser/filebrowser"
         cpu_shares: "{{ filebrowser_cpu_shares }}"
         memory: "{{ filebrowser_memory }}"
         restart_policy: unless-stopped

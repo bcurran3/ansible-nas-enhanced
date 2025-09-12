@@ -43,8 +43,9 @@
           homepage.container: "{{ cloudflare_container_name }}"
           homepage.showStats: "{{ cloudflare_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/joshuaavalon/docker-cloudflare/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/joshava/cloudflare-ddns"
         cpu_shares: "{{ cloudflare_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ cloudflare_memory }}"

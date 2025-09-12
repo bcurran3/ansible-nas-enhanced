@@ -63,8 +63,9 @@
           traefik.http.routers.codeserver.middlewares: "{{ codeserver_hostname }}@docker"
           traefik.http.middlewares.codeserver.IPAllowList.sourcerange: "{{ codeserver_traefik_whitelist }}"
           traefik.http.services.codeserver.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/r/codercom/code-server/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/codercom/code-server"
         cpu_shares: "{{ codeserver_cpu_shares }}"
         memory: "{{ codeserver_memory }}"
         restart_policy: unless-stopped

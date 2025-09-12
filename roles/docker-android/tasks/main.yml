@@ -51,8 +51,9 @@
           traefik.http.routers.dockerandroid.middlewares: "{{ dockerandroid_hostname }}@docker"
           traefik.http.middlewares.dockerandroid.IPAllowList.sourcerange: "{{ dockerandroid_traefik_whitelist }}"
           traefik.http.services.dockerandroid.loadbalancer.server.port: "6080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/budtmo/docker-android/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/budtmo/docker-android"
         cpu_shares: "{{ dockerandroid_cpu_shares }}"
         memory: "{{ dockerandroid_memory }}"
         restart_policy: unless-stopped

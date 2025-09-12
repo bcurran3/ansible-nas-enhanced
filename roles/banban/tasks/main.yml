@@ -17,7 +17,6 @@
         hostname: "{{ banban_container_name }}"
         image: "{{ banban_image_name }}:{{ banban_image_tag }}"
         pull: true
-        cpu_shares: "{{ banban_cpu_shares }}"
         volumes:
           - "{{ banban_data_directory }}/db:/app/prisma/db"
           - "{{ banban_data_directory }}/storage:/app/storage"
@@ -53,8 +52,10 @@
           traefik.http.routers.banban.middlewares: "{{ banban_hostname }}@docker"
           traefik.http.middlewares.banban.IPAllowList.sourcerange: "{{ banban_traefik_whitelist }}"
           traefik.http.services.banban.loadbalancer.server.port: "{{ banban_port_http }}"
-          banban.tag.include: '^\d+\.\d+\.\d+$$'
-          banban.link.template: "https://github.com/m0g/banban/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/m0gd0ck/banban"
+        cpu_shares: "{{ banban_cpu_shares }}"
         memory: "{{ banban_memory }}"
         restart_policy: unless-stopped
   when: banban_enabled is true

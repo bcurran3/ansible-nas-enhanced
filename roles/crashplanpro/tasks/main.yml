@@ -50,8 +50,9 @@
           traefik.http.routers.crashplanpro.middlewares: "{{ crashplanpro_hostname }}@docker"
           traefik.http.middlewares.crashplanpro.IPAllowList.sourcerange: "{{ crashplanpro_traefik_whitelist }}"
           traefik.http.services.crashplanpro.loadbalancer.server.port: "5800"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/jlesage/docker-crashplan-pro/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/jlesage/crashplan-pro"
         cpu_shares: "{{ crashplanpro_cpu_shares }}"
         memory: "{{ crashplanpro_memory }}"
         restart_policy: unless-stopped

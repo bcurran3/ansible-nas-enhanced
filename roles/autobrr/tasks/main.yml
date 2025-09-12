@@ -15,7 +15,6 @@
         name: "{{ autobrr_container_name }}"
         image: "{{ autobrr_image_name }}:{{ autobrr_image_tag }}"
         pull: true
-        cpu_shares: "{{ autobrr_cpu_shares }}"
         volumes:
           - "{{ autobrr_data_directory }}/config:/config"
         ports:
@@ -49,8 +48,10 @@
           traefik.http.routers.frontend.middlewares: "{{ autobrr_hostname }}"
           traefik.http.routers.autobrr.middlewares: "{{ autobrr_hostname }}@docker"
           traefik.http.middlewares.autobrr.IPAllowList.sourcerange: "{{ autobrr_traefik_whitelist }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/autobrr/autobrr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/autobrr/autobrr/releases"
+        cpu_shares: "{{ autobrr_cpu_shares }}"
         memory: "{{ autobrr_memory }}"
         restart_policy: unless-stopped
   when: autobrr_enabled is true

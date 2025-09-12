@@ -49,8 +49,9 @@
           traefik.http.routers.gokapi.middlewares: "{{ gokapi_hostname }}@docker"
           traefik.http.middlewares.gokapi.IPAllowList.sourcerange: "{{ gokapi_traefik_whitelist }}"
           traefik.http.services.gokapi.loadbalancer.server.port: "53842"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Forceu/Gokapi/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/f0rc3/gokapi"
         cpu_shares: "{{ gokapi_cpu_shares }}"
         memory: "{{ gokapi_memory }}"
         restart_policy: unless-stopped

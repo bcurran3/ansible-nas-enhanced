@@ -51,8 +51,8 @@
           traefik.http.routers.dailytxt.middlewares: "{{ dailytxt_hostname }}@docker"
           traefik.http.middlewares.dailytxt.IPAllowList.sourcerange: "{{ dailytxt_traefik_whitelist }}"
           traefik.http.services.dailytxt.loadbalancer.server.port: "8766"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/r/phitux/dailytxt/tags/$${major}.$${minor}.$${patch}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/phitux/dailytxt"
         cpu_shares: "{{ dailytxt_cpu_shares }}"
         memory: "{{ dailytxt_memory }}"
         restart_policy: unless-stopped

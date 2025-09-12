@@ -99,8 +99,9 @@
           traefik.http.routers.gamevault.middlewares: "{{ gamevault_hostname }}@docker"
           traefik.http.middlewares.gamevault.IPAllowList.sourcerange: "{{ gamevault_traefik_whitelist }}"
           traefik.http.services.gamevault.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/r/phalcode/gamevault-backend/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/phalcode/gamevault-backend"
         cpu_shares: "{{ gamevault_cpu_shares }}"
         memory: "{{ gamevault_memory }}"
         restart_policy: unless-stopped

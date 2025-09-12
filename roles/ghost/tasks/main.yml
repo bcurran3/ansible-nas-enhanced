@@ -107,8 +107,9 @@
           traefik.http.routers.ghost.middlewares: "{{ ghost_hostname }}@docker"
           traefik.http.middlewares.ghost.IPAllowList.sourcerange: "{{ ghost_traefik_whitelist }}"
           traefik.http.services.ghost.loadbalancer.server.port: "2368"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/TryGhost/Ghost/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/ghost"
         cpu_shares: "{{ ghost_cpu_shares }}"
         memory: "{{ ghost_memory }}"
         restart_policy: unless-stopped

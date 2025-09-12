@@ -50,8 +50,9 @@
           traefik.http.routers.containery.middlewares: "{{ containery_hostname }}@docker"
           traefik.http.middlewares.containery.IPAllowList.sourcerange: "{{ containery_traefik_whitelist }}"
           traefik.http.services.containery.loadbalancer.server.port: "5000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/danylo829/containery/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/danylo829/containery/releases"
         cpu_shares: "{{ containery_cpu_shares }}"
         memory: "{{ containery_memory }}"
         restart_policy: unless-stopped

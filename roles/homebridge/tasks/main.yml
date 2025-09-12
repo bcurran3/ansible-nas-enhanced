@@ -51,8 +51,9 @@
           traefik.http.routers.homebridge.middlewares: "{{ homebridge_hostname }}@docker"
           traefik.http.middlewares.homebridge.IPAllowList.sourcerange: "{{ homebridge_traefik_whitelist }}"
           traefik.http.services.homebridge.loadbalancer.server.port: "8087"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/homebridge/homebridge/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/oznu/homebridge"
         cpu_shares: "{{ homebridge_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ homebridge_memory }}"
