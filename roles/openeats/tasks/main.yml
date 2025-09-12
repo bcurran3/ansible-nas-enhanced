@@ -37,8 +37,9 @@
           homepage.container: "{{ openeats_db_container_name }}"
           homepage.showStats: "{{ openeats_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/mariadb/server"
         cpu_shares: "{{ openeats_db_cpu_shares }}"
         memory: "{{ openeats_db_memory }}"
         restart_policy: unless-stopped
@@ -72,13 +73,14 @@
           homepage.container: "{{ openeats_api_container_name }}"
           homepage.showStats: "{{ openeats_api_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/open-eats/openeats-api/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/openeats/openeats-api"
         cpu_shares: "{{ openeats_api_cpu_shares }}"
         memory: "{{ openeats_api_memory }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Web Container
+    - name: Create {{ ansible_nas_app_name }} Web UI Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_container_name }}"
@@ -118,8 +120,9 @@
           traefik.http.routers.openeats.middlewares: "{{ openeats_hostname }}@docker"
           traefik.http.middlewares.openeats.IPAllowList.sourcerange: "{{ openeats_traefik_whitelist }}"
           traefik.http.services.openeats.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/open-eats/OpenEats/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/openeats/openeats-web"
         cpu_shares: "{{ openeats_cpu_shares }}"
         memory: "{{ openeats_memory }}"
         restart_policy: unless-stopped

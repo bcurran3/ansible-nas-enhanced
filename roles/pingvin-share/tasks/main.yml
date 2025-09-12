@@ -51,8 +51,9 @@
           traefik.http.routers.pingvinshare.middlewares: "{{ pingvinshare_hostname }}@docker"
           traefik.http.middlewares.pingvinshare.IPAllowList.sourcerange: "{{ pingvinshare_traefik_whitelist }}"
           traefik.http.services.pingvinshare.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "hhttps://github.com/stonith404/pingvin-share/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/stonith404/pingvin-share"
         cpu_shares: "{{ pingvinshare_cpu_shares }}"
         memory: "{{ pingvinshare_memory }}"
         restart_policy: unless-stopped

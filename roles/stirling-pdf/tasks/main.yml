@@ -54,8 +54,9 @@
           traefik.http.routers.stirling_pdf.middlewares: "stirling_pdf@docker"
           traefik.http.middlewares.stirling_pdf.IPAllowList.sourcerange: "{{ stirling_pdf_traefik_whitelist }}"
           traefik.http.services.stirling_pdf.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Stirling-Tools/Stirling-PDF/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/stirlingtools/stirling-pdf"
         cpu_shares: "{{ stirling_pdf_cpu_shares }}"
         memory: "{{ stirling_pdf_memory }}"
         restart_policy: unless-stopped

@@ -49,8 +49,9 @@
           homepage.container: "{{ meshcentral_db_container_name }}"
           homepage.showStats: "{{ meshcentral_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mongo"
         cpu_shares: "{{ meshcentral_db_cpu_shares }}"
         memory: "{{ meshcentral_db_memory }}"
         restart_policy: unless-stopped
@@ -114,9 +115,9 @@
           traefik.http.routers.meshcentral.middlewares: "{{ meshcentral_hostname }}@docker"
           traefik.http.middlewares.meshcentral.IPAllowList.sourcerange: "{{ meshcentral_traefik_whitelist }}"
           traefik.http.services.meshcentral.loadbalancer.server.port: "4430"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/Typhonragewind/meshcentral-docker/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ no releases on github
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/typhonragewind/meshcentral"
         cpu_shares: "{{ meshcentral_cpu_shares }}"
         memory: "{{ meshcentral_memory }}"
         restart_policy: unless-stopped

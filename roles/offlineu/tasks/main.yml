@@ -55,9 +55,9 @@
           traefik.http.routers.offlineu.middlewares: "{{ offlineu_hostname }}@docker"
           traefik.http.middlewares.offlineu.IPAllowList.sourcerange: "{{ offlineu_traefik_whitelist }}"
           traefik.http.services.offlineu.loadbalancer.server.port: "5000"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/WhiskeyCoder/OfflineU/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ no published releases
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/skippysteve/OfflineU/releases"
         cpu_shares: "{{ offlineu_cpu_shares }}"
         memory: "{{ offlineu_memory }}"
         restart_policy: unless-stopped

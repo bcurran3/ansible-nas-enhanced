@@ -57,8 +57,9 @@
           traefik.http.routers.sonarr.middlewares: "{{ sonarr_hostname }}@docker"
           traefik.http.middlewares.sonarr.IPAllowList.sourcerange: "{{ sonarr_traefik_whitelist }}"
           traefik.http.services.sonarr.loadbalancer.server.port: "8989"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-sonarr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/sonarr"
         cpu_shares: "{{ sonarr_cpu_shares }}"
         memory: "{{ sonarr_memory }}"
         restart_policy: unless-stopped

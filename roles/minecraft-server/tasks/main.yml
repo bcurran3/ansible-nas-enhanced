@@ -33,8 +33,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ minecraft_server_container_name }}"
           homepage.showStats: "{{ minecraft_server_homepage_showStats }}"
-          wud.tag.include: "^\\d{4}\\.\\d{1,2}\\.\\d{1,2}(?:\\.\\d+)?$"
-          wud.link.template: "https://github.com/itzg/docker-minecraft-server/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/itzg/minecraft-server"
         cpu_shares: "{{ minecraft_server_cpu_shares }}"
         memory: "{{ minecraft_server_memory }}"
         restart_policy: unless-stopped

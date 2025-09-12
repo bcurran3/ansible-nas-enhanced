@@ -51,8 +51,9 @@
           traefik.http.routers.portracker.middlewares: "{{ portracker_hostname }}@docker"
           traefik.http.middlewares.portracker.IPAllowList.sourcerange: "{{ portracker_traefik_whitelist }}"
           traefik.http.services.portracker.loadbalancer.server.port: "{{ portracker_port }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Mostafa-Wahied/portracker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/mostafawahied/portracker"
         cpu_shares: "{{ portracker_cpu_shares }}"
         memory: "{{ portracker_memory }}"
         restart_policy: unless-stopped

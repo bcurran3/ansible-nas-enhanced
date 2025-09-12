@@ -55,8 +55,9 @@
           traefik.http.routers.pulse.middlewares: "{{ pulse_hostname }}@docker"
           traefik.http.middlewares.pulse.IPAllowList.sourcerange: "{{ pulse_traefik_whitelist }}"
           traefik.http.services.pulse.loadbalancer.server.port: "{{ pulse_port }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/rcourtman/Pulse/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/rcourtman/pulse"
         cpu_shares: "{{ pulse_cpu_shares }}"
         memory: "{{ pulse_memory }}"
         restart_policy: unless-stopped

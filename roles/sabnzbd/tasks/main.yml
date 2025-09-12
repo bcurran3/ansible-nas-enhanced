@@ -50,8 +50,9 @@
           traefik.http.routers.sabnzbd.middlewares: "{{ sabnzbd_hostname }}@docker"
           traefik.http.middlewares.sabnzbd.IPAllowList.sourcerange: "{{ sabnzbd_traefik_whitelist }}"
           traefik.http.services.sabnzbd.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/sabnzbd/sabnzbd/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/sabnzbd"
         cpu_shares: "{{ sabnzbd_cpu_shares }}"
         memory: "{{ sabnzbd_memory }}"
         restart_policy: unless-stopped

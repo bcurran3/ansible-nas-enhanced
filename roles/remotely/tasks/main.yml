@@ -51,8 +51,9 @@
           traefik.http.routers.remotely.middlewares: "{{ remotely_hostname }}@docker"
           traefik.http.middlewares.remotely.IPAllowList.sourcerange: "{{ remotely_traefik_whitelist }}"
           traefik.http.services.remotely.loadbalancer.server.port: "5000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/r/immybot/remotely/tags/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/immybot/remotely"
         cpu_shares: "{{ remotely_cpu_shares }}"
         memory: "{{ remotely_memory }}"
         restart_policy: unless-stopped

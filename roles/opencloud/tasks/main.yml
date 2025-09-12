@@ -94,8 +94,9 @@
           traefik.http.routers.opencloud.middlewares: "{{ opencloud_hostname }}@docker"
           traefik.http.middlewares.opencloud.IPAllowList.sourcerange: "{{ opencloud_traefik_whitelist }}"
           traefik.http.services.opencloud.loadbalancer.server.port: "9200"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/opencloud-eu/opencloud/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/opencloudeu/opencloud-rolling"
         cpu_shares: "{{ opencloud_cpu_shares }}"
         memory: "{{ opencloud_memory }}"
         restart_policy: unless-stopped

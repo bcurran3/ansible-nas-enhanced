@@ -48,8 +48,9 @@
           traefik.http.routers.qdirstat.middlewares: "{{ qdirstat_hostname }}@docker"
           traefik.http.middlewares.qdirstat.IPAllowList.sourcerange: "{{ qdirstat_traefik_whitelist }}"
           traefik.http.services.qdirstat.loadbalancer.server.port: "5800"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/jlesage/docker-qdirstat/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/jlesage/qdirstat"
         cpu_shares: "{{ qdirstat_cpu_shares }}"
         memory: "{{ qdirstat_memory }}"
         restart_policy: unless-stopped

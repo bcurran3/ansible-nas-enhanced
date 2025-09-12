@@ -52,8 +52,9 @@
           traefik.http.routers.overseerr.middlewares: "overseerr@docker"
           traefik.http.middlewares.overseerr.IPAllowList.sourcerange: "{{ overseerr_traefik_whitelist }}"
           traefik.http.services.overseerr.loadbalancer.server.port: "5055"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-overseerr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/overseerr"
         cpu_shares: "{{ overseerr_cpu_shares }}"
         memory: "{{ overseerr_memory }}"
         restart_policy: unless-stopped

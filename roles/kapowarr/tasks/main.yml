@@ -49,8 +49,9 @@
           traefik.http.routers.kapowarr.middlewares: "{{ kapowarr_hostname }}@docker"
           traefik.http.middlewares.kapowarr.IPAllowList.sourcerange: "{{ kapowarr_traefik_whitelist }}"
           traefik.http.services.kapowarr.loadbalancer.server.port: "5656"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Casvt/Kapowarr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/mrcas/kapowarr"
         cpu_shares: "{{ kapowarr_cpu_shares }}"
         memory: "{{ kapowarr_memory }}"
         restart_policy: unless-stopped

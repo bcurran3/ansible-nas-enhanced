@@ -51,8 +51,9 @@
           traefik.http.routers.lancommander.middlewares: "{{ lancommander_hostname }}@docker"
           traefik.http.middlewares.lancommander.IPAllowList.sourcerange: "{{ lancommander_traefik_whitelist }}"
           traefik.http.services.lancommander.loadbalancer.server.port: "1337"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/LANCommander/LANCommander/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/lancommander/lancommander"
         cpu_shares: "{{ lancommander_cpu_shares }}"
         memory: "{{ lancommander_memory_limit }}"
         restart_policy: unless-stopped

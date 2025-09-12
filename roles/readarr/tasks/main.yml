@@ -58,8 +58,8 @@
           traefik.http.routers.readarr.middlewares: "{{ readarr_hostname }}@docker"
           traefik.http.middlewares.readarr.IPAllowList.sourcerange: "{{ readarr_traefik_whitelist }}"
           traefik.http.services.readarr.loadbalancer.server.port: "8787"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-readarr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://lscr.io/linuxserver/readarr"
         cpu_shares: "{{ readarr_cpu_shares }}"
         memory: "{{ readarr_memory }}"
         restart_policy: unless-stopped

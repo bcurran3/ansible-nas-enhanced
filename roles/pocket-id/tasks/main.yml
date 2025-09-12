@@ -60,8 +60,9 @@
           traefik.http.routers.pocketid.middlewares: "{{ pocketid_hostname }}@docker"
           traefik.http.middlewares.pocketid.IPAllowList.sourcerange: "{{ pocketid_traefik_whitelist }}"
           traefik.http.services.pocketid.loadbalancer.server.port: "{{ pocketid_port }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/pocket-id/pocket-id/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/Pocket-ID/Pocket-ID/releases"
         cpu_shares: "{{ pocketid_cpu_shares }}"
         memory: "{{ pocketid_memory }}"
         restart_policy: unless-stopped

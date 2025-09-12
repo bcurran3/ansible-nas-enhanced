@@ -72,8 +72,9 @@
           traefik.http.routers.grafana.middlewares: "{{ stats_grafana_hostname }}@docker"
           traefik.http.middlewares.grafana.IPAllowList.sourcerange: "{{ stats_grafana_traefik_whitelist }}"
           traefik.http.services.grafana.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/grafana/grafana/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/grafana/grafana"
         cpu_shares: "{{ grafana_cpu_shares }}"
         memory: "{{ grafana_memory}}"
         restart_policy: unless-stopped

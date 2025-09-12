@@ -57,8 +57,8 @@
           traefik.http.routers.idrac6.middlewares: "{{ idrac6_hostname }}@docker"
           traefik.http.middlewares.idrac6.IPAllowList.sourcerange: "{{ idrac6_traefik_whitelist }}"
           traefik.http.services.idrac6.loadbalancer.server.port: "5800"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/DomiStyle/docker-idrac6/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/domistyle/idrac6"
         cpu_shares: "{{ idrac6_cpu_shares }}"
         memory: "{{ idrac6_memory }}"
         restart_policy: unless-stopped

@@ -51,8 +51,9 @@
           traefik.http.routers.octoprint.middlewares: "{{ octoprint_hostname }}@docker"
           traefik.http.middlewares.octoprint.IPAllowList.sourcerange: "{{ octoprint_traefik_whitelist }}"
           traefik.http.services.octoprint.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/OctoPrint/OctoPrint/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/octoprint/octoprint"
         cpu_shares: "{{ octoprint_cpu_shares }}"
         memory: "{{ octoprint_memory }}"
         restart_policy: unless-stopped

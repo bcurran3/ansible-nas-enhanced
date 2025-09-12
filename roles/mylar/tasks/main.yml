@@ -55,8 +55,9 @@
           traefik.http.routers.mylar.middlewares: "{{ mylar_hostname }}@docker"
           traefik.http.middlewares.mylar.IPAllowList.sourcerange: "{{ mylar_traefik_whitelist }}"
           traefik.http.services.mylar.loadbalancer.server.port: "8090"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/mylar3/mylar3/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/mylar3"
         cpu_shares: "{{ mylar_cpu_shares }}"
         memory: "{{ mylar_memory }}"
         restart_policy: unless-stopped

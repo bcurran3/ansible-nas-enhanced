@@ -52,8 +52,9 @@
           traefik.http.routers.tasksmd.middlewares: "{{ tasksmd_hostname }}@docker"
           traefik.http.middlewares.tasksmd.IPAllowList.sourcerange: "{{ tasksmd_traefik_whitelist }}"
           traefik.http.services.tasksmd.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/BaldissaraMatheus/Tasks.md/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/baldissaramatheus/tasks.md"
         cpu_shares: "{{ tasksmd_cpu_shares }}"
         memory: "{{ tasksmd_memory }}"
         restart_policy: unless-stopped

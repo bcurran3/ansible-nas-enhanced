@@ -60,8 +60,9 @@
           traefik.http.routers.jellyfin.middlewares: "{{ jellyfin_hostname }}@docker"
           traefik.http.middlewares.jellyfin.IPAllowList.sourcerange: "{{ jellyfin_traefik_whitelist }}"
           traefik.http.services.jellyfin.loadbalancer.server.port: "8096"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/jellyfin/jellyfin/releases/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/linuxserver/jellyfin"
         cpu_shares: "{{ jellyfin_cpu_shares }}"
         memory: "{{ jellyfin_memory }}"
         restart_policy: unless-stopped

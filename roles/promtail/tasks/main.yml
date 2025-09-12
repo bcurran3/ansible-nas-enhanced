@@ -63,8 +63,9 @@
           traefik.http.routers.promtail.middlewares: "{{ promtail_hostname }}@docker"
           traefik.http.middlewares.promtail.IPAllowList.sourcerange: "{{ promtail_traefik_whitelist }}"
           traefik.http.services.promtail.loadbalancer.server.port: "9080"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://hub.docker.com/r/grafana/promtail/tags/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/grafana/promtail"
         cpu_shares: "{{ promtail_cpu_shares }}"
         memory: "{{ promtail_memory }}"
         restart_policy: unless-stopped

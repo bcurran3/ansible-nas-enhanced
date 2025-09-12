@@ -38,8 +38,9 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_redis_watchtower_monitor_only }}"
           dockflare.enable: "false"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ mastodon_redis_cpu_shares }}"
         memory: "{{ mastodon_redis_memory }}"
         restart_policy: unless-stopped
@@ -71,8 +72,9 @@
           com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_db_watchtower_monitor_only }}"
           dockflare.enable: "false"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/fmartinou/whats-up-docker/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ mastodon_db_cpu_shares }}"
         memory: "{{ mastodon_db_memory }}"
         restart_policy: unless-stopped
@@ -170,8 +172,9 @@
 #         https://docs.linuxserver.io/FAQ/#strict-proxy-traefik
           traefik.http.services.mastodon.loadbalancer.serverstransport: "ignorecert"
           traefik.http.services.mastodon.loadbalancer.server.scheme: "https"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/dev/mastodon/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/mastodon/mastodon/releases"
         cpu_shares: "{{ mastodon_cpu_shares }}"
         memory: "{{ mastodon_memory }}"
         restart_policy: unless-stopped

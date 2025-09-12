@@ -50,8 +50,9 @@
           traefik.http.routers.kavita.middlewares: "{{ kavita_hostname }}@docker"
           traefik.http.middlewares.kavita.IPAllowList.sourcerange: "{{ kavita_traefik_whitelist }}"
           traefik.http.services.kavita.loadbalancer.server.port: "5000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Kareadita/Kavita/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/jvmilazz0/kavita"
         cpu_shares: "{{ kavita_cpu_shares }}"
         memory: "{{ kavita_memory }}"
         restart_policy: unless-stopped

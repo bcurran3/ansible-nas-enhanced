@@ -48,8 +48,9 @@
           traefik.http.routers.maintainerr.middlewares: "{{ maintainerr_hostname }}@docker"
           traefik.http.middlewares.maintainerr.IPAllowList.sourcerange: "{{ maintainerr_traefik_whitelist }}"      
           traefik.http.services.maintainerr.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/jorenn92/Maintainerr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/jorenn92/Maintainerr/releases"
         cpu_shares: "{{ maintainerr_cpu_shares }}"
         memory: "{{ maintainerr_memory }}"
         restart_policy: unless-stopped

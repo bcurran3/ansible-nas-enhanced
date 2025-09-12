@@ -57,8 +57,8 @@
           traefik.http.routers.pytivo.middlewares: "{{ pytivo_hostname }}@docker"
           traefik.http.middlewares.pytivo.IPAllowList.sourcerange: "{{ pytivo_traefik_whitelist }}"
           traefik.http.services.pytivo.loadbalancer.server.port: "9032"
-          wud.tag.include: "^\\d{4}\\.\\d{2}\\.\\d{2}(?:-.*)?$"
-          wud.link.template: "https://github.com/pinion/docker-pytivo/releases/tag/$${tag}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/pinion/docker-pytivo"
         cpu_shares: "{{ pytivo_cpu_shares }}"
         memory: "{{ pytivo_memory }}"
         restart_policy: unless-stopped

@@ -40,8 +40,9 @@
           homepage.container: "{{ projectsend_db_container_name }}"
           homepage.showStats: "{{ projectsend_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/mariadb"
         cpu_shares: "{{ projectsend_db_cpu_shares }}"
         memory: "{{ projectsend_db_memory }}"
         restart_policy: unless-stopped
@@ -91,8 +92,9 @@
           traefik.http.routers.projectsend.middlewares: "{{ projectsend_hostname }}@docker"
           traefik.http.middlewares.projectsend.IPAllowList.sourcerange: "{{ projectsend_traefik_whitelist }}"
           traefik.http.services.projectsend.loadbalancer.server.port: "80"
-          wud.tag.include: "^r\\d+$"
-          wud.link.template: "https://github.com/projectsend/projectsend/releases/tag/$${tag}"
+          wud.tag.include: '^r\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/projectsend"
         cpu_shares: "{{ projectsend_cpu_shares }}"
         memory: "{{ projectsend_memory }}"
         restart_policy: unless-stopped

@@ -50,8 +50,8 @@
           traefik.http.routers.minio.middlewares: "{{ minio_hostname }}@docker"
           traefik.http.middlewares.minio.IPAllowList.sourcerange: "{{ minio_traefik_whitelist }}"
           traefik.http.services.minio.loadbalancer.server.port: "9000"
-          wud.tag.include: "^RELEASE\\.\\d{4}-\\d{2}-\\d{2}T\\d{2}-\\d{2}-\\d{2}Z$"
-          wud.link.template: "https://github.com/minio/minio/releases/tag/$${tag}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/minio/minio"
         cpu_shares: "{{ minio_cpu_shares }}"
         memory: "{{ minio_memory }}"
         restart_policy: unless-stopped

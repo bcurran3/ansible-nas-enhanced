@@ -59,8 +59,9 @@
           traefik.http.routers.lidarr.middlewares: "{{ lidarr_hostname }}@docker"
           traefik.http.middlewares.lidarr.IPAllowList.sourcerange: "{{ lidarr_traefik_whitelist }}"
           traefik.http.services.lidarr.loadbalancer.server.port: "8686"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-lidarr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/lidarr"
         cpu_shares: "{{ lidarr_cpu_shares }}"
         memory: "{{ lidarr_memory }}"
         restart_policy: unless-stopped

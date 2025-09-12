@@ -49,8 +49,9 @@
           traefik.http.routers.nzbget.middlewares: "{{ nzbget_hostname }}@docker"
           traefik.http.middlewares.nzbget.IPAllowList.sourcerange: "{{ nzbget_traefik_whitelist }}"
           traefik.http.services.nzbget.loadbalancer.server.port: "6789"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/nzbget/nzbget/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/nzbget"
         cpu_shares: "{{ nzbget_cpu_shares }}"
         memory: "{{ nzbget_memory }}"
         restart_policy: unless-stopped

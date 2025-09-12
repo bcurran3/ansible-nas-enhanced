@@ -52,8 +52,9 @@
           traefik.http.routers.pialert.middlewares: "{{ pialert_hostname }}@docker"
           traefik.http.middlewares.pialert.IPAllowList.sourcerange: "{{ pialert_traefik_whitelist }}"
           traefik.http.services.pialert.loadbalancer.server.port: "20211"
-          wud.tag.include: "^v\\d{4}-\\d{2}-\\d{2}$"
-          wud.link.template: "https://github.com/jokobsk/Pi.Alert/releases/tag/$${tag}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/jokobsk/pi.alert"
         cpu_shares: "{{ pialert_cpu_shares }}"
         memory: "{{ pialert_memory }}"
         restart_policy: unless-stopped

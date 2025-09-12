@@ -63,8 +63,9 @@
           traefik.http.routers.qbittorrent.middlewares: "{{ qbittorrent_hostname }}@docker"
           traefik.http.middlewares.qbittorrent.IPAllowList.sourcerange: "{{ qbittorrent_traefik_whitelist }}"
           traefik.http.services.qbittorrent.loadbalancer.server.port: "8113"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-qbittorrent/releases/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/qbittorrent"
         cpu_shares: "{{ qbittorrent_cpu_shares }}"
         memory: "{{ qbittorrent_memory }}"
         restart_policy: unless-stopped

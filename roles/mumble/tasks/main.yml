@@ -51,8 +51,9 @@
           traefik.http.routers.mumble.middlewares: "{{ mumble_hostname }}@docker"
           traefik.http.middlewares.mumble.IPAllowList.sourcerange: "{{ mumble_traefik_whitelist }}"
           traefik.http.services.mumble.loadbalancer.server.port: "64738"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/mumble-voip/mumble/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/mumblevoip/mumble-server"
         cpu_shares: "{{ mumble_cpu_shares }}"
         memory: "{{ mumble_memory }}"
         restart_policy: unless-stopped

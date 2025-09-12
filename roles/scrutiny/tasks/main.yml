@@ -74,8 +74,9 @@
           traefik.http.routers.scrutiny.middlewares: "{{ scrutiny_hostname }}@docker"
           traefik.http.middlewares.scrutiny.IPAllowList.sourcerange: "{{ scrutiny_traefik_whitelist }}"
           traefik.http.services.scrutiny.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/AnalogJ/scrutiny/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/AnalogJ/scrutiny/releases"
         capabilities:
           - SYS_RAWIO
           - SYS_ADMIN # NVMe support

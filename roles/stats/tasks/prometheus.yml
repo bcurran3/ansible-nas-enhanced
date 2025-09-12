@@ -64,8 +64,9 @@
           traefik.http.routers.prometheus.middlewares: "{{ stats_prometheus_hostname }}@docker"
           traefik.http.middlewares.prometheus.IPAllowList.sourcerange: "{{ stats_prometheus_traefik_whitelist }}"
           traefik.http.services.prometheus.loadbalancer.server.port: "9090"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/prometheus/prometheus/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/prom/prometheus"
         cpu_shares: "{{ stats_prometheus_cpu_shares }}"
         memory: "{{ stats_prometheus_memory }}"
         restart: "{{ prometheus_config is changed }}"

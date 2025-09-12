@@ -57,8 +57,9 @@
           traefik.http.routers.ispyagentdvr.middlewares: "{{ ispyagentdvr_hostname }}@docker"
           traefik.http.middlewares.ispyagentdvr.IPAllowList.sourcerange: "{{ ispyagentdvr_traefik_whitelist }}"
           traefik.http.services.ispyagentdvr.loadbalancer.server.port: "8097"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/dev/ispyagentdvr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/mekayelanik/ispyagentdvr"
         cpu_shares: "{{ ispyagentdvr_cpu_shares }}"
         memory: "{{ ispyagentdvr_memory }}"
         restart_policy: unless-stopped

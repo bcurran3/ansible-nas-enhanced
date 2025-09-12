@@ -39,8 +39,9 @@
           homepage.container: "{{ rustdesk_hbbr_container_name }}"
           homepage.showStats: "{{ rustdesk_hbbr_homepage_showStats }}"
           trafik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/rustdesk/rustdesk-server"
         cpu_shares: "{{ rustdesk_hbbr_cpu_shares }}"
         memory: "{{ rustdesk_hbbr_memory }}"
         restart_policy: unless-stopped
@@ -80,8 +81,9 @@
           homepage.container: "{{ rustdesk_hbbs_container_name }}"
           homepage.showStats: "{{ rustdesk_hbbs_homepage_showStats }}"
           trafik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/rustdesk/rustdesk/releases/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/rustdesk/rustdesk-server"
         cpu_shares: "{{ rustdesk_hbbs_cpu_shares }}"
         memory: "{{ rustdesk_hbbs_memory }}"
         restart_policy: unless-stopped
@@ -126,8 +128,9 @@
           traefik.http.routers.rustdesk.middlewares: "{{ rustdesk_hostname }}@docker"
           traefik.http.middlewares.rustdesk.IPAllowList.sourcerange: "{{ rustdesk_traefik_whitelist }}"
           traefik.http.services.rustdesk.loadbalancer.server.port: "5000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/r/keyurbhole/flutter_web_desk/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/keyurbhole/flutter_web_desk"
         cpu_shares: "{{ rustdesk_web_cpu_shares }}"
         memory: "{{ rustdesk_web_memory }}"
         restart_policy: unless-stopped

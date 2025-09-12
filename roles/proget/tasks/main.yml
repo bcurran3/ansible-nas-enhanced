@@ -60,7 +60,10 @@
           homepage.container: "{{ proget_db_container_name }}"
           homepage.showStats: "{{ proget_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.ignore.tags: "true"
+          wud.tag.include: '^2019-CU\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.watch.registry: "https://mcr.microsoft.com"
+          wud.link.template: "https://hub.docker.com/r/microsoft/mssql-server"
         cpu_shares: "{{ proget_db_cpu_shares }}"
         memory: "{{ proget_db_memory }}"
         restart_policy: unless-stopped
@@ -110,8 +113,10 @@
           traefik.http.routers.proget.middlewares: "proget@docker"
           traefik.http.middlewares.proget.IPAllowList.sourcerange: "{{ proget_traefik_whitelist }}"
           traefik.http.services.proget.loadbalancer.server.port: "80"
-          wud.tag.include: "^\\d+\\.\\d+\\.\\d+$"
-          wud.link.template: "https://inedo.com/proget/whats-new/v$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.watch.registry: "https://proget.inedo.com"
+          wud.link.template: "https://proget.inedo.com/productimages/inedo/proget"
         cpu_shares: "{{ proget_cpu_shares }}"
         memory: "{{ proget_memory }}"
         restart_policy: unless-stopped

@@ -51,8 +51,9 @@
           traefik.http.routers.netalertx.middlewares: "{{ netalertx_hostname }}@docker"
           traefik.http.middlewares.netalertx.IPAllowList.sourcerange: "{{ netalertx_traefik_whitelist }}"
           traefik.http.services.netalertx.loadbalancer.server.port: "20211"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/jokob-sk/NetAlertX/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/jokobsk/netalertx"
         cpu_shares: "{{ netalertx_cpu_shares }}"
         memory: "{{ netalertx_memory }}"
         restart_policy: unless-stopped

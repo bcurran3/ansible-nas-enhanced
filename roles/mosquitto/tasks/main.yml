@@ -43,8 +43,9 @@
           homepage.container: "{{ mosquitto_container_name }}"
           homepage.showStats: "{{ mosquitto_homepage_showStats }}"
           traefik_enabled: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/_/eclipse-mosquitto/tags/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/eclipse-mosquitto"
         cpu_shares: "{{ mosquitto_cpu_shares }}"
         memory: "{{ mosquitto_memory }}"
         restart: "{{ mosquitto_conf is changed }}"

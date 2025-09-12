@@ -43,8 +43,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_redis_container_name }}"
           homepage.showStats: "{{ paperless_ngx_redis_homepage_showStats }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ paperless_ngx_redis_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ paperless_ngx_redis_memory }}"
@@ -79,8 +80,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_db_container_name }}"
           homepage.showStats: "{{ paperless_ngx_db_homepage_showStats }}"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://hub.docker.com/_/postgres/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ paperless_ngx_db_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ paperless_ngx_db_memory }}"
@@ -140,8 +142,9 @@
           traefik.http.routers.paperless_ngx.middlewares: "paperless_ngx@docker"
           traefik.http.middlewares.paperless_ngx.IPAllowList.sourcerange: "{{ paperless_ngx_traefik_whitelist }}"
           traefik.http.services.paperless_ngx.loadbalancer.server.port: "8000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/paperless-ngx/paperless-ngx/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/paperless-ngx/paperless-ngx/releases"
         cpu_shares: "{{ paperless_ngx_cpu_shares }}"
         memory: "{{ paperless_ngx_memory }}"
         restart_policy: unless-stopped

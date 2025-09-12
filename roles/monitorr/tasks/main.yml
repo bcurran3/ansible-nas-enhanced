@@ -50,8 +50,9 @@
           traefik.http.routers.monitorr.middlewares: "{{ monitorr_hostname }}@docker"
           traefik.http.middlewares.monitorr.IPAllowList.sourcerange: "{{ monitorr_traefik_whitelist }}"
           traefik.http.services.monitorr.loadbalancer.server.port: "80"
-          wud.tag.include: "^\\d+\\.\\d+\\.\\d+m$"
-          wud.link.template: "https://github.com/Monitorr/Monitorr/releases/tag/$${major}.$${minor}.$${patch}m"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/monitorr/monitorr"
         cpu_shares: "{{ monitorr_cpu_shares }}"
         memory: "{{ monitorr_memory }}"
         restart_policy: unless-stopped

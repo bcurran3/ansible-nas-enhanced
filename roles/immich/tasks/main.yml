@@ -46,8 +46,9 @@
           homepage.container: "{{ immich_machinelearning_container_name }}"
           homepage.showStats: "false"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/immich-app/immich/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/immich-app/immich/releases"
         cpu_shares: "{{ immich_machinelearning_cpu_shares }}"
         memory: "{{ immich_machinelearning_memory }}"
         restart_policy: unless-stopped
@@ -93,8 +94,9 @@
           homepage.container: "{{ immich_postgres_container_name }}"
           homepage.showStats: "false"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: ""
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/immich-app/immich/releases"
         cpu_shares: "{{ immich_postgres_cpu_shares }}"
         memory: "{{ immich_postgres_memory }}"
         restart_policy: always
@@ -128,8 +130,9 @@
           homepage.container: "{{ immich_redis_container_name }}"
           homepage.showStats: "{{ immich_redis_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/redis/redis/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ immich_redis_cpu_shares }}"
         memory: "{{ immich_redis_memory }}"
         restart_policy: always
@@ -193,8 +196,9 @@
           traefik.http.routers.immich.middlewares: "{{ immich_hostname }}@docker"
           traefik.http.middlewares.immich.IPAllowList.sourcerange: "{{ immich_traefik_whitelist }}"
           traefik.http.services.immich.loadbalancer.server.port: "2283"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/immich-app/immich/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/immich-app/immich/releases"
         cpu_shares: "{{ immich_server_cpu_shares }}"
         memory: "{{ immich_server_memory }}"
         restart_policy: unless-stopped

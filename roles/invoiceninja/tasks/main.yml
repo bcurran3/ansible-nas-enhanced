@@ -59,8 +59,9 @@
           homepage.container: "{{ invoiceninja_db_container_name }}"
           homepage.showStats: "{{ invoiceninja_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ invoiceninja_db_cpu_shares }}"
         memory: "{{ invoiceninja_db_memory }}"
         restart_policy: unless-stopped
@@ -130,8 +131,9 @@
           homepage.container: "{{ invoiceninja_app_container_name }}"
           homepage.showStats: "{{ invoiceninja_app_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/invoiceninja/invoiceninja/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/invoiceninja/invoiceninja"
         cpu_shares: "{{ invoiceninja_app_cpu_shares }}"
         memory: "{{ invoiceninja_app_memory }}"
         restart_policy: unless-stopped
@@ -182,8 +184,9 @@
           traefik.http.routers.invoiceninja.middlewares: "{{ invoiceninja_hostname }}@docker"
           traefik.http.middlewares.invoiceninja.IPAllowList.sourcerange: "{{ invoiceninja_traefik_whitelist }}"
           traefik.http.services.invoiceninja.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/nginx/nginx/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/nginx"
         cpu_shares: "{{ invoiceninja_web_cpu_shares }}"
         memory: "{{ invoiceninja_web_memory }}"
         restart_policy: unless-stopped

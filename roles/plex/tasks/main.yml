@@ -92,8 +92,9 @@
           traefik.http.routers.plex.middlewares: "{{ plex_hostname }}@docker"
           traefik.http.middlewares.plex.IPAllowList.sourcerange: "{{ plex_traefik_whitelist }}"
           traefik.http.services.plex.loadbalancer.server.port: "32400"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-plex/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/plex"
         cpu_shares: "{{ plex_cpu_shares }}"
         memory: "{{ plex_memory }}"
         restart_policy: unless-stopped

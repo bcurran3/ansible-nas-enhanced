@@ -51,8 +51,9 @@
           traefik.http.routers.pyload.middlewares: "{{ pyload_hostname }}@docker"
           traefik.http.middlewares.pyload.IPAllowList.sourcerange: "{{ pyload_traefik_whitelist }}"
           traefik.http.services.pyload.loadbalancer.server.port: "8000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/pyload/pyload/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/writl/pyload"
         cpu_shares: "{{ pyload_cpu_shares }}"
         memory: "{{ pyload_memory }}"
         restart_policy: unless-stopped

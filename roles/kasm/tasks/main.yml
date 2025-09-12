@@ -65,8 +65,9 @@
           traefik.http.middlewares.kasm.IPAllowList.sourcerange: "{{ kasm_traefik_whitelist }}"
           traefik.http.services.kasm.loadbalancer.passhostheader: "true"
           traefik.http.services.kasm.loadbalancer.server.port: "{{ kasm_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/r/linuxserver/kasm/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/kasm"
 # NOTE: Traefik labels need work to make kasm.server.tld work; i.e. pass https header to kasm instead of http
         cpu_shares: "{{ kasm_cpu_shares }}"
         memory: "{{ kasm_memory }}"

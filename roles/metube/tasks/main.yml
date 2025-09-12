@@ -46,8 +46,9 @@
           traefik.http.routers.metube.middlewares: "{{ metube_hostname }}@docker"
           traefik.http.middlewares.metube.IPAllowList.sourcerange: "{{ metube_traefik_whitelist }}"
           traefik.http.services.metube.loadbalancer.server.port: "8081"
-          wud.tag.include: "^\\d{4}\\.\\d{2}\\.\\d{2}$"
-          wud.link.template: "https://github.com/alexta69/metube/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/alexta69/metube/releases"
         cpu_shares: "{{ metube_cpu_shares }}"
         memory: "{{ metube_memory }}"
         restart_policy: unless-stopped

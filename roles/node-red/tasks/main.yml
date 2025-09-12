@@ -48,8 +48,9 @@
           traefik.http.routers.node_red.middlewares: "node_red@docker"
           traefik.http.middlewares.node_red.IPAllowList.sourcerange: "{{ node_red_traefik_whitelist }}"
           traefik.http.services.node_red.loadbalancer.server.port: "1880"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/node-red/node-red/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/nodered/node-red"
         cpu_shares: "{{ node_red_cpu_shares }}"
         memory: "{{ node_red_memory }}"
         restart_policy: unless-stopped

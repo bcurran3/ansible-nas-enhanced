@@ -53,8 +53,9 @@
           traefik.http.routers.prowlarr.middlewares: "{{ prowlarr_hostname }}@docker"
           traefik.http.middlewares.prowlarr.IPAllowList.sourcerange: "{{ prowlarr_traefik_whitelist }}"
           traefik.http.services.prowlarr.loadbalancer.server.port: "9696"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/linuxserver/docker-prowlarr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://lscr.io/linuxserver/prowlarr"
         cpu_shares: "{{ prowlarr_cpu_shares }}"
         memory: "{{ prowlarr_memory }}"
         restart_policy: unless-stopped
