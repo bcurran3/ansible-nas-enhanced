@@ -25,6 +25,10 @@ function help {
     echo "      List ANE available apps."
     echo "  --behind, --outdated"
     echo "      Check if your ANE files are up-to-date."
+    echo "  --disable <app_name>"
+    echo "      Disable an app (basic)"
+    echo "  --enable <app_name>"
+    echo "      Enable an app (basic)"
     echo "  --enabled, --installed"
     echo "      List ANE enabled apps."
     echo "  --install"
@@ -99,10 +103,45 @@ if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-o
     exit
 fi
 
+# Disable an app (basic)
+if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
+    FILE="inventories/ANE/group_vars/nas.yml"
+    ENABLED_LINE="${2}_enabled: true"
+    DISABLED_LINE="${2}_enabled: false"
+    if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
+        # If it is, change "true" to "false"
+        sed -i "s/$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
+        echo "** $2 disabled."
+    elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
+        # If it is, report it and do nothing
+        echo "  ** $2 is already disabled."
+    else
+        echo "  ** $2 does not exist in the file."
+    fi
+    exit
+fi
+
+# Enable an app (basic)
+if [[ "$1" = "--enable" || "$1" = "-enable" ]]; then
+    FILE="inventories/ANE/group_vars/nas.yml"
+    ENABLED_LINE="${2}_enabled: true"
+    DISABLED_LINE="${2}_enabled: false"
+    if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
+        echo "  ** $2 is already enabled."
+    elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
+        sed -i "s/$DISABLED_LINE/$ENABLED_LINE/" "$FILE"
+        echo "  ** $2 re-enabled."
+    else
+        echo "$ENABLED_LINE" >> "$FILE"
+        echo "  ** $2 added and enabled."
+    fi
+    exit
+fi
+
 # List ANE enabled apps
 if [[ "$1" = "--enabled" || "$1" = "-enabled" || "$1" = "--installed" || "$1" = "-installed" ]]; then
      echo "ANE enabled apps:"
-     cat inventories/ANE/group_vars/nas.yml |grep 'enabled: true'
+     cat inventories/ANE/group_vars/nas.yml | grep 'enabled: true'
      exit
 fi
 
