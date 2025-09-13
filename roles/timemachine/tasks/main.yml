@@ -37,9 +37,9 @@
           homepage.container: "{{ timemachine_container_name }}"
           homepage.showStats: "{{ timemachine_homepage_showStats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ timemachine_port }}"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/dev/appname/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ no published releases or tags on github
+          wud.tag.include: '^v\d+\.\d+\.\d+-\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/awlnx/samba-timemachine"
         cpu_shares: "{{ timemachine_cpu_shares }}"
         memory: "{{ timemachine_memory }}"
         restart_policy: unless-stopped

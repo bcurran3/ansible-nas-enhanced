@@ -48,9 +48,9 @@
           traefik.http.routers.grocy.middlewares: "{{ grocy_hostname }}@docker"
           traefik.http.middlewares.grocy.IPAllowList.sourcerange: "{{ grocy_traefik_whitelist }}"
           traefik.http.services.grocy.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^version-\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/linuxserver/grocy"
+          wud.link.template: "lscr.io/linuxserver/grocy"
         cpu_shares: "{{ grocy_cpu_shares }}"
         memory: "{{ grocy_memory }}"
         restart_policy: unless-stopped

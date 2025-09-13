@@ -121,8 +121,9 @@
           traefik.http.routers.technitium.middlewares: "{{ technitium_hostname }}@docker"
           traefik.http.middlewares.technitium.IPAllowList.sourcerange: "{{ technitium_traefik_whitelist }}"
           traefik.http.services.technitium.loadbalancer.server.port: "{{ technitium_port }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/r/technitium/dns-server/tags/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/technitium/dns-server"
         cpu_shares: "{{ technitium_cpu_shares }}"
         memory: "{{ technitium_memory }}"
         restart_policy: unless-stopped

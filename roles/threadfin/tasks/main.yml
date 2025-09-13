@@ -36,8 +36,9 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ threadfin_port }}"
           homepage.widget.type: "xteve"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ threadfin_port }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Threadfin/Threadfin/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/fyb3roptik/threadfin"
 # Does this have a web interface??????????
         cpu_shares: "{{ threadfin_cpu_shares }}"
         memory: "{{ threadfin_memory }}"

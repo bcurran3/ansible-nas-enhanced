@@ -53,9 +53,9 @@
           traefik.http.routers.bazarr.middlewares: "{{ bazarr_hostname }}@docker"
           traefik.http.middlewares.bazarr.IPAllowList.sourcerange: "{{ bazarr_traefik_whitelist }}"
           traefik.http.services.bazarr.loadbalancer.server.port: "6767"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^version-\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/linuxserver/bazarr"
+          wud.link.template: "lscr.io/linuxserver/bazarr"
         cpu_shares: "{{ bazarr_cpu_shares }}"
         memory: "{{ bazarr_memory }}"
         restart_policy: unless-stopped

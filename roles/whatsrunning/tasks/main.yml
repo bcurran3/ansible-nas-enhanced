@@ -41,8 +41,9 @@
           traefik.http.routers.whatsrunning.middlewares: "{{ whatsrunning_hostname }}@docker"
           traefik.http.middlewares.whatsrunning.IPAllowList.sourcerange: "{{ whatsrunning_traefik_whitelist }}"
           traefik.http.services.whatsrunning.loadbalancer.server.port: "5000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/mikeage/whatsrunning/tags/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d{4}\.\d{2}\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/mikeage/whatsrunning"
         cpu_shares: "{{ whatsrunning_cpu_shares }}"
         memory: "{{ whatsrunning_memory }}"
         restart_policy: unless-stopped

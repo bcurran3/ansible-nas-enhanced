@@ -52,8 +52,9 @@
           traefik.http.routers.whisparr.middlewares: "{{ whisparr_hostname }}@docker"
           traefik.http.middlewares.whisparr.IPAllowList.sourcerange: "{{ whisparr_traefik_whitelist }}"
           traefik.http.services.whisparr.loadbalancer.server.port: "6969"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/thespad/docker-whisparr/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v\d+\.\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/TheSpad/Whisparr/pkgs/container/whisparr"
         cpu_shares: "{{ whisparr_cpu_shares }}"
         memory: "{{ whisparr_memory }}"
         restart_policy: unless-stopped

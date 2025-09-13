@@ -57,8 +57,9 @@
           traefik.http.routers.vfd.middlewares: "{{ vfd_hostname }}@docker"
           traefik.http.middlewares.vfd.IPAllowList.sourcerange: "{{ vfd_traefik_whitelist }}"
           traefik.http.services.vfd.loadbalancer.server.port: "{{ vfd_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/kiinami/vfd/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/kiinami/vfd/pkgs/container/vfd"
         cpu_shares: "{{ vfd_cpu_shares }}"
         memory: "{{ vfd_memory }}"
         restart_policy: unless-stopped

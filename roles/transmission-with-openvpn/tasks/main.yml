@@ -75,8 +75,9 @@
           traefik.http.routers.transmission_openvpn.middlewares: "{{ transmission_openvpn_hostname }}@docker"
           traefik.http.middlewares.transmission_openvpn.IPAllowList.sourcerange: "{{ transmission_openvpn_traefik_whitelist }}"
           traefik.http.services.transmission_openvpn.loadbalancer.server.port: "9091"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/haugene/docker-transmission-openvpn/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+(\.\d+)?$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/haugene/transmission-openvpn"
         restart_policy: unless-stopped
         cpu_shares: "{{ transmission_openvpn_cpu_shares }}"
         memory: "{{ transmission_openvpn_memory }}"

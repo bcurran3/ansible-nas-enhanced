@@ -44,8 +44,9 @@
           traefik.http.routers.tinyauth.middlewares: "{{ tinyauth_hostname }}@docker"
           traefik.http.middlewares.tinyauth.IPAllowList.sourcerange: "{{ tinyauth_traefik_whitelist }}"
           traefik.http.services.tinyauth.loadbalancer.server.port: "{{ tinyauth_port }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/steveiliop56/tinyauth/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/steveiliop/tinyauth/pkgs/container/tinyauth"
         cpu_shares: "{{ tinyauth_cpu_shares }}"
         memory: "{{ tinyauth_memory }}"
         restart_policy: unless-stopped

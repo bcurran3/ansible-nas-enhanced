@@ -57,8 +57,9 @@
           traefik.http.routers.wireguard.middlewares: "{{ wireguard_hostname }}@docker"
           traefik.http.middlewares.wireguard.IPAllowList.sourcerange: "{{ wireguard_traefik_whitelist }}"
           traefik.http.services.wireguard.loadbalancer.server.port: "{{ wireguard_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/wg-easy/wg-easy/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/weejewel/wg-easy"
         cpu_shares: "{{ wireguard_cpu_shares }}"
         memory: "{{ wireguard_memory }}"
         restart_policy: unless-stopped

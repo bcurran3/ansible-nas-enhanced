@@ -45,8 +45,9 @@
           traefik.http.routers.yadnsb.middlewares: "{{ yadnsb_hostname }}@docker"
           traefik.http.middlewares.yadnsb.IPAllowList.sourcerange: "{{ yadnsb_traefik_whitelist }}"
           traefik.http.services.yadnsb.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/altendorfme/yadnsb/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/altendorfme/yadnsb/pkgs/container/yadnsb"
         cpu_shares: "{{ yadnsb_cpu_shares }}"
         memory: "{{ yadnsb_memory }}"
         restart_policy: unless-stopped

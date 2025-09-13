@@ -41,8 +41,9 @@
           homepage.container: "{{ youtubedlmaterial_db_container_name }}"
           homepage.showStats: "{{ youtubedlmaterial_db_homepage_showStats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/mongodb/mongo/tags/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mongo"
         cpu_shares: "{{ youtubedlmaterial_db_cpu_shares }}"
         memory: "{{ youtubedlmaterial_db_memory }}"
         restart_policy: unless-stopped
@@ -61,9 +62,6 @@
           - "{{ youtubedlmaterial_dl_subscriptions_directory }}:/app/subscriptions:rw"
           - "{{ youtubedlmaterial_dl_channels_directory }}:/app/subscriptions/channels:rw"
           - "{{ youtubedlmaterial_dl_users_directory }}:/app/users:rw"
-############ special for me
-          - "{{ podcasts_root }}:/app/users/admin/subscriptions/channels:rw"
-############ special for me
         network_mode: "bridge"
         ports:
           - "{{ youtubedlmaterial_port_http }}:17442"
@@ -103,8 +101,9 @@
           traefik.http.routers.frontend.middlewares: "{{ youtubedlmaterial_hostname }}"
           traefik.http.routers.youtubedlmaterial.middlewares: "{{ youtubedlmaterial_hostname }}@docker"
           traefik.http.middlewares.youtubedlmaterial.IPAllowList.sourcerange: "{{ youtubedlmaterial_traefik_whitelist }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/Tzahi12345/YoutubeDL-Material/releases/tags/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/tzahi12345/youtubedl-material"
         cpu_shares: "{{ youtubedlmaterial_cpu_shares }}"
         memory: "{{ youtubedlmaterial_memory }}"
         restart_policy: unless-stopped

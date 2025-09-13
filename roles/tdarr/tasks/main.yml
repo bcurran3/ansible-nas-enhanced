@@ -85,8 +85,9 @@
           traefik.http.routers.tdarr.middlewares: "{{ tdarr_hostname }}@docker"
           traefik.http.middlewares.tdarr.IPAllowList.sourcerange: "{{ tdarr_traefik_whitelist }}"
           traefik.http.services.tdarr.loadbalancer.server.port: "8265"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/HaveAGitGat/Tdarr/releases/tag/$${major}.$${minor}-Beta"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/HaveAGitGat/Tdarr/pkgs/container/tdarr"
         cpu_shares: "{{ tdarr_cpu_shares }}"
         memory: "{{ tdarr_memory }}"
         restart_policy: unless-stopped

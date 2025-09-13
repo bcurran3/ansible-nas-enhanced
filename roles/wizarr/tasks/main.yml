@@ -50,9 +50,9 @@
           traefik.http.routers.wizarr.middlewares: "{{ wizarr_hostname }}@docker"
           traefik.http.middlewares.wizarr.IPAllowList.sourcerange: "{{ wizarr_traefik_whitelist }}"
           traefik.http.services.wizarr.loadbalancer.server.port: "5690"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/wizarrrr/wizarr/releases/tag/$${major}.$${minor}.$${patch}"
-#         ^ needs to be changed to format: 2025.8.1
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/wizarrrr/wizarr/pkgs/container/wizarr"
         cpu_shares: "{{ wizarr_cpu_shares }}"
         memory: "{{ wizarr_memory }}"
         restart_policy: unless-stopped

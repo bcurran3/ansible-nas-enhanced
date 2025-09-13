@@ -48,9 +48,9 @@
           traefik.http.routers.jackett.middlewares: "{{ jackett_hostname }}@docker"
           traefik.http.middlewares.jackett.IPAllowList.sourcerange: "{{ jackett_traefik_whitelist }}"
           traefik.http.services.jackett.loadbalancer.server.port: "9117"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/linuxserver/jackett"
+          wud.link.template: "lscr.io/linuxserver/jackett"
         cpu_shares: "{{ jackett_cpu_shares }}"
         memory: "{{ jackett_memory }}"
         restart_policy: unless-stopped

@@ -49,8 +49,23 @@
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8083"
           traefik.enable: "false"
 #         ^^^ TDL would like to enable and add a re-write rule to go to the dashboard
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/traefik/traefik/releases/tag/$${major}.$${minor}.$${patch}"
+
+          #traefik.enable: "true"
+          # Define the router that will catch the request
+          #traefik.http.routers.dashboard-redirect.rule: "Host(`{{ traefik_hostname }}`)"
+          #traefik.http.routers.dashboard-redirect.entrypoints: "websecure"
+          #traefik.http.routers.dashboard-redirect.tls.certresolver: "{{ traefik_cert_resolver }}"
+          # Link the router to the redirect middleware
+          #traefik.http.routers.dashboard-redirect.middlewares: "redirect-to-ip@docker"
+          # Define the redirect middleware
+          #traefik.http.middlewares.redirect-to-ip.redirectregex.regex: "^https?://(.*)"
+          #traefik.http.middlewares.redirect-to-ip.redirectregex.replacement: "http://{{ dashboard_ip }}:8083"
+          # Assign a dummy service (required by Traefik, but never used because of the redirect)
+          #traefik.http.routers.dashboard-redirect.service: "noop@internal"
+
+          wud.tag.include: '^v\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/traefik"
         cpu_shares: "{{ traefik_cpu_shares }}"
         memory: "{{ traefik_memory }}"
         recreate: "{{ template_config is changed }}"

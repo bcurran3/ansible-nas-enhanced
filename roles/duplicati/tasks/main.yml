@@ -60,9 +60,9 @@
           traefik.http.routers.duplicati.middlewares: "{{ duplicati_hostname }}@docker"
           traefik.http.middlewares.duplicati.IPAllowList.sourcerange: "{{ duplicati_traefik_whitelist }}"
           traefik.http.services.duplicati.loadbalancer.server.port: "8200"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^version-\d+\.\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/linuxserver/duplicati"
+          wud.link.template: "lscr.io/linuxserver/duplicati"
         cpu_shares: "{{ duplicati_cpu_shares }}"
         memory: "{{ duplicati_memory }}"
         restart_policy: unless-stopped

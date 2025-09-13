@@ -58,8 +58,9 @@
           traefik.http.routers.trala.middlewares: "{{ trala_hostname }}@docker"
           traefik.http.middlewares.trala.IPAllowList.sourcerange: "{{ trala_traefik_whitelist }}"
           traefik.http.services.trala.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/dannybouwers/trala/tags/v$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/dannybouwers/trala/pkgs/container/trala"
         cpu_shares: "{{ trala_cpu_shares }}"
         memory: "{{ trala_memory }}"
         restart_policy: unless-stopped

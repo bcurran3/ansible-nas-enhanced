@@ -1,0 +1,70 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ repliqate_backup_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ repliqate_container_name }}"
+        hostname: "{{ repliqate_container_name }}"
+        image: "{{ repliqate_image_name }}:{{ repliqate_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ repliqate_backup_directory }}:/var/repliqate"
+          - "{{ docker_image_directory }}:/var/lib/docker/volumes"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ repliqate_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ repliqate_watchtower_monitor_only }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ repliqate_homepage_group }}"
+          homepage.icon: "{{ repliqate_homepage_icon }}"
+          homepage.description: "{{ 'a modular Docker container/volume backup solution' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ repliqate_container_name }}"
+          homepage.showStats: "{{ repliqate_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/lminlone/repliqate/releases/"
+        cpu_shares: "{{ repliqate_cpu_shares }}"
+        memory: "{{ repliqate_memory }}"
+        restart_policy: unless-stopped
+  when: repliqate_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ repliqate_container_name }}"
+        state: absent
+  when: repliqate_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ repliqate_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ repliqate_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: repliqate_enabled is false and archive_app_data_enabled is true

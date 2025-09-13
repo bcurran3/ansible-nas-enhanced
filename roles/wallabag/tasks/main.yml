@@ -52,8 +52,9 @@
           traefik.http.routers.wallabag.middlewares: "{{ wallabag_hostname }}@docker"
           traefik.http.middlewares.wallabag.IPAllowList.sourcerange: "{{ wallabag_traefik_whitelist }}"
           traefik.http.services.wallabag.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/wallabag/wallabag/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/wallabag/wallabag"
         cpu_shares: "{{ wallabag_cpu_shares }}"
         memory: "{{ wallabag_memory }}"
         restart_policy: unless-stopped

@@ -55,8 +55,9 @@
           traefik.http.routers.thelounge.middlewares: "{{ thelounge_hostname }}@docker"
           traefik.http.middlewares.thelounge.IPAllowList.sourcerange: "{{ thelounge_traefik_whitelist }}"
           traefik.http.services.thelounge.loadbalancer.server.port: "9000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/thelounge/thelounge/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/thelounge/thelounge"
         cpu_shares: "{{ thelounge_cpu_shares }}"
         memory: "{{ thelounge_memory }}"
         restart_policy: unless-stopped
