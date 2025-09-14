@@ -17,16 +17,25 @@
         pull: true
         volumes:
           - "{{ arcane_data_directory }}:/app/data"
-          - "{{ docker_compose_data_directory }}:/opt/my-docker-stacks:ro"
+          - "{{ docker_compose_data_directory }}:/app/data/projects"
           - "/var/run/docker.sock:/var/run/docker.sock"
         ports:
-          - "{{ arcane_port_http }}:3000"
+          - "{{ arcane_port_http }}:{{ arcane_port_http }}"
         env:
-          APP_ENV: "production"
+          APP_URL: "http://localhost:{{ arcane_port_http }}"
+          ENCRYPTION_KEY: "{{ arcane_env_encryption_key }}"
+          JWT_SECRET: "{{ arcane_env_jwt_secret }}"
           PUID: "{{ arcane_puid }}"
           PGID: "{{ arcane_pgid }}"
-          PUBLIC_SESSION_SECRET: "{{ arcane_public_session_secret }}"
+          PORT: "{{ arcane_port_http }}"
+#         PUBLIC_SESSION_SECRET: "{{ arcane_public_session_secret }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ['CMD-SHELL', 'curl -fsS http://localhost:3552/api/health >/dev/null || exit 1']
+          interval: 10s
+          timeout: 3s
+          retries: 5
+          start_period: 15s
         labels:
           autoheal: "{{ arcane_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ arcane_watchtower_monitor_only }}"
@@ -51,7 +60,7 @@
           traefik.http.routers.frontend.middlewares: "{{ arcane_hostname }}"
           traefik.http.routers.arcane.middlewares: "{{ arcane_hostname }}@docker"
           traefik.http.middlewares.arcane.IPAllowList.sourcerange: "{{ arcane_traefik_whitelist }}"
-          traefik.http.services.arcane.loadbalancer.server.port: "3000"
+          traefik.http.services.arcane.loadbalancer.server.port: "{{ arcane_port_http }}"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/OFKM/Arcane/releases"

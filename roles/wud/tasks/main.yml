@@ -21,10 +21,12 @@
         ports:
           - "{{ wud_port_http }}:3000"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           WUD_AUTH_BASIC_ADMIN_USER: "{{ wud_admin_username }}"
           WUD_AUTH_BASIC_ADMIN_HASH: "{{ wud_admin_password }}"
+          WUD_REGISTRY_HUB_PUBLIC_LOGIN: "{{ wud_env_wud_registry_hub_public_login }}"
+          WUD_REGISTRY_HUB_PUBLIC_PASSWORD: "{{ wud_env_wud_registry_hub_public_password }}"
           WUD_WATCHER_LOCAL_WATCHALL: "true"
+          TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: 'curl --fail http://localhost:3000/health || exit 1'
           interval: "10s"
@@ -42,7 +44,7 @@
           homepage.group: "{{ wud_homepage_group }}"
           homepage.icon: "{{ wud_homepage_icon }}"
           homepage.href: "{{ wud_homepage_href }}"
-          homepage.description: "{{ 'What''s Up Docker?' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'Keep your containers up-to-date!' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wud_container_name }}"

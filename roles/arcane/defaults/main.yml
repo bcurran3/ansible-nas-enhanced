@@ -7,10 +7,9 @@ arcane_traefik_whitelist: "{{ lan }}"
 
 arcane_puid: "1000"
 arcane_pgid: "1000"
-arcane_public_session_secret: "run openssl rand -base64 32"
 
 # network
-arcane_port_http: "3024"
+arcane_port_http: "3552"
 arcane_hostname: "arcane"
 
 arcane_data_directory: "{{ docker_home }}/arcane"
@@ -21,6 +20,10 @@ arcane_image_name: "ghcr.io/ofkm/arcane"
 arcane_image_tag: "latest"
 arcane_cpu_shares: "1024"
 arcane_memory: "1G"
+
+# app
+arcane_env_encryption_key: "utNR/dbhefsHao21s4OlY85jhPP1LIDIYJpy9ioYtLo=" # openssl rand -base64 32
+arcane_env_jwt_secret: "BiDGz3DUEdMVuwhdgf0/QsNnuwGNgNyDbhffZIwuFrYOAiJ1OPerEjIGr9StvV7YBbk8UpGOLJb4J7TZdaRdcw==" # openssl rand -base64 64
 
 # autoheal
 arcane_autoheal: "false"
