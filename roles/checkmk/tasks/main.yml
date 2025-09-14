@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ checkmk_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ checkmk_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ checkmk_watchtower_enable }}"
           dockflare.enable: "{{ checkmk_dockflare_tunnel }}"
           dockflare.access.group: "{{ checkmk_dockflare_access_group }}"
           dockflare.hostname: "{{ checkmk_hostname }}.{{ ansible_nas_domain }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'Best-in-class infrastructure & application monitoring' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ checkmk_container_name }}"
-          homepage.showStats: "{{ checkmk_homepage_showStats }}"
+          homepage.showStats: "{{ checkmk_homepage_showstats }}"
           traefik.enable: "{{ checkmk_available_externally | string }}"
           traefik.http.routers.checkmk.rule: "Host(`checkmk.{{ ansible_nas_domain }}`)"
           traefik.http.routers.checkmk.tls.certresolver: "letsencrypt"

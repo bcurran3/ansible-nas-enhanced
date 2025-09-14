@@ -27,7 +27,7 @@
           MINIO_PROMETHEUS_AUTH_TYPE: public
         labels:
           autoheal: "{{ minio_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ minio_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ minio_watchtower_enable }}"
           dockflare.enable: "{{ minio_dockflare_tunnel }}"
           dockflare.access.group: "{{ minio_dockflare_access_group }}"
           dockflare.hostname: "{{ minio_hostname }}.{{ ansible_nas_domain }}"
@@ -39,7 +39,7 @@
           homepage.description: "{{ 'minio description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ minio_container_name }}"
-          homepage.showStats: "{{ minio_homepage_showStats }}"
+          homepage.showStats: "{{ minio_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ minio_port }}"
           traefik.enable: "{{ minio_available_externally | string }}"
           traefik.http.routers.minio.rule: "Host(`{{ minio_hostname }}.{{ ansible_nas_domain }}`)"

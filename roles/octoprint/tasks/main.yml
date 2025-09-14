@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ octoprint_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ octoprint_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ octoprint_watchtower_enable }}"
           dockflare.enable: "{{ octoprint_dockflare_tunnel }}"
           dockflare.access.group: "{{ octoprint_dockflare_access_group }}"
           dockflare.hostname: "{{ octoprint_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'octoprint description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ octoprint_container_name }}"
-          homepage.showStats: "{{ octoprint_homepage_showStats }}"
+          homepage.showStats: "{{ octoprint_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ octoprint_port }}"
           traefik.enable: "{{ octoprint_available_externally | string }}"
           traefik.http.routers.octoprint.rule: "Host(`{{ octoprint_hostname }}.{{ ansible_nas_domain }}`)"

@@ -31,7 +31,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ booksonic_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ booksonic_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ booksonic_watchtower_enable }}"
           dockflare.enable: "{{ booksonic_dockflare_tunnel }}"
           dockflare.access.group: "{{ booksonic_dockflare_access_group }}"
           dockflare.hostname: "{{ booksonic_hostname }}.{{ ansible_nas_domain }}"
@@ -43,7 +43,7 @@
           homepage.description: "{{ 'booksonic description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ booksonic_container_name }}"
-          homepage.showStats: "{{ booksonic_homepage_showStats }}"
+          homepage.showStats: "{{ booksonic_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ booksonic_port }}"
           traefik.enable: "{{ booksonic_available_externally | string }}"
           traefik.http.routers.booksonic.rule: "Host(`{{ booksonic_hostname }}.{{ ansible_nas_domain }}`)"

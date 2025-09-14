@@ -25,7 +25,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ autobrr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ autobrr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ autobrr_watchtower_enable }}"
           dockflare.enable: "{{ autobrr_dockflare_tunnel }}"
           dockflare.access.group: "{{ autobrr_dockflare_access_group }}"
           dockflare.hostname: "{{ autobrr_hostname }}.{{ ansible_nas_domain }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'Modern, easy to use download automation for torrents and usenet.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ autobrr_container_name }}"
-          homepage.showStats: "{{ autobrr_homepage_showStats }}"
+          homepage.showStats: "{{ autobrr_homepage_showstats }}"
           traefik.enable: "{{ autobrr_available_externally | string }}"
           traefik.http.routers.autobrr.rule: "Host(`{{ autobrr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.autobrr.tls.certresolver: "letsencrypt"

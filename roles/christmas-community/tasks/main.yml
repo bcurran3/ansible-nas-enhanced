@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ christmas_community_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ christmas_community_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ christmas_community_watchtower_enable }}"
           dockflare.enable: "{{ christmas_community_dockflare_tunnel }}"
           dockflare.access.group: "{{ christmas_community_dockflare_access_group }}"
           dockflare.hostname: "{{ christmas_community_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'Christmas lists for families' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "christmas-community"
-          homepage.showStats: "{{ christmas_community_homepage_showStats }}"
+          homepage.showStats: "{{ christmas_community_homepage_showstats }}"
           traefik.enable: "{{ christmas_community_available_externally | string }}"
           traefik.http.routers.christmas_community.rule: "Host(`{{ christmas_community_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.christmas_community.tls.certresolver: "letsencrypt"

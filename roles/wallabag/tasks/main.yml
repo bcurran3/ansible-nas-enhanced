@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ wallabag_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ wallabag_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ wallabag_watchtower_enable }}"
           dockflare.enable: "{{ wallabag_dockflare_tunnel }}"
           dockflare.access.group: "{{ wallabag_dockflare_access_group }}"
           dockflare.hostname: "{{ wallabag_hostname }}.{{ ansible_nas_domain }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'wallabag is a self hostable application for saving web pages: Save and classify articles. Read them later. Freely.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wallabag_container_name }}"
-          homepage.showStats: "{{ wallabag_homepage_showStats }}"
+          homepage.showStats: "{{ wallabag_homepage_showstats }}"
           traefik.enable: "{{ wallabag_available_externally | string }}"
           traefik.http.routers.wallabag.rule: "Host(`wallabag.{{ ansible_nas_domain }}`)"
           traefik.http.routers.wallabag.tls.certresolver: "letsencrypt"

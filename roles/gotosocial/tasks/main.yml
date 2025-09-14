@@ -34,7 +34,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ gotosocial_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ gotosocial_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ gotosocial_watchtower_enable }}"
           dockflare.enable: "{{ gotosocial_dockflare_tunnel }}"
           dockflare.access.group: "{{ gotosocial_dockflare_access_group }}"
           dockflare.hostname: "{{ gotosocial_hostname }}.{{ ansible_nas_domain }}"
@@ -47,7 +47,7 @@
           homepage.description: "{{ 'Fast, fun, small ActivityPub server.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gotosocial_container_name }}"
-          homepage.showStats: "{{ gotosocial_homepage_showStats }}"
+          homepage.showStats: "{{ gotosocial_homepage_showstats }}"
           traefik.enable: "{{ gotosocial_available_externally | string }}"
           traefik.http.routers.gotosocial.rule: "Host(`{{ gotosocial_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gotosocial.tls.certresolver: "letsencrypt"

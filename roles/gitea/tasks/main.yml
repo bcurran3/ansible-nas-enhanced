@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ gitea_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ gitea_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ gitea_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} DB"
           homepage.group: "{{ gitea_db_homepage_group }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gitea_db_container_name }}"
-          homepage.showStats: "{{ gitea_db_homepage_showStats }}"
+          homepage.showStats: "{{ gitea_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^9\.3\.\d+$'
           wud.tag.transform.type: "semver"
@@ -78,7 +78,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ gitea_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ gitea_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ gitea_watchtower_enable }}"
           dockflare.enable: "{{ gitea_dockflare_tunnel }}"
           dockflare.access.group: "{{ gitea_dockflare_access_group }}"
           dockflare.hostname: "{{ gitea_hostname }}.{{ ansible_nas_domain }}"
@@ -91,7 +91,7 @@
           homepage.description: "{{ 'git with a cup of tea' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gitea_container_name }}"
-          homepage.showStats: "{{ gitea_homepage_showStats }}"
+          homepage.showStats: "{{ gitea_homepage_showstats }}"
           traefik.enable: "{{ gitea_available_externally | string }}"
           traefik.http.routers.gitea.rule: "Host(`{{ gitea_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gitea.tls.certresolver: "letsencrypt"

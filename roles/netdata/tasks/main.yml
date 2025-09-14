@@ -28,7 +28,7 @@
           - apparmor:unconfined
         labels:
           autoheal: "{{ netdata_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ netdata_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ netdata_watchtower_enable }}"
           dockflare.enable: "{{ netdata_dockflare_tunnel }}"
           dockflare.access.group: "{{ netdata_dockflare_access_group }}"
           dockflare.hostname: "{{ netdata_hostname }}.{{ ansible_nas_domain }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'The fastest path to AI-powered full stack observability, even for lean teams.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ netdata_container_name }}"
-          homepage.showStats: "{{ netdata_homepage_showStats }}"
+          homepage.showStats: "{{ netdata_homepage_showstats }}"
           homepage.widget.type: "netdata"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netdata_port }}"
           traefik.enable: "{{ netdata_available_externally | string }}"

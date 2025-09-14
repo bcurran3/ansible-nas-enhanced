@@ -26,7 +26,7 @@
           MYSQL_ROOT_PASSWORD: "firefly"
         labels:
           autoheal: "{{ firefly_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ firefly_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ firefly_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ firefly_db_homepage_group }}"
@@ -35,7 +35,7 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ firefly_db_container_name }}"
-          homepage.showStats: "{{ firefly_db_homepage_showStats }}"
+          homepage.showStats: "{{ firefly_db_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_db_port }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -75,7 +75,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ firefly_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ firefly_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ firefly_watchtower_enable }}"
           dockflare.enable: "{{ firefly_dockflare_tunnel }}"
           dockflare.access.group: "{{ firefly_dockflare_access_group }}"
           dockflare.hostname: "{{ firefly_hostname }}.{{ ansible_nas_domain }}"
@@ -87,7 +87,7 @@
           homepage.description: "{{ 'firefly description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ firefly_container_name }}"
-          homepage.showStats: "{{ firefly_homepage_showStats }}"
+          homepage.showStats: "{{ firefly_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port }}"
           traefik.enable: "{{ firefly_available_externally | string }}"
           traefik.http.routers.firefly.rule: "Host(`{{ firefly_hostname }}.{{ ansible_nas_domain }}`)"

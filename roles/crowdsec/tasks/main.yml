@@ -37,7 +37,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ crowdsec_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ crowdsec_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ crowdsec_watchtower_enable }}"
           dockflare.enable: "false"
 #         dockflare.enable: "{{ crowdsec_dockflare_tunnel }}"
 #         dockflare.access.group: "{{ crowdsec_dockflare_access_group }}"
@@ -51,7 +51,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ crowdsec_container_name }}"
-          homepage.showStats: "{{ crowdsec_homepage_showStats }}"
+          homepage.showStats: "{{ crowdsec_homepage_showstats }}"
           homepage.widget.type: "crowdsec"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
           homepage.widget.username: "{{ crowdsec_homepage_widget_username }}"

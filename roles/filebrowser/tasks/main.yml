@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ filebrowser_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ filebrowser_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebrowser_watchtower_enable }}"
           dockflare.enable: "{{ filebrowser_dockflare_tunnel }}"
           dockflare.access.group: "{{ filebrowser_dockflare_access_group }}"
           dockflare.hostname: "{{ filebrowser_hostname }}.{{ ansible_nas_domain }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'Web File Browser' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ filebrowser_container_name }}"
-          homepage.showStats: "{{ filebrowser_homepage_showStats }}"
+          homepage.showStats: "{{ filebrowser_homepage_showstats }}"
           traefik.enable: "{{ filebrowser_available_externally | string }}"
           traefik.http.routers.filebrowser.rule: "Host(`{{ filebrowser_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.filebrowser.tls.certresolver: "letsencrypt"

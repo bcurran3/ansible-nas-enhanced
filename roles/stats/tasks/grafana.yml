@@ -50,7 +50,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ stats_grafana_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ stats_grafana_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ stats_grafana_watchtower_enable }}"
           dockflare.enable: "{{ stats_grafana_dockflare_tunnel }}"
           dockflare.access.group: "{{ stats_grafana_dockflare_access_group }}"
           dockflare.hostname: "{{ stats_grafana_hostname }}.{{ ansible_nas_domain }}"
@@ -62,7 +62,7 @@
           homepage.description: "{{ 'Dashboards and centralized observability.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stats_grafana_container_name }}"
-          homepage.showStats: "{{ stats_grafana_homepage_showStats }}"
+          homepage.showStats: "{{ stats_grafana_homepage_showstats }}"
           traefik.enable: "{{ stats_grafana_available_externally | string }}"
           traefik.http.routers.grafana.rule: "Host(`grafana.{{ ansible_nas_domain }}`) "
           traefik.http.routers.grafana.tls.certresolver: "letsencrypt"

@@ -35,7 +35,7 @@
           GROUP_ID: "{{ makemkv_group_id }}"
         labels:
           autoheal: "{{ makemkv_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ makemkv_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ makemkv_watchtower_enable }}"
           dockflare.enable: "{{ makemkv_dockflare_tunnel }}"
           dockflare.access.group: "{{ makemkv_dockflare_access_group }}"
           dockflare.hostname: "{{ makemkv_hostname }}.{{ ansible_nas_domain }}"
@@ -48,7 +48,7 @@
           homepage.description: "{{ 'Backup your Bluray and DVD discs' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ makemkv_container_name }}"
-          homepage.showStats: "{{ makemkv_homepage_showStats }}"
+          homepage.showStats: "{{ makemkv_homepage_showstats }}"
           traefik.enable: "{{ makemkv_available_externally | string }}"
           traefik.http.routers.makemkv.rule: "Host(`makemkv.{{ ansible_nas_domain }}`)"
           traefik.http.routers.makemkv.tls.certresolver: "letsencrypt"

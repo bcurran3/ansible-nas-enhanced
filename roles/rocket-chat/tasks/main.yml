@@ -53,7 +53,7 @@
 #         - "{{ rocketchat_data_directory }}/mongodb/dump:/dump"
         labels:
           autoheal: "{{ rocketchat_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ rocketchat_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ rocketchat_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ rocketchat_db_homepage_group }}"
@@ -62,7 +62,7 @@
           homepage.description: "{{ 'The MongoDB Database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ rocketchat_db_container_name }}"
-          homepage.showStats: "{{ rocketchat_db_homepage_showStats }}"
+          homepage.showStats: "{{ rocketchat_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -99,7 +99,7 @@
           - "{{ rocketchat_data_directory }}/uploads:/app/uploads"
         labels:
           autoheal: "{{ rocketchat_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ rocketchat_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ rocketchat_watchtower_enable }}"
           dockflare.enable: "{{ rocketchat_dockflare_tunnel }}"
           dockflare.access.group: "{{ rocketchat_dockflare_access_group }}"
           dockflare.hostname: "{{ rocketchat_hostname }}.{{ ansible_nas_domain }}"
@@ -112,7 +112,7 @@
           homepage.description: "{{ 'The communications platform that puts data protection first.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ rocketchat_container_name }}"
-          homepage.showStats: "{{ rocketchat_homepage_showStats }}"
+          homepage.showStats: "{{ rocketchat_homepage_showstats }}"
           traefik.enable: "{{ rocketchat_available_externally | string }}"
           traefik.http.routers.rocketchat.rule: "Host(`rocketchat.{{ ansible_nas_domain }}`)"
           traefik.http.routers.rocketchat.tls.certresolver: "letsencrypt"

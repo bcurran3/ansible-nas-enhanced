@@ -26,7 +26,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ grocy_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ grocy_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ grocy_watchtower_enable }}"
           dockflare.enable: "{{ grocy_dockflare_tunnel }}"
           dockflare.access.group: "{{ grocy_dockflare_access_group }}"
           dockflare.hostname: "{{ grocy_hostname }}.{{ ansible_nas_domain }}"
@@ -39,7 +39,7 @@
           homepage.description: "{{ 'ERP beyond your fridge - Grocy is a web-based self-hosted groceries & household management solution for your home' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ grocy_container_name }}"
-          homepage.showStats: "{{ grocy_homepage_showStats }}"
+          homepage.showStats: "{{ grocy_homepage_showstats }}"
           traefik.enable: "{{ grocy_available_externally | string }}"
           traefik.http.routers.grocy.rule: "Host(`grocy.{{ ansible_nas_domain }}`)"
           traefik.http.routers.grocy.tls.certresolver: "letsencrypt"

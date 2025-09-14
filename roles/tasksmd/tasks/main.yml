@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ tasksmd_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ tasksmd_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ tasksmd_watchtower_enable }}"
           dockflare.enable: "{{ tasksmd_dockflare_tunnel }}"
           dockflare.access.group: "{{ tasksmd_dockflare_access_group }}"
           dockflare.hostname: "{{ tasksmd_hostname }}.{{ ansible_nas_domain }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'a self-hosted, Markdown file based task management board' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tasksmd_container_name }}"
-          homepage.showStats: "{{ tasksmd_homepage_showStats }}"
+          homepage.showStats: "{{ tasksmd_homepage_showstats }}"
           traefik.enable: "{{ tasksmd_available_externally | string }}"
           traefik.http.routers.tasksmd.rule: "Host(`{{ tasksmd_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tasksmd.tls.certresolver: "letsencrypt"

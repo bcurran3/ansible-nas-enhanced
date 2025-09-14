@@ -48,7 +48,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ invoiceninja_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ invoiceninja_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ invoiceninja_db_homepage_group }}"
@@ -57,7 +57,7 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ invoiceninja_db_container_name }}"
-          homepage.showStats: "{{ invoiceninja_db_homepage_showStats }}"
+          homepage.showStats: "{{ invoiceninja_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -120,7 +120,7 @@
           - "{{ invoiceninja_db_container_name }}"
         labels:
           autoheal: "{{ invoiceninja_app_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_app_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ invoiceninja_app_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ invoiceninja_app_homepage_group }}"
@@ -129,7 +129,7 @@
           homepage.description: "{{ 'A source-available invoice, quote, project and time-tracking app built with Laravel' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ invoiceninja_app_container_name }}"
-          homepage.showStats: "{{ invoiceninja_app_homepage_showStats }}"
+          homepage.showStats: "{{ invoiceninja_app_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -161,7 +161,7 @@
           - "{{ invoiceninja_db_container_name }}"
         labels:
           autoheal: "{{ invoiceninja_web_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ invoiceninja_web_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ invoiceninja_web_watchtower_enable }}"
           dockflare.enable: "{{ invoiceninja_dockflare_tunnel }}"
           dockflare.access.group: "{{ invoiceninja_dockflare_access_group }}"
           dockflare.hostname: "{{ invoiceninja_hostname }}.{{ ansible_nas_domain }}"
@@ -174,7 +174,7 @@
           homepage.description: "{{ 'the world''s most popular Web Server' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ invoiceninja_web_container_name }}"
-          homepage.showStats: "{{ invoiceninja_web_homepage_showStats }}"
+          homepage.showStats: "{{ invoiceninja_web_homepage_showstats }}"
           traefik.enable: "{{ invoiceninja_available_externally | string }}"
           traefik.http.routers.invoiceninja.rule: "Host(`invoiceninja.{{ ansible_nas_domain }}`)"
           traefik.http.routers.invoiceninja.tls.certresolver: "letsencrypt"

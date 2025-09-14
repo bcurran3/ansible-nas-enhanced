@@ -24,7 +24,7 @@
         command: "-input /traefik.json -outdir /target -pem -pkcs -watch"
         labels:
           autoheal: "{{ acmenator_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ acmenator_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ acmenator_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.group: "{{ acmenator_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
@@ -32,7 +32,7 @@
           homepage.description: "{{ 'Convert Traefik certs to PEM or p12' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ acmenator_container_name }}"
-          homepage.showStats: "{{ acmenator_homepage_showStats }}"
+          homepage.showStats: "{{ acmenator_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ glpi_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ glpi_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ glpi_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ glpi_db_homepage_group }}"
@@ -37,7 +37,7 @@
           homepage.description: "{{ 'MariaDB' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ glpi_db_container_name }}"
-          homepage.showStats: "{[ glpi_db_homepage_showStats ]}"
+          homepage.showStats: "{[ glpi_db_homepage_showstats ]}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/linuxserver/docker-mariadb/releases/tag/$${major}.$${minor}.$${patch}"
@@ -65,7 +65,7 @@
           - "{{ glpi_db_container_name }}"
         labels:
           autoheal: "{{ glpi_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ glpi_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ glpi_watchtower_enable }}"
           dockflare.enable: "{{ glpi_dockflare_tunnel }}"
           dockflare.access.group: "{{ glpi_dockflare_access_group }}"
           dockflare.hostname: "{{ glpi_hostname }}.{{ ansible_nas_domain }}"
@@ -78,7 +78,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ glpi_container_name }}"
-          homepage.showStats: "{[ glpi_homepage_showStats ]}"
+          homepage.showStats: "{[ glpi_homepage_showstats ]}"
           traefik.enable: "{{ glpi_available_externally | string }}"
           traefik.http.routers.glpi.rule: "Host(`glpi.{{ ansible_nas_domain }}`)"
           traefik.http.routers.glpi.tls.certresolver: "letsencrypt"

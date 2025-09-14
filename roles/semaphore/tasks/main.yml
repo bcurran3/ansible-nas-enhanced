@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ semaphore_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ semaphore_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ semaphore_watchtower_enable }}"
           dockflare.enable: "{{ semaphore_dockflare_tunnel }}"
           dockflare.access.group: "{{ semaphore_dockflare_access_group }}"
           dockflare.hostname: "{{ semaphore_hostname }}.{{ ansible_nas_domain }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'Modern UI and powerful API for Ansible, Terraform, OpenTofu, PowerShell and other DevOps tools.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ semaphore_container_name }}"
-          homepage.showStats: "{{ semaphore_homepage_showStats }}"
+          homepage.showStats: "{{ semaphore_homepage_showstats }}"
           traefik.enable: "{{ semaphore_available_externally | string }}"
           traefik.http.routers.semaphore.rule: "Host(`{{ semaphore_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.semaphore.tls.certresolver: "letsencrypt"

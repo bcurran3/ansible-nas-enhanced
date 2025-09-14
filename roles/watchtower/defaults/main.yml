@@ -5,44 +5,41 @@ watchtower_enabled: false
 watchtower_available_externally: "false"
 watchtower_traefik_whitelist: "{{ lan }}"
 
-# Sets the 6 field cron schedule to use for checks and updates. This will check at 5am daily.
-watchtower_cron_schedule: 0 0 5 * * *
+watchtower_hostname: "watchtower"
+#watchtower_port: "2347"
 
-# Sets the Watchtower Docker start command. Different options can be supplied based on whether you want to receive
-# notifications or not, some examples are provided below. See https://containrrr.dev/watchtower/arguments/ for more options.
-
-# No notifications
-watchtower_command: "--schedule '{{ watchtower_cron_schedule }}'"
-
-# Email notifications
-# watchtower_command: "--schedule '{{ watchtower_cron_schedule }}' --notifications 'email' --notification-email-from 'ansible@nas.com' --notification-email-to '{{ ansible_nas_email }}' --notification-email-server 'my.email.server.com' --notification-email-server-port '25' --notification-email-server-user 'email_username' --notification-email-server-password 'top-secret'"
-
-# Slack notifications
-# watchtower_command: "--schedule '{{ watchtower_cron_schedule }}' --notifications 'slack' --notification-slack-hook-url 'https://hooks.slack.com/services/xxx/yyyyyyyyyyyyyyy' --notification-slack-identifier 'ansible-nas'"
-
-# specs
-watchtower_cpu_shares: 1024
-watchtower_memory: 1g
-
+# docker
 watchtower_container_name: "watchtower"
 watchtower_image_name: "containrrr/watchtower"
 watchtower_image_version: "latest"
+watchtower_cpu_shares: 1024
+watchtower_memory: 256MB
 
 # app
-watchtower_hostname: "watchtower"
-watchtower_port: "2347"
 # REF - https://containrrr.github.io/watchtower/arguments/
+watchtower_docker_config: "/home/{{ ansible_nas_user }}/.docker/config.json"
 watchtower_cleanup: "true"
 watchtower_remove_volumes: "true"
 watchtower_debug: "true"
 watchtower_include_stopped: "false"
 watchtower_revive_stopped: "false"
 # watchtower_poll_interval: "0" # "Only schedule or interval can be defined, not both."
-watchtower_monitor_only: "false"
+watchtower_enable: "false"
 watchtower_no_restart: "false"
 watchtower_no_pull: "false"
+watchtower_rolling_restart: "false"
 watchtower_schedule: "0 0 5 * * *"
 watchtower_timeout: "10"
+# Sets the 6 field cron schedule to use for checks and updates. This will check at 5am daily.
+watchtower_cron_schedule: 0 0 5 * * *
+# Sets the Watchtower Docker start command. Different options can be supplied based on whether you want to receive
+# notifications or not, some examples are provided below. See https://containrrr.dev/watchtower/arguments/ for more options.
+# No notifications
+watchtower_command: "--schedule '{{ watchtower_cron_schedule }}'"
+# Email notifications
+# watchtower_command: "--schedule '{{ watchtower_cron_schedule }}' --notifications 'email' --notification-email-from 'ansible@nas.com' --notification-email-to '{{ ansible_nas_email }}' --notification-email-server 'my.email.server.com' --notification-email-server-port '25' --notification-email-server-user 'email_username' --notification-email-server-password 'top-secret'"
+# Slack notifications
+# watchtower_command: "--schedule '{{ watchtower_cron_schedule }}' --notifications 'slack' --notification-slack-hook-url 'https://hooks.slack.com/services/xxx/yyyyyyyyyyyyyyy' --notification-slack-identifier 'ansible-nas'"
 # REF https://containrrr.github.io/watchtower/notifications/
 watchtower_notifications: "" # email, gotify, slack, or msteams
 watchtower_notification_email_from: "fromaddress@domain.com"
@@ -67,11 +64,11 @@ watchtower_notifications_slack_icon_url: "http://somewhere.com/icon.png"
 watchtower_autoheal: "false"
 
 # homepage
-watchtower_homepage_group: "Apps"
+watchtower_homepage_group: "Misc"
 watchtower_homepage_icon: "watchtower.png"
 #watchtower_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port }}"
-watchtower_homepage_showStats: "false"
-watchtower_api_token: "123456789"
+#watchtower_homepage_showstats: "false"
+#watchtower_api_token: "123456789"
 
 # watchtower
-watchtower_watchtower_monitor_only: "true"
+watchtower_watchtower_enable: "false"

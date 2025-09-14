@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ kavita_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ kavita_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ kavita_watchtower_enable }}"
           dockflare.enable: "{{ kavita_dockflare_tunnel }}"
           dockflare.access.group: "{{ kavita_dockflare_access_group }}"
           dockflare.hostname: "{{ kavita_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'a fast, feature rich, cross platform reading server.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ kavita_container_name }}"
-          homepage.showStats: "{{ kavita_homepage_showStats }}"
+          homepage.showStats: "{{ kavita_homepage_showstats }}"
           traefik.enable: "{{ kavita_available_externally | string }}"
           traefik.http.routers.kavita.rule: "Host(`{{ kavita_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.kavita.tls.certresolver: "letsencrypt"

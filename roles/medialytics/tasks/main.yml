@@ -17,7 +17,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ medialytics_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ medialytics_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ medialytics_watchtower_enable }}"
           dockflare.enable: "{{ medialytics_dockflare_tunnel }}"
           dockflare.access.group: "{{ medialytics_dockflare_access_group }}"
           dockflare.hostname: "{{ medialytics_hostname }}.{{ ansible_nas_domain }}"
@@ -30,7 +30,7 @@
           homepage.description: "{{ 'A basic, free tool that shows information about Plex Media Server content' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ medialytics_container_name }}"
-          homepage.showStats: "{{ medialytics_homepage_showStats }}"
+          homepage.showStats: "{{ medialytics_homepage_showstats }}"
           traefik.enable: "{{ medialytics_available_externally | string }}"
           traefik.http.routers.medialytics.rule: "Host(`{{ medialytics_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.medialytics.tls.certresolver: "letsencrypt"

@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ freshrss_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ freshrss_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.group: "{{ freshrss_db_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
@@ -36,7 +36,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ freshrss_db_container_name }}"
-          homepage.showStats: "{{ freshrss_db_homepage_showStats }}"
+          homepage.showStats: "{{ freshrss_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^16\.\d+(\.\d+)?-alpine.*$'
           wud.tag.transform.type: "semver"
@@ -68,7 +68,7 @@
           - "{{ freshrss_db_container_name }}"
         labels:
           autoheal: "{{ freshrss_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ freshrss_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ freshrss_watchtower_enable }}"
           dockflare.enable: "{{ freshrss_dockflare_tunnel }}"
           dockflare.access.group: "{{ freshrss_dockflare_access_group }}"
           dockflare.hostname: "{{ freshrss_hostname }}.{{ ansible_nas_domain }}"
@@ -81,7 +81,7 @@
           homepage.description: "{{ 'A free, self-hostable news aggregator.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ freshrss_container_name }}"
-          homepage.showStats: "{{ freshrss_homepage_showStats }}"
+          homepage.showStats: "{{ freshrss_homepage_showstats }}"
           homepage.widget.type: "freshrss"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
           homepage.widget.username: "{{ freshrss_homepage_widget_username }}"

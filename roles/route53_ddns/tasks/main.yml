@@ -26,7 +26,7 @@
           - "{{ route53_data_directory }}/ddns-route53.yml:/etc/ddns-route53/ddns-route53.yml"
         labels:
           autoheal: "{{ route53_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ route53_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ route53_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ route53_homepage_group }}"
@@ -34,7 +34,7 @@
           homepage.description: "{{ 'route53 description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ route53_container_name }}"
-          homepage.showStats: "{{ route53_homepage_showStats }}"
+          homepage.showStats: "{{ route53_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ openeats_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ openeats_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ openeats_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ openeats_db_homepage_group }}"
@@ -35,7 +35,7 @@
           homepage.description: "{{ 'The innovative open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_db_container_name }}"
-          homepage.showStats: "{{ openeats_db_homepage_showStats }}"
+          homepage.showStats: "{{ openeats_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -63,7 +63,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ openeats_api_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ openeats_api_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ openeats_api_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} API"
           homepage.group: "{{ openeats_api_homepage_group }}"
@@ -71,7 +71,7 @@
           homepage.description: "{{ 'OpenEats API' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_api_container_name }}"
-          homepage.showStats: "{{ openeats_api_homepage_showStats }}"
+          homepage.showStats: "{{ openeats_api_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -97,7 +97,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ openeats_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ openeats_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ openeats_watchtower_enable }}"
           dockflare.enable: "{{ openeats_dockflare_tunnel }}"
           dockflare.access.group: "{{ openeats_dockflare_access_group }}"
           dockflare.hostname: "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
@@ -110,7 +110,7 @@
           homepage.description: "{{ 'Self Hosted Recipe Management App' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_container_name }}"
-          homepage.showStats: "{{ openeats_homepage_showStats }}"
+          homepage.showStats: "{{ openeats_homepage_showstats }}"
           traefik.enable: "{{ openeats_available_externally | string }}"
           traefik.http.routers.openeats.rule: "Host(`openeats.{{ ansible_nas_domain }}`)"
           traefik.http.routers.openeats.tls.certresolver: "letsencrypt"

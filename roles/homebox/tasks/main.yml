@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ homebox_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ homebox_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ homebox_watchtower_enable }}"
           dockflare.enable: "{{ homebox_dockflare_tunnel }}"
           dockflare.access.group: "{{ homebox_dockflare_access_group }}"
           dockflare.hostname: "{{ homebox_hostname }}.{{ ansible_nas_domain }}"
@@ -42,7 +42,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ homebox_container_name }}"
-          homepage.showStats: "{{ homebox_homepage_showStats }}"
+          homepage.showStats: "{{ homebox_homepage_showstats }}"
           traefik.enable: "{{ homebox_available_externally | string }}"
           traefik.http.routers.homebox.rule: "Host(`homebox.{{ ansible_nas_domain }}`)"
           traefik.http.routers.homebox.tls.certresolver: "letsencrypt"

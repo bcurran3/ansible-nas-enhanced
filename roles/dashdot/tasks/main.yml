@@ -16,7 +16,7 @@
         network_mode: bridge
         labels:
           autoheal: "{{ dashdot_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ dashdot_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ dashdot_watchtower_enable }}"
           dockflare.enable: "{{ dashdot_dockflare_tunnel }}"
           dockflare.access.group: "{{ dashdot_dockflare_access_group }}"
           dockflare.hostname: "{{ dashdot_hostname }}.{{ ansible_nas_domain }}"
@@ -29,7 +29,7 @@
           homepage.description: "{{ 'A simple, modern server dashboard, primarily used by smaller private servers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dashdot_container_name }}"
-          homepage.showStats: "{{ dashdot_homepage_showStats }}"
+          homepage.showStats: "{{ dashdot_homepage_showstats }}"
           traefik.enable: "{{ dashdot_available_externally | string }}"
           traefik.http.routers.dashdot.rule: "Host(`{{ dashdot_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.dashdot.tls.certresolver: "letsencrypt"

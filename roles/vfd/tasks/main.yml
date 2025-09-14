@@ -34,7 +34,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ vfd_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ vfd_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ vfd_watchtower_enable }}"
           dockflare.enable: "{{ vfd_dockflare_tunnel }}"
           dockflare.access.group: "{{ vfd_dockflare_access_group }}"
           dockflare.hostname: "{{ vfd_hostname }}.{{ ansible_nas_domain }}"
@@ -47,7 +47,7 @@
           homepage.description: "{{ 'VFD is a small service that tracks the price of flights on Google Flights, stores the historical data, allows you to view it in a simple web interface, and sends notifications when there is a new best price.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vfd_container_name }}"
-          homepage.showStats: "{{ vfd_homepage_showStats }}"
+          homepage.showStats: "{{ vfd_homepage_showstats }}"
           traefik.enable: "{{ vfd_available_externally | string }}"
           traefik.http.routers.vfd.rule: "Host(`{{ vfd_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.vfd.tls.certresolver: "letsencrypt"

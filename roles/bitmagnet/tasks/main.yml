@@ -33,7 +33,7 @@
           interval: 10s
         labels:
           autoheal: "{{ bitmagnet_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ bitmagnet_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ bitmagnet_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ bitmagnet_db_homepage_group }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'PostgreSQL' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ bitmagnet_db_container_name }}"
-          homepage.showStats: "{{ bitmagnet_db_homepage_showStats }}"
+          homepage.showStats: "{{ bitmagnet_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/postgres/postgres/tag/$${major}.$${minor}.$${patch}"
@@ -73,7 +73,7 @@
         command: worker run --keys=http_server --keys=queue_server --keys=dht_crawler
         labels:
           autoheal: "{{ bitmagnet_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ bitmagnet_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ bitmagnet_watchtower_enable }}"
           dockflare.enable: "{{ bitmagnet_dockflare_tunnel }}"
           dockflare.access.group: "{{ bitmagnet_dockflare_access_group }}"
           dockflare.hostname: "{{ bitmagnet_hostname }}.{{ ansible_nas_domain }}"
@@ -86,7 +86,7 @@
           homepage.description: "{{ 'A self-hosted BitTorrent indexer, DHT crawler, content classifier and torrent search engine with web UI, GraphQL API and Servarr stack integration.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ bitmagnet_container_name }}"
-          homepage.showStats: "{{ bitmagnet_homepage_showStats }}"
+          homepage.showStats: "{{ bitmagnet_homepage_showstats }}"
           traefik.enable: "{{ bitmagnet_available_externally | string }}"
           traefik.http.routers.bitmagnet.rule: "Host(`{{ bitmagnet_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.bitmagnet.tls.certresolver: "letsencrypt"

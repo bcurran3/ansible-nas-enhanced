@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ doublecommander_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ doublecommander_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ doublecommander_watchtower_enable }}"
           dockflare.enable: "{{ doublecommander_dockflare_tunnel }}"
           dockflare.access.group: "{{ doublecommander_dockflare_access_group }}"
           dockflare.hostname: "{{ doublecommander_hostname }}.{{ ansible_nas_domain }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'Double Commander is a free cross platform open source file manager with two panels side by side.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ doublecommander_container_name }}"
-          homepage.showStats: "{{ doublecommander_homepage_showStats }}"
+          homepage.showStats: "{{ doublecommander_homepage_showstats }}"
           traefik.enable: "{{ doublecommander_available_externally | string }}"
           traefik.http.routers.doublecommander.rule: "Host(`doublecommander.{{ ansible_nas_domain }}`)"
           traefik.http.routers.doublecommander.tls.certresolver: "letsencrypt"

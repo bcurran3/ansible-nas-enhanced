@@ -21,7 +21,7 @@
           - "/var/run/docker.sock:/var/run/docker.sock"
         labels:
           autoheal: "{{ tinyauth_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ tinyauth_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ tinyauth_watchtower_enable }}"
           dockflare.enable: "{{ tinyauth_dockflare_tunnel }}"
           dockflare.access.group: "{{ tinyauth_dockflare_access_group }}"
           dockflare.hostname: "{{ tinyauth_hostname }}.{{ ansible_nas_domain }}"
@@ -33,7 +33,7 @@
           homepage.description: "{{ 'The simplest way to protect your apps with a login screen.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tinyauth_container_name }}"
-          homepage.showStats: "{{ tinyauth_homepage_showStats }}"
+          homepage.showStats: "{{ tinyauth_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tinyauth_port }}"
           traefik.enable: "{{ tinyauth_available_externally | string }}"
           traefik.http.routers.tinyauth.rule: "Host(`{{ tinyauth_hostname }}.{{ ansible_nas_domain }}`)"

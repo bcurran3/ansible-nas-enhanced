@@ -15,7 +15,7 @@
           - "{{ chatpadai_port_http }}: 80"
         labels:
           autoheal: "{{ chatpadai_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ chatpadai_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ chatpadai_watchtower_enable }}"
           dockflare.enable: "{{ chatpadai_dockflare_tunnel }}"
           dockflare.access.group: "{{ chatpadai_dockflare_access_group }}"
           dockflare.hostname: "{{ chatpadai_hostname }}.{{ ansible_nas_domain }}"
@@ -28,7 +28,7 @@
           homepage.description: "{{ 'Not just another ChatGPT user-interface!' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ chatpadai_container_name }}"
-          homepage.showStats: "{{ chatpadai_homepage_showStats }}"
+          homepage.showStats: "{{ chatpadai_homepage_showstats }}"
           traefik.enable: "{{ chatpadai_available_externally | string }}"
           traefik.http.routers.chatpad.rule: "Host(`{{ chatpadai_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.chatpad.tls.certresolver: "letsencrypt"

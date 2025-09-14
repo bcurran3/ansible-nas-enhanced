@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ seedsync_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ seedsync_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ seedsync_watchtower_enable }}"
           dockflare.enable: "{{ seedsync_dockflare_tunnel }}"
           dockflare.access.group: "{{ seedsync_dockflare_access_group }}"
           dockflare.hostname: "{{ seedsync_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'Sync your seedbox. Fast. And more.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ seedsync_container_name }}"
-          homepage.showStats: "{{ seedsync_homepage_showStats }}"
+          homepage.showStats: "{{ seedsync_homepage_showstats }}"
           traefik.enable: "{{ seedsync_available_externally | string }}"
           traefik.http.routers.seedsync.rule: "Host(`{{ seedsync_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.seedsync.tls.certresolver: "letsencrypt"

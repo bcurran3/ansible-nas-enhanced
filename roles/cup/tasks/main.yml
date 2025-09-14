@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ cup_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ cup_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ cup_watchtower_enable }}"
           dockflare.enable: "{{ cup_dockflare_tunnel }}"
           dockflare.access.group: "{{ cup_dockflare_access_group }}"
           dockflare.hostname: "{{ cup_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'Docker container updates made easy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ cup_container_name }}"
-          homepage.showStats: "{{ cup_homepage_showStats }}"
+          homepage.showStats: "{{ cup_homepage_showstats }}"
           homepage.widget.type: "customapi"
           homepage.widget.url: "{{ cup_homepage_widget_url }}"
           homepage.widget.mappings[0].label: "Monitoring"

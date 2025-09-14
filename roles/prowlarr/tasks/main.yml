@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ prowlarr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ prowlarr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ prowlarr_watchtower_enable }}"
           dockflare.enable: "{{ prowlarr_dockflare_tunnel }}"
           dockflare.access.group: "{{ prowlarr_dockflare_access_group }}"
           dockflare.hostname: "{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'Indexer Proxy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ prowlarr_container_name }}"
-          homepage.showStats: "{{ prowlarr_homepage_showStats }}"
+          homepage.showStats: "{{ prowlarr_homepage_showstats }}"
           homepage.widget.type: "prowlarr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port }}"
           homepage.widget.key: "{{ prowlarr_homepage_widget_key }}"

@@ -29,7 +29,7 @@
           PGID: "{{ filebot_group_id }}"
         labels:
           autoheal: "{{ filebot_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enable }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -50,7 +50,7 @@
         volumes_from: filebot
         labels:
           autoheal: "{{ filebot_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enable }}"
           dockflare.enable: "{{ filebot_dockflare_tunnel }}"
           dockflare.access.group: "{{ filebot_dockflare_access_group }}"
           dockflare.hostname: "{{ filebot_hostname }}.{{ ansible_nas_domain }}"
@@ -63,7 +63,7 @@
 #         homepage.description: ""
           homepage.server: "my-docker"
           homepage.container: "{{ filebot_container_name }}"
-          homepage.showStats: "{{ filebot_homepage_showStats }}"
+          homepage.showStats: "{{ filebot_homepage_showstats }}"
           traefik.enable: "{{ filebot_available_externally | string }}"
           traefik.http.routers.filebot.rule: "Host(`filebot.{{ ansible_nas_domain }}`)"
           traefik.http.routers.filebot.tls.certresolver: "letsencrypt"
@@ -87,7 +87,7 @@
         volumes_from: filebot
         labels:
           autoheal: "{{ filebot_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ filebot_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enable }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'

@@ -29,7 +29,7 @@
           - "--indexer-addr=0.0.0.0:1212"
         labels:
           autoheal: "{{ magneticod_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ magnetico_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}d"
           homepage.group: "{{ magneticod_homepage_group }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'Autonomous (self-hosted) BitTorrent DHT search engine suite.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ magneticod_container_name }}"
-          homepage.showStats: "{{ magneticod_homepage_showStats }}"
+          homepage.showStats: "{{ magneticod_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -66,7 +66,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ magneticow_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ magnetico_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enable }}"
           dockflare.enable: "{{ magnetico_dockflare_tunnel }}"
           dockflare.access.group: "{{ magnetico_dockflare_access_group }}"
           dockflare.hostname: "{{ magnetico_hostname }}.{{ ansible_nas_domain }}"
@@ -79,7 +79,7 @@
           homepage.description: "{{ 'Autonomous (self-hosted) BitTorrent DHT search engine suite.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ magneticow_container_name }}"
-          homepage.showStats: "{{ magnetico_homepage_showStats }}"
+          homepage.showStats: "{{ magnetico_homepage_showstats }}"
           traefik.enable: "{{ magnetico_available_externally | string }}"
           traefik.http.routers.magnetico.rule: "Host(`magnetico.{{ ansible_nas_domain }}`)"
           traefik.http.routers.magnetico.tls.certresolver: "letsencrypt"

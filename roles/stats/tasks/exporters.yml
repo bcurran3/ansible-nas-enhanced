@@ -14,7 +14,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ stats_smartctl_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ stats_smartctl_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ stats_smartctl_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "prometheus-smartctl"
           homepage.group: "{{ stats_smartctl_homepage_group }}"
@@ -23,7 +23,7 @@
           homepage.description: "{{ 'HDD S.M.A.R.T exporter for Prometheus written in Python' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stats_smartctl_container_name }}"
-          homepage.showStats: "{{ stats_smartctl_homepage_showStats }}"
+          homepage.showStats: "{{ stats_smartctl_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -48,7 +48,7 @@
           - "/dev:/dev:ro"
         labels:
           autoheal: "{{ stats_hddtemp_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ stats_hddtemp_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ stats_hddtemp_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "HDDTemp"
           homepage.group: "{{ stats_hddtemp_homepage_group }}"
@@ -56,7 +56,7 @@
           homepage.description: "{{ 'Hard disk temperature tool' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stats_hddtemp_container_name }}"
-          homepage.showStats: "{{ stats_hddtemp_homepage_showStats }}"
+          homepage.showStats: "{{ stats_hddtemp_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -77,7 +77,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ stats_speedtest_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ stats_speedtest_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ stats_speedtest_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "Speedtest-Exporter"
           homepage.group: "{{ stats_speedtest_homepage_group }}"
@@ -86,7 +86,7 @@
           homepage.description: "{{ 'Speedtest Exporter made in python using the official speedtest bin' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stats_speedtest_container_name }}"
-          homepage.showStats: "{{ stats_speedtest_homepage_showStats }}"
+          homepage.showStats: "{{ stats_speedtest_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

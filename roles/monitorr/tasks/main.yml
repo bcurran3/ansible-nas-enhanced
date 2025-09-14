@@ -27,7 +27,7 @@
           PGID: "{{ monitorr_group_id }}"
         labels:
           autoheal: "{{ monitorr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ monitorr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ monitorr_watchtower_enable }}"
           dockflare.enable: "{{ monitorr_dockflare_tunnel }}"
           dockflare.access.group: "{{ monitorr_dockflare_access_group }}"
           dockflare.hostname: "{{ monitorr_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'a self-hosted PHP web app that monitors the status of local and remote network services, websites, and applications' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ monitorr_container_name }}"
-          homepage.showStats: "{{ monitorr_homepage_showStats }}"
+          homepage.showStats: "{{ monitorr_homepage_showstats }}"
           traefik.enable: "{{ monitorr_available_externally | string }}"
           traefik.http.routers.monitorr.rule: "Host(`monitorr.{{ ansible_nas_domain }}`)"
           traefik.http.routers.monitorr.tls.certresolver: "letsencrypt"

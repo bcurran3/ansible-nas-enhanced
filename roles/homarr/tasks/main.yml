@@ -25,7 +25,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ homarr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ homarr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ homarr_watchtower_enable }}"
           dockflare.enable: "{{ homarr_dockflare_tunnel }}"
           dockflare.access.group: "{{ homarr_dockflare_access_group }}"
           dockflare.hostname: "{{ homarr_hostname }}.{{ ansible_nas_domain }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'A modern and easy to use dashboard.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ homarr_container_name }}"
-          homepage.showStats: "{{ homarr_homepage_showStats }}"
+          homepage.showStats: "{{ homarr_homepage_showstats }}"
           traefik.enable: "{{ homarr_available_externally | string }}"
           traefik.http.routers.homarr.rule: "Host(`homarr.{{ ansible_nas_domain }}`)"
           traefik.http.routers.homarr.tls.certresolver: "letsencrypt"

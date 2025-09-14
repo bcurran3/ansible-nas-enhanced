@@ -39,7 +39,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ apcupsd_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ apcupsd_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ apcupsd_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ apcupsd_homepage_group }}"
@@ -47,7 +47,7 @@
           homepage.description: "{{ 'Dockerize apcupsd' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ apcupsd_container_name }}"
-          homepage.showStats: "{{ apcupsd_homepage_showStats }}"
+          homepage.showStats: "{{ apcupsd_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

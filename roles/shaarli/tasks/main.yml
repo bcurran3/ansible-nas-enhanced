@@ -26,7 +26,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ shaarli_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ shaarli_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ shaarli_watchtower_enable }}"
           dockflare.enable: "{{ shaarli_dockflare_tunnel }}"
           dockflare.access.group: "{{ shaarli_dockflare_access_group }}"
           dockflare.hostname: "{{ shaarli_hostname }}.{{ ansible_nas_domain }}"
@@ -39,7 +39,7 @@
           homepage.description: "{{ 'The personal, minimalist, super-fast, database free, bookmarking service' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ shaarli_container_name }}"
-          homepage.showStats: "{{ shaarli_homepage_showStats }}"
+          homepage.showStats: "{{ shaarli_homepage_showstats }}"
           traefik.enable: "{{ shaarli_available_externally | string }}"
           traefik.http.routers.shaarli.rule: "Host(`shaarli.{{ ansible_nas_domain }}`)"
           traefik.http.routers.shaarli.tls.certresolver: "letsencrypt"

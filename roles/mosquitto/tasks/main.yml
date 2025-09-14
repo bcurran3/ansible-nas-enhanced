@@ -33,7 +33,7 @@
         restart_policy: unless-stopped
         labels:
           autoheal: "{{ mosquitto_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ mosquitto_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ mosquitto_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mosquitto_homepage_group }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'An open source MQTT broker' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mosquitto_container_name }}"
-          homepage.showStats: "{{ mosquitto_homepage_showStats }}"
+          homepage.showStats: "{{ mosquitto_homepage_showstats }}"
           traefik_enabled: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

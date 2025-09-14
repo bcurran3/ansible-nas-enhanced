@@ -33,7 +33,7 @@
           - "{{ ghost_data_directory }}/db:/var/lib/mysql"
         labels:
           autoheal: "{{ ghost_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ ghost_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ ghost_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ ghost_db_homepage_group }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ghost_db_container_name }}"
-          homepage.showStats: "{{ ghost_db_homepage_showStats }}"
+          homepage.showStats: "{{ ghost_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
@@ -84,7 +84,7 @@
           - "{{ ghost_db_container_name }}"
         labels:
           autoheal: "{{ ghost_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ ghost_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ ghost_watchtower_enable }}"
           dockflare.enable: "{{ ghost_dockflare_tunnel }}"
           dockflare.access.group: "{{ ghost_dockflare_access_group }}"
           dockflare.hostname: "{{ ghost_hostname }}.{{ ansible_nas_domain }}"
@@ -97,7 +97,7 @@
           homepage.description: "{{ 'Independent technology for modern publishing, memberships, subscriptions and newsletters.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ghost_container_name }}"
-          homepage.showStats: "{{ ghost_homepage_showStats }}"
+          homepage.showStats: "{{ ghost_homepage_showstats }}"
           traefik.enable: "{{ ghost_available_externally | string }}"
           traefik.http.routers.ghost.rule: "Host(`{{ ghost_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ghost.tls.certresolver: "letsencrypt"

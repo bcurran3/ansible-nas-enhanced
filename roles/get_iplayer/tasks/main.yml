@@ -23,7 +23,7 @@
           - "{{ get_iplayer_port }}:8181"
         labels:
           autoheal: "{{ get_iplayer_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ get_iplayer_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ get_iplayer_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ get_iplayer_homepage_group }}"
@@ -31,7 +31,7 @@
           homepage.description: "{{ 'get_iplayer description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ get_iplayer_container_name }}"
-          homepage.showStats: "{{ get_iplayer_homepage_showStats }}"
+          homepage.showStats: "{{ get_iplayer_homepage_showstats }}"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/kolonuk/get_iplayer"

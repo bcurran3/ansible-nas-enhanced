@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ whisparr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ whisparr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ whisparr_watchtower_enable }}"
           dockflare.enable: "{{ whisparr_dockflare_tunnel }}"
           dockflare.access.group: "{{ whisparr_dockflare_access_group }}"
           dockflare.hostname: "{{ whisparr_hostname }}.{{ ansible_nas_domain }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'Whisparr is an adult movie collection manager for Usenet and BitTorrent users.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ whisparr_container_name }}"
-          homepage.showStats: "{{ whisparr_homepage_showStats }}"
+          homepage.showStats: "{{ whisparr_homepage_showstats }}"
           traefik.enable: "{{ whisparr_available_externally | string }}"
           traefik.http.routers.whisparr.rule: "Host(`{{ whisparr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.whisparr.tls.certresolver: "letsencrypt"

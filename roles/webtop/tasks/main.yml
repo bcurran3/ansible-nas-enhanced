@@ -32,7 +32,7 @@
           - seccomp:unconfined          #optional
         labels:
           autoheal: "{{ webtop_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ webtop_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ webtop_watchtower_enable }}"
           dockflare.enable: "{{ webtop_dockflare_tunnel }}"
           dockflare.access.group: "{{ webtop_dockflare_access_group }}"
           dockflare.hostname: "{{ webtop_hostname }}.{{ ansible_nas_domain }}"
@@ -45,7 +45,7 @@
           homepage.description: "{{ 'Ubuntu, Alpine, Arch, and Fedora based Webtop images, Linux in a web browser supporting popular desktop environments.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ webtop_container_name }}"
-          homepage.showStats: "{{ webtop_homepage_showStats }}"
+          homepage.showStats: "{{ webtop_homepage_showstats }}"
           traefik.enable: "{{ webtop_available_externally | string }}"
           traefik.http.routers.webtop.rule: "Host(`{{ webtop_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.webtop.tls.certresolver: "letsencrypt"

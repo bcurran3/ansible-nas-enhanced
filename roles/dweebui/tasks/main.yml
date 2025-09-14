@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ dweebui_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ dweebuit_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ dweebuit_watchtower_enable }}"
           dockflare.enable: "{{ dweebui_dockflare_tunnel }}"
           dockflare.access.group: "{{ dweebui_dockflare_access_group }}"
           dockflare.hostname: "{{ dweebui_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'DweebUI is a WebUI for managing your containers. Simple setup, a dynamically updating dashboard, and a multi-user permission system.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dweebui_container_name }}"
-          homepage.showStats: "{{ dweebui_homepage_showStats }}"
+          homepage.showStats: "{{ dweebui_homepage_showstats }}"
           traefik.enable: "{{ dweebui_available_externally | string }}"
           traefik.http.routers.dweebui.rule: "Host(`{{ dweebui_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.dweebui.tls.certresolver: "letsencrypt"

@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ ollama_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ ollama_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ ollama_watchtower_enable }}"
           dockflare.enable: "{{ ollama_dockflare_tunnel }}"
           dockflare.access.group: "{{ ollama_dockflare_access_group }}"
           dockflare.hostname: "{{ ollama_hostname }}.{{ ansible_nas_domain }}"
@@ -42,7 +42,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ollama_container_name }}"
-          homepage.showStats: "{{ ollama_homepage_showStats }}"
+          homepage.showStats: "{{ ollama_homepage_showstats }}"
           traefik.enable: "{{ ollama_available_externally | string }}"
           traefik.http.routers.ollama.rule: "Host(`ollama.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ollama.tls.certresolver: "letsencrypt"

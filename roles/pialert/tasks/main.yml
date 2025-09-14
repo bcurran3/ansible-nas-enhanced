@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ pialert_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ pialert_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ pialert_watchtower_enable }}"
           dockflare.enable: "{{ pialert_dockflare_tunnel }}"
           dockflare.access.group: "{{ pialert_dockflare_access_group }}"
           dockflare.hostname: "{{ pialert_hostname }}.{{ ansible_nas_domain }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'pialert' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pialert_container_name }}"
-          homepage.showStats: "{{ pialert_homepage_showStats }}"
+          homepage.showStats: "{{ pialert_homepage_showstats }}"
           traefik.enable: "{{ pialert_available_externally | string }}"
           traefik.http.routers.pialert.rule: "Host(`{{ pialert_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pialert.tls.certresolver: "letsencrypt"

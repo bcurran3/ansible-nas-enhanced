@@ -33,7 +33,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ lidarr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ lidarr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ lidarr_watchtower_enable }}"
           dockflare.enable: "{{ lidarr_dockflare_tunnel }}"
           dockflare.access.group: "{{ lidarr_dockflare_access_group }}"
           dockflare.hostname: "{{ lidarr_hostname }}.{{ ansible_nas_domain }}"
@@ -46,7 +46,7 @@
           homepage.description: "{{ 'a music collection manager' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ lidarr_container_name }}"
-          homepage.showStats: "{{ lidarr_homepage_showStats }}"
+          homepage.showStats: "{{ lidarr_homepage_showstats }}"
           homepage.widget.type: "lidarr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port }}"
           homepage.widget.key: "{{ lidarr_homepage_widget_key }}"

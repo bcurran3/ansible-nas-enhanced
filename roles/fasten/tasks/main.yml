@@ -26,7 +26,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ fasten_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ fasten_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ fasten_watchtower_enable }}"
           dockflare.enable: "{{ fasten_dockflare_tunnel }}"
           dockflare.access.group: "{{ fasten_dockflare_access_group }}"
           dockflare.hostname: "{{ fasten_hostname }}.{{ ansible_nas_domain }}"
@@ -39,7 +39,7 @@
           homepage.description: "{{ 'Fasten is an open-source, self-hosted, personal/family electronic medical record aggregator, designed to integrate with 100,000's of insurances/hospitals/clinic' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ fasten_container_name }}"
-          homepage.showStats: "{{ fasten_homepage_showStats }}"
+          homepage.showStats: "{{ fasten_homepage_showstats }}"
           traefik.enable: "{{ fasten_available_externally | string }}"
           traefik.http.routers.fasten.rule: "Host(`{{ fasten_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.fasten.tls.certresolver: "letsencrypt"

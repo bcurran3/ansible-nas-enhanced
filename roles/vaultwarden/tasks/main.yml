@@ -39,7 +39,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ vaultwarden_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ vaultwarden_watchtower_enable }}"
           dockflare.enable: "{{ vaultwarden_dockflare_tunnel }}"
           dockflare.access.group: "{{ vaultwarden_dockflare_access_group }}"
           dockflare.hostname: "{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
@@ -52,7 +52,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vaultwarden_container_name }}"
-          homepage.showStats: "{{ vaultwarden_homepage_showStats }}"
+          homepage.showStats: "{{ vaultwarden_homepage_showstats }}"
           traefik.enable: "{{ vaultwarden_available_externally | string }}"
           traefik.http.routers.vaultwarden.rule: "Host(`{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.vaultwarden.tls.certresolver: "letsencrypt"
@@ -107,7 +107,7 @@
           - "{{ vaultwarden_container_name }}"
         labels:
           autoheal: "{{ vaultwarden_backup_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ vaultwarden_backup_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ vaultwarden_backup_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Backup"
           homepage.group: "{{ vaultwarden_backup_homepage_group }}"
@@ -116,7 +116,7 @@
           homepage.description: "{{ 'A simple cron powered backup image for vaultwarden.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vaultwarden_backup_container_name }}"
-          homepage.showStats: "{{ vaultwarden_backup_homepage_showStats }}"
+          homepage.showStats: "{{ vaultwarden_backup_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"

@@ -33,7 +33,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ localai_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ localai_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ localai_watchtower_enable }}"
           dockflare.enable: "{{ localai_dockflare_tunnel }}"
           dockflare.access.group: "{{ localai_dockflare_access_group }}"
           dockflare.hostname: "{{ localai_hostname }}.{{ ansible_nas_domain }}"
@@ -46,7 +46,7 @@
           homepage.description: "{{ 'LocalAI is the free, Open Source OpenAI alternative.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ localai_container_name }}"
-          homepage.showStats: "{{ localai_homepage_showStats }}"
+          homepage.showStats: "{{ localai_homepage_showstats }}"
           traefik.enable: "{{ localai_available_externally | string }}"
           traefik.http.routers.localai.rule: "Host(`{{ localai_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.localai.tls.certresolver: "letsencrypt"

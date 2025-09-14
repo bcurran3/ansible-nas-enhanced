@@ -37,7 +37,7 @@
         stop_timeout: 120
         labels:
           autoheal: "{{ windows_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ windows_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ windows_watchtower_enable }}"
           dockflare.enable: "{{ windows_dockflare_tunnel }}"
           dockflare.access.group: "{{ windows_dockflare_access_group }}"
           dockflare.hostname: "{{ windows_hostname }}.{{ ansible_nas_domain }}"
@@ -50,7 +50,7 @@
           homepage.description: "{{ 'Windows inside a Docker container.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ windows_container_name }}"
-          homepage.showStats: "{{ windows_homepage_showStats }}"
+          homepage.showStats: "{{ windows_homepage_showstats }}"
           traefik.enable: "{{ windows_available_externally | string }}"
           traefik.http.routers.windows.rule: "Host(`{{ windows_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.windows.tls.certresolver: "letsencrypt"

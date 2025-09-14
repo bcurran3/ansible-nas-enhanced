@@ -29,7 +29,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ gamevault_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ gamevault_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ gamevault_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ gamevault_db_homepage_group }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gamevault_db_container_name }}"
-          homepage.showStats: "{{ gamevault_db_homepage_showStats }}"
+          homepage.showStats: "{{ gamevault_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://hub.docker.com/_/postgres/tags/$${major}.$${minor}.$${patch}-alpine"
@@ -76,7 +76,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ gamevault_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ gamevault_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ gamevault_watchtower_enable }}"
           dockflare.enable: "{{ gamevault_dockflare_tunnel }}"
           dockflare.access.group: "{{ gamevault_dockflare_access_group }}"
           dockflare.hostname: "{{ gamevault_hostname }}.{{ ansible_nas_domain }}"
@@ -89,7 +89,7 @@
           homepage.description: "{{ 'the self-hosted gaming platform for drm-free games' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gamevault_container_name }}"
-          homepage.showStats: "{{ gamevault_homepage_showStats }}"
+          homepage.showStats: "{{ gamevault_homepage_showstats }}"
           traefik.enable: "{{ gamevault_available_externally | string }}"
           traefik.http.routers.gamevault.rule: "Host(`{{ gamevault_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gamevault.tls.certresolver: "letsencrypt"

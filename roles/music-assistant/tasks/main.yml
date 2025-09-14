@@ -25,7 +25,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ musicassistant_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ musicassistant_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ musicassistant_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ musicassistant_homepage_group }}"
@@ -33,7 +33,7 @@
           homepage.description: "{{ 'a free, opensource Media library manager that connects to your streaming services and a wide range of connected speakers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ musicassistant_container_name }}"
-          homepage.showStats: "{{ musicassistant_homepage_showStats }}"
+          homepage.showStats: "{{ musicassistant_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

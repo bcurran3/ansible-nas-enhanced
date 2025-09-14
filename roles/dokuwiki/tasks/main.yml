@@ -26,7 +26,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ dokuwiki_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ dokuwiki_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ dokuwiki_watchtower_enable }}"
           dockflare.enable: "{{ dokuwiki_dockflare_tunnel }}"
           dockflare.access.group: "{{ dokuwiki_dockflare_access_group }}"
           dockflare.hostname: "{{ dokuwiki_hostname }}.{{ ansible_nas_domain }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'dokuwiki description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dokuwiki_container_name }}"
-          homepage.showStats: "{{ dokuwiki_homepage_showStats }}"
+          homepage.showStats: "{{ dokuwiki_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dokuwiki_port }}"
           traefik.enable: "{{ dokuwiki_available_externally | string }}"
           traefik.http.routers.dokuwiki.rule: "Host(`{{ dokuwiki_hostname }}.{{ ansible_nas_domain }}`)"

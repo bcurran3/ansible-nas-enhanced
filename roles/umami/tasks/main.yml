@@ -29,7 +29,7 @@
 #          retries: "5"
         labels:
           autoheal: "{{ umami_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ umami_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ umami_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ umami_db_homepage_group }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ umami_db_container_name }}"
-          homepage.showStats: "{{ umami_db_homepage_showStats }}"
+          homepage.showStats: "{{ umami_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^16\.\d+(\.\d+)?-alpine.*$'
           wud.tag.transform.type: "semver"
@@ -70,7 +70,7 @@
           - "{{ umami_db_container_name }}"
         labels:
           autoheal: "{{ umami_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ umami_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ umami_watchtower_enable }}"
           dockflare.enable: "{{ umami_dockflare_tunnel }}"
           dockflare.access.group: "{{ umami_dockflare_access_group }}"
           dockflare.hostname: "{{ umami_hostname }}.{{ ansible_nas_domain }}"
@@ -83,7 +83,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ umami_container_name }}"
-          homepage.showStats: "{{ umami_homepage_showStats }}"
+          homepage.showStats: "{{ umami_homepage_showstats }}"
           traefik.enable: "{{ umami_available_externally | string }}"
           traefik.http.routers.umami.rule: "Host(`umami.{{ ansible_nas_domain }}`)"
           traefik.http.routers.umami.tls.certresolver: "letsencrypt"

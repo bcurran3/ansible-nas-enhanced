@@ -49,7 +49,7 @@
           - 'memlock:-1:-1'
         labels:
           autoheal: "{{ diskover_elasticsearch_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ diskover_elasticsearch_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ diskover_elasticsearch_watchtower_enable }}"
           dockflare.enable: "{{ diskover_dockflare_tunnel }}"
           dockflare.access.group: "{{ diskover_dockflare_access_group }}"
           dockflare.hostname: "{{ diskover_elasticsearch_hostname }}.{{ ansible_nas_domain }}"
@@ -62,7 +62,7 @@
           homepage.description: "{{ 'Free and Open Source, Distributed, RESTful Search Engine' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ diskover_elasticsearch_container_name }}"
-          homepage.showStats: "{{ diskover_elasticsearch_homepage_showStats }}"
+          homepage.showStats: "{{ diskover_elasticsearch_homepage_showstats }}"
           traefik.enable: "{{ diskover_available_externally | string }}"
           traefik.http.routers.elasticsearch.rule: "Host(`{{ diskover_elasticsearch_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.elasticsearch.tls.certresolver: "letsencrypt"
@@ -94,7 +94,7 @@
         privileged: true
         labels:
           autoheal: "false"
-          com.centurylinklabs.watchtower.monitor-only: "{{ diskover_elasticsearch_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ diskover_elasticsearch_watchtower_enable }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 
@@ -128,7 +128,7 @@
           - "{{ diskover_port_http }}:80"
         labels:
           autoheal: "{{ diskover_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ diskover_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ diskover_watchtower_enable }}"
           dockflare.enable: "{{ diskover_dockflare_tunnel }}"
           dockflare.access.group: "{{ diskover_dockflare_access_group }}"
           dockflare.hostname: "{{ diskover_hostname }}.{{ ansible_nas_domain }}"
@@ -141,7 +141,7 @@
           homepage.description: "{{ 'Open source file indexer, file search engine and data management and analytics powered by Elasticsearch' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ diskover_container_name }}"
-          homepage.showStats: "{{ diskover_homepage_showStats }}"
+          homepage.showStats: "{{ diskover_homepage_showstats }}"
           traefik.enable: "{{ diskover_available_externally | string }}"
           traefik.http.routers.diskover.rule: "Host(`{{ diskover_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.diskover.tls.certresolver: "letsencrypt"

@@ -31,7 +31,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ navidrome_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ navidrome_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ navidrome_watchtower_enable }}"
           dockflare.enable: "{{ navidrome_dockflare_tunnel }}"
           dockflare.access.group: "{{ navidrome_dockflare_access_group }}"
           dockflare.hostname: "{{ navidrome_hostname }}.{{ ansible_nas_domain }}"
@@ -43,7 +43,7 @@
           homepage.description: "{{ 'navidrome description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ navidrome_container_name }}"
-          homepage.showStats: "{{ navidrome_homepage_showStats }}"
+          homepage.showStats: "{{ navidrome_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ navidrome_port }}"
           traefik.enable: "{{ navidrome_available_externally | string }}"
           traefik.http.routers.navidrome.rule: "Host(`{{ navidrome_hostname }}.{{ ansible_nas_domain }}`)"

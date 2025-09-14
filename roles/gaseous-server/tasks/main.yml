@@ -41,7 +41,7 @@
 #          retries: 5
         labels:
           autoheal: "{{ gaseous_server_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ gaseous_server_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ gaseous_server_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.description: "{{ 'The open source relational database' if homepage_show_description else omit }}"
@@ -50,7 +50,7 @@
           homepage.href: "{{ gaseous_server_db_homepage_href }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gaseous_server_db_container_name }}"
-          homepage.showStats: "{{ gaseous_server_db_homepage_showStats }}"
+          homepage.showStats: "{{ gaseous_server_db_homepage_showstats }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://github.com/MariaDB/mariadb-docker/releases/tag/$${major}.$${minor}.$${patch}"
@@ -83,7 +83,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ gaseous_server_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ gaseous_server_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ gaseous_server_watchtower_enable }}"
           dockflare.enable: "{{ gaseous_server_dockflare_tunnel }}"
           dockflare.access.group: "{{ gaseous_server_dockflare_access_group }}"
           dockflare.hostname: "{{ gaseous_server_hostname }}.{{ ansible_nas_domain }}"
@@ -96,7 +96,7 @@
           homepage.description: "{{ 'A game ROM manager, with a built in web based emulator using multiple sources to identify and provide metadata' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gaseous_server_container_name }}"
-          homepage.showStats: "{{ gaseous_server_homepage_showStats }}"
+          homepage.showStats: "{{ gaseous_server_homepage_showstats }}"
           traefik.enable: "{{ gaseous_server_available_externally | string }}"
           traefik.http.routers.gaseous_server.rule: "Host(`{{ gaseous_server_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gaseous_server.tls.certresolver: "letsencrypt"

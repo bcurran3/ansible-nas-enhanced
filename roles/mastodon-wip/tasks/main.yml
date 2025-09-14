@@ -35,7 +35,7 @@
         command: "redis-server --requirepass topsecret"
         labels:
           autoheal: "{{ mastodon_redis_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_redis_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_redis_watchtower_enable }}"
           dockflare.enable: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
@@ -69,7 +69,7 @@
           test: ['CMD', 'pg_isready', '-U', 'postgres']
         labels:
           autoheal: "{{ mastodon_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_db_watchtower_enable }}"
           dockflare.enable: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+.*$'
@@ -147,7 +147,7 @@
           - "{{ mastodon_db_container_name }}"
         labels:
           autoheal: "{{ mastodon_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ mastodon_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_watchtower_enable }}"
           dockflare.enable: "{{ mastodon_dockflare_tunnel }}"
           dockflare.access.group: "{{ mastodon_dockflare_access_group }}"
           dockflare.hostname: "{{ mastodon_hostname }}.{{ ansible_nas_domain }}"
@@ -160,7 +160,7 @@
 #         homepage.description: ""
           homepage.server: "my-docker"
           homepage.container: "{{ mastodon_container_name }}"
-          homepage.showStats: "{{ mastodon_homepage_showStats }}"
+          homepage.showStats: "{{ mastodon_homepage_showstats }}"
           traefik.enable: "{{ mastodon_available_externally | string }}"
           traefik.http.routers.mastodon.rule: "Host(`{{ mastodon_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.mastodon.tls.certresolver: "letsencrypt"

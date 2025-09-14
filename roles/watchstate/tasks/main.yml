@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ watchstate_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ watchstate_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ watchstate_watchtower_enable }}"
           dockflare.enable: "{{ watchstate_dockflare_tunnel }}"
           dockflare.access.group: "{{ watchstate_dockflare_access_group }}"
           dockflare.hostname: "{{ watchstate_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'Self-hosted service to sync your plex, jellyfin and emby play state.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ watchstate_container_name }}"
-          homepage.showStats: "{{ watchstate_homepage_showStats }}"
+          homepage.showStats: "{{ watchstate_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port }}"
           traefik.enable: "{{ watchstate_available_externally | string }}"
           traefik.http.routers.watchstate.rule: "Host(`{{ watchstate_hostname }}.{{ ansible_nas_domain }}`)"

@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ searxng_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ searxng_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ searxng_watchtower_enable }}"
           dockflare.enable: "{{ searxng_dockflare_tunnel }}"
           dockflare.access.group: "{{ searxng_dockflare_access_group }}"
           dockflare.hostname: "{{ searxng_hostname }}.{{ ansible_nas_domain }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'SearXNG is a free internet metasearch engine which aggregates results from various search services and databases.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ searxng_container_name }}"
-          homepage.showStats: "{{ searxng_homepage_showStats }}"
+          homepage.showStats: "{{ searxng_homepage_showstats }}"
           traefik.enable: "{{ searxng_available_externally | string }}"
           traefik.http.routers.searxng.rule: "Host(`{{ searxng_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.searxng.tls.certresolver: "letsencrypt"

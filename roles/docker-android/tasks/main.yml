@@ -28,7 +28,7 @@
           - "/dev/kvm"
         labels:
           autoheal: "{{ dockerandroid_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ dockerandroid_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockerandroid_watchtower_enable }}"
           dockflare.enable: "{{ dockerandroid_dockflare_tunnel }}"
           dockflare.access.group: "{{ dockerandroid_dockflare_access_group }}"
           dockflare.hostname: "{{ dockerandroid_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'Android in docker solution with noVNC supported and video recording' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dockerandroid_container_name }}"
-          homepage.showStats: "{{ dockerandroid_homepage_showStats }}"
+          homepage.showStats: "{{ dockerandroid_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockerandroid_port }}"
           traefik.enable: "{{ dockerandroid_available_externally | string }}"
           traefik.http.routers.dockerandroid.rule: "Host(`{{ dockerandroid_hostname }}.{{ ansible_nas_domain }}`)"

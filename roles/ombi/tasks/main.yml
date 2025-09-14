@@ -27,7 +27,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ ombi_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ ombi_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ ombi_watchtower_enable }}"
           dockflare.enable: "{{ ombi_dockflare_tunnel }}"
           dockflare.access.group: "{{ ombi_dockflare_access_group }}"
           dockflare.hostname: "{{ ombi_hostname }}.{{ ansible_nas_domain }}"
@@ -39,7 +39,7 @@
           homepage.description: "{{ 'ombi description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ombi_container_name }}"
-          homepage.showStats: "{{ ombi_homepage_showStats }}"
+          homepage.showStats: "{{ ombi_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ombi_port }}"
           traefik.enable: "{{ ombi_available_externally | string }}"
           traefik.http.routers.ombi.rule: "Host(`{{ ombi_hostname }}.{{ ansible_nas_domain }}`)"

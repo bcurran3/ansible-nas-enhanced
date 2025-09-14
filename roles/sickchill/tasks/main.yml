@@ -30,7 +30,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ sickchill_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ sickchill_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ sickchill_watchtower_enable }}"
           dockflare.enable: "{{ sickchill_dockflare_tunnel }}"
           dockflare.access.group: "{{ sickchill_dockflare_access_group }}"
           dockflare.hostname: "{{ sickchill_hostname }}.{{ ansible_nas_domain }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'sickchill description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ sickchill_container_name }}"
-          homepage.showStats: "{{ sickchill_homepage_showStats }}"
+          homepage.showStats: "{{ sickchill_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sickchill_port }}"
           traefik.enable: "{{ sickchill_available_externally | string }}"
           traefik.http.routers.sickchill.rule: "Host(`{{ sickchill_hostname }}.{{ ansible_nas_domain }}`)"

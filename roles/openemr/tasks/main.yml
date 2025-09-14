@@ -42,7 +42,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ openemr_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ openemr_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ openemr_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ openemr_db_homepage_group }}"
@@ -51,7 +51,7 @@
           homepage.description: "{{ 'MariaDB' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openemr_db_container_name }}"
-          homepage.showStats: "{{ openemr_db_homepage_showStats }}"
+          homepage.showStats: "{{ openemr_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -92,7 +92,7 @@
           - "{{ openemr_db_container_name }}"
         labels:
           autoheal: "{{ openemr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ openemr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ openemr_watchtower_enable }}"
           dockflare.enable: "{{ openemr_dockflare_tunnel }}"
           dockflare.access.group: "{{ openemr_dockflare_access_group }}"
           dockflare.hostname: "{{ openemr_hostname }}.{{ ansible_nas_domain }}"
@@ -105,7 +105,7 @@
           homepage.description: "{{ 'OpenEMR' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openemr_container_name }}"
-          homepage.showStats: "{{ openemr_homepage_showStats }}"
+          homepage.showStats: "{{ openemr_homepage_showstats }}"
           traefik.enable: "{{ openemr_available_externally | string }}"
           traefik.http.routers.openemr.rule: "Host(`{{ openemr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.openemr.tls.certresolver: "letsencrypt"

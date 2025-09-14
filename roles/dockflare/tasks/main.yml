@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ dockflare_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ dockflare_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockflare_watchtower_enable }}"
           dockflare.enable: "{{ dockflare_dockflare_tunnel }}"
           dockflare.access.group: "{{ dockflare_dockflare_access_group }}"
           dockflare.hostname: "{{ dockflare_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'Automate Cloudflare Tunnels with Docker Labels' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dockflare_container_name }}"
-          homepage.showStats: "{{ dockflare_homepage_showStats }}"
+          homepage.showStats: "{{ dockflare_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
           traefik.enable: "{{ dockflare_available_externally | string }}"
           traefik.http.routers.dockflare.rule: "Host(`{{ dockflare_hostname }}.{{ ansible_nas_domain }}`)"

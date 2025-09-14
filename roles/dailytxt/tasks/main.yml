@@ -28,7 +28,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ dailytxt_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ dailytxt_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ dailytxt_watchtower_enable }}"
           dockflare.enable: "{{ dailytxt_dockflare_tunnel }}"
           dockflare.access.group: "{{ dailytxt_dockflare_access_group }}"
           dockflare.hostname: "{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'Encrypted Diary Web-App' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "dailytxt"
-          homepage.showStats: "{{ dailytxt_homepage_showStats }}"
+          homepage.showStats: "{{ dailytxt_homepage_showstats }}"
           traefik.enable: "{{ dailytxt_available_externally | string }}"
           traefik.http.routers.dailytxt.rule: "Host(`{{ dailytxt_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.dailytxt.tls.certresolver: "letsencrypt"

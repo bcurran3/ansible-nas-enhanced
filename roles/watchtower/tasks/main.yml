@@ -8,26 +8,27 @@
         hostname: "{{ watchtower_container_name }}"
         image: "{{ watchtower_image_name }}:{{ watchtower_image_version }}"
         pull: true
-        ports:
-            - "{{ watchtower_port }}:8080"                             # added
+#        ports:
+#            - "{{ watchtower_port }}:8080"                             # added
         volumes:
           - "/var/run/docker.sock:/var/run/docker.sock"
+          - "{{ watchtower_docker_config }}:/config.json:ro"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           WATCHTOWER_CLEANUP: "{{ watchtower_cleanup }}"
           WATCHTOWER_LABEL_ENABLE: "true"
           WATCHTOWER_LABEL_TAKE_PRECEDENCE: "true"
           WATCHTOWER_REMOVE_VOLUMES: "{{ watchtower_remove_volumes }}"
           WATCHTOWER_DEBUG: "{{ watchtower_debug }}"
-          WATCHTOWER_HTTP_API_TOKEN: "{{ watchtower_api_token }}"           # added
-          WATCHTOWER_HTTP_API_METRICS: "true"              # added
-          WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"       # added
+#         WATCHTOWER_HTTP_API_TOKEN: "{{ watchtower_api_token }}"           # added
+#         WATCHTOWER_HTTP_API_METRICS: "true"              # added
+#         WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"       # added
           WATCHTOWER_INCLUDE_STOPPED: "{{ watchtower_include_stopped }}"
           WATCHTOWER_REVIVE_STOPPED: "{{ watchtower_revive_stopped }}"
 #         WATCHTOWER_POLL_INTERVAL: "{{ watchtower_poll_interval }}"
-          WATCHTOWER_MONITOR_ONLY: "{{ watchtower_monitor_only }}"
+          WATCHTOWER_enable: "{{ watchtower_enable }}"
           WATCHTOWER_NO_RESTART: "{{ watchtower_no_restart }}"
           WATCHTOWER_NO_PULL: "{{ watchtower_no_pull }}"
+          WATCHTOWER_ROLLING_RESTART: "{{ watchtower_rolling_restart }}"
           WATCHTOWER_SCHEDULE: "{{ watchtower_schedule }}"
           WATCHTOWER_TIMEOUT: "{{ watchtower_timeout }}"
           WATCHTOWER_NOTIFICATIONS: "{{ watchtower_notifications }}"
@@ -48,10 +49,11 @@
           WATCHTOWER_NOTIFICATION_SLACK_CHANNEL: "{{ watchtower_notifications_slack_channel }}"
           WATCHTOWER_NOTIFICATION_SLACK_ICON_EMOJI: "{{ watchtower_notifications_slack_icon_emoji }}"
           WATCHTOWER_NOTIFICATION_SLACK_ICON_URL: "{{ watchtower_notifications_slack_icon_url }}"
+          TZ: "{{ ansible_nas_timezone }}"
         command: "{{ watchtower_command }}"
         labels:
           autoheal: "{{ watchtower_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ watchtower_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ watchtower_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ watchtower_homepage_group }}"
@@ -61,19 +63,11 @@
           homepage.description: "{{ 'A process for automating Docker container base image updates.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ watchtower_container_name }}"
-          homepage.showStats: "{{ watchtower_homepage_showStats }}"
-          homepage.widget.type: "watchtower"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port }}"
-          homepage.widget.key: "{{ watchtower_api_token }}"
-          traefik.enable: "{{ watchtower_available_externally | string }}"
-          traefik.http.routers.watchtower.rule: "Host(`{{ watchtower_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.watchtower.tls.certresolver: "letsencrypt"
-          traefik.http.routers.watchtower.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.watchtower.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ watchtower_hostname }}"
-          traefik.http.routers.watchtower.middlewares: "{{ watchtower_hostname }}@docker"
-          traefik.http.middlewares.watchtower.IPAllowList.sourcerange: "{{ watchtower_traefik_whitelist }}"
-          traefik.http.services.watchtower.loadbalancer.server.port: "8080"
+#         homepage.showStats: "{{ watchtower_homepage_showstats }}"
+#         homepage.widget.type: "watchtower"
+#         homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port }}"
+#         homepage.widget.key: "{{ watchtower_api_token }}"
+          traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/containrrr/watchtower"

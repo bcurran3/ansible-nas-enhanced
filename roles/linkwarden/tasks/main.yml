@@ -25,7 +25,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ linkwarden_search_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ linkwarden_search_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ linkwarden_search_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Meilisearch"
           homepage.group: "{{ linkwarden_search_homepage_group }}"
@@ -34,7 +34,7 @@
           homepage.description: "{{ 'A lightning-fast search engine API bringing AI-powered hybrid search to your sites and applications.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ linkwarden_search_container_name }}"
-          homepage.showStats: "{{ linkwarden_search_homepage_showStats }}"
+          homepage.showStats: "{{ linkwarden_search_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -59,7 +59,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ linkwarden_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ linkwarden_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ linkwarden_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ linkwarden_db_homepage_group }}"
@@ -68,7 +68,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ linkwarden_db_container_name }}"
-          homepage.showStats: "{{ linkwarden_db_homepage_showStats }}"
+          homepage.showStats: "{{ linkwarden_db_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -105,7 +105,7 @@
           - "{{ linkwarden_search_container_name }}"
         labels:
           autoheal: "{{ linkwarden_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ linkwarden_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ linkwarden_watchtower_enable }}"
           dockflare.enable: "{{ linkwarden_dockflare_tunnel }}"
           dockflare.access.group: "{{ linkwarden_dockflare_access_group }}"
           dockflare.hostname: "{{ linkwarden_hostname }}.{{ ansible_nas_domain }}"
@@ -117,7 +117,7 @@
           homepage.description: "{{ 'linkwarden description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ linkwarden_container_name }}"
-          homepage.showStats: "{{ linkwarden_homepage_showStats }}"
+          homepage.showStats: "{{ linkwarden_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}"
           traefik.enable: "{{ linkwarden_available_externally | string }}"
           traefik.http.routers.linkwarden.rule: "Host(`{{ linkwarden_hostname }}.{{ ansible_nas_domain }}`)"

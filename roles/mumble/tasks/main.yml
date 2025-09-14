@@ -28,7 +28,7 @@
           MUMBLE_CONFIG_SERVER_PASSWORD: "{{ mumble_server_password }}"
         labels:
           autoheal: "{{ mumble_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ mumble_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ mumble_watchtower_enable }}"
           dockflare.enable: "{{ mumble_dockflare_tunnel }}"
           dockflare.access.group: "{{ mumble_dockflare_access_group }}"
           dockflare.hostname: "{{ mumble_hostname }}.{{ ansible_nas_domain }}"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'mumble description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mumble_container_name }}"
-          homepage.showStats: "{{ mumble_homepage_showStats }}"
+          homepage.showStats: "{{ mumble_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port }}"
           traefik.enable: "{{ mumble_available_externally | string }}"
           traefik.http.routers.mumble.rule: "Host(`{{ mumble_hostname }}.{{ ansible_nas_domain }}`)"

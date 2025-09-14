@@ -30,7 +30,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ plexrewind_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ plexrewind_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ plexrewind_watchtower_enable }}"
           dockflare.enable: "{{ plexrewind_dockflare_tunnel }}"
           dockflare.access.group: "{{ plexrewind_dockflare_access_group }}"
           dockflare.hostname: "{{ plexrewind_hostname }}.{{ ansible_nas_domain }}"
@@ -43,7 +43,7 @@
           homepage.description: "{{ 'Present Plex user statistics and habits in a beautiful and organized manner.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ plexrewind_container_name }}"
-          homepage.showStats: "{{ plexrewind_homepage_showStats }}"
+          homepage.showStats: "{{ plexrewind_homepage_showstats }}"
           traefik.enable: "{{ plexrewind_available_externally | string }}"
           traefik.http.routers.plexrewind.rule: "Host(`{{ plexrewind_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.plexrewind.tls.certresolver: "letsencrypt"

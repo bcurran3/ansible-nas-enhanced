@@ -20,7 +20,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ striparr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ striparr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ striparr_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ striparr_homepage_group }}"
@@ -30,7 +30,7 @@
           homepage.description: "{{ 'Strips metadata from files downloaded by Sonarr and Radarr.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ striparr_container_name }}"
-          homepage.showStats: "{{ striparr_homepage_showStats }}"
+          homepage.showStats: "{{ striparr_homepage_showstats }}"
           traefik.enable:: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

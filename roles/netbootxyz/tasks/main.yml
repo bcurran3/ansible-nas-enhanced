@@ -33,7 +33,7 @@
           WEB_APP_PORT: "{{ netbootxyz_port_http }}"
         labels:
           autoheal: "{{ netbootxyz_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ netbootxyz_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ netbootxyz_watchtower_enable }}"
           dockflare.enable: "{{ netbootxyz_dockflare_tunnel }}"
           dockflare.access.group: "{{ netbootxyz_dockflare_access_group }}"
           dockflare.hostname: "{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}"
@@ -46,7 +46,7 @@
           homepage.description: "{{ 'Your favorite operating systems in one place. A network-based bootable operating system installer based on iPXE.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ netbootxyz_container_name }}"
-          homepage.showStats: "{{ netbootxyz_homepage_showStats }}"
+          homepage.showStats: "{{ netbootxyz_homepage_showstats }}"
           traefik.enable: "{{ netbootxyz_available_externally | string }}"
           traefik.http.routers.netbootxyz.rule: "Host(`{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.netbootxyz.tls.certresolver: "letsencrypt"

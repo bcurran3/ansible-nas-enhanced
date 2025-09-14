@@ -18,7 +18,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ dozzle_agent_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ dozzle_agent_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ dozzle_agent_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dozzle_agent_homepage_group }}"
@@ -27,7 +27,7 @@
           homepage.description: "{{ 'Realtime log viewer for docker containers.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dozzle_agent_container_name }}"
-          homepage.showStats: "{{ dozzle_agent_homepage_showStats }}"
+          homepage.showStats: "{{ dozzle_agent_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

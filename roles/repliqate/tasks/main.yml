@@ -23,7 +23,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ repliqate_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ repliqate_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ repliqate_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ repliqate_homepage_group }}"
@@ -31,7 +31,7 @@
           homepage.description: "{{ 'a modular Docker container/volume backup solution' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ repliqate_container_name }}"
-          homepage.showStats: "{{ repliqate_homepage_showStats }}"
+          homepage.showStats: "{{ repliqate_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
           wud.tag.transform.type: "semver"

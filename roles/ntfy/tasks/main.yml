@@ -32,7 +32,7 @@
 #            start_period: 40s
         labels:
           autoheal: "{{ ntfy_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ ntfy_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ ntfy_watchtower_enable }}"
           dockflare.enable: "{{ ntfy_dockflare_tunnel }}"
           dockflare.access.group: "{{ ntfy_dockflare_access_group }}"
           dockflare.hostname: "{{ ntfy_hostname }}.{{ ansible_nas_domain }}"
@@ -45,7 +45,7 @@
           homepage.description: "{{ 'Send push notifications to your phone or desktop using PUT/POST' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ntfy_container_name }}"
-          homepage.showStats: "{{ ntfy_homepage_showStats }}"
+          homepage.showStats: "{{ ntfy_homepage_showstats }}"
           traefik.enable: "{{ ntfy_available_externally | string }}"
           traefik.http.routers.ntfy.rule: "Host(`{{ ntfy_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ntfy.tls.certresolver: "letsencrypt"

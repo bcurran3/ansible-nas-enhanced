@@ -26,7 +26,7 @@
           PGID: "{{ esphome_group_id }}"
         labels:
           autoheal: "{{ esphome_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ esphome_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ esphome_watchtower_enable }}"
           dockflare.enable: "{{ esphome_dockflare_tunnel }}"
           dockflare.access.group: "{{ esphome_dockflare_access_group }}"
           dockflare.hostname: "{{ esphome_hostname }}.{{ ansible_nas_domain }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'esphome description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ esphome_container_name }}"
-          homepage.showStats: "{{ esphome_homepage_showStats }}"
+          homepage.showStats: "{{ esphome_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ esphome_port }}"
           traefik.enable: "{{ esphome_available_externally | string }}"
           traefik.http.routers.esphome.rule: "Host(`{{ esphome_hostname }}.{{ ansible_nas_domain }}`)"

@@ -15,7 +15,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ fastmusicremover_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ fastmusicremover_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ fastmusicremover_watchtower_enable }}"
           dockflare.enable: "{{ fastmusicremover_dockflare_tunnel }}"
           dockflare.access.group: "{{ fastmusicremover_dockflare_access_group }}"
           dockflare.hostname: "{{ fastmusicremover_hostname }}.{{ ansible_nas_domain }}"
@@ -28,7 +28,7 @@
           homepage.description: "{{ 'lightweight music and noise remover for YouTube and other internet media, using DeepFilterNet for audio enhancement' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "fastmusicremover"
-          homepage.showStats: "{{ fastmusicremover_homepage_showStats }}"
+          homepage.showStats: "{{ fastmusicremover_homepage_showstats }}"
           traefik.enable: "{{ fastmusicremover_available_externally | string }}"
           traefik.http.routers.fastmusicremover.rule: "Host(`{{ fastmusicremover_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.fastmusicremover.tls.certresolver: "letsencrypt"

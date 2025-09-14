@@ -30,7 +30,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ flexget_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ flexget_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ flexget_watchtower_enable }}"
           dockflare.enable: "{{ flexget_dockflare_tunnel }}"
           dockflare.access.group: "{{ flexget_dockflare_access_group }}"
           dockflare.hostname: "{{ flexget_hostname }}.{{ ansible_nas_domain }}"
@@ -43,7 +43,7 @@
           homepage.description: "{{ 'FlexGet is a multipurpose automation tool for content like torrents, nzbs, podcasts, comics, series, movies, etc.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ flexget_container_name }}"
-          homepage.showStats: "{{ flexget_homepage_showStats }}"
+          homepage.showStats: "{{ flexget_homepage_showstats }}"
           traefik.enable: "{{ flexget_available_externally | string }}"
           traefik.http.routers.flexget.rule: "Host(`flexget.{{ ansible_nas_domain }}`)"
           traefik.http.routers.flexget.tls.certresolver: "letsencrypt"

@@ -35,7 +35,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ immich_machinelearning_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "true"
+          com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
           homepage.group: "{{ immich_machinelearning_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} Machine Learning"
@@ -83,7 +83,7 @@
           timeout: 5s
         labels:
           autoheal: "{{ immich_postgres_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "true"
+          com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
           homepage.group: "{{ immich_postgres_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
@@ -119,7 +119,7 @@
           test: ["CMD-SHELL", "redis-cli ping || exit 1"]
         labels:
           autoheal: "{{ immich_redis_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ immich_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ immich_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.group: "{{ immich_redis_homepage_group }}"
           homepage.name: "Immich Redis"
@@ -128,7 +128,7 @@
           homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ immich_redis_container_name }}"
-          homepage.showStats: "{{ immich_redis_homepage_showStats }}"
+          homepage.showStats: "{{ immich_redis_homepage_showstats }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.include: '^6\.2\.\d+-alpine$'
@@ -170,7 +170,7 @@
 #         disable: "false"
         labels:
           autoheal: "{{ immich_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "true"
+          com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "{{ immich_dockflare_tunnel }}"
           dockflare.access.group: "{{ immich_dockflare_access_group }}"
           dockflare.hostname: "{{ immich_hostname }}.{{ ansible_nas_domain }}"
@@ -183,7 +183,7 @@
           homepage.description: "{{ 'High performance self-hosted photo and video management solution' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ immich_server_container_name }}"
-          homepage.showStats: "{{ immich_homepage_showStats }}"
+          homepage.showStats: "{{ immich_homepage_showstats }}"
           homepage.widget.type: "immich"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port }}"
           homepage.widget.key: "{{ immich_homepage_widget_key }}"

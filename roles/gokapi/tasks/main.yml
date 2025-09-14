@@ -26,7 +26,7 @@
           - "{{ gokapi_port_http }}:53842"
         labels:
           autoheal: "{{ gokapi_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ gokapi_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ gokapi_watchtower_enable }}"
           dockflare.enable: "{{ gokapi_dockflare_tunnel }}"
           dockflare.access.group: "{{ gokapi_dockflare_access_group }}"
           dockflare.hostname: "{{ gokapi_hostname }}.{{ ansible_nas_domain }}"
@@ -39,7 +39,7 @@
           homepage.description: "{{ 'Lightweight selfhosted Firefox Send alternative without public upload. AWS S3 supported.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gokapi_container_name }}"
-          homepage.showStats: "{{ gokapi_homepage_showStats }}"
+          homepage.showStats: "{{ gokapi_homepage_showstats }}"
           traefik.enable: "{{ gokapi_available_externally | string }}"
           traefik.http.routers.gokapi.rule: "Host(`{{ gokapi_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gokapi.tls.certresolver: "letsencrypt"

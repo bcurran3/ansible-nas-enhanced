@@ -35,7 +35,7 @@
         command: "redis-server --requirepass topsecret"
         labels:
           autoheal: "{{ nextcloud_redis_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_redis_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_redis_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ nextcloud_redis_homepage_group }}"
@@ -44,7 +44,7 @@
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_redis_container_name }}"
-          homepage.showStats: "{{ nextcloud_redis_homepage_showStats }}"
+          homepage.showStats: "{{ nextcloud_redis_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -74,7 +74,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ nextcloud_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ nextcloud_db_homepage_group }}"
@@ -83,7 +83,7 @@
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_db_container_name }}"
-          homepage.showStats: "{{ nextcloud_db_homepage_showStats }}"
+          homepage.showStats: "{{ nextcloud_db_homepage_showstats }}"
           traefik.enable: "false"
 #          wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.include: '^8\.4\.\d+$'
@@ -137,7 +137,7 @@
           - "{{ nextcloud_db_container_name }}"
         labels:
           autoheal: "{{ nextcloud_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ nextcloud_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_watchtower_enable }}"
           dockflare.enable: "{{ nextcloud_dockflare_tunnel }}"
           dockflare.access.group: "{{ nextcloud_dockflare_access_group }}"
           dockflare.hostname: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
@@ -150,7 +150,7 @@
           homepage.description: "{{ 'Open source dropbox alternative' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_container_name }}"
-          homepage.showStats: "{{ nextcloud_homepage_showStats }}"
+          homepage.showStats: "{{ nextcloud_homepage_showstats }}"
           homepage.widget.type: "nextcloud"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port }}"
           homepage.widget.key: "{{ nextcloud_homepage_widget_key }}"

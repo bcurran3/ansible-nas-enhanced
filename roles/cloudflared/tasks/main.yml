@@ -14,7 +14,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ cloudflared_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ cloudflared_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ cloudflared_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.group: "{{ cloudflared_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
@@ -23,7 +23,7 @@
           homepage.description: "{{ 'Client for Cloudflare Tunnel, a daemon that exposes private services through the Cloudflare edge.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ cloudflared_container_name }}"
-          homepage.showStats: "{{ cloudflared_homepage_showStats }}"
+          homepage.showStats: "{{ cloudflared_homepage_showstats }}"
           homepage.widget.type: "cloudflared"
           homepage.widget.accountid: "{{ cloudflared_homepage_widget_accountid }}"
           homepage.widget.tunnelid: "{{ cloudflared_homepage_widget_tunnelid }}"

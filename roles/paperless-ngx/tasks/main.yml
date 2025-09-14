@@ -33,7 +33,7 @@
         labels:
           traefik.enable: "false"
           autoheal: "{{ paperless_ngx_redis_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_redis_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_redis_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ paperless_ngx_redis_homepage_group }}"
@@ -42,7 +42,7 @@
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_redis_container_name }}"
-          homepage.showStats: "{{ paperless_ngx_redis_homepage_showStats }}"
+          homepage.showStats: "{{ paperless_ngx_redis_homepage_showstats }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/redis"
@@ -70,7 +70,7 @@
         labels:
           traefik.enable: "false"
           autoheal: "{{ paperless_ngx_db_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ paperless_ngx_db_homepage_group }}"
@@ -79,7 +79,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_db_container_name }}"
-          homepage.showStats: "{{ paperless_ngx_db_homepage_showStats }}"
+          homepage.showStats: "{{ paperless_ngx_db_homepage_showstats }}"
           wud.tag.include: '^\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/postgres"
@@ -119,7 +119,7 @@
           - "{{ paperless_ngx_redis_container_name }}"
         labels:
           autoheal: "{{ paperless_ngx_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ paperless_ngx_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_watchtower_enable }}"
           dockflare.enable: "{{ paperless_ngx_dockflare_tunnel }}"
           dockflare.access.group: "{{ paperless_ngx_dockflare_access_group }}"
           dockflare.hostname: "{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}"
@@ -132,7 +132,7 @@
           homepage.description: "{{ 'Open source dropbox alternative' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_container_name }}"
-          homepage.showStats: "{{ paperless_ngx_homepage_showStats }}"
+          homepage.showStats: "{{ paperless_ngx_homepage_showstats }}"
           traefik.enable: "{{ paperless_ngx_available_externally | string }}"
           traefik.http.routers.paperless_ngx.rule: "Host(`{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.paperless_ngx.tls.certresolver: "letsencrypt"

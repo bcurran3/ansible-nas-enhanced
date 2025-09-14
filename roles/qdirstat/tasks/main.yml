@@ -25,7 +25,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ qdirstat_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ qdirstat_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ qdirstat_watchtower_enable }}"
           dockflare.enable: "{{ qdirstat_dockflare_tunnel }}"
           dockflare.access.group: "{{ qdirstat_dockflare_access_group }}"
           dockflare.hostname: "{{ qdirstat_hostname }}.{{ ansible_nas_domain }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'Qt-based directory statistics' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ qdirstat_container_name }}"
-          homepage.showStats: "{{ qdirstat_homepage_showStats }}"
+          homepage.showStats: "{{ qdirstat_homepage_showstats }}"
           traefik.enable: "{{ qdirstat_available_externally | string }}"
           traefik.http.routers.qdirstat.rule: "Host(`qdirstat.{{ ansible_nas_domain }}`)"
           traefik.http.routers.qdirstat.tls.certresolver: "letsencrypt"

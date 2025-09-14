@@ -27,7 +27,7 @@
         memory: "{{ loggifly_memory }}"
         labels:
           autoheal: "{{ loggifly_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ loggifly_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ loggifly_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ loggifly_homepage_group }}"
@@ -35,7 +35,7 @@
           homepage.description: "{{ 'A Lightweight Tool that monitors Docker Container Logs for predefined keywords or regex patterns and sends Notifications.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ loggifly_container_name }}"
-          homepage.showStats: "{{ loggifly_homepage_showStats }}"
+          homepage.showStats: "{{ loggifly_homepage_showstats }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

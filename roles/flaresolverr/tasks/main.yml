@@ -25,7 +25,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ flaresolverr_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ flaresolverr_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ flaresolverr_watchtower_enable }}"
           dockflare.enable: "{{ flaresolverr_dockflare_tunnel }}"
           dockflare.access.group: "{{ flaresolverr_dockflare_access_group }}"
           dockflare.hostname: "{{ flaresolverr_hostname }}.{{ ansible_nas_domain }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'Proxy server to bypass Cloudflare protection' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ flaresolverr_container_name }}"
-          homepage.showStats: "{{ flaresolverr_homepage_showStats }}"
+          homepage.showStats: "{{ flaresolverr_homepage_showstats }}"
           traefik.enable: "{{ flaresolverr_available_externally | string }}"
           traefik.http.routers.flaresolverr.rule: "Host(`flaresolverr.{{ ansible_nas_domain }}`)"
           traefik.http.routers.flaresolverr.tls.certresolver: "letsencrypt"

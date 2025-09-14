@@ -24,7 +24,7 @@
           POSTGRES_DB: "commafeed"
         labels:
           autoheal: "{{ commafeed_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ commafeed_db_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ commafeed_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "CommaFeed PostgreSQL"
           homepage.group: "{{ commafeed_db_homepage_group }}"
@@ -34,7 +34,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ commafeed_db_container_name }}"
-          homepage.showStats: "{{ commafeed_db_homepage_showStats }}"
+          homepage.showStats: "{{ commafeed_db_homepage_showstats }}"
           wud.tag.include: '^\d+\.\d+\.\d+$$'
           wud.link.template: "https://github.com/postgres/postgres/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ commafeed_db_cpu_shares }}"
@@ -62,7 +62,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ commafeed_autoheal }}"
-          com.centurylinklabs.watchtower.monitor-only: "{{ commafeed_watchtower_monitor_only }}"
+          com.centurylinklabs.watchtower.enable: "{{ commafeed_watchtower_enable }}"
           dockflare.enable: "{{ commafeed_dockflare_tunnel }}"
           dockflare.access.group: "{{ commafeed_dockflare_access_group }}"
           dockflare.hostname: "{{ commafeed_hostname }}.{{ ansible_nas_domain }}"
@@ -75,7 +75,7 @@
           homepage.description: "{{ 'Google Reader inspired self-hosted personal RSS reader.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ commafeed_container_name }}"
-          homepage.showStats: "{{ commafeed_homepage_showStats }}"
+          homepage.showStats: "{{ commafeed_homepage_showstats }}"
           traefik.enable: "{{ commafeed_available_externally | string }}"
           traefik.http.routers.commafeed.rule: "Host(`{{ commafeed_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.commafeed.tls.certresolver: "letsencrypt"
