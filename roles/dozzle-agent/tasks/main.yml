@@ -1,0 +1,46 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dozzle_agent_container_name }}"
+        hostname: "{{ dozzle_agent_container_name }}"
+        image: "{{ dozzle_agent_image_name }}:{{ dozzle_agent_image_tag }}"
+        pull: true
+        command: "agent"
+        ports:
+          - "7007:7007"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+          - "/etc/timezone:/etc/timezone:ro"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ dozzle_agent_autoheal }}"
+          com.centurylinklabs.watchtower.monitor-only: "{{ dozzle_agent_watchtower_monitor_only }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ dozzle_agent_homepage_group }}"
+          homepage.icon: "{{ dozzle_agent_homepage_icon }}"
+          homepage.href: "{{ dozzle_agent_homepage_href }}"
+          homepage.description: "{{ 'Realtime log viewer for docker containers.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dozzle_agent_container_name }}"
+          homepage.showStats: "{{ dozzle_agent_homepage_showStats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/amir20/dozzle"
+        cpu_shares: "{{ dozzle_agent_cpu_shares }}"
+        memory: "{{ dozzle_agent_memory }}"
+        restart_policy: unless-stopped
+  when: dozzle_agent_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ dozzle_agent_container_name }}"
+        state: absent
+  when: dozzle_agent_enabled is false
