@@ -25,9 +25,10 @@
         ports:
           - "{{ booksonic_port }}:4040"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
+          DOCKER_MODS: "{{ booksonic_env_docker_mods }}"
           PUID: "{{ booksonic_user_id }}"
           PGID: "{{ booksonic_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ booksonic_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ booksonic_watchtower_monitor_only }}"

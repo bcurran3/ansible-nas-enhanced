@@ -23,9 +23,10 @@
         ports:
           - "{{ bazarr_port }}:6767"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
+          DOCKER_MODS: "{{ bazarr_env_docker_mods }}"
           PUID: "{{ bazarr_user_id }}"
           PGID: "{{ bazarr_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ bazarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ bazarr_watchtower_monitor_only }}"

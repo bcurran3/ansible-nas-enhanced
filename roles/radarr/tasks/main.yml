@@ -22,11 +22,10 @@
         ports:
           - "{{ radarr_port }}:7878"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
+          DOCKER_MODS: "{{ radarr_env_docker_mods }}"
           PUID: "{{ radarr_user_id }}"
           PGID: "{{ radarr_group_id }}"
-#         DOCKER_MODS: "linuxserver/mods:radarr-striptracks"   # added
-#         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:radarr"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ radarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ radarr_watchtower_monitor_only }}"

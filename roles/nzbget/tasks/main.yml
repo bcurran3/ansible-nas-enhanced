@@ -21,9 +21,10 @@
         ports:
           - "{{ nzbget_port }}:6789"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
+          DOCKER_MODS: "{{ nzbget_env_docker_mods }}"
           PUID: "{{ nzbget_user_id }}"
           PGID: "{{ nzbget_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ nzbget_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ nzbget_watchtower_monitor_only }}"

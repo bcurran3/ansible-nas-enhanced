@@ -116,12 +116,13 @@
           - "{{ samba_shares_other_root }}:/data2:ro"
           - "{{ diskover_data_directory }}/config:/config"
         env:
-          PUID: "1000"
-          PGID: "1000"
+          DOCKER_MODS: "{{ diskover_env_docker_mods }}"
           ES_USER: "elastic"
           ES_PORT: "9200"
           ES_PASS: "topsecret"
           ES_HOST: "{{ diskover_elasticsearch_container_name }}"
+          PUID: "1000"
+          PGID: "1000"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ diskover_port_http }}:80"

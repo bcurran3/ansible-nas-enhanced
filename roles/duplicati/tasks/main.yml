@@ -29,9 +29,8 @@
           - NET_ADMIN
           - DAC_READ_SEARCH
         env:
-          DOCKER_MODS: "linuxserver/mods:universal-package-install" # added
-          INSTALL_PACKAGES: "smbclient|cifs-utils" # added
-          # ^^^ should make these variables
+          DOCKER_MODS: "{{ duplicati_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ duplicati_env_install_packages }}"
           PUID: "{{ duplicati_user_id }}"
           PGID: "{{ duplicati_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"

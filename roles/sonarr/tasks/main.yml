@@ -24,11 +24,11 @@
         ports:
           - "{{ sonarr_port }}:8989"
         env:
+          DOCKER_MODS: "{{ sonarr_env_docker_mods }}"
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ sonarr_user_id }}"
           PGID: "{{ sonarr_group_id }}"
-#         DOCKER_MODS: "linuxserver/mods:radarr-striptracks"     # added
-#         DOCKER_MODS: "ghcr.io/themepark-dev/theme.park:sonarr"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ sonarr_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ sonarr_watchtower_monitor_only }}"

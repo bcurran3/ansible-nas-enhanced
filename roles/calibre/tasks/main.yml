@@ -21,11 +21,12 @@
           - "{{ calibre_books_directory }}:/books:rw"
           - "{{ calibre_comics_directory }}:/comics:rw"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
+          CLI_ARGS: "{{ calibre_cli_args }}"
+          DOCKER_MODS: "{{ calibre_env_docker_mods }}"
+          PASSWORD: "{{ calibre_password }}"
           PUID: "{{ calibre_user_id }}"
           PGID: "{{ calibre_group_id }}"
-          PASSWORD: "{{ calibre_password }}"
-          CLI_ARGS: "{{ calibre_cli_args }}"
+          TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ calibre_port }}:8080"
           - "{{ calibre_webserver_port }}:8081"

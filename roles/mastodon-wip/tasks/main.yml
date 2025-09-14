@@ -94,6 +94,7 @@
         network_mode: "bridge"
         command: "bundle exec puma -C config/puma.rb"
         env:
+          DOCKER_MODS: "{{ mastodon_env_docker_mods }}"
           PUID: "1000"
           PGID: "1000"
           LOCAL_DOMAIN: "{{ ansible_nas_domain }}"

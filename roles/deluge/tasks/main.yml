@@ -23,9 +23,10 @@
         ports:
           - "{{ deluge_port }}:8112"
         env:
-          TZ: "{{ deluge_timezone }}"
+          DOCKER_MODS: "{{ deluge_env_docker_mods }}"
           PUID: "{{ deluge_user_id }}"
           PGID: "{{ deluge_group_id }}"
+          TZ: "{{ deluge_timezone }}"
         labels:
           autoheal: "{{ deluge_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ deluge_watchtower_monitor_only }}"

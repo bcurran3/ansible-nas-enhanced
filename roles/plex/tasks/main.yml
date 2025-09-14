@@ -56,7 +56,7 @@
         network_mode: "bridge"   # changed
         devices: "{{ plex_devices | default(omit) }}"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
+          DOCKER_MODS: "{{ plex_env_docker_mods }}"
           PUID: "{{ plex_user_id }}"
           PGID: "{{ plex_group_id }}"
           VERSION: "{{ plex_version }}"
@@ -64,6 +64,7 @@
           NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility" # added
           GenerateBIFKeyframesOnly: "1"                       # added
           PLEX_DISABLE_SECURITY: "1"                          # added
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ plex_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ plex_watchtower_monitor_only }}"

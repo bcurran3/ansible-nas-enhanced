@@ -21,9 +21,10 @@
         ports:
           - "{{ ombi_port }}:3579"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
+          DOCKER_MODS: "{{ ombi_env_docker_mods }}"
           PUID: "{{ ombi_user_id }}"
           PGID: "{{ ombi_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ ombi_autoheal }}"
           com.centurylinklabs.watchtower.monitor-only: "{{ ombi_watchtower_monitor_only }}"
