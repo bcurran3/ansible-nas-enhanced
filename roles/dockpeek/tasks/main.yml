@@ -1,0 +1,59 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dockpeek_container_name }}"
+        hostname: "{{ dockpeek_container_name }}"
+        image: "{{ dockpeek_image_name }}:{{ dockpeek_image_tag }}"
+        pull: true
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+          - "{{ dockpeek_port }}:80"
+        env:
+          SECRET_KEY: "{{ dockpeek_env_secret_key }}"
+          USERNAME: "{{ dockpeek_env_username }}"
+          PASSWORD: "{{ dockpeek_env_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ dockpeek_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockpeek_watchtower_enable }}"
+          dockflare.enable: "{{ dockpeek_dockflare_tunnel }}"
+          dockflare.access.group: "{{ dockpeek_dockflare_access_group }}"
+          dockflare.hostname: "{{ dockpeek_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockpeek_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ dockpeek_homepage_group }}"
+          homepage.icon: "{{ dockpeek_homepage_icon }}"
+          homepage.href: "{{ dockpeek_homepage_href }}"
+          homepage.description: "{{ 'Docker Dashboard for Easy Container Access' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dockpeek_container_name }}"
+          homepage.showStats: "{{ dockpeek_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockpeek_port }}"
+          traefik.enable: "{{ dockpeek_available_externally | string }}"
+          traefik.http.routers.dockpeek.rule: "Host(`{{ dockpeek_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.dockpeek.tls.certresolver: "letsencrypt"
+          traefik.http.routers.dockpeek.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.dockpeek.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ dockpeek_hostname }}"
+          traefik.http.routers.dockpeek.middlewares: "{{ dockpeek_hostname }}@docker"
+          traefik.http.middlewares.dockpeek.IPAllowList.sourcerange: "{{ dockpeek_traefik_whitelist }}"
+          traefik.http.services.dockpeek.loadbalancer.server.port: "8000"
+          wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/dockpeek/dockpeek/pkgs/container/dockpeek"
+        cpu_shares: "{{ dockpeek_cpu_shares }}"
+        memory: "{{ dockpeek_memory }}"
+        restart_policy: unless-stopped
+  when: dockpeek_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ dockpeek_container_name }}"
+        state: absent
+  when: dockpeek_enabled is false

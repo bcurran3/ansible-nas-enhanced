@@ -1,0 +1,145 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ youtarr_data_directory }}"
+        - "{{ youtarr_data_directory }}/config"
+        - "{{ youtarr_data_directory }}/db"
+        - "{{ youtarr_data_directory }}/images"
+        - "{{ youtarr_data_directory }}/jobs"
+        - "{{ youtarr_data_directory }}/migrations"
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ youtarr_db_container_name }}"
+        hostname: "{{ youtarr_db_container_name }}"
+        image: "{{ youtarr_db_image_name }}:{{ youtarr_db_image_tag }}"
+        pull: true
+        command: "--port=3321 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci"
+        volumes:
+          - "{{ youtarr_data_directory }}/db:/var/lib/mysql"
+          - "{{ youtarr_data_directory }}/migrations:/docker-entrypoint-initdb.d"
+          - "{{ youtarr_data_directory }}/config/mariadb.cnf:/etc/mysql/conf.d/charset.cnf:ro"
+        env:
+          MYSQL_ROOT_PASSWORD: "123qweasd"
+          MYSQL_DATABASE: "youtarr"
+          MYSQL_TCP_PORT: "3321"
+          MYSQL_CHARSET: "utf8mb4"
+          MYSQL_COLLATION: "utf8mb4_unicode_ci"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "3321", "-p123qweasd"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+          start_period: 30s
+        labels:
+          autoheal: "{{ youtarr_db_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ youtarr_db_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ youtarr_db_homepage_group }}"
+          homepage.icon: "{{ youtarr_db_homepage_icon }}"
+          homepage.href: "{{ youtarr_homepage_href }}"
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ youtarr_db_container_name }}"
+          homepage.showStats: "{{ youtarr_db_homepage_showstats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
+        cpu_shares: "{{ youtarr_db_cpu_shares }}"
+        memory: "{{ youtarr_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ youtarr_container_name }}"
+        hostname: "{{ youtarr_container_name }}"
+        image: "{{ youtarr_image_name }}:{{ youtarr_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ youtarr_dl_directory }}:/usr/src/app/data"
+          - "{{ youtarr_data_directory }}/images:/app/server/images"
+          - "{{ youtarr_data_directory }}/config:/app/config"
+          - "{{ youtarr_data_directory }}/jobs:/app/jobs"
+          - "{{ youtarr_data_directory }}/migrations:/app/migrations"
+        ports:
+          - "{{ youtarr_port }}:3011"
+        env:
+          IN_DOCKER_CONTAINER: "1"
+          DB_HOST: "{{ youtarr_db_container_name }}"
+          DB_PORT: "3321"
+          DB_USER: "root"
+          DB_PASSWORD: "123qweasd"
+          DB_NAME: "youtarr"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ youtarr_db_container_name }}"
+        labels:
+          autoheal: "{{ youtarr_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ youtarr_watchtower_enable }}"
+          dockflare.enable: "{{ youtarr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ youtarr_dockflare_access_group }}"
+          dockflare.hostname: "{{ youtarr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ youtarr_homepage_group }}"
+          homepage.icon: "{{ youtarr_homepage_icon }}"
+          homepage.href: "{{ youtarr_homepage_href }}"
+          homepage.description: "{{ 'youtarr description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ youtarr_container_name }}"
+          homepage.showStats: "{{ youtarr_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port }}"
+          traefik.enable: "{{ youtarr_available_externally | string }}"
+          traefik.http.routers.youtarr.rule: "Host(`{{ youtarr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.youtarr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.youtarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.youtarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ youtarr_hostname }}"
+          traefik.http.routers.youtarr.middlewares: "{{ youtarr_hostname }}@docker"
+          traefik.http.middlewares.youtarr.IPAllowList.sourcerange: "{{ youtarr_traefik_whitelist }}"
+          traefik.http.services.youtarr.loadbalancer.server.port: "3011"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform: "semver"
+          wud.link.template: "https://hub.docker.com/r/dialmaster/youtarr"
+        cpu_shares: "{{ youtarr_cpu_shares }}"
+        memory: "{{ youtarr_memory }}"
+        restart_policy: unless-stopped
+  when: youtarr_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ youtarr_container_name }}"
+        state: absent
+  when: youtarr_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ youtarr_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ youtarr_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: youtarr_enabled is false and archive_app_data_enabled is true

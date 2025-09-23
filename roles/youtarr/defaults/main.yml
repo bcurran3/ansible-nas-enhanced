@@ -1,0 +1,51 @@
+---
+# ANE
+ansible_nas_app_name: "Youtarr"
+youtarr_enabled: false
+youtarr_available_externally: false
+youtarr_traefik_whitelist: "{{ lan }}"
+
+# directories
+youtarr_data_directory: "{{ docker_home }}/youtarr"
+
+# docker
+youtarr_container_name: "youtarr"
+youtarr_image_name: "dialmaster/youtarr"
+youtarr_image_tag: "latest"
+youtarr_db_container_name: "youtarr-db"
+youtarr_db_image_name: "mariadb"
+youtarr_db_image_tag: "10.3"
+
+# network
+youtarr_port: "3087"
+youtarr_hostname: "youtarr"
+
+# specs
+youtarr_cpu_shares: "1024"
+youtarr_memory: 1g
+youtarr_db_cpu_shares: "1024"
+youtarr_db_memory: 1g
+
+youtarr_dl_directory: "{{ downloads_root }}/youtube/video"
+
+# autoheal
+youtarr_autoheal: "false"
+youtarr_db_autoheal: "false"
+
+# dockflare
+youtarr_dockflare_tunnel: "false"
+youtarr_dockflare_access_group: ""
+
+# homepage
+youtarr_homepage_group: "Apps"
+youtarr_homepage_icon: "youtarr.png"
+youtarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port }}"
+youtarr_homepage_showstats: "false"
+youtarr_db_homepage_group: "DBs"
+youtarr_db_homepage_icon: "mariadb.png"
+youtarr_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port }}"
+youtarr_db_homepage_showstats: "false"
+
+# watchtower
+youtarr_watchtower_enable: "false"
+youtarr_db_watchtower_enable: "false"

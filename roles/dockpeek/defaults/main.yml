@@ -1,0 +1,40 @@
+---
+# ANE
+ansible_nas_app_name: "Dockpeek"
+dockpeek_enabled: false
+dockpeek_available_externally: false
+dockpeek_traefik_whitelist: "{{ lan }}"
+
+# docker
+dockpeek_container_name: "dockpeek"
+dockpeek_image_name: "ghcr.io/dockpeek/dockpeek"
+dockpeek_image_tag: "latest"
+
+# network
+dockpeek_port: "3420"
+dockpeek_hostname: "dockpeek"
+
+# specs
+dockpeek_cpu_shares: "1024"
+dockpeek_memory: 256MB
+
+# app
+dockpeek_env_secret_key: "Ansible-NAS"
+dockpeek_env_username: "admin"
+dockpeek_env_password: "topsecret"
+
+# autoheal
+dockpeek_autoheal: "false"
+
+# dockflare
+dockpeek_dockflare_tunnel: "false"
+dockpeek_dockflare_access_group: ""
+
+# homepage
+dockpeek_homepage_group: "Apps"
+dockpeek_homepage_icon: "dockpeek.png"
+dockpeek_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockpeek_port }}"
+dockpeek_homepage_showstats: "false"
+
+# watchtower
+dockpeek_watchtower_enable: "false"
