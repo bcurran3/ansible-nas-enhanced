@@ -1,0 +1,89 @@
+---
+# https://openpaymenthost.com/
+# requires editing secrets/fragmenta.json within the container
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ openpaymenthost_data_directory }}"
+        - "{{ openpaymenthost_data_directory }}/exec"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ openpaymenthost_container_name }}"
+        hostname: "{{ openpaymenthost_container_name }}"
+        image: "{{ openpaymenthost_image_name }}:{{ openpaymenthost_image_tag }}"
+        pull: true
+        volumes:
+#          - "{{ openpaymenthost_data_directory }}:/home/default/build"
+#          - "{{ openpaymenthost_data_directory }}/exec:/home/default/build/exec"
+#        command: "/home/default/build/exec/open-payment-host"
+        ports:
+          - "{{ openpaymenthost_port }}:3000"
+        env:
+          FRAG_ENV: "production"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ openpaymenthost_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ openpaymenthost_watchtower_enable }}"
+          dockflare.enable: "{{ openpaymenthost_dockflare_tunnel }}"
+          dockflare.access.group: "{{ openpaymenthost_dockflare_access_group }}"
+          dockflare.hostname: "{{ openpaymenthost_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openpaymenthost_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ openpaymenthost_homepage_group }}"
+          homepage.icon: "{{ openpaymenthost_homepage_icon }}"
+          homepage.href: "{{ openpaymenthost_homepage_href }}"
+          homepage.description: "{{ 'Self hosted alternative for Gumroad, Buy Me a Coffee, Ko-fi etc' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ openpaymenthost_container_name }}"
+          homepage.showStats: "{{ openpaymenthost_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openpaymenthost_port }}"
+          traefik.enable: "{{ openpaymenthost_available_externally | string }}"
+          traefik.http.routers.openpaymenthost.rule: "Host(`{{ openpaymenthost_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.openpaymenthost.tls.certresolver: "letsencrypt"
+          traefik.http.routers.openpaymenthost.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.openpaymenthost.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ openpaymenthost_hostname }}"
+          traefik.http.routers.openpaymenthost.middlewares: "{{ openpaymenthost_hostname }}@docker"
+          traefik.http.middlewares.openpaymenthost.IPAllowList.sourcerange: "{{ openpaymenthost_traefik_whitelist }}"
+          traefik.http.services.openpaymenthost.loadbalancer.server.port: "{{ openpaymenthost_port }}"
+          wud.tag.include: '/^\\d+\\.\\d+\\.\\d+$/'
+          wud.tag.transform.type: "semver"
+          wud.link.template: 'https://hub.docker.com/r/abishekmuthian/open-payment-host'
+        cpu_shares: "{{ openpaymenthost_cpu_shares }}"
+        memory: "{{ openpaymenthost_memory }}"
+        restart_policy: unless-stopped
+  when: openpaymenthost_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ openpaymenthost_container_name }}"
+        state: absent
+  when: openpaymenthost_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ openpaymenthost_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ openpaymenthost_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: openpaymenthost_enabled is false and archive_app_data_enabled is true

@@ -63,7 +63,7 @@
           # Assign a dummy service (required by Traefik, but never used because of the redirect)
           #traefik.http.routers.dashboard-redirect.service: "noop@internal"
 
-          wud.tag.include: '^v\d+\.\d+.*$'
+          wud.tag.include: "^v\\d+\\.\\d+$"
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/traefik"
         cpu_shares: "{{ traefik_cpu_shares }}"

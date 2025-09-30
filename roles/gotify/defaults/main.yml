@@ -14,7 +14,7 @@ gotify_hostname: "gotify"
 
 # docker
 gotify_container_name: "gotify"
-gotify_image_name: "gotify/server"
+gotify_image_name: "ghcr.io/gotify/server"
 gotify_image_version: "latest"
 gotify_cpu_shares: 1024
 
@@ -25,7 +25,8 @@ gotify_group_id: "0"
 gotify_memory: 256m
 
 # app
-gotify_env_gotify_server_cors_alloworigins: "[{{ ansible_nas_domain }}]"
+gotify_env_gotify_server_cors_alloworigins: "{{ ansible_nas_domain }}"
+gotify_env_gotify_server_trustedproxies: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
 
 # autoheal
 gotify_autoheal: "false"

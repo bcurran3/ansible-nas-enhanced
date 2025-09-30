@@ -111,7 +111,7 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
     if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
         # If it is, change "true" to "false"
         sed -i "s/$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
-        echo "** $2 disabled."
+        echo "  ** $2 disabled."
     elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
         # If it is, report it and do nothing
         echo "  ** $2 is already disabled."
