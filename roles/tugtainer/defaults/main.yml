@@ -1,0 +1,38 @@
+---
+# ANE
+ansible_nas_app_name: "Tugtainer"
+tugtainer_enabled: false
+tugtainer_available_externally: false
+tugtainer_traefik_whitelist: "{{ lan }}"
+
+# directories
+tugtainer_data_directory: "{{ docker_home }}/tugtainer"
+
+# docker
+tugtainer_container_name: "tugtainer"
+tugtainer_image_name: "quenary/tugtainer"
+tugtainer_image_tag: "latest"
+
+# network
+tugtainer_port: "9412"
+tugtainer_hostname: "tugtainer"
+
+# specs
+tugtainer_cpu_shares: "1024"
+tugtainer_memory: 1g
+
+# autoheal
+tugtainer_autoheal: "false"
+
+# dockflare
+tugtainer_dockflare_tunnel: "false"
+tugtainer_dockflare_access_group: ""
+
+# homepage
+tugtainer_homepage_group: "Apps"
+tugtainer_homepage_icon: "docker.png"
+tugtainer_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tugtainer_port }}"
+tugtainer_homepage_showstats: "false"
+
+# watchtower
+tugtainer_watchtower_enable: "false"
