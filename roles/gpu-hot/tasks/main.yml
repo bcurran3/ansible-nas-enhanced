@@ -1,0 +1,69 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ gpuhot_container_name }}"
+        hostname: "{{ gpuhot_container_name }}"
+        image: "{{ gpuhot_image_name }}:{{ gpuhot_image_tag }}"
+        pull: true
+        ports:
+          - "{{ gpuhot_port }}:1312"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
+        env:
+          NVIDIA_VISIBLE_DEVICES: "all"
+          NVIDIA_DRIVER_CAPABILITIES: "all"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:1312/api/gpu-data"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+          start_period: 40s
+        labels:
+          autoheal: "{{ gpuhot_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ gpuhot_watchtower_enable }}"
+          dockflare.enable: "{{ gpuhot_dockflare_tunnel }}"
+          dockflare.access.group: "{{ gpuhot_dockflare_access_group }}"
+          dockflare.hostname: "{{ gpuhot_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gpuhot_port }}"
+#         dockflare.access.policy: "authenticate"
+#         dockflare.access.allowed_idps: "YOUR_IDP_UUID_HERE"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ gpuhot_homepage_group }}"
+          homepage.icon: "{{ gpuhot_homepage_icon }}"
+          homepage.href: "{{ gpuhot_homepage_href }}"
+          homepage.description: "{{ 'Real-time NVIDIA GPU dashboard' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ gpuhot_container_name }}"
+          homepage.showStats: "{{ gpuhot_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gpuhot_port }}"
+          traefik.enable: "{{ gpuhot_available_externally | string }}"
+          traefik.http.routers.gpuhot.rule: "Host(`{{ gpuhot_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.gpuhot.tls.certresolver: "letsencrypt"
+          traefik.http.routers.gpuhot.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.gpuhot.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ gpuhot_hostname }}"
+          traefik.http.routers.gpuhot.middlewares: "{{ gpuhot_hostname }}@docker"
+          traefik.http.middlewares.gpuhot.IPAllowList.sourcerange: "{{ gpuhot_traefik_whitelist }}"
+          traefik.http.services.gpuhot.loadbalancer.server.port: "1312"
+          wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/psalias2006/GPU-Hot/pkgs/container/gpu-hot"
+        cpu_shares: "{{ gpuhot_cpu_shares }}"
+        memory: "{{ gpuhot_memory }}"
+        restart_policy: unless-stopped
+  when: gpuhot_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ gpuhot_container_name }}"
+        state: absent
+  when: gpuhot_enabled is false
