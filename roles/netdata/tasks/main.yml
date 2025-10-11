@@ -53,9 +53,9 @@
           traefik.http.routers.netdata.middlewares: "{{ netdata_hostname }}@docker"
           traefik.http.middlewares.netdata.IPAllowList.sourcerange: "{{ netdata_traefik_whitelist }}"
           traefik.http.services.netdata.loadbalancer.server.port: "19999"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\\d+\\.\\d+\\.\\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/netdata/netdata"
+          wud.link.template: "https://github.com/netdata/netdata/pkgs/container/netdata"
         cpu_shares: "{{ netdata_cpu_shares }}"
         memory: "{{ netdata_memory }}"
         restart_policy: unless-stopped
