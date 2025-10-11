@@ -68,9 +68,9 @@
 #         homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port }}"
 #         homepage.widget.key: "{{ watchtower_api_token }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.include: '^\\d+\\.\\d+\\.\\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/containrrr/watchtower"
+          wud.link.template: "https://github.com/containrrr/watchtower/pkgs/container/watchtower"
         cpu_shares: "{{ watchtower_cpu_shares }}"
         memory: "{{ watchtower_memory }}"
         restart_policy: unless-stopped
