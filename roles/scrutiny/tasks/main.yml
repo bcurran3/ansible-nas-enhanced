@@ -47,6 +47,12 @@
           - "/dev:/dev:ro"
         ports:
           - "{{ scrutiny_port }}:8080"
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
+          interval: 5s
+          timeout: 10s
+          retries: 20
+          start_period: 10s
         labels:
           autoheal: "{{ scrutiny_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ scrutiny_watchtower_enable }}"
