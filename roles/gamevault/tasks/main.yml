@@ -53,8 +53,8 @@
         hostname: "{{ gamevault_container_name }}"
         image: "{{ gamevault_image_name }}:{{ gamevault_image_tag }}"
         pull: true
-#       links:
-#         - "{{ gamevault_db_container_name }}"
+        links:
+         - "{{ gamevault_db_container_name }}"
         volumes:
           - "{{ gamevault_data_directory }}/config:/config"
           - "{{ gamevault_data_directory }}/media:/media"
