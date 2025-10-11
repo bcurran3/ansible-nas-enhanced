@@ -72,9 +72,9 @@
 #         traefik.http.routers.vaultwarden-ws.middlewares: "{{ vaultwarden_hostname }}-ws@docker"
 #         traefik.http.middlewares.vaultwarden-ws.IPAllowList.sourcerange: "{{ vaultwarden_traefik_whitelist }}"
 #         traefik.http.services.vaultwarden-ws.loadbalancer.server.port: "3012"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.include: '^\\d+\\.\\d+\\.\\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/vaultwarden/server"
+          wud.link.template: "https://github.com/dani-garcia/vaultwarden/pkgs/container/vaultwarden"
         cpu_shares: "{{ vaultwarden_cpu_shares }}"
         memory: "{{ vaultwarden_memory }}"
         restart_policy: unless-stopped
