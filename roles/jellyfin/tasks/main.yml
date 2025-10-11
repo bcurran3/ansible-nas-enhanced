@@ -18,12 +18,15 @@
         pull: true
         volumes:
           - "{{ jellyfin_data_directory }}/config:/config:rw"
+          - "{{ jellyfin_anime_directory }}:/anime:{{ jellyfin_anime_permissions }}"
+          - "{{ jellyfin_audiobooks_directory }}:/audiobooks:{{ jellyfin_audiobooks_permissions }}"
+          - "{{ jellyfin_books_directory }}:/books:{{ jellyfin_books_permissions }}"
           - "{{ jellyfin_movies_directory }}:/movies:{{ jellyfin_movies_permissions }}"
           - "{{ jellyfin_music_directory }}:/music:{{ jellyfin_music_permissions }}"
           - "{{ jellyfin_photos_directory }}:/photos:{{ jellyfin_photos_permissions }}"
+          - "{{ jellyfin_podcasts_directory }}:/podcasts:{{ jellyfin_podcasts_permissions }}"
+          - "{{ jellyfin_porn_directory }}:/porn:{{ jellyfin_porn_permissions }}"
           - "{{ jellyfin_tv_directory }}:/tv:{{ jellyfin_tv_permissions }}"
-          - "{{ jellyfin_books_directory }}:/books:{{ jellyfin_books_permissions }}"
-          - "{{ jellyfin_audiobooks_directory }}:/audiobooks:{{ jellyfin_audiobooks_permissions }}"
         ports:
           - "{{ jellyfin_port_http }}:8096"
         env:

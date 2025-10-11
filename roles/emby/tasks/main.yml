@@ -18,10 +18,15 @@
         pull: true
         volumes:
           - "{{ emby_data_directory }}/config:/config:rw"
-          - "{{ emby_movies_directory }}:/movies:{{ emby_movies_permissions }}"
-          - "{{ emby_tv_directory }}:/tv:{{ emby_tv_permissions }}"
           - "{{ emby_anime_directory }}:/anime:{{ emby_anime_permissions }}"
-          # should add porn support
+          - "{{ emby_audiobooks_directory }}:/audiobooks:{{ emby_audiobooks_permissions }}"
+          - "{{ emby_books_directory }}:/books:{{ emby_books_permissions }}"
+          - "{{ emby_movies_directory }}:/movies:{{ emby_movies_permissions }}"
+          - "{{ emby_music_directory }}:/music:{{ emby_music_permissions }}"
+          - "{{ emby_photos_directory }}:/photos:{{ emby_photos_permissions }}"
+          - "{{ emby_podcasts_directory }}:/podcasts:{{ emby_podcasts_permissions }}"
+          - "{{ emby_porn_directory }}:/porn:{{ emby_porn_permissions }}"
+          - "{{ emby_tv_directory }}:/tv:{{ emby_tv_permissions }}"
         ports:
           - "{{ emby_port_http }}:8096"
           - "{{ emby_port_https }}:8920"
