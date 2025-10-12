@@ -66,9 +66,9 @@
 #         traefik.http.routers.crowdsec.middlewares: "{{ crowdsec_hostname }}@docker"
 #         traefik.http.middlewares.crowdsec.IPAllowList.sourcerange: "{{ crowdsec_traefik_whitelist }}"
 #         traefik.http.services.crowdsec.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/crowdsecurity/crowdsec"
+          wud.link.template: "https://github.com/crowdsecurity/crowdsec/pkgs/container/crowdsec"
         cpu_shares: "{{ crowdsec_cpu_shares }}"
         memory: "{{ crowdsec_memory }}"
         restart_policy: unless-stopped
