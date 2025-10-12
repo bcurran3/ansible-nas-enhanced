@@ -16,8 +16,8 @@
           if nvidia_runtime_enabled | bool else omit
         }}"
         env:
-          NVIDIA_VISIBLE_DEVICES: "all"
-          NVIDIA_DRIVER_CAPABILITIES: "all"
+          NVIDIA_SMI: "{{ gpuhot_env_nvidia_smi }}"
+          NVIDIA_VISIBLE_DEVICES: "{{ gpuhot_env_nvidia_visible_devices }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD", "curl", "-f", "http://localhost:1312/api/gpu-data"]
