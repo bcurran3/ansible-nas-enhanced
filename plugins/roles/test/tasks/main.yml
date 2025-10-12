@@ -17,38 +17,6 @@
     - debug:
         msg: "LAN whitelist: {{ lan }}"
 
-
-#    - shell: git rev-list ...@{u} --count
-#      register: commits_behind_number
-
-    #- shell: git log -"{{ commits_behind_number }}" ...@{u} --pretty=format:"%h - %an, %ar - %s"
-#    - shell: 'git log -7 ...@{u} --pretty=format:"%h - %an, %ar - %s"'
-#      register: commits_behind
-
-#    - debug:
-#        msg: "{{ commits_behind_number.stdout }} - {{ commits_behind.stdout }}"
-
-#    - debug:
-#        msg: "Ansible-NAS is {{ commits_behind_number.stdout }} commits behind master. Here's what you're missing {{ commits_behind.stdout }}"
-
-
-# ^^^^^^ UPDATE ABOVE to do BELOW
-
-
-# Check git commits ANE is behind
-#if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" ]]; then
-#    git fetch --quiet
-#    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
-#    BEHIND=$(git rev-list --count HEAD..@{u})
-#    echo "  ** Your ANE installation is $BEHIND git commits behind."
-#    if [ $BEHIND -gt 0 ]; then
-#       echo "  ** \"./ane.sh --upgrade\" or \"git pull\" to update"
-#    fi
-#    exit
-#fi
-
-
-
     - name: find roles directories
       ansible.builtin.find:
         paths: plugins/
