@@ -16,7 +16,7 @@
       file:
         path: "{{ item }}"
         state: directory
-        owner: "{{ invoiceninja_user_id }}"
+        owner: "999"
         group: "999"
         mode: "755"
       with_items:
@@ -46,8 +46,8 @@
         volumes:
           - "{{ invoiceninja_data_directory }}/db:/var/lib/mysql"
         env:
-          PUID: "1000"
-          PGID: "1000"
+          PUID: "{{ invoiceninja_db_user_id }}"
+          PGID: "{{ invoiceninja_db_group_id }}"
           MYSQL_ROOT_PASSWORD: "topsecretroot"
           MYSQL_DATABASE: "invoiceninja"
           MYSQL_USER: "invoiceninja"
@@ -96,9 +96,9 @@
           API_SECRET: "{{ invoiceninja_api_secret }}"
           REQUIRE_HTTPS: "{{ invoiceninja_require_https }}"
           LICENSE_KEY:  "{{ invoiceninja_license_key }}"
-          PHANTOMJS_PDF_GENERATION: "false"
-          PDF_GENERATOR: "snappdf"
-          TRUSTED_PROXIES: '*'
+          PHANTOMJS_PDF_GENERATION: "{{ invoiceninja_phantomjs_pdf_generation }}"
+          PDF_GENERATOR: "{{ invoiceninja_pdf_generator }}"
+          TRUSTED_PROXIES: "{{ invoiceninja_trusted_proxies }}"
           IS_DOCKER: "TRUE"
           NINJA_ENVIRONMENT: "selfhost"
           UPDATE_SECRET: "{{ invoiceninja_update_secret }}"
