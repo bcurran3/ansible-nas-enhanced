@@ -8,10 +8,18 @@
         group: "{{ invoiceninja_group_id }}"
         mode: "755"
       with_items:
-#       - "{{ invoiceninja_data_directory }}/logo"
         - "{{ invoiceninja_data_directory }}/public"
         - "{{ invoiceninja_data_directory }}/storage"
         - "{{ invoiceninja_data_directory }}/nginx"
+
+    - name: Create {{ ansible_nas_app_name }} DB Directory
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ invoiceninja_user_id }}"
+        group: "999"
+        mode: "755"
+      with_items:
         - "{{ invoiceninja_data_directory }}/db"
 
     - name: Create {{ ansible_nas_app_name }} Network
@@ -36,7 +44,6 @@
         network_mode: "{{ invoiceninja_network_name }}"
         networks_cli_compatible: "yes"
         volumes:
-#         - "{{ invoiceninja_data_directory }}/db:/config"
           - "{{ invoiceninja_data_directory }}/db:/var/lib/mysql"
         env:
           PUID: "1000"
