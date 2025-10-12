@@ -44,8 +44,9 @@
           homepage.container: "{{ ghost_db_container_name }}"
           homepage.showStats: "{{ ghost_db_homepage_showstats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/mysql/mysql-server/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^8\.0\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mysql"
         cpu_shares: "{{ ghost_db_cpu_shares }}"
         memory: "{{ ghost_db_memory }}"
         restart_policy: unless-stopped
@@ -107,7 +108,7 @@
           traefik.http.routers.ghost.middlewares: "{{ ghost_hostname }}@docker"
           traefik.http.middlewares.ghost.IPAllowList.sourcerange: "{{ ghost_traefik_whitelist }}"
           traefik.http.services.ghost.loadbalancer.server.port: "2368"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/ghost"
         cpu_shares: "{{ ghost_cpu_shares }}"

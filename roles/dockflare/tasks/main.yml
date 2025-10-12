@@ -51,7 +51,8 @@
           traefik.http.routers.dockflare.middlewares: "{{ dockflare_hostname }}@docker"
           traefik.http.middlewares.dockflare.IPAllowList.sourcerange: "{{ dockflare_traefik_whitelist }}"
           traefik.http.services.dockflare.loadbalancer.server.port: "5000"
-          wud.watch.digest: "true"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/alplat/dockflare"
         cpu_shares: "{{ dockflare_cpu_shares }}"
         memory: "{{ dockflare_memory }}"

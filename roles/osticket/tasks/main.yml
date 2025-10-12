@@ -40,9 +40,9 @@
           homepage.container: "{{ osticket_db_container_name }}"
           homepage.showStats: "{{ osticket_homepage_showstats }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://lscr.io/linuxserver/mariadb"
+          wud.link.template: "lscr.io/linuxserver/mariadb"
         cpu_shares: "{{ osticket_db_cpu_shares }}"
         memory: "{{ osticket_db_memory }}"
         restart_policy: unless-stopped
@@ -94,7 +94,7 @@
           traefik.http.routers.osticket.middlewares: "{{ osticket_hostname }}@docker"
           traefik.http.middlewares.osticket.IPAllowList.sourcerange: "{{ osticket_traefik_whitelist }}"
           traefik.http.services.osticket.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/ahkarswe/osticket"
         cpu_shares: "{{ osticket_cpu_shares }}"

@@ -41,7 +41,7 @@
           traefik.http.routers.doku.middlewares: "{{ doku_hostname }}@docker"
           traefik.http.middlewares.doku.IPAllowList.sourcerange: "{{ doku_traefik_whitelist }}"
           traefik.http.services.doku.loadbalancer.server.port: "{{ doku_port }}"
-          wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/amerkurev/doku/pkgs/container/doku"
         cpu_shares: "{{ doku_cpu_shares }}"

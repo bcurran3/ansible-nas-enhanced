@@ -113,10 +113,9 @@
           traefik.http.routers.proget.middlewares: "proget@docker"
           traefik.http.middlewares.proget.IPAllowList.sourcerange: "{{ proget_traefik_whitelist }}"
           traefik.http.services.proget.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d{4}\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.watch.registry: "https://proget.inedo.com"
-          wud.link.template: "https://proget.inedo.com/productimages/inedo/proget"
+          wud.link.template: "https://inedo.com/proget"
         cpu_shares: "{{ proget_cpu_shares }}"
         memory: "{{ proget_memory }}"
         restart_policy: unless-stopped
