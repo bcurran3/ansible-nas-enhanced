@@ -45,6 +45,7 @@
         networks_cli_compatible: "yes"
         volumes:
           - "{{ invoiceninja_data_directory }}/db:/var/lib/mysql"
+          - "/etc/localtime:/etc/localtime:ro"
         env:
           PUID: "{{ invoiceninja_db_user_id }}"
           PGID: "{{ invoiceninja_db_group_id }}"
