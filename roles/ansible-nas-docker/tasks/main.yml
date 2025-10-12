@@ -70,18 +70,18 @@
       ansible.builtin.debug:
         msg: "A reboot is required after NVIDIA driver installation."
       when: nvidia_driver_result.changed
+
+    - name: Check NVIDIA driver is running
+      ansible.builtin.shell: nvidia-smi > /dev/null 2>&1
+      register: nvidia_smi_result
+      changed_when: false
+      ignore_errors: true
+
+    - name: Set nvidia_runtime_enabled to false when NVIDIA driver not running
+      ansible.builtin.set_fact:
+        nvidia_runtime_enabled: false
+      when: nvidia_smi_result.rc != 0
   when: nvidia_runtime_enabled is true
-
-- name: Check NVIDIA driver is running
-  ansible.builtin.shell: nvidia-smi > /dev/null 2>&1
-  register: nvidia_smi_result
-  changed_when: false
-  ignore_errors: true
-
-- name: Set nvidia_runtime_enabled to false when NVIDIA driver not running
-  ansible.builtin.set_fact:
-    nvidia_runtime_enabled: false
-  when: nvidia_smi_result.rc != 0
 
 - name: Check for and Install NVIDIA Container Runtime
   block:
