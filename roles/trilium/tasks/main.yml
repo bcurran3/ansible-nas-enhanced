@@ -1,0 +1,89 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ trilium_data_directory }}"
+        - "{{ trilium_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ trilium_container_name }}"
+        hostname: "{{ trilium_container_name }}"
+        image: "{{ trilium_image_name }}:{{ trilium_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ trilium_data_directory }}/data:/home/node/trilium-data"
+          - /etc/timezone:/etc/timezone:ro
+          - /etc/localtime:/etc/localtime:ro
+        ports:
+          - "{{ trilium_port }}:8080"
+        env:
+          USER_UID: "{{ trilium_env_user_uid }}"
+          USER_GID: "{{ trilium_env_user_gid }}"
+          TRILIUM_DATA_DIR: "/home/node/trilium-data"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ trilium_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ trilium_watchtower_enable }}"
+          dockflare.enable: "{{ trilium_dockflare_tunnel }}"
+          dockflare.access.group: "{{ trilium_dockflare_access_group }}"
+          dockflare.hostname: "{{ trilium_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ trilium_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ trilium_homepage_group }}"
+          homepage.icon: "{{ trilium_homepage_icon }}"
+          homepage.href: "{{ trilium_homepage_href }}"
+          homepage.description: "{{ 'Build your personal knowledge base' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ trilium_container_name }}"
+          homepage.showStats: "{{ trilium_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ trilium_port }}"
+          traefik.enable: "{{ trilium_available_externally | string }}"
+          traefik.http.routers.trilium.rule: "Host(`{{ trilium_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.trilium.tls.certresolver: "letsencrypt"
+          traefik.http.routers.trilium.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.trilium.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ trilium_hostname }}"
+          traefik.http.routers.trilium.middlewares: "{{ trilium_hostname }}@docker"
+          traefik.http.middlewares.trilium.IPAllowList.sourcerange: "{{ trilium_traefik_whitelist }}"
+          traefik.http.services.trilium.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/triliumnext/trilium"
+        cpu_shares: "{{ trilium_cpu_shares }}"
+        memory: "{{ trilium_memory }}"
+        restart_policy: unless-stopped
+  when: trilium_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ trilium_container_name }}"
+        state: absent
+  when: trilium_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ trilium_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ trilium_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: trilium_enabled is false and archive_app_data_enabled is true

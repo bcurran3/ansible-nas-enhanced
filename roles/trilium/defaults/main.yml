@@ -1,0 +1,42 @@
+---
+# ANE
+ansible_nas_app_name: "Trilium Notes"
+trilium_enabled: false
+trilium_available_externally: false
+trilium_traefik_whitelist: "{{ lan }}"
+
+# directories
+trilium_data_directory: "{{ docker_home }}/trilium"
+
+# docker
+trilium_container_name: "trilium"
+trilium_image_name: "triliumnext/trilium"
+trilium_image_tag: "latest"
+
+# network
+trilium_port: "8082"
+trilium_hostname: "trilium"
+
+# specs
+trilium_cpu_shares: "1024"
+trilium_memory: 1g
+
+# app
+trilium_env_user_uid: "0"  # saved data
+trilium_env_user_gid: "0"  # saved data
+
+# autoheal
+trilium_autoheal: "false"
+
+# dockflare
+trilium_dockflare_tunnel: "false"
+trilium_dockflare_access_group: ""
+
+# homepage
+trilium_homepage_group: "Apps"
+trilium_homepage_icon: "sh-trilium-notes.png"
+trilium_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ trilium_port }}"
+trilium_homepage_showstats: "false"
+
+# watchtower
+trilium_watchtower_enable: "false"
