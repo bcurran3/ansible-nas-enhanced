@@ -1,0 +1,96 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ gameyfin_data_directory }}"
+        - "{{ gameyfin_data_directory }}/data"
+        - "{{ gameyfin_data_directory }}/db"
+        - "{{ gameyfin_data_directory }}/logs"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ gameyfin_container_name }}"
+        hostname: "{{ gameyfin_container_name }}"
+        image: "{{ gameyfin_image_name }}:{{ gameyfin_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ gameyfin_data_directory }}/data:/opt/gameyfin/data"
+          - "{{ gameyfin_data_directory }}/db:/opt/gameyfin/db"
+          - "{{ gameyfin_data_directory }}/logs:/opt/gameyfin/logs"
+          - "{{ gameyfin_games_directory }}:/games"
+        ports:
+          - "{{ gameyfin_port }}:8080"
+        # If you plan to use the included torrent plugin, uncomment the following lines:
+        # - "6969:6969"
+        # - "6881:6881"
+        env:
+          APP_KEY: "{{ gameyfin_env_app_key }}"
+          APP_URL: "{{ gameyfin_env_app_url }}"
+          PUID: "{{ gameyfin_user_id }}"
+          PGID: "{{ gameyfin_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ gameyfin_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ gameyfin_watchtower_enable }}"
+          dockflare.enable: "{{ gameyfin_dockflare_tunnel }}"
+          dockflare.access.group: "{{ gameyfin_dockflare_access_group }}"
+          dockflare.hostname: "{{ gameyfin_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gameyfin_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ gameyfin_homepage_group }}"
+          homepage.icon: "{{ gameyfin_homepage_icon }}"
+          homepage.href: "{{ gameyfin_homepage_href }}"
+          homepage.description: "{{ 'Manage your video games.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ gameyfin_container_name }}"
+          homepage.showStats: "{{ gameyfin_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gameyfin_port }}"
+          traefik.enable: "{{ gameyfin_available_externally | string }}"
+          traefik.http.routers.gameyfin.rule: "Host(`{{ gameyfin_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.gameyfin.tls.certresolver: "letsencrypt"
+          traefik.http.routers.gameyfin.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.gameyfin.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ gameyfin_hostname }}"
+          traefik.http.routers.gameyfin.middlewares: "{{ gameyfin_hostname }}@docker"
+          traefik.http.middlewares.gameyfin.IPAllowList.sourcerange: "{{ gameyfin_traefik_whitelist }}"
+          traefik.http.services.gameyfin.loadbalancer.server.port: "8080"
+          wud.tag.include: '^v\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/Gameyfin/Gameyfin/pkgs/container/gameyfin"
+        cpu_shares: "{{ gameyfin_cpu_shares }}"
+        memory: "{{ gameyfin_memory }}"
+        restart_policy: unless-stopped
+  when: gameyfin_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ gameyfin_container_name }}"
+        state: absent
+  when: gameyfin_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ gameyfin_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ gameyfin_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: gameyfin_enabled is false and archive_app_data_enabled is true
