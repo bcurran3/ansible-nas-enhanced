@@ -1,0 +1,54 @@
+---
+# ANE
+ansible_nas_app_name: "Tandoor Recipes"
+tandoor_recipes_enabled: false
+tandoor_recipes_available_externally: false
+tandoor_recipes_traefik_whitelist: "{{ lan }}"
+
+# directories
+tandoor_recipes_data_directory: "{{ docker_home }}/tandoor-recipes"
+
+# docker
+tandoor_recipes_container_name: "tandoor-recipes"
+tandoor_recipes_image_name: "vabene1111/recipes"
+tandoor_recipes_image_tag: "latest"
+tandoor_recipes_db_container_name: "tandoor-recipes-db"
+tandoor_recipes_db_image_name: "postgres"
+tandoor_recipes_db_image_tag: "16-alpine"
+
+# network
+tandoor_recipes_port: "3035"
+tandoor_recipes_hostname: "recipes"
+
+# specs
+tandoor_recipes_cpu_shares: "1024"
+tandoor_recipes_memory: 1g
+tandoor_recipes_db_cpu_shares: "1024"
+tandoor_recipes_db_memory: 1g
+
+# app
+tandoor_recipes_env_allowed_hosts: "{{ tandoor_recipes_hostname }}.{{ ansible_nas_domain }}"
+tandoor_recipes_env_postgres_password: "topsecret"
+tandoor_recipes_env_secret_key: "lhV7H9Hu6oXjW4T/CoKciocYlV4njZxSaTj2Uvt1bpYtctV4Vd"
+
+# autoheal
+tandoor_recipes_autoheal: "false"
+tandoor_recipes_db_autoheal: "false"
+
+# dockflare
+tandoor_recipes_dockflare_tunnel: "false"
+tandoor_recipes_dockflare_access_group: ""
+
+# homepage
+tandoor_recipes_homepage_group: "Apps"
+tandoor_recipes_homepage_icon: "tandoor-recipes.png"
+tandoor_recipes_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port }}"
+tandoor_recipes_homepage_showstats: "false"
+tandoor_recipes_db_homepage_group: "DBs"
+tandoor_recipes_db_homepage_icon: "postgres.png"
+tandoor_recipes_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port }}"
+tandoor_recipes_db_homepage_showstats: "false"
+
+# watchtower
+tandoor_recipes_watchtower_enable: "false"
+tandoor_recipes_db_watchtower_enable: "false"
