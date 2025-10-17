@@ -2,6 +2,8 @@
 # Ansible-NAS-Enhanced helper script
 
 ANE_EDITOR="nano"
+ANE_ALWAYS_PRUNE=false
+ANE_ALWAYS_UPGRADE=false
 
 function print_logo {
 echo "      _    _   _ _____"
@@ -50,6 +52,17 @@ function help {
     echo "  --upgrade, --pull"
     echo "      Upgrade ANE files from git"
     exit
+}
+
+function prune {
+    echo "  ** Pruning images..."
+    docker image prune -f
+    echo "  ** Pruning volumes..."
+    docker volume prune -f
+}
+
+function upgrade {
+    git pull
 }
 
 # offer help when no switches provided
@@ -187,10 +200,7 @@ fi
 
 # Prune docker stuff to save space
 if [[ "$1" = "--prune" || "$1" = "-prune" ]]; then
-    echo "  ** Pruning images..."
-    docker image prune -f
-    echo "  ** Pruning volumes..."
-    docker volume prune -f
+    prune
     exit
 fi
 
@@ -202,12 +212,14 @@ fi
 
 # Run ANE full playbook
 if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" || "$1" = "-update" || "$1" = "-u" ]]; then
+    if ($ANE_ALWAYS_UPGRADE); then upgrade; fi
     ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $2 $3 $4 $5 $6 $7 $8 $9 ${10}
+    if ($ANE_ALWAYS_PRUNE); then prune; fi
     exit
 fi
 
 # Edit ANE settings/variables
-if [[ "$1" = "--settings" || "$1" = "-s" ]]; then
+if [[ "$1" = "--settings" || "$1" = "-settings" || "$1" = "-s" || "$1" = "--vars" || "$1" = "-vars" || "$1" = "-v" ]]; then
     $ANE_EDITOR inventories/ANE/group_vars/nas.yml
     exit
 fi
@@ -220,7 +232,7 @@ fi
 
 # Upgrade ANE files
 if [[ "$1" = "--upgrade" || "$1" = "-upgrade" || "$1" = "--pull" || "$1" = "-pull" ]]; then
-    git pull
+    upgrade
     exit
 fi
 
