@@ -1,0 +1,73 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ modmanager_data_directory }}"
+        - "{{ modmanager_data_directory }}/modcache"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ modmanager_container_name }}"
+        hostname: "{{ modmanager_container_name }}"
+        image: "{{ modmanager_image_name }}:{{ modmanager_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ modmanager_data_directory }}/modcache:/modcache"
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+        env:
+          DOCKER_MODS: "{{ modmanager_env_docker_mods }}"
+#         DOCKER_HOST: ""             # optional
+#         DOCKER_MODS_EXTRA_HOSTS: "" # optional
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ modmanager_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ modmanager_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ modmanager_homepage_group }}"
+          homepage.icon: "{{ modmanager_homepage_icon }}"
+          homepage.description: "{{ 'modmanager description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ modmanager_container_name }}"
+          homepage.showStats: "{{ modmanager_homepage_showstats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^version-\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "lscr.io/linuxserver/modmanager"
+        cpu_shares: "{{ modmanager_cpu_shares }}"
+        memory: "{{ modmanager_memory }}"
+        restart_policy: unless-stopped
+  when: modmanager_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ modmanager_container_name }}"
+        state: absent
+  when: modmanager_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ modmanager_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ modmanager_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: modmanager_enabled is false and archive_app_data_enabled is true
