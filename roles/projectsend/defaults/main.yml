@@ -15,15 +15,12 @@ projectsend_port_http: "3006"
 projectsend_user_id: "1000"
 projectsend_group_id: "1000"
 
-projectsend_network_name: "projectsend"
-
 # docker
 projectsend_container_name: "projectsend"
 projectsend_image_name: "lscr.io/linuxserver/projectsend"
 projectsend_image_tag: "latest"
 projectsend_cpu_shares: "1024"
 projectsend_memory: "512m"
-projectsend_env_docker_mods: ""
 projectsend_db_container_name: "projectsend-db"
 projectsend_db_image_name: "lscr.io/linuxserver/mariadb"
 projectsend_db_image_tag: "latest"
@@ -47,6 +44,10 @@ projectsend_db_homepage_group: "DBs"
 projectsend_db_homepage_icon: "mariadb.png"
 projectsend_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
 projectsend_db_homepage_showstats: "false"
+
+# linuxserver.io docker mods
+projectsend_env_docker_mods: ""
+projectsend_db_env_docker_mods: ""
 
 # watchtower
 projectsend_watchtower_enable: "false"

@@ -21,8 +21,6 @@ deluge_log_level: "error"
 deluge_port: "8112"
 deluge_hostname: "deluge"
 
-deluge_timezone: "{{ ansible_nas_timezone }}"
-
 # specs
 deluge_memory: 1g
 
@@ -31,7 +29,6 @@ deluge_container_name: deluge
 deluge_cpu_shares: 1024
 deluge_image_name: "lscr.io/linuxserver/deluge"
 deluge_image_tag: "latest"
-deluge_env_docker_mods: ""
 
 # autoheal
 deluge_autoheal: "false"
@@ -45,6 +42,9 @@ deluge_homepage_group: "Apps"
 deluge_homepage_icon: "deluge.png"
 deluge_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ deluge_port }}"
 deluge_homepage_showstats: "false"
+
+# linuxserver.io docker mods
+deluge_env_docker_mods: ""
 
 # watchtower
 deluge_watchtower_enable: "false"

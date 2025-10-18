@@ -92,9 +92,9 @@
           traefik.http.routers.change_detection.middlewares: "change_detection@docker"
           traefik.http.middlewares.change_detection.IPAllowList.sourcerange: "{{ change_detection_traefik_whitelist }}"
           traefik.http.services.change_detection.loadbalancer.server.port: "{{ change_detection_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/dgtlmoon/changedetection.io/releases"
+          wud.link.template: "https://github.com/dgtlmoon/changedetection.io/pkgs/container/changedetection.io"
         cpu_shares: "{{ change_detection_cpu_shares }}"
         memory: "{{ change_detection_memory }}"
         restart_policy: unless-stopped

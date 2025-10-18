@@ -22,7 +22,7 @@
         volumes:
           - "{{ projectsend_data_directory }}/db:/config/databases"
         env:
-          DOCKER_MODS: "{{ projectsend_env_docker_mods }}"
+          DOCKER_MODS: "{{ projectsend_db_env_docker_mods }}"
           MYSQL_ROOT_PASSWORD: "projectsend"
           MYSQL_DATABASE: "projectsend"
           MYSQL_USER: "projectsend"
@@ -60,6 +60,7 @@
           - "{{ projectsend_data_directory }}/config:/config"
           - "{{ projectsend_data_directory }}/data:/data"
         env:
+          DOCKER_MODS: "{{ projectsend_env_docker_mods }}"
           MAX_UPLOAD: "{{ projectsend_max_upload }}"
           PUID: "{{ projectsend_user_id }}"
           PGID: "{{ projectsend_group_id }}"
