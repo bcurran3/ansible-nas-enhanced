@@ -145,6 +145,7 @@ if [[ "$1" = "--enable" || "$1" = "-enable" ]]; then
         sed -i "s/$DISABLED_LINE/$ENABLED_LINE/" "$FILE"
         echo "  ** $2 re-enabled."
     else
+        echo -e "\n### $2" >> "$FILE"
         echo "$ENABLED_LINE" >> "$FILE"
         echo "  ** $2 added and enabled."
     fi
