@@ -147,6 +147,8 @@ if [[ "$1" = "--enable" || "$1" = "-enable" ]]; then
     else
         echo -e "\n### $2" >> "$FILE"
         echo "$ENABLED_LINE" >> "$FILE"
+#        echo "$2_available_externally: true" >> "$FILE"
+#        echo "$2_homepage_href: \"https://{{ $2_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
         echo "  ** $2 added and enabled."
     fi
     exit
