@@ -118,41 +118,45 @@ fi
 
 # Disable an app (basic)
 if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
+    shift
     FILE="inventories/ANE/group_vars/nas.yml"
-    ENABLED_LINE="${2}_enabled: true"
-    DISABLED_LINE="${2}_enabled: false"
-    if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
-        # If it is, change "true" to "false"
-        sed -i "s/$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
-        echo "  ** $2 disabled."
-    elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
-        # If it is, report it and do nothing
-        echo "  ** $2 is already disabled."
-    else
-        echo "  ** $2 does not exist in the file."
-    fi
+    for arg in "$@"; do    
+        ENABLED_LINE="${arg}_enabled: true"
+        DISABLED_LINE="${arg}_enabled: false"
+        if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
+            sed -i "s/$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
+            echo "  ** ${arg} disabled."
+        elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
+            echo "  ** ${arg} is already disabled."
+        else
+            echo "  ** ${arg} does not exist in the file."
+        fi
+    done
     exit
 fi
 
 # Enable an app (basic)
 if [[ "$1" = "--enable" || "$1" = "-enable" ]]; then
+    shift
     FILE="inventories/ANE/group_vars/nas.yml"
-    ENABLED_LINE="${2}_enabled: true"
-    DISABLED_LINE="${2}_enabled: false"
-    if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
-        echo "  ** $2 is already enabled."
-    elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
-        sed -i "s/$DISABLED_LINE/$ENABLED_LINE/" "$FILE"
-        echo "  ** $2 re-enabled."
-    else
-        echo -e "\n### $2" >> "$FILE"
-        echo "$ENABLED_LINE" >> "$FILE"
-        if [ -f "$FILE" ] && grep -xq "traefik_enabled: true" "$FILE"; then
-            echo "$2_available_externally: true" >> "$FILE"
-            echo "$2_homepage_href: \"https://{{ $2_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
+    for arg in "$@"; do
+        ENABLED_LINE="${arg}_enabled: true"
+        DISABLED_LINE="${arg}_enabled: false"
+        if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
+            echo "  ** ${arg} is already enabled."
+        elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
+            sed -i "s/$DISABLED_LINE/$ENABLED_LINE/" "$FILE"
+            echo "  ** ${arg} re-enabled."
+        else
+            echo -e "\n### $arg" >> "$FILE"
+            echo "$ENABLED_LINE" >> "$FILE"
+            if [ -f "$FILE" ] && grep -xq "traefik_enabled: true" "$FILE"; then
+                echo "${arg}_available_externally: true" >> "$FILE"
+                echo "${arg}_homepage_href: \"https://{{ ${arg}_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
+            fi
+            echo "  ** ${arg} added and enabled."
         fi
-        echo "  ** $2 added and enabled."
-    fi
+    done
     exit
 fi
 
