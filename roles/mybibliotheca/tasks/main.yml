@@ -1,0 +1,85 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ mybibliotheca_data_directory }}"
+        - "{{ mybibliotheca_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ mybibliotheca_container_name }}"
+        hostname: "{{ mybibliotheca_container_name }}"
+        image: "{{ mybibliotheca_image_name }}:{{ mybibliotheca_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ mybibliotheca_data_directory }}/data:/app/data"
+        ports:
+          - "{{ mybibliotheca_port }}:5054"
+        env:
+          WORKERS: "6"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ mybibliotheca_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ mybibliotheca_watchtower_enable }}"
+          dockflare.enable: "{{ mybibliotheca_dockflare_tunnel }}"
+          dockflare.access.group: "{{ mybibliotheca_dockflare_access_group }}"
+          dockflare.hostname: "{{ mybibliotheca_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mybibliotheca_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ mybibliotheca_homepage_group }}"
+          homepage.icon: "{{ mybibliotheca_homepage_icon }}"
+          homepage.href: "{{ mybibliotheca_homepage_href }}"
+          homepage.description: "{{ 'Bibliotheca is a self-hosted personal library and reading tracker web app built with Flask.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ mybibliotheca_container_name }}"
+          homepage.showStats: "{{ mybibliotheca_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mybibliotheca_port }}"
+          traefik.enable: "{{ mybibliotheca_available_externally | string }}"
+          traefik.http.routers.mybibliotheca.rule: "Host(`{{ mybibliotheca_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.mybibliotheca.tls.certresolver: "letsencrypt"
+          traefik.http.routers.mybibliotheca.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.mybibliotheca.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ mybibliotheca_hostname }}"
+          traefik.http.routers.mybibliotheca.middlewares: "{{ mybibliotheca_hostname }}@docker"
+          traefik.http.middlewares.mybibliotheca.IPAllowList.sourcerange: "{{ mybibliotheca_traefik_whitelist }}"
+          traefik.http.services.mybibliotheca.loadbalancer.server.port: "5054"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/pickles4evaaaa/mybibliotheca"
+        cpu_shares: "{{ mybibliotheca_cpu_shares }}"
+        memory: "{{ mybibliotheca_memory }}"
+        restart_policy: unless-stopped
+  when: mybibliotheca_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ mybibliotheca_container_name }}"
+        state: absent
+  when: mybibliotheca_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ mybibliotheca_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ mybibliotheca_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: mybibliotheca_enabled is false and archive_app_data_enabled is true
