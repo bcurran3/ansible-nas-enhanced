@@ -12,6 +12,7 @@
         - "{{ youtarr_data_directory }}/images"
         - "{{ youtarr_data_directory }}/jobs"
         - "{{ youtarr_data_directory }}/migrations"
+        - "{{ youtarr_dl_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -74,12 +75,17 @@
         ports:
           - "{{ youtarr_port }}:3011"
         env:
-          IN_DOCKER_CONTAINER: "1"
+          AUTH_ENABLED: "{{ youtarr_env_auth_enabled }}"
+          AUTH_PRESET_USERNAME: "{{ youtarr_env_auth_preset_username }}"
+          AUTH_PRESET_PASSWORD: "{{ youtarr_env_auth_preset_password }}"
           DB_HOST: "{{ youtarr_db_container_name }}"
           DB_PORT: "3321"
           DB_USER: "root"
           DB_PASSWORD: "123qweasd"
           DB_NAME: "youtarr"
+          IN_DOCKER_CONTAINER: "1"
+          PLEX_URL: "{{ youtarr_env_plex_url }}"
+          YOUTUBE_OUTPUT_DIR: "/usr/src/app/data"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ youtarr_db_container_name }}"

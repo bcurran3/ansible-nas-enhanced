@@ -16,9 +16,10 @@
         image: "{{ radarr_image_name }}:{{ radarr_image_version }}"
         pull: true
         volumes:
-          - "{{ radarr_movies_directory }}:/movies:rw"
-          - "{{ radarr_download_directory }}:/downloads:rw"
           - "{{ radarr_data_directory }}:/config:rw"
+          - "{{ radarr_download_directory }}:/downloads:rw"
+          - "{{ radarr_anime_directory }}:/anime:rw"
+          - "{{ radarr_movies_directory }}:/movies:rw"
         ports:
           - "{{ radarr_port }}:7878"
         env:

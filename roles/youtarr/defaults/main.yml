@@ -7,6 +7,7 @@ youtarr_traefik_whitelist: "{{ lan }}"
 
 # directories
 youtarr_data_directory: "{{ docker_home }}/youtarr"
+youtarr_dl_directory: "{{ downloads_root }}/youtube/video"
 
 # docker
 youtarr_container_name: "youtarr"
@@ -26,7 +27,11 @@ youtarr_memory: 1g
 youtarr_db_cpu_shares: "1024"
 youtarr_db_memory: 1g
 
-youtarr_dl_directory: "{{ downloads_root }}/youtube/video"
+# app
+youtarr_env_auth_enabled: "true"
+youtarr_env_auth_preset_username: "admin"
+youtarr_env_auth_preset_password: "password"
+youtarr_env_plex_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400"
 
 # autoheal
 youtarr_autoheal: "false"
