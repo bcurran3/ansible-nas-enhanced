@@ -1,0 +1,44 @@
+---
+# ANE
+ansible_nas_app_name: "vertd"
+vertd_enabled: false
+vertd_available_externally: false
+vertd_traefik_whitelist: "{{ lan }}"
+
+# directories
+vertd_data_directory: "{{ docker_home }}/vertd"
+
+# docker
+vertd_container_name: "vertd"
+vertd_image_name: "ghcr.io/vert-sh/vertd"
+vertd_image_tag: "latest"
+
+# network
+vertd_port: "24153"
+vertd_hostname: "vertd"
+
+# specs
+vertd_cpu_shares: "1024"
+vertd_memory: 1g
+
+# app
+vertd_env_webhook_url: "" # if set, vertd will attempt to notify you via a discord webhook when a video fails to convert.
+vertd_env_webhook_pings: "" # webhook pings -- these will be formatted into the main message
+vertd_env_admin_password: "topsecret"
+vertd_env_public_url: ""
+
+# autoheal
+vertd_autoheal: "false"
+
+# dockflare
+vertd_dockflare_tunnel: "false"
+vertd_dockflare_access_group: ""
+
+# homepage
+vertd_homepage_group: "Apps"
+vertd_homepage_icon: "sh-vert.png"
+vertd_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vertd_port }}"
+vertd_homepage_showstats: "false"
+
+# watchtower
+vertd_watchtower_enable: "false"
