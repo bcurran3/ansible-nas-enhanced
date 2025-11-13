@@ -1,0 +1,39 @@
+---
+# ANE
+ansible_nas_app_name: "Pinchflat"
+pinchflat_enabled: false
+pinchflat_available_externally: false
+pinchflat_traefik_whitelist: "{{ lan }}"
+
+# directories
+pinchflat_data_directory: "{{ docker_home }}/pinchflat"
+pinchflat_dl_video_directory: "{{ downloads_root }}/youtube/video"
+
+# docker
+pinchflat_container_name: "pinchflat"
+pinchflat_image_name: "ghcr.io/kieraneglin/pinchflat"
+pinchflat_image_tag: "latest"
+
+# network
+pinchflat_port: "8945"
+pinchflat_hostname: "pinchflat"
+
+# specs
+pinchflat_cpu_shares: "1024"
+pinchflat_memory: 1g
+
+# autoheal
+pinchflat_autoheal: "false"
+
+# dockflare
+pinchflat_dockflare_tunnel: "false"
+pinchflat_dockflare_access_group: ""
+
+# homepage
+pinchflat_homepage_group: "Apps"
+pinchflat_homepage_icon: "pinchflat.png"
+pinchflat_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pinchflat_port }}"
+pinchflat_homepage_showstats: "false"
+
+# watchtower
+pinchflat_watchtower_enable: "false"
