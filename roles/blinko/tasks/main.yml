@@ -111,6 +111,14 @@
         cpu_shares: "{{ blinko_cpu_shares }}"
         memory: "{{ blinko_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (blinko_port | string)] +
+                (['https://' + blinko_hostname + '.' + ansible_nas_domain] if (blinko_available_externally is true or blinko_dockflare_tunnel is true) else [])
+              }}
   when: blinko_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

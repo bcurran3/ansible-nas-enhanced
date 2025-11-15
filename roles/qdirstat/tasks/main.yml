@@ -54,6 +54,14 @@
         cpu_shares: "{{ qdirstat_cpu_shares }}"
         memory: "{{ qdirstat_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (qdirstat_port_http | string)] +
+                (['https://' + qdirstat_hostname + '.' + ansible_nas_domain] if (qdirstat_available_externally is true or qdirstat_dockflare_tunnel is true) else [])
+              }}
   when: qdirstat_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

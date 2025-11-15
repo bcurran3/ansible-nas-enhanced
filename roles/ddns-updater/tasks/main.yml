@@ -69,6 +69,14 @@
         memory: "{{ ddns_updater_memory }}"
         restart: "{{ ddns_updater_config is changed }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ddns_updater_port_http | string)] +
+                (['https://' + ddns_updater_hostname + '.' + ansible_nas_domain] if (ddns_updater_available_externally is true or ddns_updater_dockflare_tunnel is true) else [])
+              }}
   when: ddns_updater_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

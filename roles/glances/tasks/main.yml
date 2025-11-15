@@ -62,6 +62,14 @@
         memory: "{{ glances_memory }}"
         security_opts: "{{ glances_security_options }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (glances_port_one | string)] +
+                (['https://' + glances_hostname + '.' + ansible_nas_domain] if (glances_available_externally is true or glances_dockflare_tunnel is true) else [])
+              }}
   when: glances_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

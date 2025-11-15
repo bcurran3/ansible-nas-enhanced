@@ -163,6 +163,14 @@
         cpu_shares: "{{ twofauth_cpu_shares }}"
         memory: "{{ twofauth_memory_limit }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (twofauth_port_http | string)] +
+                (['https://' + twofauth_hostname + '.' + ansible_nas_domain] if (twofauth_available_externally is true or twofauth_dockflare_tunnel is true) else [])
+              }}
   when: twofauth_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

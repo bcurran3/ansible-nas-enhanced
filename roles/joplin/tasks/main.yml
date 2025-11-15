@@ -95,6 +95,14 @@
         cpu_shares: "{{ joplin_cpu_shares }}"
         memory: "{{ joplin_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (joplin_port_http | string)] +
+                (['https://' + joplin_hostname + '.' + ansible_nas_domain] if (joplin_available_externally is true or joplin_dockflare_tunnel is true) else [])
+              }}
   when: joplin_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

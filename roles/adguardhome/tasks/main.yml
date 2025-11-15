@@ -112,6 +112,14 @@
         cpu_shares: "{{ adguardhome_cpu_shares }}"
         memory: "{{ adguardhome_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (adguardhome_port | string)] +
+                (['https://' + adguardhome_hostname + '.' + ansible_nas_domain] if (adguardhome_available_externally is true or adguardhome_dockflare_tunnel is true) else [])
+              }}
   when: adguardhome_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

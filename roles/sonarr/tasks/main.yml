@@ -66,6 +66,14 @@
         cpu_shares: "{{ sonarr_cpu_shares }}"
         memory: "{{ sonarr_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (sonarr_port_http | string)] +
+                (['https://' + sonarr_hostname + '.' + ansible_nas_domain] if (sonarr_available_externally is true or sonarr_dockflare_tunnel is true) else [])
+              }}
   when: sonarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

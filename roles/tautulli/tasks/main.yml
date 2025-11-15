@@ -63,6 +63,14 @@
         cpu_shares: "{{ tautulli_cpu_shares }}"
         memory: "{{ tautulli_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tautulli_port | string)] +
+                (['https://' + tautulli_hostname + '.' + ansible_nas_domain] if (tautulli_available_externally is true or tautulli_dockflare_tunnel is true) else [])
+              }}
   when: tautulli_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

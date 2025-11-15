@@ -113,6 +113,14 @@
         cpu_shares: "{{ osclass_cpu_shares }}"
         memory: "{{ osclass_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (osclass_port_http | string)] +
+                (['https://' + osclass_hostname + '.' + ansible_nas_domain] if (osclass_available_externally is true or osclass_dockflare_tunnel is true) else [])
+              }}
   when: osclass_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

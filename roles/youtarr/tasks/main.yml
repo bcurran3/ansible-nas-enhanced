@@ -11,7 +11,6 @@
         - "{{ youtarr_data_directory }}/db"
         - "{{ youtarr_data_directory }}/images"
         - "{{ youtarr_data_directory }}/jobs"
-        - "{{ youtarr_data_directory }}/migrations"
         - "{{ youtarr_dl_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
@@ -71,7 +70,6 @@
           - "{{ youtarr_data_directory }}/images:/app/server/images"
           - "{{ youtarr_data_directory }}/config:/app/config"
           - "{{ youtarr_data_directory }}/jobs:/app/jobs"
-          - "{{ youtarr_data_directory }}/migrations:/app/migrations"
         ports:
           - "{{ youtarr_port }}:3011"
         env:
