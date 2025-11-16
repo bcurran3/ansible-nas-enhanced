@@ -77,6 +77,14 @@
           wud.link.template: "https://gallery.ecr.aws/elastic/elasticsearch"
         cpu_shares: "{{ diskover_elasticsearch_cpu_shares }}"
         memory: "{{ diskover_elasticsearch_memory }}"
+
+    - name: Access {{ ansible_nas_app_name }} Elasticsearch at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (diskover_elasticsearch_port_http | string)] +
+                (['https://' + diskover_hostname + '.' + ansible_nas_domain] if (diskover_available_externally is true or diskover_dockflare_tunnel is true) else [])
+              }}
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Elasticsearch-helper Container
@@ -157,6 +165,14 @@
         cpu_shares: "{{ diskover_cpu_shares }}"
         memory: "{{ diskover_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (diskover_port_http | string)] +
+                (['https://' + diskover_hostname + '.' + ansible_nas_domain] if (diskover_available_externally is true or diskover_dockflare_tunnel is true) else [])
+              }}
   when: diskover_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

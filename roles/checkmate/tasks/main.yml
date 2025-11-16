@@ -102,6 +102,14 @@
         cpu_shares: "{{ checkmate_server_cpu_shares }}"
         memory: "{{ checkmate_server_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (checkmate_server_port_http | string)] +
+                (['https://' + checkmate_server_hostname + '.' + ansible_nas_domain] if (checkmate_server_available_externally is true or checkmate_server_dockflare_tunnel is true) else [])
+              }}
   when: checkmate_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

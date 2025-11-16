@@ -70,7 +70,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (radarr_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (radarr_port | string)] +
                 (['https://' + radarr_hostname + '.' + ansible_nas_domain] if (radarr_available_externally is true or radarr_dockflare_tunnel is true) else [])
               }}
   when: radarr_enabled is true

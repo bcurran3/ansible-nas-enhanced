@@ -57,6 +57,14 @@
         cpu_shares: "{{ checkcle_cpu_shares }}"
         memory: "{{ checkcle_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (checkcle_port_http | string)] +
+                (['https://' + checkcle_hostname + '.' + ansible_nas_domain] if (checkcle_available_externally is true or checkcle_dockflare_tunnel is true) else [])
+              }}
   when: checkcle_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

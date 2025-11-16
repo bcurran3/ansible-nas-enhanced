@@ -56,6 +56,14 @@
         cpu_shares: "{{ containery_cpu_shares }}"
         memory: "{{ containery_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (containery_port | string)] +
+                (['https://' + containery_hostname + '.' + ansible_nas_domain] if (containery_available_externally is true or containery_dockflare_tunnel is true) else [])
+              }}
   when: containery_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -56,6 +56,14 @@
         cpu_shares: "{{ cloudcmd_cpu_shares }}"
         memory: "{{ cloudcmd_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (cloudcmd_port_http | string)] +
+                (['https://' + cloudcmd_hostname + '.' + ansible_nas_domain] if (cloudcmd_available_externally is true or cloudcmd_dockflare_tunnel is true) else [])
+              }}
   when: cloudcmd_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

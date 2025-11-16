@@ -54,6 +54,14 @@
         cpu_shares: "{{ dokuwiki_cpu_shares }}"
         memory: "{{ dokuwiki_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dokuwiki_port | string)] +
+                (['https://' + dokuwiki_hostname + '.' + ansible_nas_domain] if (dokuwiki_available_externally is true or dokuwiki_dockflare_tunnel is true) else [])
+              }}
   when: dokuwiki_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

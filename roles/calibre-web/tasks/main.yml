@@ -62,6 +62,14 @@
         cpu_shares: "{{ calibreweb_cpu_shares }}"
         memory: "{{ calibreweb_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (calibreweb_port | string)] +
+                (['https://' + calibreweb_hostname + '.' + ansible_nas_domain] if (calibreweb_available_externally is true or calibreweb_dockflare_tunnel is true) else [])
+              }}
   when: calibreweb_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

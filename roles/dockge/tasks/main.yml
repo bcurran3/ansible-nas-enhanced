@@ -58,6 +58,14 @@
         cpu_shares: "{{ dockge_cpu_shares }}"
         memory: "{{ dockge_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockge_port | string)] +
+                (['https://' + dockge_hostname + '.' + ansible_nas_domain] if (dockge_available_externally is true or dockge_dockflare_tunnel is true) else [])
+              }}
   when: dockge_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
