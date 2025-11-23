@@ -24,6 +24,16 @@ joplin_db_image_name: "postgres"
 joplin_db_image_tag: "16-alpine"
 joplin_db_memory: "1g"
 
+# app
+joplin_env_mailer_enabled: "0" # 1 to enable
+joplin_env_mailer_host: "smtp.{{ ansible_nas_domain }}"
+joplin_env_mailer_port: "587"
+joplin_env_mailer_security: "starttls"
+joplin_env_mailer_auth_user: "your_email_address@{{ ansible_nas_domain }}"
+joplin_env_mailer_auth_password: "yourpassword"
+joplin_env_mailer_noreply_name: "JoplinServer"
+joplin_env_mailer_noreply_email: "noreply@{{ ansible_nas_domain }}"
+
 # autoheal
 joplin_autoheal: "false"
 joplin_db_autoheal: "false"
