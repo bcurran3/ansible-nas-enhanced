@@ -12,19 +12,20 @@ dailytxt_data_directory: "{{ docker_home }}/dailytxt"
 dailytxt_hostname: "dailytxt"
 dailytxt_port_http: "8766"
 
-# configuration
-dailytxt_admin_password: "topsecret"
-dailytxt_allow_registration: "true"
-dailytxt_jwt_exp_days: "30"
-dailytxt_logout_after_days: "30"
-dailytxt_secret_key: "N2HnBPOjMbouxti1lx2iR5Uz40WyjBDVk1w2GLHM2aA="
-
 # docker
 dailytxt_container_name: "dailytxt"
 dailytxt_image_name: "phitux/dailytxt"
 dailytxt_image_tag: "latest"
 dailytxt_cpu_shares: "1024"
 dailytxt_memory: "512m"
+
+# app
+dailytxt_env_admin_password: "topsecret"
+dailytxt_env_allow_registration: "true"
+dailytxt_env_data_indent: "2"
+dailytxt_env_jwt_exp_days: "30"
+dailytxt_env_logout_after_days: "30"
+dailytxt_env_secret_key: "N2HnBPOjMbouxti1lx2iR5Uz40WyjBDVk1w2GLHM2aA="
 
 # autoheal
 dailytxt_autoheal: "false"
@@ -35,8 +36,7 @@ dailytxt_dockflare_access_group: ""
 
 # homepage
 dailytxt_homepage_group: "Apps"
-dailytxt_homepage_icon: "https://raw.githubusercontent.com/PhiTux/DailyTxT/refs/heads/main/frontend/static/icons/icon-512.png"
-#dailytxt_homepage_icon: "http://192.168.69.210:8766/_app/immutable/assets/locked_heart_with_keyhole.D-D1TLkf.svg"
+dailytxt_homepage_icon: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}/icons/icon-512.png"
 dailytxt_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
 dailytxt_homepage_showstats: "false"
 
