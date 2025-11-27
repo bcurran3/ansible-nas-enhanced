@@ -55,7 +55,7 @@
         pull: true
         dns_servers: "{{ pihole_dns }}"
         ports:
-          - "{{ pihole_port }}:80"
+          - "{{ pihole_port_http }}:80"
           - "53:53/udp"
           - "53:53/tcp"
           - "67:67/udp"
@@ -79,7 +79,7 @@
           dockflare.enable: "{{ pihole_dockflare_tunnel }}"
           dockflare.access.group: "{{ pihole_dockflare_access_group }}"
           dockflare.hostname: "{{ pihole_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pihole_homepage_group }}"
           homepage.icon: "{{ pihole_homepage_icon }}"
@@ -88,9 +88,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ pihole_container_name }}"
           homepage.showStats: "{{ pihole_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
           homepage.widget.type: "pihole"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
           homepage.widget.version: "6"
           homepage.widget.key: "{{ pihole_homepage_widget_key }}"
           traefik.enable: "{{ pihole_available_externally | string }}"
@@ -108,6 +108,14 @@
         cpu_shares: "{{ pihole_cpu_shares }}"
         memory: "{{ pihole_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pihole_port_http | string)] +
+                (['https://' + pihole_hostname + '.' + ansible_nas_domain] if (pihole_available_externally is true or pihole_dockflare_tunnel is true) else [])
+              }}
   when: pihole_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

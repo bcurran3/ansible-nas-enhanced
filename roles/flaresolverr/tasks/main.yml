@@ -54,6 +54,14 @@
         cpu_shares: "{{ flaresolverr_cpu_shares }}"
         memory: "{{ flaresolverr_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (flaresolverr_port | string)] +
+                (['https://' + flaresolverr_hostname + '.' + ansible_nas_domain] if (flaresolverr_available_externally is true or flaresolverr_dockflare_tunnel is true) else [])
+              }}
   when: flaresolverr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

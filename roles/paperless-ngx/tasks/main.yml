@@ -148,6 +148,14 @@
         cpu_shares: "{{ paperless_ngx_cpu_shares }}"
         memory: "{{ paperless_ngx_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (paperless_ngx_port | string)] +
+                (['https://' + paperless_ngx_hostname + '.' + ansible_nas_domain] if (paperless_ngx_available_externally is true or paperless_ngx_dockflare_tunnel is true) else [])
+              }}
   when: paperless_ngx_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

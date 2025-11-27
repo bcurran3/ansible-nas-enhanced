@@ -112,6 +112,14 @@
         cpu_shares: "{{ gaseous_server_cpu_shares }}"
         memory: "{{ gaseous_server_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gaseous_server_port_http | string)] +
+                (['https://' + gaseous_server_hostname + '.' + ansible_nas_domain] if (gaseous_server_available_externally is true or gaseous_server_dockflare_tunnel is true) else [])
+              }}
   when: gaseous_server_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

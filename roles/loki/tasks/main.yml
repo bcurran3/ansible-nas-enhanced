@@ -91,6 +91,14 @@
         dest: "{{ stats_grafana_config_directory }}/provisioning/datasources/loki.yml"
         owner: "472"
       notify: restart grafana
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (loki_port_http | string)] +
+                (['https://' + loki_hostname + '.' + ansible_nas_domain] if (loki_available_externally is true or loki_dockflare_tunnel is true) else [])
+              }}
   when: loki_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

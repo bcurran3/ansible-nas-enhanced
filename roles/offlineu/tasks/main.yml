@@ -20,7 +20,7 @@
           - "{{ offlineu_data_directory }}/data:/app/data"
           - "{{ offlineu_courses }}:/app/courses"
         ports:
-          - "{{ offlineu_port }}:5000"
+          - "{{ offlineu_port_http }}:5000"
         env:
           FLASK_ENV: "production"
           TZ: "{{ ansible_nas_timezone }}"
@@ -36,7 +36,7 @@
           dockflare.enable: "{{ offlineu_dockflare_tunnel }}"
           dockflare.access.group: "{{ offlineu_dockflare_access_group }}"
           dockflare.hostname: "{{ offlineu_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ offlineu_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ offlineu_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ offlineu_homepage_group }}"
           homepage.icon: "{{ offlineu_homepage_icon }}"
@@ -45,7 +45,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ offlineu_container_name }}"
           homepage.showStats: "{{ offlineu_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ offlineu_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ offlineu_port_http }}"
           traefik.enable: "{{ offlineu_available_externally | string }}"
           traefik.http.routers.offlineu.rule: "Host(`{{ offlineu_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.offlineu.tls.certresolver: "letsencrypt"
@@ -61,6 +61,14 @@
         cpu_shares: "{{ offlineu_cpu_shares }}"
         memory: "{{ offlineu_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (offlineu_port_http | string)] +
+                (['https://' + offlineu_hostname + '.' + ansible_nas_domain] if (offlineu_available_externally is true or offlineu_dockflare_tunnel is true) else [])
+              }}
   when: offlineu_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

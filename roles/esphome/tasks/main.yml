@@ -55,6 +55,14 @@
         cpu_shares: "{{ esphome_cpu_shares }}"
         memory: "{{ esphome_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (esphome_port | string)] +
+                (['https://' + esphome_hostname + '.' + ansible_nas_domain] if (esphome_available_externally is true or esphome_dockflare_tunnel is true) else [])
+              }}
   when: esphome_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

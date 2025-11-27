@@ -60,6 +60,14 @@
         cpu_shares: "{{ nzbget_cpu_shares }}"
         memory: "{{ nzbget_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (nzbget_port | string)] +
+                (['https://' + nzbget_hostname + '.' + ansible_nas_domain] if (nzbget_available_externally is true or nzbget_dockflare_tunnel is true) else [])
+              }}
   when: nzbget_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

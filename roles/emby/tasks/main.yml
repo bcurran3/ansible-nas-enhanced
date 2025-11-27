@@ -71,6 +71,14 @@
         cpu_shares: "{{ emby_cpu_shares }}"
         memory: "{{ emby_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (emby_port_http | string)] +
+                (['https://' + emby_hostname + '.' + ansible_nas_domain] if (emby_available_externally is true or emby_dockflare_tunnel is true) else [])
+              }}
   when: emby_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

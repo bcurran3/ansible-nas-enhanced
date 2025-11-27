@@ -97,6 +97,14 @@
         cpu_shares: "{{ miniflux_cpu_shares }}"
         memory: "{{ miniflux_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (miniflux_port | string)] +
+                (['https://' + miniflux_hostname + '.' + ansible_nas_domain] if (miniflux_available_externally is true or miniflux_dockflare_tunnel is true) else [])
+              }}
   when: miniflux_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

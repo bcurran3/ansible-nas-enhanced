@@ -19,7 +19,7 @@
         volumes:
           - "{{ mybibliotheca_data_directory }}/data:/app/data"
         ports:
-          - "{{ mybibliotheca_port }}:5054"
+          - "{{ mybibliotheca_port_http }}:5054"
         env:
           WORKERS: "6"
           TZ: "{{ ansible_nas_timezone }}"
@@ -29,7 +29,7 @@
           dockflare.enable: "{{ mybibliotheca_dockflare_tunnel }}"
           dockflare.access.group: "{{ mybibliotheca_dockflare_access_group }}"
           dockflare.hostname: "{{ mybibliotheca_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mybibliotheca_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mybibliotheca_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mybibliotheca_homepage_group }}"
           homepage.icon: "{{ mybibliotheca_homepage_icon }}"
@@ -38,7 +38,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ mybibliotheca_container_name }}"
           homepage.showStats: "{{ mybibliotheca_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mybibliotheca_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mybibliotheca_port_http }}"
           traefik.enable: "{{ mybibliotheca_available_externally | string }}"
           traefik.http.routers.mybibliotheca.rule: "Host(`{{ mybibliotheca_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.mybibliotheca.tls.certresolver: "letsencrypt"
@@ -54,6 +54,14 @@
         cpu_shares: "{{ mybibliotheca_cpu_shares }}"
         memory: "{{ mybibliotheca_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mybibliotheca_port_http | string)] +
+                (['https://' + mybibliotheca_hostname + '.' + ansible_nas_domain] if (mybibliotheca_available_externally is true or mybibliotheca_dockflare_tunnel is true) else [])
+              }}
   when: mybibliotheca_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

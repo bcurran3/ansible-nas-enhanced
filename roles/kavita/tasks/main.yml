@@ -56,6 +56,14 @@
         cpu_shares: "{{ kavita_cpu_shares }}"
         memory: "{{ kavita_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (kavita_port_http | string)] +
+                (['https://' + kavita_hostname + '.' + ansible_nas_domain] if (kavita_available_externally is true or kavita_dockflare_tunnel is true) else [])
+              }}
   when: kavita_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

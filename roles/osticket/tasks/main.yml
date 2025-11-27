@@ -101,6 +101,14 @@
         cpu_shares: "{{ osticket_cpu_shares }}"
         memory: "{{ osticket_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (osticket_port_http | string)] +
+                (['https://' + osticket_hostname + '.' + ansible_nas_domain] if (osticket_available_externally is true or osticket_dockflare_tunnel is true) else [])
+              }}
   when: osticket_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

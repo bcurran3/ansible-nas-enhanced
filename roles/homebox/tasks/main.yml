@@ -58,6 +58,14 @@
         cpu_shares: "{{ homebox_cpu_shares }}"
         memory: "{{ homebox_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (homebox_port_http | string)] +
+                (['https://' + homebox_hostname + '.' + ansible_nas_domain] if (homebox_available_externally is true or homebox_dockflare_tunnel is true) else [])
+              }}
   when: homebox_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -9,7 +9,7 @@
         image: "{{ ittools_image_name }}:{{ ittools_image_tag }}"
         pull: true
         ports:
-          - "{{ ittools_port }}:80"
+          - "{{ ittools_port_http }}:80"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
@@ -18,7 +18,7 @@
           dockflare.enable: "{{ ittools_dockflare_tunnel }}"
           dockflare.access.group: "{{ ittools_dockflare_access_group }}"
           dockflare.hostname: "{{ ittools_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ittools_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ittools_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ ittools_homepage_group }}"
           homepage.icon: "{{ ittools_homepage_icon }}"
@@ -27,7 +27,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ ittools_container_name }}"
           homepage.showStats: "{{ ittools_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ittools_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ittools_port_http }}"
           traefik.enable: "{{ ittools_available_externally | string }}"
           traefik.http.routers.ittools.rule: "Host(`{{ ittools_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ittools.tls.certresolver: "letsencrypt"
@@ -43,6 +43,14 @@
         cpu_shares: "{{ ittools_cpu_shares }}"
         memory: "{{ ittools_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ittools_port_http | string)] +
+                (['https://' + ittools_hostname + '.' + ansible_nas_domain] if (ittools_available_externally is true or ittools_dockflare_tunnel is true) else [])
+              }}
   when: ittools_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

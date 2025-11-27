@@ -19,7 +19,7 @@
         volumes:
           - "{{ pocketid_data_directory }}/data:/app/data"
         ports:
-          - "{{ pocketid_port }}:{{ pocketid_port }}"
+          - "{{ pocketid_port_http }}:{{ pocketid_port_http }}"
         env:
         # https://pocket-id.org/docs/configuration/environment-variables
           APP_URL: "{{ pocketid_homepage_href }}"
@@ -41,7 +41,7 @@
           dockflare.enable: "{{ pocketid_dockflare_tunnel }}"
           dockflare.access.group: "{{ pocketid_dockflare_access_group }}"
           dockflare.hostname: "{{ pocketid_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pocketid_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pocketid_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pocketid_homepage_group }}"
           homepage.icon: "{{ pocketid_homepage_icon }}"
@@ -50,7 +50,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ pocketid_container_name }}"
           homepage.showStats: "{{ pocketid_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pocketid_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pocketid_port_http }}"
           traefik.enable: "{{ pocketid_available_externally | string }}"
           traefik.http.routers.pocketid.rule: "Host(`{{ pocketid_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pocketid.tls.certresolver: "letsencrypt"
@@ -59,13 +59,21 @@
           traefik.http.routers.frontend.middlewares: "{{ pocketid_hostname }}"
           traefik.http.routers.pocketid.middlewares: "{{ pocketid_hostname }}@docker"
           traefik.http.middlewares.pocketid.IPAllowList.sourcerange: "{{ pocketid_traefik_whitelist }}"
-          traefik.http.services.pocketid.loadbalancer.server.port: "{{ pocketid_port }}"
+          traefik.http.services.pocketid.loadbalancer.server.port: "{{ pocketid_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/Pocket-ID/Pocket-ID/releases"
         cpu_shares: "{{ pocketid_cpu_shares }}"
         memory: "{{ pocketid_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pocketid_port_http | string)] +
+                (['https://' + pocketid_hostname + '.' + ansible_nas_domain] if (pocketid_available_externally is true or pocketid_dockflare_tunnel is true) else [])
+              }}
   when: pocketid_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

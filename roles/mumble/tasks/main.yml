@@ -41,7 +41,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ mumble_container_name }}"
           homepage.showStats: "{{ mumble_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_tcp_port }}"
           traefik.enable: "{{ mumble_available_externally | string }}"
           traefik.http.routers.mumble.rule: "Host(`{{ mumble_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.mumble.tls.certresolver: "letsencrypt"
@@ -57,6 +57,14 @@
         cpu_shares: "{{ mumble_cpu_shares }}"
         memory: "{{ mumble_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mumble_tcp_port | string)] +
+                (['https://' + mumble_hostname + '.' + ansible_nas_domain] if (mumble_available_externally is true or mumble_dockflare_tunnel is true) else [])
+              }}
   when: mumble_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

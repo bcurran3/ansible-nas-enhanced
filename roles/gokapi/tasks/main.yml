@@ -55,6 +55,14 @@
         cpu_shares: "{{ gokapi_cpu_shares }}"
         memory: "{{ gokapi_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gokapi_port_http | string)] +
+                (['https://' + gokapi_hostname + '.' + ansible_nas_domain] if (gokapi_available_externally is true or gokapi_dockflare_tunnel is true) else [])
+              }}
   when: gokapi_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
