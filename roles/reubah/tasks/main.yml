@@ -58,6 +58,14 @@
         cpu_shares: "{{ reubah_cpu_shares }}"
         memory: "{{ reubah_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (reubah_port_http | string)] +
+                (['https://' + reubah_hostname + '.' + ansible_nas_domain] if (reubah_available_externally is true or reubah_dockflare_tunnel is true) else [])
+              }}
   when: reubah_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

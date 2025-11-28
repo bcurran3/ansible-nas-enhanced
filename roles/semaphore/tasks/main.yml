@@ -58,6 +58,14 @@
         cpu_shares: "{{ semaphore_cpu_shares }}"
         memory: "{{ semaphore_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (semaphore_port_http | string)] +
+                (['https://' + semaphore_hostname + '.' + ansible_nas_domain] if (semaphore_available_externally is true or semaphore_dockflare_tunnel is true) else [])
+              }}
   when: semaphore_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

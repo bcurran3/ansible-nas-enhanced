@@ -128,6 +128,14 @@
         cpu_shares: "{{ rocketchat_cpu_shares }}"
         memory: "{{ rocketchat_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (rocketchat_port_http | string)] +
+                (['https://' + rocketchat_hostname + '.' + ansible_nas_domain] if (rocketchat_available_externally is true or rocketchat_dockflare_tunnel is true) else [])
+              }}
   when: rocketchat_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

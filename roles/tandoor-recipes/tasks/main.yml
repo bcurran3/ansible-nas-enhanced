@@ -169,6 +169,14 @@
         cpu_shares: "{{ tandoor_recipes_cpu_shares }}"
         memory: "{{ tandoor_recipes_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tandoor_recipes_port | string)] +
+                (['https://' + tandoor_recipes_hostname + '.' + ansible_nas_domain] if (tandoor_recipes_available_externally is true or tandoor_recipes_dockflare_tunnel is true) else [])
+              }}
   when: tandoor_recipes_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -67,6 +67,14 @@
         cpu_shares: "{{ readarr_cpu_shares }}"
         memory: "{{ readarr_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (readarr_port | string)] +
+                (['https://' + readarr_hostname + '.' + ansible_nas_domain] if (readarr_available_externally is true or readarr_dockflare_tunnel is true) else [])
+              }}
   when: readarr_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

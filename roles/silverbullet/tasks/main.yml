@@ -53,6 +53,14 @@
         cpu_shares: "{{ silverbullet_cpu_shares }}"
         memory: "{{ silverbullet_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (silverbullet_port | string)] +
+                (['https://' + silverbullet_hostname + '.' + ansible_nas_domain] if (silverbullet_available_externally is true or silverbullet_dockflare_tunnel is true) else [])
+              }}
   when: silverbullet_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

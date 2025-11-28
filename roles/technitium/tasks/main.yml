@@ -127,6 +127,14 @@
         cpu_shares: "{{ technitium_cpu_shares }}"
         memory: "{{ technitium_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (technitium_port | string)] +
+                (['https://' + technitium_hostname + '.' + ansible_nas_domain] if (technitium_available_externally is true or technitium_dockflare_tunnel is true) else [])
+              }}
   when: technitium_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

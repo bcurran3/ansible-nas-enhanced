@@ -58,6 +58,14 @@
         cpu_shares: "{{ trilium_cpu_shares }}"
         memory: "{{ trilium_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (trilium_port | string)] +
+                (['https://' + trilium_hostname + '.' + ansible_nas_domain] if (trilium_available_externally is true or trilium_dockflare_tunnel is true) else [])
+              }}
   when: trilium_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
