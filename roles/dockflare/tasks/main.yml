@@ -1,4 +1,6 @@
 ---
+# https://github.com/ChrispyBacon-dev/DockFlare/blob/stable/docker-compose.yml
+
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -7,7 +9,89 @@
         state: directory
       with_items:
         - "{{ dockflare_data_directory }}"
+        - "{{ dockflare_data_directory }}/redis"
+
+    - name: Create {{ ansible_nas_app_name }} Directories (2)
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "65532"
+        group: "65532"
+      with_items:
         - "{{ dockflare_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Docker Socket Proxy Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dockflare_proxy_container_name }}"
+        hostname: "{{ dockflare_proxy_container_name }}"
+        image: "{{ dockflare_proxy_image_name }}:{{ dockflare_proxy_image_tag }}"
+        pull: true
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        env:
+          DOCKER_HOST: "unix:///var/run/docker.sock"
+          CONTAINERS: "1"
+          EVENTS: "1"
+          NETWORKS: "1"
+          IMAGES: "1"
+          POST: "1"
+          PING: "1"
+          INFO: "1"
+          EXEC: "1"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ dockflare_proxy_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockflare_proxy_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Docker Socket Proxy"
+          homepage.group: "{{ dockflare_proxy_homepage_group }}"
+          homepage.icon: "{{ dockflare_proxy_homepage_icon }}"
+          homepage.href: "{{ dockflare_homepage_href }}"
+          homepage.description: "{{ 'Proxy over your Docker socket to restrict which requests it accepts' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dockflare_proxy_container_name }}"
+          homepage.showStats: "{{ dockflare_proxy_homepage_showstats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/tecnativa/docker-socket-proxy"
+        cpu_shares: "{{ dockflare_proxy_cpu_shares }}"
+        memory: "{{ dockflare_proxy_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dockflare_redis_container_name }}"
+        hostname: "{{ dockflare_redis_container_name }}"
+        image: "{{ dockflare_redis_image_name }}:{{ dockflare_redis_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dockflare_data_directory }}/redis:/data"
+        command: "redis-server --save --appendonly no"
+        #       ["redis-server", "--save", "", "--appendonly", "no"]
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ dockflare_redis_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockflare_redis_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ dockflare_redis_homepage_group }}"
+          homepage.icon: "{{ dockflare_redis_homepage_icon }}"
+          homepage.href: "{{ dockflare_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dockflare_redis_container_name }}"
+          homepage.showStats: "{{ dockflare_redis_homepage_showstats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
+        cpu_shares: "{{ dockflare_redis_cpu_shares }}"
+        memory: "{{ dockflare_redis_memory }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,14 +102,19 @@
         pull: true
         volumes:
           - "{{ dockflare_data_directory }}/data:/app/data"
-          - "/var/run/docker.sock:/var/run/docker.sock:ro"
         ports:
           - "{{ dockflare_port }}:5000"
         env:
+          REDIS_URL: "redis://{{ dockflare_redis_container_name }}:6379/0"
+          REDIS_DB_INDEX: "0"  # Optional: specify Redis database index (0-15) for isolation from other containers
+          DOCKER_HOST: "tcp://{{ dockflare_proxy_container_name }}:2375"
           STATE_FILE_PATH: "/app/data/state.json"
           USE_EXTERNAL_CLOUDFLARED: "{{ dockflare_env_use_external_cloudflared }}"
           EXTERNAL_TUNNEL_ID: "{{ dockflare_env_external_tunnel_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ dockflare_proxy_container_name }}"
+          - "{{ dockflare_redis_container_name }}"
         labels:
           autoheal: "{{ dockflare_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ dockflare_watchtower_enable }}"

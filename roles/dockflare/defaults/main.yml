@@ -12,6 +12,12 @@ dockflare_data_directory: "{{ docker_home }}/dockflare"
 dockflare_container_name: "dockflare"
 dockflare_image_name: "alplat/dockflare"
 dockflare_image_tag: "stable"
+dockflare_proxy_container_name: "dockflare-proxy"
+dockflare_proxy_image_name: "tecnativa/docker-socket-proxy"
+dockflare_proxy_image_tag: "v0.4.1"
+dockflare_redis_container_name: "dockflare-redis"
+dockflare_redis_image_name: "redis"
+dockflare_redis_image_tag: "7-alpine"
 
 # network
 dockflare_port: "5002"
@@ -20,6 +26,10 @@ dockflare_hostname: "dockflare"
 # specs
 dockflare_cpu_shares: 1024
 dockflare_memory: 256MB
+dockflare_proxy_cpu_shares: "1024"
+dockflare_proxy_memory: 1g
+dockflare_redis_cpu_shares: "1024"
+dockflare_redis_memory: 1g
 
 # app
 dockflare_env_use_external_cloudflared: "false"
@@ -27,6 +37,8 @@ dockflare_env_external_tunnel_id: "your_tunnel_id"
 
 # autoheal
 dockflare_autoheal: "false"
+dockflare_proxy_autoheal: "false"
+dockflare_redis_autoheal: "false"
 
 # dockflare
 dockflare_dockflare_tunnel: "false"
@@ -37,6 +49,16 @@ dockflare_homepage_group: "Network"
 dockflare_homepage_icon: "https://raw.githubusercontent.com/ChrispyBacon-dev/DockFlare/refs/heads/stable/images/bannertr.png"
 dockflare_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
 dockflare_homepage_showstats: "false"
+dockflare_proxy_homepage_group: "Misc"
+dockflare_proxy_homepage_icon: "https://raw.githubusercontent.com/ChrispyBacon-dev/DockFlare/refs/heads/stable/images/bannertr.png"
+dockflare_proxy_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
+dockflare_proxy_homepage_showstats: "false"
+dockflare_redis_homepage_group: "DBs"
+dockflare_redis_homepage_icon: "redis.png"
+dockflare_redis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
+dockflare_redis_homepage_showstats: "false"
 
 # watchtower
 dockflare_watchtower_enable: "false"
+dockflare_proxy_watchtower_enable: "false"
+dockflare_redis_watchtower_enable: "false"
