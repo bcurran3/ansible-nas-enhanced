@@ -20,20 +20,16 @@
         pull: true
         network_mode: "bridge"
         volumes:
-          - "{{ osticket_data_directory }}/db:/var/lib/mysql"
+#          - "{{ osticket_data_directory }}/db:/var/lib/mysql"
+          - "{{ osticket_data_directory }}/db:/config"
         env:
           ALLOW_EMPTY_PASSWORD: "yes"
           CONTAINER_NAME: "{{ osticket_db_container_name }}"
           DOCKER_MODS: "{{ osticket_db_env_docker_mods }}"
-          MARIADB_USER: "{{ osticket_env_mysql_user }}"
-          MARIADB_PASSWORD: "{{ osticket_env_mysql_password }}"
-          MARIADB_DATABASE: "{{ osticket_env_mysql_database }}"
-          MARIADB_ROOT_PASSWORD: "{{ osticket_env_mysql_root_password }}"
-          #
           MYSQL_ROOT_PASSWORD: "{{ osticket_env_mysql_root_password }}"
+          MYSQL_DATABASE: "{{ osticket_env_mysql_database }}"
           MYSQL_USER: "{{ osticket_env_mysql_user }}"
           MYSQL_PASSWORD: "{{ osticket_env_mysql_password }}"
-          MYSQL_DATABASE: "{{ osticket_env_mysql_database }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ osticket_db_autoheal }}"
@@ -70,10 +66,10 @@
           ADMIN_PASSWORD: "{{ osticket_env_admin_password }}"
           CONTAINER_NAME: "{{ osticket_container_name }}"
           MYSQL_ROOT_PASSWORD: "{{ osticket_env_mysql_root_password }}"
-          MYSQL_USER: "{{ osticket_env_mysql_user }}"
-          MYSQL_PASSWORD: "{{ osticket_env_mysql_password }}"
           MYSQL_DATABASE: "{{ osticket_env_mysql_database }}"
           MYSQL_HOST: "{{ osticket_db_container_name }}"
+          MYSQL_USER: "{{ osticket_env_mysql_user }}"
+          MYSQL_PASSWORD: "{{ osticket_env_mysql_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ osticket_db_container_name }}"
