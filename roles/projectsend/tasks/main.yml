@@ -23,6 +23,8 @@
           - "{{ projectsend_data_directory }}/db:/config/databases"
         env:
           DOCKER_MODS: "{{ projectsend_db_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ projectsend_db_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ projectsend_db_env_docker_mods_install_pip_packages}}"
           MYSQL_ROOT_PASSWORD: "projectsend"
           MYSQL_DATABASE: "projectsend"
           MYSQL_USER: "projectsend"
@@ -61,6 +63,8 @@
           - "{{ projectsend_data_directory }}/data:/data"
         env:
           DOCKER_MODS: "{{ projectsend_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ projectsend_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ projectsend_env_docker_mods_install_pip_packages}}"
           MAX_UPLOAD: "{{ projectsend_max_upload }}"
           PUID: "{{ projectsend_user_id }}"
           PGID: "{{ projectsend_group_id }}"

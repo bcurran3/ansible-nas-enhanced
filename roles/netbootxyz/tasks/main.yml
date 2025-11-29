@@ -25,7 +25,6 @@
           - "{{ netbootxyz_port_http2 }}:{{ netbootxyz_port_http2 }}"
           - "69/udp:69/udp"
         env:
-          DOCKER_MODS: "{{ netbootxyz_env_docker_mods }}"
           NGINX_PORT: "{{ netbootxyz_port_http2 }}"
           PUID: "{{ netbootxyz_user_id }}"
           PGID: "{{ netbootxyz_group_id }}"
@@ -65,9 +64,9 @@
 #          traefik.http.routers.netbootxyz2.middlewares: "{{ netbootxyz_hostname2 }}@docker"
 #          traefik.http.middlewares.netbootxyz2.IPAllowList.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
 #          traefik.http.services.netbootxyz2.loadbalancer.server.port: "{{ netbootxyz_port_http2 }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "lscr.io/linuxserver/netbootxyz"
+        wud.tag.include: '^\d+\.\d+\.\d+$'
+        wud.tag.transform.type: "semver"
+        wud.link.template: "https://github.com/netbootxyz/netbootxyz/pkgs/container/netbootxyz"
         cpu_shares: "{{ netbootxyz_cpu_shares }}"
         memory: "{{ netbootxyz_memory }}"
         restart_policy: unless-stopped
