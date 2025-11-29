@@ -99,6 +99,14 @@
         cpu_shares: "{{ umami_cpu_shares }}"
         memory: "{{ umami_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (umami_port_http | string)] +
+                (['https://' + umami_hostname + '.' + ansible_nas_domain] if (umami_available_externally is true or umami_dockflare_tunnel is true) else [])
+              }}
   when: umami_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

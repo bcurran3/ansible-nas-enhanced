@@ -13,6 +13,14 @@
     enabled: true
   when: usermin_enabled is true
 
+- name: Access Usermin at
+  ansible.builtin.debug:
+    msg: >-
+          {{
+            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (usermin_port_http | string)]
+          }}
+  when: usermin_enabled is true
+
 - name: Uninstall Usermin
   ansible.builtin.apt:
     name: usermin

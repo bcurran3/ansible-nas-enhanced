@@ -134,6 +134,14 @@
         cpu_shares: "{{ rustdesk_web_cpu_shares }}"
         memory: "{{ rustdesk_web_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (rustdesk_web_port_http | string)] +
+                (['https://' + rustdesk_hostname + '.' + ansible_nas_domain] if (rustdesk_available_externally is true or rustdesk_dockflare_tunnel is true) else [])
+              }}
   when: rustdesk_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

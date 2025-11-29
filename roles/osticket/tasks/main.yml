@@ -69,31 +69,6 @@
           MYSQL_HOST: "{{ osticket_db_container_name }}"
           MYSQL_USER: "{{ osticket_env_mysql_user }}"
           MYSQL_PASSWORD: "{{ osticket_env_mysql_password }}"
-#############
-          CRON_INTERVAL: "10"
-
-          DB_HOST: "{{ osticket_db_container_name }}"
-          DB_NAME: "{{ osticket_env_mysql_database }}"
-          DB_USER: "{{ osticket_env_mysql_user }}"
-          DB_PASS: "{{ osticket_env_mysql_password }}"
-
-          SMTP_HOST: "localhost"
-          SMTP_PORT: "25"
-          SMTP_FROM: "osticket@{{ ansible_nas_domain }}"
-          SMTP_TLS: "0"
-          SMTP_USER: "osticket@{{ ansible_nas_domain }}"
-          SMTP_PASS: "password"
-
-          INSTALL_SECRET: "1QjajFhKuElyKvSoCF9vmWbFapl9HhJVyL249cy5VOICRQTbMueIetkTO3i9s6um"
-          INSTALL_EMAIL: "osticket@{{ ansible_nas_domain }}"
-          INSTALL_NAME: "OSTicket Helpdesk"
-
-          ADMIN_FIRSTNAME: "Admin"
-          ADMIN_LASTNAME: "User"
-          ADMIN_EMAIL: "admin@{{ ansible_nas_domain }}"
-          ADMIN_USER: "{{ ansible_nas_user }}"
-          ADMIN_PASS: "{{ ansible_nas_app_admin_password }}"
-#########
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ osticket_db_container_name }}"

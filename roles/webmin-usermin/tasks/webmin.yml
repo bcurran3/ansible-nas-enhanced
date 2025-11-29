@@ -13,6 +13,14 @@
     enabled: true
   when: webmin_enabled is true
 
+- name: Access Webmin at
+  ansible.builtin.debug:
+    msg: >-
+          {{
+            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (webmin_port_http | string)]
+          }}
+  when: webmin_enabled is true
+
 - name: Uninstall Webmin
   ansible.builtin.apt:
     name: webmin

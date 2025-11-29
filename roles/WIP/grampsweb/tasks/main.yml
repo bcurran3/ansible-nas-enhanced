@@ -135,6 +135,14 @@
         cpu_shares: "{{ grampsweb_cpu_shares }}"
         memory: "{{ grampsweb_memory }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (grampsweb_port_http | string)] +
+                (['https://' + grampsweb_hostname + '.' + ansible_nas_domain] if (grampsweb_available_externally is true or grampsweb_dockflare_tunnel is true) else [])
+              }}
   when: grampsweb_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

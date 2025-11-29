@@ -73,6 +73,14 @@
         memory: "{{ woodpecker_ci_memory }}"
         restart_policy: unless-stopped
 
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (woodpecker_ci_port_ui | string)] +
+                (['https://' + woodpecker_ci_hostname + '.' + ansible_nas_domain] if (woodpecker_ci_available_externally is true or woodpecker_ci_dockflare_tunnel is true) else [])
+              }}
+
     - name: Create {{ ansible_nas_app_name }} Agent Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
