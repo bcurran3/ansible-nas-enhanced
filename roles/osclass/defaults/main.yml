@@ -6,6 +6,26 @@ osclass_available_externally: false
 osclass_traefik_whitelist: "{{ lan }}"
 osclass_data_directory: "{{ docker_home }}/osclass"
 
+# network
+osclass_hostname: "classifieds"
+osclass_port_http: "8091"
+osclass_db_hostname: "osclass-db"
+
+# docker
+osclass_container_name: "osclass"
+# Legacy Bitnami image (no longer updated) # look at mstoetzer/osclass (no docs)
+osclass_image_name: "bitnamilegacy/osclass-archived"
+osclass_image_tag: "latest"
+osclass_cpu_shares: "1024"
+osclass_memory: "1G"
+osclass_db_container_name: "osclass-db"
+# would like to migrate to lscr.io/linuxserver/mariadb https://docs.linuxserver.io/images/docker-mariadb/
+#osclass_db_image_name: "lscr.io/linuxserver/mariadb"
+osclass_db_image_name: "bitnami/mariadb"
+osclass_db_image_tag: "latest"
+osclass_db_cpu_shares: "1024"
+osclass_db_memory: "1G"
+
 # app
 osclass_env_osclass_admin_username: "admin"
 osclass_env_osclass_admin_password: "topsecret"
@@ -21,33 +41,13 @@ osclass_db_env_mysql_password: "bitnami"
 osclass_db_env_puid: "1000"
 osclass_db_env_pgid: "1000"
 
-# network
-osclass_hostname: "classifieds"
-osclass_port_http: "8091"
-osclass_db_hostname: "osclass-db"
-
-# docker
-osclass_container_name: "osclass"
-# Legacy Bitnami image (no longer updated) # look at mstoetzer/osclass
-osclass_image_name: "bitnamilegacy/osclass-archived"
-osclass_image_tag: "latest"
-osclass_cpu_shares: "1024"
-osclass_memory: "1G"
-osclass_db_container_name: "osclass-db"
-# would like to migrate to lscr.io/linuxserver/mariadb https://docs.linuxserver.io/images/docker-mariadb/
-#osclass_db_image_name: "lscr.io/linuxserver/mariadb"
-osclass_db_image_name: "bitnami/mariadb"
-osclass_db_image_tag: "latest"
-osclass_db_cpu_shares: "1024"
-osclass_db_memory: "1G"
+# autoheal
+osclass_autoheal: "false"
+osclass_db_autoheal: "false"
 
 # dockflare
 osclass_dockflare_tunnel: "false"
 osclass_dockflare_access_group: ""
-
-# autoheal
-osclass_autoheal: "false"
-osclass_db_autoheal: "false"
 
 # homepage
 osclass_homepage_group: "Apps"
@@ -57,6 +57,11 @@ osclass_homepage_showstats: "false"
 osclass_db_homepage_group: "DBs"
 osclass_db_homepage_icon: "mariadb.png"
 osclass_db_homepage_showstats: "false"
+
+# linuxserver.io docker mods
+osclass_db_env_docker_mods: ""
+osclass_db_env_docker_mods_install_packages: ""
+osclass_db_env_docker_mods_install_pip_packages: ""
 
 # watchtower
 osclass_watchtower_enable: "false"
