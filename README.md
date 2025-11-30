@@ -1,17 +1,14 @@
-# Ansible NAS
+# Ansible-NAS-Enhanced
 
-![Available Applications](https://img.shields.io/github/directory-file-count/davestephens/ansible-nas/roles?label=Available%20Applications&style=flat-square)
-[![CI](https://github.com/davestephens/ansible-nas/workflows/CI/badge.svg)](https://github.com/davestephens/ansible-nas/actions?query=workflow%3ACI)
-[![Integration](https://github.com/davestephens/ansible-nas/workflows/Integration/badge.svg)](https://github.com/davestephens/ansible-nas/actions?query=workflow%3AIntegration)
-[![Gitter chat](https://img.shields.io/gitter/room/ansible-nas/chat.svg?logo=gitter&style=flat-square)](https://gitter.im/Ansible-NAS/Chat)
+![Available Applications](https://img.shields.io/github/directory-file-count/bcurran3/ansible-nas-enhanced/roles?label=Available%20Applications&style=flat-square)
 [![license](https://img.shields.io/github/license/DAVFoundation/api_doc.svg?style=flat-square)](https://github.com/davestephens/ansible-nas/blob/main/LICENSE)
-[![Ko-fi](https://img.shields.io/static/v1.svg?label=ko-fi&message=Buy%20Me%20A%20Coffee&color=orange&style=flat-square&logo=buy-me-a-coffee)](https://ko-fi.com/davestephens)
+[![Ko-fi](https://img.shields.io/static/v1.svg?label=ko-fi&message=Buy%20Me%20A%20Coffee&color=orange&style=flat-square&logo=buy-me-a-coffee)](https://ko-fi.com/bcurran3)
 
 After getting burned by broken FreeNAS updates one too many times, I figured I could do a much better job myself using just a stock Ubuntu install, some clever Ansible config and a bunch of Docker containers.
 
-## What Ansible-NAS Does
+## What Ansible-NAS-Enhanced Does
 
-You can configure Ansible-NAS to set up any (or all!) of the applications listed below on your home server.
+You can configure Ansible-NAS-Enhanced to set up any (or all!) of the applications listed below on your home server.
 
 If you have a spare domain name you can configure applications to be accessible externally to your home LAN too; they'll be configured with a sensible hostname and DNS gets updated accordingly if your home IP address changes.
 
@@ -122,19 +119,19 @@ If you have a spare domain name you can configure applications to be accessible 
 
 ## Preconfigured Application Stacks
 
-Ansible-NAS application [stacks](https://ansible-nas.io/docs/category/stacks/) are a number of applications deployed together and preconfigured to perform a common goal.
+Ansible-NAS-Enhanced application [stacks](https://ansible-nas.io/docs/category/stacks/) are a number of applications deployed together and preconfigured to perform a common goal.
 
 * [Logging](https://ansible-nas.io/docs/applications/stacks/logging/) - application logging capture and search service based on Grafana Loki.
 
 ## What This Could Do
 
-Ansible-NAS can run anything that's in a Docker image, which is why Portainer is included. A NAS configuration is a pretty personal thing based on what you download, what media you view, how many photos you take...so it's difficult to please everyone.
+Ansible-NAS-Enhanced can run anything that's in a Docker image, which is why Portainer is included. A NAS configuration is a pretty personal thing based on what you download, what media you view, how many photos you take...so it's difficult to please everyone.
 
 That said, if specific functionality you want isn't included and you think others could benefit, add it and raise a PR!
 
 ## What This Doesn't Do
 
-Ansible NAS doesn't set up your disk partitions, primarily because getting it wrong can be incredibly destructive. That aside, configuring partitions is usually a one-time (or very infrequent) event, so there's not much to be gained by automating it. Check out the [docs](https://ansible-nas.io/docs/) for recommended setups.
+Ansible-NAS-Enhanced doesn't set up your disk partitions, primarily because getting it wrong can be incredibly destructive. That aside, configuring partitions is usually a one-time (or very infrequent) event, so there's not much to be gained by automating it. Check out the [docs](https://ansible-nas.io/docs/) for recommended setups.
 
 ## Installation
 
@@ -144,23 +141,18 @@ See [Installation](https://ansible-nas.io/docs/getting-started/installation/).
 
 You can read the docs [here](https://ansible-nas.io). PRs for more documentation always welcome!
 
-## Migrating from FreeNAS
-
-Read the [migrating from FreeNAS](https://ansible-nas.io/docs/further-configuration/migrating-from-freenas/) docs.
-
 ## Requirements
 
-* Ansible NAS targets the latest Ubuntu LTS release, which is currently Ubuntu Server 22.04 LTS.
-* You can run Ansible-NAS on whatever hardware you like, read the docs for more info. I use an HP Microserver.
+* Ansible-NAS-Enhanced targets the latest Ubuntu LTS release, which is currently Ubuntu Server 22.04 LTS.
+* You can run Ansible-NAS-Enhanced on whatever hardware you like, read the docs for more info. I use an HP Microserver.
 
 ## Getting Help
 
 Getting help is easy! You can:
 
 * Read the [docs](https://ansible-nas.io/docs/)
-* Start a [discussion](https://github.com/davestephens/ansible-nas/discussions)
-* Raise an [issue](https://github.com/davestephens/ansible-nas/issues) if you think you've found a bug
-* Chat on [Gitter](https://gitter.im/Ansible-NAS/Chat)
+* Start a [discussion](https://github.com/bcurran3/ansible-nas-enhanced/discussions)
+* Raise an [issue](https://github.com/bcurran3/ansible-nas--enhanced/issues) if you think you've found a bug
 
 ## Contributing
 
@@ -168,10 +160,8 @@ Contributions are always welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md)
 
 ## Support
 
-If you've enjoyed Ansible-NAS as much as I do working on it, please consider [buying me a coffee](https://ko-fi.com/davestephens) :coffee:
+If you've enjoyed Ansible-NAS-Enhanced as much as I do working on it, please consider [buying me a coffee](https://ko-fi.com/bcurran3) :coffee:
 
 ## Thanks
 
-The awesome dudes at [JetBrains](https://www.jetbrains.com/?from=Ansible-NAS) for supplying core contributors with JetBrains Open Source licenses!
-
-All of the awesome contributors to Ansible-NAS!
+All of the awesome contributors to Ansible-NAS ...and TIA (Thanks in Advance) to all those who will contribute to Ansible-NAS--Enhanced!
