@@ -11,12 +11,12 @@
         name: "{{ vaultwarden_container_name }}"
       register: result
 
-    - name: Get container state
+    - name: Get container state Backup
       community.docker.docker_container_info:
         name: "{{ vaultwarden_backup_container_name }}"
       register: result_backup
 
-    - name: Check {{ ansible_nas_app_name }} Backup is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

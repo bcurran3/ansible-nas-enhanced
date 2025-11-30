@@ -9,21 +9,17 @@
     - name: Get container state
       community.docker.docker_container_info:
         name: "{{ change_detection_container_name }}"
-      register: result
-
-    - name: Check {{ ansible_nas_app_name }} is running
-      ansible.builtin.assert:
-        that:
-          - result.container['State']['Status'] == "running"
-          - result.container['State']['Restarting'] == false
+      register: result_app
 
     - name: Get container state
       community.docker.docker_container_info:
         name: "{{ change_detection_sockpuppet_container_name }}"
-      register: result
+      register: result_sockpuppet
 
-    - name: Check {{ ansible_nas_app_name }} Sock Puppet(eer) Browser is running
+    - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
-          - result.container['State']['Status'] == "running"
-          - result.container['State']['Restarting'] == false
+          - result_app.container['State']['Status'] == "running"
+          - result_app.container['State']['Restarting'] == false
+          - result_sockpuppet.container['State']['Status'] == "running"
+          - result_sockpuppet.container['State']['Restarting'] == false

@@ -6,22 +6,22 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get container state
+    - name: Get container state Machine Learning
       community.docker.docker_container_info:
         name: "{{ immich_machinelearning_image }}"
       register: result_ml
 
-    - name: Get container state
+    - name: Get container state DB
       community.docker.docker_container_info:
         name: "{{ immich_postgres_image }}"
       register: result_db
 
-    - name: Get container state
+    - name: Get container state Redis
       community.docker.docker_container_info:
         name: "{{ immich_redis_container_name }}"
       register: result_redis
 
-    - name: Get container state
+    - name: Get container state Server
       community.docker.docker_container_info:
         name: "{{ immich_server_container_name }}"
       register: result

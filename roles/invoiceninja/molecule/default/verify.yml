@@ -6,17 +6,17 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get container state
+    - name: Get container state app
       community.docker.docker_container_info:
         name: "{{ invoiceninja_app_container_name }}"
       register: result_app
 
-    - name: Get container state
+    - name: Get container state DB
       community.docker.docker_container_info:
         name: "{{ invoiceninja_db_container_name }}"
       register: result_db
 
-    - name: Get container state
+    - name: Get container state web
       community.docker.docker_container_info:
         name: "{{ invoiceninja_web_container_name }}"
       register: result_web

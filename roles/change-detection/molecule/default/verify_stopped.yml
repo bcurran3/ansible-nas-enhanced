@@ -10,20 +10,16 @@
       community.docker.docker_container:
         name: "{{ change_detection_container_name }}"
         state: absent
-      register: result
-
-    - name: Check {{ ansible_nas_app_name }} is stopped
-      ansible.builtin.assert:
-        that:
-          - not result.changed
+      register: result_app
 
     - name: Try and stop and remove {{ ansible_nas_app_name }} Sock Puppet(eer) Browser
       community.docker.docker_container:
         name: "{{ change_detection_sockpuppet_container_name }}"
         state: absent
-      register: result
+      register: result_sockpuppet
 
-    - name: Check {{ ansible_nas_app_name }} Sock Puppet(eer) Browser is stopped
+    - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
-          - not result.changed
+          - not result_app.changed
+          - not result_sockpuppet.changed

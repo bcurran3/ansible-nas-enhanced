@@ -6,19 +6,19 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Machine Learning
       community.docker.docker_container:
         name: "{{ immich_machinelearning_container_name }}"
         state: absent
       register: result_ml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ ansible_nas_app_name }} DB
       community.docker.docker_container:
         name: "{{ immich_postgres_container_name }}"
         state: absent
       register: result_db
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Redis
       community.docker.docker_container:
         name: "{{ immich_redis_container_name }}"
         state: absent

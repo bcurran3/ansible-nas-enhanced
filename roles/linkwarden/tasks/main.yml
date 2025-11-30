@@ -150,6 +150,16 @@
       community.docker.docker_container:
         name: "{{ linkwarden_container_name }}"
         state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Meilisearch Container
+      community.docker.docker_container:
+        name: "{{ linkwarden_search_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ linkwarden_db_container_name }}"
+        state: absent
   when: linkwarden_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
