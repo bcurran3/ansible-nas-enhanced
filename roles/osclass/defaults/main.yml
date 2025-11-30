@@ -5,36 +5,39 @@ osclass_enabled: false
 osclass_available_externally: false
 osclass_traefik_whitelist: "{{ lan }}"
 osclass_data_directory: "{{ docker_home }}/osclass"
-osclass_hostname: "classifieds"
 
 # app
-osclass_admin_username: "admin"
-osclass_admin_password: "topsecret"
-osclass_email: ""
-osclass_smtp_host: ""
-osclass_smtp_port: ""
-osclass_smtp_user: ""
-osclass_smtp_password: ""
-
-# database
-osclass_database_hostname: "osclass-db"
-osclass_database_user: "osclass"
-osclass_database_password: "bitnami"
+osclass_env_osclass_admin_username: "admin"
+osclass_env_osclass_admin_password: "topsecret"
+osclass_env_osclass_email: ""
+osclass_env_osclass_smtp_host: ""
+osclass_env_osclass_smtp_port: ""
+osclass_env_osclass_smtp_user: ""
+osclass_env_osclass_smtp_password: ""
+osclass_db_env_mysql_root_password: "Ansible-NAS"
+osclass_db_env_mysql_database: "osclass_db"
+osclass_db_env_mysql_user: "osclass"
+osclass_db_env_mysql_password: "bitnami"
+osclass_db_env_puid: "1000"
+osclass_db_env_pgid: "1000"
 
 # network
+osclass_hostname: "classifieds"
 osclass_port_http: "8091"
+osclass_db_hostname: "osclass-db"
 
 # docker
 osclass_container_name: "osclass"
-# Legacy Bitnami image (no longer updated)
+# Legacy Bitnami image (no longer updated) # look at mstoetzer/osclass
 osclass_image_name: "bitnamilegacy/osclass-archived"
 osclass_image_tag: "latest"
 osclass_cpu_shares: "1024"
 osclass_memory: "1G"
 osclass_db_container_name: "osclass-db"
+# would like to migrate to lscr.io/linuxserver/mariadb https://docs.linuxserver.io/images/docker-mariadb/
+#osclass_db_image_name: "lscr.io/linuxserver/mariadb"
 osclass_db_image_name: "bitnami/mariadb"
 osclass_db_image_tag: "latest"
-#^ would like to migrate to linuxserver/mariadb
 osclass_db_cpu_shares: "1024"
 osclass_db_memory: "1G"
 
