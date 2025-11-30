@@ -1,0 +1,138 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ wordpress_data_directory }}"
+        - "{{ wordpress_data_directory }}/db"
+        - "{{ wordpress_data_directory }}/html"
+
+    - name: Create {{ ansible_nas_app_name }} MySQL Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wordpress_db_container_name }}"
+        hostname: "{{ wordpress_db_container_name }}"
+        image: "{{ wordpress_db_image_name }}:{{ wordpress_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ wordpress_data_directory }}/db:/var/lib/mysql"
+#         - "{{ wordpress_data_directory }}/db/my.cnf:/etc/my.cnf"
+        env:
+          MYSQL_DATABASE: "{{ wordpress_env_wordpress_db_name }}"
+          MYSQL_USER: "{{ wordpress_env_wordpress_db_user }}"
+          MYSQL_PASSWORD: "{{ wordpress_env_wordpress_db_password }}"
+          MYSQL_RANDOM_ROOT_PASSWORD: "{{ wordpress_db_env_mysql_random_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wordpress_db_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ wordpress_db_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MySQL"
+          homepage.group: "{{ wordpress_db_homepage_group }}"
+          homepage.icon: "{{ wordpress_db_homepage_icon }}"
+          homepage.href: "{{ wordpress_homepage_href }}"
+          homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wordpress_db_container_name }}"
+          homepage.showStats: "{{ wordpress_db_homepage_showstats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mysql"
+        cpu_shares: "{{ wordpress_db_cpu_shares }}"
+        memory: "{{ wordpress_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wordpress_container_name }}"
+        hostname: "{{ wordpress_container_name }}"
+        image: "{{ wordpress_image_name }}:{{ wordpress_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ wordpress_data_directory }}/html:/var/www/html"
+        ports:
+          - "{{ wordpress_port_http }}:80"
+        env:
+          WORDPRESS_DB_HOST: "{{ wordpress_db_container_name }}"
+          WORDPRESS_DB_USER: "{{ wordpress_env_wordpress_db_user}}"
+          WORDPRESS_DB_PASSWORD: "{{ wordpress_env_wordpress_db_password }}"
+          WORDPRESS_DB_NAME: "{{ wordpress_env_wordpress_db_name }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wordpress_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ wordpress_watchtower_enable }}"
+          dockflare.enable: "{{ wordpress_dockflare_tunnel }}"
+          dockflare.access.group: "{{ wordpress_dockflare_access_group }}"
+          dockflare.hostname: "{{ wordpress_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wordpress_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ wordpress_homepage_group }}"
+          homepage.icon: "{{ wordpress_homepage_icon }}"
+          homepage.href: "{{ wordpress_homepage_href }}"
+          homepage.description: "{{ 'wordpress description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wordpress_container_name }}"
+          homepage.showStats: "{{ wordpress_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wordpress_port_http }}"
+          traefik.enable: "{{ wordpress_available_externally | string }}"
+          traefik.http.routers.wordpress.rule: "Host(`{{ wordpress_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.wordpress.tls.certresolver: "letsencrypt"
+          traefik.http.routers.wordpress.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.wordpress.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ wordpress_hostname }}"
+          traefik.http.routers.wordpress.middlewares: "{{ wordpress_hostname }}@docker"
+          traefik.http.middlewares.wordpress.IPAllowList.sourcerange: "{{ wordpress_traefik_whitelist }}"
+          traefik.http.services.wordpress.loadbalancer.server.port: "80"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/wordpress"
+        cpu_shares: "{{ wordpress_cpu_shares }}"
+        memory: "{{ wordpress_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wordpress_port_http | string)] +
+                (['https://' + wordpress_hostname + '.' + ansible_nas_domain] if (wordpress_available_externally is true or wordpress_dockflare_tunnel is true) else [])
+              }}
+  when: wordpress_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ wordpress_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ wordpress_db_container_name }}"
+        state: absent
+  when: wordpress_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ wordpress_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ wordpress_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: wordpress_enabled is false and archive_app_data_enabled is true

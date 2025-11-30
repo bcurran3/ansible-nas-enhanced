@@ -1,0 +1,55 @@
+---
+# ANE
+ansible_nas_app_name: "wordpress"
+wordpress_enabled: false
+wordpress_available_externally: false
+wordpress_traefik_whitelist: "{{ lan }}"
+
+# directories
+wordpress_data_directory: "{{ docker_home }}/wordpress"
+
+# docker
+wordpress_container_name: "wordpress"
+wordpress_image_name: "wordpress"
+wordpress_image_tag: "latest"
+wordpress_db_container_name: "wordpress-db"
+wordpress_db_image_name: "mysql"
+wordpress_db_image_tag: "8.0"
+
+# network
+wordpress_port_http: "3034"
+wordpress_hostname: "wordpress"
+
+# specs
+wordpress_cpu_shares: "1024"
+wordpress_memory: 1g
+wordpress_db_cpu_shares: "1024"
+wordpress_db_memory: 1g
+
+# app
+wordpress_env_wordpress_db_user: "wordpress"
+wordpress_env_wordpress_db_password: "wordpress"
+wordpress_env_wordpress_db_name: "wordpress"
+wordpress_db_env_mysql_random_root_password: "1"
+
+# autoheal
+wordpress_autoheal: "false"
+wordpress_db_autoheal: "false"
+
+# dockflare
+wordpress_dockflare_tunnel: "false"
+wordpress_dockflare_access_group: ""
+
+# homepage
+wordpress_homepage_group: "Apps"
+wordpress_homepage_icon: "wordpress.png"
+wordpress_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wordpress_port_http }}"
+wordpress_homepage_showstats: "false"
+wordpress_db_homepage_group: "DBs"
+wordpress_db_homepage_icon: "mysql.png"
+wordpress_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wordpress_port_http }}"
+wordpress_db_homepage_showstats: "false"
+
+# watchtower
+wordpress_watchtower_enable: "false"
+wordpress_db_watchtower_enable: "false"
