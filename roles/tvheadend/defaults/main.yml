@@ -1,0 +1,57 @@
+---
+# ANE
+ansible_nas_app_name: "TVheadend"
+tvheadend_enabled: false
+tvheadend_available_externally: false
+tvheadend_traefik_whitelist: "{{ lan }}"
+
+# directories
+tvheadend_data_directory: "{{ docker_home }}/tvheadend"
+tvheadend_tv_directory: "{{ tv_root }}"
+
+# docker
+tvheadend_container_name: "tvheadend"
+tvheadend_image_name: "lscr.io/linuxserver/tvheadend"
+tvheadend_image_tag: "latest"
+
+# uid / gid
+tvheadend_user_id: "1000"
+tvheadend_group_id: "1000"
+
+# network
+tvheadend_hostname: "tvheadend"
+tvheadend_port_http: "9981"
+tvheadend_port_htsp: "9982"
+
+# specs
+tvheadend_cpu_shares: "1024"
+tvheadend_memory: 1g
+
+# app
+tvheadend_env_run_opts: ""
+
+# autoheal
+tvheadend_autoheal: "false"
+
+# dockflare
+tvheadend_dockflare_tunnel: "false"
+tvheadend_dockflare_access_group: ""
+
+# hardware devices - Only needed if you want to pass through a DVB card to the container. If you use IPTV or HDHomeRun you can leave it out.
+tvheadend_devices:
+ - /dev/dri:/dev/dri
+ - /dev/dvb:/dev/dvb
+
+# homepage
+tvheadend_homepage_group: "Apps"
+tvheadend_homepage_icon: "tvheadend.png"
+tvheadend_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tvheadend_port }}"
+tvheadend_homepage_showstats: "false"
+
+# linuxserver.io docker mods
+tvheadend_env_docker_mods: ""
+tvheadend_env_docker_mods_install_packages: ""
+tvheadend_env_docker_mods_install_pip_packages: ""
+
+# watchtower
+tvheadend_watchtower_enable: "false"

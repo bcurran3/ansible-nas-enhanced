@@ -1,0 +1,101 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ tvheadend_data_directory }}"
+        - "{{ tvheadend_data_directory }}/config"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tvheadend_container_name }}"
+        hostname: "{{ tvheadend_container_name }}"
+        image: "{{ tvheadend_image_name }}:{{ tvheadend_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tvheadend_data_directory }}/config:/config"
+          - "{{ tvheadend_tv_directory }}:/recordings"
+        ports:
+          - "{{ tvheadend_port_http }}:9981"
+          - "{{ tvheadend_port_htsp }}:9982"
+        env:
+          DOCKER_MODS: "{{ tvheadend_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ tvheadend_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ tvheadend_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ tvheadend_user_id }}"
+          PGID: "{{ tvheadend_group_id }}"
+          RUN_OPTS: "{{ tvheadend_env_run_opts }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ tvheadend_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ tvheadend_watchtower_enable }}"
+          dockflare.enable: "{{ tvheadend_dockflare_tunnel }}"
+          dockflare.access.group: "{{ tvheadend_dockflare_access_group }}"
+          dockflare.hostname: "{{ tvheadend_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tvheadend_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ tvheadend_homepage_group }}"
+          homepage.icon: "{{ tvheadend_homepage_icon }}"
+          homepage.href: "{{ tvheadend_homepage_href }}"
+          homepage.description: "{{ 'tvheadend description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tvheadend_container_name }}"
+          homepage.showStats: "{{ tvheadend_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tvheadend_port }}"
+          traefik.enable: "{{ tvheadend_available_externally | string }}"
+          traefik.http.routers.tvheadend.rule: "Host(`{{ tvheadend_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.tvheadend.tls.certresolver: "letsencrypt"
+          traefik.http.routers.tvheadend.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.tvheadend.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ tvheadend_hostname }}"
+          traefik.http.routers.tvheadend.middlewares: "{{ tvheadend_hostname }}@docker"
+          traefik.http.middlewares.tvheadend.IPAllowList.sourcerange: "{{ tvheadend_traefik_whitelist }}"
+          traefik.http.services.tvheadend.loadbalancer.server.port: "80"
+          wud.tag.include: '^version-\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "lscr.io/linuxserver/tvheadend"
+        cpu_shares: "{{ tvheadend_cpu_shares }}"
+        devices: "{{ tvheadend_devices }}"
+        memory: "{{ tvheadend_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tvheadend_port_http | string)] +
+                (['https://' + tvheadend_hostname + '.' + ansible_nas_domain] if (tvheadend_available_externally is true or tvheadend_dockflare_tunnel is true) else [])
+              }}
+  when: tvheadend_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ tvheadend_container_name }}"
+        state: absent
+  when: tvheadend_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ tvheadend_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ tvheadend_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: tvheadend_enabled is false and archive_app_data_enabled is true
