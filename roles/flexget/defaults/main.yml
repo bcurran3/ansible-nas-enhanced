@@ -4,14 +4,14 @@ ansible_nas_app_name: "Flexget"
 flexget_enabled: false
 flexget_available_externally: false
 flexget_traefik_whitelist: "{{ lan }}"
+flexget_data_directory: "{{ docker_home }}/flexget"
 
 # network
 flexget_hostname: "flexget"
-
-flexget_data_directory: "{{ docker_home }}/flexget"
-flexget_FG_WEBUI_PASSWD: "topsecret"
 flexget_port_http: "3539"
 
+# app
+flexget_FG_WEBUI_PASSWD: "{{ ansible_nas_app_admin_password }}"
 flexget_user_id: "0"
 flexget_group_id: "0"
 

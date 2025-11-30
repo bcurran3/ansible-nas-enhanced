@@ -13,7 +13,7 @@ By default `ansible_nas_user` will be granted access with a password of `topsecr
 ```yaml
 vd_users:
   - username: "{{ ansible_nas_user }}"
-    password: "topsecret"
+    password: "{{ ansible_nas_app_admin_password }}"
     sudo: "Y"
   - username: "larrylaffer"
     password: "kensentme"
