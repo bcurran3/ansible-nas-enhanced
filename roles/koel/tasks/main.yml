@@ -1,0 +1,140 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ koel_data_directory }}"
+        - "{{ koel_data_directory }}/db"
+        - "{{ koel_data_directory }}/index"
+        - "{{ koel_data_directory }}/storage"
+        - "{{ koel_data_directory }}/sql"
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ koel_db_container_name }}"
+        hostname: "{{ koel_db_container_name }}"
+        image: "{{ koel_db_image_name }}:{{ koel_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ koel_data_directory }}/db:/var/lib/mysql"
+        env:
+          MYSQL_ROOT_PASSWORD: "topsecretroot"
+          MYSQL_DATABASE: "koel"
+          MYSQL_USER: "koel"
+          MYSQL_PASSWORD: "koel"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ koel_db_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ koel_db_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ koel_db_homepage_group }}"
+          homepage.icon: "{{ koel_db_homepage_icon }}"
+          homepage.href: "{{ koel_homepage_href }}"
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ koel_db_container_name }}"
+          homepage.showStats: "{{ koel_db_homepage_showstats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
+        cpu_shares: "{{ koel_db_cpu_shares }}"
+        memory: "{{ koel_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ koel_container_name }}"
+        hostname: "{{ koel_container_name }}"
+        image: "{{ koel_image_name }}:{{ koel_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ koel_data_directory }}/index:/var/www/html/storage/search-indexes"
+          - "{{ koel_data_directory }}/storage:/var/www/html/public/img/storage"
+          - "{{ koel_data_directory }}/sql:/docker-entrypoint-initdb.d"
+          - "{{ keol_music_directory }}:/music:rw"
+        ports:
+          - "{{ koel_port_http }}:80"
+        env:
+          DB_CONNECTION: "mysql"
+          DB_HOST: "{{ koel_db_container_name }}"
+          DB_USERNAME: "koel"
+          DB_PASSWORD: "koel"
+          DB_DATABASE: "koel"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ koel_db_container_name }}"
+        labels:
+          autoheal: "{{ koel_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ koel_watchtower_enable }}"
+          dockflare.enable: "{{ koel_dockflare_tunnel }}"
+          dockflare.access.group: "{{ koel_dockflare_access_group }}"
+          dockflare.hostname: "{{ koel_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ koel_homepage_group }}"
+          homepage.icon: "{{ koel_homepage_icon }}"
+          homepage.href: "{{ koel_homepage_href }}"
+          homepage.description: "{{ 'Open-source music streaming software' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ koel_container_name }}"
+          homepage.showStats: "{{ koel_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
+          traefik.enable: "{{ koel_available_externally | string }}"
+          traefik.http.routers.koel.rule: "Host(`{{ koel_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.koel.tls.certresolver: "letsencrypt"
+          traefik.http.routers.koel.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.koel.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ koel_hostname }}"
+          traefik.http.routers.koel.middlewares: "{{ koel_hostname }}@docker"
+          traefik.http.middlewares.koel.IPAllowList.sourcerange: "{{ koel_traefik_whitelist }}"
+          traefik.http.services.koel.loadbalancer.server.port: "80"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/phanan/koel"
+        cpu_shares: "{{ koel_cpu_shares }}"
+        memory: "{{ koel_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (koel_port_http | string)] +
+                (['https://' + koel_hostname + '.' + ansible_nas_domain] if (koel_available_externally is true or koel_dockflare_tunnel is true) else [])
+              }}
+  when: koel_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ koel_container_name }}"
+        state: absent
+  when: koel_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ koel_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ koel_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: koel_enabled is false and archive_app_data_enabled is true

@@ -1,0 +1,50 @@
+---
+# ANE
+ansible_nas_app_name: "koel"
+koel_enabled: false
+koel_available_externally: false
+koel_traefik_whitelist: "{{ lan }}"
+
+# directories
+koel_data_directory: "{{ docker_home }}/koel"
+koel_music_directory: "{{ music_root }}"
+
+# docker
+koel_container_name: "koel"
+koel_image_name: "phanan/koel"
+koel_image_tag: "latest"
+koel_db_container_name: "koel-db"
+koel_db_image_name: "mariadb"
+koel_db_image_tag: "10.11"
+
+# network
+koel_port_http: "3033"
+koel_hostname: "koel"
+
+# specs
+koel_cpu_shares: "1024"
+koel_memory: 1g
+koel_db_cpu_shares: "1024"
+koel_db_memory: 1g
+
+# autoheal
+koel_autoheal: "false"
+koel_db_autoheal: "false"
+
+# dockflare
+koel_dockflare_tunnel: "false"
+koel_dockflare_access_group: ""
+
+# homepage
+koel_homepage_group: "Apps"
+koel_homepage_icon: "koel.png"
+koel_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
+koel_homepage_showstats: "false"
+koel_db_homepage_group: "DBs"
+koel_db_homepage_icon: "mariadb.png"
+koel_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
+koel_db_homepage_showstats: "false"
+
+# watchtower
+koel_watchtower_enable: "false"
+koel_db_watchtower_enable: "false"
