@@ -1,0 +1,48 @@
+---
+# ANE
+ansible_nas_app_name: "Tailscale"
+tailscale_enabled: false
+tailscale_available_externally: false
+tailscale_traefik_whitelist: "{{ lan }}"
+
+# directories
+tailscale_data_directory: "{{ docker_home }}/tailscale"
+
+# docker
+tailscale_container_name: "tailscale"
+tailscale_image_name: "tailscale/tailscale"
+tailscale_image_tag: "stable"
+
+# network
+tailscale_hostname: "tailscale"
+
+# specs
+tailscale_cpu_shares: "1024"
+tailscale_memory: 1g
+
+# app
+tailscale_env_ts_accept_dns: "" # Accept DNS configuration from the admin console. Not accepted by default.
+tailscale_env_ts_auth_once: "" # Attempt to log in only if not already logged in. False by default, to forcibly log in every time the container starts.
+tailscale_env_ts_authkey: "" # A Tailscale auth key⁠ used to authenticate the container.
+tailscale_env_ts_dest_ip: "" # Proxy all incoming Tailscale traffic to the specified destination IP.
+tailscale_env_ts_kube_secret: "" # If running in Kubernetes, the Kubernetes secret name where Tailscale state is stored. The default is tailscale.
+tailscale_env_ts_hostname: "{{ ansible_nas_hostname }}" # Use the specified hostname for the node.
+tailscale_env_ts_outbound_http_proxy_listen: "" # Set an address and port for the HTTP proxy⁠.
+tailscale_env_ts_routes: "" # Advertises subnet routes⁠. Equivalent to tailscale set --advertise-routes=. To accept advertised routes, use TS_EXTRA_ARGS to pass in --accept-routes.
+tailscale_env_ts_socket: "" # Unix socket path used by the Tailscale binary, where the tailscaled LocalAPI socket is created. The default is /var/run/tailscale/tailscaled.sock.
+tailscale_env_ts_socks5_server: "" #S et an address and port for the SOCKS5 proxy⁠.
+tailscale_env_ts_state_dir: "/var/state" # Directory where the state of tailscaled is stored. This needs to persist across container restarts.
+tailscale_env_ts_userspace: "" # Enable userspace networking⁠, instead of kernel networking. Enabled by default.
+tailscale_env_ts_extra_args: "" # any other CLI flags for tailscale set
+tailscale_env_ts_tailscaled_extra_args: "" # any other flags for tailscaled
+
+# autoheal
+tailscale_autoheal: "false"
+
+# homepage
+tailscale_homepage_group: "Misc"
+tailscale_homepage_icon: "tailscale.png"
+tailscale_homepage_showstats: "false"
+
+# watchtower
+tailscale_watchtower_enable: "false"

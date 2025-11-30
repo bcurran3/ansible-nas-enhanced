@@ -1,0 +1,93 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ tailscale_data_directory }}"
+        - "{{ tailscale_data_directory }}/lib"
+        - "{{ tailscale_data_directory }}/state"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tailscale_container_name }}"
+        hostname: "{{ tailscale_container_name }}"
+        image: "{{ tailscale_image_name }}:{{ tailscale_image_tag }}"
+        pull: true
+        capabilities:
+          - NET_ADMIN
+          - SYS_MODULE
+        command: "tailscaled"
+        network_mode: "host"
+        privileged: true
+        volumes:
+          - "{{ tailscale_data_directory }}/lib:/var/lib"
+          - "{{ tailscale_data_directory }}/state:/var/state"
+          - "/dev/net/tun:/dev/net/tun"
+        env:
+          TS_ACCEPT_DNS: "{{ tailscale_env_ts_accept_dns }}"
+          TS_AUTH_ONCE: "{{ tailscale_env_ts_auth_once }}"
+          TS_AUTHKEY: "{{ tailscale_env_ts_authkey }}"
+          TS_DEST_IP: "{{ tailscale_env_ts_dest_ip }}"
+          TS_KUBE_SECRET: "{{ tailscale_env_ts_kube_secret }}"
+          TS_HOSTNAME: "{{ tailscale_env_ts_hostname }}"
+          TS_OUTBOUND_HTTP_PROXY_LISTEN: "{{ tailscale_env_ts_outbound_http_proxy_listen }}"
+          TS_ROUTES: "{{ tailscale_env_ts_routes }}"
+          TS_SOCKET: "{{ tailscale_env_ts_socket}}"
+          TS_SOCKS5_SERVER: "{{ tailscale_env_ts_socks5_server }}"
+          TS_STATE_DIR: "{{ tailscale_env_ts_state_dir }}"
+          TS_USERSPACE: "{{ tailscale_env_ts_userspace }}"
+          TS_EXTRA_ARGS: "{{ tailscale_env_ts_extra_args }}"
+          TS_TAILSCALED_EXTRA_ARGS: "{{ tailscale_env_ts_tailscaled_extra_args}}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ tailscale_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ tailscale_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ tailscale_homepage_group }}"
+          homepage.icon: "{{ tailscale_homepage_icon }}"
+          homepage.href: "{{ tailscale_homepage_href }}"
+          homepage.description: "{{ 'Private WireGuard networks made easy' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tailscale_container_name }}"
+          homepage.showStats: "{{ tailscale_homepage_showstats }}"
+          traefik.enable: "false"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/tailscale/tailscale"
+        cpu_shares: "{{ tailscale_cpu_shares }}"
+        memory: "{{ tailscale_memory }}"
+        restart_policy: unless-stopped
+  when: tailscale_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ tailscale_container_name }}"
+        state: absent
+  when: tailscale_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ tailscale_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ tailscale_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: tailscale_enabled is false and archive_app_data_enabled is true
