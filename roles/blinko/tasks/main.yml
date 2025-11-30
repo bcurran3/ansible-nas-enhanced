@@ -127,6 +127,11 @@
       community.docker.docker_container:
         name: "{{ blinko_container_name }}"
         state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ blinko_db_container_name }}"
+        state: absent
   when: blinko_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}

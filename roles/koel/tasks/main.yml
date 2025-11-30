@@ -117,6 +117,11 @@
       community.docker.docker_container:
         name: "{{ koel_container_name }}"
         state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ koel_db_container_name }}"
+        state: absent
   when: koel_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}

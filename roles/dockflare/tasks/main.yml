@@ -11,7 +11,7 @@
         - "{{ dockflare_data_directory }}"
         - "{{ dockflare_data_directory }}/redis"
 
-    - name: Create {{ ansible_nas_app_name }} Directories (2)
+    - name: Create {{ ansible_nas_app_name }} Directories Part Deux
       file:
         path: "{{ item }}"
         state: directory
@@ -161,6 +161,16 @@
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ dockflare_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Proxy Container
+      community.docker.docker_container:
+        name: "{{ dockflare_proxy_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        name: "{{ dockflare_redis_container_name }}"
         state: absent
   when: dockflare_enabled is false
 

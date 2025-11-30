@@ -38,15 +38,15 @@
         hostname: "{{ scrutiny_container_name }}"
         image: "{{ scrutiny_image_name }}:{{ scrutiny_image_tag }}"
         pull: true
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
+        ports:
+          - "{{ scrutiny_port }}:8080"
         volumes:
           - "{{ scrutiny_data_directory }}/config:/opt/scrutiny/config"
           - "{{ scrutiny_data_directory }}/influxdb:/opt/scrutiny/influxdb"
           - "/run/udev:/run/udev:ro"
           - "/dev:/dev:ro"
-        ports:
-          - "{{ scrutiny_port }}:8080"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD", "curl", "-f", "http://localhost:8080/api/health"]
           interval: 5s
