@@ -1,0 +1,96 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ spoolman_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ spoolman_container_name }}"
+        hostname: "{{ spoolman_container_name }}"
+        image: "{{ spoolman_image_name }}:{{ spoolman_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ spoolman_data_directory }}:/home/app/.local/share/spoolman"
+        ports:
+          - "{{ spoolman_port }}:8000"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ spoolman_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ spoolman_watchtower_enable }}"
+          dockflare.enable: "{{ spoolman_dockflare_tunnel }}"
+          dockflare.access.group: "{{ spoolman_dockflare_access_group }}"
+          dockflare.hostname: "{{ spoolman_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ spoolman_port }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ spoolman_homepage_group }}"
+          homepage.icon: "{{ spoolman_homepage_icon }}"
+          homepage.href: "{{ spoolman_homepage_href }}"
+          homepage.description: "{{ 'Keep track of your inventory of 3D-printer filament spools.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ spoolman_container_name }}"
+          homepage.showStats: "{{ spoolman_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ spoolman_port }}"
+          repliqate.enabled: "{{ spoolman_repliqate_enabled }}"
+          repliqate.engine: "{{ spoolman_repliqate_engine }}"
+          repliqate.schedule: "{{ spoolman_repliqate_schedule }}"
+          repliqate.backup_id: "{{ spoolman_repliqate_backup_id }}"
+          repliqate.retention: "{{ spoolman_repliqate_retention }}"
+          traefik.enable: "{{ spoolman_available_externally | string }}"
+          traefik.http.routers.spoolman.rule: "Host(`{{ spoolman_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.spoolman.tls.certresolver: "letsencrypt"
+          traefik.http.routers.spoolman.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.spoolman.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ spoolman_hostname }}"
+          traefik.http.routers.spoolman.middlewares: "{{ spoolman_hostname }}@docker"
+          traefik.http.middlewares.spoolman.IPAllowList.sourcerange: "{{ spoolman_traefik_whitelist }}"
+          traefik.http.services.spoolman.loadbalancer.server.port: "8000"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/Donkie/Spoolman/pkgs/container/spoolman"
+        cpu_shares: "{{ spoolman_cpu_shares }}"
+        memory: "{{ spoolman_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (spoolman_port_http | string)] +
+                (['https://' + spoolman_hostname + '.' + ansible_nas_domain] if (spoolman_available_externally is true or spoolman_dockflare_tunnel is true) else [])
+              }}
+  when: spoolman_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ spoolman_container_name }}"
+        state: absent
+  when: spoolman_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ spoolman_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ spoolman_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: spoolman_enabled is false and archive_app_data_enabled is true
