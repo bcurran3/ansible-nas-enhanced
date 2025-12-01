@@ -4,6 +4,8 @@
 ANE_EDITOR="nano"
 ANE_ALWAYS_PRUNE=false
 ANE_ALWAYS_UPGRADE=false
+ANE_DISABLE_ALSO_STOPS=false
+ANE_ENABLE_ALSO_STARTS=false
 
 function print_logo {
 echo "      _    _   _ _____"
@@ -28,9 +30,9 @@ function help {
     echo "  --behind, --outdated"
     echo "      Check if your ANE files are up-to-date."
     echo "  --disable <app_name>"
-    echo "      Disable an app (basic)"
+    echo "      Disable an app."
     echo "  --enable <app_name>"
-    echo "      Enable an app (basic)"
+    echo "      Enable an app."
     echo "  --enabled, --installed"
     echo "      List ANE enabled apps."
     echo "  --install"
@@ -50,7 +52,7 @@ function help {
     echo "  --stop"
     echo "      Stop all running containers."
     echo "  --upgrade, --pull"
-    echo "      Upgrade ANE files from git"
+    echo "      Upgrade ANE files from repo"
     exit
 }
 
@@ -111,50 +113,93 @@ if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-o
     BEHIND=$(git rev-list --count HEAD..@{u})
     echo "  ** Your ANE installation is $BEHIND git commits behind."
     if [ $BEHIND -gt 0 ]; then
-       echo "  ** \"./ane.sh --upgrade\" or \"git pull\" to update"
+       echo "  ** \"./ane.sh --upgrade\" to update"
     fi
     exit
 fi
 
-# Disable an app (basic)
+# Disable an app
 if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
     shift
     FILE="inventories/ANE/group_vars/nas.yml"
-    for arg in "$@"; do    
+    for arg in "$@"; do
+        if [[ "${arg}" == *"-"* ]]; then
+            echo "  ** Sorry, this function does not work with hyphenated app names."
+            exit 1
+        fi
         ENABLED_LINE="${arg}_enabled: true"
         DISABLED_LINE="${arg}_enabled: false"
         if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
             sed -i "s/$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
             echo "  ** ${arg} disabled."
+            if $ANE_DISABLE_ALSO_STOPS; then
+               echo COMMAND docker stop ${arg} > /dev/null 2>&1
+               docker stop ${arg} > /dev/null 2>&1
+               if [ $? -eq 0 ]; then
+                  echo "  ** ${arg} stopped. ${arg} may have linked containers (i.e. DBs) still running."
+               else 
+                  echo "  ** ${arg} not stopped."
+               fi
+               docker stop "${arg}-db" > /dev/null 2>&1
+               if [ $? -eq 0 ]; then
+                  echo "  ** ${arg}-db stopped."
+               fi
+               docker stop "${arg}-redis" > /dev/null 2>&1
+               if [ $? -eq 0 ]; then
+                  echo "  ** ${arg}-redis stopped."
+               fi
+            fi
         elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
             echo "  ** ${arg} is already disabled."
         else
-            echo "  ** ${arg} does not exist in the file."
+            echo "  ** ${arg} does not exist in $FILE."
+            echo "  ** \"./ane.sh --enabled\" to view enabled apps."
         fi
     done
     exit
 fi
 
-# Enable an app (basic)
+# Enable an app
 if [[ "$1" = "--enable" || "$1" = "-enable" ]]; then
     shift
+    APPSLIST="./nas.yml"
     FILE="inventories/ANE/group_vars/nas.yml"
     for arg in "$@"; do
+        if [[ "${arg}" == *"-"* ]]; then
+            echo "  ** Sorry, this function does not work with hyphenated app names."
+            exit 1
+        fi
         ENABLED_LINE="${arg}_enabled: true"
         DISABLED_LINE="${arg}_enabled: false"
+        VALID_APP="role: ${arg}"
         if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
             echo "  ** ${arg} is already enabled."
         elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
             sed -i "s/$DISABLED_LINE/$ENABLED_LINE/" "$FILE"
-            echo "  ** ${arg} re-enabled."
+            if $ANE_ENABLE_ALSO_STARTS; then
+                echo "  ** ${arg} re-enabled. Installing..."
+                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
+            else
+                echo "  ** ${arg} re-enabled. \"./ane.sh --app ${arg}\" to install."
+            fi
         else
+        if [ -f "$APPSLIST" ] && grep -q "$VALID_APP" "$APPSLIST"; then
             echo -e "\n### $arg" >> "$FILE"
             echo "$ENABLED_LINE" >> "$FILE"
             if [ -f "$FILE" ] && grep -xq "traefik_enabled: true" "$FILE"; then
                 echo "${arg}_available_externally: true" >> "$FILE"
                 echo "${arg}_homepage_href: \"https://{{ ${arg}_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
             fi
-            echo "  ** ${arg} added and enabled."
+            if $ANE_ENABLE_ALSO_STARTS; then
+                echo "  ** ${arg} enabled. Installing..."
+                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
+            else
+                echo "  ** ${arg} enabled. \"./ane.sh --app ${arg}\" to install."
+            fi
+        else
+            echo "  ** ${arg} not found in $APPSLIST. ${arg} is not a valid app."
+            echo "  ** \"./ane.sh --available\" to view available apps."
+        fi
         fi
     done
     exit
