@@ -27,7 +27,7 @@ drone_ci_image_tag: "2"
 
 # Drone-CI Application Config
 # the users that'll be granted admin, comma separated. Should match a gitea user.
-drone_ci_admin_user: david
+drone_ci_admin_user: "{{ ansible_nas_user }}"
 
 # shared secret - use openssl rand -hex 16 to generate your own
 drone_ci_agent_secret: d052ab29a86a02c6b6ff1e5851ee15e1
@@ -65,6 +65,13 @@ drone_ci_runner_homepage_group: "Misc"
 drone_ci_runner_homepage_icon: "drone_ci.png"
 drone_ci_runner_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ drone_ci_port }}"
 drone_ci_runner_homepage_showstats: "false"
+
+# repliqate
+drone_ci_repliqate_enabled: "false"
+drone_ci_repliqate_engine: "restic"
+drone_ci_repliqate_schedule: "@daily 3am"
+drone_ci_repliqate_backup_id: "drone_ci"
+drone_ci_repliqate_retention: "30d"
 
 # watchtower
 drone_ci_watchtower_enable: "false"

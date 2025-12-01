@@ -11,7 +11,7 @@ dweebui_hostname: "dweebui"
 dweebui_port_http: "8004"
 
 # app
-dweebui_secret: "MrWiskers"
+dweebui_env_secret: "{{ ansible_nas_app_admin_password }}"
 
 # docker
 dweebui_container_name: "dweebui"
@@ -32,6 +32,13 @@ dweebui_homepage_group: "Apps"
 dweebui_homepage_icon: "dweebui.png"
 dweebui_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dweebui_port_http }}"
 dweebui_homepage_showstats: "false"
+
+# repliqate
+dweebui_repliqate_enabled: "false"
+dweebui_repliqate_engine: "restic"
+dweebui_repliqate_schedule: "@daily 3am"
+dweebui_repliqate_backup_id: "dweebui"
+dweebui_repliqate_retention: "30d"
 
 # watchtower
 dweebui_watchtower_enable: "false"

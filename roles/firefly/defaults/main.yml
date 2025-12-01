@@ -49,6 +49,18 @@ firefly_db_homepage_icon: "mariadb.png"
 firefly_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port }}"
 firefly_db_homepage_showstats: "false"
 
+# repliqate
+firefly_repliqate_enabled: "false"
+firefly_repliqate_engine: "restic"
+firefly_repliqate_schedule: "@daily 3am"
+firefly_repliqate_backup_id: "firefly"
+firefly_repliqate_retention: "30d"
+firefly_db_repliqate_enabled: "false"
+firefly_db_repliqate_engine: "restic"
+firefly_db_repliqate_schedule: "@daily 3am"
+firefly_db_repliqate_backup_id: "firefly"
+firefly_db_repliqate_retention: "30d"
+
 # watchtower
 firefly_watchtower_enable: "false"
 firefly_db_watchtower_enable: "false"

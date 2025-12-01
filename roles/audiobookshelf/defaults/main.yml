@@ -16,8 +16,8 @@ audiobookshelf_image_name: "ghcr.io/advplyr/audiobookshelf"
 audiobookshelf_image_tag: "latest"
 
 # network
-audiobookshelf_port: "13378"
 audiobookshelf_hostname: "audiobookshelf"
+audiobookshelf_port: "13378"
 
 # specs
 audiobookshelf_cpu_shares: "1024"
@@ -36,6 +36,12 @@ audiobookshelf_homepage_icon: "audiobookshelf.png"
 audiobookshelf_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ audiobookshelf_port }}"
 audiobookshelf_homepage_showstats: "false"
 
+# repliqate
+audiobookshelf_repliqate_enabled: "false"
+audiobookshelf_repliqate_engine: "restic"
+audiobookshelf_repliqate_schedule: "@daily 3am"
+audiobookshelf_repliqate_backup_id: "audiobookshelf"
+audiobookshelf_repliqate_retention: "30d"
+
 # watchtower
 audiobookshelf_watchtower_enable: "false"
-

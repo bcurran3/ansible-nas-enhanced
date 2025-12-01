@@ -1,7 +1,7 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Couchpotato Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -47,6 +47,11 @@
           homepage.container: "{{ couchpotato_container_name }}"
           homepage.showStats: "{{ couchpotato_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ couchpotato_port }}"
+          repliqate.enabled: "{{ couchpotato_repliqate_enabled }}"
+          repliqate.engine: "{{ couchpotato_repliqate_engine }}"
+          repliqate.schedule: "{{ couchpotato_repliqate_schedule }}"
+          repliqate.backup_id: "{{ couchpotato_repliqate_backup_id }}"
+          repliqate.retention: "{{ couchpotato_repliqate_retention }}"
           traefik.enable: "{{ couchpotato_available_externally | string }}"
           traefik.http.routers.couchpotato.rule: "Host(`couchpotato.{{ ansible_nas_domain }}`)"
           traefik.http.routers.couchpotato.tls.certresolver: "letsencrypt"

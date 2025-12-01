@@ -51,6 +51,18 @@ gitea_db_homepage_icon: "mysql.png"
 gitea_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"
 gitea_db_homepage_showstats: "false"
 
+# repliqate
+gitea_repliqate_enabled: "false"
+gitea_repliqate_engine: "restic"
+gitea_repliqate_schedule: "@daily 3am"
+gitea_repliqate_backup_id: "gitea"
+gitea_repliqate_retention: "30d"
+gitea_db_repliqate_enabled: "false"
+gitea_db_repliqate_engine: "restic"
+gitea_db_repliqate_schedule: "@daily 3am"
+gitea_db_repliqate_backup_id: "gitea-db"
+gitea_db_repliqate_retention: "30d"
+
 # watchtower
 gitea_watchtower_enable: "false"
 gitea_db_watchtower_enable: "false"

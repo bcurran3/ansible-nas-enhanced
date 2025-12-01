@@ -13,14 +13,16 @@ freshrss_container_name: "freshrss"
 freshrss_image_name: "freshrss/freshrss"
 freshrss_image_version: "latest"
 freshrss_cpu_shares: 1024
+freshrss_memory: 1g
 freshrss_db_container_name: "freshrss-db"
 freshrss_db_image_name: "postgres"
 freshrss_db_image_version: "16-alpine"
 freshrss_db_cpu_shares: 1024
+freshrss_db_memory: 1g
 
 # network
-freshrss_port: "8089"
 freshrss_hostname: "freshrss"
+freshrss_port: "8089"
 
 # autoheal
 freshrss_autoheal: "false"
@@ -42,9 +44,17 @@ freshrss_db_homepage_icon: "freshrss.png"
 freshrss_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
 freshrss_db_homepage_showstats: "false"
 
-# specs
-freshrss_memory: 1g
-freshrss_db_memory: 1g
+# repliqate
+freshrss_repliqate_enabled: "false"
+freshrss_repliqate_engine: "restic"
+freshrss_repliqate_schedule: "@daily 3am"
+freshrss_repliqate_backup_id: "freshrss"
+freshrss_repliqate_retention: "30d"
+freshrss_db_repliqate_enabled: "false"
+freshrss_db_repliqate_engine: "restic"
+freshrss_db_repliqate_schedule: "@daily 3am"
+freshrss_db_repliqate_backup_id: "freshrss-db"
+freshrss_db_repliqate_retention: "30d"
 
 # watchtower
 freshrss_watchtower_enable: "false"

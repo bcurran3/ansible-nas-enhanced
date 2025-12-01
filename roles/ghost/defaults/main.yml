@@ -52,6 +52,18 @@ ghost_db_homepage_icon: "mysql.png"
 ghost_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
 ghost_db_homepage_showstats: "false"
 
+# repliqate
+ghost_repliqate_enabled: "false"
+ghost_repliqate_engine: "restic"
+ghost_repliqate_schedule: "@daily 3am"
+ghost_repliqate_backup_id: "ghost"
+ghost_repliqate_retention: "30d"
+ghost_db_repliqate_enabled: "false"
+ghost_db_repliqate_engine: "restic"
+ghost_db_repliqate_schedule: "@daily 3am"
+ghost_db_repliqate_backup_id: "ghost-db"
+ghost_db_repliqate_retention: "30d"
+
 # watchtower
 ghost_watchtower_enable: "false"
 ghost_db_watchtower_enable: "false"

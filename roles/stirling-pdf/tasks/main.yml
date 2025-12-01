@@ -42,7 +42,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stirling_pdf_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stirling_pdf_container_name }}"
-          homepage.showStats: "{[ stirling_pdf_homepage_showstats ]}"
+          homepage.showStats: "{{ stirling_pdf_homepage_showstats }}"
           homepage.widget.type: "stirling-pdf"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stirling_pdf_port_http }}"
           traefik.enable: "{{ stirling_pdf_available_externally | string }}"

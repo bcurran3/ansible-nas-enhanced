@@ -9,31 +9,26 @@ ddns_updater_traefik_whitelist: "{{ lan }}"
 ddns_updater_data_directory: "{{ docker_home }}/ddns-updater"
 
 # network
-ddns_updater_port: 8202
 ddns_updater_hostname: "ddns-updater"
+ddns_updater_port: 8202
 
 # docker
 ddns_updater_container_name: ddns-updater
-ddns_updater_cpu_shares: 1024
 ddns_updater_image_name: "qmcgaw/ddns-updater"
 ddns_updater_image_tag: "latest"
 
 # specs
+ddns_updater_cpu_shares: 1024
 ddns_updater_memory: 1g
 
 # gotify
 # ddns_updater_gotify_token: "token"
-# ddns_updater_gotify_url: "https://gotify.{{ ansible_nas_domain }}"
+# ddns_updater_gotify_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port }}"
 
-# DDNS Updater Config
-# Period of IP address check
-ddns_updater_period: 5m
-
-# Duration to cooldown between updates for each record. This is useful to avoid being rate limited or banned.
-ddns_updater_cooldown_period: 5m
-
-# Timeout for all HTTP requests
-ddns_updater_http_timeout: 10s
+# app
+ddns_updater_period: 5m # Period of IP address check
+ddns_updater_cooldown_period: 5m # Duration to cooldown between updates for each record. This is useful to avoid being rate limited or banned.
+ddns_updater_http_timeout: 10s # Timeout for all HTTP requests
 
 # autoheal
 ddns_updater_autoheal: "false"
@@ -47,6 +42,13 @@ ddns_updater_homepage_group: "Network"
 ddns_updater_homepage_icon: "ddns_updater.png"
 ddns_updater_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port }}"
 ddns_updater_homepage_showstats: "false"
+
+# repliqate
+ddns_updater_repliqate_enabled: "false"
+ddns_updater_repliqate_engine: "restic"
+ddns_updater_repliqate_schedule: "@daily 3am"
+ddns_updater_repliqate_backup_id: "ddns_updater"
+ddns_updater_repliqate_retention: "30d"
 
 # watchtower
 ddns_updater_watchtower_enable: "false"

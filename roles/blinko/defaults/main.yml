@@ -51,6 +51,18 @@ blinko_db_homepage_icon: "postgres.png"
 blinko_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ blinko_port }}"
 blinko_db_homepage_showstats: "false"
 
+# repliqate
+blinko_repliqate_enabled: "false"
+blinko_repliqate_engine: "restic"
+blinko_repliqate_schedule: "@daily 3am"
+blinko_repliqate_backup_id: "blinko"
+blinko_repliqate_retention: "30d"
+blinko_db_repliqate_enabled: "false"
+blinko_db_repliqate_engine: "restic"
+blinko_db_repliqate_schedule: "@daily 3am"
+blinko_db_repliqate_backup_id: "blinko-db"
+blinko_db_repliqate_retention: "30d"
+
 # watchtower
 blinko_watchtower_enable: "false"
 blinko_db_watchtower_enable: "false"

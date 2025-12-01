@@ -5,17 +5,14 @@ gpuhot_enabled: false
 gpuhot_available_externally: false
 gpuhot_traefik_whitelist: "{{ lan }}"
 
-# directories
-gpuhot_data_directory: "{{ docker_home }}/gpu-hot"
-
 # docker
 gpuhot_container_name: "gpu-hot"
 gpuhot_image_name: "ghcr.io/psalias2006/gpu-hot"
 gpuhot_image_tag: "latest"
 
 # network
-gpuhot_port: "1312"
 gpuhot_hostname: "gpuhot"
+gpuhot_port: "1312"
 
 # specs
 gpuhot_cpu_shares: "1024"
@@ -24,6 +21,7 @@ gpuhot_memory: 256MB
 # app
 gpuhot_env_nvidia_visible_devices: "all" # Specific GPUs (default: all)
 gpuhot_env_nvidia_smi: "false" # Force nvidia-smi mode for all GPUs
+
 # autoheal
 gpuhot_autoheal: "false"
 

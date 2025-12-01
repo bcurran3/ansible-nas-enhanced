@@ -4,12 +4,11 @@ ansible_nas_app_name: "BanBan"
 banban_enabled: false
 banban_available_externally: false
 banban_traefik_whitelist: "{{ lan }}"
+banban_data_directory: "{{ docker_home }}/banban"
 
 # network
 banban_port_http: "3028"
 banban_hostname: "banban"
-
-banban_data_directory: "{{ docker_home }}/banban"
 
 # docker
 banban_container_name: "banban"
@@ -30,6 +29,13 @@ banban_homepage_group: "Apps"
 banban_homepage_icon: "banban.png"
 banban_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ banban_port_http }}"
 banban_homepage_showstats: "false"
+
+# repliqate
+banban_repliqate_enabled: "false"
+banban_repliqate_engine: "restic"
+banban_repliqate_schedule: "@daily 3am"
+banban_repliqate_backup_id: "banban"
+banban_repliqate_retention: "30d"
 
 # watchtower
 banban_watchtower_enable: "false"

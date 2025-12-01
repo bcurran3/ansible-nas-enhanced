@@ -49,6 +49,11 @@
           homepage.container: "{{ apcupsd_container_name }}"
           homepage.showStats: "{{ apcupsd_homepage_showstats }}"
           traefik.enable: "false"
+          repliqate.enabled: "{{ apcupsd_repliqate_enabled }}"
+          repliqate.engine: "{{ apcupsd_repliqate_engine }}"
+          repliqate.schedule: "{{ apcupsd_repliqate_schedule }}"
+          repliqate.backup_id: "{{ apcupsd_repliqate_backup_id }}"
+          repliqate.retention: "{{ apcupsd_repliqate_retention }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/gregewing/apcupsd"

@@ -43,6 +43,18 @@ glpi_db_homepage_icon: "mariadb.png"
 glpi_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
 glpi_db_homepage_showstats: "false"
 
+# repliqate
+glpi_repliqate_enabled: "false"
+glpi_repliqate_engine: "restic"
+glpi_repliqate_schedule: "@daily 3am"
+glpi_repliqate_backup_id: "glpi"
+glpi_repliqate_retention: "30d"
+glpi_db_repliqate_enabled: "false"
+glpi_db_repliqate_engine: "restic"
+glpi_db_repliqate_schedule: "@daily 3am"
+glpi_db_repliqate_backup_id: "glpi-db"
+glpi_db_repliqate_retention: "30d"
+
 # watchtower
 glpi_watchtower_enable: "false"
 glpi_db_watchtower_enable: "false"

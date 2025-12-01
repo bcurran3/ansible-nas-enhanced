@@ -4,13 +4,12 @@ ansible_nas_app_name: "Crowdsec"
 crowdsec_enabled: false
 crowdsec_available_externally: false
 crowdsec_traefik_whitelist: "{{ lan }}"
+crowdsec_data_directory: "{{ docker_home }}/crowdsec"
 
 # network
 crowdsec_port_http: "3032"
 crowdsec_port_metrics: "6060"
 crowdsec_hostname: "crowdsec"
-
-crowdsec_data_directory: "{{ docker_home }}/crowdsec"
 
 # docker
 crowdsec_container_name: "crowdsec"
@@ -36,7 +35,14 @@ crowdsec_homepage_icon: "crowdsec.png"
 crowdsec_homepage_href: "https://app.crowdsec.net/"
 crowdsec_homepage_showstats: "false"
 crowdsec_homepage_widget_username: "your username"
-crowdset_homepage_widget_password: "your password"
+crowdsec_homepage_widget_password: "your password"
+
+# repliqate
+crowdsec_repliqate_enabled: "false"
+crowdsec_repliqate_engine: "restic"
+crowdsec_repliqate_schedule: "@daily 3am"
+crowdsec_repliqate_backup_id: "crowdsec"
+crowdsec_repliqate_retention: "30d"
 
 # watchtower
 crowdsec_watchtower_enable: "false"

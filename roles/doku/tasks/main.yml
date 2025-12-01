@@ -32,6 +32,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ doku_container_name }}"
           homepage.showStats: "{{ doku_homepage_showstats }}"
+          repliqate.enabled: "false"
           traefik.enable: "{{ doku_available_externally | string }}"
           traefik.http.routers.doku.rule: "Host(`{{ doku_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.doku.tls.certresolver: "letsencrypt"

@@ -6,7 +6,7 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ repliqate_backup_directory }}"
+        - "{{ repliqate_data_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -16,7 +16,7 @@
         image: "{{ repliqate_image_name }}:{{ repliqate_image_tag }}"
         pull: true
         volumes:
-          - "{{ repliqate_backup_directory }}:/var/repliqate"
+          - "{{ repliqate_data_directory }}:/var/repliqate"
           - "{{ docker_image_directory }}:/var/lib/docker/volumes"
           - "/var/run/docker.sock:/var/run/docker.sock"
         env:
@@ -32,6 +32,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ repliqate_container_name }}"
           homepage.showStats: "{{ repliqate_homepage_showstats }}"
+          repliqate.enabled: 'false'
           traefik.enable: "false"
           wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
           wud.tag.transform.type: "semver"

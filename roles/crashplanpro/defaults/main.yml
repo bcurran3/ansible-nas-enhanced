@@ -4,6 +4,8 @@ ansible_nas_app_name: "CrashPlan Pro"
 crashplanpro_enabled: false
 crashplanpro_available_externally: false
 crashplanpro_traefik_whitelist: "{{ lan }}"
+
+# directories
 crashplanpro_data_directory: "{{ docker_home }}/crashplanpro"
 crashplanpro_storage_directory: "/"
 
@@ -30,6 +32,13 @@ crashplanpro_homepage_group: "Apps"
 crashplanpro_homepage_icon: "https://lh7-rt.googleusercontent.com/docsz/AD_4nXfsuRt75p1awOo4PEiVymI3TcFauFUk8syT3gqnrp0O1xedOTVRsZwXxOB6vTa4Z8gWRZXYuc1RWecqmhen1x9UnS11RK3axRLeS_kOUbVA583INyD4w00F_Ohn2GDJyWFXSDYckTM_Zep_NKY7mAwEeBE?key=8ldYwBcnQ67yTok6G7LSquuN"
 crashplanpro_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crashplanpro_port_http }}"
 crashplanpro_homepage_showstats: "false"
+
+# repliqate
+crashplanpro_repliqate_enabled: "false"
+crashplanpro_repliqate_engine: "restic"
+crashplanpro_repliqate_schedule: "@daily 3am"
+crashplanpro_repliqate_backup_id: "crashplanpro"
+crashplanpro_repliqate_retention: "30d"
 
 # watchtower
 crashplanpr_watchtower_enable: "false"

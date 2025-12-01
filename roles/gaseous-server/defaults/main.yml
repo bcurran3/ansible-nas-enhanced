@@ -42,6 +42,18 @@ gaseous_server_db_homepage_icon: "mariadb.png"
 gaseous_server_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
 gaseous_server_db_homepage_showstats: "false"
 
+# repliqate
+gaseous_server_repliqate_enabled: "false"
+gaseous_server_repliqate_engine: "restic"
+gaseous_server_repliqate_schedule: "@daily 3am"
+gaseous_server_repliqate_backup_id: "gaseous_server"
+gaseous_server_repliqate_retention: "30d"
+gaseous_server_db_repliqate_enabled: "false"
+gaseous_server_db_repliqate_engine: "restic"
+gaseous_server_db_repliqate_schedule: "@daily 3am"
+gaseous_server_db_repliqate_backup_id: "gaseous_server-db"
+gaseous_server_db_repliqate_retention: "30d"
+
 # watchtower
 gaseous_server_watchtower_enable: "false"
 gaseous_server_db_watchtower_enable: "false"

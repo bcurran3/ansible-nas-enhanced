@@ -30,5 +30,12 @@ glance_homepage_icon: "https://raw.githubusercontent.com/glanceapp/glance/main/i
 glance_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glance_port_http }}"
 glance_homepage_showstats: "false"
 
+# repliqate
+glance_repliqate_enabled: "false"
+glance_repliqate_engine: "restic"
+glance_repliqate_schedule: "@daily 3am"
+glance_repliqate_backup_id: "glance"
+glance_repliqate_retention: "30d"
+
 # watchtower
 glance_watchtower_enable: "false"
