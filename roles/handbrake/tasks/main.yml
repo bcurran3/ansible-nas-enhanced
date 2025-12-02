@@ -73,9 +73,9 @@
           traefik.http.routers.handbrake.middlewares: "{{ handbrake_hostname }}@docker"
           traefik.http.middlewares.handbrake.IPAllowList.sourcerange: "{{ handbrake_traefik_whitelist }}"
           traefik.http.services.handbrake.loadbalancer.server.port: "5800"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/jlesage/handbrake"
+          wud.link.template: "https://github.com/jlesage/docker-handbrake/pkgs/container/handbrake"
         cpu_shares: "{{ handbrake_cpu_shares }}"
         memory: "{{ handbrake_memory }}"
         restart_policy: unless-stopped

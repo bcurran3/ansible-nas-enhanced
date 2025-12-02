@@ -58,9 +58,9 @@
           traefik.http.routers.flexget.middlewares: "{{ flexget_hostname }}@docker"
           traefik.http.middlewares.flexget.IPAllowList.sourcerange: "{{ flexget_traefik_whitelist }}"
           traefik.http.services.flexget.loadbalancer.server.port: "5050"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/wiserain/flexget"
+          wud.link.template: "https://github.com/wiserain/docker-flexget/pkgs/container/flexget"
         cpu_shares: "{{ flexget_cpu_shares }}"
         memory: "{{ flexget_memory }}"
         restart_policy: unless-stopped

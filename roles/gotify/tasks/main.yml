@@ -63,9 +63,9 @@
           traefik.http.routers.gotify.middlewares: "{{ gotify_hostname }}@docker"
           traefik.http.middlewares.gotify.IPAllowList.sourcerange: "{{ gotify_traefik_whitelist }}"
           traefik.http.services.gotify.loadbalancer.server.port: "{{ gotify_port }}"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/gotify/server"
+          wud.link.template: "https://github.com/gotify/server/pkgs/container/server"
         cpu_shares: "{{ gotify_cpu_shares }}"
         memory: "{{ gotify_memory }}"
         restart_policy: unless-stopped

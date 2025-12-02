@@ -55,9 +55,9 @@
           traefik.http.routers.krusader.middlewares: "{{ krusader_hostname }}@docker"
           traefik.http.middlewares.krusader.IPAllowList.sourcerange: "{{ krusader_traefik_whitelist }}"
           traefik.http.services.krusader.loadbalancer.server.port: "6080"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+-\d+-\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/binhex/arch-krusader"
+          wud.link.template: "https://github.com/binhex/arch-krusader/pkgs/container/arch-krusader"
         cpu_shares: "{{ krusader_cpu_shares }}"
         memory: "{{ krusader_memory }}"
         restart_policy: unless-stopped

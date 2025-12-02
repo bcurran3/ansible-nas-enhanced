@@ -54,9 +54,9 @@
           traefik.http.routers.esphome.middlewares: "{{ esphome_hostname }}@docker"
           traefik.http.middlewares.esphome.IPAllowList.sourcerange: "{{ esphome_traefik_whitelist }}"
           traefik.http.services.esphome.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d{4}\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/esphome/esphome"
+          wud.link.template: "https://github.com/esphome/esphome/pkgs/container/esphome"
         cpu_shares: "{{ esphome_cpu_shares }}"
         memory: "{{ esphome_memory }}"
         restart_policy: unless-stopped

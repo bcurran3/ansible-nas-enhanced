@@ -58,11 +58,8 @@ wan: "0.0.0.0/0"
 nvidia_runtime_enabled: false
 
 ###
-### Samba
+### Libraries
 ###
-
-# Share media libraires (proper NAS) or not (app server)
-samba_share_libraries: true
 
 # The location where all shares will be created by default. Can be overridden on a per-share basis.
 samba_shares_root: /data/shares
@@ -126,6 +123,13 @@ torrents_root: "{{ samba_shares_root }}/torrents"
 
 # Where your TV episodes library is stored
 tv_root: "{{ samba_shares_root }}/tv"
+
+###
+### Samba
+###
+
+# Share media libraires (proper NAS) or not (app server)
+samba_share_libraries: true
 
 # Shares you want published over Samba.
 samba_shares:
@@ -249,15 +253,13 @@ samba_shares:
     browseable: yes
     path: "{{ podcasts_root }}"
 
-############ should probably turn public off
-  - name: porn
-    comment: "Porn"
-    guest_ok: no
-    public: yes
-    write_list: "{{ ansible_nas_user }}"
-    browseable: yes
-    path: "{{ porn_root }}"
-############
+#  - name: porn
+#    comment: "Porn"
+#    guest_ok: yes
+#    public: yes
+#    writable: yes
+#    browseable: yes
+#    path: "{{ porn_root }}"
 
   - name: recordings
     comment: "Recordings"
@@ -282,6 +284,9 @@ samba_shares:
     writable: yes
     browseable: yes
     path: "{{ tv_root }}"
+
+# more more details on Samba variables at:
+# https://github.com/vladgh/ansible-collection-vladgh-samba
 
 # Enable apple extensions for compatibility with apple clients
 samba_apple_extensions: yes

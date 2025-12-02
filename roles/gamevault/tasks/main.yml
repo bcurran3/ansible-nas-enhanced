@@ -45,8 +45,9 @@
           repliqate.backup_id: "{{ gamevault_db_repliqate_backup_id }}"
           repliqate.retention: "{{ gamevault_db_repliqate_retention }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://hub.docker.com/_/postgres/tags/$${major}.$${minor}.$${patch}-alpine"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/Phalcode/GameVault-Backend/pkgs/container/gamevault-backend"
         cpu_shares: "{{ gamevault_db_cpu_shares }}"
         memory: "{{ gamevault_db_memory }}"
         restart_policy: unless-stopped

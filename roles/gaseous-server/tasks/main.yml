@@ -116,9 +116,9 @@
           traefik.http.routers.gaseous_server.middlewares: "{{ gaseous_server_hostname }}@docker"
           traefik.http.middlewares.gaseous_server.IPAllowList.sourcerange: "{{ gaseous_server_traefik_whitelist }}"
           traefik.http.services.gaseous_server.loadbalancer.server.port: "80"
-          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/gaseousgames/gaseous-server"
+          wud.link.template: "https://github.com/gaseous-project/gaseous-server/pkgs/container/gaseousserver"
         cpu_shares: "{{ gaseous_server_cpu_shares }}"
         memory: "{{ gaseous_server_memory }}"
         restart_policy: unless-stopped
