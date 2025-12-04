@@ -58,9 +58,9 @@
           traefik.http.routers.makemkv.middlewares: "{{ makemkv_hostname }}@docker"
           traefik.http.middlewares.makemkv.IPAllowList.sourcerange: "{{ makemkv_traefik_whitelist }}"
           traefik.http.services.makemkv.loadbalancer.server.port: "5800"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/jlesage/makemkv"
+          wud.link.template: "https://github.com/jlesage/docker-makemkv/pkgs/container/makemkv"
         cpu_shares: "{{ makemkv_cpu_shares }}"
         memory: "{{ makemkv_memory }}"
         restart_policy: unless-stopped

@@ -52,10 +52,9 @@
           traefik.http.routers.n8n.middlewares: "{{ n8n_hostname }}@docker"
           traefik.http.middlewares.n8n.IPAllowList.sourcerange: "{{ n8n_traefik_whitelist }}"
           traefik.http.services.n8n.loadbalancer.server.port: "5678"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.watch.registry: "https://docker.n8n.io"
-          wud.link.template: "https://github.com/n8n-io/n8n/releases"
+          wud.link.template: "docker.n8n.io/n8nio/n8n"
         cpu_shares: "{{ n8n_cpu_shares }}"
         memory: "{{ n8n_memory }}"
         restart_policy: unless-stopped
