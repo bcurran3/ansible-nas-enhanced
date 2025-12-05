@@ -63,9 +63,8 @@
           traefik.http.routers.openedai.middlewares: "{{ openwebui_openedai_hostname }}@docker"
           traefik.http.middlewares.openedai.IPAllowList.sourcerange: "{{ openwebui_traefik_whitelist }}"
           traefik.http.services.openedai.loadbalancer.server.port: "8000"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/Matatonic/OpenEDAI-Speech/releases"
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/matatonic/openedai-speech/pkgs/container/openedai-speech"
         cpu_shares: "{{ openwebui_openedai_cpu_shares }}"
         memory: "{{ openwebui_openedai_memory }}"
         restart_policy: unless-stopped
@@ -120,9 +119,9 @@
           traefik.http.routers.openwebui.middlewares: "{{ openwebui_hostname }}@docker"
           traefik.http.middlewares.openwebui.IPAllowList.sourcerange: "{{ openwebui_traefik_whitelist }}"
           traefik.http.services.openwebui.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/open-webui/open-webui/releases"
+          wud.link.template: "https://github.com/open-webui/open-webui/pkgs/container/open-webui"
         cpu_shares: "{{ openwebui_cpu_shares }}"
         memory: "{{ openwebui_memory }}"
         restart_policy: unless-stopped

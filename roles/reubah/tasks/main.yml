@@ -52,9 +52,8 @@
           traefik.http.routers.reubah.middlewares: "{{ reubah_hostname }}@docker"
           traefik.http.middlewares.reubah.IPAllowList.sourcerange: "{{ reubah_traefik_whitelist }}"
           traefik.http.services.reubah.loadbalancer.server.port: "{{ reubah_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/dendianugerah/reubah/releases"
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/dendianugerah/reubah/pkgs/container/reubah"
         cpu_shares: "{{ reubah_cpu_shares }}"
         memory: "{{ reubah_memory }}"
         restart_policy: unless-stopped

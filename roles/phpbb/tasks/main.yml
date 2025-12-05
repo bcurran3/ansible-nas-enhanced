@@ -105,9 +105,8 @@
           traefik.http.routers.phpbb.middlewares: "{{ phpbb_hostname }}@docker"
           traefik.http.middlewares.phpbb.IPAllowList.sourcerange: "{{ phpbb_traefik_whitelist }}"
           traefik.http.services.phpbb.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/bitnami/phpbb"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/bitnamilegacy/phpbb-archived"
         cpu_shares: "{{ phpbb_cpu_shares }}"
         memory: "{{ phpbb_memory }}"
         restart_policy: unless-stopped

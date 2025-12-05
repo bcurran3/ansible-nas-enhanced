@@ -133,9 +133,9 @@
           traefik.http.routers.romm.middlewares: "{{ romm_hostname }}@docker"
           traefik.http.middlewares.romm.IPAllowList.sourcerange: "{{ romm_traefik_whitelist }}"
           traefik.http.services.romm.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/rommapp/romm"
+          wud.link.template: "https://github.com/rommapp/romm/pkgs/container/romm"
         cpu_shares: "{{ romm_cpu_shares }}"
         memory: "{{ romm_memory }}"
         restart_policy: unless-stopped

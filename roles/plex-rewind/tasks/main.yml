@@ -53,9 +53,9 @@
           traefik.http.routers.plexrewind.middlewares: "{{ plexrewind_hostname }}@docker"
           traefik.http.middlewares.plexrewind.IPAllowList.sourcerange: "{{ plexrewind_traefik_whitelist }}"
           traefik.http.services.plexrewind.loadbalancer.server.port: "8383"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/raunot/PlexRewind/releases"
+          wud.link.template: "https://github.com/raunot/plex-rewind/pkgs/container/plex-rewind"
         cpu_shares: "{{ plexrewind_cpu_shares }}"
         memory: "{{ plexrewind_memory_limit }}"
         restart_policy: unless-stopped

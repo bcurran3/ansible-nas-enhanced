@@ -49,9 +49,9 @@
           traefik.http.routers.organizr.middlewares: "{{ organizr_hostname }}@docker"
           traefik.http.middlewares.organizr.IPAllowList.sourcerange: "{{ organizr_traefik_whitelist }}"
           traefik.http.services.organizr.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/organizr/organizr"
+          wud.link.template: "https://github.com/Organizr/Organizr/pkgs/container/organizr"
         cpu_shares: "{{ organizr_cpu_shares }}"
         memory: "{{ organizr_memory }}"
         restart_policy: unless-stopped

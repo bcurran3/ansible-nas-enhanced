@@ -122,9 +122,9 @@
           traefik.http.routers.rocketchat.middlewares: "{{ rocketchat_hostname }}@docker"
           traefik.http.middlewares.rocketchat.IPAllowList.sourcerange: "{{ rocketchat_traefik_whitelist }}"
           traefik.http.services.rocketchat.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/rocketchat/rocket.chat"
+          wud.link.template: "https://github.com/RocketChat/Rocket.Chat/releases/tag/{{- .Version -}}"
         cpu_shares: "{{ rocketchat_cpu_shares }}"
         memory: "{{ rocketchat_memory }}"
         restart_policy: unless-stopped

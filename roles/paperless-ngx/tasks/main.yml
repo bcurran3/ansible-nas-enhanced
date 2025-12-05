@@ -142,9 +142,9 @@
           traefik.http.routers.paperless_ngx.middlewares: "paperless_ngx@docker"
           traefik.http.middlewares.paperless_ngx.IPAllowList.sourcerange: "{{ paperless_ngx_traefik_whitelist }}"
           traefik.http.services.paperless_ngx.loadbalancer.server.port: "8000"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/paperless-ngx/paperless-ngx/releases"
+          wud.link.template: "https://github.com/paperless-ngx/paperless-ngx/pkgs/container/paperless-ngx"
         cpu_shares: "{{ paperless_ngx_cpu_shares }}"
         memory: "{{ paperless_ngx_memory }}"
         restart_policy: unless-stopped
