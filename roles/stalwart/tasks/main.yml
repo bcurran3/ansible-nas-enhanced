@@ -54,9 +54,9 @@
           traefik.http.routers.stalwart.middlewares: "{{ stalwart_hostname }}@docker"
           traefik.http.middlewares.stalwart.IPAllowList.sourcerange: "{{ stalwart_traefik_whitelist }}"
           traefik.http.services.stalwart.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/stalwartlabs/mail-server"
+          wud.link.template: "https://github.com/stalwartlabs/mail-server/pkgs/container/stalwart"
         cpu_shares: "{{ stalwart_cpu_shares }}"
         memory: "{{ stalwart_memory }}"
         restart_policy: unless-stopped

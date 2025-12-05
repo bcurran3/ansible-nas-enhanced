@@ -52,9 +52,9 @@
           traefik.http.routers.trilium.middlewares: "{{ trilium_hostname }}@docker"
           traefik.http.middlewares.trilium.IPAllowList.sourcerange: "{{ trilium_traefik_whitelist }}"
           traefik.http.services.trilium.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/triliumnext/trilium"
+          wud.link.template: "https://github.com/TriliumNext/Trilium/pkgs/container/trilium"
         cpu_shares: "{{ trilium_cpu_shares }}"
         memory: "{{ trilium_memory }}"
         restart_policy: unless-stopped

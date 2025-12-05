@@ -59,10 +59,11 @@
           - "{{ tianji_port_http }}:12345"
         env:
           DATABASE_URL: "postgresql://tianji:tianji@{{ tianji_db_container_name }}:5432/tianji"
-          JWT_SECRET: "{{ tianji_jwt_secret }}"
-          ALLOW_REGISTER: "{{ tianji_openapi_key }}"
-          ALLOW_OPENAPI: "{{ tianji_allow_openapi }}"
-          OPENAI_API_KEY: "{{ tianji_openapi_key }}"
+          JWT_SECRET: "{{ tianji_env_jwt_secret }}"
+          ALLOW_REGISTER: "{{ tianji_env_allow_register }}"
+          ALLOW_OPENAPI: "{{ tianji_env_allow_openapi }}"
+          OPENAI_API_KEY: "{{ tianji_env_openapi_key }}"
+          PUBLIC_URL: "{{ tianji_env_public_url }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ tianji_db_container_name }}"
@@ -93,7 +94,7 @@
           traefik.http.services.tianji.loadbalancer.server.port: "12345"
           wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/moonrailgun/tianji"
+          wud.link.template: "https://github.com/msgbyte/tianji/pkgs/container/tianji"
         cpu_shares: "{{ tianji_cpu_shares }}"
         memory: "{{ tianji_memory }}"
         restart_policy: unless-stopped

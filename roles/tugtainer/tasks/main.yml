@@ -49,9 +49,9 @@
           traefik.http.routers.tugtainer.middlewares: "{{ tugtainer_hostname }}@docker"
           traefik.http.middlewares.tugtainer.IPAllowList.sourcerange: "{{ tugtainer_traefik_whitelist }}"
           traefik.http.services.tugtainer.loadbalancer.server.port: "80"
-          wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/quenary/tugtainer"
+          wud.link.template: "https://github.com/quenary/tugtainer/pkgs/container/tugtainer"
         cpu_shares: "{{ tugtainer_cpu_shares }}"
         memory: "{{ tugtainer_memory }}"
         restart_policy: unless-stopped

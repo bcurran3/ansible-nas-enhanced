@@ -50,9 +50,9 @@
           traefik.http.routers.syncthing.middlewares: "{{ syncthing_hostname }}@docker"
           traefik.http.middlewares.syncthing.IPAllowList.sourcerange: "{{ syncthing_traefik_whitelist }}"
           traefik.http.services.syncthing.loadbalancer.server.port: "8384"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/syncthing/syncthing"
+          wud.link.template: "https://github.com/syncthing/syncthing/pkgs/container/syncthing"
         cpu_shares: "{{ syncthing_cpu_shares }}"
         memory: "{{ syncthing_memory }}"
         restart_policy: unless-stopped

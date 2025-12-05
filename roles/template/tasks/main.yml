@@ -58,9 +58,15 @@
           traefik.http.routers.appname.middlewares: "{{ appname_hostname }}@docker"
           traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ appname_traefik_whitelist }}"
           traefik.http.services.appname.loadbalancer.server.port: "80"
-          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/dev/app/releases/tag/{{tag}}"
+          wud.link.template: "https://hub.docker.com/r/devname/appname"
+#          wud.tag.include: '^\d+\.\d+\.\d+$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://github.com/dev/appname/pkgs/container/appname"
+#          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://lscr.io/linuxserver/appname"
         cpu_shares: "{{ appname_cpu_shares }}"
         memory: "{{ appname_memory }}"
         restart_policy: unless-stopped

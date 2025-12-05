@@ -51,9 +51,8 @@
           traefik.http.routers.searxng.middlewares: "{{ searxng_hostname }}@docker"
           traefik.http.middlewares.searxng.IPAllowList.sourcerange: "{{ searxng_traefik_whitelist }}"
           traefik.http.services.searxng.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\\d{4}\\.\\d{2}\\.\\d{2}-.*$'
-          wud.tag.transform.type: "date"
-          wud.tag.transform.date.format: "YYYY.MM.DD"
+          wud.tag.include: '^\d{4}\.\d+\.\d+-.*$'
+          wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/searxng/searxng-docker/pkgs/container/searxng"
         cpu_shares: "{{ searxng_cpu_shares }}"
         memory: "{{ searxng_memory_limit }}"
