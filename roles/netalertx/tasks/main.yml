@@ -2,13 +2,32 @@
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+        owner: "20211"
+        group: "20211"
       with_items:
         - "{{ netalertx_data_directory }}"
-        - "{{ netalertx_data_directory }}/config"
-        - "{{ netalertx_data_directory }}/db"
+        - "{{ netalertx_data_directory }}/log"
+
+    - name: Create {{ ansible_nas_app_name }} Directories Part Deux
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "20211"
+        group: "20211"
+        mode: "1700"
+      with_items:
+        - "{{ netalertx_data_directory }}/tmp"
+
+    - name: Secure NetAlertX tmp directory
+      ansible.posix.mount:
+        path: "{{ netalertx_data_directory }}/tmp"
+        src: "{{ netalertx_data_directory }}/tmp"
+        fstype: none
+        opts: "rw,bind,noexec,nosuid,nodev,async,noatime,nodiratime"
+        state: mounted
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -17,12 +36,36 @@
         hostname: "{{ netalertx_container_name }}"
         image: "{{ netalertx_image_name }}:{{ netalertx_image_tag }}"
         pull: true
-        volumes:
-          - "{{ netalertx_data_directory }}/config:/app/config"
-          - "{{ netalertx_data_directory }}/db:/app/db"
         network_mode: host
+        cap_drop:
+          - ALL              # Drop all capabilities for enhanced security
+        capabilities:
+          - NET_ADMIN        # Required for ARP scanning
+          - NET_RAW          # Required for raw socket operations
+          - NET_BIND_SERVICE # Required to bind to privileged ports (nbtscan)
         env:
+          LISTEN_ADDR: "0.0.0.0"            # Listen for connections on all interfaces
+          PORT: "{{ netalertx_port_http }}" # Application port
+          GRAPHQL_PORT: "20212"             # GraphQL API port (passed into APP_CONF_OVERRIDE at runtime)
+          NETALERTX_DEBUG: "0"              # 0=kill all services and restart if any dies. 1 keeps running dead services.
           TZ: "{{ ansible_nas_timezone }}"
+        mounts:
+          - type: bind
+            source: "{{ netalertx_data_directory }}"
+            target: "/data"
+            read_only: false
+          - type: bind
+            source: "/etc/localtime"
+            target: "/etc/localtime"
+            read_only: true
+          - type: bind
+            source: "{{ netalertx_data_directory }}/log"
+            target: "/tmp/log"
+            read_only: false
+          - type: bind
+            source: "{{ netalertx_data_directory }}/tmp"
+            target: "/tmp"
+            read_only: false
         labels:
           autoheal: "{{ netalertx_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ netalertx_watchtower_enable }}"
@@ -55,7 +98,13 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/jokob-sk/NetAlertX/pkgs/container/netalertx"
         cpu_shares: "{{ netalertx_cpu_shares }}"
+        log_driver: "json-file" # Use JSON file logging driver
+        log_options:
+            max-size: "10m"   # Rotate log files after they reach 10MB
+            max-file: "3"     # Keep a maximum of 3 log files
         memory: "{{ netalertx_memory }}"
+        pids_limit: "512"
+        read_only: true      # Make the container filesystem read-only
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
