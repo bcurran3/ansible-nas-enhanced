@@ -38,14 +38,16 @@
           - name: "{{ proget_network_name }}"
         networks_cli_compatible: "yes"
         network_mode: "bridge"
+#        ports:
+#          - "1433:1433"
         volumes:
           - "{{ proget_data_directory }}/data:/var/opt/mssql/data"
           - "{{ proget_data_directory }}/log:/var/opt/mssql/log"
           - "{{ proget_data_directory }}/secrets:/var/opt/mssql/secrets"
         env:
           ACCEPT_EULA: "Y"
-          MSSQL_SA_PASSWORD: "t0ps3cr3t!pw"
-          MSSQL_PID: "Express"
+          MSSQL_SA_PASSWORD: "{{ proget_db_mssql_sa_password }}"
+          MSSQL_PID: "{{ proget_db_mssql_pid }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ proget_db_autoheal }}"
@@ -68,6 +70,19 @@
         memory: "{{ proget_db_memory }}"
         restart_policy: unless-stopped
 
+    - name: Init ProGet DB
+      community.docker.docker_container_exec:
+        container: "{{ proget_db_container_name }}"
+        command: >-
+          /opt/mssql-tools18/bin/sqlcmd
+          -C 
+          -S localhost
+          -U SA
+          -P {{ proget_db_mssql_sa_password | quote }}
+          -Q 'IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = "ProGet") BEGIN CREATE DATABASE [ProGet] COLLATE SQL_Latin1_General_CP1_CI_AS; END'
+      register: result
+      changed_when: "'CREATE DATABASE' in result.stdout"
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -79,15 +94,15 @@
           - name: "{{ proget_network_name }}"
         networks_cli_compatible: "yes"
         network_mode: "bridge"
-        links:
-          - "{{ proget_db_container_name}}"
-        volumes:
-          - "{{ proget_data_directory }}/packages:/var/proget/packages"
         ports:
           - "{{ proget_port_http }}:80"
+        volumes:
+          - "{{ proget_data_directory }}/packages:/var/proget/packages"
         env:
-          PROGET_SQL_CONNECTION_STRING: "{{ proget_env_sql_connection_string }}"
+          PROGET_SQL_CONNECTION_STRING: "{{ proget_env_proget_sql_connection_string }}"
           TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ proget_db_container_name }}"
         labels:
           autoheal: "{{ proget_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ proget_watchtower_enable }}"
