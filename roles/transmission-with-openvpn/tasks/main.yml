@@ -24,10 +24,10 @@
           - "{{ transmission_watch_directory }}:/watch:rw"
           - "/etc/timezone:/etc/timezone:ro"
         ports:
-          - "{{ transmission_openvpn_webui_port }}:9091"
-          - "{{ transmission_openvpn_external_port }}:51413"
-          - "{{ transmission_openvpn_external_port }}:51413/udp"
-          - "{{ transmission_openvpn_proxy_port }}:3128"
+          - "{{ transmission_openvpn_port_http }}:9091"
+          - "{{ transmission_openvpn_port_bt }}:51413"
+          - "{{ transmission_openvpn_port_bt }}:51413/udp"
+          - "{{ transmission_openvpn_port_proxy }}:3128"
         env:
           TRANSMISSION_HOME: "/config"
           TRANSMISSION_DOWNLOAD_DIR: "/downloads"
@@ -56,7 +56,7 @@
           dockflare.enable: "{{ transmission_openvpn_dockflare_tunnel }}"
           dockflare.access.group: "{{ transmission_openvpn_dockflare_access_group }}"
           dockflare.hostname: "{{ transmission_openvpn_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_openvpn_webui_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_openvpn_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ transmission_openvpn_homepage_group }}"
           homepage.icon: "{{ transmission_openvpn_homepage_icon }}"
@@ -65,7 +65,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ transmission_openvpn_container_name }}"
           homepage.showStats: "{{ transmission_openvpn_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_openvpn_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_openvpn_port_http }}"
           traefik.enable: "{{ transmission_openvpn_available_externally | string }}"
           traefik.http.routers.transmission_openvpn.rule: "Host(`{{ transmission_openvpn_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.transmission_openvpn.tls.certresolver: "letsencrypt"
@@ -86,7 +86,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (transmission_openvpn_webui_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (transmission_openvpn_port_http | string)] +
                 (['https://' + transmission_openvpn_hostname + '.' + ansible_nas_domain] if (transmission_openvpn_available_externally is true or transmission_openvpn_dockflare_tunnel is true) else [])
               }}
   when: transmission_openvpn_enabled is true

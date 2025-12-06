@@ -28,7 +28,7 @@
         volumes:
           - "{{ woodpecker_ci_data_directory }}:/var/lib/woodpecker:rw"
         ports:
-          - "{{ woodpecker_ci_port_ui }}:8000"
+          - "{{ woodpecker_ci_port_http }}:8000"
           - "{{ woodpecker_ci_port_grpc }}:9000"
         env:
           WOODPECKER_ADMIN: "{{ woodpecker_ci_admin_user }}"
@@ -47,7 +47,7 @@
           dockflare.enable: "{{ woodpecker_ci_dockflare_tunnel }}"
           dockflare.access.group: "{{ woodpecker_ci_dockflare_access_group }}"
           dockflare.hostname: "{{ woodpecker_ci_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port_ui }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ woodpecker_ci_homepage_group }}"
           homepage.icon: "{{ woodpecker_ci_homepage_icon }}"
@@ -77,7 +77,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (woodpecker_ci_port_ui | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (woodpecker_ci_port_http | string)] +
                 (['https://' + woodpecker_ci_hostname + '.' + ansible_nas_domain] if (woodpecker_ci_available_externally is true or woodpecker_ci_dockflare_tunnel is true) else [])
               }}
 
