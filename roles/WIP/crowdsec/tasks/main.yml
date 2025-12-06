@@ -1,5 +1,5 @@
 ---
-### WORK IN PROGRESS - TESTING
+### WORK IN PROGRESS - needs default acquistion data source for traefik setup
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -10,6 +10,7 @@
         - "{{ crowdsec_data_directory }}"
         - "{{ crowdsec_data_directory }}/config"
         - "{{ crowdsec_data_directory }}/data"
+        - "{{ crowdsec_data_directory }}/plugins"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -21,33 +22,34 @@
         volumes:
           - "{{ crowdsec_data_directory }}/config:/etc/crowdsec"
           - "{{ crowdsec_data_directory }}/config/acquis.d:/etc/crowdsec/acquis.d"
-          - "{{ crowdsec_data_directory }}/config/acquis.yaml:/etc/crowdsec/acquis.yaml"
+#         - "{{ crowdsec_data_directory }}/config/acquis.yaml:/etc/crowdsec/acquis.yaml"
           - "{{ crowdsec_data_directory }}/data:/var/lib/crowdsec/data"
           - "/var/log/auth.log:/logs/auth.log:ro"
           - "/var/log/syslog.log:/logs/syslog.log:ro"
           - "/var/log/apache:/logs/apache:ro"
+          - "{{ crowdsec_data_directory }}/plugins:/usr/local/lib/crowdsec/plugins/"
         ports:
           - "{{ crowdsec_port_http }}:8080"
           - "{{ crowdsec_port_metrics }}:{{ crowdsec_port_metrics }}" # Port to expose Prometheus metrics
         env:
-          COLLECTIONS: "{{ crowdsec_collections }}"
-          DISABLE_COLLECTIONS: "{{ crowdsec_disable_collections }}"
-          LOCAL_API_URL: "http://0.0.0.0:{{ crowdsec_port_http }}"
+          COLLECTIONS: "{{ crowdsec_env_collections }}"
+          DISABLE_COLLECTIONS: "{{ crowdsec_env_disable_collections }}"
+          LOCAL_API_URL: "http://0.0.0.0:8080"
           METRICS_PORT: "{{ crowdsec_port_metrics }}"
+          PLUGIN_DIR: "/usr/local/lib/crowdsec/plugins/"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ crowdsec_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ crowdsec_watchtower_enable }}"
-          dockflare.enable: "false"
-#         dockflare.enable: "{{ crowdsec_dockflare_tunnel }}"
-#         dockflare.access.group: "{{ crowdsec_dockflare_access_group }}"
-#         dockflare.hostname: "{{ crowdsec_hostname }}.{{ ansible_nas_domain }}"
-#         dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
+          dockflare.enable: "{{ crowdsec_dockflare_tunnel }}"
+          dockflare.access.group: "{{ crowdsec_dockflare_access_group }}"
+          dockflare.hostname: "{{ crowdsec_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ crowdsec_homepage_group }}"
           homepage.icon: "{{ crowdsec_homepage_icon }}"
           homepage.href: "{{ crowdsec_homepage_href }}"
-          homepage.description: "{{ 'Crowdsec - An open-source, lightweight agent to detect and respond to bad behaviours.' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'An open-source, lightweight agent to detect and respond to bad behaviours.' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ crowdsec_container_name }}"
@@ -61,16 +63,15 @@
           repliqate.schedule: "{{ crowdsec_repliqate_schedule }}"
           repliqate.backup_id: "{{ crowdsec_repliqate_backup_id }}"
           repliqate.retention: "{{ crowdsec_repliqate_retention }}"
-          traefik.enable: "false"
-#         traefik.enable: "{{ crowdsec_available_externally | string }}"
-#         traefik.http.routers.crowdsec.rule: "Host(`crowdsec.{{ ansible_nas_domain }}`)"
-#         traefik.http.routers.crowdsec.tls.certresolver: "letsencrypt"
-#         traefik.http.routers.crowdsec.tls.domains[0].main: "{{ ansible_nas_domain }}"
-#         traefik.http.routers.crowdsec.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-#         traefik.http.routers.frontend.middlewares: "{{ crowdsec_hostname }}"
-#         traefik.http.routers.crowdsec.middlewares: "{{ crowdsec_hostname }}@docker"
-#         traefik.http.middlewares.crowdsec.IPAllowList.sourcerange: "{{ crowdsec_traefik_whitelist }}"
-#         traefik.http.services.crowdsec.loadbalancer.server.port: "8080"
+          traefik.enable: "{{ crowdsec_available_externally | string }}"
+          traefik.http.routers.crowdsec.rule: "Host(`crowdsec.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.crowdsec.tls.certresolver: "letsencrypt"
+          traefik.http.routers.crowdsec.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.crowdsec.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ crowdsec_hostname }}"
+          traefik.http.routers.crowdsec.middlewares: "{{ crowdsec_hostname }}@docker"
+          traefik.http.middlewares.crowdsec.IPAllowList.sourcerange: "{{ crowdsec_traefik_whitelist }}"
+          traefik.http.services.crowdsec.loadbalancer.server.port: "8080"
           wud.tag.include: "^v\\d+\\.\\d+\\.\\d+$"
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/crowdsecurity/crowdsec/pkgs/container/crowdsec"

@@ -37,14 +37,14 @@
         volumes:
           - "{{ guacamole_data_directory }}/config:/config:rw"
         ports:
-          - "{{ guacamole_port }}:8080"
+          - "{{ guacamole_port_http }}:8080"
         labels:
           autoheal: "{{ guacamole_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ guacamole_watchtower_enable }}"
           dockflare.enable: "{{ guacamole_dockflare_tunnel }}"
           dockflare.access.group: "{{ guacamole_dockflare_access_group }}"
           dockflare.hostname: "{{ guacamole_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ guacamole_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ guacamole_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ guacamole_homepage_group }}"
           homepage.icon: "{{ guacamole_homepage_icon }}"
@@ -53,7 +53,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ guacamole_container_name }}"
           homepage.showStats: "{{ guacamole_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ guacamole_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ guacamole_port_http }}"
           repliqate.enabled: "{{ guacamole_repliqate_enabled }}"
           repliqate.engine: "{{ guacamole_repliqate_engine }}"
           repliqate.schedule: "{{ guacamole_repliqate_schedule }}"
@@ -86,7 +86,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (guacamole_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (guacamole_port_http | string)] +
                 (['https://' + guacamole_hostname + '.' + ansible_nas_domain] if (guacamole_available_externally is true or guacamole_dockflare_tunnel is true) else [])
               }}
   when: guacamole_enabled is true

@@ -22,7 +22,7 @@
           - "{{ containery_data_directory }}/static:/containery/app/static/dist"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
         ports:
-          - "{{ containery_port }}:5000"
+          - "{{ containery_port_http }}:5000"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
@@ -31,7 +31,7 @@
           dockflare.enable: "{{ containery_dockflare_tunnel }}"
           dockflare.access.group: "{{ containery_dockflare_access_group }}"
           dockflare.hostname: "{{ containery_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ containery_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ containery_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ containery_homepage_group }}"
           homepage.icon: "{{ containery_homepage_icon }}"
@@ -40,7 +40,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ containery_container_name }}"
           homepage.showStats: "{{ containery_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ containery_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ containery_port_http }}"
           repliqate.enabled: "{{ containery_repliqate_enabled }}"
           repliqate.engine: "{{ containery_repliqate_engine }}"
           repliqate.schedule: "{{ containery_repliqate_schedule }}"
@@ -66,7 +66,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (containery_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (containery_port_http | string)] +
                 (['https://' + containery_hostname + '.' + ansible_nas_domain] if (containery_available_externally is true or containery_dockflare_tunnel is true) else [])
               }}
   when: containery_enabled is true

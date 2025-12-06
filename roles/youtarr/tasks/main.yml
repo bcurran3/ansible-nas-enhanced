@@ -71,7 +71,7 @@
           - "{{ youtarr_data_directory }}/config:/app/config"
           - "{{ youtarr_data_directory }}/jobs:/app/jobs"
         ports:
-          - "{{ youtarr_port }}:3011"
+          - "{{ youtarr_port_http }}:3011"
         env:
           AUTH_ENABLED: "{{ youtarr_env_auth_enabled }}"
           AUTH_PRESET_USERNAME: "{{ youtarr_env_auth_preset_username }}"
@@ -93,7 +93,7 @@
           dockflare.enable: "{{ youtarr_dockflare_tunnel }}"
           dockflare.access.group: "{{ youtarr_dockflare_access_group }}"
           dockflare.hostname: "{{ youtarr_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ youtarr_homepage_group }}"
           homepage.icon: "{{ youtarr_homepage_icon }}"
@@ -102,7 +102,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ youtarr_container_name }}"
           homepage.showStats: "{{ youtarr_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port_http }}"
           traefik.enable: "{{ youtarr_available_externally | string }}"
           traefik.http.routers.youtarr.rule: "Host(`{{ youtarr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.youtarr.tls.certresolver: "letsencrypt"
@@ -123,7 +123,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (youtarr_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (youtarr_port_http | string)] +
                 (['https://' + youtarr_hostname + '.' + ansible_nas_domain] if (youtarr_available_externally is true or youtarr_dockflare_tunnel is true) else [])
               }}
   when: youtarr_enabled is true

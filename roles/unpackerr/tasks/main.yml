@@ -19,9 +19,9 @@
           - "{{ downloads_root }}:/downloads"
         env:
           UN_LOG_FILE: "{{ unpackerr_data_directory }}"
-          UN_SONARR_0_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonarr_port }}"
+          UN_SONARR_0_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonarr_port_http }}"
           UN_SONARR_0_API_KEY: "{{ unpackerr_env_un_sonarr_0_api_key }}"
-          UN_RADARR_0_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port }}"
+          UN_RADARR_0_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port_http }}"
           UN_RADARR_0_API_KEY: "{{ unpackerr_env_un_radarr_0_api_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:

@@ -61,7 +61,7 @@
           - "{{ freshrss_data_directory }}/data:/var/www/FreshRSS/data:rw"
           - "{{ freshrss_data_directory }}/extensions:/var/www/FreshRSS/extensions:rw"
         ports:
-          - "{{ freshrss_port }}:80"
+          - "{{ freshrss_port_http }}:80"
         env:
           CRON_MIN: "1,31"
           DB_HOST: "{{ freshrss_container_name }}"
@@ -77,18 +77,18 @@
           dockflare.enable: "{{ freshrss_dockflare_tunnel }}"
           dockflare.access.group: "{{ freshrss_dockflare_access_group }}"
           dockflare.hostname: "{{ freshrss_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port_http }}"
           homepage.group: "{{ freshrss_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ freshrss_homepage_icon }}"
           homepage.href: "{{ freshrss_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port_http }}"
           homepage.description: "{{ 'A free, self-hostable news aggregator.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ freshrss_container_name }}"
           homepage.showStats: "{{ freshrss_homepage_showstats }}"
           homepage.widget.type: "freshrss"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port_http }}"
           homepage.widget.username: "{{ freshrss_homepage_widget_username }}"
           homepage.widget.password: "{{ freshrss_homepage_widget_password }}"
           repliqate.enabled: "{{ freshrss_repliqate_enabled }}"
@@ -116,7 +116,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (freshrss_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (freshrss_port_http | string)] +
                 (['https://' + freshrss_hostname + '.' + ansible_nas_domain] if (freshrss_available_externally is true or freshrss_dockflare_tunnel is true) else [])
               }}
   when: freshrss_enabled is true

@@ -19,7 +19,7 @@
           - "{{ tugtainer_data_directory }}:/tugtainer"
           - /var/run/docker.sock:/var/run/docker.sock
         ports:
-          - "{{ tugtainer_port }}:80"
+          - "{{ tugtainer_port_http }}:80"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
@@ -28,7 +28,7 @@
           dockflare.enable: "{{ tugtainer_dockflare_tunnel }}"
           dockflare.access.group: "{{ tugtainer_dockflare_access_group }}"
           dockflare.hostname: "{{ tugtainer_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tugtainer_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tugtainer_port_http }}"
 #         dockflare.access.policy: "authenticate"
 #         dockflare.access.allowed_idps: "YOUR_IDP_UUID_HERE"
           homepage.name: "{{ ansible_nas_app_name }}"
@@ -39,7 +39,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ tugtainer_container_name }}"
           homepage.showStats: "{{ tugtainer_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tugtainer_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tugtainer_port_http }}"
           traefik.enable: "{{ tugtainer_available_externally | string }}"
           traefik.http.routers.tugtainer.rule: "Host(`{{ tugtainer_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tugtainer.tls.certresolver: "letsencrypt"
@@ -60,7 +60,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tugtainer_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tugtainer_port_http | string)] +
                 (['https://' + tugtainer_hostname + '.' + ansible_nas_domain] if (tugtainer_available_externally is true or tugtainer_dockflare_tunnel is true) else [])
               }}
   when: tugtainer_enabled is true

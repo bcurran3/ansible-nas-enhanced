@@ -31,7 +31,7 @@
         pull: true
         command: "-config.file=/etc/promtail/config.yml"
         ports:
-          - "{{ promtail_port }}:9080"
+          - "{{ promtail_port_http }}:9080"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
@@ -44,7 +44,7 @@
           dockflare.enable: "{{ promtail_dockflare_tunnel }}"
           dockflare.access.group: "{{ promtail_dockflare_access_group }}"
           dockflare.hostname: "{{ promtail_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ promtail_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ promtail_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ promtail_homepage_group }}"
           homepage.icon: "{{ promtail_homepage_icon }}"
@@ -53,7 +53,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ promtail_container_name }}"
           homepage.showStats: "{{ promtail_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ promtail_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ promtail_port_http }}"
           traefik.enable: "{{ promtail_available_externally | string }}"
           traefik.http.routers.promtail.rule: "Host(`{{ promtail_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.promtail.tls.certresolver: "letsencrypt"
@@ -74,7 +74,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (promtail_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (promtail_port_http | string)] +
                 (['https://' + promtail_hostname + '.' + ansible_nas_domain] if (promtail_available_externally is true or promtail_dockflare_tunnel is true) else [])
               }}
   when: promtail_enabled is true

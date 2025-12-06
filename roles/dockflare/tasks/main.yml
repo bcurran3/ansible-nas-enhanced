@@ -108,7 +108,7 @@
         volumes:
           - "{{ dockflare_data_directory }}/data:/app/data"
         ports:
-          - "{{ dockflare_port }}:5000"
+          - "{{ dockflare_port_http }}:5000"
         env:
           REDIS_URL: "redis://{{ dockflare_redis_container_name }}:6379/0"
           REDIS_DB_INDEX: "0"  # Optional: specify Redis database index (0-15) for isolation from other containers
@@ -126,7 +126,7 @@
           dockflare.enable: "{{ dockflare_dockflare_tunnel }}"
           dockflare.access.group: "{{ dockflare_dockflare_access_group }}"
           dockflare.hostname: "{{ dockflare_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dockflare_homepage_group }}"
           homepage.icon: "{{ dockflare_homepage_icon }}"
@@ -135,7 +135,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ dockflare_container_name }}"
           homepage.showStats: "{{ dockflare_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port_http }}"
           repliqate.enabled: "{{ dockflare_repliqate_enabled }}"
           repliqate.engine: "{{ dockflare_repliqate_engine }}"
           repliqate.schedule: "{{ dockflare_repliqate_schedule }}"
@@ -161,7 +161,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockflare_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockflare_port_http | string)] +
                 (['https://' + dockflare_hostname + '.' + ansible_nas_domain] if (dockflare_available_externally is true or dockflare_dockflare_tunnel is true) else [])
               }}
   when: dockflare_enabled is true

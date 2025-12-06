@@ -18,7 +18,7 @@
         volumes:
           - "{{ octoprint_data_directory }}:/octoprint:rw"
         ports:
-          - "{{ octoprint_port }}:80"
+          - "{{ octoprint_port_http }}:80"
         devices:
           - "{{ octoprint_printer_mountpoint }}"
           - "{{ octoprint_enable_webcam | ternary(octoprint_webcam_mountpoint, '/dev/null') }}"
@@ -32,7 +32,7 @@
           dockflare.enable: "{{ octoprint_dockflare_tunnel }}"
           dockflare.access.group: "{{ octoprint_dockflare_access_group }}"
           dockflare.hostname: "{{ octoprint_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ octoprint_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ octoprint_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ octoprint_homepage_group }}"
           homepage.icon: "{{ octoprint_homepage_icon }}"
@@ -41,7 +41,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ octoprint_container_name }}"
           homepage.showStats: "{{ octoprint_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ octoprint_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ octoprint_port_http }}"
           traefik.enable: "{{ octoprint_available_externally | string }}"
           traefik.http.routers.octoprint.rule: "Host(`{{ octoprint_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.octoprint.tls.certresolver: "letsencrypt"
@@ -62,7 +62,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (octoprint_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (octoprint_port_http | string)] +
                 (['https://' + octoprint_hostname + '.' + ansible_nas_domain] if (octoprint_available_externally is true or octoprint_dockflare_tunnel is true) else [])
               }}
   when: octoprint_enabled is true

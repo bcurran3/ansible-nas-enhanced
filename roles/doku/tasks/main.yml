@@ -12,9 +12,9 @@
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
           - "{{ docker_home }}:/hostroot:ro"
         ports:
-          - "{{ doku_port }}:{{ doku_port }}"
+          - "{{ doku_port_http }}:{{ doku_port_http }}"
         env:
-          PORT: "{{ doku_port }}"
+          PORT: "{{ doku_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ doku_autoheal }}"
@@ -22,12 +22,12 @@
           dockflare.enable: "{{ doku_dockflare_tunnel }}"
           dockflare.access.group: "{{ doku_dockflare_access_group }}"
           dockflare.hostname: "{{ doku_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port_http }}"
           homepage.group: "{{ doku_homepage_group }}"
           homepage.name: "{{ doku_homepage_name}} "
           homepage.icon: "{{ doku_homepage_icon }}"
           homepage.href: "{{ doku_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ doku_port_http }}"
           homepage.description: "{{ 'Docker disk space usage' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ doku_container_name }}"
@@ -41,7 +41,7 @@
           traefik.http.routers.frontend.middlewares: "{{ doku_hostname }}"
           traefik.http.routers.doku.middlewares: "{{ doku_hostname }}@docker"
           traefik.http.middlewares.doku.IPAllowList.sourcerange: "{{ doku_traefik_whitelist }}"
-          traefik.http.services.doku.loadbalancer.server.port: "{{ doku_port }}"
+          traefik.http.services.doku.loadbalancer.server.port: "{{ doku_port_http }}"
           wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/amerkurev/doku/pkgs/container/doku"
@@ -53,7 +53,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (doku_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (doku_port_http | string)] +
                 (['https://' + doku_hostname + '.' + ansible_nas_domain] if (doku_available_externally is true or doku_dockflare_tunnel is true) else [])
               }}
   when: doku_enabled is true

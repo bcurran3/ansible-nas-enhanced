@@ -18,7 +18,7 @@
         image: "{{ n8n_image_name }}:{{ n8n_image_version }}"
         pull: true
         ports:
-          - "{{ n8n_port }}:5678"
+          - "{{ n8n_port_http }}:5678"
         volumes:
           - "{{ n8n_data_directory }}:/home/node/.n8n:rw"
           - "/etc/timezone:/etc/timezone:ro"
@@ -33,7 +33,7 @@
           dockflare.enable: "{{ n8n_dockflare_tunnel }}"
           dockflare.access.group: "{{ n8n_dockflare_access_group }}"
           dockflare.hostname: "{{ n8n_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ n8n_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ n8n_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ n8n_homepage_group }}"
           homepage.icon: "{{ n8n_homepage_icon }}"
@@ -42,7 +42,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ n8n_container_name }}"
           homepage.showStats: "{{ n8n_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ n8n_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ n8n_port_http }}"
           traefik.enable: "{{ n8n_available_externally | string }}"
           traefik.http.routers.n8n.rule: "Host(`{{ n8n_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.n8n.tls.certresolver: "letsencrypt"
@@ -63,7 +63,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (n8n_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (n8n_port_http | string)] +
                 (['https://' + n8n_hostname + '.' + ansible_nas_domain] if (n8n_available_externally is true or n8n_dockflare_tunnel is true) else [])
               }}
   when: n8n_enabled is true

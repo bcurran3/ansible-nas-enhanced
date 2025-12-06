@@ -19,7 +19,7 @@ youtarr_db_image_tag: "10.3"
 
 # network
 youtarr_hostname: "youtarr"
-youtarr_port: "3087"
+youtarr_port_http: "3087"
 
 # specs
 youtarr_cpu_shares: "1024"
@@ -30,7 +30,7 @@ youtarr_db_memory: 1g
 # app
 youtarr_env_auth_enabled: "true"
 youtarr_env_auth_preset_username: "admin"
-youtarr_env_auth_preset_password: "password"
+youtarr_env_auth_preset_password: "{{ ansible_nas_app_admin_password }}"
 youtarr_env_plex_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400"
 
 # autoheal
@@ -44,11 +44,11 @@ youtarr_dockflare_access_group: ""
 # homepage
 youtarr_homepage_group: "Apps"
 youtarr_homepage_icon: "sh-youtarr.png"
-youtarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port }}"
+youtarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port_http }}"
 youtarr_homepage_showstats: "false"
 youtarr_db_homepage_group: "DBs"
 youtarr_db_homepage_icon: "mariadb.png"
-youtarr_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port }}"
+youtarr_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port_http }}"
 youtarr_db_homepage_showstats: "false"
 
 # watchtower

@@ -27,25 +27,25 @@
           CONDUIT_MAX_CONCURRENT_REQUESTS: "100"
           CONDUIT_ADDRESS: "0.0.0.0"
           CONDUIT_CONFIG: ""
-          CONDUIT_PORT: "6167"
+          CONDUIT_PORT: "{{ conduit_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ conduit_data_directory }}/db:/var/lib/matrix-conduit"
         ports:
-          - "{{ conduit_port }}:6167"
+          - "{{ conduit_port_http }}:6167"
         labels:
           autoheal: "{{ conduit_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ conduit_watchtower_enable }}"
           dockflare.enable: "{{ conduit_dockflare_tunnel }}"
           dockflare.access.group: "{{ conduit_dockflare_access_group }}"
           dockflare.hostname: "{{ conduit_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ conduit_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ conduit_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ conduit_homepage_group }}"
           homepage.href: "{{ conduit_homepage_href }}"
           homepage.icon: "{{ conduit_homepage_icon }}"
           homepage.description: "{{ 'Conduit is a simple, fast and reliable chat server powered by Matrix' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ conduit_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ conduit_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ conduit_container_name }}"
           homepage.showStats: "{{ conduit_homepage_showstats }}"
@@ -62,7 +62,7 @@
           traefik.http.routers.frontend.middlewares: "{{ conduit_hostname }}"
           traefik.http.routers.conduit.middlewares: "{{ conduit_hostname }}@docker"
           traefik.http.middlewares.conduit.IPAllowList.sourcerange: "{{ conduit_traefik_whitelist }}"
-          traefik.http.services.conduit.loadbalancer.server.port: "6167"
+          traefik.http.services.conduit.loadbalancer.server.port: "{{ conduit_port_http }}"
           wud.watch.digest: "true"
           wud.tag.include: "^latest$"
         cpu_shares: "{{ conduit_cpu_shares }}"
@@ -73,7 +73,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (conduit_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (conduit_port_http | string)] +
                 (['https://' + conduit_hostname + '.' + ansible_nas_domain] if (conduit_available_externally is true or conduit_dockflare_tunnel is true) else [])
               }}
   when: conduit_enabled is true

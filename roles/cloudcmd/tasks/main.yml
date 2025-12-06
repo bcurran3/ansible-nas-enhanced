@@ -20,7 +20,7 @@
           - "{{ cloudcmd_data_directory }}/config:/config:rw"
           - "{{ cloudcmd_browse_directory }}:/mnt/fs"
         ports:
-          - "{{ cloudcmd_port }}:8000"
+          - "{{ cloudcmd_port_http }}:8000"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ cloudcmd_user_id }}"
@@ -31,7 +31,7 @@
           dockflare.enable: "{{ cloudcmd_dockflare_tunnel }}"
           dockflare.access.group: "{{ cloudcmd_dockflare_access_group }}"
           dockflare.hostname: "{{ cloudcmd_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cloudcmd_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cloudcmd_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ cloudcmd_homepage_group }}"
           homepage.icon: "{{ cloudcmd_homepage_icon }}"
@@ -40,7 +40,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ cloudcmd_container_name }}"
           homepage.showStats: "{{ cloudcmd_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cloudcmd_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cloudcmd_port_http }}"
           repliqate.enabled: "{{ cloudcmd_repliqate_enabled }}"
           repliqate.engine: "{{ cloudcmd_repliqate_engine }}"
           repliqate.schedule: "{{ cloudcmd_repliqate_schedule }}"

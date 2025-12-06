@@ -40,7 +40,7 @@
     #      - "{{ comics_root }}:/media/comics:ro"
     #      - "{{ music_root }}:/media/music:ro"
         ports:
-          - "{{ nextcloudaio_port }}:8080"
+          - "{{ nextcloudaio_port_http }}:8080"
           - "3478:3478"     # TURN server for Talk
         env:
           NEXTCLOUD_DATADIR: "/mnt/ncdata"
@@ -71,7 +71,7 @@
           dockflare.enable: "{{ nextcloudaio_dockflare_tunnel }}"
           dockflare.access.group: "{{ nextcloudaio_dockflare_access_group }}"
           dockflare.hostname: "{{ nextcloudaio_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloudaio_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloudaio_port_http }}"
           traefik.enable: "{{ nextcloudaio_available_externally | string }}"
           traefik.http.routers.nextcloudaio.rule: "Host(`{{ nextcloudaio_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.nextcloudaio.tls.certresolver: "letsencrypt"
@@ -92,7 +92,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (nextcloudaio_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (nextcloudaio_port_http | string)] +
                 (['https://' + nextcloudaio_hostname + '.' + ansible_nas_domain] if (nextcloudaio_available_externally is true or nextcloudaio_dockflare_tunnel is true) else [])
               }}
   when: nextcloudaio_enabled is true

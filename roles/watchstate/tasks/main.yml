@@ -23,7 +23,7 @@
         volumes:
           - "{{ watchstate_data_directory }}/config:/config"
         ports:
-          - "{{ watchstate_port }}:8080"
+          - "{{ watchstate_port_http }}:8080"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
@@ -32,7 +32,7 @@
           dockflare.enable: "{{ watchstate_dockflare_tunnel }}"
           dockflare.access.group: "{{ watchstate_dockflare_access_group }}"
           dockflare.hostname: "{{ watchstate_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ watchstate_homepage_group }}"
           homepage.icon: "{{ watchstate_homepage_icon }}"
@@ -41,7 +41,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ watchstate_container_name }}"
           homepage.showStats: "{{ watchstate_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port_http }}"
           traefik.enable: "{{ watchstate_available_externally | string }}"
           traefik.http.routers.watchstate.rule: "Host(`{{ watchstate_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.watchstate.tls.certresolver: "letsencrypt"
@@ -62,7 +62,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (watchstate_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (watchstate_port_http | string)] +
                 (['https://' + watchstate_hostname + '.' + ansible_nas_domain] if (watchstate_available_externally is true or watchstate_dockflare_tunnel is true) else [])
               }}
   when: watchstate_enabled is true

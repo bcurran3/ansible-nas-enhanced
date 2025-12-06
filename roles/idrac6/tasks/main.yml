@@ -20,7 +20,7 @@
         pull: true
         network_mode: "bridge"
         ports:
-          - "{{ idrac6_port_web }}:5800"
+          - "{{ idrac6_port_http }}:5800"
           - "{{ idrac6_port_vnc }}:5900"
         volumes:
           - "{{ idrac6_data_directory }}/app:/app"
@@ -47,7 +47,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ idrac6_container_name }}"
           homepage.showStats: "{{ idrac6_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ idrac6_port_web }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ idrac6_port_http }}"
           traefik.enable: "{{ idrac6_available_externally | string }}"
           traefik.http.routers.idrac6.rule: "Host(`{{ idrac6_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.idrac6.tls.certresolver: "letsencrypt"
@@ -67,7 +67,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (idrac6_port_web | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (idrac6_port_http | string)] +
                 (['https://' + idrac6_hostname + '.' + ansible_nas_domain] if (idrac6_available_externally is true or idrac6_dockflare_tunnel is true) else [])
               }}
   when: idrac6_enabled is true

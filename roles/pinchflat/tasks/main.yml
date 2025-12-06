@@ -20,7 +20,7 @@
           - "{{ pinchflat_data_directory }}/config:/config"
           - "{{ pinchflat_dl_video_directory }}:/downloads"
         ports:
-          - "{{ pinchflat_port }}:8945"
+          - "{{ pinchflat_port_http }}:8945"
         env:
           PUID: "{{ pinchflat_user_id }}"
           PGID: "{{ pinchflat_group_id }}"
@@ -31,7 +31,7 @@
           dockflare.enable: "{{ pinchflat_dockflare_tunnel }}"
           dockflare.access.group: "{{ pinchflat_dockflare_access_group }}"
           dockflare.hostname: "{{ pinchflat_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pinchflat_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pinchflat_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pinchflat_homepage_group }}"
           homepage.icon: "{{ pinchflat_homepage_icon }}"
@@ -40,7 +40,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ pinchflat_container_name }}"
           homepage.showStats: "{{ pinchflat_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pinchflat_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pinchflat_port_http }}"
           traefik.enable: "{{ pinchflat_available_externally | string }}"
           traefik.http.routers.pinchflat.rule: "Host(`{{ pinchflat_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pinchflat.tls.certresolver: "letsencrypt"
@@ -61,7 +61,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pinchflat_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pinchflat_port_http | string)] +
                 (['https://' + pinchflat_hostname + '.' + ansible_nas_domain] if (pinchflat_available_externally is true or pinchflat_dockflare_tunnel is true) else [])
               }}
   when: pinchflat_enabled is true

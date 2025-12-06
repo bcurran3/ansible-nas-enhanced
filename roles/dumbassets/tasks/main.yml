@@ -18,7 +18,7 @@
         volumes:
           - "{{ dumbassets_data_directory }}:/app/data"
         ports:
-          - "{{ dumbassets_port }}:3000"
+          - "{{ dumbassets_port_http }}:3000"
         env:
           NODE_ENV: "{{ dumbassets_node_env }}"
           DEBUG: "{{ dumbassets_debug }}"
@@ -37,7 +37,7 @@
           dockflare.enable: "{{ dumbassets_dockflare_tunnel }}"
           dockflare.access.group: "{{ dumbassets_dockflare_access_group }}"
           dockflare.hostname: "{{ dumbassets_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dumbassets_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dumbassets_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dumbassets_homepage_group }}"
           homepage.icon: "{{ dumbassets_homepage_icon }}"
@@ -46,7 +46,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ dumbassets_container_name }}"
           homepage.showStats: "{{ dumbassets_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dumbassets_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dumbassets_port_http }}"
           repliqate.enabled: "{{ dumbassets_repliqate_enabled }}"
           repliqate.engine: "{{ dumbassets_repliqate_engine }}"
           repliqate.schedule: "{{ dumbassets_repliqate_schedule }}"
@@ -72,7 +72,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dumbassets_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dumbassets_port_http | string)] +
                 (['https://' + dumbassets_hostname + '.' + ansible_nas_domain] if (dumbassets_available_externally is true or dumbassets_dockflare_tunnel is true) else [])
               }}
   when: dumbassets_enabled is true

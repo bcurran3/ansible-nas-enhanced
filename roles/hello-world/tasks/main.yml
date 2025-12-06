@@ -18,14 +18,14 @@
         volumes:
           - "{{ hello_world_data_directory }}:/hello_world:rw"
         ports:
-          - "{{ hello_world_port }}:8000"
+          - "{{ hello_world_port_http }}:8000"
         labels:
           autoheal: "{{ hello_world_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ hello_world_watchtower_enable }}"
           dockflare.enable: "{{ hello_world_dockflare_tunnel }}"
           dockflare.access.group: "{{ hello_world_dockflare_access_group }}"
           dockflare.hostname: "{{ hello_world_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hello_world_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hello_world_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ hello_world_homepage_group }}"
           homepage.icon: "{{ hello_world_homepage_icon }}"
@@ -34,7 +34,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ hello_world_container_name }}"
           homepage.showStats: "{{ hello_world_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hello_world_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hello_world_port_http }}"
           traefik.enable: "{{ hello_world_available_externally | string }}"
           traefik.http.routers.hello_world.rule: "Host(`{{ hello_world_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.hello_world.tls.certresolver: "letsencrypt"
@@ -54,7 +54,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (hello_world_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (hello_world_port_http | string)] +
                 (['https://' + hello_world_hostname + '.' + ansible_nas_domain] if (hello_world_available_externally is true or hello_world_dockflare_tunnel is true) else [])
               }}
   when: hello_world_enabled is true

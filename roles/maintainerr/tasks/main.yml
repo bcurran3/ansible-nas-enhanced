@@ -17,7 +17,7 @@
         image: "{{ maintainerr_image_name }}:{{ maintainerr_image_tag }}"
         pull: true
         ports:
-          - "{{ maintainerr_port }}:80"
+          - "{{ maintainerr_port_http }}:80"
         volumes:
           - "{{ maintainerr_data_directory }}/data:/opt/data"
         env:
@@ -29,7 +29,7 @@
           dockflare.enable: "{{ maintainerr_dockflare_tunnel }}"
           dockflare.access.group: "{{ maintainerr_dockflare_access_group }}"
           dockflare.hostname: "{{ maintainerr_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ maintainerr_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ maintainerr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ maintainerr_homepage_group }}"
           homepage.icon: "{{ maintainerr_homepage_icon }}"
@@ -59,7 +59,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (maintainerr_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (maintainerr_port_http | string)] +
                 (['https://' + maintainerr_hostname + '.' + ansible_nas_domain] if (maintainerr_available_externally is true or maintainerr_dockflare_tunnel is true) else [])
               }}
   when: maintainerr_enabled is true

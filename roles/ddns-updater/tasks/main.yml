@@ -25,7 +25,7 @@
         image: "{{ ddns_updater_image_name }}:{{ ddns_updater_image_tag }}"
         pull: true
         ports:
-          - "{{ ddns_updater_port }}:{{ ddns_updater_port }}"
+          - "{{ ddns_updater_port_http }}:{{ ddns_updater_port_http }}"
         volumes:
           - "{{ ddns_updater_data_directory }}:/updater/data:rw"
         env:
@@ -36,14 +36,14 @@
           HTTP_TIMEOUT: "{{ ddns_updater_http_timeout }}"
           TZ: "{{ ansible_nas_timezone }}"
           BACKUP_PERIOD: "72h"
-          LISTENING_PORT: "{{ ddns_updater_port }}"
+          LISTENING_PORT: "{{ ddns_updater_port_http }}"
         labels:
           autoheal: "{{ ddns_updater_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ ddns_updater_watchtower_enable }}"
           dockflare.enable: "{{ ddns_updater_dockflare_tunnel }}"
           dockflare.access.group: "{{ ddns_updater_dockflare_access_group }}"
           dockflare.hostname: "{{ ddns_updater_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ ddns_updater_homepage_group }}"
           homepage.icon: "{{ ddns_updater_homepage_icon }}"
@@ -52,7 +52,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ ddns_updater_container_name }}"
           homepage.showStats: "{{ ddns_updater_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ddns_updater_port_http }}"
           repliqate.enabled: "{{ ddns_updater_repliqate_enabled }}"
           repliqate.engine: "{{ ddns_updater_repliqate_engine }}"
           repliqate.schedule: "{{ ddns_updater_repliqate_schedule }}"
@@ -66,7 +66,7 @@
           traefik.http.routers.frontend.middlewares: "{{ ddns_updater_hostname }}"
           traefik.http.routers.ddns_updater.middlewares: "ddns_updater@docker"
           traefik.http.middlewares.ddns_updater.IPAllowList.sourcerange: "{{ ddns_updater_traefik_whitelist }}"
-          traefik.http.services.ddns_updater.loadbalancer.server.port: "{{ ddns_updater_port }}"
+          traefik.http.services.ddns_updater.loadbalancer.server.port: "{{ ddns_updater_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/qmcgaw/ddns-updater"
@@ -79,7 +79,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ddns_updater_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ddns_updater_port_http | string)] +
                 (['https://' + ddns_updater_hostname + '.' + ansible_nas_domain] if (ddns_updater_available_externally is true or ddns_updater_dockflare_tunnel is true) else [])
               }}
   when: ddns_updater_enabled is true

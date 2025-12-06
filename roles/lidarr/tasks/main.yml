@@ -21,7 +21,7 @@
           - "{{ lidarr_downloads_directory }}:/downloads:rw"
           - "{{ lidarr_music_directory }}:/music:rw"
         ports:
-          - "{{ lidarr_port }}:8686"
+          - "{{ lidarr_port_http }}:8686"
         env:
           DOCKER_MODS: "{{ lidarr_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ lidarr_env_docker_mods_install_packages }}"
@@ -39,18 +39,18 @@
           dockflare.enable: "{{ lidarr_dockflare_tunnel }}"
           dockflare.access.group: "{{ lidarr_dockflare_access_group }}"
           dockflare.hostname: "{{ lidarr_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ lidarr_homepage_group }}"
           homepage.icon: "{{ lidarr_homepage_icon }}"
           homepage.href: "{{ lidarr_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port_http }}"
           homepage.description: "{{ 'a music collection manager' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ lidarr_container_name }}"
           homepage.showStats: "{{ lidarr_homepage_showstats }}"
           homepage.widget.type: "lidarr"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port_http }}"
           homepage.widget.key: "{{ lidarr_homepage_widget_key }}"
           traefik.enable: "{{ lidarr_available_externally | string }}"
           traefik.http.routers.lidarr.rule: "Host(`{{ lidarr_hostname }}.{{ ansible_nas_domain }}`)"
@@ -72,7 +72,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (lidarr_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (lidarr_port_http | string)] +
                 (['https://' + lidarr_hostname + '.' + ansible_nas_domain] if (lidarr_available_externally is true or lidarr_dockflare_tunnel is true) else [])
               }}
   when: lidarr_enabled is true

@@ -154,7 +154,7 @@
         network_mode: "bridge"
         networks_cli_compatible: "yes"
         ports:
-          - "{{ immich_port }}:2283"
+          - "{{ immich_port_http }}:2283"
         env:
           REDIS_HOSTNAME: "{{ immich_redis_container_name }}"
           DB_HOSTNAME: "{{ immich_postgres_container_name }}"
@@ -175,18 +175,18 @@
           dockflare.enable: "{{ immich_dockflare_tunnel }}"
           dockflare.access.group: "{{ immich_dockflare_access_group }}"
           dockflare.hostname: "{{ immich_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ immich_homepage_group }}"
           homepage.icon: "{{ immich_homepage_icon }}"
           homepage.href: "{{ immich_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port_http }}"
           homepage.description: "{{ 'High performance self-hosted photo and video management solution' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ immich_server_container_name }}"
           homepage.showStats: "{{ immich_homepage_showstats }}"
           homepage.widget.type: "immich"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port_http }}"
           homepage.widget.key: "{{ immich_homepage_widget_key }}"
           homepage.widget.version: "2"
           traefik.enable: "{{ immich_available_externally | string }}"
@@ -209,7 +209,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (immich_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (immich_port_http | string)] +
                 (['https://' + immich_hostname + '.' + ansible_nas_domain] if (immich_available_externally is true or immich_dockflare_tunnel is true) else [])
               }}
   when: immich_enabled is true

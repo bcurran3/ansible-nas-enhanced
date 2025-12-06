@@ -27,7 +27,7 @@
           - "{{ znc_data_directory }}:/znc-data:rw"
           - "/etc/timezone:/etc/timezone:ro"
         ports:
-          - "{{ znc_port }}:6677"
+          - "{{ znc_port_http }}:6677"
         env:
           PUID: "{{ znc_user_id }}"
           PGID: "{{ znc_group_id }}"
@@ -38,7 +38,7 @@
           dockflare.enable: "{{ znc_dockflare_tunnel }}"
           dockflare.access.group: "{{ znc_dockflare_access_group }}"
           dockflare.hostname: "{{ znc_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ znc_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ znc_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ znc_homepage_group }}"
           homepage.icon: "{{ znc_homepage_icon }}"
@@ -47,7 +47,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ znc_container_name }}"
           homepage.showStats: "{{ znc_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ znc_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ znc_port_http }}"
           traefik.enable: "{{ znc_available_externally | string }}"
           traefik.http.routers.znc.rule: "Host(`{{ znc_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.znc.tls.certresolver: "letsencrypt"
@@ -68,7 +68,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (znc_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (znc_port_http | string)] +
                 (['https://' + znc_hostname + '.' + ansible_nas_domain] if (znc_available_externally is true or znc_dockflare_tunnel is true) else [])
               }}
   when: znc_enabled is true

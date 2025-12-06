@@ -36,7 +36,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ firefly_db_container_name }}"
           homepage.showStats: "{{ firefly_db_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_db_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_db_port_http }}"
           repliqate.enabled: "{{ firefly_db_repliqate_enabled }}"
           repliqate.engine: "{{ firefly_db_repliqate_engine }}"
           repliqate.schedule: "{{ firefly_db_repliqate_schedule }}"
@@ -66,7 +66,7 @@
         links:
           - "{{ firefly_db_container_name }}"
         ports:
-          - "{{ firefly_port }}:8080"
+          - "{{ firefly_port_http }}:8080"
         env:
           APP_URL: "https://{{ firefly_hostname }}.{{ ansible_nas_domain }}"
           APP_ENV: "local"
@@ -87,7 +87,7 @@
           dockflare.enable: "{{ firefly_dockflare_tunnel }}"
           dockflare.access.group: "{{ firefly_dockflare_access_group }}"
           dockflare.hostname: "{{ firefly_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ firefly_homepage_group }}"
           homepage.icon: "{{ firefly_homepage_icon }}"
@@ -96,7 +96,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ firefly_container_name }}"
           homepage.showStats: "{{ firefly_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
           repliqate.enabled: "{{ firefly_repliqate_enabled }}"
           repliqate.engine: "{{ firefly_repliqate_engine }}"
           repliqate.schedule: "{{ firefly_repliqate_schedule }}"
@@ -122,7 +122,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (firefly_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (firefly_port_http | string)] +
                 (['https://' + firefly_hostname + '.' + ansible_nas_domain] if (firefly_available_externally is true or firefly_dockflare_tunnel is true) else [])
               }}
   when: firefly_enabled is true

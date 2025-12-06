@@ -56,7 +56,7 @@
           - "{{ tandoor_recipes_data_directory }}/mediafiles:/opt/recipes/mediafiles"
           - "{{ tandoor_recipes_data_directory }}/staticfiles:/opt/recipes/staticfiles"
         ports:
-          - "{{ tandoor_recipes_port }}:80"
+          - "{{ tandoor_recipes_port_http }}:80"
         env:
           ALLOWED_HOSTS: "{{ tandoor_recipes_env_allowed_hosts }}"
           DB_ENGINE: "django.db.backends.postgresql"
@@ -66,7 +66,7 @@
           POSTGRES_PASSWORD: "{{ tandoor_recipes_env_postgres_password }}"
           POSTGRES_DB: "djangodb"
           SECRET_KEY: "{{ tandoor_recipes_env_secret_key }}"
-          TANDOOR_PORT: "{{ tandoor_recipes_port }}"
+          TANDOOR_PORT: "{{ tandoor_recipes_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
 #          https://docs.tandoor.dev/system/configuration/
 #          GUNICORN_WORKERS: "3"
@@ -143,7 +143,7 @@
           dockflare.enable: "{{ tandoor_recipes_dockflare_tunnel }}"
           dockflare.access.group: "{{ tandoor_recipes_dockflare_access_group }}"
           dockflare.hostname: "{{ tandoor_recipes_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ tandoor_recipes_homepage_group }}"
           homepage.icon: "{{ tandoor_recipes_homepage_icon }}"
@@ -152,7 +152,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ tandoor_recipes_container_name }}"
           homepage.showStats: "{{ tandoor_recipes_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port_http }}"
           traefik.enable: "{{ tandoor_recipes_available_externally | string }}"
 #         traefik.http.routers.tandoor_recipes.rule: "Host(`{{ tandoor_recipes_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tandoor_recipes.rule: "Host(`recipes.{{ ansible_nas_domain }}`)"
@@ -162,7 +162,7 @@
           traefik.http.routers.frontend.middlewares: "{{ tandoor_recipes_hostname }}"
           traefik.http.routers.tandoor_recipes.middlewares: "tandoor_recipes@docker"
           traefik.http.middlewares.tandoor_recipes.IPAllowList.sourcerange: "{{ tandoor_recipes_traefik_whitelist }}"
-          traefik.http.services.tandoor_recipes.loadbalancer.server.port: "{{ tandoor_recipes_port }}"
+          traefik.http.services.tandoor_recipes.loadbalancer.server.port: "{{ tandoor_recipes_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/TandoorRecipes/recipes/pkgs/container/recipes"
@@ -174,7 +174,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tandoor_recipes_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tandoor_recipes_port_http | string)] +
                 (['https://' + tandoor_recipes_hostname + '.' + ansible_nas_domain] if (tandoor_recipes_available_externally is true or tandoor_recipes_dockflare_tunnel is true) else [])
               }}
   when: tandoor_recipes_enabled is true

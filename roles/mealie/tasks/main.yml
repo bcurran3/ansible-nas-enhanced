@@ -18,7 +18,7 @@
         volumes:
           - "{{ mealie_data_directory }}:/app/data:rw"
         ports:
-          - "{{ mealie_port }}:9000"
+          - "{{ mealie_port_http }}:9000"
         env:
           BASE_URL: "{{ mealie_env_base_url }}"
           PUID: "{{ mealie_user_id }}"
@@ -36,7 +36,7 @@
           dockflare.enable: "{{ mealie_dockflare_tunnel }}"
           dockflare.access.group: "{{ mealie_dockflare_access_group }}"
           dockflare.hostname: "{{ mealie_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mealie_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mealie_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mealie_homepage_group }}"
           homepage.icon: "{{ mealie_homepage_icon }}"
@@ -45,7 +45,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ mealie_container_name }}"
           homepage.showStats: "{{ mealie_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mealie_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mealie_port_http }}"
           traefik.enable: "{{ mealie_available_externally | string }}"
           traefik.http.routers.mealie.rule: "Host(`{{ mealie_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.mealie.tls.certresolver: "letsencrypt"
@@ -66,7 +66,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mealie_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mealie_port_http | string)] +
                 (['https://' + mealie_hostname + '.' + ansible_nas_domain] if (mealie_available_externally is true or mealie_dockflare_tunnel is true) else [])
               }}
   when: mealie_enabled is true

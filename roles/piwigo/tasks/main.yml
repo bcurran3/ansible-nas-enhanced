@@ -64,7 +64,7 @@
           - "{{ piwigo_data_directory }}/config:/config:rw"
           - "{{ piwigo_photos }}:/gallery:rw"
         ports:
-          - "{{ piwigo_port }}:80"
+          - "{{ piwigo_port_http }}:80"
         env:
           DOCKER_MODS: "{{ piwigo_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ piwigo_env_docker_mods_install_packages }}"
@@ -82,7 +82,7 @@
           dockflare.enable: "{{ piwigo_dockflare_tunnel }}"
           dockflare.access.group: "{{ piwigo_dockflare_access_group }}"
           dockflare.hostname: "{{ piwigo_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ piwigo_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ piwigo_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ piwigo_homepage_group }}"
           homepage.icon: "{{ piwigo_homepage_icon }}"
@@ -91,7 +91,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ piwigo_container_name }}"
           homepage.showStats: "{{ piwigo_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ piwigo_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ piwigo_port_http }}"
           traefik.enable: "{{ piwigo_available_externally | string }}"
           traefik.http.routers.piwigo.rule: "Host(`{{ piwigo_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.piwigo.tls.certresolver: "letsencrypt"
@@ -112,7 +112,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (piwigo_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (piwigo_port_http | string)] +
                 (['https://' + piwigo_hostname + '.' + ansible_nas_domain] if (piwigo_available_externally is true or piwigo_dockflare_tunnel is true) else [])
               }}
   when: piwigo_enabled is true

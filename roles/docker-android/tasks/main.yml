@@ -19,7 +19,7 @@
 #        volumes:
 #          - "{{ dockerandroid_data_directory }}/data:/home/androidusr"
         ports:
-          - "{{ dockerandroid_port }}:6080"
+          - "{{ dockerandroid_port_http }}:6080"
         env:
           EMULATOR_DEVICE: "{{ dockerandroid_env_emulator_device }}"
           WEB_VNC: "true"
@@ -32,7 +32,7 @@
           dockflare.enable: "{{ dockerandroid_dockflare_tunnel }}"
           dockflare.access.group: "{{ dockerandroid_dockflare_access_group }}"
           dockflare.hostname: "{{ dockerandroid_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockerandroid_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockerandroid_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dockerandroid_homepage_group }}"
           homepage.icon: "{{ dockerandroid_homepage_icon }}"
@@ -41,7 +41,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ dockerandroid_container_name }}"
           homepage.showStats: "{{ dockerandroid_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockerandroid_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockerandroid_port_http }}"
           repliqate.enabled: "{{ dockerandroid_repliqate_enabled }}"
           repliqate.engine: "{{ dockerandroid_repliqate_engine }}"
           repliqate.schedule: "{{ dockerandroid_repliqate_schedule }}"
@@ -67,7 +67,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockerandroid_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockerandroid_port_http | string)] +
                 (['https://' + dockerandroid_hostname + '.' + ansible_nas_domain] if (dockerandroid_available_externally is true or dockerandroid_dockflare_tunnel is true) else [])
               }}
   when: dockerandroid_enabled is true

@@ -9,13 +9,12 @@ mumble_traefik_whitelist: "{{ lan }}"
 mumble_data_directory: "{{ docker_home }}/mumble"
 
 # Networking
-mumble_tcp_port: "64738"
-mumble_udp_port: "64738"
+mumble_port_tcp: "64738"
+mumble_port_udp: "64738"
 mumble_hostname: mumble
 
 # Configuration
-# It is strongly advised this password is changed, especially if this is publicly available.
-mumble_server_password: "abcpassword123"
+mumble_server_password: "{{ ansible_nas_app_admin_password }}"
 
 # docker
 mumble_container_name: mumble-server
@@ -34,7 +33,7 @@ mumble_dockflare_access_group: ""
 # homepage
 mumble_homepage_group: "Apps"
 mumble_homepage_icon: "mumble.png"
-mumble_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port }}"
+mumble_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port_tcp }}"
 mumble_homepage_showstats: "false"
 
 # watchtower

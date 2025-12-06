@@ -36,18 +36,18 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         ports:
-          - "{{ portainer_port }}:9000"
+          - "{{ portainer_port_http }}:9000"
         labels:
           autoheal: "{{ portainer_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ portainer_watchtower_enable }}"
           dockflare.enable: "{{ portainer_dockflare_tunnel }}"
           dockflare.access.group: "{{ portainer_dockflare_access_group }}"
           dockflare.hostname: "{{ portainer_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ portainer_homepage_group }}"
           homepage.href: "{{ portainer_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port_http }}"
           homepage.icon: "{{ portainer_homepage_icon }}"
           homepage.description: "{{ 'Making Docker and Kubernetes management easy.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
@@ -55,7 +55,7 @@
           homepage.showStats: "{{ portainer_homepage_showstats }}"
           homepage.widget.type: "portainer"
           homepage.widget.env: "2"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port_http }}"
           homepage.widget.key: "{{ portainer_homepage_widget_key }}"
           traefik.enable: "{{ portainer_available_externally | string }}"
           traefik.http.routers.portainer.rule: "Host(`{{ portainer_hostname }}.{{ ansible_nas_domain }}`)"
@@ -77,7 +77,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (portainer_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (portainer_port_http | string)] +
                 (['https://' + portainer_hostname + '.' + ansible_nas_domain] if (portainer_available_externally is true or portainer_dockflare_tunnel is true) else [])
               }}
   when: portainer_enabled is true

@@ -19,7 +19,7 @@
 #        volumes:
 #          - "{{ virtualtabletop_data_directory }}/games:/app/library/games"
         ports:
-          - "{{ virtualtabletop_port }}:{{ virtualtabletop_port }}"
+          - "{{ virtualtabletop_port_http }}:{{ virtualtabletop_port_http }}"
         env:
           ADMINURL: "{{ virtualtabletop_env_adminurl }}"
           ALLOWPUBLICLIBRARYEDITS: "{{ virtualtabletop_env_allowpubliclibraryedits }}"
@@ -27,7 +27,7 @@
           EXTERNALURL: "{{ virtualtabletop_env_externalurl }}"
           FORCETRACING: "{{ virtualtabletop_env_forcetracing }}"
           MINIFYJAVASCRIPT: "{{ virtualtabletop_env_minifyjavascript }}"
-          PORT: "{{ virtualtabletop_port }}"
+          PORT: "{{ virtualtabletop_port_http }}"
           SERVERNAME: "{{ virtualtabletop_env_servername }}"
           SIMULATESERVERLAG: "{{ virtualtabletop_env_simulateserverlag }}"
           URLPREFIX: "{{ virtualtabletop_env_urlprefix }}"
@@ -38,7 +38,7 @@
           dockflare.enable: "{{ virtualtabletop_dockflare_tunnel }}"
           dockflare.access.group: "{{ virtualtabletop_dockflare_access_group }}"
           dockflare.hostname: "{{ virtualtabletop_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtualtabletop_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtualtabletop_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ virtualtabletop_homepage_group }}"
           homepage.icon: "{{ virtualtabletop_homepage_icon }}"
@@ -47,7 +47,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ virtualtabletop_container_name }}"
           homepage.showStats: "{{ virtualtabletop_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtualtabletop_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtualtabletop_port_http }}"
           traefik.enable: "{{ virtualtabletop_available_externally | string }}"
           traefik.http.routers.virtualtabletop.rule: "Host(`{{ virtualtabletop_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.virtualtabletop.tls.certresolver: "letsencrypt"
@@ -56,7 +56,7 @@
           traefik.http.routers.frontend.middlewares: "{{ virtualtabletop_hostname }}"
           traefik.http.routers.virtualtabletop.middlewares: "{{ virtualtabletop_hostname }}@docker"
           traefik.http.middlewares.virtualtabletop.IPAllowList.sourcerange: "{{ virtualtabletop_traefik_whitelist }}"
-          traefik.http.services.virtualtabletop.loadbalancer.server.port: "{{ virtualtabletop_port }}"
+          traefik.http.services.virtualtabletop.loadbalancer.server.port: "{{ virtualtabletop_port_http }}"
           wud.watch.digest: "true"
           wud.link.template: "https://hub.docker.com/r/arnoldsmith86/virtualtabletop"
         cpu_shares: "{{ virtualtabletop_cpu_shares }}"
@@ -67,7 +67,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (virtualtabletop_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (virtualtabletop_port_http | string)] +
                 (['https://' + virtualtabletop_hostname + '.' + ansible_nas_domain] if (virtualtabletop_available_externally is true or virtualtabletop_dockflare_tunnel is true) else [])
               }}
   when: virtualtabletop_enabled is true

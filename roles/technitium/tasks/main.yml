@@ -55,7 +55,7 @@
         pull: true
         dns_servers: "{{ technitium_dns }}"
         ports:
-          - "{{ technitium_port }}:{{ technitium_port }}"
+          - "{{ technitium_port_http }}:{{ technitium_port_http }}"
           - "53:53/udp" # DNS
           - "53:53/tcp" # DNS
           - "67:67/udp" # DHCP service
@@ -72,7 +72,7 @@
           - "{{ technitium_data_directory }}:/etc/dns"
         env:
           DNS_SERVER_DOMAIN: "{{ technitium_env_dns_server_domain }}"
-          DNS_SERVER_WEB_SERVICE_HTTP_PORT: "{{ technitium_port }}"
+          DNS_SERVER_WEB_SERVICE_HTTP_PORT: "{{ technitium_port_http }}"
           DNS_SERVER_ADMIN_PASSWORD: "{{ technitium_env_dns_server_password }}"
       # - DNS_SERVER_ADMIN_PASSWORD_FILE=password.txt #The path to a file that contains a plain text password for the DNS web console admin user.
       # - DNS_SERVER_PREFER_IPV6=false #DNS Server will use IPv6 for querying whenever possible with this option enabled.
@@ -98,7 +98,7 @@
           dockflare.enable: "{{ technitium_dockflare_tunnel }}"
           dockflare.access.group: "{{ technitium_dockflare_access_group }}"
           dockflare.hostname: "{{ technitium_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ technitium_homepage_group }}"
           homepage.icon: "{{ technitium_homepage_icon }}"
@@ -107,9 +107,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ technitium_container_name }}"
           homepage.showStats: "{{ technitium_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
           homepage.widget.type: "technitium"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
           homepage.widget.key: "{{ technitium_homepage_widget_key }}"
           homepage.widget.range: "{{ technitium_homepage_widget_range }}"
           traefik.enable: "{{ technitium_available_externally | string }}"
@@ -120,7 +120,7 @@
           traefik.http.routers.frontend.middlewares: "{{ technitium_hostname }}"
           traefik.http.routers.technitium.middlewares: "{{ technitium_hostname }}@docker"
           traefik.http.middlewares.technitium.IPAllowList.sourcerange: "{{ technitium_traefik_whitelist }}"
-          traefik.http.services.technitium.loadbalancer.server.port: "{{ technitium_port }}"
+          traefik.http.services.technitium.loadbalancer.server.port: "{{ technitium_port_http }}"
           wud.tag.include: '^\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/technitium/dns-server"
@@ -132,7 +132,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (technitium_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (technitium_port_http | string)] +
                 (['https://' + technitium_hostname + '.' + ansible_nas_domain] if (technitium_available_externally is true or technitium_dockflare_tunnel is true) else [])
               }}
   when: technitium_enabled is true

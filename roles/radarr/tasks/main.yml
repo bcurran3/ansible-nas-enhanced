@@ -21,7 +21,7 @@
           - "{{ radarr_anime_directory }}:/anime:rw"
           - "{{ radarr_movies_directory }}:/movies:rw"
         ports:
-          - "{{ radarr_port }}:7878"
+          - "{{ radarr_port_http }}:7878"
         env:
           DOCKER_MODS: "{{ radarr_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ radarr_env_docker_mods_install_packages }}"
@@ -39,18 +39,18 @@
           dockflare.enable: "{{ radarr_dockflare_tunnel }}"
           dockflare.access.group: "{{ radarr_dockflare_access_group }}"
           dockflare.hostname: "{{ radarr_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ radarr_homepage_group }}"
           homepage.icon: "{{ radarr_homepage_icon }}"
           homepage.href: "{{ radarr_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port_http }}"
           homepage.description: "{{ 'A fork of Sonarr to work with movies' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ radarr_container_name }}"
           homepage.showStats: "{{ radarr_homepage_showstats }}"      
           homepage.widget.type: "radarr"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ radarr_port_http }}"
           homepage.widget.key: "{{ radarr_homepage_widget_key }}"
           traefik.enable: "{{ radarr_available_externally | string }}"
           traefik.http.routers.radarr.rule: "Host(`{{ radarr_hostname }}.{{ ansible_nas_domain }}`)"
@@ -72,7 +72,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (radarr_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (radarr_port_http | string)] +
                 (['https://' + radarr_hostname + '.' + ansible_nas_domain] if (radarr_available_externally is true or radarr_dockflare_tunnel is true) else [])
               }}
   when: radarr_enabled is true

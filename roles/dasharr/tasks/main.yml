@@ -19,17 +19,17 @@
         volumes:
           - "{{ dasharr_data_directory }}/config:/app/config"
         ports:
-          - "{{ dasharr_port }}:{{ dasharr_port }}"
+          - "{{ dasharr_port_http }}:{{ dasharr_port_http }}"
         env:
           APP_URL: "{{ dasharr_env_app_url }}"
-          PORT: "{{ dasharr_port }}"
+          PORT: "{{ dasharr_port_http }}"
           PUID: "{{ dasharr_user_id }}"
           PGID: "{{ dasharr_group_id }}"
           SESSION_SECRET: "{{ dasharr_env_session_secret }}"
           TRUST_PROXY: "{{ dasharr_env_trust_proxy}}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "wget", "-q", "--spider", "http://localhost:{{ dasharr_port }}"]
+          test: ["CMD", "wget", "-q", "--spider", "http://localhost:{{ dasharr_port_http }}"]
           interval: 30s
           timeout: 10s
           retries: 3
@@ -40,7 +40,7 @@
           dockflare.enable: "{{ dasharr_dockflare_tunnel }}"
           dockflare.access.group: "{{ dasharr_dockflare_access_group }}"
           dockflare.hostname: "{{ dasharr_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dasharr_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dasharr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dasharr_homepage_group }}"
           homepage.icon: "{{ dasharr_homepage_icon }}"
@@ -49,7 +49,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ dasharr_container_name }}"
           homepage.showStats: "{{ dasharr_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dasharr_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dasharr_port_http }}"
           repliqate.enabled: "{{ dasharr_repliqate_enabled }}"
           repliqate.engine: "{{ dasharr_repliqate_engine }}"
           repliqate.schedule: "{{ dasharr_repliqate_schedule }}"
@@ -63,7 +63,7 @@
           traefik.http.routers.frontend.middlewares: "{{ dasharr_hostname }}"
           traefik.http.routers.dasharr.middlewares: "{{ dasharr_hostname }}@docker"
           traefik.http.middlewares.dasharr.IPAllowList.sourcerange: "{{ dasharr_traefik_whitelist }}"
-          traefik.http.services.dasharr.loadbalancer.server.port: "{{ dasharr_port }}"
+          traefik.http.services.dasharr.loadbalancer.server.port: "{{ dasharr_port_http }}"
           wud.watch.digest: "true"
           wud.link.template: "https://hub.docker.com/r/schenanigans/dasharr"
         cpu_shares: "{{ dasharr_cpu_shares }}"
@@ -74,7 +74,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dasharr_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dasharr_port_http | string)] +
                 (['https://' + dasharr_hostname + '.' + ansible_nas_domain] if (dasharr_available_externally is true or dasharr_dockflare_tunnel is true) else [])
               }}
   when: dasharr_enabled is true

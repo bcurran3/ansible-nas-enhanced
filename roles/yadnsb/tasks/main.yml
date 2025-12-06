@@ -9,7 +9,7 @@
         image: "{{ yadnsb_image_name }}:{{ yadnsb_image_tag }}"
         pull: true
         ports:
-          - "{{ yadnsb_port }}:3000"
+          - "{{ yadnsb_port_http }}:3000"
         env:
           TZ: "{{ ansible_nas_timezone }}"
 #        security_opt:
@@ -26,7 +26,7 @@
           dockflare.enable: "{{ yadnsb_dockflare_tunnel }}"
           dockflare.access.group: "{{ yadnsb_dockflare_access_group }}"
           dockflare.hostname: "{{ yadnsb_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ yadnsb_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ yadnsb_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ yadnsb_homepage_group }}"
           homepage.icon: "{{ yadnsb_homepage_icon }}"
@@ -35,7 +35,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ yadnsb_container_name }}"
           homepage.showStats: "{{ yadnsb_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ yadnsb_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ yadnsb_port_http }}"
           traefik.enable: "{{ yadnsb_available_externally | string }}"
           traefik.http.routers.yadnsb.rule: "Host(`{{ yadnsb_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.yadnsb.tls.certresolver: "letsencrypt"
@@ -56,7 +56,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (yadnsb_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (yadnsb_port_http | string)] +
                 (['https://' + yadnsb_hostname + '.' + ansible_nas_domain] if (yadnsb_available_externally is true or yadnsb_dockflare_tunnel is true) else [])
               }}
   when: yadnsb_enabled is true

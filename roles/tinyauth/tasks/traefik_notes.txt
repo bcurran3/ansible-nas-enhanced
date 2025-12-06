@@ -27,7 +27,7 @@ traefik.http.routers.tinyauth.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
 traefik.http.middlewares.tinyauth-ip-whitelist.ipallowlist.sourcerange: "{{ tinyauth_traefik_whitelist }}"
 
 # Define a separate middleware for ForwardAuth, to be used by other services.
-traefik.http.middlewares.tinyauth-forwardauth.forwardauth.address: "http://tinyauth:{{ tinyauth_port }}/api/auth/traefik"
+traefik.http.middlewares.tinyauth-forwardauth.forwardauth.address: "http://tinyauth:{{ tinyauth_port_http }}/api/auth/traefik"
 
 # ======================================================
 # Applying Middlewares to the Routers
@@ -47,4 +47,4 @@ traefik.http.routers.tinyauth.middlewares: "tinyauth-ip-whitelist@docker"
 
 # This is the correct way to define the port for the service.
 # Note: You can either define it explicitly or let Traefik discover it.
-traefik.http.services.tinyauth.loadbalancer.server.port: "{{ tinyauth_port }}"
+traefik.http.services.tinyauth.loadbalancer.server.port: "{{ tinyauth_port_http }}"

@@ -16,7 +16,7 @@
         image: "{{ silverbullet_image_name }}:{{ silverbullet_image_version }}"
         pull: true
         ports:
-          - "{{ silverbullet_port }}:3000"
+          - "{{ silverbullet_port_http }}:3000"
         volumes:
           - "{{ silverbullet_data_directory }}:/space"
         env:
@@ -28,7 +28,7 @@
           dockflare.enable: "{{ silverbullet_dockflare_tunnel }}"
           dockflare.access.group: "{{ silverbullet_dockflare_access_group }}"
           dockflare.hostname: "{{ silverbullet_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ silverbullet_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ silverbullet_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ silverbullet_homepage_group }}"
           homepage.icon: "{{ silverbullet_homepage_icon }}"
@@ -37,7 +37,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ silverbullet_container_name }}"
           homepage.showStats: "{{ silverbullet_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ silverbullet_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ silverbullet_port_http }}"
           traefik.enable: "{{ silverbullet_available_externally | string }}"
           traefik.http.routers.silverbullet.rule: "Host(`{{ silverbullet_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.silverbullet.tls.certresolver: "letsencrypt"
@@ -58,7 +58,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (silverbullet_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (silverbullet_port_http | string)] +
                 (['https://' + silverbullet_hostname + '.' + ansible_nas_domain] if (silverbullet_available_externally is true or silverbullet_dockflare_tunnel is true) else [])
               }}
   when: silverbullet_enabled is true

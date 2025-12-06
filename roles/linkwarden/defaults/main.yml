@@ -21,7 +21,7 @@ linkwarden_search_image_tag: "v1.12.8"
 
 
 # network
-linkwarden_port: "8990"
+linkwarden_port_http: "8990"
 linkwarden_hostname: "linkwarden"
 linkwarden_db_hostname: "linkwarden-db"
 linkwarden_search_hostname: "linkwarden-search"
@@ -46,7 +46,7 @@ linkwarden_env_base_url: ""
 # openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32 && echo
 linkwarden_env_meili_master_key: "2rbQOk9coKHYxtJV5YMMxtorZVBePA8U"
 linkwarden_env_nextauth_secret: "GrK3u5Ajv6ra2JINwQsL9UsWbhbb2YTo"
-linkwarden_env_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}/api/v1/auth"
+linkwarden_env_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port_http }}/api/v1/auth"
 linkwarden_env_postgres_user: "postgres"
 linkwarden_env_postgres_password: "linkwarden"
 
@@ -62,15 +62,15 @@ linkwarden_dockflare_access_group: ""
 # homepage
 linkwarden_homepage_group: "Apps"
 linkwarden_homepage_icon: "linkwarden.png"
-linkwarden_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}"
+linkwarden_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port_http }}"
 linkwarden_homepage_showstats: "false"
 linkwarden_db_homepage_group: "DBs"
 linkwarden_db_homepage_icon: "postgres.png"
-linkwarden_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}"
+linkwarden_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port_http }}"
 linkwarden_db_homepage_showstats: "false"
 linkwarden_search_homepage_group: "Misc"
 linkwarden_search_homepage_icon: "meilisearch.png"
-linkwarden_search_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port }}"
+linkwarden_search_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port_http }}"
 linkwarden_search_homepage_showstats: "false"
 
 # watchtower

@@ -22,8 +22,8 @@
         volumes:
           - "{{ mumble_data_directory }}:/data:rw"
         ports:
-          - "{{ mumble_tcp_port }}:64738/tcp"
-          - "{{ mumble_udp_port }}:64738/udp"
+          - "{{ mumble_port_tcp }}:64738/tcp"
+          - "{{ mumble_port_udp }}:64738/udp"
         env:
           MUMBLE_CONFIG_SERVER_PASSWORD: "{{ mumble_server_password }}"
         labels:
@@ -32,7 +32,7 @@
           dockflare.enable: "{{ mumble_dockflare_tunnel }}"
           dockflare.access.group: "{{ mumble_dockflare_access_group }}"
           dockflare.hostname: "{{ mumble_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_tcp_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port_tcp }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mumble_homepage_group }}"
           homepage.icon: "{{ mumble_homepage_icon }}"
@@ -41,7 +41,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ mumble_container_name }}"
           homepage.showStats: "{{ mumble_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_tcp_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port_tcp }}"
           traefik.enable: "{{ mumble_available_externally | string }}"
           traefik.http.routers.mumble.rule: "Host(`{{ mumble_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.mumble.tls.certresolver: "letsencrypt"
@@ -62,7 +62,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mumble_tcp_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mumble_port_tcp | string)] +
                 (['https://' + mumble_hostname + '.' + ansible_nas_domain] if (mumble_available_externally is true or mumble_dockflare_tunnel is true) else [])
               }}
   when: mumble_enabled is true

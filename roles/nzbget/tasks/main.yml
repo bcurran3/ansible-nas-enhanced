@@ -19,7 +19,7 @@
           - "{{ nzbget_download_directory }}:/downloads:rw"
           - "{{ nzbget_data_directory }}:/config:rw"
         ports:
-          - "{{ nzbget_port }}:6789"
+          - "{{ nzbget_port_http }}:6789"
         env:
           DOCKER_MODS: "{{ nzbget_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ nzbget_env_docker_mods_install_packages }}"
@@ -37,7 +37,7 @@
           dockflare.enable: "{{ nzbget_dockflare_tunnel }}"
           dockflare.access.group: "{{ nzbget_dockflare_access_group }}"
           dockflare.hostname: "{{ nzbget_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nzbget_port }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nzbget_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ nzbget_homepage_group }}"
           homepage.icon: "{{ nzbget_homepage_icon }}"
@@ -46,7 +46,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ nzbget_container_name }}"
           homepage.showStats: "{{ nzbget_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nzbget_port }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nzbget_port_http }}"
           traefik.enable: "{{ nzbget_available_externally | string }}"
           traefik.http.routers.nzbget.rule: "Host(`{{ nzbget_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.nzbget.tls.certresolver: "letsencrypt"
@@ -67,7 +67,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (nzbget_port | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (nzbget_port_http | string)] +
                 (['https://' + nzbget_hostname + '.' + ansible_nas_domain] if (nzbget_available_externally is true or nzbget_dockflare_tunnel is true) else [])
               }}
   when: nzbget_enabled is true
