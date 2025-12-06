@@ -37,7 +37,7 @@
           homepage.group: "{{ prunemate_homepage_group }}"
           homepage.icon: "{{ prunemate_homepage_icon }}"
           homepage.href: "{{ prunemate_homepage_href }}"
-          homepage.description: "{{ 'prunemate description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'Docker image & resource cleanup helper, on a schedule!' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ prunemate_container_name }}"
           homepage.showStats: "{{ prunemate_homepage_showstats }}"
@@ -56,15 +56,9 @@
           traefik.http.routers.prunemate.middlewares: "{{ prunemate_hostname }}@docker"
           traefik.http.middlewares.prunemate.IPAllowList.sourcerange: "{{ prunemate_traefik_whitelist }}"
           traefik.http.services.prunemate.loadbalancer.server.port: "8080"
-          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/devname/prunemate"
-#          wud.tag.include: '^\d+\.\d+\.\d+$'
-#          wud.tag.transform.type: "semver"
-#          wud.link.template: "https://github.com/dev/prunemate/pkgs/container/prunemate"
-#          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-#          wud.tag.transform.type: "semver"
-#          wud.link.template: "https://lscr.io/linuxserver/prunemate"
+          wud.link.template: "https://hub.docker.com/r/anoniemerd/prunemate"
         cpu_shares: "{{ prunemate_cpu_shares }}"
         memory: "{{ prunemate_memory }}"
         restart_policy: unless-stopped
