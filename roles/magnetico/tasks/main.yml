@@ -1,7 +1,5 @@
 ---
-# WIP
-# need sudo touch credentials to config dir
-# add admin:$2y$12$yOtVgiZRJ.l9ecjFYPW11e0N19PNs3jcbxDTund57DRs26..jNGaq for admin/topsecret
+# This app was archived by the owner on Jan 20, 2022.
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -13,7 +11,22 @@
         - "{{ magnetico_data_directory }}/config"
         - "{{ magnetico_data_directory }}/data"
 
-    - name: Create {{ ansible_nas_app_name }}d Container
+    - name: Install python3-passlib package
+      ansible.builtin.apt:
+        pkg:
+          - python3-passlib
+        state: present
+
+    - name: Create {{ ansible_nas_app_name }} Web UI password file
+      community.general.htpasswd:
+        path: "{{ magnetico_data_directory }}/config/credentials"
+        name: "{{ magnetico_username }}"
+        password: "{{ magnetico_password }}"
+        crypt_scheme: bcrypt
+        mode: '0640'
+        create: true
+
+    - name: Create {{ ansible_nas_app_name }} Crawler Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ magneticod_container_name }}"
@@ -31,10 +44,10 @@
           autoheal: "{{ magneticod_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enable }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}d"
+          homepage.name: "{{ ansible_nas_app_name }} Crawler"
           homepage.group: "{{ magneticod_homepage_group }}"
-          homepage.icon: "{{ magneticod_homepage_icon }}"
-          homepage.href: "{{ magneticod_homepage_href }}"
+          homepage.icon: "{{ magnetico_homepage_icon }}"
+          homepage.href: "{{ magnetico_homepage_href }}"
           homepage.description: "{{ 'Autonomous (self-hosted) BitTorrent DHT search engine suite.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ magneticod_container_name }}"
@@ -47,23 +60,22 @@
         memory: "{{ magneticod_memory }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }}w Container
+    - name: Create {{ ansible_nas_app_name }} Web UI Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ magneticow_container_name }}"
+        hostname: "{{ magneticow_container_name }}"
         image: "{{ magneticow_image_name }}:{{ magneticow_image_tag }}"
         pull: true
-        links:
-          - "{{ magnetico_container2_name }}"
-        volumes:
-          - "{{ magnetico_data_directory }}/data:/root/.local/share/magneticod/"
-          - "{{ magnetico_data_directory }}/config:/root/.config/magneticow"
         ports:
           - "{{ magnetico_port_http }}:8080"
-        dns_servers: "{{ ansible_nas_dns }}"
-        hostname: "{{ magneticow_container_name }}"
+        volumes:
+          - "{{ magnetico_data_directory }}/config:/root/.config/magneticow"
+          - "{{ magnetico_data_directory }}/data:/root/.local/share/magneticod/"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ magneticod_container_name }}"
         labels:
           autoheal: "{{ magneticow_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enable }}"
@@ -107,12 +119,12 @@
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }}w Container
+    - name: Stop {{ ansible_nas_app_name }} Web UI Container
       community.docker.docker_container:
         name: "{{ magneticow_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }}d Container
+    - name: Stop {{ ansible_nas_app_name }} Crawler Container
       community.docker.docker_container:
         name: "{{ magneticod_container_name }}"
         state: absent

@@ -12,16 +12,20 @@ magnetico_hostname: "magnetico"
 magnetico_port_http: "8092"
 
 # docker
-magneticod_container_name: "magneticod"
+magneticod_container_name: "magnetico-crawler"
 magneticod_image_name: "boramalper/magneticod"
 magneticod_image_tag: "latest"
 magneticod_cpu_shares: "1024"
 magneticod_memory: "1g"
-magneticow_container_name: "magneticow"
+magneticow_container_name: "magnetico"
 magneticow_image_name: "boramalper/magneticow"
 magneticow_image_tag: "latest"
 magneticow_cpu_shares: "1024"
 magneticow_memory: "1g"
+
+# app
+magnetico_username: "{{ ansible_nas_user }}"
+magnetico_password: "{{ ansible_nas_app_admin_password }}"
 
 # autoheal
 magneticod_autoheal: "false"
@@ -36,8 +40,7 @@ magnetico_homepage_group: "Apps"
 magnetico_homepage_icon: "magnetico.png"
 magnetico_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ magnetico_port_http }}"
 magnetico_homepage_showstats: "false"
-magneticod_homepage_group: "Apps"
-magneticod_homepage_icon: "magnetico.png"
+magneticod_homepage_group: "Misc"
 magneticod_homepage_showstats: "false"
 
 # watchtower
