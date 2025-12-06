@@ -62,9 +62,9 @@
           traefik.http.routers.wud.middlewares: "{{ wud_hostname }}@docker"
           traefik.http.middlewares.wud.IPAllowList.sourcerange: "{{ wud_traefik_whitelist }}"
           traefik.http.services.wud.loadbalancer.server.port: "3000"
-          wud.tag.include: '^v\\d+\\.\\d+\\.\\d+$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/orgs/getwud/packages/container/wud"
+          wud.link.template: "https://github.com/getwud/wud/pkgs/container/wud"
         cpu_shares: "{{ wud_cpu_shares }}"
         memory: "{{ wud_memory }}"
         restart_policy: unless-stopped

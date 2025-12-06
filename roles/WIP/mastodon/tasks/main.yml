@@ -175,9 +175,9 @@
 #         https://docs.linuxserver.io/FAQ/#strict-proxy-traefik
           traefik.http.services.mastodon.loadbalancer.serverstransport: "ignorecert"
           traefik.http.services.mastodon.loadbalancer.server.scheme: "https"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/mastodon/mastodon/releases"
+          wud.link.template: "https://github.com/mastodon/mastodon/pkgs/container/mastodon"
         cpu_shares: "{{ mastodon_cpu_shares }}"
         memory: "{{ mastodon_memory }}"
         restart_policy: unless-stopped

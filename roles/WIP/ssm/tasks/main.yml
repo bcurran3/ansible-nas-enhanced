@@ -107,8 +107,9 @@
           traefik.http.routers.ssm.middlewares: "{{ ssm_hostname }}@docker"
           traefik.http.middlewares.ssm.IPAllowList.sourcerange: "{{ ssm_traefik_whitelist }}"
           traefik.http.services.ssm.loadbalancer.server.port: "8000"
-#          wud.tag.include: '^\d+\.\d+\.\d+$$'
-#          wud.link.template: "https://github.com/dev/ssm/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/SquirrelCorporation/SquirrelServersManager/pkgs/container/squirrelserversmanager-client"
         cpu_shares: "{{ ssm_client_cpu_shares }}"
         memory: "{{ ssm_client_memory }}"
         restart_policy: unless-stopped
@@ -151,9 +152,9 @@
           autoheal: "{{ ssm_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ ssm_watchtower_enable }}"
           dockflare.enable: "false"
-          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/Squirrel-Corporation/SquirrelServersManager/releases"
+          wud.link.template: "https://github.com/SquirrelCorporation/SquirrelServersManager/pkgs/container/squirrelserversmanager-server"
         cpu_shares: "{{ ssm_cpu_shares }}"
         memory: "{{ ssm_memory }}"
         restart_policy: unless-stopped

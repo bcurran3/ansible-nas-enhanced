@@ -60,9 +60,9 @@
           traefik.http.routers.windows.middlewares: "{{ windows_hostname }}@docker"
           traefik.http.middlewares.windows.IPAllowList.sourcerange: "{{ windows_traefik_whitelist }}"
           traefik.http.services.windows.loadbalancer.server.port: "8006"
-          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/dockurr/windows"
+          wud.link.template: "https://github.com/dockur/windows/pkgs/container/windows"
         cpu_shares: "{{ windows_cpu_shares }}"
         memory: "{{ windows_memory_size }}"
         restart_policy: unless-stopped
