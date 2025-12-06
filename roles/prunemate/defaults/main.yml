@@ -1,0 +1,49 @@
+---
+# ANE
+ansible_nas_app_name: "PruneMate"
+prunemate_enabled: false
+prunemate_available_externally: false
+prunemate_traefik_whitelist: "{{ lan }}"
+
+# directories
+prunemate_data_directory: "{{ docker_home }}/prunemate"
+
+# docker
+prunemate_container_name: "prunemate"
+prunemate_image_name: "anoniemerd/prunemate"
+prunemate_image_tag: "latest"
+
+# network
+prunemate_port_http: "7676"
+prunemate_hostname: "prunemate"
+
+# specs
+prunemate_cpu_shares: "1024"
+prunemate_memory: 1g
+
+# app
+prunemate_env_prunemate_tz: "{{ ansible_nas_timezone }}"
+prunemate_env_prunemate_time_24h: "true" #false for 12-Hour format (AM/PM)
+
+# autoheal
+prunemate_autoheal: "false"
+
+# dockflare
+prunemate_dockflare_tunnel: "false"
+prunemate_dockflare_access_group: ""
+
+# homepage
+prunemate_homepage_group: "Apps"
+prunemate_homepage_icon: "sh-prunemate.png"
+prunemate_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prunemate_port_http }}"
+prunemate_homepage_showstats: "false"
+
+# repliqate
+prunemate_repliqate_enabled: "false"
+prunemate_repliqate_engine: "restic"
+prunemate_repliqate_schedule: "@daily 3am"
+prunemate_repliqate_backup_id: "prunemate"
+prunemate_repliqate_retention: "30d"
+
+# watchtower
+prunemate_watchtower_enable: "false"

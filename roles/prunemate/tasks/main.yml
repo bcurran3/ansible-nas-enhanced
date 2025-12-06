@@ -1,0 +1,107 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ prunemate_data_directory }}"
+        - "{{ prunemate_data_directory }}/config"
+        - "{{ prunemate_data_directory }}/logs"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ prunemate_container_name }}"
+        hostname: "{{ prunemate_container_name }}"
+        image: "{{ prunemate_image_name }}:{{ prunemate_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ prunemate_data_directory }}/config:/config"
+          - "{{ prunemate_data_directory }}/logs:/var/log"
+        ports:
+          - "{{ prunemate_port_http }}:8080"
+        env:
+          PRUNEMATE_TZ: "{{ prunemate_env_prunemate_tz }}"
+          PRUNEMATE_TIME_24H: "{{ prunemate_env_prunemate_time_24h }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ prunemate_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ prunemate_watchtower_enable }}"
+          dockflare.enable: "{{ prunemate_dockflare_tunnel }}"
+          dockflare.access.group: "{{ prunemate_dockflare_access_group }}"
+          dockflare.hostname: "{{ prunemate_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prunemate_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ prunemate_homepage_group }}"
+          homepage.icon: "{{ prunemate_homepage_icon }}"
+          homepage.href: "{{ prunemate_homepage_href }}"
+          homepage.description: "{{ 'prunemate description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ prunemate_container_name }}"
+          homepage.showStats: "{{ prunemate_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prunemate_port_http }}"
+          repliqate.enabled: "{{ prunemate_repliqate_enabled }}"
+          repliqate.engine: "{{ prunemate_repliqate_engine }}"
+          repliqate.schedule: "{{ prunemate_repliqate_schedule }}"
+          repliqate.backup_id: "{{ prunemate_repliqate_backup_id }}"
+          repliqate.retention: "{{ prunemate_repliqate_retention }}"
+          traefik.enable: "{{ prunemate_available_externally | string }}"
+          traefik.http.routers.prunemate.rule: "Host(`{{ prunemate_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.prunemate.tls.certresolver: "letsencrypt"
+          traefik.http.routers.prunemate.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.prunemate.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ prunemate_hostname }}"
+          traefik.http.routers.prunemate.middlewares: "{{ prunemate_hostname }}@docker"
+          traefik.http.middlewares.prunemate.IPAllowList.sourcerange: "{{ prunemate_traefik_whitelist }}"
+          traefik.http.services.prunemate.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/devname/prunemate"
+#          wud.tag.include: '^\d+\.\d+\.\d+$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://github.com/dev/prunemate/pkgs/container/prunemate"
+#          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://lscr.io/linuxserver/prunemate"
+        cpu_shares: "{{ prunemate_cpu_shares }}"
+        memory: "{{ prunemate_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (prunemate_port_http | string)] +
+                (['https://' + prunemate_hostname + '.' + ansible_nas_domain] if (prunemate_available_externally is true or prunemate_dockflare_tunnel is true) else [])
+              }}
+  when: prunemate_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ prunemate_container_name }}"
+        state: absent
+  when: prunemate_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ prunemate_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ prunemate_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: prunemate_enabled is false and archive_app_data_enabled is true
