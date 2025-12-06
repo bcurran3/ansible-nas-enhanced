@@ -9,7 +9,11 @@
         state: directory
       with_items:
         - "{{ openpaymenthost_data_directory }}"
-        - "{{ openpaymenthost_data_directory }}/exec"
+        - "{{ openpaymenthost_data_directory }}/certs"
+        - "{{ openpaymenthost_data_directory }}/db"
+        - "{{ openpaymenthost_data_directory }}/log"
+        - "{{ openpaymenthost_data_directory }}/public"
+        - "{{ openpaymenthost_data_directory }}/secrets"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,12 +22,15 @@
         hostname: "{{ openpaymenthost_container_name }}"
         image: "{{ openpaymenthost_image_name }}:{{ openpaymenthost_image_tag }}"
         pull: true
-        volumes:
-#          - "{{ openpaymenthost_data_directory }}:/home/default/build"
-#          - "{{ openpaymenthost_data_directory }}/exec:/home/default/build/exec"
-#        command: "/home/default/build/exec/open-payment-host"
+        command: "/home/default/build/exec/open-payment-host"
         ports:
-          - "{{ openpaymenthost_port_http }}:3000"
+          - "{{ openpaymenthost_port_http }}:80"
+        volumes:
+          - "{{ openpaymenthost_data_directory }}/certs:/home/default/build/certs"
+          - "{{ openpaymenthost_data_directory }}/db:/home/default/build/db"
+          - "{{ openpaymenthost_data_directory }}/log:/home/default/build/log"
+          - "{{ openpaymenthost_data_directory }}/public:/home/default/build/public"
+          - "{{ openpaymenthost_data_directory }}/secrets:/home/default/build/secrets"
         env:
           FRAG_ENV: "production"
           TZ: "{{ ansible_nas_timezone }}"
@@ -51,7 +58,7 @@
           traefik.http.routers.frontend.middlewares: "{{ openpaymenthost_hostname }}"
           traefik.http.routers.openpaymenthost.middlewares: "{{ openpaymenthost_hostname }}@docker"
           traefik.http.middlewares.openpaymenthost.IPAllowList.sourcerange: "{{ openpaymenthost_traefik_whitelist }}"
-          traefik.http.services.openpaymenthost.loadbalancer.server.port: "{{ openpaymenthost_port_http }}"
+          traefik.http.services.openpaymenthost.loadbalancer.server.port: "80"
           wud.tag.include: '/^\\d+\\.\\d+\\.\\d+$/'
           wud.tag.transform.type: "semver"
           wud.link.template: 'https://hub.docker.com/r/abishekmuthian/open-payment-host'
