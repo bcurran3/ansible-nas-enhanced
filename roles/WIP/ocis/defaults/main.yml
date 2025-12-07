@@ -1,0 +1,55 @@
+---
+# ANE
+ansible_nas_app_name: "ownCloud Infinite Scale (oCIS)"
+ocis_enabled: false
+ocis_available_externally: false
+ocis_traefik_whitelist: "{{ lan }}"
+
+# directories
+ocis_data_directory: "{{ docker_home }}/ocis"
+
+# docker
+ocis_container_name: "ocis"
+ocis_image_name: "owncloud/ocis"
+ocis_image_tag: "latest"
+
+# uid / gid
+ocis_user_id: "0"
+ocis_group_id: "0"
+
+# network
+ocis_port_http: "9200"
+ocis_hostname: "ocis"
+
+# specs
+ocis_cpu_shares: "1024"
+ocis_memory: 1g
+
+# app
+ocis_env_ocis_insecure: "true"
+ocis_env_proxy_http_addr: "0.0.0.0:9200 "
+#ocis_env_ocis_url: "https://localhost:9200"
+ocis_env_ocis_url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ocis_port_http }}"
+
+# autoheal
+ocis_autoheal: "false"
+
+# dockflare
+ocis_dockflare_tunnel: "false"
+ocis_dockflare_access_group: ""
+
+# homepage
+ocis_homepage_group: "Apps"
+ocis_homepage_icon: "owncloud.png"
+ocis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ocis_port_http }}"
+ocis_homepage_showstats: "false"
+
+# repliqate
+ocis_repliqate_enabled: "false"
+ocis_repliqate_engine: "restic"
+ocis_repliqate_schedule: "@daily 3am"
+ocis_repliqate_backup_id: "ocis"
+ocis_repliqate_retention: "30d"
+
+# watchtower
+ocis_watchtower_enable: "false"

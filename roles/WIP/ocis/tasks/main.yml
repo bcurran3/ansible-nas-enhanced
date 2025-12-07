@@ -1,0 +1,151 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+      with_items:
+        - "{{ ocis_data_directory }}"
+        - "{{ ocis_data_directory }}/config"
+        - "{{ ocis_data_directory }}/data"
+
+    - name: Initialize {{ ansible_nas_app_name }}
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "ocis-init"
+        hostname: "ocis-init"
+        image: "{{ ocis_image_name }}:{{ ocis_image_tag }}"
+        pull: true
+        command: "init --insecure yes"
+        volumes:
+          - "{{ ocis_data_directory }}/config:/etc/ocis"
+          - "{{ ocis_data_directory }}/data:/var/lib/ocis"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "false"
+          dockflare.enable: "false"
+          repliqate.enabled: "false"
+          traefik.enable: "false"
+        cleanup: true
+        detach: false
+      ignore_errors: true
+      register: ocis_output
+
+    - name: Display {{ ansible_nas_app_name }} initial admin password
+      ansible.builtin.debug:
+        msg: "{{ ocis_output.container.Output.split('\n') }}"
+      failed_when: false
+
+    - name: Pause to copy admin password
+      ansible.builtin.pause:
+        seconds: 30
+        prompt: "Copy and paste that password NOW!"
+      when: ocis_output is succeeded
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ ocis_container_name }}"
+        hostname: "{{ ocis_container_name }}"
+        image: "{{ ocis_image_name }}:{{ ocis_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ ocis_data_directory }}/config:/etc/ocis"
+          - "{{ ocis_data_directory }}/data:/var/lib/ocis"
+        ports:
+          - "{{ ocis_port_http }}:9200"
+        env:
+          OCIS_CONFIG_DIR: "/etc/ocis"
+          OCIS_DATA_DIR: "/var/lib/ocis"
+          OCIS_DOMAIN: "{{ ocis_hostname }}.{{ ansible_nas_domain }}"
+          OCIS_INSECURE: "{{ ocis_env_ocis_insecure }}"
+          OCIS_URL: "{{ ocis_env_ocis_url }}"
+#         COLLABORA_DOMAIN: "{{ collabora_hostname }}.{{ ansible_nas_domain }}"
+#         ONLYOFFICE_DOMAIN: "{{ onlyoffice_hostname }}.{{ ansible_nas_domain }}"
+          PROXY_HTTP_ADDR: "{{ ocis_env_proxy_http_addr }}"
+          SMTP_HOST: ""
+          SMTP_PORT: ""
+          SMTP_SENDER: "ocis <noreply@yourdomain.com>"
+          SMTP_USERNAME: ""
+          SMTP_PASSWORD: ""
+          SMTP_AUTHENTICATION: ""
+          SMTP_SECURITY: ""
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ ocis_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ ocis_watchtower_enable }}"
+          dockflare.enable: "{{ ocis_dockflare_tunnel }}"
+          dockflare.access.group: "{{ ocis_dockflare_access_group }}"
+          dockflare.hostname: "{{ ocis_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ocis_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ ocis_homepage_group }}"
+          homepage.icon: "{{ ocis_homepage_icon }}"
+          homepage.href: "{{ ocis_homepage_href }}"
+          homepage.description: "{{ 'new file sync & share platform that will be the foundation of your data management platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ ocis_container_name }}"
+          homepage.showStats: "{{ ocis_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ocis_port_http }}"
+          repliqate.enabled: "{{ ocis_repliqate_enabled }}"
+          repliqate.engine: "{{ ocis_repliqate_engine }}"
+          repliqate.schedule: "{{ ocis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ ocis_repliqate_backup_id }}"
+          repliqate.retention: "{{ ocis_repliqate_retention }}"
+          traefik.enable: "false"
+#          traefik.enable: "{{ ocis_available_externally | string }}"
+          traefik.http.routers.ocis.rule: "Host(`{{ ocis_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.ocis.tls.certresolver: "letsencrypt"
+          traefik.http.routers.ocis.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.ocis.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ ocis_hostname }}"
+          traefik.http.routers.ocis.middlewares: "{{ ocis_hostname }}@docker"
+          traefik.http.middlewares.ocis.IPAllowList.sourcerange: "{{ ocis_traefik_whitelist }}"
+          traefik.http.services.ocis.loadbalancer.server.port: "9200"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/owncloud/ocis"
+        cpu_shares: "{{ ocis_cpu_shares }}"
+        memory: "{{ ocis_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ocis_port_http | string)] +
+                (['https://' + ocis_hostname + '.' + ansible_nas_domain] if (ocis_available_externally is true or ocis_dockflare_tunnel is true) else [])
+              }}
+  when: ocis_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ ocis_container_name }}"
+        state: absent
+  when: ocis_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ ocis_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ ocis_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: ocis_enabled is false and archive_app_data_enabled is true
