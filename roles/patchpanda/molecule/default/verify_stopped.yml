@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }}
+      community.docker.docker_container:
+        name: "{{ patchpanda_container_name }}"
+        state: absent
+      register: result
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} Apprise API
+      community.docker.docker_container:
+        name: "{{ patchpanda_apprise_container_name }}"
+        state: absent
+      register: result_apprise
+
+    - name: Check if {{ ansible_nas_app_name }} is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed
+          - not result_aprise.changed

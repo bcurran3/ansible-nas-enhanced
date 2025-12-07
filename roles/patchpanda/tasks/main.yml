@@ -1,0 +1,150 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ patchpanda_data_directory }}"
+        - "{{ patchpanda_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Apprise Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ patchpanda_apprise_container_name }}"
+        hostname: "{{ patchpanda_apprise_container_name }}"
+        image: "{{ patchpanda_apprise_image_name }}:{{ patchpanda_apprise_image_tag }}"
+        pull: true
+#       ports:
+#         - 6603:8000
+        env:
+          APPRISE_STATEFUL_MODE: "disabled"
+          APPRISE_WORKER_COUNT: "{{ patchpanda_apprise_env_apprise_worker_count }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ patchpanda_apprise_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchpanda_apprise_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Apprise API"
+          homepage.group: "{{ patchpanda_apprise_homepage_group }}"
+          homepage.icon: "{{ patchpanda_apprise_homepage_icon }}"
+          homepage.href: "{{ patchpanda_apprise_homepage_href }}"
+          homepage.description: "{{ 'Apprise' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ patchpanda_apprise_container_name }}"
+          homepage.showStats: "{{ patchpanda_apprise_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+          repliqate.enabled: "false"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/caronc/apprise"
+        cpu_shares: "{{ patchpanda_apprise_cpu_shares }}"
+        memory: "{{ patchpanda_apprise_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ patchpanda_container_name }}"
+        hostname: "{{ patchpanda_container_name }}"
+        image: "{{ patchpanda_image_name }}:{{ patchpanda_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ patchpanda_data_directory }}/data:/app/data"
+          - "{{ docker_compose_data_directory }}:/srv/www"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+          - "{{ patchpanda_port_http }}:8080"
+        env:
+          APPRISE_API_URL: "{{ patchpanda_env_apprise_api_url }}"
+          APPRISE_NOTIFICATION_URLS: "{{ patchpanda_env_apprise_notification_urls }}"
+          DISCORD_WEBHOOK_URL: "{{ patchpanda_env_webhook_url }}"
+          GITHUB_USERNAME: "{{ patchpanda_env_github_username }}"
+          GITHUB_PASSWORD: "{{ patchpanda_env_github_password }}"
+          BASE_URL: "{{ patchpanda_env_base_url }}"
+          PORTAINER_URL: "{{ patchpanda_env_portainer_url }}"
+          PORTAINER_USERNAME: "{{ patchpanda_env_portainer_username }}"
+          PORTAINER_PASSWORD: "{{ patchpanda_env_portainer_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ patchpanda_apprise_container_name }}"
+        labels:
+          autoheal: "{{ patchpanda_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchpanda_watchtower_enable }}"
+          dockflare.enable: "{{ patchpanda_dockflare_tunnel }}"
+          dockflare.access.group: "{{ patchpanda_dockflare_access_group }}"
+          dockflare.hostname: "{{ patchpanda_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ patchpanda_homepage_group }}"
+          homepage.icon: "{{ patchpanda_homepage_icon }}"
+          homepage.href: "{{ patchpanda_homepage_href }}"
+          homepage.description: "{{ 'Self-hostable Docker Compose stack update manager.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ patchpanda_container_name }}"
+          homepage.showStats: "{{ patchpanda_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+          repliqate.enabled: "{{ patchpanda_repliqate_enabled }}"
+          repliqate.engine: "{{ patchpanda_repliqate_engine }}"
+          repliqate.schedule: "{{ patchpanda_repliqate_schedule }}"
+          repliqate.backup_id: "{{ patchpanda_repliqate_backup_id }}"
+          repliqate.retention: "{{ patchpanda_repliqate_retention }}"
+          traefik.enable: "{{ patchpanda_available_externally | string }}"
+          traefik.http.routers.patchpanda.rule: "Host(`{{ patchpanda_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.patchpanda.tls.certresolver: "letsencrypt"
+          traefik.http.routers.patchpanda.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.patchpanda.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ patchpanda_hostname }}"
+          traefik.http.routers.patchpanda.middlewares: "{{ patchpanda_hostname }}@docker"
+          traefik.http.middlewares.patchpanda.IPAllowList.sourcerange: "{{ patchpanda_traefik_whitelist }}"
+          traefik.http.services.patchpanda.loadbalancer.server.port: "8080"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/dkorecko/PatchPanda/pkgs/container/patchpanda"
+        cpu_shares: "{{ patchpanda_cpu_shares }}"
+        memory: "{{ patchpanda_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (patchpanda_port_http | string)] +
+                (['https://' + patchpanda_hostname + '.' + ansible_nas_domain] if (patchpanda_available_externally is true or patchpanda_dockflare_tunnel is true) else [])
+              }}
+  when: patchpanda_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Apprise API Container
+      community.docker.docker_container:
+        name: "{{ patchpanda_apprise_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ patchpanda_container_name }}"
+        state: absent
+  when: patchpanda_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ patchpanda_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ patchpanda_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: patchpanda_enabled is false and archive_app_data_enabled is true

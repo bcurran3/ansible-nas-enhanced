@@ -1,0 +1,68 @@
+---
+# ANE
+ansible_nas_app_name: "PatchPanda"
+patchpanda_enabled: false
+patchpanda_available_externally: false
+patchpanda_traefik_whitelist: "{{ lan }}"
+
+# directories
+patchpanda_data_directory: "{{ docker_home }}/patchpanda"
+
+# docker
+patchpanda_container_name: "patchpanda"
+patchpanda_image_name: "ghcr.io/dkorecko/patchpanda"
+patchpanda_image_tag: "latest"
+patchpanda_apprise_container_name: "patchpanda-apprise"
+patchpanda_apprise_image_name: "caronc/apprise"
+patchpanda_apprise_image_tag: "latest"
+
+# network
+patchpanda_port_http: "5093"
+patchpanda_hostname: "patchpanda"
+
+# specs
+patchpanda_cpu_shares: "1024"
+patchpanda_memory: 1g
+patchpanda_apprise_cpu_shares: "1024"
+patchpanda_apprise_memory: 512M
+
+# app
+patchpanda_env_apprise_api_url: "http://{{ patchpanda_apprise_container_name }}:8000"
+patchpanda_env_apprise_notification_urls: "" # discord://webhook_id/webhook_token,mailto://user:password@gmail.com # optional, comma-separated list of Apprise notification URLs
+patchpanda_env_webhook_url: "" # https://discord.com/api/webhooks/... # optional, use your discord webhook URL here for the direct discord integration
+patchpanda_env_github_username: "" # use your GitHub username here
+patchpanda_env_github_password: "" # use your GitHub personal access token here
+patchpanda_env_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+patchpanda_env_portainer_url: "" # "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port_http }}" # if you wish to include stacks fully managed by Portainer
+patchpanda_env_portainer_username: "" # if you wish to include stacks fully managed by Portainer
+patchpanda_env_portainer_password: "" # if you wish to include stacks fully managed by Portainer
+patchpanda_apprise_env_apprise_worker_count: "2"
+
+# autoheal
+patchpanda_autoheal: "false"
+patchpanda_apprise_autoheal: "false"
+
+# dockflare
+patchpanda_dockflare_tunnel: "false"
+patchpanda_dockflare_access_group: ""
+
+# homepage
+patchpanda_homepage_group: "Apps"
+patchpanda_homepage_icon: "patchpanda.png"
+patchpanda_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+patchpanda_homepage_showstats: "false"
+patchpanda_apprise_homepage_group: "Misc"
+patchpanda_apprise_homepage_icon: "patchpanda.png"
+patchpanda_apprise_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+patchpanda_apprise_homepage_showstats: "false"
+
+# repliqate
+patchpanda_repliqate_enabled: "false"
+patchpanda_repliqate_engine: "restic"
+patchpanda_repliqate_schedule: "@daily 3am"
+patchpanda_repliqate_backup_id: "patchpanda"
+patchpanda_repliqate_retention: "30d"
+
+# watchtower
+patchpanda_watchtower_enable: "false"
+patchpanda_apprise_watchtower_enable: "false"
