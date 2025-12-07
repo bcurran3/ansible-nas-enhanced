@@ -1,0 +1,99 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ cleanuparr_data_directory }}"
+        - "{{ cleanuparr_data_directory }}/config"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ cleanuparr_container_name }}"
+        hostname: "{{ cleanuparr_container_name }}"
+        image: "{{ cleanuparr_image_name }}:{{ cleanuparr_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ cleanuparr_data_directory }}/config:/config"
+        ports:
+          - "{{ cleanuparr_port_http }}:11011"
+        env:
+          PUID: "{{ cleanuparr_user_id }}"
+          PGID: "{{ cleanuparr_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ cleanuparr_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ cleanuparr_watchtower_enable }}"
+          dockflare.enable: "{{ cleanuparr_dockflare_tunnel }}"
+          dockflare.access.group: "{{ cleanuparr_dockflare_access_group }}"
+          dockflare.hostname: "{{ cleanuparr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cleanuparr_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ cleanuparr_homepage_group }}"
+          homepage.icon: "{{ cleanuparr_homepage_icon }}"
+          homepage.href: "{{ cleanuparr_homepage_href }}"
+          homepage.description: "{{ 'a tool for automating the cleanup of unwanted or blocked files in Sonarr, Radarr, and supported download clients like qBittorrent.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ cleanuparr_container_name }}"
+          homepage.showStats: "{{ cleanuparr_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cleanuparr_port_http }}"
+          repliqate.enabled: "{{ cleanuparr_repliqate_enabled }}"
+          repliqate.engine: "{{ cleanuparr_repliqate_engine }}"
+          repliqate.schedule: "{{ cleanuparr_repliqate_schedule }}"
+          repliqate.backup_id: "{{ cleanuparr_repliqate_backup_id }}"
+          repliqate.retention: "{{ cleanuparr_repliqate_retention }}"
+          traefik.enable: "{{ cleanuparr_available_externally | string }}"
+          traefik.http.routers.cleanuparr.rule: "Host(`{{ cleanuparr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.cleanuparr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.cleanuparr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.cleanuparr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ cleanuparr_hostname }}"
+          traefik.http.routers.cleanuparr.middlewares: "{{ cleanuparr_hostname }}@docker"
+          traefik.http.middlewares.cleanuparr.IPAllowList.sourcerange: "{{ cleanuparr_traefik_whitelist }}"
+          traefik.http.services.cleanuparr.loadbalancer.server.port: "11011"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/Cleanuparr/Cleanuparr/pkgs/container/cleanuparr"
+        cpu_shares: "{{ cleanuparr_cpu_shares }}"
+        memory: "{{ cleanuparr_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (cleanuparr_port_http | string)] +
+                (['https://' + cleanuparr_hostname + '.' + ansible_nas_domain] if (cleanuparr_available_externally is true or cleanuparr_dockflare_tunnel is true) else [])
+              }}
+  when: cleanuparr_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ cleanuparr_container_name }}"
+        state: absent
+  when: cleanuparr_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ cleanuparr_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ cleanuparr_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: cleanuparr_enabled is false and archive_app_data_enabled is true
