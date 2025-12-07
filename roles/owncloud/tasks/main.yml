@@ -1,0 +1,218 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ owncloud_data_directory }}"
+        - "{{ owncloud_data_directory }}/db"
+        - "{{ owncloud_data_directory }}/files"
+        - "{{ owncloud_data_directory }}/redis"
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ owncloud_db_container_name }}"
+        hostname: "{{ owncloud_db_container_name }}"
+        image: "{{ owncloud_db_image_name }}:{{ owncloud_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ owncloud_data_directory }}/db:/var/lib/mysql"
+        command: "--max-allowed-packet=128M --innodb-log-file-size=64M"
+        env:
+          MYSQL_ROOT_PASSWORD: "{{ owncloud_db_env_mysql_root_password }}"
+          MYSQL_USER: "{{ owncloud_env_owncloud_db_username }}"
+          MYSQL_PASSWORD: "{{ owncloud_env_owncloud_db_password }}"
+          MYSQL_DATABASE: "{{ owncloud_env_owncloud_db_name }}"
+          MARIADB_AUTO_UPGRADE: "{{ owncloud_db_env_mariadb_auto_upgrade }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "mysqladmin", "ping", "-u", "root", "--password=owncloud"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+        labels:
+          autoheal: "{{ owncloud_db_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ owncloud_db_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ owncloud_db_homepage_group }}"
+          homepage.icon: "{{ owncloud_db_homepage_icon }}"
+          homepage.href: "{{ owncloud_homepage_href }}"
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ owncloud_db_container_name }}"
+          homepage.showStats: "{{ owncloud_db_homepage_showstats }}"
+          repliqate.enabled: "{{ owncloud_db_repliqate_enabled }}"
+          repliqate.engine: "{{ owncloud_db_repliqate_engine }}"
+          repliqate.schedule: "{{ owncloud_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ owncloud_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ owncloud_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
+        cpu_shares: "{{ owncloud_db_cpu_shares }}"
+        memory: "{{ owncloud_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ owncloud_redis_container_name }}"
+        hostname: "{{ owncloud_redis_container_name }}"
+        image: "{{ owncloud_redis_image_name }}:{{ owncloud_redis_image_tag }}"
+        pull: true
+        command: "--databases 1"
+        volumes:
+          - "{{ owncloud_data_directory }}/redis:/data"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "redis-cli", "ping"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+        labels:
+          autoheal: "{{ owncloud_redis_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ owncloud_redis_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ owncloud_redis_homepage_group }}"
+          homepage.icon: "{{ owncloud_redis_homepage_icon }}"
+          homepage.href: "{{ owncloud_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ owncloud_redis_container_name }}"
+          homepage.showStats: "{{ owncloud_redis_homepage_showstats }}"
+          repliqate.enabled: "{{ owncloud_redis_repliqate_enabled }}"
+          repliqate.engine: "{{ owncloud_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ owncloud_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ owncloud_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ owncloud_redis_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
+        cpu_shares: "{{ owncloud_redis_cpu_shares }}"
+        memory: "{{ owncloud_redis_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ owncloud_container_name }}"
+        hostname: "{{ owncloud_container_name }}"
+        image: "{{ owncloud_image_name }}:{{ owncloud_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ owncloud_data_directory }}/files:/mnt/data"
+        ports:
+          - "{{ owncloud_port_http }}:8080"
+        env:
+          OWNCLOUD_DOMAIN: "{{ owncloud_env_owncloud_domain }}"
+          OWNCLOUD_TRUSTED_DOMAINS: "{{ owncloud_env_owncloud_trusted_domains }}"
+          OWNCLOUD_DB_TYPE: "mysql"
+          OWNCLOUD_DB_NAME: "{{ owncloud_env_owncloud_db_name }}"
+          OWNCLOUD_DB_USERNAME: "{{ owncloud_env_owncloud_db_username }}"
+          OWNCLOUD_DB_PASSWORD: "{{ owncloud_env_owncloud_db_password }}"
+          OWNCLOUD_DB_HOST: "{{ owncloud_db_container_name }}"
+          OWNCLOUD_ADMIN_USERNAME: "{{ owncloud_env_owncloud_admin_username }}"
+          OWNCLOUD_ADMIN_PASSWORD: "{{ owncloud_env_owncloud_admin_password }}"
+          OWNCLOUD_MYSQL_UTF8MB4: "{{ owncloud_env_owncloud_mysql_utf8mb4 }}"
+          OWNCLOUD_REDIS_ENABLED: "{{ owncloud_env_owncloud_redis_enabled }}"
+          OWNCLOUD_REDIS_HOST: "{{ owncloud_redis_container_name }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "/usr/bin/healthcheck"]
+          interval: 30s
+          timeout: 10s
+          retries: 5
+        links:
+          - "{{ owncloud_db_container_name }}"
+          - "{{ owncloud_redis_container_name }}"
+        labels:
+          autoheal: "{{ owncloud_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ owncloud_watchtower_enable }}"
+          dockflare.enable: "{{ owncloud_dockflare_tunnel }}"
+          dockflare.access.group: "{{ owncloud_dockflare_access_group }}"
+          dockflare.hostname: "{{ owncloud_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ owncloud_homepage_group }}"
+          homepage.icon: "{{ owncloud_homepage_icon }}"
+          homepage.href: "{{ owncloud_homepage_href }}"
+          homepage.description: "{{ 'owncloud description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ owncloud_container_name }}"
+          homepage.showStats: "{{ owncloud_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
+          repliqate.enabled: "{{ owncloud_repliqate_enabled }}"
+          repliqate.engine: "{{ owncloud_repliqate_engine }}"
+          repliqate.schedule: "{{ owncloud_repliqate_schedule }}"
+          repliqate.backup_id: "{{ owncloud_repliqate_backup_id }}"
+          repliqate.retention: "{{ owncloud_repliqate_retention }}"
+          traefik.enable: "{{ owncloud_available_externally | string }}"
+          traefik.http.routers.owncloud.rule: "Host(`{{ owncloud_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.owncloud.tls.certresolver: "letsencrypt"
+          traefik.http.routers.owncloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.owncloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ owncloud_hostname }}"
+          traefik.http.routers.owncloud.middlewares: "{{ owncloud_hostname }}@docker"
+          traefik.http.middlewares.owncloud.IPAllowList.sourcerange: "{{ owncloud_traefik_whitelist }}"
+          traefik.http.services.owncloud.loadbalancer.server.port: "8080"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/owncloud/server"
+        cpu_shares: "{{ owncloud_cpu_shares }}"
+        memory: "{{ owncloud_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (owncloud_port_http | string)] +
+                (['https://' + owncloud_hostname + '.' + ansible_nas_domain] if (owncloud_available_externally is true or owncloud_dockflare_tunnel is true) else [])
+              }}
+  when: owncloud_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ owncloud_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ owncloud_db_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        name: "{{ owncloud_redis_container_name }}"
+        state: absent
+  when: owncloud_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ owncloud_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ owncloud_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: owncloud_enabled is false and archive_app_data_enabled is true
