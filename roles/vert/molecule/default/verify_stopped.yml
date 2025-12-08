@@ -8,11 +8,18 @@
 
     - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
-        name: "{{ vertd_container_name }}"
+        name: "{{ vert_container_name }}"
         state: absent
       register: result
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} daemon
+      community.docker.docker_container:
+        name: "{{ vertd_container_name }}"
+        state: absent
+      register: resultd
 
     - name: Check if {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed
+          - not resultd.changed

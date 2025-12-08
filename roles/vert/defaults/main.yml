@@ -1,0 +1,64 @@
+---
+# ANE
+ansible_nas_app_name: "VERT"
+vert_enabled: false
+vert_available_externally: false
+vert_traefik_whitelist: "{{ lan }}"
+
+# directories
+vert_data_directory: "{{ docker_home }}/vert"
+
+# docker
+vert_container_name: "vert"
+vert_image_name: "ghcr.io/vert-sh/vert"
+vert_image_tag: "latest"
+vertd_container_name: "vertd"
+vertd_image_name: "ghcr.io/vert-sh/vertd"
+vertd_image_tag: "latest"
+
+# network
+vert_hostname: "vert"
+vert_port_http: "3035"
+vertd_hostname: "vertd"
+vertd_port_http: "24153"
+
+# specs
+vert_cpu_shares: "1024"
+vert_memory: 1g
+vertd_cpu_shares: "1024"
+vertd_memory: 1g
+
+# app
+vert_env_admin_password: "{{ ansible_nas_app_admin_password }}"
+vert_env_public_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
+vert_env_pub_hostname: "" #localhost:5173 # only gets used for plausible (for now)
+vert_env_pub_plausible_url: "" #https://plausible.example.com # can be empty
+vert_env_pub_disable_all_external_requests: "false" # disables vertd, stripe, plausible, etc. use if your boss complains about privacy
+vert_env_pub_env: "production" # "production", "development", or "nightly"
+vert_env_pub_vertd_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vertd_port_http }}"
+vert_env_pub_donation_url: "https://donations.vert.sh"
+vert_env_pub_stripe_key: "pk_live_51RDVmAGSxPVad6bQwzVNnbc28nlmzA30krLWk1fefCMpUPiSRPkavMMbGqa8A3lUaOCMlsUEVy2CWDYg0ip3aPpL00ZJlsMkf2"
+vert_env_webhook_url: "" # if set, vert will attempt to notify you via a discord webhook when a video fails to convert.
+vert_env_webhook_pings: "" # webhook pings -- these will be formatted into the main message
+
+# autoheal
+vert_autoheal: "false"
+vertd_autoheal: "false"
+
+# dockflare
+vert_dockflare_tunnel: "false"
+vert_dockflare_access_group: ""
+
+# homepage
+vert_homepage_group: "Apps"
+vert_homepage_icon: "sh-vert.png"
+vert_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
+vert_homepage_showstats: "false"
+vertd_homepage_group: "Misc"
+vertd_homepage_icon: "sh-vert.png"
+vertd_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
+vertd_homepage_showstats: "false"
+
+# watchtower
+vert_watchtower_enable: "false"
+vertd_watchtower_enable: "false"
