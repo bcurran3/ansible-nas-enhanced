@@ -21,8 +21,9 @@
         ports:
           - "{{ wud_port_http }}:3000"
         env:
-          WUD_AUTH_BASIC_ADMIN_USER: "{{ wud_admin_username }}"
-          WUD_AUTH_BASIC_ADMIN_HASH: "{{ wud_admin_password }}"
+# NOTE: Consider moving env vars to an ansible list so that triggers can be added manually        
+          WUD_AUTH_BASIC_ADMIN_USER: "{{ wud_env_wud_auth_basic_admin_username }}"
+          WUD_AUTH_BASIC_ADMIN_HASH: "{{ wud_env_wud_auth_basic_admin_hash }}"
           WUD_REGISTRY_HUB_PUBLIC_LOGIN: "{{ wud_env_wud_registry_hub_public_login }}"
           WUD_REGISTRY_HUB_PUBLIC_PASSWORD: "{{ wud_env_wud_registry_hub_public_password }}"
           WUD_WATCHER_LOCAL_WATCHALL: "{{ wud_env_wud_watcher_local_watchall }}"
@@ -62,9 +63,8 @@
           traefik.http.routers.wud.middlewares: "{{ wud_hostname }}@docker"
           traefik.http.middlewares.wud.IPAllowList.sourcerange: "{{ wud_traefik_whitelist }}"
           traefik.http.services.wud.loadbalancer.server.port: "3000"
-          wud.tag.include: '^v\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/getwud/wud/pkgs/container/wud"
+          wud.tag.include: "^\d+\.\d+\.\d+$$"
+          wud.link.template: "https://github.com/getwud/wud/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ wud_cpu_shares }}"
         memory: "{{ wud_memory }}"
         restart_policy: unless-stopped
