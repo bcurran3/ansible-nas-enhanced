@@ -24,18 +24,18 @@ immich_server_image: "ghcr.io/immich-app/immich-server"
 immich_server_tag: "release"
 immich_server_cpu_shares: "1024"
 immich_server_memory: 1g
+immich_db_container_name: "immich-db"
+immich_db_image: "ghcr.io/immich-app/postgres"
+immich_db_tag: "14-vectorchord0.3.0-pgvectors0.2.0"
+immich_db_cpu_shares: "1024"
+immich_db_memory: 2g
 # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
 # Example tag: ${IMMICH_VERSION:-release}-cuda
-immich_machinelearning_container_name: "immich-machine-learning"
-immich_machinelearning_image: "ghcr.io/immich-app/immich-machine-learning"
-immich_machinelearning_tag: "release"
-immich_machinelearning_cpu_shares: "1024"
-immich_machinelearning_memory: 1g
-immich_postgres_container_name: "immich-postgres"
-immich_postgres_image: "ghcr.io/immich-app/postgres"
-immich_postgres_tag: "14-vectorchord0.3.0-pgvectors0.2.0"
-immich_postgres_cpu_shares: "1024"
-immich_postgres_memory: 2g
+immich_ml_container_name: "immich-machine-learning"
+immich_ml_image: "ghcr.io/immich-app/immich-machine-learning"
+immich_ml_tag: "release"
+immich_ml_cpu_shares: "1024"
+immich_ml_memory: 1g
 immich_redis_container_name: "immich-redis"
 immich_redis_image: "redis"
 immich_redis_tag: "6.2-alpine"
@@ -58,8 +58,8 @@ immich_ignore_mount_check_errors: "false"
 
 # autoheal
 immich_autoheal: "false"
-immich_machinelearning_autoheal: "false"
-immich_postgres_autoheal: "false"
+immich_db_autoheal: "false"
+immich_ml_autoheal: "false"
 immich_redis_autoheal: "false"
 
 # dockflare
@@ -72,15 +72,32 @@ immich_homepage_icon: "immich.png"
 immich_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port_http }}"
 immich_homepage_showstats: "false"
 immich_homepage_widget_key: "your_admin_api_key"
-immich_machinelearning_homepage_group: "Misc"
-immich_machinelearning_homepage_icon: "immich.png"
-immich_machinelearning_homepage_showstats: "false"
-immich_postgres_homepage_group: "DBs"
-immich_postgres_homepage_icon: "postgres.png"
-immich_postgres_homepage_showstats: "false"
+immich_db_homepage_group: "DBs"
+immich_db_homepage_icon: "postgres.png"
+immich_db_homepage_showstats: "false"
+immich_ml_homepage_group: "Misc"
+immich_ml_homepage_icon: "immich.png"
+immich_ml_homepage_showstats: "false"
 immich_redis_homepage_group: "DBs"
 immich_redis_homepage_icon: "redis.png"
 immich_redis_homepage_showstats: "false"
+
+# repliqate
+immich_repliqate_enabled: "false"
+immich_repliqate_engine: "restic"
+immich_repliqate_schedule: "@daily 3am"
+immich_repliqate_backup_id: "immich"
+immich_repliqate_retention: "30d"
+immich_db_repliqate_enabled: "false"
+immich_db_repliqate_engine: "restic"
+immich_db_repliqate_schedule: "@daily 3am"
+immich_db_repliqate_backup_id: "immich-db"
+immich_db_repliqate_retention: "30d"
+immich_ml_repliqate_enabled: "false"
+immich_ml_repliqate_engine: "restic"
+immich_ml_repliqate_schedule: "@daily 3am"
+immich_ml_repliqate_backup_id: "immich-ml"
+immich_ml_repliqate_retention: "30d"
 
 # watchtower
 immich_watchtower_enable: "false"

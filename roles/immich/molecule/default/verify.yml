@@ -6,34 +6,34 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
+    - name: Get container state Server
+      community.docker.docker_container_info:
+        name: "{{ immich_server_container_name }}"
+      register: result
+
+    - name: Get container state DB
+      community.docker.docker_container_info:
+        name: "{{ immich_db_image }}"
+      register: result_db
+
     - name: Get container state Machine Learning
       community.docker.docker_container_info:
         name: "{{ immich_machinelearning_image }}"
       register: result_ml
-
-    - name: Get container state DB
-      community.docker.docker_container_info:
-        name: "{{ immich_postgres_image }}"
-      register: result_db
 
     - name: Get container state Redis
       community.docker.docker_container_info:
         name: "{{ immich_redis_container_name }}"
       register: result_redis
 
-    - name: Get container state Server
-      community.docker.docker_container_info:
-        name: "{{ immich_server_container_name }}"
-      register: result
-
     - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
-          - result_ml.container['State']['Status'] == "running"
-          - result_ml.container['State']['Restarting'] == false
-          - result_db.container['State']['Status'] == "running"
-          - result_db.container['State']['Restarting'] == false
-          - result_redis.container['State']['Status'] == "running"
-          - result_redis.container['State']['Restarting'] == false
           - result.container['State']['Status'] == "running"
           - result.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false
+          - result_ml.container['State']['Status'] == "running"
+          - result_ml.container['State']['Restarting'] == false
+          - result_redis.container['State']['Status'] == "running"
+          - result_redis.container['State']['Restarting'] == false

@@ -17,9 +17,9 @@
     - name: Create {{ ansible_nas_app_name }} Machine Learning Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ immich_machinelearning_container_name }}"
-        hostname: "{{ immich_machinelearning_container_name }}"
-        image: "{{ immich_machinelearning_image }}:{{ immich_machinelearning_tag }}"
+        name: "{{ immich_ml_container_name }}"
+        hostname: "{{ immich_ml_container_name }}"
+        image: "{{ immich_ml_image }}:{{ immich_ml_tag }}"
         pull: true
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
         device_requests: "{{
@@ -34,31 +34,36 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ immich_machinelearning_autoheal }}"
+          autoheal: "{{ immich_ml_autoheal }}"
           com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
-          homepage.group: "{{ immich_machinelearning_homepage_group }}"
+          homepage.group: "{{ immich_ml_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} Machine Learning"
-          homepage.icon: "{{ immich_machinelearning_homepage_icon }}"
+          homepage.icon: "{{ immich_ml_homepage_icon }}"
           homepage.href: "{{ immich_homepage_href }}"
           homepage.description: "{{'Immich Machine Learning' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ immich_machinelearning_container_name }}"
+          homepage.container: "{{ immich_ml_container_name }}"
           homepage.showStats: "false"
+          repliqate.enabled: "{{ immich_ml_repliqate_enabled }}"
+          repliqate.engine: "{{ immich_ml_repliqate_engine }}"
+          repliqate.schedule: "{{ immich_ml_repliqate_schedule }}"
+          repliqate.backup_id: "{{ immich_ml_repliqate_backup_id }}"
+          repliqate.retention: "{{ immich_ml_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/immich-app/immich/releases"
-        cpu_shares: "{{ immich_machinelearning_cpu_shares }}"
-        memory: "{{ immich_machinelearning_memory }}"
+        cpu_shares: "{{ immich_ml_cpu_shares }}"
+        memory: "{{ immich_ml_memory }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ immich_postgres_container_name }}"
-        hostname: "{{ immich_postgres_container_name }}"
-        image: "{{ immich_postgres_image }}:{{ immich_postgres_tag }}"
+        name: "{{ immich_db_container_name }}"
+        hostname: "{{ immich_db_container_name }}"
+        image: "{{ immich_db_image }}:{{ immich_db_tag }}"
         pull: true
         volumes:
           - "{{ immich_data_directory }}/database:/var/lib/postgresql/data"
@@ -82,23 +87,28 @@
           retries: 5
           timeout: 5s
         labels:
-          autoheal: "{{ immich_postgres_autoheal }}"
+          autoheal: "{{ immich_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
-          homepage.group: "{{ immich_postgres_homepage_group }}"
+          homepage.group: "{{ immich_db_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
-          homepage.icon: "{{ immich_postgres_homepage_icon }}"
+          homepage.icon: "{{ immich_db_homepage_icon }}"
           homepage.href: "{{ immich_homepage_href }}"
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ immich_postgres_container_name }}"
+          homepage.container: "{{ immich_db_container_name }}"
           homepage.showStats: "false"
+          repliqate.enabled: "{{ immich_db_repliqate_enabled }}"
+          repliqate.engine: "{{ immich_db_repliqate_engine }}"
+          repliqate.schedule: "{{ immich_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ immich_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ immich_db_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/immich-app/immich/releases"
-        cpu_shares: "{{ immich_postgres_cpu_shares }}"
-        memory: "{{ immich_postgres_memory }}"
+        cpu_shares: "{{ immich_db_cpu_shares }}"
+        memory: "{{ immich_db_memory }}"
         restart_policy: always
         shm_size: 128MB
 
@@ -157,7 +167,7 @@
           - "{{ immich_port_http }}:2283"
         env:
           REDIS_HOSTNAME: "{{ immich_redis_container_name }}"
-          DB_HOSTNAME: "{{ immich_postgres_container_name }}"
+          DB_HOSTNAME: "{{ immich_db_container_name }}"
           DB_USERNAME: "{{ immich_db_username }}"
           DB_PASSWORD: "{{ immich_db_password }}"
           DB_DATABASE_NAME: "{{ immich_db_name }}"
@@ -165,7 +175,7 @@
           UPLOAD_LOCATION: "./library"
           TZ: "{{ ansible_nas_timezone }}"
         links:
-          - "{{ immich_postgres_container_name }}"
+          - "{{ immich_db_container_name }}"
           - "{{ immich_redis_container_name }}"
 #       healthcheck:
 #         disable: "false"
@@ -189,6 +199,11 @@
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port_http }}"
           homepage.widget.key: "{{ immich_homepage_widget_key }}"
           homepage.widget.version: "2"
+          repliqate.enabled: "{{ immich_repliqate_enabled }}"
+          repliqate.engine: "{{ immich_repliqate_engine }}"
+          repliqate.schedule: "{{ immich_repliqate_schedule }}"
+          repliqate.backup_id: "{{ immich_repliqate_backup_id }}"
+          repliqate.retention: "{{ immich_repliqate_retention }}"
           traefik.enable: "{{ immich_available_externally | string }}"
           traefik.http.routers.immich.rule: "Host(`{{ immich_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.immich.tls.certresolver: "letsencrypt"
@@ -223,7 +238,7 @@
 
     - name: Stop {{ ansible_nas_app_name }} Machine Learning Container
       community.docker.docker_container:
-        name: "{{ immich_machinelearning_container_name }}"
+        name: "{{ immich_ml_container_name }}"
         state: absent
 
     - name: Stop {{ ansible_nas_app_name }} Redis Container
@@ -233,7 +248,7 @@
 
     - name: Stop {{ ansible_nas_app_name }} PostgreSQL Container
       community.docker.docker_container:
-        name: "{{ immich_postgres_container_name }}"
+        name: "{{ immich_db_container_name }}"
         state: absent
 
     - name: Delete {{ ansible_nas_app_name }} Network
