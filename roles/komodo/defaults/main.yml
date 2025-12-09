@@ -1,0 +1,79 @@
+---
+# ANE
+ansible_nas_app_name: "Komodo"
+komodo_enabled: false
+komodo_available_externally: false
+komodo_traefik_whitelist: "{{ lan }}"
+
+# directories
+komodo_data_directory: "{{ docker_home }}/komodo"
+
+# docker
+komodo_container_name: "komodo"
+komodo_image_name: "ghcr.io/moghtech/komodo-core"
+komodo_image_tag: "latest"
+komodo_db_container_name: "komodo-db"
+komodo_db_image_name: "mongo"
+komodo_db_image_tag: "latest"
+komodo_periphery_container_name: "komodo-periphery"
+komodo_periphery_image_name: "ghcr.io/moghtech/komodo-periphery"
+komodo_periphery_image_tag: "latest"
+
+# network
+komodo_port_http: "9120"
+komodo_hostname: "komodo"
+komodo_db_hostname: "komodo-db"
+komodo_periphery_hostname: "komodo-periphery"
+
+# specs
+komodo_cpu_shares: "1024"
+komodo_memory: 1g
+komodo_db_cpu_shares: "1024"
+komodo_db_memory: 1g
+komodo_periphery_cpu_shares: "1024"
+komodo_periphery_memory: 1g
+
+# autoheal
+komodo_autoheal: "false"
+komodo_db_autoheal: "false"
+komodo_periphery_autoheal: "false"
+
+# dockflare
+komodo_dockflare_tunnel: "false"
+komodo_dockflare_access_group: ""
+
+# homepage
+komodo_homepage_group: "Apps"
+komodo_homepage_icon: "komodo.png"
+komodo_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+komodo_homepage_showstats: "false"
+komodo_db_homepage_group: "DBs"
+komodo_db_homepage_icon: "mongodb.png"
+komodo_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+komodo_db_homepage_showstats: "false"
+komodo_periphery_homepage_group: "DBs"
+komodo_periphery_homepage_icon: "mongodb.png"
+komodo_periphery_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+komodo_periphery_homepage_showstats: "false"
+
+# repliqate
+komodo_repliqate_enabled: "false"
+komodo_repliqate_engine: "restic"
+komodo_repliqate_schedule: "@daily 3am"
+komodo_repliqate_backup_id: "komodo"
+komodo_repliqate_retention: "30d"
+komodo_db_repliqate_enabled: "false"
+komodo_db_repliqate_engine: "restic"
+komodo_db_repliqate_schedule: "@daily 3am"
+komodo_db_repliqate_backup_id: "komodo"
+komodo_db_repliqate_retention: "30d"
+komodo_periphery_repliqate_enabled: "false"
+komodo_periphery_repliqate_engine: "restic"
+komodo_periphery_repliqate_schedule: "@daily 3am"
+komodo_periphery_repliqate_backup_id: "komodo"
+komodo_periphery_repliqate_retention: "30d"
+
+# watchtower
+komodo_watchtower_enable: "false"
+komodo_db_watchtower_enable: "false"
+komodo_periphery_watchtower_enable: "false"

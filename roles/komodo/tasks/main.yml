@@ -1,0 +1,302 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ komodo_data_directory }}"
+        - "{{ komodo_data_directory }}/backups"
+        - "{{ komodo_data_directory }}/configdb"
+        - "{{ komodo_data_directory }}/db"
+        - "{{ komodo_data_directory }}/periphery"
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ komodo_db_container_name }}"
+        hostname: "{{ komodo_db_container_name }}"
+        image: "{{ komodo_db_image_name }}:{{ komodo_db_image_tag }}"
+        pull: true
+        command: "--quiet --wiredTigerCacheSizeGB 0.25"
+        volumes:
+          - "{{ komodo_data_directory }}/configdb:/data/configdb"
+          - "{{ komodo_data_directory }}/db:/data/db"
+        env:
+          MONGO_INITDB_ROOT_USERNAME: "komodo"
+          MONGO_INITDB_ROOT_PASSWORD: "komodo"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ komodo_db_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ komodo_db_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.group: "{{ komodo_db_homepage_group }}"
+          homepage.icon: "{{ komodo_db_homepage_icon }}"
+          homepage.href: "{{ komodo_homepage_href }}"
+          homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ komodo_db_container_name }}"
+          homepage.showStats: "{{ komodo_db_homepage_showstats }}"
+          komodo.skip:
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mongo"
+        cpu_shares: "{{ komodo_db_cpu_shares }}"
+        memory: "{{ komodo_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Periphery Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ komodo_periphery_container_name }}"
+        hostname: "{{ komodo_periphery_container_name }}"
+        image: "{{ komodo_periphery_image_name }}:{{ komodo_periphery_image_tag }}"
+        pull: true
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+          - "/proc:/proc"
+          - "{{ komodo_data_directory }}/periphery:-/etc/komodo}:{{ komodo_data_directory }}/periphery:-/etc/komodo}"
+        env:
+          ## Specify the root directory used by Periphery agent.
+          PERIPHERY_ROOT_DIRECTORY: "/etc/komodo"
+
+          ## Periphery passkeys must include KOMODO_PASSKEY to authenticate.
+          PERIPHERY_PASSKEYS: "OdgswggH6J5mF0kOXfh18KL1QSGKB06t"
+
+          ## Specify whether to disable the terminals feature
+          ## and disallow remote shell access (inside the Periphery container).
+          PERIPHERY_DISABLE_TERMINALS: "false"
+
+          ## Enable SSL using self signed certificates.
+          ## Connect to Periphery at https://address:8120.
+          PERIPHERY_SSL_ENABLED: "true"
+
+          ## If the disk size is overreporting, can use one of these to 
+          ## whitelist / blacklist the disks to filter them, whichever is easier.
+          ## Accepts comma separated list of paths.
+          ## Usually whitelisting just /etc/hostname gives correct size.
+          PERIPHERY_INCLUDE_DISK_MOUNTS: "/etc/hostname"
+          # PERIPHERY_EXCLUDE_DISK_MOUNTS=/snap,/etc/repos
+
+          ## Prettier logging with empty lines between logs
+          PERIPHERY_LOGGING_PRETTY: "false"
+          ## More human readable logging of startup config (multi-line)
+          PERIPHERY_PRETTY_STARTUP_CONFIG: "false"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ komodo_periphery_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ komodo_periphery_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Periphery"
+          homepage.group: "{{ komodo_periphery_homepage_group }}"
+          homepage.icon: "{{ komodo_periphery_homepage_icon }}"
+          homepage.href: "{{ komodo_periphery_homepage_href }}"
+          homepage.description: "{{ 'komodo description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ komodo_periphery_container_name }}"
+          homepage.showStats: "{{ komodo_periphery_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+          komodo.skip:
+          repliqate.enabled: "{{ komodo_periphery_repliqate_enabled }}"
+          repliqate.engine: "{{ komodo_periphery_repliqate_engine }}"
+          repliqate.schedule: "{{ komodo_periphery_repliqate_schedule }}"
+          repliqate.backup_id: "{{ komodo_periphery_repliqate_backup_id }}"
+          repliqate.retention: "{{ komodo_periphery_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/moghtech/komodo/pkgs/container/komodo-periphery"
+        cpu_shares: "{{ komodo_periphery_cpu_shares }}"
+        memory: "{{ komodo_periphery_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ komodo_container_name }}"
+        hostname: "{{ komodo_container_name }}"
+        image: "{{ komodo_image_name }}:{{ komodo_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ komodo_data_directory }}/backups:/backups"
+        ports:
+          - "{{ komodo_port_http }}:9120"
+        env:
+          KOMODO_DATABASE_ADDRESS: "{{ komodo_db_container_name }}:27017"
+          KOMODO_DATABASE_USERNAME: "komodo"
+          KOMODO_DATABASE_PASSWORD: "komodo"
+          ## Used for Oauth / Webhook url suggestion / Caddy reverse proxy.
+          KOMODO_HOST: "https://{{ komodo_hostname }}{{ ansible_nas_domain }}"
+          ## Displayed in the browser tab.
+          KOMODO_TITLE: "Komodo"
+          ## Create a server matching this address as the "first server".
+          ## Use `https://host.docker.internal:8120` when using systemd-managed Periphery.
+          KOMODO_FIRST_SERVER: "https://{{ komodo_periphery_container_name }}:8120"
+          ## Give the first server a custom name.
+          KOMODO_FIRST_SERVER_NAME: "{{ ansible_nas_hostname }}"
+          ## Make all buttons just double-click, rather than the full confirmation dialog.
+          KOMODO_DISABLE_CONFIRM_DIALOG: "false"
+
+          ## Rate Komodo polls your servers for
+          ## status / container status / system stats / alerting.
+          ## Options: 1-sec, 5-sec, 15-sec, 1-min, 5-min, 15-min
+          ## Default: 15-sec
+          KOMODO_MONITORING_INTERVAL: "15-sec"
+          ## Interval at which to poll Resources for any updates / automated actions.
+          ## Options: 15-min, 1-hr, 2-hr, 6-hr, 12-hr, 1-day
+          ## Default: 1-hr
+          KOMODO_RESOURCE_POLL_INTERVAL: "1-hr"
+
+          ## Used to auth incoming webhooks. Alt: KOMODO_WEBHOOK_SECRET_FILE
+          KOMODO_WEBHOOK_SECRET: "XSP9i2V8YxkyKekTjBO8G4JBPT4rPmcg"
+          ## Used to generate jwt. Alt: KOMODO_JWT_SECRET_FILE
+          KOMODO_JWT_SECRET: "KiqHoKG1RwoHACmRLi4u4JmikLXvcZDHLl29Z3AUPdSk4ppmrV5YFm2y5KbwAEVY"
+          ## Time to live for jwt tokens.
+          ## Options: 1-hr, 12-hr, 1-day, 3-day, 1-wk, 2-wk
+          KOMODO_JWT_TTL: "1-day"
+          KOMODO_PASSKEY: "OdgswggH6J5mF0kOXfh18KL1QSGKB06t"
+
+          ## Enable login with username + password.
+          KOMODO_LOCAL_AUTH: "true"
+          ## Set the initial admin username created upon first launch.
+          ## Comment out to disable initial user creation,
+          ## and create first user using signup button.
+          KOMODO_INIT_ADMIN_USERNAME: "admin"
+          ## Set the initial admin password
+          KOMODO_INIT_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
+          ## Disable new user signups.
+          KOMODO_DISABLE_USER_REGISTRATION: "false"
+          ## All new logins are auto enabled
+          KOMODO_ENABLE_NEW_USERS: "false"
+          ## Disable non-admins from creating new resources.
+          KOMODO_DISABLE_NON_ADMIN_CREATE: "false"
+          ## Allows all users to have Read level access to all resources.
+          KOMODO_TRANSPARENT_MODE: "false"
+
+          ## Prettier logging with empty lines between logs
+          KOMODO_LOGGING_PRETTY: "false"
+          ## More human readable logging of startup config (multi-line)
+          KOMODO_PRETTY_STARTUP_CONFIG: "false"
+
+          ## OIDC Login
+          KOMODO_OIDC_ENABLED: "false"
+          ## Must reachable from Komodo Core container
+          # KOMODO_OIDC_PROVIDER=https://oidc.provider.internal/application/o/komodo
+          ## Change the host to one reachable be reachable by users (optional if it is the same as above).
+          ## DO NOT include the `path` part of the URL.
+          # KOMODO_OIDC_REDIRECT_HOST=https://oidc.provider.external
+          ## Your OIDC client id
+          # KOMODO_OIDC_CLIENT_ID= # Alt: KOMODO_OIDC_CLIENT_ID_FILE
+          ## Your OIDC client secret.
+          ## If your provider supports PKCE flow, this can be ommitted.
+          # KOMODO_OIDC_CLIENT_SECRET= # Alt: KOMODO_OIDC_CLIENT_SECRET_FILE
+          ## Make usernames the full email.
+          ## Note. This does not work for all OIDC providers.
+          # KOMODO_OIDC_USE_FULL_EMAIL=true
+          ## Add additional trusted audiences for token claims verification.
+          ## Supports comma separated list, and passing with _FILE (for compose secrets).
+          # KOMODO_OIDC_ADDITIONAL_AUDIENCES=abc,123 # Alt: KOMODO_OIDC_ADDITIONAL_AUDIENCES_FILE
+
+          ## Github Oauth
+          KOMODO_GITHUB_OAUTH_ENABLED: "false"
+          # KOMODO_GITHUB_OAUTH_ID= # Alt: KOMODO_GITHUB_OAUTH_ID_FILE
+          # KOMODO_GITHUB_OAUTH_SECRET= # Alt: KOMODO_GITHUB_OAUTH_SECRET_FILE
+
+          ## Google Oauth
+          KOMODO_GOOGLE_OAUTH_ENABLED: "false"
+          # KOMODO_GOOGLE_OAUTH_ID= # Alt: KOMODO_GOOGLE_OAUTH_ID_FILE
+          # KOMODO_GOOGLE_OAUTH_SECRET= # Alt: KOMODO_GOOGLE_OAUTH_SECRET_FILE
+
+          ## Aws - Used to launch Builder instances.
+          KOMODO_AWS_ACCESS_KEY_ID: "" # Alt: KOMODO_AWS_ACCESS_KEY_ID_FILE
+          KOMODO_AWS_SECRET_ACCESS_KEY: "" # Alt: KOMODO_AWS_SECRET_ACCESS_KEY_FILE
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ komodo_db_container_name }}"
+          - "{{ komodo_periphery_container_name }}"
+        labels:
+          autoheal: "{{ komodo_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ komodo_watchtower_enable }}"
+          dockflare.enable: "{{ komodo_dockflare_tunnel }}"
+          dockflare.access.group: "{{ komodo_dockflare_access_group }}"
+          dockflare.hostname: "{{ komodo_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ komodo_homepage_group }}"
+          homepage.icon: "{{ komodo_homepage_icon }}"
+          homepage.href: "{{ komodo_homepage_href }}"
+          homepage.description: "{{ 'komodo description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ komodo_container_name }}"
+          homepage.showStats: "{{ komodo_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+          komodo.skip:
+          repliqate.enabled: "{{ komodo_repliqate_enabled }}"
+          repliqate.engine: "{{ komodo_repliqate_engine }}"
+          repliqate.schedule: "{{ komodo_repliqate_schedule }}"
+          repliqate.backup_id: "{{ komodo_repliqate_backup_id }}"
+          repliqate.retention: "{{ komodo_repliqate_retention }}"
+          traefik.enable: "{{ komodo_available_externally | string }}"
+          traefik.http.routers.komodo.rule: "Host(`{{ komodo_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.komodo.tls.certresolver: "letsencrypt"
+          traefik.http.routers.komodo.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.komodo.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ komodo_hostname }}"
+          traefik.http.routers.komodo.middlewares: "{{ komodo_hostname }}@docker"
+          traefik.http.middlewares.komodo.IPAllowList.sourcerange: "{{ komodo_traefik_whitelist }}"
+          traefik.http.services.komodo.loadbalancer.server.port: "9120"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/moghtech/komodo/pkgs/container/komodo-core"
+        cpu_shares: "{{ komodo_cpu_shares }}"
+        memory: "{{ komodo_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (komodo_port_http | string)] +
+                (['https://' + komodo_hostname + '.' + ansible_nas_domain] if (komodo_available_externally is true or komodo_dockflare_tunnel is true) else [])
+              }}
+  when: komodo_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ komodo_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Periphery Container
+      community.docker.docker_container:
+        name: "{{ komodo_periphery_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ komodo_db_container_name }}"
+        state: absent
+  when: komodo_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ komodo_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ komodo_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: komodo_enabled is false and archive_app_data_enabled is true
