@@ -1,0 +1,137 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ titra_data_directory }}"
+        - "{{ titra_data_directory }}/db"
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ titra_db_container_name }}"
+        hostname: "{{ titra_db_container_name }}"
+        image: "{{ titra_db_image_name }}:{{ titra_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ titra_data_directory }}/db:/data/db"
+        env:
+          MONGO_DB: "titra"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ titra_db_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ titra_db_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.group: "{{ titra_db_homepage_group }}"
+          homepage.icon: "{{ titra_db_homepage_icon }}"
+          homepage.href: "{{ titra_homepage_href }}"
+          homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ titra_db_container_name }}"
+          homepage.showStats: "{{ titra_db_homepage_showstats }}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mongo"
+        cpu_shares: "{{ titra_db_cpu_shares }}"
+        memory: "{{ titra_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ titra_container_name }}"
+        hostname: "{{ titra_container_name }}"
+        image: "{{ titra_image_name }}:{{ titra_image_tag }}"
+        pull: true
+        ports:
+          - "{{ titra_port_http }}:{{ titra_port_http }}"
+        env:
+          MAIL_URL: "{{ titra_env_mail_url }}"
+          MONGO_URL: "mongodb://{{ titra_db_container_name }}/titra?directConnection=true"
+          PORT: "{{ titra_port_http }}"
+          ROOT_URL: "{{ titra_env_root_url }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ titra_db_container_name }}"
+        labels:
+          autoheal: "{{ titra_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ titra_watchtower_enable }}"
+          dockflare.enable: "{{ titra_dockflare_tunnel }}"
+          dockflare.access.group: "{{ titra_dockflare_access_group }}"
+          dockflare.hostname: "{{ titra_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ titra_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ titra_homepage_group }}"
+          homepage.icon: "{{ titra_homepage_icon }}"
+          homepage.href: "{{ titra_homepage_href }}"
+          homepage.description: "{{ 'modern open source project time tracking for freelancers and small teams' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ titra_container_name }}"
+          homepage.showStats: "{{ titra_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ titra_port_http }}"
+          repliqate.enabled: "{{ titra_repliqate_enabled }}"
+          repliqate.engine: "{{ titra_repliqate_engine }}"
+          repliqate.schedule: "{{ titra_repliqate_schedule }}"
+          repliqate.backup_id: "{{ titra_repliqate_backup_id }}"
+          repliqate.retention: "{{ titra_repliqate_retention }}"
+          traefik.enable: "{{ titra_available_externally | string }}"
+          traefik.http.routers.titra.rule: "Host(`{{ titra_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.titra.tls.certresolver: "letsencrypt"
+          traefik.http.routers.titra.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.titra.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ titra_hostname }}"
+          traefik.http.routers.titra.middlewares: "{{ titra_hostname }}@docker"
+          traefik.http.middlewares.titra.IPAllowList.sourcerange: "{{ titra_traefik_whitelist }}"
+          traefik.http.services.titra.loadbalancer.server.port: "{{ titra_port_http }}"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/kromit/titra"
+        cpu_shares: "{{ titra_cpu_shares }}"
+        memory: "{{ titra_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (titra_port_http | string)] +
+                (['https://' + titra_hostname + '.' + ansible_nas_domain] if (titra_available_externally is true or titra_dockflare_tunnel is true) else [])
+              }}
+  when: titra_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ titra_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ titra_db_container_name }}"
+        state: absent
+  when: titra_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  block:
+    - name: Check for {{ ansible_nas_app_name }} Data Directory
+      stat:
+        path: "{{ titra_data_directory }}"
+      register: dir_stat
+
+    - name: Archive {{ ansible_nas_app_name }} Data Directory
+      ansible.builtin.archive:
+        path: "{{ titra_data_directory }}"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        force_archive: true
+        format: zip
+        owner: ansible-nas
+        group: ansible-nas
+        mode: u=rw,g=rw
+        remove: true
+      when: dir_stat.stat.exists
+  when: titra_enabled is false and archive_app_data_enabled is true

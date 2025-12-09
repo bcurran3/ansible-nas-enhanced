@@ -1,0 +1,60 @@
+---
+# ANE
+ansible_nas_app_name: "titra"
+titra_enabled: false
+titra_available_externally: false
+titra_traefik_whitelist: "{{ lan }}"
+
+# directories
+titra_data_directory: "{{ docker_home }}/titra"
+
+# docker
+titra_container_name: "titra"
+titra_image_name: "kromit/titra"
+titra_image_tag: "latest"
+titra_db_container_name: "titra-db"
+titra_db_image_name: "mongo"
+titra_db_image_tag: "7.0"
+
+# network
+titra_port_http: "3026"
+titra_hostname: "titra"
+
+# specs
+titra_cpu_shares: "1024"
+titra_memory: 1g
+titra_db_cpu_shares: "1024"
+titra_db_memory: 1g
+
+# app
+titra_env_mail_url: "" # example: smtp://USERNAME:PASSWORD@HOST:PORT
+titra_env_root_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ titra_port_http }}"
+
+# autoheal
+titra_autoheal: "false"
+titra_db_autoheal: "false"
+
+# dockflare
+titra_dockflare_tunnel: "false"
+titra_dockflare_access_group: ""
+
+# homepage
+titra_homepage_group: "Apps"
+titra_homepage_icon: "https://titra.io/storage/titra-logo-500.png"
+titra_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ titra_port_http }}"
+titra_homepage_showstats: "false"
+titra_db_homepage_group: "DBs"
+titra_db_homepage_icon: "mongodb.png"
+titra_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ titra_port_http }}"
+titra_db_homepage_showstats: "false"
+
+# repliqate
+titra_repliqate_enabled: "false"
+titra_repliqate_engine: "restic"
+titra_repliqate_schedule: "@daily 3am"
+titra_repliqate_backup_id: "titra"
+titra_repliqate_retention: "30d"
+
+# watchtower
+titra_watchtower_enable: "false"
+titra_db_watchtower_enable: "false"
