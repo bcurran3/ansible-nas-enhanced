@@ -6,6 +6,8 @@
         path: "{{ item }}"
         state: directory
         mode: 0775
+        owner: "{{ heimdall_puid }}"
+        group: "{{ heimdall_pgid }}"
       with_items:
         - "{{ heimdall_data_directory }}"
 
@@ -22,8 +24,8 @@
           DOCKER_MODS: "{{ heimdall_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ heimdall_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ heimdall_env_docker_mods_install_pip_packages}}"
-#         PUID: "{{ heimdall_puid }}"
-#         PGID: "{{ heimdall_pgid }}"
+          PUID: "{{ heimdall_puid }}"
+          PGID: "{{ heimdall_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ heimdall_port_http }}:80"
@@ -43,6 +45,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ heimdall_container_name }}"
           homepage.showStats: "{{ heimdall_homepage_showstats }}"
+          repliqate.enabled: "{{ heimdall_repliqate_enabled }}"
+          repliqate.engine: "{{ heimdall_repliqate_engine }}"
+          repliqate.schedule: "{{ heimdall_repliqate_schedule }}"
+          repliqate.backup_id: "{{ heimdall_repliqate_backup_id }}"
+          repliqate.retention: "{{ heimdall_repliqate_retention }}"
           traefik.enable: "{{ heimdall_available_externally | string }}"
           traefik.http.routers.heimdall.rule: "Host(`{{ heimdall_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.heimdall.tls.certresolver: "letsencrypt"
