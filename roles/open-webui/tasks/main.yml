@@ -8,7 +8,7 @@
       when: ollama_enabled is false
 
     - name: Create {{ ansible_nas_app_name }} Directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:

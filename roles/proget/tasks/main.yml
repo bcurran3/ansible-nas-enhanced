@@ -7,14 +7,14 @@
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ proget_data_directory }}/packages"
 
     - name: Create {{ ansible_nas_app_name }} DB Directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         owner: "10001"
         state: directory

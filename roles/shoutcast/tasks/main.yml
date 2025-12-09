@@ -2,7 +2,7 @@
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create{{ ansible_nas_app_name }} Directory
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:

@@ -2,7 +2,7 @@
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: "0755"
@@ -94,7 +94,7 @@
       when: vaultwarden_enabled is true
 
     - name: Create {{ ansible_nas_app_name }} Backup Container Directory
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: "0700"

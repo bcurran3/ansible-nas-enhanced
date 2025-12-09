@@ -2,7 +2,7 @@
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
@@ -10,7 +10,7 @@
         - "{{ diskover_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Elasticsearch Directories
-      file:
+      ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         owner: "1000"
