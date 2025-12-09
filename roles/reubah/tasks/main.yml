@@ -42,7 +42,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ reubah_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ reubah_container_name }}"
-          homepage.showStats: "{[ reubah_homepage_showstats ]}"
+          homepage.showStats: "{{ reubah_homepage_showstats }}"
           traefik.enable: "{{ reubah_available_externally | string }}"
           traefik.http.routers.reubah.rule: "Host(`reubah.{{ ansible_nas_domain }}`)"
           traefik.http.routers.reubah.tls.certresolver: "letsencrypt"

@@ -20,13 +20,11 @@ joomla_container_name: "joomla"
 joomla_image_name: "joomla"
 joomla_image_version: "latest"
 joomla_cpu_shares: 1024
+joomla_memory: 1g
 joomla_db_container_name: "joomla-db"
 joomla_db_image_name: "mysql"
 joomla_db_image_version: "5.7"
 joomla_db_cpu_shares: 1024
-
-# specs
-joomla_memory: 1g
 joomla_db_memory: 1g
 
 # autoheal
@@ -51,12 +49,12 @@ joomla_db_homepage_showstats: "false"
 joomla_repliqate_enabled: "false"
 joomla_repliqate_engine: "restic"
 joomla_repliqate_schedule: "@daily 3am"
-joomla_repliqate_backup_id: "joomla"
+joomla_repliqate_backup_id: "{{ joomla_container_name }}"
 joomla_repliqate_retention: "30d"
 joomla_db_repliqate_enabled: "false"
 joomla_db_repliqate_engine: "restic"
 joomla_db_repliqate_schedule: "@daily 3am"
-joomla_db_repliqate_backup_id: "joomla-db"
+joomla_db_repliqate_backup_id: "{{ joomla_db_container_name }}"
 joomla_db_repliqate_retention: "30d"
 
 # watchtower

@@ -66,15 +66,15 @@ checkmate_redis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_
 checkmate_redis_homepage_showstats: "false"
 
 # repliqate
-checkmate_repliqate_enabled: "false"
-checkmate_repliqate_engine: "restic"
-checkmate_repliqate_schedule: "@daily 3am"
-checkmate_repliqate_backup_id: "checkmate"
+checkmate_server_repliqate_enabled: "false"
+checkmate_server_repliqate_engine: "restic"
+checkmate_server_repliqate_schedule: "@daily 3am"
+checkmate_server_repliqate_backup_id: "{{ checkmate_server_container_name }}"
 checkmate_repliqate_retention: "30d"
 checkmate_db_repliqate_enabled: "false"
 checkmate_db_repliqate_engine: "restic"
 checkmate_db_repliqate_schedule: "@daily 3am"
-checkmate_db_repliqate_backup_id: "checkmate-db"
+checkmate_db_repliqate_backup_id: "{{ checkmate_db_container_name }}"
 checkmate_db_repliqate_retention: "30d"
 
 # watchtower
