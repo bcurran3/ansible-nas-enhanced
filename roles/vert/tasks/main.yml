@@ -55,63 +55,63 @@
 #        PUB_STRIPE_KEY: "{{ vert_env_pub_stripe_key }}"
 #    force_source: true # Ensures it builds locally rather than trying to pull 'vert:latest' from a registry
 
-- name: Start {{ ansible_nas_app_name }}
-  block:
-    - name: Create {{ ansible_nas_app_name }} Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ vert_container_name }}"
-        hostname: "{{ vert_container_name }}"
-        image: "{{ vert_image_name }}:{{ vert_image_tag }}"
-        pull: true
-        ports:
-          - "{{ vert_port_http }}:80"
-        env:
-# These are static in the app and NEED to be added at image build time
-#          ADMIN_PASSWORD: "{{ vert_env_admin_password }}"
-#          PUBLIC_URL: "{{ vert_env_public_url }}"
-#          PUB_HOSTNAME: "{{ vert_env_pub_hostname }}" #localhost:5173 # only gets used for plausible (for now)
-#          PUB_PLAUSIBLE_URL: "{{ vert_env_pub_plausible_url }}" #https://plausible.example.com # can be empty
-#          PUB_DISABLE_ALL_EXTERNAL_REQUESTS: "{{ vert_env_pub_disable_all_external_requests }}" # disables vertd, stripe, plausible, etc. use if your boss complains about privacy
-#          PUB_ENV: "{{ vert_env_pub_env }}" # "production", "development", or "nightly"
-#          PUB_VERTD_URL: "{{ vert_env_pub_vertd_url }}"
-#          PUB_DONATION_URL: "{{ vert_env_pub_donation_url }}"
-#          PUB_STRIPE_KEY: "{{ vert_env_pub_stripe_key }}"
-#          WEBHOOK_URL: "{{ vert_env_webhook_url }}"
-#          WEBHOOK_PINGS: "{{ vert_env_webhook_pings }}"
-          TZ: "{{ ansible_nas_timezone }}"
-        links:
-          - "{{ vertd_container_name }}"
-        labels:
-          autoheal: "{{ vert_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ vert_watchtower_enable }}"
-          dockflare.enable: "{{ vert_dockflare_tunnel }}"
-          dockflare.access.group: "{{ vert_dockflare_access_group }}"
-          dockflare.hostname: "{{ vert_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ vert_homepage_group }}"
-          homepage.icon: "{{ vert_homepage_icon }}"
-          homepage.href: "{{ vert_homepage_href }}"
-          homepage.description: "{{ 'VERT''s solution to crappy video conversion services.' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ vert_container_name }}"
-          homepage.showStats: "{{ vert_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
-          traefik.enable: "{{ vert_available_externally | string }}"
-          traefik.http.routers.vert.rule: "Host(`{{ vert_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.vert.tls.certresolver: "letsencrypt"
-          traefik.http.routers.vert.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.vert.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ vert_hostname }}"
-          traefik.http.routers.vert.middlewares: "{{ vert_hostname }}@docker"
-          traefik.http.middlewares.vert.IPAllowList.sourcerange: "{{ vert_traefik_whitelist }}"
-          traefik.http.services.vert.loadbalancer.server.port: "80"
-          wud.watch.digest: "true"
-          wud.link.template: "https://github.com/VERT-sh/vert/pkgs/container/vert"
-        cpu_shares: "{{ vert_cpu_shares }}"
-        memory: "{{ vert_memory }}"
-        restart_policy: unless-stopped
+    - name: Start {{ ansible_nas_app_name }}
+      block:
+        - name: Create {{ ansible_nas_app_name }} Container
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ vert_container_name }}"
+            hostname: "{{ vert_container_name }}"
+            image: "{{ vert_image_name }}:{{ vert_image_tag }}"
+            pull: true
+            ports:
+              - "{{ vert_port_http }}:80"
+            env:
+    # These are static in the app and NEED to be added at image build time
+    #          ADMIN_PASSWORD: "{{ vert_env_admin_password }}"
+    #          PUBLIC_URL: "{{ vert_env_public_url }}"
+    #          PUB_HOSTNAME: "{{ vert_env_pub_hostname }}" #localhost:5173 # only gets used for plausible (for now)
+    #          PUB_PLAUSIBLE_URL: "{{ vert_env_pub_plausible_url }}" #https://plausible.example.com # can be empty
+    #          PUB_DISABLE_ALL_EXTERNAL_REQUESTS: "{{ vert_env_pub_disable_all_external_requests }}" # disables vertd, stripe, plausible, etc. use if your boss complains about privacy
+    #          PUB_ENV: "{{ vert_env_pub_env }}" # "production", "development", or "nightly"
+    #          PUB_VERTD_URL: "{{ vert_env_pub_vertd_url }}"
+    #          PUB_DONATION_URL: "{{ vert_env_pub_donation_url }}"
+    #          PUB_STRIPE_KEY: "{{ vert_env_pub_stripe_key }}"
+    #          WEBHOOK_URL: "{{ vert_env_webhook_url }}"
+    #          WEBHOOK_PINGS: "{{ vert_env_webhook_pings }}"
+              TZ: "{{ ansible_nas_timezone }}"
+            links:
+              - "{{ vertd_container_name }}"
+            labels:
+              autoheal: "{{ vert_autoheal }}"
+              com.centurylinklabs.watchtower.enable: "{{ vert_watchtower_enable }}"
+              dockflare.enable: "{{ vert_dockflare_tunnel }}"
+              dockflare.access.group: "{{ vert_dockflare_access_group }}"
+              dockflare.hostname: "{{ vert_hostname }}.{{ ansible_nas_domain }}"
+              dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
+              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.group: "{{ vert_homepage_group }}"
+              homepage.icon: "{{ vert_homepage_icon }}"
+              homepage.href: "{{ vert_homepage_href }}"
+              homepage.description: "{{ 'VERT''s solution to crappy video conversion services.' if homepage_show_description else omit }}"
+              homepage.server: "my-docker"
+              homepage.container: "{{ vert_container_name }}"
+              homepage.showStats: "{{ vert_homepage_showstats }}"
+              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
+              traefik.enable: "{{ vert_available_externally | string }}"
+              traefik.http.routers.vert.rule: "Host(`{{ vert_hostname }}.{{ ansible_nas_domain }}`)"
+              traefik.http.routers.vert.tls.certresolver: "letsencrypt"
+              traefik.http.routers.vert.tls.domains[0].main: "{{ ansible_nas_domain }}"
+              traefik.http.routers.vert.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+              traefik.http.routers.frontend.middlewares: "{{ vert_hostname }}"
+              traefik.http.routers.vert.middlewares: "{{ vert_hostname }}@docker"
+              traefik.http.middlewares.vert.IPAllowList.sourcerange: "{{ vert_traefik_whitelist }}"
+              traefik.http.services.vert.loadbalancer.server.port: "80"
+              wud.watch.digest: "true"
+              wud.link.template: "https://github.com/VERT-sh/vert/pkgs/container/vert"
+            cpu_shares: "{{ vert_cpu_shares }}"
+            memory: "{{ vert_memory }}"
+            restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
