@@ -6,18 +6,19 @@ watchtower_available_externally: "false"
 watchtower_traefik_whitelist: "{{ lan }}"
 
 watchtower_hostname: "watchtower"
-#watchtower_port_http: "2347"
+watchtower_port_http: "2347"
 
 # docker
 watchtower_container_name: "watchtower"
-watchtower_image_name: "ghcr.io/containrrr/watchtower"
+#watchtower_image_name: "ghcr.io/containrrr/watchtower"
+watchtower_image_name: "ghcr.io/nicholas-fedor/watchtower"
 watchtower_image_version: "latest"
 watchtower_cpu_shares: 1024
 watchtower_memory: 256MB
 
 # app
-# REF - https://containrrr.github.io/watchtower/arguments/
-watchtower_docker_api_version: "1.44"
+# REF - https://watchtower.nickfedor.com/v1.12.3/configuration/arguments
+#watchtower_docker_api_version: "1.44"
 watchtower_docker_config: "/home/{{ ansible_nas_user }}/.docker/config.json"
 watchtower_cleanup: "true"
 watchtower_remove_volumes: "true"
@@ -69,7 +70,7 @@ watchtower_homepage_group: "Misc"
 watchtower_homepage_icon: "watchtower.png"
 watchtower_homepage_showstats: "false"
 #watchtower_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port_http }}"
-#watchtower_api_token: "123456789"
+watchtower_api_token: "123456789"
 
 # watchtower
 watchtower_watchtower_enable: "false"
