@@ -34,5 +34,12 @@ medialytics_homepage_icon: "medialytics.png"
 medialytics_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ medialytics_port_http }}"
 medialytics_homepage_showstats: "false"
 
+# repliqate
+medialytics_repliqate_enabled: "false"
+medialytics_repliqate_engine: "restic"
+medialytics_repliqate_schedule: "@daily 3am"
+medialytics_repliqate_backup_id: "{{ medialytics_container_name }}"
+medialytics_repliqate_retention: "30d"
+
 # watchtower
 medialytics_watchtower_enable: "false"

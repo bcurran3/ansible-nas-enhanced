@@ -44,10 +44,10 @@
           - NET_RAW          # Required for raw socket operations
           - NET_BIND_SERVICE # Required to bind to privileged ports (nbtscan)
         env:
-          LISTEN_ADDR: "0.0.0.0"            # Listen for connections on all interfaces
+          LISTEN_ADDR: "{{ netalertx_env_listen_addr }}" # Listen for connections on all interfaces
           PORT: "{{ netalertx_port_http }}" # Application port
-          GRAPHQL_PORT: "20212"             # GraphQL API port (passed into APP_CONF_OVERRIDE at runtime)
-          NETALERTX_DEBUG: "0"              # 0=kill all services and restart if any dies. 1 keeps running dead services.
+          GRAPHQL_PORT: "{{ netalertx_port_graphql }}" # GraphQL API port (passed into APP_CONF_OVERRIDE at runtime)
+          NETALERTX_DEBUG: "{{ netalertx_env_netalertx_debug }}" # 0=kill all services and restart if any dies. 1 keeps running dead services.
           TZ: "{{ ansible_nas_timezone }}"
         mounts:
           - type: bind
@@ -85,6 +85,11 @@
           homepage.widget.type: "netalertx"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
           homepage.widget.key: "{{ netalertx_homepage_widget_key }}"
+          repliqate.enabled: "{{ netalertx_repliqate_enabled }}"
+          repliqate.engine: "{{ netalertx_repliqate_engine }}"
+          repliqate.schedule: "{{ netalertx_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netalertx_repliqate_backup_id }}"
+          repliqate.retention: "{{ netalertx_repliqate_retention }}"
           traefik.enable: "{{ netalertx_available_externally | string }}"
           traefik.http.routers.netalertx.rule: "Host(`{{ netalertx_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.netalertx.tls.certresolver: "letsencrypt"

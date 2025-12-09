@@ -35,5 +35,12 @@ monitorr_homepage_icon: "monitorr.png"
 monitorr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ monitorr_port_http }}"
 monitorr_homepage_showstats: "false"
 
+# repliqate
+monitorr_repliqate_enabled: "false"
+monitorr_repliqate_engine: "restic"
+monitorr_repliqate_schedule: "@daily 3am"
+monitorr_repliqate_backup_id: "{{ monitorr_container_name }}"
+monitorr_repliqate_retention: "30d"
+
 # watchtower
 monitorr_watchtower_enable: "false"

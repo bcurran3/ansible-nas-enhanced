@@ -39,5 +39,12 @@ netbootxyz_homepage_icon: "netbootxyz.png"
 netbootxyz_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbootxyz_port_http }}"
 netbootxyz_homepage_showstats: "false"
 
+# repliqate
+netbootxyz_repliqate_enabled: "false"
+netbootxyz_repliqate_engine: "restic"
+netbootxyz_repliqate_schedule: "@daily 3am"
+netbootxyz_repliqate_backup_id: "{{ netbootxyz_container_name }}"
+netbootxyz_repliqate_retention: "30d"
+
 # watchtower
 netbootxyz_watchtower_enable: "false"

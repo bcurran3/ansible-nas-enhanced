@@ -45,6 +45,18 @@ koel_db_homepage_icon: "mariadb.png"
 koel_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
 koel_db_homepage_showstats: "false"
 
+# repliqate
+koel_repliqate_enabled: "false"
+koel_repliqate_engine: "restic"
+koel_repliqate_schedule: "@daily 3am"
+koel_repliqate_backup_id: "koel"
+koel_repliqate_retention: "30d"
+koel_db_repliqate_enabled: "false"
+koel_db_repliqate_engine: "restic"
+koel_db_repliqate_schedule: "@daily 3am"
+koel_db_repliqate_backup_id: "koel-db"
+koel_db_repliqate_retention: "30d"
+
 # watchtower
 koel_watchtower_enable: "false"
 koel_db_watchtower_enable: "false"

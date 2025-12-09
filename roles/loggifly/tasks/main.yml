@@ -17,14 +17,11 @@
         hostname: "{{ loggifly_container_name }}"
         image: "{{ loggifly_image_name }}:{{ loggifly_image_tag }}"
         pull: true
-        cpu_shares: "{{ loggifly_cpu_shares }}"
         volumes:
           - "{{ loggifly_data_directory }}:/config"
           - /var/run/docker.sock:/var/run/docker.sock
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        restart_policy: unless-stopped
-        memory: "{{ loggifly_memory }}"
         labels:
           autoheal: "{{ loggifly_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ loggifly_watchtower_enable }}"
@@ -36,10 +33,18 @@
           homepage.server: "my-docker"
           homepage.container: "{{ loggifly_container_name }}"
           homepage.showStats: "{{ loggifly_homepage_showstats }}"
+          repliqate.enabled: "{{ loggifly_repliqate_enabled }}"
+          repliqate.engine: "{{ loggifly_repliqate_engine }}"
+          repliqate.schedule: "{{ loggifly_repliqate_schedule }}"
+          repliqate.backup_id: "{{ loggifly_repliqate_backup_id }}"
+          repliqate.retention: "{{ loggifly_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/clemcer/loggifly/releases"
+        cpu_shares: "{{ loggifly_cpu_shares }}"
+        memory: "{{ loggifly_memory }}"
+        restart_policy: unless-stopped
   when: loggifly_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

@@ -34,5 +34,12 @@ lancommander_homepage_icon: "lancommander.png"
 lancommander_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lancommander_port_http }}"
 lancommander_homepage_showstats: "false"
 
+# repliqate
+lancommander_repliqate_enabled: "false"
+lancommander_repliqate_engine: "restic"
+lancommander_repliqate_schedule: "@daily 3am"
+lancommander_repliqate_backup_id: "{{ lancommander_container_name }}"
+lancommander_repliqate_retention: "30d"
+
 # watchtower
 lancommander_watchtower_enable: "false"

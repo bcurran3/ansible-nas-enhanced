@@ -23,8 +23,8 @@
           DOCKER_MODS: "{{ modmanager_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ modmanager_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ modmanager_env_docker_mods_install_pip_packages}}"
-#         DOCKER_HOST: ""             # optional
-#         DOCKER_MODS_EXTRA_HOSTS: "" # optional
+          DOCKER_HOST: "{{ modmanager_env_docker_host }}"
+          DOCKER_MODS_EXTRA_HOSTS: "{{ modmanager_env_docker_mods_extra_hosts }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ modmanager_autoheal }}"
@@ -37,6 +37,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ modmanager_container_name }}"
           homepage.showStats: "{{ modmanager_homepage_showstats }}"
+          repliqate.enabled: "{{ modmanager_repliqate_enabled }}"
+          repliqate.engine: "{{ modmanager_repliqate_engine }}"
+          repliqate.schedule: "{{ modmanager_repliqate_schedule }}"
+          repliqate.backup_id: "{{ modmanager_repliqate_backup_id }}"
+          repliqate.retention: "{{ modmanager_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^version-\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"

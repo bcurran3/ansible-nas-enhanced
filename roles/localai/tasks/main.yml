@@ -23,7 +23,7 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
-# I want to make the LLMs persistent - need to find them
+# I'd like to make the DL'd LLMs persistent - need to find where they are stored in the container
 #        volumes:
 #          - "{{ localai_data_directory }}/models:/build/models:rw"
         network_mode: bridge
@@ -47,6 +47,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ localai_container_name }}"
           homepage.showStats: "{{ localai_homepage_showstats }}"
+          repliqate.enabled: "false"
           traefik.enable: "{{ localai_available_externally | string }}"
           traefik.http.routers.localai.rule: "Host(`{{ localai_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.localai.tls.certresolver: "letsencrypt"

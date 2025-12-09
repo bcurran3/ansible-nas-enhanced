@@ -9,6 +9,7 @@ netalertx_data_directory: "{{ docker_home }}/netalertx"
 # network
 netalertx_hostname: "netalertx"
 netalertx_port_http: "20211"
+netalertx_port_graphql: "20212"
 
 # docker
 netalertx_container_name: "netalertx"
@@ -16,6 +17,10 @@ netalertx_image_name: "ghcr.io/jokob-sk/netalertx"
 netalertx_image_tag: "latest"
 netalertx_cpu_shares: "1024"
 netalertx_memory: "1g"
+
+# app
+netalertx_env_netalertx_debug: "0"
+netalertx_env_listen_addr: "0.0.0.0"
 
 # autoheal
 netalertx_autoheal: "false"
@@ -29,6 +34,13 @@ netalertx_homepage_group: "Network"
 netalertx_homepage_icon: "netalertx.png"
 netalertx_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
 netalertx_homepage_widget_key: "netalertx_sync_api_token" # optional, only if password is enabled
+
+# repliqate
+netalertx_repliqate_enabled: "false"
+netalertx_repliqate_engine: "restic"
+netalertx_repliqate_schedule: "@daily 3am"
+netalertx_repliqate_backup_id: "{{ netalertx_container_name }}"
+netalertx_repliqate_retention: "30d"
 
 # watchtower
 netalertx_watchtower_enable: "false"

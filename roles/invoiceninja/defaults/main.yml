@@ -86,6 +86,23 @@ invoiceninja_web_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible
 invoiceninja_web_homepage_sitemonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ invoiceninja_port_http }}"
 invoiceninja_web_homepage_showstats: "false"
 
+# repliqate
+invoiceninja_app_repliqate_enabled: "false"
+invoiceninja_app_repliqate_engine: "restic"
+invoiceninja_app_repliqate_schedule: "@daily 3am"
+invoiceninja_app_repliqate_backup_id: "invoiceninja-app"
+invoiceninja_app_repliqate_retention: "30d"
+invoiceninja_db_repliqate_enabled: "false"
+invoiceninja_db_repliqate_engine: "restic"
+invoiceninja_db_repliqate_schedule: "@daily 3am"
+invoiceninja_db_repliqate_backup_id: "invoiceninja-db"
+invoiceninja_db_repliqate_retention: "30d"
+invoiceninja_web_repliqate_enabled: "false"
+invoiceninja_web_repliqate_engine: "restic"
+invoiceninja_web_repliqate_schedule: "@daily 3am"
+invoiceninja_web_repliqate_backup_id: "invoiceninja_web"
+invoiceninja_web_repliqate_retention: "30d"
+
 # watchtower
 invoiceninja_app_watchtower_enable: "false"
 invoiceninja_db_watchtower_enable: "false"

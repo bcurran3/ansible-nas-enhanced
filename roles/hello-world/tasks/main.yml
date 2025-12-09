@@ -35,6 +35,7 @@
           homepage.container: "{{ hello_world_container_name }}"
           homepage.showStats: "{{ hello_world_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hello_world_port_http }}"
+          repliqate.enabled: "false"
           traefik.enable: "{{ hello_world_available_externally | string }}"
           traefik.http.routers.hello_world.rule: "Host(`{{ hello_world_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.hello_world.tls.certresolver: "letsencrypt"

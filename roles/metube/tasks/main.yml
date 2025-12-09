@@ -6,7 +6,7 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ metube_data_directory }}"
+        - "{{ metube_dl_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -37,6 +37,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ metube_container_name }}"
           homepage.showStats: "{{ metube_homepage_showstats }}"
+          repliqate.enabled: "false"
           traefik.enable: "{{ metube_available_externally | string }}"
           traefik.http.routers.metube.rule: "Host(`metube.{{ ansible_nas_domain }}`)"
           traefik.http.routers.metube.tls.certresolver: "letsencrypt"

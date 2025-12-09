@@ -43,6 +43,18 @@ koillection_db_homepage_icon: "postgres.png"
 koillection_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koillection_port_http }}"
 koillection_db_homepage_showstats: "false"
 
+# repliqate
+koillection_repliqate_enabled: "false"
+koillection_repliqate_engine: "restic"
+koillection_repliqate_schedule: "@daily 3am"
+koillection_repliqate_backup_id: "{{ koillection_container_name }}"
+koillection_repliqate_retention: "30d"
+koillection_db_repliqate_enabled: "false"
+koillection_db_repliqate_engine: "restic"
+koillection_db_repliqate_schedule: "@daily 3am"
+koillection_db_repliqate_backup_id: "{{ koillection_db_container_name }}"
+koillection_db_repliqate_retention: "30d"
+
 # watchtower
 koillection_watchtower_enable: "false"
 koillection_db_watchtower_enable: "false"

@@ -6,8 +6,8 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ mymediaforalexa_media_directory }}"
         - "{{ mymediaforalexa_data_directory }}"
+        - "{{ mymediaforalexa_media_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -30,6 +30,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ mymediaforalex_container_name }}"
           homepage.showStats: "{{ mymediaforalex_homepage_showstats }}"
+          repliqate.enabled: "{{ mymediaforalex_repliqate_enabled }}"
+          repliqate.engine: "{{ mymediaforalex_repliqate_engine }}"
+          repliqate.schedule: "{{ mymediaforalex_repliqate_schedule }}"
+          repliqate.backup_id: "{{ mymediaforalex_repliqate_backup_id }}"
+          repliqate.retention: "{{ mymediaforalex_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

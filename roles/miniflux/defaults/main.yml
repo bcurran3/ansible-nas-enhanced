@@ -10,7 +10,7 @@ miniflux_data_directory: "{{ docker_home }}/miniflux"
 
 # env
 miniflux_admin_username: admin
-miniflux_admin_password: supersecure
+miniflux_admin_password: "{{ ansible_nas_app_admin_password }}"
 
 # network
 miniflux_hostname: "miniflux"
@@ -22,7 +22,7 @@ miniflux_container_name: "miniflux"
 miniflux_image_name: "docker.io/miniflux/miniflux"
 miniflux_image_version: "latest"
 miniflux_cpu_shares: 1024
-miniflux_db_container_name: "miniflux-postgres"
+miniflux_db_container_name: "miniflux-db"
 miniflux_db_image_name: "postgres"
 miniflux_db_image_version: "11.1"
 miniflux_db_cpu_shares: 1024
@@ -48,6 +48,13 @@ miniflux_db_homepage_group: "DBs"
 miniflux_db_homepage_icon: "postgres.png"
 miniflux_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ miniflux_port_http }}"
 miniflux_db_homepage_showstats: "false"
+
+# repliqate
+miniflux_db_repliqate_enabled: "false"
+miniflux_db_repliqate_engine: "restic"
+miniflux_db_repliqate_schedule: "@daily 3am"
+miniflux_db_repliqate_backup_id: "{{ miniflux_db_container_name }}"
+miniflux_db_repliqate_retention: "30d"
 
 # watchtower
 miniflux_watchtower_enable: "false"

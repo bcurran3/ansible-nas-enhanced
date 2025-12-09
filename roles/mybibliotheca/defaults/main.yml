@@ -34,5 +34,12 @@ mybibliotheca_homepage_icon: "mdi-bookshelf" #something better? 📚
 mybibliotheca_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mybibliotheca_port }}"
 mybibliotheca_homepage_showstats: "false"
 
+# repliqate
+mybibliotheca_repliqate_enabled: "false"
+mybibliotheca_repliqate_engine: "restic"
+mybibliotheca_repliqate_schedule: "@daily 3am"
+mybibliotheca_repliqate_backup_id: "{{ mybibliotheca_container_name }}"
+mybibliotheca_repliqate_retention: "30d"
+
 # watchtower
 mybibliotheca_watchtower_enable: "false"

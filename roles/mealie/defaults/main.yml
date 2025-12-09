@@ -47,5 +47,12 @@ mealie_homepage_icon: "mealie.png"
 mealie_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mealie_port_http }}"
 mealie_homepage_showstats: "false"
 
+# repliqate
+mealie_repliqate_enabled: "false"
+mealie_repliqate_engine: "restic"
+mealie_repliqate_schedule: "@daily 3am"
+mealie_repliqate_backup_id: "{{ mealie_container_name }}"
+mealie_repliqate_retention: "30d"
+
 # watchtower
 mealie_watchtower_enable: "false"

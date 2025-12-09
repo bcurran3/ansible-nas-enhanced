@@ -39,5 +39,12 @@ loki_homepage_icon: "loki.png"
 loki_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ loki_port }}"
 loki_homepage_showstats: "false"
 
+# repliqate
+loki_repliqate_enabled: "false"
+loki_repliqate_engine: "restic"
+loki_repliqate_schedule: "@daily 3am"
+loki_repliqate_backup_id: "{{ loki_container_name }}"
+loki_repliqate_retention: "30d"
+
 # watchtower
 loki_watchtower_enable: "false"

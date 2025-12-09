@@ -7,8 +7,6 @@ loggifly_traefik_whitelist: "{{ lan }}"
 
 # directories
 loggifly_data_directory: "{{ docker_home }}/loggifly"
-loggifly_download_directory: "{{ downloads_root }}"
-loggifly_tv_directory: "{{ tv_root }}"
 
 # docker
 loggifly_container_name: "loggifly"
@@ -29,6 +27,13 @@ loggifly_autoheal: "false"
 loggifly_homepage_group: "Misc"
 loggifly_homepage_icon: "loggifly.png"
 loggifly_homepage_showstats: "false"
+
+# repliqate
+loggifly_repliqate_enabled: "false"
+loggifly_repliqate_engine: "restic"
+loggifly_repliqate_schedule: "@daily 3am"
+loggifly_repliqate_backup_id: "{{ loggifly_container_name }}"
+loggifly_repliqate_retention: "30d"
 
 # watchtower
 loggifly_watchtower_enable: "false"

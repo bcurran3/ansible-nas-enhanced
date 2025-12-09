@@ -66,6 +66,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ invoiceninja_db_container_name }}"
           homepage.showStats: "{{ invoiceninja_db_homepage_showstats }}"
+          repliqate.enabled: "{{ invoiceninja_db_repliqate_enabled }}"
+          repliqate.engine: "{{ invoiceninja_db_repliqate_engine }}"
+          repliqate.schedule: "{{ invoiceninja_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ invoiceninja_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ invoiceninja_db_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -74,7 +79,7 @@
         memory: "{{ invoiceninja_db_memory }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ ansible_nas_app_name }} App Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_app_container_name }}"
@@ -138,6 +143,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ invoiceninja_app_container_name }}"
           homepage.showStats: "{{ invoiceninja_app_homepage_showstats }}"
+          repliqate.enabled: "{{ invoiceninja_app_repliqate_enabled }}"
+          repliqate.engine: "{{ invoiceninja_app_repliqate_engine }}"
+          repliqate.schedule: "{{ invoiceninja_app_repliqate_schedule }}"
+          repliqate.backup_id: "{{ invoiceninja_app_repliqate_backup_id }}"
+          repliqate.retention: "{{ invoiceninja_app_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
@@ -183,6 +193,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ invoiceninja_web_container_name }}"
           homepage.showStats: "{{ invoiceninja_web_homepage_showstats }}"
+          repliqate.enabled: "{{ invoiceninja_web_repliqate_enabled }}"
+          repliqate.engine: "{{ invoiceninja_web_repliqate_engine }}"
+          repliqate.schedule: "{{ invoiceninja_web_repliqate_schedule }}"
+          repliqate.backup_id: "{{ invoiceninja_web_repliqate_backup_id }}"
+          repliqate.retention: "{{ invoiceninja_web_repliqate_retention }}"
           traefik.enable: "{{ invoiceninja_available_externally | string }}"
           traefik.http.routers.invoiceninja.rule: "Host(`invoiceninja.{{ ansible_nas_domain }}`)"
           traefik.http.routers.invoiceninja.tls.certresolver: "letsencrypt"

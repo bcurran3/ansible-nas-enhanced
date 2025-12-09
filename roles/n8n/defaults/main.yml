@@ -12,18 +12,19 @@ n8n_hostname: "n8n"
 # Directories
 n8n_data_directory: "{{ docker_home }}/n8n"
 
-# Security
-n8n_basic_auth_user: "n8n_user"
-n8n_basic_auth_password: "n8n_change_me"
-
 # docker
 n8n_container_name: "n8n"
 n8n_image_name: "docker.n8n.io/n8nio/n8n"
 n8n_image_version: "latest"
-n8n_cpu_shares: 1024
 
 # specs
+n8n_cpu_shares: 1024
 n8n_memory: 1g
+
+# app
+n8n_env_n8n_basic_auth_active: "true"
+n8n_env_n8n_basic_auth_user: "{{ ansible_nas_user }}"
+n8n_env_n8n_basic_auth_password: "{{ ansible_nas_app_admin_password }}"
 
 # autoheal
 n8n_autoheal: "false"
@@ -37,6 +38,13 @@ n8n_homepage_group: "Apps"
 n8n_homepage_icon: "n8n.png"
 n8n_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ n8n_port_http }}"
 n8n_homepage_showstats: "false"
+
+# repliqate
+n8n_repliqate_enabled: "false"
+n8n_repliqate_engine: "restic"
+n8n_repliqate_schedule: "@daily 3am"
+n8n_repliqate_backup_id: "{{ n8n_container_name }}"
+n8n_repliqate_retention: "30d"
 
 # watchtower
 n8n_watchtower_enable: "false"
