@@ -35,7 +35,7 @@ function print_error {
 
 function print_install_message {
     echo -e " **** \033[01mAnsible-NAS-Enhanced (ANE) installation script. ****\033[0m"
-    check_sudo
+    check_wsl 
     print_info "This script will:"
     print_info "  - Upgrade apt packages and install required packages (Ansible, git, nano, etc.)."
     print_info "  - Clone the ANE files from $REPO to $(pwd)/$INSTALL_DIR."
@@ -46,16 +46,17 @@ function print_install_message {
         case "$yn" in
             [Yy]* ) printf "\n"; return 0;;
             [Nn]* ) printf "\n"; print_error "Aborting...";;
-            * ) echo "Please answer yes or no.";;
+            * ) echo "Please answer yes (y) or no (n).";;
         esac
     done
 }
 
-# check if run with sudo
-# NEED to use sudo when run from WSL
-function check_sudo {
-  if ! [ $(id -u) = 0 ]; then
-    print_info "You MAY need to use sudo."
+# check for WSL
+function check_wsl {
+  if [ -r /proc/sys/fs/binfmt_misc/WSLInterop ]; then
+    if ! [ $(id -u) = 0 ]; then
+        print_info "WSL detected. You may need to use sudo."
+    fi
   fi
 }
 
