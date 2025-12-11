@@ -122,6 +122,7 @@ function default_config {
 
 function setup_instructions {
     echo -e " **** \033[01mAnsible-NAS-Enhanced (ANE) installed! ****\033[0m"
+    print_info "\"cd $INSTALL_DIR\" to enter the ANE installation location."
     print_info "\"./ane.sh --inventory\" to edit your inventory file"
     print_info "\"./ane.sh --settings\" to edit your settings/overrides file (enable apps)"
     print_info "\"./ane.sh --run\" to run the ANE playbook"
@@ -144,5 +145,4 @@ install_git
 clone_repo
 install_packages
 default_config
-cd $INSTALL_DIR
 setup_instructions
