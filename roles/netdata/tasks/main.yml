@@ -1,6 +1,15 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
+    - name: Create {{ ansible_nas_app_name }} Directories # added
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ netdata_data_directory }}/cache"
+        - "{{ netdata_data_directory }}/config"
+        - "{{ netdata_data_directory }}/lib"
+
     - name: Get docker group id
       ansible.builtin.group:
         name: docker
@@ -14,19 +23,38 @@
         image: "{{ netdata_image_name }}:{{ netdata_image_version }}"
         state: started
         pull: true
+        pid_mode: host # added
+        privileged: true # added
         ports:
           - "{{ netdata_port_http }}:19999"
         volumes:
+          - "{{ netdata_data_directory }}/cache:/var/cache/netdata" # added
+          - "{{ netdata_data_directory }}/config:/etc/netdata" # added
+          - "{{ netdata_data_directory }}/lib:/var/lib/netdata" # added
           - "/proc:/host/proc:ro"
           - "/sys:/host/sys:ro"
+          - "/var/run/docker.sock:/var/run/docker.sock:ro"
+          - "/:/host/root:ro,rslave" # added
+          - "/etc/os-release:/host/etc/os-release:ro" # added
+          - "/etc/passwd:/host/etc/passwd:ro" # added
+          - "/etc/group:/host/etc/group:ro" # added
+          - "/var/log:/host/var/log:ro" # added
+          - "/run/dbus:/run/dbus:ro" # added
+          - "/etc/localtime:/etc/localtime:ro" # added
         env:
-          PGID: "{{ docker_group.gid }} | string "
-#          PGID: "{{ docker_group.gid }} | string "
+          NETDATA_EXTRA_DEB_PACKAGES: "{{ netdata_env_netdata_extra_deb_packages }}" # added
+          PGID: "{{ docker_group.gid | string }}"
           TZ: "{{ ansible_nas_timezone }}"
-        capabilities:
-          - SYS_PTRACE
-        security_opts:
-          - apparmor:unconfined
+#        capabilities:
+#          - SYS_PTRACE
+#          - SYS_ADMIN # added
+#        security_opts:
+#          - apparmor:unconfined
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}" # added
         labels:
           autoheal: "{{ netdata_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ netdata_watchtower_enable }}"
