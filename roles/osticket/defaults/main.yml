@@ -52,6 +52,18 @@ osticket_db_env_docker_mods: ""
 osticket_db_env_docker_mods_install_packages: ""
 osticket_db_env_docker_mods_install_pip_packages: ""
 
+# repliqate
+osticket_repliqate_enabled: "false"
+osticket_repliqate_engine: "restic"
+osticket_repliqate_schedule: "@daily 3am"
+osticket_repliqate_backup_id: "{{ osticket_container_name }}"
+osticket_repliqate_retention: "30d"
+osticket_db_repliqate_enabled: "false"
+osticket_db_repliqate_engine: "restic"
+osticket_db_repliqate_schedule: "@daily 3am"
+osticket_db_repliqate_backup_id: "{{ osticket_container_name }}"
+osticket_db_repliqate_retention: "30d"
+
 # watchtower
 osticket_watchtower_enable: "false"
 osticket_db_watchtower_enable: "false"

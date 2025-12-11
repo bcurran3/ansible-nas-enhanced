@@ -35,5 +35,12 @@ openhab_homepage_icon: "openhab.png"
 openhab_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openhab_port }}"
 openhab_homepage_showstats: "false"
 
+# repliqate
+openhab_repliqate_enabled: "false"
+openhab_repliqate_engine: "restic"
+openhab_repliqate_schedule: "@daily 3am"
+openhab_repliqate_backup_id: "{{ openhab_container_name }}"
+openhab_repliqate_retention: "30d"
+
 # watchtower
 openhab_watchtower_enable: "false"

@@ -74,6 +74,23 @@ romm_redis_homepage_icon: "redis.png"
 romm_redis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port_http }}"
 romm_redis_homepage_showstats: "false"
 
+# repliqate
+romm_repliqate_enabled: "false"
+romm_repliqate_engine: "restic"
+romm_repliqate_schedule: "@daily 3am"
+romm_repliqate_backup_id: "{{ romm_container_name }}"
+romm_repliqate_retention: "30d"
+romm_db_repliqate_enabled: "false"
+romm_db_repliqate_engine: "restic"
+romm_db_repliqate_schedule: "@daily 3am"
+romm_db_repliqate_backup_id: "{{ romm_container_name }}"
+romm_db_repliqate_retention: "30d"
+romm_redis_repliqate_enabled: "false"
+romm_redis_repliqate_engine: "restic"
+romm_redis_repliqate_schedule: "@daily 3am"
+romm_redis_repliqate_backup_id: "{{ romm_container_name }}"
+romm_redis_repliqate_retention: "30d"
+
 # watchtower
 romm_watchtower_enable: "false"
 romm_db_watchtower_enable: "false"

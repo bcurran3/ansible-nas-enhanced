@@ -44,5 +44,12 @@ pihole_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_i
 pihole_homepage_showstats: "false"
 pihole_homepage_widget_key: "{{ pihole_env_ftlconf_webserver_api_password }}"
 
+# repliqate
+pihole_repliqate_enabled: "false"
+pihole_repliqate_engine: "restic"
+pihole_repliqate_schedule: "@daily 3am"
+pihole_repliqate_backup_id: "{{ pihole_container_name }}"
+pihole_repliqate_retention: "30d"
+
 # watchtower
 pihole_watchtower_enable: "false"

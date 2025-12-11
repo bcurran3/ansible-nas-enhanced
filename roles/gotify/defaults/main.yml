@@ -30,7 +30,7 @@ gotify_env_gotify_server_cors_allowmethods: "" # [GET, POST]
 gotify_env_gotify_server_cors_allowheaders: "" # [X-Gotify-Key, Authorization]
 gotify_env_gotify_server_responseheaders: "" # {X-Custom-Header: "custom value", x-other: value}
 gotify_env_gotify_server_stream_alloworigins: "[{{ ansible_nas_domain }}]" # [.+.example\.com, otherdomain\.com]
-gotify_env_gotify_server_trustedproxies: "[127.0.0.1,{{ lan }}]" # [127.0.0.1,192.168.178.2/24]
+gotify_env_gotify_server_trustedproxies: "[127.0.0.1,{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}]" # [127.0.0.1,]
 
 # autoheal
 gotify_autoheal: "false"

@@ -29,5 +29,12 @@ pornvault_homepage_icon: "pornvault.png"
 pornvault_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pornvault_port_http }}"
 pornvault_homepage_showstats: "false"
 
+# repliqate
+pornvault_repliqate_enabled: "false"
+pornvault_repliqate_engine: "restic"
+pornvault_repliqate_schedule: "@daily 3am"
+pornvault_repliqate_backup_id: "{{ pornvault_container_name }}"
+pornvault_repliqate_retention: "30d"
+
 # watchtower
 pornvault_watchtower_enable: "false"

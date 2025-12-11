@@ -40,5 +40,12 @@ plexrewind_homepage_icon: "plexrewind.png"
 plexrewind_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plexrewind_port_http }}"
 plexrewind_homepage_showstats: "false"
 
+# repliqate
+plexrewind_repliqate_enabled: "false"
+plexrewind_repliqate_engine: "restic"
+plexrewind_repliqate_schedule: "@daily 3am"
+plexrewind_repliqate_backup_id: "{{ plexrewind_container_name }}"
+plexrewind_repliqate_retention: "30d"
+
 # watchtower
 plexrewind_watchtower_enable: "false"

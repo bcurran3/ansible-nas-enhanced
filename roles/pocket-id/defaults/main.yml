@@ -42,5 +42,12 @@ pocketid_homepage_icon: "pocket-id.png"
 pocketid_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pocketid_port }}"
 pocketid_homepage_showstats: "false"
 
+# repliqate
+pocketid_repliqate_enabled: "false"
+pocketid_repliqate_engine: "restic"
+pocketid_repliqate_schedule: "@daily 3am"
+pocketid_repliqate_backup_id: "{{ pocketid_container_name }}"
+pocketid_repliqate_retention: "30d"
+
 # watchtower
 pocketid_watchtower_enable: "false"

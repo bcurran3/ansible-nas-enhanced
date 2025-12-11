@@ -18,38 +18,6 @@
       community.docker.docker_network:
         name: "{{ paperless_ngx_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} Redis Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ paperless_ngx_redis_container_name }}"
-        hostname: "{{ paperless_ngx_redis_container_name }}"
-        image: "{{ paperless_ngx_redis_image_name }}:{{ paperless_ngx_redis_image_version }}"
-        pull: true
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-        networks:
-          - name: "{{ paperless_ngx_network_name }}"
-        network_mode: "{{ paperless_ngx_network_name }}"
-        labels:
-          traefik.enable: "false"
-          autoheal: "{{ paperless_ngx_redis_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_redis_watchtower_enable }}"
-          dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Redis"
-          homepage.group: "{{ paperless_ngx_redis_homepage_group }}"
-          homepage.icon: "{{ paperless_ngx_redis_homepage_icon }}"
-          homepage.href: "{{ paperless_ngx_homepage_href }}"
-          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ paperless_ngx_redis_container_name }}"
-          homepage.showStats: "{{ paperless_ngx_redis_homepage_showstats }}"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/_/redis"
-        cpu_shares: "{{ paperless_ngx_redis_cpu_shares }}"
-        restart_policy: unless-stopped
-        memory: "{{ paperless_ngx_redis_memory }}"
-
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -80,12 +48,54 @@
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_db_container_name }}"
           homepage.showStats: "{{ paperless_ngx_db_homepage_showstats }}"
+          repliqate.enabled: "{{ paperless_ngx_db_repliqate_enabled }}"
+          repliqate.engine: "{{ paperless_ngx_db_repliqate_engine }}"
+          repliqate.schedule: "{{ paperless_ngx_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ paperless_ngx_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ paperless_ngx_db_repliqate_retention }}"
           wud.tag.include: '^\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ paperless_ngx_db_cpu_shares }}"
         restart_policy: unless-stopped
         memory: "{{ paperless_ngx_db_memory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ paperless_ngx_redis_container_name }}"
+        hostname: "{{ paperless_ngx_redis_container_name }}"
+        image: "{{ paperless_ngx_redis_image_name }}:{{ paperless_ngx_redis_image_version }}"
+        pull: true
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        networks:
+          - name: "{{ paperless_ngx_network_name }}"
+        network_mode: "{{ paperless_ngx_network_name }}"
+        labels:
+          traefik.enable: "false"
+          autoheal: "{{ paperless_ngx_redis_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_redis_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ paperless_ngx_redis_homepage_group }}"
+          homepage.icon: "{{ paperless_ngx_redis_homepage_icon }}"
+          homepage.href: "{{ paperless_ngx_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ paperless_ngx_redis_container_name }}"
+          homepage.showStats: "{{ paperless_ngx_redis_homepage_showstats }}"
+          repliqate.enabled: "{{ paperless_ngx_redis_repliqate_enabled }}"
+          repliqate.engine: "{{ paperless_ngx_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ paperless_ngx_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ paperless_ngx_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ paperless_ngx_redis_repliqate_retention }}"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
+        cpu_shares: "{{ paperless_ngx_redis_cpu_shares }}"
+        restart_policy: unless-stopped
+        memory: "{{ paperless_ngx_redis_memory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -133,6 +143,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_container_name }}"
           homepage.showStats: "{{ paperless_ngx_homepage_showstats }}"
+          repliqate.enabled: "{{ paperless_ngx_repliqate_enabled }}"
+          repliqate.engine: "{{ paperless_ngx_repliqate_engine }}"
+          repliqate.schedule: "{{ paperless_ngx_repliqate_schedule }}"
+          repliqate.backup_id: "{{ paperless_ngx_repliqate_backup_id }}"
+          repliqate.retention: "{{ paperless_ngx_repliqate_retention }}"
           traefik.enable: "{{ paperless_ngx_available_externally | string }}"
           traefik.http.routers.paperless_ngx.rule: "Host(`{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.paperless_ngx.tls.certresolver: "letsencrypt"

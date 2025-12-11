@@ -26,6 +26,14 @@ opencloud_memory: 1g
 opencloud_env_idm_admin_password: "topsecret" # NOTE: This variable needs to be set before the first start of OpenCloud. Changes to this variable after the first start will be IGNORED.
 opencloud_env_oc_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port }}"
 #opencloud_env_oc_url: "https://{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
+opencloud_env_smtp_host: ""
+opencloud_env_smtp_port: ""
+opencloud_env_smtp_sender: ""
+opencloud_env_smtp_username: ""
+opencloud_env_smtp_password: ""
+opencloud_env_smtp_insecure: ""
+opencloud_env_smtp_authentication: ""
+opencloud_env_smtp_encryption: ""
 
 # autoheal
 opencloud_autoheal: "false"
@@ -39,6 +47,13 @@ opencloud_homepage_group: "Apps"
 opencloud_homepage_icon: "sh-opencloud.png"
 opencloud_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port }}"
 opencloud_homepage_showstats: "false"
+
+# repliqate
+opencloud_repliqate_enabled: "false"
+opencloud_repliqate_engine: "restic"
+opencloud_repliqate_schedule: "@daily 3am"
+opencloud_repliqate_backup_id: "{{ opencloud_container_name }}"
+opencloud_repliqate_retention: "30d"
 
 # watchtower
 opencloud_watchtower_enable: "false"

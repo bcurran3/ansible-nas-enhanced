@@ -39,5 +39,12 @@ pyload_homepage_icon: "pyload.png"
 pyload_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pyload_port_http }}"
 pyload_homepage_showstats: "false"
 
+# repliqate
+pyload_repliqate_enabled: "false"
+pyload_repliqate_engine: "restic"
+pyload_repliqate_schedule: "@daily 3am"
+pyload_repliqate_backup_id: "{{ pyload_container_name }}"
+pyload_repliqate_retention: "30d"
+
 # watchtower
 pyload_watchtower_enable: "false"

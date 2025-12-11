@@ -23,8 +23,6 @@
           - "{{ pialert_data_directory }}/db:/home/pi/pialert/db"
         network_mode: host
         env:
-#         HOST_USER_GID: "1000"
-#         HOST_USER_ID: "1000"
           PORT: "{{ pialert_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
@@ -43,6 +41,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ pialert_container_name }}"
           homepage.showStats: "{{ pialert_homepage_showstats }}"
+          repliqate.enabled: "{{ pialert_repliqate_enabled }}"
+          repliqate.engine: "{{ pialert_repliqate_engine }}"
+          repliqate.schedule: "{{ pialert_repliqate_schedule }}"
+          repliqate.backup_id: "{{ pialert_repliqate_backup_id }}"
+          repliqate.retention: "{{ pialert_repliqate_retention }}"
           traefik.enable: "{{ pialert_available_externally | string }}"
           traefik.http.routers.pialert.rule: "Host(`{{ pialert_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pialert.tls.certresolver: "letsencrypt"

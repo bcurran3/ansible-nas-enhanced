@@ -32,5 +32,12 @@ qdirstat_homepage_icon: "qdirstat.png"
 qdirstat_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
 qdirstat_homepage_showstats: "false"
 
+# repliqate
+qdirstat_repliqate_enabled: "false"
+qdirstat_repliqate_engine: "restic"
+qdirstat_repliqate_schedule: "@daily 3am"
+qdirstat_repliqate_backup_id: "{{ qdirstat_container_name }}"
+qdirstat_repliqate_retention: "30d"
+
 # watchtower
 qdirstat_watchtower_enable: "false"

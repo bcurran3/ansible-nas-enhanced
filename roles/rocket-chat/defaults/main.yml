@@ -41,6 +41,18 @@ rocketchat_db_homepage_icon: "mongodb.png"
 rocketchat_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocketchat_port_http }}"
 rocketchat_db_homepage_showstats: "false"
 
+# repliqate
+rocketchat_repliqate_enabled: "false"
+rocketchat_repliqate_engine: "restic"
+rocketchat_repliqate_schedule: "@daily 3am"
+rocketchat_repliqate_backup_id: "{{ rocketchat_container_name }}"
+rocketchat_repliqate_retention: "30d"
+rocketchat_db_repliqate_enabled: "false"
+rocketchat_db_repliqate_engine: "restic"
+rocketchat_db_repliqate_schedule: "@daily 3am"
+rocketchat_db_repliqate_backup_id: "{{ rocketchat_container_name }}"
+rocketchat_db_repliqate_retention: "30d"
+
 # watchtower
 rocketchat_watchtower_enable: "false"
 rocketchat_db_watchtower_enable: "false"

@@ -48,6 +48,18 @@ openemr_db_env_docker_mods: ""
 openemr_db_env_docker_mods_install_packages: ""
 openemr_db_env_docker_mods_install_pip_packages: ""
 
+# repliqate
+openemr_repliqate_enabled: "false"
+openemr_repliqate_engine: "restic"
+openemr_repliqate_schedule: "@daily 3am"
+openemr_repliqate_backup_id: "{{ openemr_container_name }}"
+openemr_repliqate_retention: "30d"
+openemr_db_repliqate_enabled: "false"
+openemr_db_repliqate_engine: "restic"
+openemr_db_repliqate_schedule: "@daily 3am"
+openemr_db_repliqate_backup_id: "{{ openemr_container_name }}"
+openemr_db_repliqate_retention: "30d"
+
 # watchtower
 openemer_watchtower_enable: "false"
 openemer_db_watchtower_enable: "false"

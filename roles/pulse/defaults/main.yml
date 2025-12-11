@@ -37,5 +37,12 @@ pulse_homepage_icon: "pulse.png"
 pulse_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pulse_port_http }}"
 pulse_homepage_showstats: "false"
 
+# repliqate
+pulse_repliqate_enabled: "false"
+pulse_repliqate_engine: "restic"
+pulse_repliqate_schedule: "@daily 3am"
+pulse_repliqate_backup_id: "{{ pulse_container_name }}"
+pulse_repliqate_retention: "30d"
+
 # watchtower
 pulse_watchtower_enable: "false"

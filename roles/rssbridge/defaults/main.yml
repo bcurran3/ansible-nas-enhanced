@@ -34,5 +34,12 @@ rssbridge_homepage_icon: "rssbridge.png"
 rssbridge_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rssbridge_port_http }}"
 rssbridge_homepage_showstats: "false"
 
+# repliqate
+rssbridge_repliqate_enabled: "false"
+rssbridge_repliqate_engine: "restic"
+rssbridge_repliqate_schedule: "@daily 3am"
+rssbridge_repliqate_backup_id: "{{ rssbridge_container_name }}"
+rssbridge_repliqate_retention: "30d"
+
 # watchtower
 rssbridge_watchtower_enable: "false"

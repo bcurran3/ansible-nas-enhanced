@@ -35,5 +35,12 @@ pinchflat_homepage_icon: "pinchflat.png"
 pinchflat_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pinchflat_port_http }}"
 pinchflat_homepage_showstats: "false"
 
+# repliqate
+pinchflat_repliqate_enabled: "false"
+pinchflat_repliqate_engine: "restic"
+pinchflat_repliqate_schedule: "@daily 3am"
+pinchflat_repliqate_backup_id: "{{ pinchflat_container_name }}"
+pinchflat_repliqate_retention: "30d"
+
 # watchtower
 pinchflat_watchtower_enable: "false"
