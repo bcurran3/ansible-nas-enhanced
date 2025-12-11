@@ -23,9 +23,8 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
-# I'd like to make the DL'd LLMs persistent - need to find where they are stored in the container
-#        volumes:
-#          - "{{ localai_data_directory }}/models:/build/models:rw"
+        volumes:
+          - "{{ localai_data_directory }}/models:/models:rw"
         network_mode: bridge
         env:
           CMAKE_ARGS: "{{ localai_env_cmake_args }}"
