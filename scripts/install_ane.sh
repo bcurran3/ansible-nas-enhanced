@@ -35,6 +35,7 @@ function print_error {
 
 function print_install_message {
     echo -e " **** \033[01mAnsible-NAS-Enhanced (ANE) installation script. ****\033[0m"
+    check_sudo
     print_info "This script will:"
     print_info "  - Upgrade apt packages and install required packages (Ansible, git, nano, etc.)."
     print_info "  - Clone the ANE files from $REPO to $(pwd)/$INSTALL_DIR."
@@ -136,7 +137,6 @@ if [ -d ./$INSTALL_DIR ]; then
     print_error "Please remove or rename ./$INSTALL_DIR and try again."
 fi
 
-check_sudo
 print_install_message
 get_os
 install_git
