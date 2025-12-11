@@ -33,7 +33,7 @@ function print_error {
   exit 1
 }
 
-function print_info {
+function print_install_message {
     echo -e " **** \033[01mAnsible-NAS-Enhanced (ANE) installation script. ****\033[0m"
     print_info "This script will:"
     print_info "  - Upgrade apt packages and install required packages (Ansible, git, nano, etc.)."
@@ -51,6 +51,7 @@ function print_info {
 }
 
 # check if run with sudo
+# NEED to use sudo when run from WSL
 function check_sudo {
   if ! [ $(id -u) = 0 ]; then
     print_info "You MAY need to use sudo."
@@ -136,7 +137,7 @@ if [ -d ./$INSTALL_DIR ]; then
 fi
 
 check_sudo
-print_info
+print_install_message
 get_os
 install_git
 clone_repo
