@@ -17,13 +17,6 @@ INSTALL_DIR="ANE"
 
 ### FUNCTIONS
 
-# check if run with sudo
-function check_sudo {
-  if ! [ $(id -u) = 0 ]; then
-    print_info "You MAY need to use sudo."
-  fi
-}
-
 # print intention
 function print_info {
   echo -e "\033[36m ** INFO: $1\033[0m"
@@ -55,6 +48,13 @@ function print_info {
             * ) echo "Please answer yes or no.";;
         esac
     done
+}
+
+# check if run with sudo
+function check_sudo {
+  if ! [ $(id -u) = 0 ]; then
+    print_info "You MAY need to use sudo."
+  fi
 }
 
 function get_os {
