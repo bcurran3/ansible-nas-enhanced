@@ -30,5 +30,12 @@ stalwart_homepage_icon: "stalwart.png"
 stalwart_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stalwart_port_http }}"
 stalwart_homepage_showstats: "false"
 
+# repliqate
+stalwart_repliqate_enabled: "false"
+stalwart_repliqate_engine: "restic"
+stalwart_repliqate_schedule: "@daily 3am"
+stalwart_repliqate_backup_id: "{{ stalwart_container_name }}"
+stalwart_repliqate_retention: "30d"
+
 # watchtower
 stalwart_watchtower_enable: "false"

@@ -47,9 +47,13 @@
           homepage.showStats: "{{ traefik_homepage_showstats }}"
           homepage.widget.type: "traefik"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8083"
+          repliqate.enabled: "{{ traefik_repliqate_enabled }}"
+          repliqate.engine: "{{ traefik_repliqate_engine }}"
+          repliqate.schedule: "{{ traefik_repliqate_schedule }}"
+          repliqate.backup_id: "{{ traefik_repliqate_backup_id }}"
+          repliqate.retention: "{{ traefik_repliqate_retention }}"
           traefik.enable: "false"
 #         ^^^ TDL would like to enable and add a re-write rule to go to the dashboard
-
           #traefik.enable: "true"
           # Define the router that will catch the request
           #traefik.http.routers.dashboard-redirect.rule: "Host(`{{ traefik_hostname }}`)"
@@ -62,7 +66,6 @@
           #traefik.http.middlewares.redirect-to-ip.redirectregex.replacement: "http://{{ dashboard_ip }}:8083"
           # Assign a dummy service (required by Traefik, but never used because of the redirect)
           #traefik.http.routers.dashboard-redirect.service: "noop@internal"
-
           wud.tag.include: "^v\\d+\\.\\d+$"
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/traefik"

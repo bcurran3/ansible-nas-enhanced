@@ -33,5 +33,12 @@ tasksmd_homepage_icon: "tasksmd.png"
 tasksmd_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tasksmd_port_http }}"
 tasksmd_homepage_showstats: "false"
 
+# repliqate
+tasksmd_repliqate_enabled: "false"
+tasksmd_repliqate_engine: "restic"
+tasksmd_repliqate_schedule: "@daily 3am"
+tasksmd_repliqate_backup_id: "{{ tasksmd_container_name }}"
+tasksmd_repliqate_retention: "30d"
+
 # watchtower
 tasksmd_watchtower_enable: "false"

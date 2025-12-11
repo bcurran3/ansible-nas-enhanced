@@ -54,5 +54,12 @@ transmission_openvpn_homepage_icon: "transmission.png"
 transmission_openvpn_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_openvpn_port_http }}"
 transmission_openvpn_homepage_showstats: "false"
 
+# repliqate
+transmission_openvpn_repliqate_enabled: "false"
+transmission_openvpn_repliqate_engine: "restic"
+transmission_openvpn_repliqate_schedule: "@daily 3am"
+transmission_openvpn_repliqate_backup_id: "{{ transmission_openvpn_container_name }}"
+transmission_openvpn_repliqate_retention: "30d"
+
 # watchtower
 transmission_openvpn_watchtower_enable: "false"

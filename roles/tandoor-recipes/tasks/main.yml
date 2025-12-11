@@ -11,7 +11,7 @@
         - "{{ tandoor_recipes_data_directory }}/mediafiles"
         - "{{ tandoor_recipes_data_directory }}/staticfiles"
 
-    - name: Create {{ ansible_nas_app_name }} PostgreSQL Container
+    - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ tandoor_recipes_db_container_name }}"
@@ -37,6 +37,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ tandoor_recipes_db_container_name }}"
           homepage.showStats: "{{ tandoor_recipes_db_homepage_showstats }}"
+          repliqate.enabled: "{{ tandoor_recipes_db_repliqate_enabled }}"
+          repliqate.engine: "{{ tandoor_recipes_db_repliqate_engine }}"
+          repliqate.schedule: "{{ tandoor_recipes_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tandoor_recipes_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ tandoor_recipes_db_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -153,6 +158,11 @@
           homepage.container: "{{ tandoor_recipes_container_name }}"
           homepage.showStats: "{{ tandoor_recipes_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port_http }}"
+          repliqate.enabled: "{{ tandoor_recipes_repliqate_enabled }}"
+          repliqate.engine: "{{ tandoor_recipes_repliqate_engine }}"
+          repliqate.schedule: "{{ tandoor_recipes_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tandoor_recipes_repliqate_backup_id }}"
+          repliqate.retention: "{{ tandoor_recipes_repliqate_retention }}"
           traefik.enable: "{{ tandoor_recipes_available_externally | string }}"
 #         traefik.http.routers.tandoor_recipes.rule: "Host(`{{ tandoor_recipes_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tandoor_recipes.rule: "Host(`recipes.{{ ansible_nas_domain }}`)"

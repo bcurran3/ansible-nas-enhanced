@@ -34,5 +34,12 @@ tugtainer_homepage_icon: "docker.png"
 tugtainer_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tugtainer_port_http }}"
 tugtainer_homepage_showstats: "false"
 
+# repliqate
+tugtainer_repliqate_enabled: "false"
+tugtainer_repliqate_engine: "restic"
+tugtainer_repliqate_schedule: "@daily 3am"
+tugtainer_repliqate_backup_id: "{{ tugtainer_container_name }}"
+tugtainer_repliqate_retention: "30d"
+
 # watchtower
 tugtainer_watchtower_enable: "false"

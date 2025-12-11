@@ -26,6 +26,9 @@ tdarr_image_tag: "latest"
 tdarr_cpu_shares: "1024"
 tdarr_memory: "4g"
 
+# app
+tdarr_env_ffmpegversion: "6"
+
 # autoheal
 tdarr_autoheal: "false"
 
@@ -39,6 +42,13 @@ tdarr_homepage_icon: "tdarr.png"
 tdarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tdarr_port_http }}"
 tdarr_homepage_showstats: "false"
 tdarr_homepage_key: "insert Tdarr API key here"
+
+# repliqate
+tdarr_repliqate_enabled: "false"
+tdarr_repliqate_engine: "restic"
+tdarr_repliqate_schedule: "@daily 3am"
+tdarr_repliqate_backup_id: "{{ tdarr_container_name }}"
+tdarr_repliqate_retention: "30d"
 
 # watchtower
 tdarr_watchtower_enable: "false"

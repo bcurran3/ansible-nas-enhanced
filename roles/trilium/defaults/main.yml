@@ -38,5 +38,12 @@ trilium_homepage_icon: "sh-trilium-notes.png"
 trilium_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ trilium_port_http }}"
 trilium_homepage_showstats: "false"
 
+# repliqate
+trilium_repliqate_enabled: "false"
+trilium_repliqate_engine: "restic"
+trilium_repliqate_schedule: "@daily 3am"
+trilium_repliqate_backup_id: "{{ trilium_container_name }}"
+trilium_repliqate_retention: "30d"
+
 # watchtower
 trilium_watchtower_enable: "false"

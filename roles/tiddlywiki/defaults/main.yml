@@ -42,5 +42,12 @@ tiddlywiki_homepage_icon: "tiddlywiki.png"
 tiddlywiki_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tiddlywiki_port_http }}"
 tiddlywiki_homepage_showstats: "false"
 
+# repliqate
+tiddlywiki_repliqate_enabled: "false"
+tiddlywiki_repliqate_engine: "restic"
+tiddlywiki_repliqate_schedule: "@daily 3am"
+tiddlywiki_repliqate_backup_id: "{{ tiddlywiki_container_name }}"
+tiddlywiki_repliqate_retention: "30d"
+
 # watchtower
 tiddlywiki_watchtower_enable: "false"

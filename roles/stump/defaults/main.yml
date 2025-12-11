@@ -33,5 +33,12 @@ stump_homepage_icon: "stump.png"
 stump_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stump_port_http }}"
 stump_homepage_showstats: "false"
 
+# repliqate
+stump_repliqate_enabled: "false"
+stump_repliqate_engine: "restic"
+stump_repliqate_schedule: "@daily 3am"
+stump_repliqate_backup_id: "{{ stump_container_name }}"
+stump_repliqate_retention: "30d"
+
 # watchtower
 stump_watchtower_enable: "false"

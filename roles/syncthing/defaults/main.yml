@@ -44,5 +44,12 @@ syncthing_homepage_icon: "syncthing.png"
 syncthing_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ syncthing_port_http }}"
 syncthing_homepage_showstats: "false"
 
+# repliqate
+syncthing_repliqate_enabled: "false"
+syncthing_repliqate_engine: "restic"
+syncthing_repliqate_schedule: "@daily 3am"
+syncthing_repliqate_backup_id: "{{ syncthing_container_name }}"
+syncthing_repliqate_retention: "30d"
+
 # watchtower
 syncthing_watchtower_enable: "false"

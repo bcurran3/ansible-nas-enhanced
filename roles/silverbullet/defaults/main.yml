@@ -38,5 +38,12 @@ silverbullet_homepage_icon: "silverbullet.png"
 silverbullet_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ silverbullet_port_http }}"
 silverbullet_homepage_showstats: "false"
 
+# repliqate
+silverbullet_repliqate_enabled: "false"
+silverbullet_repliqate_engine: "restic"
+silverbullet_repliqate_schedule: "@daily 3am"
+silverbullet_repliqate_backup_id: "{{ silverbullet_container_name }}"
+silverbullet_repliqate_retention: "30d"
+
 # watchtower
 silverbullet_watchtower_enable: "false"

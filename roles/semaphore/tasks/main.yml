@@ -1,5 +1,4 @@
 ---
-# TDL: move env vars to ANE vars
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -21,11 +20,11 @@
         ports:
           - "{{ semaphore_port_http }}:3000"
         env:
-          SEMAPHORE_DB_DIALECT: "bolt"
-          SEMAPHORE_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
-          SEMAPHORE_ADMIN_NAME: "admin"
-          SEMAPHORE_ADMIN_EMAIL: "admin@localhost"
-          SEMAPHORE_ADMIN: "admin"
+          SEMAPHORE_DB_DIALECT: "{{ semaphore_env_semaphore_db_dialect }}"
+          SEMAPHORE_ADMIN_NAME: "{{ semaphore_env_semaphore_admin_name }}"
+          SEMAPHORE_ADMIN_PASSWORD: "{{ semaphore_env_semaphore_admin_password }}"
+          SEMAPHORE_ADMIN_EMAIL: "{{ semaphore_env_semaphore_admin_email }}"
+          SEMAPHORE_ADMIN: "{{ semaphore_env_semaphore_admin }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ semaphore_autoheal }}"
@@ -43,6 +42,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ semaphore_container_name }}"
           homepage.showStats: "{{ semaphore_homepage_showstats }}"
+          repliqate.enabled: "{{ semaphore_repliqate_enabled }}"
+          repliqate.engine: "{{ semaphore_repliqate_engine }}"
+          repliqate.schedule: "{{ semaphore_repliqate_schedule }}"
+          repliqate.backup_id: "{{ semaphore_repliqate_backup_id }}"
+          repliqate.retention: "{{ semaphore_repliqate_retention }}"
           traefik.enable: "{{ semaphore_available_externally | string }}"
           traefik.http.routers.semaphore.rule: "Host(`{{ semaphore_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.semaphore.tls.certresolver: "letsencrypt"

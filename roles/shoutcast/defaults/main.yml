@@ -33,5 +33,12 @@ shoutcast_homepage_icon: "shoutcast.png"
 shoutcast_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ shoutcast_port_http }}"
 shoutcast_homepage_showstats: "false"
 
+# repliqate
+shoutcast_repliqate_enabled: "false"
+shoutcast_repliqate_engine: "restic"
+shoutcast_repliqate_schedule: "@daily 3am"
+shoutcast_repliqate_backup_id: "{{ shoutcast_container_name }}"
+shoutcast_repliqate_retention: "30d"
+
 # watchtower
 shoutcast_watchtower_enable: "false"

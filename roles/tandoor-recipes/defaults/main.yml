@@ -49,6 +49,18 @@ tandoor_recipes_db_homepage_icon: "postgres.png"
 tandoor_recipes_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port_http }}"
 tandoor_recipes_db_homepage_showstats: "false"
 
+# repliqate
+tandoor_recipes_repliqate_enabled: "false"
+tandoor_recipes_repliqate_engine: "restic"
+tandoor_recipes_repliqate_schedule: "@daily 3am"
+tandoor_recipes_repliqate_backup_id: "{{ tandoor_recipes_container_name }}"
+tandoor_recipes_repliqate_retention: "30d"
+tandoor_recipes_db_repliqate_enabled: "false"
+tandoor_recipes_db_repliqate_engine: "restic"
+tandoor_recipes_db_repliqate_schedule: "@daily 3am"
+tandoor_recipes_db_repliqate_backup_id: "{{ tandoor_recipes_container_name }}"
+tandoor_recipes_db_repliqate_retention: "30d"
+
 # watchtower
 tandoor_recipes_watchtower_enable: "false"
 tandoor_recipes_db_watchtower_enable: "false"

@@ -37,6 +37,11 @@
           homepage.container: "{{ timemachine_container_name }}"
           homepage.showStats: "{{ timemachine_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ timemachine_port }}"
+          repliqate.enabled: "{{ timemachine_repliqate_enabled }}"
+          repliqate.engine: "{{ timemachine_repliqate_engine }}"
+          repliqate.schedule: "{{ timemachine_repliqate_schedule }}"
+          repliqate.backup_id: "{{ timemachine_repliqate_backup_id }}"
+          repliqate.retention: "{{ timemachine_repliqate_retention }}"
           wud.tag.include: '^v\d+\.\d+\.\d+-\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/awlnx/samba-timemachine"
