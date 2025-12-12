@@ -41,6 +41,11 @@
           homepage.container: "{{ wireshark_container_name }}"
           homepage.showStats: "{{ wireshark_homepage_showstats }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireshark_ports }}"
+          repliqate.enabled: "{{ wireshark_repliqate_enabled }}"
+          repliqate.engine: "{{ wireshark_repliqate_engine }}"
+          repliqate.schedule: "{{ wireshark_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wireshark_repliqate_backup_id }}"
+          repliqate.retention: "{{ wireshark_repliqate_retention }}"
           traefik.enable: "false" # host mode
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"

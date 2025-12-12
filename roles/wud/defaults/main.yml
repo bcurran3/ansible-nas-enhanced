@@ -39,5 +39,12 @@ wud_homepage_icon: "whats-up-docker.png"
 wud_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
 wud_homepage_showstats: "false"
 
+# repliqate
+wud_repliqate_enabled: "false"
+wud_repliqate_engine: "restic"
+wud_repliqate_schedule: "@daily 3am"
+wud_repliqate_backup_id: "{{ wud_container_name }}"
+wud_repliqate_retention: "30d"
+
 # watchtower
 wud_watchtower_enable: "false"

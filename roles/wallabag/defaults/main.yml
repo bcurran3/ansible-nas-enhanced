@@ -35,5 +35,12 @@ wallabag_homepage_icon: "wallabag.png"
 wallabag_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wallabag_port_http }}"
 wallabag_homepage_showstats: "false"
 
+# repliqate
+wallabag_repliqate_enabled: "false"
+wallabag_repliqate_engine: "restic"
+wallabag_repliqate_schedule: "@daily 3am"
+wallabag_repliqate_backup_id: "{{ wallabag_container_name }}"
+wallabag_repliqate_retention: "30d"
+
 # watchtower
 wallabag_watchtower_enable: "false"

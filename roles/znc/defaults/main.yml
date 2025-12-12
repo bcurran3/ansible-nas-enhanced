@@ -45,5 +45,12 @@ znc_homepage_icon: "znc.png"
 znc_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ znc_port_http }}"
 znc_homepage_showstats: "false"
 
+# repliqate
+znc_repliqate_enabled: "false"
+znc_repliqate_engine: "restic"
+znc_repliqate_schedule: "@daily 3am"
+znc_repliqate_backup_id: "{{ znc_container_name }}"
+znc_repliqate_retention: "30d"
+
 # watchtower
 znc_watchtower_enable: "false"

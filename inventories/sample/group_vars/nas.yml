@@ -14,7 +14,7 @@
 ### Defaults you want to customize:
 ###
 ansible_nas_hostname: ANE # hostname to use for your ANE server
-ansible_nas_timezone: Etc/UTC # timezone to use for your ANE server
+ansible_nas_timezone: Etc/UTC # timezone to use for your ANE server https://nodatime.org/TimeZones
 ansible_nas_user: yourname # your login account for your ANE server
 ansible_nas_email: yourname@myemail.com # your e-mail address
 ansible_nas_domain: mydomain.com # your domain
@@ -31,9 +31,10 @@ ansible_nas_extra_packages:
   - nano
 #  - bonnie++
 #  - cockpit
-#  - linux-generic-hwe-22.04
-#  - linux-generic-hwe-24.04
-#  - linux-generic-hwe-26.04
+#  - dnsutils
+#  - "linux-generic-hwe-{{ ansible_distribution_version }}"
+#  - mc
+#  - mdm
 #  - net-tools
 #  - nfs-common
 #  - samba

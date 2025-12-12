@@ -32,8 +32,14 @@ virtual_desktop_autoheal: "false"
 # homepage
 virtual_desktop_homepage_group: "Apps"
 virtual_desktop_homepage_icon: "virtual_desktop.png"
-#virtual_desktop_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtual_desktop_port_rdp }}"
 virtual_desktop_homepage_showstats: "false"
+
+# repliqate
+virtual_desktop_repliqate_enabled: "false"
+virtual_desktop_repliqate_engine: "restic"
+virtual_desktop_repliqate_schedule: "@daily 3am"
+virtual_desktop_repliqate_backup_id: "{{ virtual_desktop_container_name }}"
+virtual_desktop_repliqate_retention: "30d"
 
 # watchtower
 virtual_desktop_watchtower_enable: "false"

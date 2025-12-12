@@ -21,7 +21,7 @@
         ports:
           - "{{ wud_port_http }}:3000"
         env:
-# NOTE: Consider moving env vars to an ansible list so that triggers can be added manually
+# NOTE: Consider moving env vars to a list so that triggers can be added manually
           WUD_AUTH_BASIC_ADMIN_USER: "{{ wud_env_wud_auth_basic_admin_username }}"
           WUD_AUTH_BASIC_ADMIN_HASH: "{{ wud_env_wud_auth_basic_admin_hash }}"
           WUD_REGISTRY_HUB_PUBLIC_LOGIN: "{{ wud_env_wud_registry_hub_public_login }}"
@@ -54,6 +54,11 @@
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.widget.username: "{{ wud_env_wud_auth_basic_admin_username }}"
           homepage.widget.password: "{{ wud_env_wud_auth_basic_admin_hash }}"
+          repliqate.enabled: "{{ wud_repliqate_enabled }}"
+          repliqate.engine: "{{ wud_repliqate_engine }}"
+          repliqate.schedule: "{{ wud_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wud_repliqate_backup_id }}"
+          repliqate.retention: "{{ wud_repliqate_retention }}"
           traefik.enable: "{{ wud_available_externally | string }}"
           traefik.http.routers.wud.rule: "Host(`wud.{{ ansible_nas_domain }}`)"
           traefik.http.routers.wud.tls.certresolver: "letsencrypt"

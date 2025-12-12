@@ -34,5 +34,12 @@ wireguard_homepage_icon: "wireguard.png"
 wireguard_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireguard_port_http }}"
 wireguard_homepage_showstats: "false"
 
+# repliqate
+wireguard_repliqate_enabled: "false"
+wireguard_repliqate_engine: "restic"
+wireguard_repliqate_schedule: "@daily 3am"
+wireguard_repliqate_backup_id: "{{ wireguard_container_name }}"
+wireguard_repliqate_retention: "30d"
+
 # watchtower
 wireguard_watchtower_enable: "false"

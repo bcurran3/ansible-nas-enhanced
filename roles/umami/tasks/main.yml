@@ -22,11 +22,11 @@
           POSTGRES_DB: "umami"
           POSTGRES_USER: "umami"
           POSTGRES_PASSWORD: "umami"
-#        healthcheck:
-#          test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-#          interval: 5s
-#          timeout: 5s
-#          retries: "5"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
+          interval: 5s
+          timeout: 5s
+          retries: "5"
         labels:
           autoheal: "{{ umami_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ umami_db_watchtower_enable }}"
@@ -39,6 +39,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ umami_db_container_name }}"
           homepage.showStats: "{{ umami_db_homepage_showstats }}"
+          repliqate.enabled: "{{ umami_db_repliqate_enabled }}"
+          repliqate.engine: "{{ umami_db_repliqate_engine }}"
+          repliqate.schedule: "{{ umami_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ umami_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ umami_db_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^16\.\d+(\.\d+)?-alpine.*$'
           wud.tag.transform.type: "semver"
@@ -61,11 +66,11 @@
           DATABASE_URL: "postgres://umami:umami@{{ umami_db_container_name }}:5432/umami"
           APP_SECRET: "{{ umami_app_secret }}"
           TZ: "{{ ansible_nas_timezone }}"
-#        healthcheck:
-#          test: ["CMD-SHELL", "curl http://localhost:3000/api/heartbeat"]
-#          interval: 5s
-#          timeout: 5s
-#          retries: 5
+        healthcheck:
+          test: ["CMD-SHELL", "curl http://localhost:3000/api/heartbeat"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
         links:
           - "{{ umami_db_container_name }}"
         labels:
@@ -84,6 +89,11 @@
           homepage.server: "my-docker"
           homepage.container: "{{ umami_container_name }}"
           homepage.showStats: "{{ umami_homepage_showstats }}"
+          repliqate.enabled: "{{ umami_repliqate_enabled }}"
+          repliqate.engine: "{{ umami_repliqate_engine }}"
+          repliqate.schedule: "{{ umami_repliqate_schedule }}"
+          repliqate.backup_id: "{{ umami_repliqate_backup_id }}"
+          repliqate.retention: "{{ umami_repliqate_retention }}"
           traefik.enable: "{{ umami_available_externally | string }}"
           traefik.http.routers.umami.rule: "Host(`umami.{{ ansible_nas_domain }}`)"
           traefik.http.routers.umami.tls.certresolver: "letsencrypt"

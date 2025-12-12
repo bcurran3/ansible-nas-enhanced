@@ -36,6 +36,13 @@ windows_homepage_icon: "Windows.png"
 windows_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ windows_port_http }}"
 windows_homepage_showstats: "false"
 
+# repliqate
+windows_repliqate_enabled: "false"
+windows_repliqate_engine: "restic"
+windows_repliqate_schedule: "@daily 3am"
+windows_repliqate_backup_id: "{{ windows_container_name }}"
+windows_repliqate_retention: "30d"
+
 # watchtower
 windows_watchtower_enable: "false"
 

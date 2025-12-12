@@ -41,5 +41,12 @@ wizarr_homepage_icon: "wizarr.png"
 wizarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wizarr_port_http }}"
 wizarr_homepage_showstats: "false"
 
+# repliqate
+wizarr_repliqate_enabled: "false"
+wizarr_repliqate_engine: "restic"
+wizarr_repliqate_schedule: "@daily 3am"
+wizarr_repliqate_backup_id: "{{ wizarr_container_name }}"
+wizarr_repliqate_retention: "30d"
+
 # watchtower
 wizarr_watchtower_enable: "false"

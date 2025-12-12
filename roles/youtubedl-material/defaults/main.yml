@@ -32,6 +32,10 @@ youtubedlmaterial_db_memory: "1g"
 # app
 youtubedlmaterial_uid: "1000"
 youtubedlmaterial_gid: "1000"
+youtubedlmaterial_env_user: "root"
+youtubedlmaterial_env_allow_config_mutations: "true"
+youtubedlmaterial_env_ytdl_use_local_db: "false"
+youtubedlmaterial_env_write_ytdl_config: "true"
 
 # autoheal
 youtubedlmaterial_autoheal: "false"
@@ -50,6 +54,18 @@ youtubedlmaterial_homepage_showstats: "false"
 youtubedlmaterial_db_homepage_group: "DBs"
 youtubedlmaterial_db_homepage_icon: "mongodb.png"
 youtubedlmaterial_db_homepage_showstats: "false"
+
+# repliqate
+youtubedlmaterial_repliqate_enabled: "false"
+youtubedlmaterial_repliqate_engine: "restic"
+youtubedlmaterial_repliqate_schedule: "@daily 3am"
+youtubedlmaterial_repliqate_backup_id: "{{ youtubedlmaterial_container_name }}"
+youtubedlmaterial_repliqate_retention: "30d"
+youtubedlmaterial_db_repliqate_enabled: "false"
+youtubedlmaterial_db_repliqate_engine: "restic"
+youtubedlmaterial_db_repliqate_schedule: "@daily 3am"
+youtubedlmaterial_db_repliqate_backup_id: "{{ youtubedlmaterial_container_name }}"
+youtubedlmaterial_db_repliqate_retention: "30d"
 
 # watchtower
 youtubedlmaterial_watchtower_enable: "false"

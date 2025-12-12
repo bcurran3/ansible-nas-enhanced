@@ -60,6 +60,13 @@ woodpecker_ci_homepage_icon: "woodpecker-ci.png"
 woodpecker_ci_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port }}"
 woodpecker_ci_homepage_showstats: "false"
 
+# repliqate
+woodpecker_ci_repliqate_enabled: "false"
+woodpecker_ci_repliqate_engine: "restic"
+woodpecker_ci_repliqate_schedule: "@daily 3am"
+woodpecker_ci_repliqate_backup_id: "{{ woodpecker_ci_container_name }}"
+woodpecker_ci_repliqate_retention: "30d"
+
 # watchtower
 woodpecker_ci_watchtower_enable: "false"
 woodpecker_ci_agent_watchtower_enable: "false"

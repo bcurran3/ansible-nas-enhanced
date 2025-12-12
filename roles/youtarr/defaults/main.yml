@@ -51,6 +51,18 @@ youtarr_db_homepage_icon: "mariadb.png"
 youtarr_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port_http }}"
 youtarr_db_homepage_showstats: "false"
 
+# repliqate
+youtarr_repliqate_enabled: "false"
+youtarr_repliqate_engine: "restic"
+youtarr_repliqate_schedule: "@daily 3am"
+youtarr_repliqate_backup_id: "{{ youtarr_container_name }}"
+youtarr_repliqate_retention: "30d"
+youtarr_db_repliqate_enabled: "false"
+youtarr_db_repliqate_engine: "restic"
+youtarr_db_repliqate_schedule: "@daily 3am"
+youtarr_db_repliqate_backup_id: "{{ youtarr_container_name }}"
+youtarr_db_repliqate_retention: "30d"
+
 # watchtower
 youtarr_watchtower_enable: "false"
 youtarr_db_watchtower_enable: "false"

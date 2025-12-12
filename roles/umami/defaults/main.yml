@@ -43,6 +43,18 @@ umami_db_homepage_icon: "postgres.png"
 umami_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
 umami_db_homepage_showstats: "false"
 
+# repliqate
+umami_repliqate_enabled: "false"
+umami_repliqate_engine: "restic"
+umami_repliqate_schedule: "@daily 3am"
+umami_repliqate_backup_id: "{{ umami_container_name }}"
+umami_repliqate_retention: "30d"
+umami_db_repliqate_enabled: "false"
+umami_db_repliqate_engine: "restic"
+umami_db_repliqate_schedule: "@daily 3am"
+umami_db_repliqate_backup_id: "{{ umami_container_name }}"
+umami_db_repliqate_retention: "30d"
+
 # watchtower
 umami_watchtower_enable: "false"
 umami_db_watchtower_enable: "false"
