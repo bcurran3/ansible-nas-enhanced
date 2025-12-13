@@ -24,8 +24,8 @@
           - "{{ komodo_data_directory }}/configdb:/data/configdb"
           - "{{ komodo_data_directory }}/db:/data/db"
         env:
-          MONGO_INITDB_ROOT_USERNAME: "komodo"
-          MONGO_INITDB_ROOT_PASSWORD: "komodo"
+          MONGO_INITDB_ROOT_USERNAME: "{{ komodo_env_komodo_database_username }}"
+          MONGO_INITDB_ROOT_PASSWORD: "{{ komodo_env_komodo_database_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ komodo_db_autoheal }}"
@@ -64,31 +64,14 @@
           - "/proc:/proc"
           - "{{ komodo_data_directory }}/periphery:{{ komodo_data_directory }}/periphery"
         env:
-          ## Specify the root directory used by Periphery agent.
-          PERIPHERY_ROOT_DIRECTORY: "/etc/komodo"
-
-          ## Periphery passkeys must include KOMODO_PASSKEY to authenticate.
-          PERIPHERY_PASSKEYS: "OdgswggH6J5mF0kOXfh18KL1QSGKB06t"
-
-          ## Specify whether to disable the terminals feature
-          ## and disallow remote shell access (inside the Periphery container).
-          PERIPHERY_DISABLE_TERMINALS: "false"
-
-          ## Enable SSL using self signed certificates.
-          ## Connect to Periphery at https://address:8120.
-          PERIPHERY_SSL_ENABLED: "true"
-
-          ## If the disk size is overreporting, can use one of these to 
-          ## whitelist / blacklist the disks to filter them, whichever is easier.
-          ## Accepts comma separated list of paths.
-          ## Usually whitelisting just /etc/hostname gives correct size.
-          PERIPHERY_INCLUDE_DISK_MOUNTS: "/etc/hostname"
-          # PERIPHERY_EXCLUDE_DISK_MOUNTS=/snap,/etc/repos
-
-          ## Prettier logging with empty lines between logs
-          PERIPHERY_LOGGING_PRETTY: "false"
-          ## More human readable logging of startup config (multi-line)
-          PERIPHERY_PRETTY_STARTUP_CONFIG: "false"
+          PERIPHERY_ROOT_DIRECTORY: "{{ komodo_periphery_env_periphery_root_directory }}"
+          PERIPHERY_PASSKEYS: "{{ komodo_periphery_env_periphery_passkeys }}"
+          PERIPHERY_DISABLE_TERMINALS: "{{ komodo_periphery_env_periphery_disable_terminals }}"
+          PERIPHERY_SSL_ENABLED: "{{ komodo_periphery_env_periphery_ssl_enabled }}"
+          PERIPHERY_INCLUDE_DISK_MOUNTS: "{{ komodo_periphery_env_periphery_include_disk_mounts }}"
+          PERIPHERY_EXCLUDE_DISK_MOUNTS: "{{ komodo_periphery_env_periphery_exclude_disk_mounts }}"
+          PERIPHERY_LOGGING_PRETTY: "{{ komodo_periphery_env_periphery_logging_pretty }}"
+          PERIPHERY_PRETTY_STARTUP_CONFIG: "{{ komodo_periphery_env_periphery_pretty_startup_config }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ komodo_periphery_autoheal }}"
@@ -130,93 +113,43 @@
           - "{{ komodo_port_http }}:9120"
         env:
           KOMODO_DATABASE_ADDRESS: "{{ komodo_db_container_name }}:27017"
-          KOMODO_DATABASE_USERNAME: "komodo"
-          KOMODO_DATABASE_PASSWORD: "komodo"
-          ## Used for Oauth / Webhook url suggestion / Caddy reverse proxy.
-          KOMODO_HOST: "https://{{ komodo_hostname }}{{ ansible_nas_domain }}"
-          ## Displayed in the browser tab.
-          KOMODO_TITLE: "Komodo"
-          ## Create a server matching this address as the "first server".
-          ## Use `https://host.docker.internal:8120` when using systemd-managed Periphery.
-          KOMODO_FIRST_SERVER: "https://{{ komodo_periphery_container_name }}:8120"
-          ## Give the first server a custom name.
-          KOMODO_FIRST_SERVER_NAME: "{{ ansible_nas_hostname }}"
-          ## Make all buttons just double-click, rather than the full confirmation dialog.
-          KOMODO_DISABLE_CONFIRM_DIALOG: "false"
-
-          ## Rate Komodo polls your servers for
-          ## status / container status / system stats / alerting.
-          ## Options: 1-sec, 5-sec, 15-sec, 1-min, 5-min, 15-min
-          ## Default: 15-sec
-          KOMODO_MONITORING_INTERVAL: "15-sec"
-          ## Interval at which to poll Resources for any updates / automated actions.
-          ## Options: 15-min, 1-hr, 2-hr, 6-hr, 12-hr, 1-day
-          ## Default: 1-hr
-          KOMODO_RESOURCE_POLL_INTERVAL: "1-hr"
-
-          ## Used to auth incoming webhooks. Alt: KOMODO_WEBHOOK_SECRET_FILE
-          KOMODO_WEBHOOK_SECRET: "XSP9i2V8YxkyKekTjBO8G4JBPT4rPmcg"
-          ## Used to generate jwt. Alt: KOMODO_JWT_SECRET_FILE
-          KOMODO_JWT_SECRET: "KiqHoKG1RwoHACmRLi4u4JmikLXvcZDHLl29Z3AUPdSk4ppmrV5YFm2y5KbwAEVY"
-          ## Time to live for jwt tokens.
-          ## Options: 1-hr, 12-hr, 1-day, 3-day, 1-wk, 2-wk
-          KOMODO_JWT_TTL: "1-day"
-          KOMODO_PASSKEY: "OdgswggH6J5mF0kOXfh18KL1QSGKB06t"
-
-          ## Enable login with username + password.
-          KOMODO_LOCAL_AUTH: "true"
-          ## Set the initial admin username created upon first launch.
-          ## Comment out to disable initial user creation,
-          ## and create first user using signup button.
-          KOMODO_INIT_ADMIN_USERNAME: "admin"
-          ## Set the initial admin password
-          KOMODO_INIT_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
-          ## Disable new user signups.
-          KOMODO_DISABLE_USER_REGISTRATION: "false"
-          ## All new logins are auto enabled
-          KOMODO_ENABLE_NEW_USERS: "false"
-          ## Disable non-admins from creating new resources.
-          KOMODO_DISABLE_NON_ADMIN_CREATE: "false"
-          ## Allows all users to have Read level access to all resources.
-          KOMODO_TRANSPARENT_MODE: "false"
-
-          ## Prettier logging with empty lines between logs
-          KOMODO_LOGGING_PRETTY: "false"
-          ## More human readable logging of startup config (multi-line)
-          KOMODO_PRETTY_STARTUP_CONFIG: "false"
-
-          ## OIDC Login
+          KOMODO_DATABASE_USERNAME: "{{ komodo_env_komodo_database_username }}"
+          KOMODO_DATABASE_PASSWORD: "{{ komodo_env_komodo_database_password }}"
+          KOMODO_HOST: "{{ komodo_env_komodo_host }}"
+          KOMODO_TITLE: "{{ komodo_env_komodo_title }}"
+          KOMODO_FIRST_SERVER: "{{ komodo_env_komodo_first_server }}"
+          KOMODO_FIRST_SERVER_NAME: "{{ komodo_env_komodo_first_server_name }}"
+          KOMODO_DISABLE_CONFIRM_DIALOG: "{{ komodo_env_komodo_disable_confirm_dialog }}"
+          KOMODO_MONITORING_INTERVAL: "{{ komodo_env_komodo_monitoring_interval }}"
+          KOMODO_RESOURCE_POLL_INTERVAL: "{{ komodo_env_komodo_resource_poll_interval }}"
+          KOMODO_WEBHOOK_SECRET: "{{ komodo_env_komodo_webhook_secret }}"
+          KOMODO_JWT_SECRET: "{{ komodo_env_komodo_jwt_secret }}"
+          KOMODO_JWT_TTL: "{{ komodo_env_komodo_jwt_ttl }}"
+          KOMODO_PASSKEY: "{{ komodo_env_komodo_passkey }}"
+          KOMODO_LOCAL_AUTH: "{{ komodo_env_komodo_local_auth }}"
+          KOMODO_INIT_ADMIN_USERNAME: "{{ komodo_env_komodo_init_admin_username }}"
+          KOMODO_INIT_ADMIN_PASSWORD: "{{ komodo_env_komodo_init_admin_password }}"
+          KOMODO_DISABLE_USER_REGISTRATION: "{{ komodo_env_komodo_disable_user_registration }}"
+          KOMODO_ENABLE_NEW_USERS: "{{ komodo_env_komodo_enable_new_users }}"
+          KOMODO_DISABLE_NON_ADMIN_CREATE: "{{ komodo_env_komodo_disable_non_admin_create }}"
+          KOMODO_TRANSPARENT_MODE: "{{ komodo_env_komodo_transparent_mode }}"
+          KOMODO_LOGGING_PRETTY: "{{ komodo_env_komodo_logging_pretty }}"
+          KOMODO_PRETTY_STARTUP_CONFIG: "{{ komodo_env_komodo_pretty_startup_config }}"
           KOMODO_OIDC_ENABLED: "false"
-          ## Must reachable from Komodo Core container
-          # KOMODO_OIDC_PROVIDER=https://oidc.provider.internal/application/o/komodo
-          ## Change the host to one reachable be reachable by users (optional if it is the same as above).
-          ## DO NOT include the `path` part of the URL.
-          # KOMODO_OIDC_REDIRECT_HOST=https://oidc.provider.external
-          ## Your OIDC client id
-          # KOMODO_OIDC_CLIENT_ID= # Alt: KOMODO_OIDC_CLIENT_ID_FILE
-          ## Your OIDC client secret.
-          ## If your provider supports PKCE flow, this can be ommitted.
-          # KOMODO_OIDC_CLIENT_SECRET= # Alt: KOMODO_OIDC_CLIENT_SECRET_FILE
-          ## Make usernames the full email.
-          ## Note. This does not work for all OIDC providers.
-          # KOMODO_OIDC_USE_FULL_EMAIL=true
-          ## Add additional trusted audiences for token claims verification.
-          ## Supports comma separated list, and passing with _FILE (for compose secrets).
-          # KOMODO_OIDC_ADDITIONAL_AUDIENCES=abc,123 # Alt: KOMODO_OIDC_ADDITIONAL_AUDIENCES_FILE
-
-          ## Github Oauth
-          KOMODO_GITHUB_OAUTH_ENABLED: "false"
-          # KOMODO_GITHUB_OAUTH_ID= # Alt: KOMODO_GITHUB_OAUTH_ID_FILE
-          # KOMODO_GITHUB_OAUTH_SECRET= # Alt: KOMODO_GITHUB_OAUTH_SECRET_FILE
-
-          ## Google Oauth
-          KOMODO_GOOGLE_OAUTH_ENABLED: "false"
-          # KOMODO_GOOGLE_OAUTH_ID= # Alt: KOMODO_GOOGLE_OAUTH_ID_FILE
-          # KOMODO_GOOGLE_OAUTH_SECRET= # Alt: KOMODO_GOOGLE_OAUTH_SECRET_FILE
-
-          ## Aws - Used to launch Builder instances.
-          KOMODO_AWS_ACCESS_KEY_ID: "" # Alt: KOMODO_AWS_ACCESS_KEY_ID_FILE
-          KOMODO_AWS_SECRET_ACCESS_KEY: "" # Alt: KOMODO_AWS_SECRET_ACCESS_KEY_FILE
+          KOMODO_OIDC_PROVIDER: "{{ komodo_env_komodo_oidc_provider }}"
+          KOMODO_OIDC_REDIRECT_HOST: "{{ komodo_env_komodo_oidc_redirect_host }}"
+          KOMODO_OIDC_CLIENT_ID: "{{ komodo_env_komodo_oidc_client_id }}"
+          KOMODO_OIDC_CLIENT_SECRET: "{{ komodo_env_komodo_oidc_client_secret }}"
+          KOMODO_OIDC_USE_FULL_EMAIL: "{{ komodo_env_komodo_oidc_use_full_email }}"
+          KOMODO_OIDC_ADDITIONAL_AUDIENCES: "{{ komodo_env_komodo_oidc_additional_audiences }}"
+          KOMODO_GITHUB_OAUTH_ENABLED: "{{ komodo_env_komodo_github_oauth_enabled }}"
+          KOMODO_GITHUB_OAUTH_ID: "{{ komodo_env_komodo_github_oauth_id }}"
+          KOMODO_GITHUB_OAUTH_SECRET: "{{ komodo_env_komodo_github_oauth_secret }}"
+          KOMODO_GOOGLE_OAUTH_ENABLED: "{{ komodo_env_komodo_google_oauth_enabled }}"
+          KOMODO_GOOGLE_OAUTH_ID: "{{ komodo_env_komodo_google_oauth_id }}"
+          KOMODO_GOOGLE_OAUTH_SECRET: "{{ komodo_env_komodo_google_oauth_secret }}"
+          KOMODO_AWS_ACCESS_KEY_ID: "{{ komodo_env_komodo_aws_access_key_id }}"
+          KOMODO_AWS_SECRET_ACCESS_KEY: "{{ komodo_env_komodo_aws_secret_access_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ komodo_db_container_name }}"
