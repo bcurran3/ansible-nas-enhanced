@@ -12,13 +12,49 @@ loggifly_data_directory: "{{ docker_home }}/loggifly"
 loggifly_container_name: "loggifly"
 loggifly_image_name: "ghcr.io/clemcer/loggifly"
 loggifly_image_tag: "latest"
-loggifly_cpu_shares: "1024"
 
 # network
 loggifly_hostname: "loggifly"
 
 # specs
+loggifly_cpu_shares: "1024"
 loggifly_memory: 1g
+
+# app
+loggifly_env_ntfy_url: "" # URL of your ntfy server instance
+loggifly_env_ntfy_token: "" # Authentication token for ntfy in case you need authentication.
+loggifly_env_ntfy_username: "" # ntfy Username to use with the password in case you need authentication.
+loggifly_env_ntfy_password: "" # ntfy password to use with the username in case you need authentication.
+loggifly_env_ntfy_topic: "" # Notification topic for ntfy.
+loggifly_env_ntfy_tags: "kite,mag" # Tags/Emojis for ntfy notifications.
+loggifly_env_ntfy_priority: "3" # Notification priority for ntfy messages.
+loggifly_env_apprise_url: "" # Any Apprise-compatible URL
+loggifly_env_containers: "" # A comma separated list of containers. These are added to the containers from the config.yaml (if you are using one).
+loggifly_env_swarm_services: "" # A comma separated list of docker swarm services to monitor.
+loggifly_env_monitor_all_containers: "False" # Monitor all containers.
+loggifly_env_monitor_all_swarm_containers: "False" # Monitor all swarm services.
+loggifly_env_excluded_containers: "" # A comma separated list of containers that should not be monitored. To be used with MONITOR_ALL_CONTAINERS
+loggifly_env_excluded_swarm_containers: "" # A comma separated list of swarm services that should not be monitored. To be used with MONITOR_ALL_SWARM_SERVICES
+loggifly_env_loggifly_mode: "" # Set this variable to swarm when wanting to use LoggiFly in swarm mode
+loggifly_env_global_keywords: "" # Keywords that will be monitored for all containers. Overrides global_keywords.keywords from the config.yaml.
+loggifly_env_global_keywords_with_attachment: "" # Notifications triggered by these global keywords have a logfile attached.
+loggifly_env_excluded_keywords: "" # Keywords that will always be ignored. Can be used to suppress notifications from irrelevant log lines
+loggifly_env_attach_logfile: "" # Attach a Logfile to all notifications.
+loggifly_env_attchment_lines: "20" # Define the number of Log Lines in the attachment file	20
+loggifly_env_notification_cooldown: "5" # Cooldown period (in seconds) per container per keyword before a new message can be sent
+loggifly_env_action_cooldown: "300" # Cooldown period (in seconds) before the next container action can be performed. Always at least 60s. (action_keywords are only configurable in YAML)
+loggifly_env_olivetin_url: "" # URL of your OliveTin instance.
+loggifly_env_olivetin_username: "" # Username for your OliveTin instance.
+loggifly_env_olivetin_password: "" # Password for your OliveTin instance.
+loggifly_env_log_level: "INFO" # Log Level for LoggiFly container logs.
+loggifly_env_multi_line_entries: "True" # When enabled the program tries to catch log entries that span multiple lines. If you encounter bugs or you simply don't need it you can disable it.
+loggifly_env_hide_regex_in_title: "False" # Exclude regex from the notification title for a cleaner look. Useful when using very long regexes.
+loggifly_env_reload_config: "True" # When the config file is changed the program reloads the config
+loggifly_env_disable_notifications: "False" # Disable notifications when keywords are found. Useful when you only want to trigger actions.
+loggifly_env_disable_start_message: "False" # Disable startup message.
+loggifly_env_disable_shutdown_message: "False" # Disable shutdown message.
+loggifly_env_disable_config_reload_message: "False" # Disable message when the config file is reloaded.
+loggifly_env_disable_container_event_message: "False" # Disable message when the monitoring of a container stops or starts.
 
 # autoheal
 loggifly_autoheal: "false"
