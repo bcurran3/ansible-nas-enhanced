@@ -7,8 +7,11 @@
         state: directory
       with_items:
         - "{{ romm_data_directory }}"
-        - "{{ romm_data_directory }}/resources"
+        - "{{ romm_data_directory }}/assets"
+        - "{{ romm_data_directory }}/config"
         - "{{ romm_data_directory }}/db"
+        - "{{ romm_data_directory }}/redis"
+        - "{{ romm_data_directory }}/resources"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -64,6 +67,8 @@
         hostname: "{{ romm_redis_container_name }}"
         image: "{{ romm_redis_image_name }}:{{ romm_redis_image_version }}"
         pull: true
+        volumes:
+          - "{{ romm_data_directory }}/redis:/data"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
@@ -99,8 +104,11 @@
         image: "{{ romm_image_name }}:{{ romm_image_version }}"
         pull: true
         volumes:
-          - "{{ romm_data_directory }}/resources:/romm/resources:rw"
-          - "{{ romm_roms_directory }}:/romm/library/roms:rw"
+          - "{{ romm_roms_directory }}:/assets:/romm/assets"
+          - "{{ romm_roms_directory }}:/config:/romm/config"
+          - "{{ romm_data_directory }}/redis:/redis-data"
+          - "{{ romm_data_directory }}/resources:/romm/resources"
+          - "{{ romm_roms_directory }}:/romm/library"
         ports:
           - "{{ romm_port_http }}:8080"
         env:
@@ -141,6 +149,11 @@
           homepage.container: "{{ romm_container_name }}"
           homepage.showStats: "{{ romm_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port_http }}"
+          homepage.widget.type: "romm"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port_http }}"
+          homepage.widget.username: "{{ romm_homepage_widget_username }}"
+          homepage.widget.password: "{{ romm_homepage_widget_password }}"
+          homepage.widget.fields: "{{ romm_homepage_widget_fields }}"
           repliqate.enabled: "{{ romm_repliqate_enabled }}"
           repliqate.engine: "{{ romm_repliqate_engine }}"
           repliqate.schedule: "{{ romm_repliqate_schedule }}"

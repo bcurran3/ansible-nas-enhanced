@@ -5,10 +5,6 @@ romm_enabled: false
 romm_available_externally: false
 romm_traefik_whitelist: "{{ lan }}"
 
-romm_database_username: romm_user
-romm_database_password: top_secret
-romm_database_root_password: top_top_secret
-
 # directories
 romm_data_directory: "{{ docker_home }}/romm"
 romm_roms_directory: "{{ roms_root }}"
@@ -36,20 +32,21 @@ romm_db_memory: 1g
 romm_redis_cpu_shares: 1024
 romm_redis_memory: 1g
 
+# app
+romm_database_username: "romm-user"
+romm_database_password: "topsecret"
+romm_database_root_password: "top_topsecret"
+# RomM auth config
+romm_auth_secret_key: "36ba154a0ce8fe34865b59c7a38596c50340a30ce2d5e9523ad387d663fd74b" # Generate a new key with `openssl rand -hex 32`
+romm_auth_username: "admin"
+romm_auth_password: "{{ ansible_nas_app_admin_password }}"
 # IGDB auth credentials - see https://github.com/zurdi15/romm/tree/release#-docker for more info
 romm_igdb_client_id: "abcd"
 romm_igdb_client_secret: "abcd"
-
 # MobyGames auth credentials
 romm_mobygames_client_id: "abcd"
-
 # SteamGridDB auth credentials
 romm_steamgriddb_client_id: "abcd"
-
-# auth config
-romm_auth_secret_key: "36ba154a0ce8fe34865b59c7a38596c50340a30ce2d5e9523ad387d663fd74b" # Generate a new key with `openssl rand -hex 32`
-romm_auth_username: "admin"
-romm_auth_password: "{{ ansible_nas_app_admin_passwor }}"
 
 # autoheal
 romm_autoheal: "false"
@@ -65,6 +62,9 @@ romm_homepage_group: "Apps"
 romm_homepage_icon: "romm.png"
 romm_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port_http }}"
 romm_homepage_showstats: "false"
+romm_homepage_widget_username: "{{ romm_auth_username }}"
+romm_homepage_widget_password: "{{ romm_auth_password }}"
+romm_homepage_widget_fields: '["platforms", "totalRoms", "saves", "states"]' # optional - default fields shown
 romm_db_homepage_group: "DBs"
 romm_db_homepage_icon: "mariadb.png"
 romm_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ romm_port_http }}"
