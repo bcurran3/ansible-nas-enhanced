@@ -46,6 +46,19 @@ proget_db_homepage_icon: "mysql.png"
 proget_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proget_port_http }}"
 proget_db_homepage_showstats: "false"
 
+# repliqate
+proget_repliqate_enabled: "false"
+proget_repliqate_engine: "restic"
+proget_repliqate_schedule: "@daily 3am"
+proget_repliqate_backup_id: "{{ proget_container_name }}"
+proget_repliqate_retention: "30d"
+# repliqate
+proget_db_repliqate_enabled: "false"
+proget_db_repliqate_engine: "restic"
+proget_db_repliqate_schedule: "@daily 3am"
+proget_db_repliqate_backup_id: "{{ proget_container_name }}"
+proget_db_repliqate_retention: "30d"
+
 # watchtower
 proget_watchtower_enable: "false"
 proget_db_watchtower_enable: "false"
