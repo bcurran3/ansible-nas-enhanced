@@ -23,10 +23,10 @@
         volumes:
           - "{{ romm_data_directory }}/db:/var/lib/mysql"
         env:
-          MYSQL_ROOT_PASSWORD: "{{ romm_database_root_password }}"
-          MYSQL_DATABASE: "romm"
-          MYSQL_USER: "{{ romm_database_username }}"
-          MYSQL_PASSWORD: "{{ romm_database_password }}"
+          MARIADB_ROOT_PASSWORD: "{{ romm_database_root_password }}"
+          MARIADB_DATABASE: "romm"
+          MARIADB_USER: "{{ romm_database_username }}"
+          MARIADB_PASSWORD: "{{ romm_database_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
