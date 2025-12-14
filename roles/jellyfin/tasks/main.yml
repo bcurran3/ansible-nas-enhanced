@@ -16,6 +16,17 @@
         hostname: "{{ jellyfin_container_name }}"
         image: "{{ jellyfin_image_name }}:{{ jellyfin_image_version }}"
         pull: true
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
+        devices: >-
+                  {{
+                    (jellyfin_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (jellyfin_devices | default(omit))
+                  }}
         volumes:
           - "{{ jellyfin_data_directory }}/config:/config:rw"
           - "{{ jellyfin_anime_directory }}:/anime:{{ jellyfin_anime_permissions }}"

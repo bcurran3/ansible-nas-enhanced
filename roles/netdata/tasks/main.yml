@@ -55,6 +55,12 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}" # added
+        devices: >-
+                  {{
+                    (netdata_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (netdata_devices | default(omit))
+                  }}
         labels:
           autoheal: "{{ netdata_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ netdata_watchtower_enable }}"

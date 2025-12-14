@@ -30,6 +30,12 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
+        devices: >-
+                  {{
+                    (tdarr_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (tdarr_devices | default(omit))
+                  }}
         volumes:
           - "{{ tdarr_data_directory }}/server:/app/server"
           - "{{ tdarr_data_directory }}/configs:/app/configs"
@@ -40,8 +46,6 @@
         ports:
           - "{{ tdarr_port_http }}:8265"
           - "{{ tdarr_port_server }}:8266"
-        devices:
-          - "/dev/dri/:/dev/dri/"
         env:
           nodeID: "{{ ansible_nas_hostname }}"
           serverIP: "0.0.0.0"

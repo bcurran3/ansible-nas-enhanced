@@ -26,6 +26,12 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
+        devices: >-
+                  {{
+                    (immich_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (immich_devices | default(omit))
+                  }}
         volumes:
           - "{{ immich_data_directory }}/cache:/cache"
         networks:
@@ -141,7 +147,6 @@
           homepage.showStats: "{{ immich_redis_homepage_showstats }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.include: '^6\.2\.\d+-alpine$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/redis"
@@ -157,7 +162,6 @@
         image: "{{ immich_server_image }}:{{ immich_server_tag }}"
         pull: true
         volumes:
-#          - "{{ immich_upload_directory }}:/usr/src/app/upload"
           - "{{ immich_upload_directory }}:/data" #v1.137.0
           - "/etc/localtime:/etc/localtime:ro"
         networks:

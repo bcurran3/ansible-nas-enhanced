@@ -30,6 +30,12 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
+        devices: >-
+                  {{
+                    (tdarr_node_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (tdarr_node_devices | default(omit))
+                  }}
         volumes:
           - "{{ tdarr_node_data_directory }}/configs:/app/configs"
           - "{{ tdarr_node_data_directory }}/logs:/app/logs"

@@ -41,20 +41,26 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
+#       devices: "{{ plex_devices | default(omit) }}"
+        devices: >-
+                  {{
+                    (plex_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (plex_devices | default(omit))
+                  }}
         volumes:
           - "{{ plex_data_directory }}/config:/config:rw"
           - "{{ plex_data_directory }}/logs:/opt/plex/Library/Application Support/Plex Media Server/Logs:rw"
+          - "{{ plex_anime_directory }}:/anime:{{ plex_anime_permissions }}"  # added
+          - "{{ plex_audiobooks_directory }}:/audiobooks:{{ plex_audiobooks_permissions }}"
           - "{{ plex_movies_directory }}:/movies:{{ plex_movies_permissions }}"
-          - "{{ plex_tv_directory }}:/tv:{{ plex_tv_permissions }}"
+          - "{{ plex_music_directory }}:/music:{{ plex_music_permissions }}"
           - "{{ plex_photos_directory }}:/photos:{{ plex_photos_permissions }}"
           - "{{ plex_podcasts_directory }}:/podcasts:{{ plex_podcasts_permissions }}"
-          - "{{ plex_music_directory }}:/music:{{ plex_music_permissions }}"
-          - "{{ plex_audiobooks_directory }}:/audiobooks:{{ plex_audiobooks_permissions }}"
           - "{{ plex_porn_directory }}:/porn:{{ plex_porn_permissions }}"  # added
-          - "{{ plex_anime_directory }}:/anime:{{ plex_anime_permissions }}"  # added
+          - "{{ plex_tv_directory }}:/tv:{{ plex_tv_permissions }}"
           - "{{ acmenator_data_directory }}:/certs"
         network_mode: "bridge"   # changed
-        devices: "{{ plex_devices | default(omit) }}"
         env:
           DOCKER_MODS: "{{ plex_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ plex_env_docker_mods_install_packages }}"

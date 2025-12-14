@@ -23,6 +23,12 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
+        devices: >-
+                  {{
+                    (localai_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (localai_devices | default(omit))
+                  }}
         volumes:
           - "{{ localai_data_directory }}/models:/models:rw"
         network_mode: bridge

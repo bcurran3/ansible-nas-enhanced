@@ -38,6 +38,13 @@
         device_requests:
           - capabilities: [gpu]
             count: -1
+        # below needs OpenVINO toolkit or IPEX-LLM library
+        devices: >-
+                  {{
+                    (openwebui_openedai_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if igpu_enabled | default(false) | bool
+                    else (openwebui_openedai_devices | default(omit))
+                  }}
         labels:
           autoheal: "{{ openwebui_openedai_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ openwebui_openedai_watchtower_enable }}"
@@ -99,6 +106,13 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
+        # below needs OpenVINO toolkit or IPEX-LLM library
+        devices: >-
+                  {{
+                    (openwebui_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (openwebui_devices | default(omit))
+                  }}
         labels:
           autoheal: "{{ openwebui_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ openwebui_watchtower_enable }}"

@@ -30,6 +30,12 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
+        devices: >-
+                  {{
+                    (handbrake_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (handbrake_devices | default(omit))
+                  }}
         env:
           AUTOMATED_CONVERSION_PRESET: "{{ handbrake_automated_conversion_preset }}"
           AUTOMATED_CONVERSION_FORMAT: "{{ handbrake_automated_conversion_format }}"
