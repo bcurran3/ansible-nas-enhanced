@@ -1,6 +1,5 @@
 ---
-# WORK IN PROGRESS
-# NEEDS A TEMPLATE TO ADD SOME VALUES
+# WIP - NEEDS A TEMPLATE TO ADD SOME VALUES
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -76,22 +75,24 @@
           - 4433:4433 # Intel AMT CIRA
           - 16990/udp:16990/udp
         volumes:
+          - "{{ meshcentral_data_directory }}/backups:/opt/meshcentral/meshcentral-backups"
           - "{{ meshcentral_data_directory }}/data:/opt/meshcentral/meshcentral-data"
           - "{{ meshcentral_data_directory }}/user_files:/opt/meshcentral/meshcentral-files"
-          - "{{ meshcentral_data_directory }}/backups:/opt/meshcentral/meshcentral-backups"
           - "{{ meshcentral_data_directory }}/web:/opt/meshcentral/meshcentral-web"
         network_mode: bridge
         env:
-          HOSTNAME: "{{ meshcentral_hostname }}.{{ ansible_nas_domain }}"
-          REVERSE_PROXY: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}" #set to your reverse proxy IP if you want to put meshcentral behind a reverse proxy
-          REVERSE_PROXY_TLS_PORT: "443"
-          IFRAME: "{{ meshcentral_iframe }}"                #set to true if you wish to enable iframe support
-          ALLOW_NEW_ACCOUNTS: "{{ meshcentral_allow_new_accounts }}"     #set to false if you want disable self-service creation of new accounts besides the first (admin)
-          WEBRTC: "{{ meshcentral_webrtc }}"                #set to true to enable WebRTC - per documentation it is not officially released with meshcentral, but is solid enough to work with. Use with caution
-          NODE_ENV: "production"
-          BACKUPS_PW: "TopSecret" #password for the autobackup function
-          BACKUP_INTERVAL: "24" # Interval in hours for the autobackup function
-          BACKUP_KEEP_DAYS: "10" #number of days of backups the function keeps
+          ALLOW_NEW_ACCOUNTS: "{{ meshcentral_env_allow_new_accounts }}"
+          BACKUPS_PW: "{{ meshcentral_env_backups_pw }}"
+          BACKUP_INTERVAL: "{{ meshcentral_env_backup_interval }}"
+          BACKUP_KEEP_DAYS: "{{ meshcentral_env_backup_keep_days }}"
+          HOSTNAME: "{{ meshcentral_env_hostname }}"
+          IFRAME: "{{ meshcentral_env_iframe }}"
+# I don't know if typhonragewind/meshcentral supports setting the mongodb URL
+#         MONGODB_URL: "mongodb://mongodb:27017" 
+          NODE_ENV: "{{ meshcentral_env_node_env }}"
+          REVERSE_PROXY: "{{ meshcentral_env_reverse_proxy }}"
+          REVERSE_PROXY_TLS_PORT: "{{ meshcentral_env_reverse_proxy_tls_port }}"
+          WEBRTC: "{{ meshcentral_env_webrtc }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ meshcentral_db_container_name }}"
@@ -173,7 +174,6 @@
         remove: true
       when: dir_stat.stat.exists
   when: meshcentral_enabled is false and archive_app_data_enabled is true
-
 
   # NOTE:
   # need to edit config.json with       "allowedOrigin": true 
