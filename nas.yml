@@ -8,6 +8,8 @@
     ###
 
     - role: vladgh.samba.server        # ANE requirement
+      vars:
+        samba_shares: "{{ ANE_samba_shares | selectattr('enabled') | list }}"
       tags:
         - samba
         - skip_ansible_lint

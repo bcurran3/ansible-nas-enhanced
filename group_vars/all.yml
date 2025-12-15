@@ -61,7 +61,7 @@ intel_igpu_enabled: false
 nvidia_runtime_enabled: false
 
 ###
-### Libraries
+### Media Libraries
 ###
 
 # The location where all shares will be created by default. Can be overridden on a per-share basis.
@@ -115,6 +115,9 @@ podcasts_root: "{{ samba_shares_root }}/podcasts"
 # Where your porn library is stored
 porn_root: "{{ samba_shares_root }}/porn"
 
+# Where you you want public files accessible to all
+public_root: "{{ samba_shares_root }}/public"
+
 # Where your video and audio recordings are stored
 recordings_root: "{{ samba_shares_root }}/recordings"
 
@@ -131,162 +134,251 @@ tv_root: "{{ samba_shares_root }}/tv"
 ### Samba
 ###
 
-# Share media libraires (proper NAS) or not (app server)
-samba_share_libraries: true
+# What media libraries you want published over Samba.
+anime_share_enabled: false
+audiobooks_share_enabled: false
+backups_share_enabled: false
+books_share_enabled: false
+code_share_enabled: false
+comics_share_enabled: false
+courses_share_enabled: false
+documents_share_enabled: false
+downloads_share_enabled: false
+dump_share_enabled: false
+games_share_enabled: false
+movies_share_enabled: false
+music_share_enabled: false
+photos_share_enabled: false
+podcasts_share_enabled: false
+porn_share_enabled: false
+public_share_enabled: false
+recordings_share_enabled: false
+roms_share_enabled: false
+torrents_share_enabled: false
+tv_share_enabled: false
+media_root_share_enabled: false # share everything from one place instead of individually
 
-# Shares you want published over Samba.
-samba_shares:
+# Libraries to be published over Samba when set to true:
+ANE_samba_shares:
   - name: anime
     comment: "Anime"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browsable: yes
     path: "{{ anime_root }}"
+    enabled: "{{ anime_share_enabled }}"
 
   - name: audiobooks
     comment: "Audiobooks"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browsable: yes
     path: "{{ audiobooks_root }}"
+    enabled: "{{ audiobooks_share_enabled }}"
 
-#  - name: backups
-#    comment: "Backups"
-#    guest_ok: yes
-#    public: yes
-#    writable: yes
-#    browseable: yes
-#    path: "{{ backups_root }}"
+  - name: backups
+    comment: "Backups"
+    group: ansible-nas
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ backups_root }}"
+    enabled: "{{ backups_share_enabled }}"
 
   - name: books
     comment: "Books"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ books_root }}"
+    enabled: "{{ books_share_enabled }}"
 
   - name: code
     comment: "Code"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ code_root }}"
+    enabled: "{{ code_share_enabled }}"
 
   - name: comics
     comment: "Comics"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ comics_root }}"
+    enabled: "{{ comics_share_enabled }}"
 
   - name: courses
     comment: "Courses"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ courses_root }}"
+    enabled: "{{ courses_share_enabled }}"
 
   - name: documents
     comment: "Documents"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ documents_root }}"
+    enabled: "{{ documents_share_enabled }}"
 
   - name: downloads
-    comment: "Stuff downloaded"
+    comment: "Downloaded stuff"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ downloads_root }}"
+    enabled: "{{ downloads_share_enabled }}"
 
   - name: dump
     comment: "File dump"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
-    path: "{{ samba_shares_root }}/dump"
+    path: "{{ dump_root }}"
+    enabled: "{{ dump_share_enabled }}"
 
   - name: games
     comment: "Games"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ games_root }}"
+    enabled: "{{ games_share_enabled }}"
 
   - name: movies
     comment: "Movies"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ movies_root }}"
+    enabled: "{{ movies_share_enabled }}"
 
   - name: music
     comment: "Music"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ music_root }}"
+    enabled: "{{ music_share_enabled }}"
 
   - name: photos
     comment: "Pictures"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ photos_root }}"
+    enabled: "{{ photos_share_enabled }}"
 
   - name: podcasts
     comment: "Podcasts"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ podcasts_root }}"
+    enabled: "{{ podcasts_share_enabled }}"
 
-#  - name: porn
-#    comment: "Porn"
-#    guest_ok: yes
-#    public: yes
-#    writable: yes
-#    browseable: yes
-#    path: "{{ porn_root }}"
+  - name: porn
+    comment: "Porn"
+    group: ansible-nas
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ porn_root }}"
+    enabled: "{{ porn_share_enabled }}"
+
+  - name: public
+    comment: "Publically shared files"
+    group: ansible-nas
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ public_root }}"
+    enabled: "{{ public_share_enabled }}"
 
   - name: recordings
     comment: "Recordings"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ recordings_root }}"
+    enabled: "{{ recordings_share_enabled }}"
+
+  - name: roms
+    comment: "ROMs"
+    group: ansible-nas
+    guest_ok: yes
+    public: yes
+    writable: yes
+    browseable: yes
+    path: "{{ roms_root }}"
+    enabled: "{{ roms_share_enabled }}"
 
   - name: torrents
     comment: "Torrent Files"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ torrents_root }}"
+    enabled: "{{ torrents_share_enabled }}"
 
   - name: tv
     comment: "TV Episodes"
+    group: ansible-nas
     guest_ok: yes
     public: yes
     writable: yes
     browseable: yes
     path: "{{ tv_root }}"
+    enabled: "{{ tv_share_enabled }}"
+
+  - name: media_root
+    comment: 'Media'
+    group: ansible-nas
+    guest_ok: no
+    public: yes
+    write_list: "{{ ansible_nas_user }}"
+    browseable: yes
+    path: "{{ samba_shares_root }}"
+    enabled: "{{ media_root_share_enabled }}"
 
 # more more details on Samba variables at:
 # https://github.com/vladgh/ansible-collection-vladgh-samba
