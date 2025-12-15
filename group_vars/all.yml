@@ -131,10 +131,9 @@ torrents_root: "{{ samba_shares_root }}/torrents"
 tv_root: "{{ samba_shares_root }}/tv"
 
 ###
-### Samba
+### Media Libraries to share over Samba and NFS
 ###
 
-# What media libraries you want published over Samba.
 anime_share_enabled: false
 audiobooks_share_enabled: false
 backups_share_enabled: false
@@ -158,7 +157,11 @@ torrents_share_enabled: false
 tv_share_enabled: false
 media_root_share_enabled: false # share everything from one place instead of individually
 
-# Libraries to be published over Samba when set to true:
+###
+### Samba
+###
+
+# Libraries to be published over Samba when set to true (above):
 ANE_samba_shares:
   - name: anime
     comment: "Anime"
@@ -321,7 +324,7 @@ ANE_samba_shares:
     enabled: "{{ porn_share_enabled }}"
 
   - name: public
-    comment: "Publically shared files"
+    comment: "Public/Shared files"
     group: ansible-nas
     guest_ok: yes
     public: yes
@@ -409,14 +412,55 @@ samba_server_string: Ansible NAS Enhanced
 # Data you want published over NFS. More info on the NFS config format can be found at
 # https://help.ubuntu.com/community/SettingUpNFSHowTo#Shares
 # WARNING: Weird things might happen if you share the same data over Samba and NFS and allow writes on both!
-
-# Share media libraires (proper NAS) or not (app server)
-nfs_share_libraries: true
+# If you're Samba shares are writeable, you should set your NFS shares to read only
 
 nfs_shares_root: /data/shares
+nfs_shares_access: ro # read only, change to rw for read write
 
-nfs_exports:
-  - "{{ nfs_shares_root }}/public *(rw,sync,no_root_squash)"
+# Libraries to be published over NFS when set to true (above):
+ANE_nfs_exports_list:
+  - export: "{{ nfs_shares_root }}/anime *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ anime_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/audiobooks *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ audiobooks_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/backups *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ backups_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/books *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ books_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/code *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ code_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/comics *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ comics_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/courses *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ courses_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/documents *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ documents_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/downloads *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ downloads_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/dump *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ dump_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/games *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ games_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/movies *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ movies_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/music *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ music_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/photos *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ photos_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/porn *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ porn_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/public *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ public_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/recordings *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ recordings_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/roms *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ roms_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/torrents *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ torrents_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/tv *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ tv_share_enabled }}"
+  - export: "{{ nfs_shares_root }}/media_root *({{ nfs_shares_access }},sync,no_root_squash)"
+    enabled: "{{ media_root_share_enabled }}"
 
 # What version of python ansible should use on target system (path to specific binary)
 ansible_python_interpreter: /usr/bin/python3
