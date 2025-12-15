@@ -6,11 +6,11 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
-      community.docker.docker_container:
-        name: "{{ checkmate_redis_container_name }}"
-        state: absent
-      register: result_redis
+#    - name: Try and stop and remove {{ ansible_nas_app_name }}
+#      community.docker.docker_container:
+#        name: "{{ checkmate_client_container_name }}"
+#        state: absent
+#      register: result_client
 
     - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
@@ -20,20 +20,20 @@
 
     - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
-        name: "{{ checkmate_client_container_name }}"
-        state: absent
-      register: result_client
-
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
-      community.docker.docker_container:
-        name: "{{ checkmate_server_container_name }}"
+        name: "{{ checkmate_container_name }}"
         state: absent
       register: result_server
+
+#    - name: Try and stop and remove {{ ansible_nas_app_name }}
+#      community.docker.docker_container:
+#        name: "{{ checkmate_redis_container_name }}"
+#        state: absent
+#      register: result_redis
 
     - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
-          - not result_redis.changed
+#          - not result_client.changed
           - not result_db.changed
-          - not result_client.changed
           - not result_server.changed
+#          - not result_redis.changed

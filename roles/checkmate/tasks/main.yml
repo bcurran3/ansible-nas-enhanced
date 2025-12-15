@@ -1,6 +1,7 @@
 ---
-# WORK IN PROGRESS
-# https://docs.checkmate.so/checkmate-2.1/users-guide/quickstart
+# WORK IN PROGRESS - 98% - works using IP but not hostname - probably just need to override the UPTIME_APP vars with hostname
+# https://docs.checkmate.so/users-guide/quickstart
+# version with front end: https://raw.githubusercontent.com/bluewave-labs/Checkmate/refs/heads/master/docker/dist/docker-compose.yaml
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -24,13 +25,13 @@
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
-#        healthcheck:
-#          test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
-#          interval: 5s
-#          timeout: 30s
-#          start_period: 0s
-#          start_interval: 1s
-#          retries: 30
+        healthcheck:
+          test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--quiet"]
+          interval: 5s
+          timeout: 30s
+          start_period: 0s
+          start_interval: 1s
+          retries: 30
         labels:
           autoheal: "{{ checkmate_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ checkmate_db_watchtower_enable }}"
@@ -59,66 +60,66 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ checkmate_server_container_name }}"
-        hostname: "{{ checkmate_server_container_name }}"
-        image: "{{ checkmate_server_image_name }}:{{ checkmate_server_image_tag }}"
+        name: "{{ checkmate_container_name }}"
+        hostname: "{{ checkmate_container_name }}"
+        image: "{{ checkmate_image_name }}:{{ checkmate_image_tag }}"
         pull: true
         dns_servers: "{{ ansible_nas_dns }}"
         ports:
-          - "{{ checkmate_server_port_http }}:52345"
+          - "{{ checkmate_port_http }}:52345"
         network_mode: bridge
         env:
-          UPTIME_APP_API_BASE_URL: "{{ checkmate_server_hostname }}.{{ ansible_nas_domain }}/api/v1"
-          UPTIME_APP_CLIENT_HOST: "{{ checkmate_server_hostname }}.{{ ansible_nas_domain }}"
+          UPTIME_APP_API_BASE_URL: "{{ checkmate_env_uptime_app_api_base_url }}"
+          UPTIME_APP_CLIENT_HOST: "{{ checkmate_env_uptime_app_client_host }}"
           DB_CONNECTION_STRING: "mongodb://{{ checkmate_db_container_name }}:27017/uptime_db"
-          CLIENT_HOST: "http://localhost"
-          JWT_SECRET: "EtNCM7ibSBHF33XB5q+zwOumszdQPvWo+mPF3HF0lUQ="
+          CLIENT_HOST: "{{ checkmate_env_client_host }}"
+          JWT_SECRET: "{{ checkmate_env_jwt_secret }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ checkmate_db_container_name }}"
         labels:
-          autoheal: "{{ checkmate_server_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ checkmate_server_watchtower_enable }}"
-          dockflare.enable: "{{ checkmate_server_dockflare_tunnel }}"
-          dockflare.access.group: "{{ checkmate_server_dockflare_access_group }}"
-          dockflare.hostname: "{{ checkmate_server_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_server_port_http }}"
+          autoheal: "{{ checkmate_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ checkmate_watchtower_enable }}"
+          dockflare.enable: "{{ checkmate_dockflare_tunnel }}"
+          dockflare.access.group: "{{ checkmate_dockflare_access_group }}"
+          dockflare.hostname: "{{ checkmate_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ checkmate_server_homepage_group }}"
-          homepage.icon: "{{ checkmate_server_homepage_icon }}"
-          homepage.href: "{{ checkmate_server_homepage_href }}"
-          homepage.description: "{{ 'Checkmate is an open-source, self-hosted tool designed to track and monitor server hardware, uptime, response times, and incidents in real-time with beautiful visualizations.' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_server_port_http }}"
+          homepage.group: "{{ checkmate_homepage_group }}"
+          homepage.icon: "{{ checkmate_homepage_icon }}"
+          homepage.href: "{{ checkmate_homepage_href }}"
+          homepage.description: "{{ 'open source uptime and infrastructure monitoring application' if homepage_show_description else omit }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_port_http }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ checkmate_server_container_name }}"
-          homepage.showStats: "{{ checkmate_server_homepage_showstats }}"
-          repliqate.enabled: "{{ checkmate_server_repliqate_enabled }}"
-          repliqate.engine: "{{ checkmate_server_repliqate_engine }}"
-          repliqate.schedule: "{{ checkmate_server_repliqate_schedule }}"
-          repliqate.backup_id: "{{ checkmate_server_repliqate_backup_id }}"
-          repliqate.retention: "{{ checkmate_server_repliqate_retention }}"
+          homepage.container: "{{ checkmate_container_name }}"
+          homepage.showStats: "{{ checkmate_homepage_showstats }}"
+          repliqate.enabled: "{{ checkmate_repliqate_enabled }}"
+          repliqate.engine: "{{ checkmate_repliqate_engine }}"
+          repliqate.schedule: "{{ checkmate_repliqate_schedule }}"
+          repliqate.backup_id: "{{ checkmate_repliqate_backup_id }}"
+          repliqate.retention: "{{ checkmate_repliqate_retention }}"
           traefik.enable: "{{ checkmate_available_externally | string }}"
-          traefik.http.routers.checkmate.rule: "Host(`{{ checkmate_server_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.checkmate.rule: "Host(`{{ checkmate_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.checkmate.tls.certresolver: "letsencrypt"
           traefik.http.routers.checkmate.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.checkmate.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ checkmate_server_hostname }}"
-          traefik.http.routers.checkmate.middlewares: "{{ checkmate_server_hostname }}@docker"
+          traefik.http.routers.frontend.middlewares: "{{ checkmate_hostname }}"
+          traefik.http.routers.checkmate.middlewares: "{{ checkmate_hostname }}@docker"
           traefik.http.middlewares.checkmate.IPAllowList.sourcerange: "{{ checkmate_traefik_whitelist }}"
           traefik.http.services.checkmate.loadbalancer.server.port: "52345"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/BlueWave-Labs/CheckMate-Backend/releases"
-        cpu_shares: "{{ checkmate_server_cpu_shares }}"
-        memory: "{{ checkmate_server_memory }}"
+        cpu_shares: "{{ checkmate_cpu_shares }}"
+        memory: "{{ checkmate_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (checkmate_server_port_http | string)] +
-                (['https://' + checkmate_server_hostname + '.' + ansible_nas_domain] if (checkmate_server_available_externally is true or checkmate_server_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (checkmate_port_http | string)] +
+                (['https://' + checkmate_hostname + '.' + ansible_nas_domain] if (checkmate_available_externally is true or checkmate_dockflare_tunnel is true) else [])
               }}
   when: checkmate_enabled is true
 
@@ -126,7 +127,7 @@
   block:
     - name: Stop {{ ansible_nas_app_name }} Server Container
       community.docker.docker_container:
-        name: "{{ checkmate_server_container_name }}"
+        name: "{{ checkmate_container_name }}"
         state: absent
 
     - name: Stop {{ ansible_nas_app_name }} DB Container
