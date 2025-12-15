@@ -7,27 +7,11 @@
         state: directory
         owner: "20211"
         group: "20211"
+#        mode: "1750"
       with_items:
         - "{{ netalertx_data_directory }}"
-        - "{{ netalertx_data_directory }}/log"
-
-    - name: Create {{ ansible_nas_app_name }} Directories Part Deux
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: "20211"
-        group: "20211"
-        mode: "1700"
-      with_items:
-        - "{{ netalertx_data_directory }}/tmp"
-
-    - name: Secure NetAlertX tmp directory
-      ansible.posix.mount:
-        path: "{{ netalertx_data_directory }}/tmp"
-        src: "{{ netalertx_data_directory }}/tmp"
-        fstype: none
-        opts: "rw,bind,noexec,nosuid,nodev,async,noatime,nodiratime"
-        state: mounted
+        - "{{ netalertx_data_directory }}/db"
+        - "{{ netalertx_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -41,31 +25,20 @@
           - ALL              # Drop all capabilities for enhanced security
         capabilities:
           - NET_ADMIN        # Required for ARP scanning
-          - NET_RAW          # Required for raw socket operations
           - NET_BIND_SERVICE # Required to bind to privileged ports (nbtscan)
+          - NET_RAW          # Required for raw socket operations
         env:
           LISTEN_ADDR: "{{ netalertx_env_listen_addr }}" # Listen for connections on all interfaces
           PORT: "{{ netalertx_port_http }}" # Application port
           GRAPHQL_PORT: "{{ netalertx_port_graphql }}" # GraphQL API port (passed into APP_CONF_OVERRIDE at runtime)
+          ALWAYS_FRESH_INSTALL: "{{ netalertx_env_always_fresh_install }}" # Set to true to reset your config and database on each container start
           NETALERTX_DEBUG: "{{ netalertx_env_netalertx_debug }}" # 0=kill all services and restart if any dies. 1 keeps running dead services.
           TZ: "{{ ansible_nas_timezone }}"
-        mounts:
-          - type: bind
-            source: "{{ netalertx_data_directory }}"
-            target: "/data"
-            read_only: false
-          - type: bind
-            source: "/etc/localtime"
-            target: "/etc/localtime"
-            read_only: true
-          - type: bind
-            source: "{{ netalertx_data_directory }}/log"
-            target: "/tmp/log"
-            read_only: false
-          - type: bind
-            source: "{{ netalertx_data_directory }}/tmp"
-            target: "/tmp"
-            read_only: false
+        volumes:
+          - "{{ netalertx_data_directory }}:/data"
+          - "/etc/localtime:/etc/localtime:ro"
+        tmpfs:
+              - "/tmp:uid=20211,gid=20211,mode=1700,rw,noexec,nosuid,nodev,async,noatime,nodiratime"
         labels:
           autoheal: "{{ netalertx_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ netalertx_watchtower_enable }}"
@@ -111,6 +84,12 @@
         pids_limit: "512"
         read_only: true      # Make the container filesystem read-only
         restart_policy: unless-stopped
+
+    - name: Set permissions on app.conf to 644
+      ansible.builtin.file:
+        path: "{{ netalertx_data_directory }}/config/app.conf"
+        mode: '0644'
+        state: file
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
