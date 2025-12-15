@@ -1,0 +1,43 @@
+---
+# ANE
+ansible_nas_app_name: "Checkmate Capture"
+checkmate_capture_enabled: false
+checkmate_capture_available_externally: false
+checkmate_capture_traefik_whitelist: "{{ lan }}"
+
+# directories
+checkmate_capture_data_directory: "{{ docker_home }}/checkmate_capture"
+
+# docker
+checkmate_capture_container_name: "checkmate-capture"
+checkmate_capture_image_name: "ghcr.io/bluewave-labs/capture"
+checkmate_capture_image_tag: "latest"
+
+# network
+checkmate_capture_port_http: "59232"
+checkmate_capture_hostname: "checkmate-capture"
+
+# specs
+checkmate_capture_cpu_shares: "1024"
+checkmate_capture_memory: 1g
+
+# app
+# \/ Must match the secret you enter on Checkmate
+checkmate_capture_env_api_secret: "EtNCM7ibSBHF33XB5q+zwOumszdQPvWo+mPF3HF0lUQ="
+checkmate_capture_env_gin_mode: "release"
+
+# autoheal
+checkmate_capture_autoheal: "false"
+
+# dockflare
+checkmate_capture_dockflare_tunnel: "false"
+checkmate_capture_dockflare_access_group: ""
+
+# homepage
+checkmate_capture_homepage_group: "Misc"
+checkmate_capture_homepage_icon: "checkmate.png"
+checkmate_capture_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_port_http }}"
+checkmate_capture_homepage_showstats: "false"
+
+# watchtower
+checkmate_capture_watchtower_enable: "false"

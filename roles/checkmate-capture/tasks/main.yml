@@ -1,0 +1,63 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ checkmate_capture_container_name }}"
+        hostname: "{{ checkmate_capture_container_name }}"
+        image: "{{ checkmate_capture_image_name }}:{{ checkmate_capture_image_tag }}"
+        pull: true
+        volumes:
+          - "/etc/os-release:/etc/os-release:ro"
+        ports:
+          - "{{ checkmate_capture_port_http }}:59232"
+        env:
+          API_SECRET: "{{ checkmate_capture_env_api_secret }}"
+          GIN_MODE: "{{ checkmate_capture_env_gin_mode }}"
+          PORT: "{{ checkmate_capture_port_http }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ checkmate_capture_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ checkmate_capture_watchtower_enable }}"
+          dockflare.enable: "false"
+# Not sure if dockflare is useful here???
+#          dockflare.enable: "{{ checkmate_capture_dockflare_tunnel }}"
+#          dockflare.access.group: "{{ checkmate_capture_dockflare_access_group }}"
+#          dockflare.hostname: "{{ checkmate_capture_hostname }}.{{ ansible_nas_domain }}"
+#          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmate_capture_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ checkmate_capture_homepage_group }}"
+          homepage.icon: "{{ checkmate_capture_homepage_icon }}"
+          homepage.href: "{{ checkmate_capture_homepage_href }}"
+          homepage.description: "{{ 'open source hardware monitoring agent for Checkmate' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ checkmate_capture_container_name }}"
+          homepage.showStats: "{{ checkmate_capture_homepage_showstats }}"
+          repliqate.enabled: "false"
+          traefik.enable: "false"
+# Not sure if traefik is useful here???
+#          traefik.enable: "{{ checkmate_capture_available_externally | string }}"
+#          traefik.http.routers.checkmate_capture.rule: "Host(`{{ checkmate_capture_hostname }}.{{ ansible_nas_domain }}`)"
+#          traefik.http.routers.checkmate_capture.tls.certresolver: "letsencrypt"
+#          traefik.http.routers.checkmate_capture.tls.domains[0].main: "{{ ansible_nas_domain }}"
+#          traefik.http.routers.checkmate_capture.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+#          traefik.http.routers.frontend.middlewares: "{{ checkmate_capture_hostname }}"
+#          traefik.http.routers.checkmate_capture.middlewares: "{{ checkmate_capture_hostname }}@docker"
+#          traefik.http.middlewares.checkmate_capture.IPAllowList.sourcerange: "{{ checkmate_capture_traefik_whitelist }}"
+#          traefik.http.services.checkmate_capture.loadbalancer.server.port: "80"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/bluewave-labs/capture/pkgs/container/capture"
+        cpu_shares: "{{ checkmate_capture_cpu_shares }}"
+        memory: "{{ checkmate_capture_memory }}"
+        restart_policy: unless-stopped
+  when: checkmate_capture_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ checkmate_capture_container_name }}"
+        state: absent
+  when: checkmate_capture_enabled is false
