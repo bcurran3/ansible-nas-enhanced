@@ -16,7 +16,7 @@ homepage_port_http: "11111"
 homepage_puid: "0"
 homepage_pgid: "0"
 homepage_allowed_hosts: "*"
-homepage_show_description: "false"
+homepage_show_description: false
 
 # docker
 homepage_container_name: "homepage"
@@ -42,8 +42,11 @@ homepage_repliqate_retention: "30d"
 # watchtower
 homepage_watchtower_enable: "false"
 
-# App template file values
-###############################
+###
+### Homepage template files values
+###
+
+# https://gethomepage.dev/configs/bookmarks/
 homepage_bookmarks_yaml:
   - Developer:
       - "Ansible-NAS-Enhanced":
@@ -67,6 +70,7 @@ homepage_bookmarks_yaml:
             href: https://youtube.com/
             icon: youtube
 
+# https://gethomepage.dev/configs/services/
 homepage_services_yaml:
 #  - Networking:
 #      - Router:
@@ -74,7 +78,7 @@ homepage_services_yaml:
 #          href: http://192.168.1.1/
 #          description: Asus Router
 
-# settings
+# https://gethomepage.dev/configs/settings/
 homepage_title: "{{ ansible_nas_hostname }} Homepage"
 homepage_locale: en-US
 
@@ -84,7 +88,7 @@ homepage_settings_yaml:
 #  description: "" # You can customize the description of the page if you'd like.
   startUrl: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homepage_port_http }}" # You can customize the start_url as required for installable apps. The default is "/".
 #  background: "" # f you'd like to use a background image instead of the solid theme color, you may provide a full URL to an image of your choice.
-  favicon: "sh-ansible.png"
+#  favicon: "sh-ansible.png" # If you'd like to use a custom favicon instead of the included one, you may provide a full URL to an image of your choice.
 #  base: "https://{{ homepage_hostname }}.{{ ansible_nas_domain }}"
   instanceName: "{{ ansible_nas_user }}"
   language: "{{ homepage_locale }}"
@@ -127,6 +131,7 @@ homepage_settings_yaml:
       style: row
       columns: 4
 
+# https://gethomepage.dev/widgets/
 homepage_widgets_yaml:
   - search:
       provider: google # google, duckduckgo, bing, baidu, brave or custom
@@ -148,3 +153,13 @@ homepage_widgets_yaml:
       uptime: true
       units: metric # only used by cpu temp
       refresh: 60000 # optional, in ms
+
+# https://gethomepage.dev/configs/proxmox/
+homepage_proxmox_yaml:
+#  - pve: # must match your actual Proxmox node name
+#      url: "" # https://proxmox.host.or.ip:8006
+#      token: "" # username@pam!Token ID
+#      secret: "" # secret
+
+# https://gethomepage.dev/configs/docker/
+# https://gethomepage.dev/configs/kubernetes/
