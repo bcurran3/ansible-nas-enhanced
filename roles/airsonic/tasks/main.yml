@@ -55,6 +55,9 @@
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/airsonic/airsonic"
+        cpu_shares: "{{ airsonic_cpu_shares }}"
+        restart_policy: unless-stopped
+        memory: "{{ airsonic_memory }}"
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
@@ -63,9 +66,6 @@
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (airsonic_port_http | string)] +
                 (['https://' + airsonic_hostname + '.' + ansible_nas_domain] if (airsonic_available_externally is true or airsonic_dockflare_tunnel is true) else [])
               }}
-        cpu_shares: "{{ airsonic_cpu_shares }}"
-        restart_policy: unless-stopped
-        memory: "{{ airsonic_memory }}"
   when: airsonic_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
