@@ -112,7 +112,7 @@ By default, applications can be found on the ports listed below.
 | Hammond          | 3041    | Bridge  | HTTP           |
 | HandBrake        | 5801    | Bridge  | HTTP           |
 | Heimdall         | 11112   | Bridge  | HTTP           |
-| Hello World      | 9999    | Bridge  | HTTP           |
+| Hello World      | 9920    | Bridge  | HTTP           |
 | Homarr           | 7575    | Bridge  | HTTP           |
 | Home Assistant   | 8123    | Host    | HTTP           |
 | HomeBox          | 3100
@@ -371,6 +371,6 @@ By default, applications can be found on the ports listed below.
 
 
 # next avail = 3050
-# next avail = 9020
+# next avail = 9021
 
 # NOTE: Conflicts on ports 9000 + 9002
