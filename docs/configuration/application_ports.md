@@ -62,7 +62,7 @@ By default, applications can be found on the ports listed below.
 | Dockge           | 5001
 | Dockman          | 8866
 | Dockpeek         | 3420    | Bridge  | HTTP           |
-| Dokemon          | 9091    | Bridge  | HTTP           |
+| Dokemon          | 9019    | Bridge  | HTTP           |
 | Doku             | 9091    | Bridge  | HTTP           |
 | DokuWiki         | 8085    | Bridge  | HTTP           |
 | Double Commander | 3006    | Bridge  | HTTP           |
@@ -371,6 +371,6 @@ By default, applications can be found on the ports listed below.
 
 
 # next avail = 3050
-# next avail = 9019
+# next avail = 9020
 
 # NOTE: Conflicts on ports 9000 + 9002
