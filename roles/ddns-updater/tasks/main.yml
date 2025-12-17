@@ -29,14 +29,14 @@
         volumes:
           - "{{ ddns_updater_data_directory }}:/updater/data:rw"
         env:
+          BACKUP_PERIOD: "72h"
           GOTIFY_TOKEN: "{{ ddns_updater_gotify_token | default('') }}"
           GOTIFY_URL: "{{ ddns_updater_gotify_url | default('') }}"
+          HTTP_TIMEOUT: "{{ ddns_updater_http_timeout }}"
+          LISTENING_PORT: "{{ ddns_updater_port_http }}"
           PERIOD: "{{ ddns_updater_period }}"
           UPDATE_COOLDOWN_PERIOD: "{{ ddns_updater_cooldown_period }}"
-          HTTP_TIMEOUT: "{{ ddns_updater_http_timeout }}"
           TZ: "{{ ansible_nas_timezone }}"
-          BACKUP_PERIOD: "72h"
-          LISTENING_PORT: "{{ ddns_updater_port_http }}"
         labels:
           autoheal: "{{ ddns_updater_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ ddns_updater_watchtower_enable }}"
