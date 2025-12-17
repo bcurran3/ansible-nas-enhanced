@@ -41,3 +41,94 @@ homepage_repliqate_retention: "30d"
 
 # watchtower
 homepage_watchtower_enable: "false"
+
+# App
+# settings
+homepage_title: "{{ ansible_nas_hostname }} Homepage"
+homepage_locale: en-US
+
+# Homepage config files - the variables below are formatted to Homepage YAML config files
+homepage_settings_yaml:
+  title: "{{ homepage_title }}"
+  language: "{{ homepage_locale }}"
+  showStats: true
+  layout:
+    Apps:
+      style: row
+      columns: 6
+    Media Management:
+      style: column
+  #    columns: 4
+    Media Servers:
+      style: column
+  #    columns: 2
+  #  Server Utils:
+  #    style: row
+  #    columns: 4
+    Download Tools:
+      style: row
+      columns: 4
+    Docker Utils:
+      style: column
+  #   columns: 4
+    Network:
+      style: column
+  #    columns: 4
+    DBs:
+      style: row
+      columns: 4
+    Misc:
+      style: row
+      columns: 4
+
+homepage_services_yaml:
+#  - Networking:
+#      - Router:
+#          icon: asus-router
+#          href: http://192.168.1.1/
+#          description: Asus Router
+
+homepage_widgets_yaml:
+  - search:
+      provider: google # google, duckduckgo, bing, baidu, brave or custom
+      focus: true # Optional, will set focus to the search bar on page load
+      target: _blank # One of _self, _blank, _parent or _top
+  - greeting:
+      text_size: xl
+      text: "{{ ansible_nas_hostname }}"
+  - datetime:
+      text_size: xl # Valid text sizes are 4xl, 3xl, 2xl, xl, md, sm, xs
+      format:
+        timeStyle: short
+        hour12: true
+        dateStyle: short
+  - resources:
+      cpu: true
+      memory: true
+      cputemp: true
+      uptime: true
+      units: metric # only used by cpu temp
+      refresh: 60000 # optional, in ms
+
+homepage_bookmarks_yaml:
+  - Developer:
+      - "Ansible-NAS-Enhanced":
+          - abbr: ANE
+            href: https://gitea.mrbillsabode.org/bill/ansible-nas-enhanced
+      - Github:
+          - abbr: GH
+            href: https://github.com/
+            icon: github
+      - "Hacker News":
+          - abbr: HN
+            href: https://news.ycombinator.com/
+  - Social:
+      - Reddit:
+          - abbr: RE
+            href: https://reddit.com/
+            icon: reddit
+  - Entertainment:
+      - YouTube:
+          - abbr: YT
+            href: https://youtube.com/
+            icon: youtube

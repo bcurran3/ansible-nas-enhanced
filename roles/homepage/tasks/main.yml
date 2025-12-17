@@ -11,6 +11,18 @@
         - "{{ homepage_data_directory }}/config/logs"
         - "{{ homepage_data_directory }}/images"
 
+    - name: Template config files
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ homepage_data_directory }}/{{ item }}"
+      with_items:
+        - bookmarks.yaml
+        - docker.yaml
+        - settings.yaml
+        - services.yaml
+        - widgets.yaml
+      register: homepage_config
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
