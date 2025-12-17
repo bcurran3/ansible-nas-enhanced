@@ -24,7 +24,7 @@
           - "{{ banban_port_http }}:{{ banban_port_http }}"
         env:
           DATABASE_URL: "file:./db/banban.db"
-          PORT: "{{ banban_port_http }}"
+          PORT: "{{ banban_port_http | string }}"
           NODE_ENV: "production"
           TZ: "{{ ansible_nas_timezone }}"
         labels:

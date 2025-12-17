@@ -7,22 +7,20 @@ ghost_traefik_whitelist: "{{ lan }}"
 
 ghost_data_directory: "{{ docker_home }}/ghost"
 ghost_hostname: "ghost"
-ghost_port_http: 2368
+ghost_port_http: "2368"
 ghost_network: "ghost"
-
-# mysql
-ghost_db_password: "topsecret"
-ghost_db_memory_limit: "1G"
 
 # docker
 ghost_container_name: "ghost"
 ghost_image_name: "ghost"
 ghost_image_tag: "latest"
-ghost_cpu_shares: 1024
-ghost_memory: "1G"
 ghost_db_container_name: "ghost-db"
 ghost_db_image_name: "mysql"
 ghost_db_image_tag: "8.0"
+
+# specs
+ghost_cpu_shares: 1024
+ghost_memory: "1G"
 ghost_db_cpu_shares: 1024
 ghost_db_memory: "1G"
 
@@ -32,6 +30,7 @@ ghost_mail_transport: "SMTP"
 ghost_mail_options_host: "smtp.{{ ansible_nas_domain }}"
 ghost_mail_options_port: "465"
 ghost_url: "https://{{ ghost_hostname }}.{{ ansible_nas_domain }}"
+ghost_db_password: "topsecret"
 
 # autoheal
 ghost_autoheal: "false"

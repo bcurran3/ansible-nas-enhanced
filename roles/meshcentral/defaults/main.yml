@@ -9,31 +9,33 @@ meshcentral_data_directory: "{{ docker_home }}/meshcentral"
 # network
 meshcentral_network: "meshcentral"
 meshcentral_hostname: "meshcentral"
-meshcentral_port_http: 9012
+meshcentral_port_http: "9012"
 
 # docker
 meshcentral_container_name: "meshcentral"
 meshcentral_image_name: "typhonragewind/meshcentral" # possibly need a new image, on Feb 11, 2024 Typhonragewind posted "I won't be adding more changes at this moment, other than fixing bugs."
 meshcentral_image_tag: "mongodb-latest"
-meshcentral_cpu_shares: 1024
-meshcentral_memory: "1g"
 meshcentral_db_container_name: "meshcentral-db"
 meshcentral_db_image_name: "mongo"
 meshcentral_db_image_tag: "latest"
+
+# specs
+meshcentral_cpu_shares: 1024
+meshcentral_memory: "1G"
 meshcentral_db_cpu_shares: 1024
-meshcentral_db_memory: "1g"
+meshcentral_db_memory: "1G"
 
 # app
-meshcentral_env_allow_new_accounts: "false" #set to false if you want disable self-service creation of new accounts besides the first (admin)
+meshcentral_env_allow_new_accounts: false #set to false if you want disable self-service creation of new accounts besides the first (admin)
 meshcentral_env_backups_pw: "TopSecret" #password for the autobackup function
 meshcentral_env_backup_interval: "24" #Interval in hours for the autobackup function
 meshcentral_env_backup_keep_days: "10" #number of days of backups the function keeps
 meshcentral_env_hostname: "{{ meshcentral_hostname }}.{{ ansible_nas_domain }}"
-meshcentral_env_iframe: "false" #set to true if you wish to enable iframe support
+meshcentral_env_iframe: false #set to true if you wish to enable iframe support
 meshcentral_env_node_env: "production"
 meshcentral_env_reverse_proxy: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}" #set to your reverse proxy IP if you want to put meshcentral behind a reverse proxy
 meshcentral_env_reverse_proxy_tls_port: "443"
-meshcentral_env_webrtc: "false" #set to true to enable WebRTC - per documentation it is not officially released with meshcentral, but is solid enough to work with. Use with caution
+meshcentral_env_webrtc: false #set to true to enable WebRTC - per documentation it is not officially released with meshcentral, but is solid enough to work with. Use with caution
 
 # autoheal
 meshcentral_autoheal: "false"

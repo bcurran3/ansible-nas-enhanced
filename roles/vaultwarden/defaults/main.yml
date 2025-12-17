@@ -15,26 +15,28 @@ vaultwarden_hostname: "vaultwarden"
 vaultwarden_ip_whitelist: "0.0.0.0/0"
 
 # docker
-vaultwarden_container_name: vaultwarden
+vaultwarden_container_name: "vaultwarden"
 vaultwarden_image_name: "ghcr.io/dani-garcia/vaultwarden"
 vaultwarden_image_tag: "latest"
-vaultwarden_cpu_shares: "1024"
-vaultwarden_memory: "512m"
-vaultwarden_backup_container_name: vaultwarden-backup
+vaultwarden_backup_container_name: "vaultwarden-backup"
 vaultwarden_backup_image_name: "bruceforce/vaultwarden-backup"
 vaultwarden_backup_image_tag: "latest"
-vaultwarden_backup_cpu_shares: "1024"
-vaultwarden_backup_memory: "512m"
+
+# specs
+vaultwarden_cpu_shares: 1024
+vaultwarden_memory: "512M"
+vaultwarden_backup_cpu_shares: 1024
+vaultwarden_backup_memory: "512M"
 
 # app
 # Keep this token secret, this is password to access admin area of your server!
 # This token can be anything, but it's recommended to use a long, randomly generated string of characters,
 # for example running openssl rand -base64 48
-vaultwarden_admin_token: Dkgp/XHTYIQCFlCTqxpii9yiaSrjxWEZo/ctQBthxwrWuarHc2qyYpt4jlVKA+YU
+vaultwarden_admin_token: "Dkgp/XHTYIQCFlCTqxpii9yiaSrjxWEZo/ctQBthxwrWuarHc2qyYpt4jlVKA+YU"
 # To create a user set this to "true", and reprovision the container by re-running the anarion-nas playbook.
 # Once you have created your user, set to "false" and run one more time.
 # Target just Vaultwarden by running: ansible-playbook -i inventory nas.yml -b -K -t vaultwarden
-vaultwarden_allow_signups: false
+vaultwarden_allow_signups: "false"
 ## Mail specific settings, set SMTP_FROM and either SMTP_HOST or USE_SENDMAIL to enable the mail service.
 ## To make sure the email links are pointing to the correct host, set the DOMAIN variable.
 ## Note: if SMTP_USERNAME is specified, SMTP_PASSWORD is mandatory
