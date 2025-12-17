@@ -4,148 +4,165 @@ By default, applications can be found on the ports listed below.
 
 | Application      | Port    | Mode    | Notes          |
 |------------------|---------|---------|----------------|
-| 2FAuth           |  8001
-| AdGuard Home     | 8844
+| 2FAuth           | 8001    | Bridge  | HTTP           |
+| AdGuard Home     | 8844    | Bridge  |                |
+| AdGuard Home     | 53      | Bridge  |                |
+| AdGuard Home     | 67      | Bridge  |                |
+| AdGuard Home     | 68      | Bridge  |                |
+| AdGuard Home     | 784     | Bridge  |                |
+| AdGuard Home     | 853     | Bridge  |                |
+| AdGuard Home     | 5443    | Bridge  |                |
+| AdGuard Home     | 8853    | Bridge  |                |
 | Airsonic         | 4040    | Bridge  | HTTP           |
 | apcupsd          | 3551
-| Arcane           | 3552
+| Arcane           | 3552    | Bridge  | HTTP           |
 | Audiobookshelf   | 13378
 | autobrr          | 7474
-| BanBan           | 3028
+| BanBan           | 3028    | Bridge  | HTTP           |
 | Bazarr           | 6767    | Bridge  | HTTP           |
 | Beszel           | 3015
 | Beszel Agent     | 45876
-| bitmagnet        | 3333 and 3334
+| bitmagnet        | 3333
+| bitmagnet        | 3334
 | Bitwarden "hub"  | 3012    | Bridge  | Web Not.       |
 | Bitwarden        | 19080   | Bridge  | HTTP           |
 | Blinko           | 1111
 | Booksonic Air    | 4041    | Bridge  | HTTP           |
-| Calibre          | 8093 + 8094
+| Calibre          | 8093
+| Calibre          | 8094
 | Calibre-Web      | 8084    | Bridge  | HTTP           |
-| Change Detection | 3029
-| Chatpad AI       | 8084
+| Change Detection | 3029    | Bridge  | HTTP           |
+| Chatpad AI       | 8084    | Bridge  | HTTP           |
 | CheckCle         | 8098
-| Checkmate        | 4001 + 4002
-| Checkmate Capture|  59232
-| Checkmk Raw Edition 5000 + 8000
-| Chowdown         | 4000
-| Christmas Community 3010
+| Checkmate        | 4001
+| Checkmate        | 4002
+| Checkmate Capture| 59232
+| Checkmk Raw Ed.  | 5000
+| Checkmk Raw Ed.  | 8000
+| Chowdown         | 4000    | Bridge  | HTTP           |
+| Christmas Comm.  | 3010    | Bridge  | HTTP           |
 | Cleanuparr       | 11011
 | Cloud Commander  | 7373    | Bridge  | HTTP           |
-| code-server      |  3009
-| CommaFeed        |  8082
+| code-server      | 3009    | Bridge  | HTTP           |
+| CommaFeed        | 8082
 | Conduit          | 6167
-| Containery       | 5000
+| Containery       | 5002
 | CouchDB          | 5984
 | Couchpotato      | 5050    | Bridge  | HTTP           |
 | CrashPlan Pro    | 5800
 | Cup              | 3017
-| DailyTxT         |  8766
-| Dasharr          |  3035
+| DailyTxT         | 8766    | Bridge  | HTTP           |
+| Dasharr          | 3035
 | Dashy            | 8082    | Bridge  | HTTP           |
-| dash.            |  3022
+| dash.            | 3022
 | ddns-updater     | 8202
 | Deluge           | 8112
-| Diskover         |  3005 + 9200 (elasticsearch)
-| Docker-Android   | 6080
-| DockFlare        | 5002
+| Diskover         | 3005    | Bridge  | HTTP           |
+| Diskover ElasticS| 9200    | Bridge  | HTTP           |
+| Docker-Android   | 6080    | Bridge  | HTTP           |
+| DockFlare        | 5003    | Bridge  | HTTP           |
 | Dockge           | 5001
 | Dockman          | 8866
-| Dockpeek         | 3420
-| Dokemon          | 9091
-| Doku             | 9091
+| Dockpeek         | 3420    | Bridge  | HTTP           |
+| Dokemon          | 9091    | Bridge  | HTTP           |
+| Doku             | 9091    | Bridge  | HTTP           |
 | DokuWiki         | 8085    | Bridge  | HTTP           |
-| Double Commander |  3006
-| Dozzle           | 9999
+| Double Commander | 3006    | Bridge  | HTTP           |
+| Dozzle           | 9999    | Bridge  | HTTP           |
 | Dozzle Agent     | 7007
-| Drone CI         | 8001 + 8002
-| DumbAssets       | 3000
+| Drone CI         | 8001
+| Drone CI         | 8002
+| DumbAssets       | 3000    | Bridge  | HTTP           |
 | Duplicacy        | 3875    | Bridge  | HTTP           |
 | Duplicati        | 8200    | Bridge  | HTTP           |
-| DweebUI          |  8004
+| DweebUI          | 8004
 | Emby             | 8096    | Bridge  | HTTP           |
 | Emby             | 8920    | Bridge  | HTTPS          |
 | EspHome          | 6052    | Bridge  | HTTP           |
-| Fast Music Remover 3014
+| Fast Music Removr| 3014
 | Fasten           | 9091
-| File Browser     | 8086
-| FileBrowser Quantum 8086
-| FileShelter      | 5091
+| File Browser     | 8086    | Bridge  | HTTP           |
+| FileBrowser Quan | 8086    | Bridge  | HTTP           |
+| FileShelter      | 5091    | Bridge  | HTTP           |
 | Flood            | 3003
 | Firefly III      | 8066    | Bridge  | HTTP           |
-| FlareSolverr     |  8191
+| FlareSolverr     | 8191
 | Flexget          | 3539
-| Focalboard       | 3017
+| Focalboard       | 3017    | Bridge  | HTTP           |
 | FreshRSS         | 8089    | Bridge  | HTTP           |
-| GameVault        | 5082
+| GameVault        | 5082    | Bridge  | HTTP           |
 | Gameyfin         | 8081
-| Gaseous Server   |  5198
+| Gaseous Server   | 5198
 | get_iplayer      | 8182    | Bridge  | HTTP           |
-| Ghost            | 2368
+| Ghost            | 2368    | Bridge  | HTTP           |
 | Gitea            | 3001    | Bridge  | HTTP           |
 | Gitea            | 2221    | Bridge  | SSH            |
 | GitLab           | 4080    | Bridge  | HTTP           |
 | GitLab           | 4443    | Bridge  | HTTPS          |
 | GitLab           | 422     | Bridge  | SSH            |
-| Glance           | 8082
+| Glance           | 8082    | Bridge  | HTTP           |
 | Glances          | 61208   | Bridge  | HTTP           |
 | Glances          | 61209   | Bridge  |                |
-| GLPI             |  3022
+| GLPI             | 3022
 | Gokapi           | 53842
 | Gotify           | 2346    | Bridge  | HTTP           |
 | GoToSocial       | 3016
-| GPU Hot          | 1312
+| GPU Hot          | 1312    | Bridge  | HTTP           |
 | Grafana          | 3000    | Bridge  | HTTP           |
-| Grocy            | 9283
+| Grocy            | 9283    | Bridge  | HTTP           |
 | Guacamole        | 8090    | Bridge  | HTTP           |
-| Hammond          | 3022
-| HandBrake        |  5801
+| Hammond          | 3022    | Bridge  | HTTP           |
+| HandBrake        | 5801    | Bridge  | HTTP           |
 | Heimdall         | 11112   | Bridge  | HTTP           |
-| Hello World      | 9999
-| Homarr           | 7575
+| Hello World      | 9999    | Bridge  | HTTP           |
+| Homarr           | 7575    | Bridge  | HTTP           |
 | Home Assistant   | 8123    | Host    | HTTP           |
 | HomeBox          | 3100
 | Homebridge       | 8087    | Host    | HTTP           |
-| Homepage         | 11111
+| Homepage         | 11111   | Bridge  | HTTP           |
 | HTPC Manager     | 8086
 | Huntarr          | 9705
-| iDRAC6           | 5800 + 5900 vnc
+| iDRAC6           | 5800    | Bridge  | HTTP           |
+| iDRAC6           | 5900 vnc
 | IDrive           | n/a
-| Immich           | 2283
+| Immich           | 2283    | Bridge  | HTTP           |
 | InfluxDB         | 8086    | Bridge  | HTTP           |
-| Invoice Ninja    | 9009
-| (ispy) Agent DVR |  8097 + 3478 turn + 50000-50010
-| IT-Tools         | 8991
+| Invoice Ninja    | 9009    | Bridge  | HTTP           |
+| (ispy) Agent DVR | 8097
+| (ispy) Agent DVR | 3478 turn
+| (ispy) Agent DVR | 50000-50010
+| IT-Tools         | 8991    | Bridge  | HTTP           |
 | Jackett          | 9117    | Bridge  | HTTP           |
 | Jellyfin         | 8896    | Bridge  | HTTP           |
-| Joomla           | 8181
-| Joplin           | 22300
-| Kapowarr         | 5656
-| Karaoke-Forever  |  8095
-| Kasm             | 3025 + 3026
-| Kavita           | 3024
+| Joomla           | 8181    | Bridge  | HTTP           |
+| Joplin           | 22300   | Bridge  | HTTP           |
+| Kapowarr         | 5656    | Bridge  | HTTP           |
+| Karaoke-Forever  | 8095    | Bridge  | HTTP           |
+| Kasm             | 3025
+| Kasm             | 3026
+| Kavita           | 3024    | Bridge  | HTTP           |
 | koel             | 3033
-| Koillection      | 3030
+| Koillection      | 3030    | Bridge  | HTTP           |
 | Komga            | 8088    | Bridge  | HTTPS          |
-| Komodo           | 9120
+| Komodo           | 9120    | Bridge  | HTTP           |
 | Krusader         | 6080    | Bridge  | HTTP           |
 | Krusader         | 5900    | Bridge  | VNC            |
-| LANCommander     | 1337
+| LANCommander     | 1337    | Bridge  | HTTP           |
 | Lidarr           | 8686    | Bridge  | HTTP           |
-| Linkwarden       | 8990
-| LocalAI          | 3006
+| Linkwarden       | 8990    | Bridge  | HTTP           |
+| LocalAI          | 3006    | Bridge  | HTTP           |
 | LoggiFly         | n/a
 | Loki             | 3100
 | Luanti           | 30000
-| magnetico        | 8092
+| magnetico        | 8092    | Bridge  | HTTP           |
 | Maintainerr      | 8154
-| MakeMKV          | 5804
+| MakeMKV          | 5804    | Bridge  | HTTP           |
 | Mealie           | 9925    | Host    | HTTP           |
 | Medialytics      | 3013
 | MeshCentral      | 8086
-| MeTube           | 3019
+| MeTube           | 3019    | Bridge  | HTTP           |
 | MIND             | 3023
-| Minecraft Bedrock Server 19132
+| Minecraft Bed Srv| 19132
 | Minecraft Server | 25565   | Host    | TCP            |
 | MiniDLNA         | 8201    | Host    | HTTP           |
 | Miniflux         | 8070    | Bridge  | HTTP           |
@@ -153,46 +170,56 @@ By default, applications can be found on the ports listed below.
 | Mosquitto        | 9001    | Bridge  | HTTP           |
 | Mumble           | 64738 tcp + udp
 | Music Assistant  | n/a (???????)
-| MyBibliotheca    | 5054
+| MyBibliotheca    | 5054    | Bridge  | HTTP           |
 | Mylar            | 8585    | Bridge  | HTTP           |
 | MyMediaForAlexa  | 52051   | Host    | HTTP           |
 | n8n              | 5678    | Bridge  | HTTP           |
 | Navidrome        | 4533    | Bridge  | HTTP           |
-| NetAlertX        | 20211 + 20212
+| NetAlertX        | 20211
+| NetAlertX        | 20212
 | netbootxyz       | 3002    | Bridge  | HTTP           |
 | netbootxyz       | 5803    | Bridge  | HTTP           |
 | netbootxyz       | 69      | Bridge  | TFTP           |
 | Netdata          | 19999   | Bridge  | HTTP           |
 | Nextcloud        | 8080    | Bridge  | HTTP           |
 | Node-RED         | 1880
-| Nomad            | 4646 + 4647 +4648
-| ntfy             | 3018
+| Nomad            | 4646
+| Nomad            | 4647
+| Nomad            | 4648
+| ntfy             | 3018    | Bridge  | HTTP           |
 | NZBGet           | 6789    | Bridge  | HTTP           |
 | OctoPrint        | 8095
-| Odoo             | 8069 + 8072
-| OfflineU         | 5000
-| Ollama           | 11434
-| ONLYOFFICE Docs  |  8090
+| Odoo             | 8069
+| Odoo             | 8072
+| OfflineU         | 5000    | Bridge  | HTTP           |
+| Ollama           | 11434   | Bridge  | HTTP           |
+| ONLYOFFICE Docs  | 8090    | Bridge  | HTTP           |
 | Ombi             | 3579    | Bridge  | HTTP           |
-| Open WebUI       |  11435 + 11436
+| Open WebUI       | 11435
+| Open WebUI       | 11436
 | OpenCloud        | 9200
-| OpenEats         | 5807 + 8082 + 3306
-| OpenEMR          | 3016
+| OpenEats         | 3306
+| OpenEats         | 5807
+| OpenEats         | 8082
+| OpenEMR          | 3016    | Bridge  | HTTP           |
 | openHAB          | 7777    | Host    | HTTP           |
 | openHAB          | 7778    | Host    | HTTPS          |
 | Organizr         | 10081   | Bridge  | HTTP           |
 | Organizr         | 10444   | Bridge  | HTTPS          |
-| OsClass          | 8091
-| osTicket         | 8082
+| OsClass          | 8091    | Bridge  | HTTP           |
+| osTicket         | 8082    | Bridge  | HTTP           |
 | Overseerr        | 5055    | Bridge  | HTTP           |
 | ownCloud Server  | 3034
 | Paperless_ng     | 16922   | Bridge  | HTTP           |
 | PatchPanda       | 5093
 | Peppermint       | 3021
-| phpBB            | 8081
-| Pi-hole          | 8888 + 53 +67 +123
+| phpBB            | 8081    | Bridge  | HTTP           |
+| Pi-hole          | 8888
+| Pi-hole          | 53
+| Pi-hole          | 67
+| Pi-hole          | 123
 | Pinchflat        | 8945
-| Pingvin Share    |  3001
+| Pingvin Share    | 3001    | Bridge  | HTTP           |
 | Piwigo           | 16923   | Bridge  | HTTP           |
 | Plex             | 32400   | Bridge  | HTTP           |
 | Plex             | 32400   | Bridge  | UDP            |
@@ -205,74 +232,90 @@ By default, applications can be found on the ports listed below.
 | Plex             | 32469   | Bridge  | TCP/UDP        |
 | Plex             | 33400   | Bridge  | HTTP           |
 | Plex             | 1900    | Bridge  | UDP            |
-| Plex Rewind      |  8383
+| Plex Rewind      | 8383
 | Pocket ID        | 1411
-| Porn Vault       |  3030
+| Porn Vault       | 3030    | Bridge  | HTTP           |
 | Portainer        | 9000    | Bridge  | HTTP           |
-| Portainer Agent  |  9002
-| portracker       |  4999
-| ProGet           |  3334
-| ProjectSend      | 3006
-| Promtail         |  9080
+| Portainer Agent  | 9002
+| portracker       | 4999
+| ProGet           | 3334    | Bridge  | HTTP           |
+| ProjectSend      | 3006    | Bridge  | HTTP           |
+| Promtail         | 9080
 | Prowlarr         | 9696    | Bridge  | HTTP           |
-| PruneMate        |  7676
-| Pulse            | 7655
+| PruneMate        | 7676    | Bridge  | HTTP           |
+| Pulse            | 7655    | Bridge  | HTTP           |
 | pyload           | 8000    | Bridge  | HTTP           |
 | PyTivo           | 9032    | Bridge  | HTTP           |
 | PyTivo           | 2190    | Bridge  | UDP            |
-| qBittorrent      | 8113 + 6882
-| QDirStat         |  5800
+| qBittorrent      | 8113    | Bridge  | HTTP           |
+| qBittorrent      | 6882    | Bridge  | bt             |
+| QDirStat         | 5800    | Bridge  | HTTP           |
 | Radarr           | 7878    | Bridge  | HTTP           |
-| Readarr          |  8787
-| Recyclarr        |  n/a
-| Remotely         |  5000
+| Readarr          | 8787    | Bridge  | HTTP           |
+| Recyclarr        | n/a
+| Remotely         | 5000    | Bridge  | HTTP           |
 | Repliqate        | n/a
-| Resilio Sync     | 3014 + 55555
-| Reubah           | 3020
-| Rocket.Chat      |  3333
-| RomM             | 8484
+| Resilio Sync     | 3014    | Bridge  | HTTP           |
+| Resilio Sync     | 55555
+| Reubah           | 3020    | Bridge  | HTTP           |
+| Rocket.Chat      | 3333    | Bridge  | HTTP           |
+| RomM             | 8484    | Bridge  | HTTP           |
 | ddns-route53     | n/a (????)
 | RSS-Bridge       | 8091    | Bridge  | HTTP           |
 | Sabnzbd          | 18080   | Bridge  | HTTP           |
-| Scrutiny         | 8085
-| SearXNG          | 3008
+| Scrutiny         | 8085    | Bridge  | HTTP           |
+| SearXNG          | 3008    | Bridge  | HTTP           |
 | SeedSync         | 8800
 | Semaphore        | 3001
-| Shaarli          | 5804
+| Shaarli          | 5804    | Bridge  | HTTP           |
 | Shoutcast Server | 8002
 | Sickchill        | 8081    | Bridge  | HTTP           |
 | Silver Bullet    | 3002
 | Sonarr           | 8989    | Bridge  | HTTP           |
 | Sonos-Web        | 5050
 | Speedtest-Trk    | 8765    | HTTP    |                |
-| Spoolman         |  7912
-| Stalwart Mail    |  3008 +25 + 587 + 465 + 143 + 993 + 4190
-| Stash            |  9998
+| Spoolman         | 7912
+| Stalwart Mail    | 3008
+| Stalwart Mail    | 25
+| Stalwart Mail    | 587
+| Stalwart Mail    | 465
+| Stalwart Mail    | 143
+| Stalwart Mail    | 993
+| Stalwart Mail    | 4190
+| Stash            | 9998
 | stats stack
-| - prometheus 9090 + 9902
-| - telegraf 9273 + 8086
-| - speedtest 9798
-| - hddtemp 7634
 | - grafana 3000
-| Stirling PDF     |  3011
-| Striparr         | 40000
-| Stump            |  10801
+| - hddtemp 7634
+| - prometheus 9090
+| - prometheus 9902
+| - speedtest 9798
+| - telegraf 9273
+| - telegraf 8086
+| Stirling PDF     | 3011    | Bridge  | HTTP           |
+| Striparr         | 40000   | Bridge  | HTTP           |
+| Stump            | 10801
 | Syncthing admin  | 8384    | Host    | HTTP           |
 | Syncthing P2P    | 22000   | Host    | TCP+UDP        |
 | Tailscale        | ?????  Host mode
-| Tandoor Recipes  |  3035
-| Tasks.md         | 3018
+| Tandoor Recipes  | 3035    | Bridge  | HTTP           |
+| Tasks.md         | 3018    | Bridge  | HTTP           |
 | Tautulli         | 8185    | Bridge  | HTTP           |
-| Tdarr Server     | 8265 + 8266
-| Tdarr Node       |  8268
-| Technitium DNS Server 8380 + 53 + 67 + 853 + 8053 + 53443
+| Tdarr Server     | 8265
+| Tdarr Server     | 8266
+| Tdarr Node       | 8268
+| Technitium DNS   | 8380
+| Technitium DNS   | 53
+| Technitium DNS   | 67
+| Technitium DNS   | 853
+| Technitium DNS   | 8053
+| Technitium DNS   | 53443
 | The Lounge       | 113     | Bridge  |                |
 | The Lounge       | 9002    | Bridge  | HTTP           |
-| Threadfin        |  34400
-| Tianji           | 3031
+| Threadfin        | 34400
+| Tianji           | 3031    | Bridge  | HTTP           |
 | TiddlyWiki       | 8092    | Bridge  | HTTP           |
 | Time Machine     | 10445   | Bridge  | SMB            |
-| titra            | 3026
+| titra            | 3026    | Bridge  | HTTP           |
 | Traefik          | 80      | Host    | HTTP           |
 | Traefik          | 443     | Host    | HTTPS          |
 | Traefik          | 8083    | Host    | HTTP Admin     |
@@ -281,40 +324,49 @@ By default, applications can be found on the ports listed below.
 | Transmission VPN | 9091    | Bridge  | HTTP           |
 | Transmission VPN | 3128    | Bridge  | HTTP Proxy     |
 | Transmission VPN | 51415   | Bridge  | bt             |
-| Trilium Notes    |  8082
-| Tugtainer        |  9412
-| TVheadend        | 9981 + 9982
+| Trilium Notes    | 8082    | Bridge  | HTTP           |
+| Tugtainer        | 9412    | Bridge  | HTTP           |
+| TVheadend        | 9981
+| TVheadend        | 9982
 | Ubooquity        | 2202    | Bridge  | HTTP           |
 | Ubooquity        | 2203    | Bridge  | HTTP Admin     |
-| Umami            | 3019
+| Umami            | 3019    | Bridge  | HTTP           |
 | Unpackerr        |  n/a
-| Uptime Kuma      | 3004
-| Usermin          | 20000
+| Uptime Kuma      | 3004    | Bridge  | HTTP           |
+| Usermin          | 20000   | Host    | HTTP           |
 | uTorrent         | 8111    | Bridge  | HTTP           |
 | uTorrent         | 6881    | Bridge  | BT             |
 | uTorrent         | 6881    | Bridge  | UDP            |
-| Valheim          | 2456 + 2457 + 2458
-| Vaultwarden      |  19080 + 3012
-| VERT             |  3035 + 24153
-| VFD              |  4242
-| Virtual Desktop  |  3389 RDP
-| virtualtabletop  |  8272
+| Valheim          | 2456
+| Valheim          | 2457
+| Valheim          | 2458
+| Vaultwarden      | 19080
+| Vaultwarden      | 3012
+| VERT             | 3035    | Bridge  | HTTP           |
+| VERT             | 24153
+| VFD              | 4242    | Bridge  | HTTP           |
+| Virtual Desktop  | 3389 RDP
+| virtualtabletop  | 8272    | Bridge  | HTTP           |
 | Wallabag         | 7780    | Bridge  | HTTP           |
-| WatchState       |  8992
-| Watchtower       |  2347
-| WatchYourLAN     |  8840
-| Webmin           | 10000 
-| Webtop           | 3000
-| What's Running   | 3021
-| Whisparr         | 6969
-| Windows          |  8006 + 3388 RDP
-| WireGuard        |  51821 + 51820
-| Wireshark        |  3000 + 3001 Host
-| Wizarr           |  5690
-| Woodpecker CI    |  8000 + 9000
-| WordPress        |  3034
-| WUD              | 3013
-| YaDNSb           | 3025
-| Youtarr          |  3087
+| WatchState       | 8992
+| Watchtower       | 2347
+| WatchYourLAN     | 8840    | Bridge  | HTTP           |
+| Webmin           | 10000   | Host    | HTTP           |
+| Webtop           | 3000    | Bridge  | HTTP           |
+| What's Running   | 3021    | Bridge  | HTTP           |
+| Whisparr         | 6969    | Bridge  | HTTP           |
+| Windows          | 8006
+| Windows          | 3388 RDP
+| WireGuard        | 51820
+| WireGuard        | 51821
+| Wireshark        | 3000    | Host    | HTTP           |
+| Wireshark        | 3001    | Host    | HTTP           |
+| Wizarr           | 5690    | Bridge  | HTTP           |
+| Woodpecker CI    | 8000
+| Woodpecker CI    | 9000
+| WordPress        | 3034    | Bridge  | HTTP           |
+| WUD              | 3013    | Bridge  | HTTP           |
+| YaDNSb           | 3025    | Bridge  | HTTP           |
+| Youtarr          | 3087    | Bridge  | HTTP           |
 | YouTubeDL-Mater  | 8998    | Bridge  | HTTP           |
 | ZNC              | 6677    | Bridge  |                |
