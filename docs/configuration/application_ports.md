@@ -185,14 +185,14 @@ By default, applications can be found on the ports listed below.
 | OsClass          | 8091
 | osTicket         | 8082
 | Overseerr        | 5055    | Bridge  | HTTP           |
-| ownCloud Server 3034
+| ownCloud Server  | 3034
 | Paperless_ng     | 16922   | Bridge  | HTTP           |
-| PatchPanda 5093
-| Peppermint 3021
-| phpBB 8081
+| PatchPanda       | 5093
+| Peppermint       | 3021
+| phpBB            | 8081
 | Pi-hole 8888 + 53 +67 +123
-| Pinchflat 8945
-| Pingvin Share 3001
+| Pinchflat        | 8945
+| Pingvin Share    |  3001
 | Piwigo           | 16923   | Bridge  | HTTP           |
 | Plex             | 32400   | Bridge  | HTTP           |
 | Plex             | 32400   | Bridge  | UDP            |
@@ -205,45 +205,45 @@ By default, applications can be found on the ports listed below.
 | Plex             | 32469   | Bridge  | TCP/UDP        |
 | Plex             | 33400   | Bridge  | HTTP           |
 | Plex             | 1900    | Bridge  | UDP            |
-| Plex Rewind 8383
-| Pocket ID 1411
-| Porn Vault 3030
+| Plex Rewind      |  8383
+| Pocket ID        | 1411
+| Porn Vault       |  3030
 | Portainer        | 9000    | Bridge  | HTTP           |
-| Portainer Agent 9002
-| portracker 4999
-| ProGet 3334
-| ProjectSend 3006
-| Promtail 9080
+| Portainer Agent  |  9002
+| portracker       |  4999
+| ProGet           |  3334
+| ProjectSend      | 3006
+| Promtail         |  9080
 | Prowlarr         | 9696    | Bridge  | HTTP           |
-| PruneMate 7676
-| Pulse 7655
+| PruneMate        |  7676
+| Pulse            | 7655
 | pyload           | 8000    | Bridge  | HTTP           |
 | PyTivo           | 9032    | Bridge  | HTTP           |
 | PyTivo           | 2190    | Bridge  | UDP            |
 | qBittorrent 8113 + 6882
-| QDirStat 5800
+| QDirStat         |  5800
 | Radarr           | 7878    | Bridge  | HTTP           |
-| Readarr 8787
-| Recyclarr n/a
-| Remotely 5000
-| Repliqate n/a
+| Readarr          |  8787
+| Recyclarr        |  n/a
+| Remotely         |  5000
+| Repliqate        | n/a
 | Resilio Sync 3014 + 55555
-| Reubah 3020
-| Rocket.Chat 3333
-| RomM 8484
-| ddns-route53 n/a (????)
+| Reubah           | 3020
+| Rocket.Chat      |  3333
+| RomM             | 8484
+| ddns-route53     | n/a (????)
 | RSS-Bridge       | 8091    | Bridge  | HTTP           |
 | Sabnzbd          | 18080   | Bridge  | HTTP           |
-| Scrutiny 8085
-| SearXNG 3008
-| SeedSync 8800
-| Semaphore 3001
-| Shaarli 5804
-| Shoutcast Server 8002
+| Scrutiny         | 8085
+| SearXNG          | 3008
+| SeedSync         | 8800
+| Semaphore        | 3001
+| Shaarli          | 5804
+| Shoutcast Server | 8002
 | Sickchill        | 8081    | Bridge  | HTTP           |
-| Silver Bullet 3002
+| Silver Bullet    | 3002
 | Sonarr           | 8989    | Bridge  | HTTP           |
-| Sonos-Web 5050
+| Sonos-Web        | 5050
 | Speedtest-Trk    | 8765    | HTTP    |                |
 | Spoolman 7912
 | Stalwart Mail 3008 +25 + 587 + 465 + 143 + 993 + 4190
