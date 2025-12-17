@@ -13,53 +13,53 @@ By default, applications can be found on the ports listed below.
 | autobrr          | 7474
 | BanBan           | 3028
 | Bazarr           | 6767    | Bridge  | HTTP           |
-| Beszel 3015
-| Beszel Agent 45876
+| Beszel           | 3015
+| Beszel Agent     | 45876
 | bitmagnet 3333 and 3334
 | Bitwarden "hub"  | 3012    | Bridge  | Web Not.       |
 | Bitwarden        | 19080   | Bridge  | HTTP           |
-| Blinko 1111
+| Blinko           | 1111
 | Booksonic Air    | 4041    | Bridge  | HTTP           |
 | Calibre 8093 + 8094
 | Calibre-Web      | 8084    | Bridge  | HTTP           |
-| Change Detection 3029
-| Chatpad AI 8084
-| CheckCle 8093
+| Change Detection | 3029
+| Chatpad AI       | 8084
+| CheckCle         | 8098
 | Checkmate 4001 + 4002
-| Checkmate Capture 59232
+| Checkmate Capture|  59232
 | Checkmk Raw Edition 5000 + 8000
-| Chowdown 4000
+| Chowdown         | 4000
 | Christmas Community 3010
-| Cleanuparr 11011
+| Cleanuparr       | 11011
 | Cloud Commander  | 7373    | Bridge  | HTTP           |
-| code-server 3009
-| CommaFeed 8082
-| Conduit 6167
-| Containery 5000
-| CouchDB 5984
+| code-server      |  3009
+| CommaFeed        |  8082
+| Conduit          | 6167
+| Containery       | 5000
+| CouchDB          | 5984
 | Couchpotato      | 5050    | Bridge  | HTTP           |
-| CrashPlan Pro 5800
-| Cup 3017
-| DailyTxT 8766
-| Dasharr 3035
+| CrashPlan Pro    | 5800
+| Cup              | 3017
+| DailyTxT         |  8766
+| Dasharr          |  3035
 | Dashy            | 8082    | Bridge  | HTTP           |
-| dash. 3022
-| ddns-updater 8202
-| Deluge 8112
+| dash.            |  3022
+| ddns-updater     | 8202
+| Deluge           | 8112
 | Diskover 3005 + 9200 (elasticsearch)
-| Docker-Android 6080
-| DockFlare 5002
-| Dockge 5001
-| Dockman 8866
-| Dockpeek 3420
-| Dokemon 9091
-| Doku 9091
+| Docker-Android   | 6080
+| DockFlare        | 5002
+| Dockge           | 5001
+| Dockman          | 8866
+| Dockpeek         | 3420
+| Dokemon          | 9091
+| Doku             | 9091
 | DokuWiki         | 8085    | Bridge  | HTTP           |
-| Double Commander 3006
-| Dozzle 9999
-| Dozzle Agent 7007
+| Double Commander |  3006
+| Dozzle           | 9999
+| Dozzle Agent     | 7007
 | Drone CI 8001 + 8002
-| DumbAssets 3000
+| DumbAssets       | 3000
 | Duplicacy        | 3875    | Bridge  | HTTP           |
 | Duplicati        | 8200    | Bridge  | HTTP           |
 | DweebUI 8004
