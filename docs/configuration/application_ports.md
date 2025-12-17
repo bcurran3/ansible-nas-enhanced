@@ -30,7 +30,7 @@ By default, applications can be found on the ports listed below.
 | Calibre          | 8094
 | Calibre-Web      | 8084    | Bridge  | HTTP           |
 | Change Detection | 3029    | Bridge  | HTTP           |
-| Chatpad AI       | 8084    | Bridge  | HTTP           |
+| Chatpad AI       | 9009    | Bridge  | HTTP           |
 | CheckCle         | 8098
 | Checkmate        | 4001
 | Checkmate        | 4002
@@ -42,7 +42,7 @@ By default, applications can be found on the ports listed below.
 | Cleanuparr       | 11011
 | Cloud Commander  | 7373    | Bridge  | HTTP           |
 | code-server      | 3009    | Bridge  | HTTP           |
-| CommaFeed        | 8082
+| CommaFeed        | 9004
 | Conduit          | 6167
 | Containery       | 5002
 | CouchDB          | 5984
@@ -51,7 +51,7 @@ By default, applications can be found on the ports listed below.
 | Cup              | 3017
 | DailyTxT         | 8766    | Bridge  | HTTP           |
 | Dasharr          | 3035
-| Dashy            | 8082    | Bridge  | HTTP           |
+| Dashy            | 9008    | Bridge  | HTTP           |
 | dash.            | 3022
 | ddns-updater     | 8202
 | Deluge           | 8112
@@ -79,8 +79,8 @@ By default, applications can be found on the ports listed below.
 | EspHome          | 6052    | Bridge  | HTTP           |
 | Fast Music Removr| 3045
 | Fasten           | 9091
-| File Browser     | 8086    | Bridge  | HTTP           |
-| FileBrowser Quan | 8086    | Bridge  | HTTP           |
+| File Browser     | 9013    | Bridge  | HTTP           |
+| FileBrowser Quan | 9014    | Bridge  | HTTP           |
 | FileShelter      | 5091    | Bridge  | HTTP           |
 | Flood            | 3003
 | Firefly III      | 8066    | Bridge  | HTTP           |
@@ -89,7 +89,7 @@ By default, applications can be found on the ports listed below.
 | Focalboard       | 3047    | Bridge  | HTTP           |
 | FreshRSS         | 8089    | Bridge  | HTTP           |
 | GameVault        | 5082    | Bridge  | HTTP           |
-| Gameyfin         | 8081
+| Gameyfin         | 8099
 | Gaseous Server   | 5198
 | get_iplayer      | 8182    | Bridge  | HTTP           |
 | Ghost            | 2368    | Bridge  | HTTP           |
@@ -98,7 +98,7 @@ By default, applications can be found on the ports listed below.
 | GitLab           | 4080    | Bridge  | HTTP           |
 | GitLab           | 4443    | Bridge  | HTTPS          |
 | GitLab           | 422     | Bridge  | SSH            |
-| Glance           | 8082    | Bridge  | HTTP           |
+| Glance           | 9006    | Bridge  | HTTP           |
 | Glances          | 61208   | Bridge  | HTTP           |
 | Glances          | 61209   | Bridge  |                |
 | GLPI             | 3039
@@ -118,7 +118,7 @@ By default, applications can be found on the ports listed below.
 | HomeBox          | 3100
 | Homebridge       | 8087    | Host    | HTTP           |
 | Homepage         | 11111   | Bridge  | HTTP           |
-| HTPC Manager     | 8086
+| HTPC Manager     | 9011
 | Huntarr          | 9705
 | iDRAC6           | 5800    | Bridge  | HTTP           |
 | iDRAC6           | 5900 vnc
@@ -135,7 +135,7 @@ By default, applications can be found on the ports listed below.
 | Joomla           | 8181    | Bridge  | HTTP           |
 | Joplin           | 22300   | Bridge  | HTTP           |
 | Kapowarr         | 5656    | Bridge  | HTTP           |
-| Karaoke-Forever  | 8095    | Bridge  | HTTP           |
+| Karaoke-Forever  | 9018    | Bridge  | HTTP           |
 | Kasm             | 3025
 | Kasm             | 3026
 | Kavita           | 3024    | Bridge  | HTTP           |
@@ -152,12 +152,12 @@ By default, applications can be found on the ports listed below.
 | LoggiFly         | n/a
 | Loki             | 3100
 | Luanti           | 30000
-| magnetico        | 8092    | Bridge  | HTTP           |
+| magnetico        | 9017    | Bridge  | HTTP           |
 | Maintainerr      | 8154
 | MakeMKV          | 5804    | Bridge  | HTTP           |
 | Mealie           | 9925    | Host    | HTTP           |
 | Medialytics      | 3044
-| MeshCentral      | 8086
+| MeshCentral      | 9012
 | MeTube           | 3019    | Bridge  | HTTP           |
 | MIND             | 3023
 | Minecraft Bed Srv| 19132
@@ -191,7 +191,7 @@ By default, applications can be found on the ports listed below.
 | Odoo             | 8072
 | OfflineU         | 5000    | Bridge  | HTTP           |
 | Ollama           | 11434   | Bridge  | HTTP           |
-| ONLYOFFICE Docs  | 8090    | Bridge  | HTTP           |
+| ONLYOFFICE Docs  | 9015    | Bridge  | HTTP           |
 | Ombi             | 3579    | Bridge  | HTTP           |
 | Open WebUI       | 11435
 | Open WebUI       | 11436
@@ -204,14 +204,14 @@ By default, applications can be found on the ports listed below.
 | openHAB          | 7778    | Host    | HTTPS          |
 | Organizr         | 10081   | Bridge  | HTTP           |
 | Organizr         | 10444   | Bridge  | HTTPS          |
-| OsClass          | 8091    | Bridge  | HTTP           |
-| osTicket         | 8082    | Bridge  | HTTP           |
+| OsClass          | 9016    | Bridge  | HTTP           |
+| osTicket         | 9005    | Bridge  | HTTP           |
 | Overseerr        | 5055    | Bridge  | HTTP           |
 | ownCloud Server  | 3034
 | Paperless_ng     | 16922   | Bridge  | HTTP           |
 | PatchPanda       | 5093
 | Peppermint       | 3021
-| phpBB            | 8081    | Bridge  | HTTP           |
+| phpBB            | 9003    | Bridge  | HTTP           |
 | Pi-hole          | 8888
 | Pi-hole          | 53
 | Pi-hole          | 67
@@ -261,7 +261,7 @@ By default, applications can be found on the ports listed below.
 | ddns-route53     | n/a (????)
 | RSS-Bridge       | 8091    | Bridge  | HTTP           |
 | Sabnzbd          | 18080   | Bridge  | HTTP           |
-| Scrutiny         | 8085    | Bridge  | HTTP           |
+| Scrutiny         | 9010    | Bridge  | HTTP           |
 | SearXNG          | 3008    | Bridge  | HTTP           |
 | SeedSync         | 8800
 | Semaphore        | 3001
@@ -322,7 +322,7 @@ By default, applications can be found on the ports listed below.
 | Transmission VPN | 9091    | Bridge  | HTTP           |
 | Transmission VPN | 3128    | Bridge  | HTTP Proxy     |
 | Transmission VPN | 51415   | Bridge  | bt             |
-| Trilium Notes    | 8082    | Bridge  | HTTP           |
+| Trilium Notes    | 9007    | Bridge  | HTTP           |
 | Tugtainer        | 9412    | Bridge  | HTTP           |
 | TVheadend        | 9981
 | TVheadend        | 9982
@@ -371,3 +371,6 @@ By default, applications can be found on the ports listed below.
 
 
 # next avail = 3050
+# next avail = 9019
+
+# NOTE: Conflicts on ports 9000 + 9002
