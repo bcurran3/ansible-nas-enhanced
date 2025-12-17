@@ -67,84 +67,84 @@ By default, applications can be found on the ports listed below.
 | Emby             | 8920    | Bridge  | HTTPS          |
 | EspHome          | 6052    | Bridge  | HTTP           |
 | Fast Music Remover 3014
-| Fasten 9091
-| File Browser 8086
+| Fasten           | 9091
+| File Browser     | 8086
 | FileBrowser Quantum 8086
-| FileShelter 5091
-| Flood 3003
+| FileShelter      | 5091
+| Flood            | 3003
 | Firefly III      | 8066    | Bridge  | HTTP           |
-| FlareSolverr 8191
-| Flexget 3539
-| Focalboard 3017
+| FlareSolverr     |  8191
+| Flexget          | 3539
+| Focalboard       | 3017
 | FreshRSS         | 8089    | Bridge  | HTTP           |
-| GameVault 5082
-| Gameyfin 8081
-| Gaseous Server 5198
+| GameVault        | 5082
+| Gameyfin         | 8081
+| Gaseous Server   |  5198
 | get_iplayer      | 8182    | Bridge  | HTTP           |
-| Ghost 2368
+| Ghost            | 2368
 | Gitea            | 3001    | Bridge  | HTTP           |
 | Gitea            | 2221    | Bridge  | SSH            |
 | GitLab           | 4080    | Bridge  | HTTP           |
 | GitLab           | 4443    | Bridge  | HTTPS          |
 | GitLab           | 422     | Bridge  | SSH            |
-| Glance 8082
+| Glance           | 8082
 | Glances          | 61208   | Bridge  | HTTP           |
 | Glances          | 61209   | Bridge  |                |
-| GLPI 3022
-| Gokapi 53842
+| GLPI             |  3022
+| Gokapi           | 53842
 | Gotify           | 2346    | Bridge  | HTTP           |
-| GoToSocial 3016
-| GPU Hot 1312
+| GoToSocial       | 3016
+| GPU Hot          | 1312
 | Grafana          | 3000    | Bridge  | HTTP           |
-| Grocy 9283
+| Grocy            | 9283
 | Guacamole        | 8090    | Bridge  | HTTP           |
-| Hammond 3022
-| HandBrake 5801
+| Hammond          | 3022
+| HandBrake        |  5801
 | Heimdall         | 11112   | Bridge  | HTTP           |
-| Hello World 9999
-| Homarr 7575
+| Hello World      | 9999
+| Homarr           | 7575
 | Home Assistant   | 8123    | Host    | HTTP           |
-| HomeBox 3100
+| HomeBox          | 3100
 | Homebridge       | 8087    | Host    | HTTP           |
-| Homepage 11111
-| HTPC Manager 8086
-| Huntarr 9705
+| Homepage         | 11111
+| HTPC Manager     | 8086
+| Huntarr          | 9705
 | iDRAC6 5800 + 5900 vnc
-| IDrive n/a
-| Immich 2283
+| IDrive           | n/a
+| Immich           | 2283
 | InfluxDB         | 8086    | Bridge  | HTTP           |
-| Invoice Ninja 9009
+| Invoice Ninja    | 9009
 | (ispy) Agent DVR 8097 + 3478 turn + 50000-50010
-| IT-Tools 8991
+| IT-Tools         | 8991
 | Jackett          | 9117    | Bridge  | HTTP           |
 | Jellyfin         | 8896    | Bridge  | HTTP           |
-| Joomla 8181
-| Joplin 22300
-| Kapowarr 5656
-| Karaoke-Forever 8095
+| Joomla           | 8181
+| Joplin           | 22300
+| Kapowarr         | 5656
+| Karaoke-Forever  |  8095
 | Kasm 3025 + 3026
-| Kavita 3024
-| koel 3033
-| Koillection 3030
+| Kavita           | 3024
+| koel             | 3033
+| Koillection      | 3030
 | Komga            | 8088    | Bridge  | HTTPS          |
-| Komodo 9120
+| Komodo           | 9120
 | Krusader         | 6080    | Bridge  | HTTP           |
 | Krusader         | 5900    | Bridge  | VNC            |
-| LANCommander 1337
+| LANCommander     | 1337
 | Lidarr           | 8686    | Bridge  | HTTP           |
-| Linkwarden 8990
-| LocalAI 3006
-| LoggiFly n/a
-| Loki 3100
-| Luanti 30000
-| magnetico 8092
-| Maintainerr 8154
-| MakeMKV 5804
+| Linkwarden       | 8990
+| LocalAI          | 3006
+| LoggiFly         | n/a
+| Loki             | 3100
+| Luanti           | 30000
+| magnetico        | 8092
+| Maintainerr      | 8154
+| MakeMKV          | 5804
 | Mealie           | 9925    | Host    | HTTP           |
-| Medialytics 3013
-| MeshCentral 8086
-| MeTube 3019
-| MIND 3023
+| Medialytics      | 3013
+| MeshCentral      | 8086
+| MeTube           | 3019
+| MIND             | 3023
 | Minecraft Bedrock Server 19132
 | Minecraft Server | 25565   | Host    | TCP            |
 | MiniDLNA         | 8201    | Host    | HTTP           |
@@ -152,8 +152,8 @@ By default, applications can be found on the ports listed below.
 | Mosquitto        | 1883    | Bridge  | Websocket      |
 | Mosquitto        | 9001    | Bridge  | HTTP           |
 | Mumble 64738 tcp + udp
-| Music Assistant n/a (???????)
-| MyBibliotheca 5054
+| Music Assistant  | n/a (???????)
+| MyBibliotheca    | 5054
 | Mylar            | 8585    | Bridge  | HTTP           |
 | MyMediaForAlexa  | 52051   | Host    | HTTP           |
 | n8n              | 5678    | Bridge  | HTTP           |
@@ -164,26 +164,26 @@ By default, applications can be found on the ports listed below.
 | netbootxyz       | 69      | Bridge  | TFTP           |
 | Netdata          | 19999   | Bridge  | HTTP           |
 | Nextcloud        | 8080    | Bridge  | HTTP           |
-| Node-RED 1880
+| Node-RED         | 1880
 | Nomad 4646 + 4647 +4648
-| ntfy 3018
+| ntfy             | 3018
 | NZBGet           | 6789    | Bridge  | HTTP           |
-| OctoPrint 8095
+| OctoPrint        | 8095
 | Odoo 8069 + 8072
-| OfflineU 5000
-| Ollama 11434
-| ONLYOFFICE Docs 8090
+| OfflineU         | 5000
+| Ollama           | 11434
+| ONLYOFFICE Docs  |  8090
 | Ombi             | 3579    | Bridge  | HTTP           |
 | Open WebUI 11435 + 11436
-| OpenCloud 9200
+| OpenCloud        | 9200
 | OpenEats 5807 + 8082 + 3306
-| OpenEMR 3016
+| OpenEMR          | 3016
 | openHAB          | 7777    | Host    | HTTP           |
 | openHAB          | 7778    | Host    | HTTPS          |
 | Organizr         | 10081   | Bridge  | HTTP           |
 | Organizr         | 10444   | Bridge  | HTTPS          |
-| OsClass 8091
-| osTicket 8082
+| OsClass          | 8091
+| osTicket         | 8082
 | Overseerr        | 5055    | Bridge  | HTTP           |
 | ownCloud Server 3034
 | Paperless_ng     | 16922   | Bridge  | HTTP           |
