@@ -5,13 +5,13 @@ By default, applications can be found on the ports listed below.
 | Application      | Port    | Mode    | Notes          |
 |------------------|---------|---------|----------------|
 | 2FAuth 8001
-| AdGuard Home 8844
+| AdGuard Home     | 8844
 | Airsonic         | 4040    | Bridge  | HTTP           |
-| apcupsd 3551
-| Arcane 3552
-| Audiobookshelf 13378
-| autobrr 7474
-| BanBan 3028
+| apcupsd          | 3551
+| Arcane           | 3552
+| Audiobookshelf   | 13378
+| autobrr          | 7474
+| BanBan           | 3028
 | Bazarr           | 6767    | Bridge  | HTTP           |
 | Beszel 3015
 | Beszel Agent 45876
