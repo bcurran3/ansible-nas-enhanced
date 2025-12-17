@@ -14,12 +14,12 @@
     - name: Template config files
       ansible.builtin.template:
         src: "{{ item }}"
-        dest: "{{ homepage_data_directory }}/{{ item }}"
+        dest: "{{ homepage_data_directory }}/config/{{ item }}"
       with_items:
         - bookmarks.yaml
         - docker.yaml
-        - settings.yaml
         - services.yaml
+        - settings.yaml
         - widgets.yaml
       register: homepage_config
 
