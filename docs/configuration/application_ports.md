@@ -4,7 +4,7 @@ By default, applications can be found on the ports listed below.
 
 | Application      | Port    | Mode    | Notes          |
 |------------------|---------|---------|----------------|
-| 2FAuth 8001
+| 2FAuth           |  8001
 | AdGuard Home     | 8844
 | Airsonic         | 4040    | Bridge  | HTTP           |
 | apcupsd          | 3551
@@ -15,17 +15,17 @@ By default, applications can be found on the ports listed below.
 | Bazarr           | 6767    | Bridge  | HTTP           |
 | Beszel           | 3015
 | Beszel Agent     | 45876
-| bitmagnet 3333 and 3334
+| bitmagnet        | 3333 and 3334
 | Bitwarden "hub"  | 3012    | Bridge  | Web Not.       |
 | Bitwarden        | 19080   | Bridge  | HTTP           |
 | Blinko           | 1111
 | Booksonic Air    | 4041    | Bridge  | HTTP           |
-| Calibre 8093 + 8094
+| Calibre          | 8093 + 8094
 | Calibre-Web      | 8084    | Bridge  | HTTP           |
 | Change Detection | 3029
 | Chatpad AI       | 8084
 | CheckCle         | 8098
-| Checkmate 4001 + 4002
+| Checkmate        | 4001 + 4002
 | Checkmate Capture|  59232
 | Checkmk Raw Edition 5000 + 8000
 | Chowdown         | 4000
@@ -46,7 +46,7 @@ By default, applications can be found on the ports listed below.
 | dash.            |  3022
 | ddns-updater     | 8202
 | Deluge           | 8112
-| Diskover 3005 + 9200 (elasticsearch)
+| Diskover         |  3005 + 9200 (elasticsearch)
 | Docker-Android   | 6080
 | DockFlare        | 5002
 | Dockge           | 5001
@@ -58,11 +58,11 @@ By default, applications can be found on the ports listed below.
 | Double Commander |  3006
 | Dozzle           | 9999
 | Dozzle Agent     | 7007
-| Drone CI 8001 + 8002
+| Drone CI         | 8001 + 8002
 | DumbAssets       | 3000
 | Duplicacy        | 3875    | Bridge  | HTTP           |
 | Duplicati        | 8200    | Bridge  | HTTP           |
-| DweebUI 8004
+| DweebUI          |  8004
 | Emby             | 8096    | Bridge  | HTTP           |
 | Emby             | 8920    | Bridge  | HTTPS          |
 | EspHome          | 6052    | Bridge  | HTTP           |
@@ -109,12 +109,12 @@ By default, applications can be found on the ports listed below.
 | Homepage         | 11111
 | HTPC Manager     | 8086
 | Huntarr          | 9705
-| iDRAC6 5800 + 5900 vnc
+| iDRAC6           | 5800 + 5900 vnc
 | IDrive           | n/a
 | Immich           | 2283
 | InfluxDB         | 8086    | Bridge  | HTTP           |
 | Invoice Ninja    | 9009
-| (ispy) Agent DVR 8097 + 3478 turn + 50000-50010
+| (ispy) Agent DVR |  8097 + 3478 turn + 50000-50010
 | IT-Tools         | 8991
 | Jackett          | 9117    | Bridge  | HTTP           |
 | Jellyfin         | 8896    | Bridge  | HTTP           |
@@ -122,7 +122,7 @@ By default, applications can be found on the ports listed below.
 | Joplin           | 22300
 | Kapowarr         | 5656
 | Karaoke-Forever  |  8095
-| Kasm 3025 + 3026
+| Kasm             | 3025 + 3026
 | Kavita           | 3024
 | koel             | 3033
 | Koillection      | 3030
@@ -151,32 +151,32 @@ By default, applications can be found on the ports listed below.
 | Miniflux         | 8070    | Bridge  | HTTP           |
 | Mosquitto        | 1883    | Bridge  | Websocket      |
 | Mosquitto        | 9001    | Bridge  | HTTP           |
-| Mumble 64738 tcp + udp
+| Mumble           | 64738 tcp + udp
 | Music Assistant  | n/a (???????)
 | MyBibliotheca    | 5054
 | Mylar            | 8585    | Bridge  | HTTP           |
 | MyMediaForAlexa  | 52051   | Host    | HTTP           |
 | n8n              | 5678    | Bridge  | HTTP           |
 | Navidrome        | 4533    | Bridge  | HTTP           |
-| NetAlertX 20211 + 20212
+| NetAlertX        | 20211 + 20212
 | netbootxyz       | 3002    | Bridge  | HTTP           |
 | netbootxyz       | 5803    | Bridge  | HTTP           |
 | netbootxyz       | 69      | Bridge  | TFTP           |
 | Netdata          | 19999   | Bridge  | HTTP           |
 | Nextcloud        | 8080    | Bridge  | HTTP           |
 | Node-RED         | 1880
-| Nomad 4646 + 4647 +4648
+| Nomad            | 4646 + 4647 +4648
 | ntfy             | 3018
 | NZBGet           | 6789    | Bridge  | HTTP           |
 | OctoPrint        | 8095
-| Odoo 8069 + 8072
+| Odoo             | 8069 + 8072
 | OfflineU         | 5000
 | Ollama           | 11434
 | ONLYOFFICE Docs  |  8090
 | Ombi             | 3579    | Bridge  | HTTP           |
-| Open WebUI 11435 + 11436
+| Open WebUI       |  11435 + 11436
 | OpenCloud        | 9200
-| OpenEats 5807 + 8082 + 3306
+| OpenEats         | 5807 + 8082 + 3306
 | OpenEMR          | 3016
 | openHAB          | 7777    | Host    | HTTP           |
 | openHAB          | 7778    | Host    | HTTPS          |
@@ -190,7 +190,7 @@ By default, applications can be found on the ports listed below.
 | PatchPanda       | 5093
 | Peppermint       | 3021
 | phpBB            | 8081
-| Pi-hole 8888 + 53 +67 +123
+| Pi-hole          | 8888 + 53 +67 +123
 | Pinchflat        | 8945
 | Pingvin Share    |  3001
 | Piwigo           | 16923   | Bridge  | HTTP           |
@@ -220,14 +220,14 @@ By default, applications can be found on the ports listed below.
 | pyload           | 8000    | Bridge  | HTTP           |
 | PyTivo           | 9032    | Bridge  | HTTP           |
 | PyTivo           | 2190    | Bridge  | UDP            |
-| qBittorrent 8113 + 6882
+| qBittorrent      | 8113 + 6882
 | QDirStat         |  5800
 | Radarr           | 7878    | Bridge  | HTTP           |
 | Readarr          |  8787
 | Recyclarr        |  n/a
 | Remotely         |  5000
 | Repliqate        | n/a
-| Resilio Sync 3014 + 55555
+| Resilio Sync     | 3014 + 55555
 | Reubah           | 3020
 | Rocket.Chat      |  3333
 | RomM             | 8484
@@ -245,34 +245,34 @@ By default, applications can be found on the ports listed below.
 | Sonarr           | 8989    | Bridge  | HTTP           |
 | Sonos-Web        | 5050
 | Speedtest-Trk    | 8765    | HTTP    |                |
-| Spoolman 7912
-| Stalwart Mail 3008 +25 + 587 + 465 + 143 + 993 + 4190
-| Stash 9998
+| Spoolman         |  7912
+| Stalwart Mail    |  3008 +25 + 587 + 465 + 143 + 993 + 4190
+| Stash            |  9998
 | stats stack
 | - prometheus 9090 + 9902
 | - telegraf 9273 + 8086
 | - speedtest 9798
 | - hddtemp 7634
 | - grafana 3000
-| Stirling PDF 3011
-| Striparr 40000
-| Stump 10801
+| Stirling PDF     |  3011
+| Striparr         | 40000
+| Stump            |  10801
 | Syncthing admin  | 8384    | Host    | HTTP           |
 | Syncthing P2P    | 22000   | Host    | TCP+UDP        |
-| Tailscale Host mode
-| Tandoor Recipes 3035
-| Tasks.md 3018
+| Tailscale        | ?????  Host mode
+| Tandoor Recipes  |  3035
+| Tasks.md         | 3018
 | Tautulli         | 8185    | Bridge  | HTTP           |
-| Tdarr Server 8265 + 8266
-| Tdarr Node 8268
+| Tdarr Server     | 8265 + 8266
+| Tdarr Node       |  8268
 | Technitium DNS Server 8380 + 53 + 67 + 853 + 8053 + 53443
 | The Lounge       | 113     | Bridge  |                |
 | The Lounge       | 9002    | Bridge  | HTTP           |
-| Threadfin 34400
-| Tianji 3031
+| Threadfin        |  34400
+| Tianji           | 3031
 | TiddlyWiki       | 8092    | Bridge  | HTTP           |
 | Time Machine     | 10445   | Bridge  | SMB            |
-| titra 3026
+| titra            | 3026
 | Traefik          | 80      | Host    | HTTP           |
 | Traefik          | 443     | Host    | HTTPS          |
 | Traefik          | 8083    | Host    | HTTP Admin     |
@@ -281,40 +281,40 @@ By default, applications can be found on the ports listed below.
 | Transmission VPN | 9091    | Bridge  | HTTP           |
 | Transmission VPN | 3128    | Bridge  | HTTP Proxy     |
 | Transmission VPN | 51415   | Bridge  | bt             |
-| Trilium Notes 8082
-| Tugtainer 9412
-| TVheadend 9981 + 9982
+| Trilium Notes    |  8082
+| Tugtainer        |  9412
+| TVheadend        | 9981 + 9982
 | Ubooquity        | 2202    | Bridge  | HTTP           |
 | Ubooquity        | 2203    | Bridge  | HTTP Admin     |
-| Umami 3019
-| Unpackerr n/a
-| Uptime Kuma 3004
-| Usermin 20000
+| Umami            | 3019
+| Unpackerr        |  n/a
+| Uptime Kuma      | 3004
+| Usermin          | 20000
 | uTorrent         | 8111    | Bridge  | HTTP           |
 | uTorrent         | 6881    | Bridge  | BT             |
 | uTorrent         | 6881    | Bridge  | UDP            |
-| Valheim 2456 + 2457 + 2458
-| Vaultwarden 19080 + 3012
-| VERT 3035 + 24153
-| VFD 4242
-| Virtual Desktop 3389 RDP
-| virtualtabletop 8272
+| Valheim          | 2456 + 2457 + 2458
+| Vaultwarden      |  19080 + 3012
+| VERT             |  3035 + 24153
+| VFD              |  4242
+| Virtual Desktop  |  3389 RDP
+| virtualtabletop  |  8272
 | Wallabag         | 7780    | Bridge  | HTTP           |
-| WatchState 8992
-| Watchtower 2347
-| WatchYourLAN 8840
-| Webmin 10000
-| Webtop 3000
-| What's Running 3021
-| Whisparr 6969
-| Windows 8006 + 3388 RDP
-| WireGuard 51821 + 51820
-| Wireshark 3000 + 3001 Host
-| Wizarr 5690
-| Woodpecker CI 8000 + 9000
-| WordPress 3034
-| WUD 3013
-| YaDNSb 3025
-| Youtarr 3087
+| WatchState       |  8992
+| Watchtower       |  2347
+| WatchYourLAN     |  8840
+| Webmin           | 10000 
+| Webtop           | 3000
+| What's Running   | 3021
+| Whisparr         | 6969
+| Windows          |  8006 + 3388 RDP
+| WireGuard        |  51821 + 51820
+| Wireshark        |  3000 + 3001 Host
+| Wizarr           |  5690
+| Woodpecker CI    |  8000 + 9000
+| WordPress        |  3034
+| WUD              | 3013
+| YaDNSb           | 3025
+| Youtarr          |  3087
 | YouTubeDL-Mater  | 8998    | Bridge  | HTTP           |
 | ZNC              | 6677    | Bridge  |                |
