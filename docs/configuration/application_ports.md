@@ -24,8 +24,6 @@ By default, applications can be found on the ports listed below.
 | Beszel Agent     | 45876
 | bitmagnet        | 3333
 | bitmagnet        | 3334
-| Bitwarden "hub"  | 3012    | Bridge  | Web Not.       |
-| Bitwarden        | 19080   | Bridge  | HTTP           |
 | Blinko           | 1111
 | Booksonic Air    | 4041    | Bridge  | HTTP           |
 | Calibre          | 8093
@@ -79,7 +77,7 @@ By default, applications can be found on the ports listed below.
 | Emby             | 8096    | Bridge  | HTTP           |
 | Emby             | 8920    | Bridge  | HTTPS          |
 | EspHome          | 6052    | Bridge  | HTTP           |
-| Fast Music Removr| 3014
+| Fast Music Removr| 3045
 | Fasten           | 9091
 | File Browser     | 8086    | Bridge  | HTTP           |
 | FileBrowser Quan | 8086    | Bridge  | HTTP           |
@@ -88,7 +86,7 @@ By default, applications can be found on the ports listed below.
 | Firefly III      | 8066    | Bridge  | HTTP           |
 | FlareSolverr     | 8191
 | Flexget          | 3539
-| Focalboard       | 3017    | Bridge  | HTTP           |
+| Focalboard       | 3047    | Bridge  | HTTP           |
 | FreshRSS         | 8089    | Bridge  | HTTP           |
 | GameVault        | 5082    | Bridge  | HTTP           |
 | Gameyfin         | 8081
@@ -103,15 +101,15 @@ By default, applications can be found on the ports listed below.
 | Glance           | 8082    | Bridge  | HTTP           |
 | Glances          | 61208   | Bridge  | HTTP           |
 | Glances          | 61209   | Bridge  |                |
-| GLPI             | 3022
+| GLPI             | 3039
 | Gokapi           | 53842
 | Gotify           | 2346    | Bridge  | HTTP           |
-| GoToSocial       | 3016
+| GoToSocial       | 3046
 | GPU Hot          | 1312    | Bridge  | HTTP           |
 | Grafana          | 3000    | Bridge  | HTTP           |
 | Grocy            | 9283    | Bridge  | HTTP           |
 | Guacamole        | 8090    | Bridge  | HTTP           |
-| Hammond          | 3022    | Bridge  | HTTP           |
+| Hammond          | 3041    | Bridge  | HTTP           |
 | HandBrake        | 5801    | Bridge  | HTTP           |
 | Heimdall         | 11112   | Bridge  | HTTP           |
 | Hello World      | 9999    | Bridge  | HTTP           |
@@ -150,7 +148,7 @@ By default, applications can be found on the ports listed below.
 | LANCommander     | 1337    | Bridge  | HTTP           |
 | Lidarr           | 8686    | Bridge  | HTTP           |
 | Linkwarden       | 8990    | Bridge  | HTTP           |
-| LocalAI          | 3006    | Bridge  | HTTP           |
+| LocalAI          | 3042    | Bridge  | HTTP           |
 | LoggiFly         | n/a
 | Loki             | 3100
 | Luanti           | 30000
@@ -158,7 +156,7 @@ By default, applications can be found on the ports listed below.
 | Maintainerr      | 8154
 | MakeMKV          | 5804    | Bridge  | HTTP           |
 | Mealie           | 9925    | Host    | HTTP           |
-| Medialytics      | 3013
+| Medialytics      | 3044
 | MeshCentral      | 8086
 | MeTube           | 3019    | Bridge  | HTTP           |
 | MIND             | 3023
@@ -234,12 +232,12 @@ By default, applications can be found on the ports listed below.
 | Plex             | 1900    | Bridge  | UDP            |
 | Plex Rewind      | 8383
 | Pocket ID        | 1411
-| Porn Vault       | 3030    | Bridge  | HTTP           |
+| Porn Vault       | 6996    | Bridge  | HTTP           |
 | Portainer        | 9000    | Bridge  | HTTP           |
 | Portainer Agent  | 9002
 | portracker       | 4999
 | ProGet           | 3334    | Bridge  | HTTP           |
-| ProjectSend      | 3006    | Bridge  | HTTP           |
+| ProjectSend      | 3036    | Bridge  | HTTP           |
 | Promtail         | 9080
 | Prowlarr         | 9696    | Bridge  | HTTP           |
 | PruneMate        | 7676    | Bridge  | HTTP           |
@@ -270,12 +268,12 @@ By default, applications can be found on the ports listed below.
 | Shaarli          | 5804    | Bridge  | HTTP           |
 | Shoutcast Server | 8002
 | Sickchill        | 8081    | Bridge  | HTTP           |
-| Silver Bullet    | 3002
+| Silver Bullet    | 3007
 | Sonarr           | 8989    | Bridge  | HTTP           |
 | Sonos-Web        | 5050
 | Speedtest-Trk    | 8765    | HTTP    |                |
 | Spoolman         | 7912
-| Stalwart Mail    | 3008
+| Stalwart Mail    | 3043
 | Stalwart Mail    | 25
 | Stalwart Mail    | 587
 | Stalwart Mail    | 465
@@ -297,8 +295,8 @@ By default, applications can be found on the ports listed below.
 | Syncthing admin  | 8384    | Host    | HTTP           |
 | Syncthing P2P    | 22000   | Host    | TCP+UDP        |
 | Tailscale        | ?????  Host mode
-| Tandoor Recipes  | 3035    | Bridge  | HTTP           |
-| Tasks.md         | 3018    | Bridge  | HTTP           |
+| Tandoor Recipes  | 3037    | Bridge  | HTTP           |
+| Tasks.md         | 3048    | Bridge  | HTTP           |
 | Tautulli         | 8185    | Bridge  | HTTP           |
 | Tdarr Server     | 8265
 | Tdarr Server     | 8266
@@ -315,7 +313,7 @@ By default, applications can be found on the ports listed below.
 | Tianji           | 3031    | Bridge  | HTTP           |
 | TiddlyWiki       | 8092    | Bridge  | HTTP           |
 | Time Machine     | 10445   | Bridge  | SMB            |
-| titra            | 3026    | Bridge  | HTTP           |
+| titra            | 3027    | Bridge  | HTTP           |
 | Traefik          | 80      | Host    | HTTP           |
 | Traefik          | 443     | Host    | HTTPS          |
 | Traefik          | 8083    | Host    | HTTP Admin     |
@@ -330,7 +328,7 @@ By default, applications can be found on the ports listed below.
 | TVheadend        | 9982
 | Ubooquity        | 2202    | Bridge  | HTTP           |
 | Ubooquity        | 2203    | Bridge  | HTTP Admin     |
-| Umami            | 3019    | Bridge  | HTTP           |
+| Umami            | 3049    | Bridge  | HTTP           |
 | Unpackerr        |  n/a
 | Uptime Kuma      | 3004    | Bridge  | HTTP           |
 | Usermin          | 20000   | Host    | HTTP           |
@@ -342,7 +340,7 @@ By default, applications can be found on the ports listed below.
 | Valheim          | 2458
 | Vaultwarden      | 19080
 | Vaultwarden      | 3012
-| VERT             | 3035    | Bridge  | HTTP           |
+| VERT             | 3038    | Bridge  | HTTP           |
 | VERT             | 24153
 | VFD              | 4242    | Bridge  | HTTP           |
 | Virtual Desktop  | 3389 RDP
@@ -353,7 +351,7 @@ By default, applications can be found on the ports listed below.
 | WatchYourLAN     | 8840    | Bridge  | HTTP           |
 | Webmin           | 10000   | Host    | HTTP           |
 | Webtop           | 3000    | Bridge  | HTTP           |
-| What's Running   | 3021    | Bridge  | HTTP           |
+| What's Running   | 3411    | Bridge  | HTTP           |
 | Whisparr         | 6969    | Bridge  | HTTP           |
 | Windows          | 8006
 | Windows          | 3388 RDP
@@ -364,9 +362,12 @@ By default, applications can be found on the ports listed below.
 | Wizarr           | 5690    | Bridge  | HTTP           |
 | Woodpecker CI    | 8000
 | Woodpecker CI    | 9000
-| WordPress        | 3034    | Bridge  | HTTP           |
+| WordPress        | 3040    | Bridge  | HTTP           |
 | WUD              | 3013    | Bridge  | HTTP           |
-| YaDNSb           | 3025    | Bridge  | HTTP           |
+| YaDNSb           | 3032    | Bridge  | HTTP           |
 | Youtarr          | 3087    | Bridge  | HTTP           |
 | YouTubeDL-Mater  | 8998    | Bridge  | HTTP           |
 | ZNC              | 6677    | Bridge  |                |
+
+
+# next avail = 3050
