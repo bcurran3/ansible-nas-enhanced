@@ -64,7 +64,7 @@
           - "/etc/localtime:/etc/localtime:ro"
         ports:
           - "{{ gitea_port_http }}:3000"
-          - "{{ gitea_port_ssh }}:{{ gitea_port_ssh }}"
+          - "{{ gitea_port_ssh | string }}:{{ gitea_port_ssh | string }}"
         links:
           - "{{ gitea_db_container_name }}"
         env:
@@ -76,7 +76,7 @@
           DISABLE_REGISTRATION: "{{ gitea_disable_registration }}"
           RUN_MODE: "prod"
           SSH_DOMAIN: "{{ ansible_nas_hostname }}"
-          SSH_PORT: "{{ gitea_port_ssh }}"
+          SSH_PORT: "{{ gitea_port_ssh | string }}"
           ROOT_URL: "https://{{ gitea_hostname }}.{{ ansible_nas_domain }}/"
           USER_UID: "{{ gitea_uid }}"
           USER_GID: "{{ gitea_gid }}"
