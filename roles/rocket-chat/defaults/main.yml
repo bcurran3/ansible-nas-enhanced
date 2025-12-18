@@ -1,60 +1,60 @@
 ---
 # ANE
 ansible_nas_app_name: "Rocket.Chat"
-rocketchat_enabled: false
-rocketchat_available_externally: false
-rocketchat_traefik_whitelist: "{{ lan }}"
-rocketchat_data_directory: "{{ docker_home }}/rocket-chat"
+rocket_chat_enabled: false
+rocket_chat_available_externally: false
+rocket_chat_traefik_whitelist: "{{ lan }}"
+rocket_chat_data_directory: "{{ docker_home }}/rocket-chat"
 
 # network
-rocketchat_hostname: "rocketchat"
-rocketchat_port_http: "3333"
+rocket_chat_hostname: "rocketchat"
+rocket_chat_port_http: "3333"
 
 # docker
-rocketchat_network_name: "rocketchat"
-rocketchat_container_name: "rocket-chat"
-rocketchat_image_name: "ghcr.io/rocketchat/rocket.chat"
-rocketchat_image_tag: "latest"
-rocketchat_db_container_name: "rocketchat-db"
-rocketchat_db_image_name: "docker.io/bitnami/mongodb"
-rocketchat_db_image_tag: "5.0"
+rocket_chat_network_name: "rocket-chat"
+rocket_chat_container_name: "rocket-chat"
+rocket_chat_image_name: "ghcr.io/rocket_chat/rocket.chat"
+rocket_chat_image_tag: "latest"
+rocket_chat_db_container_name: "rocket-chat-db"
+rocket_chat_db_image_name: "docker.io/bitnami/mongodb"
+rocket_chat_db_image_tag: "5.0"
 
 # specs
-rocketchat_cpu_shares: 1024
-rocketchat_memory: "1G"
-rocketchat_db_cpu_shares: 1024
-rocketchat_db_memory: "1G"
+rocket_chat_cpu_shares: 1024
+rocket_chat_memory: "1G"
+rocket_chat_db_cpu_shares: 1024
+rocket_chat_db_memory: "1G"
 
 # autoheal
-rocketchat_autoheal: "false"
-rocketchat_db_autoheal: "false"
+rocket_chat_autoheal: "false"
+rocket_chat_db_autoheal: "false"
 
 # dockflare
-rocketchat_dockflare_tunnel: "false"
-rocketchat_dockflare_access_group: ""
+rocket_chat_dockflare_tunnel: "false"
+rocket_chat_dockflare_access_group: ""
 
 # homepage
-rocketchat_homepage_group: "Apps"
-rocketchat_homepage_icon: "rocketchat.png"
-rocketchat_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocketchat_port_http }}"
-rocketchat_homepage_showstats: "false"
-rocketchat_db_homepage_group: "DBs"
-rocketchat_db_homepage_icon: "mongodb.png"
-rocketchat_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocketchat_port_http }}"
-rocketchat_db_homepage_showstats: "false"
+rocket_chat_homepage_group: "Apps"
+rocket_chat_homepage_icon: "rocket-chat.png"
+rocket_chat_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
+rocket_chat_homepage_showstats: "false"
+rocket_chat_db_homepage_group: "DBs"
+rocket_chat_db_homepage_icon: "mongodb.png"
+rocket_chat_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
+rocket_chat_db_homepage_showstats: "false"
 
 # repliqate
-rocketchat_repliqate_enabled: "false"
-rocketchat_repliqate_engine: "restic"
-rocketchat_repliqate_schedule: "@daily 3am"
-rocketchat_repliqate_backup_id: "{{ rocketchat_container_name }}"
-rocketchat_repliqate_retention: "30d"
-rocketchat_db_repliqate_enabled: "false"
-rocketchat_db_repliqate_engine: "restic"
-rocketchat_db_repliqate_schedule: "@daily 3am"
-rocketchat_db_repliqate_backup_id: "{{ rocketchat_container_name }}"
-rocketchat_db_repliqate_retention: "30d"
+rocket_chat_repliqate_enabled: "false"
+rocket_chat_repliqate_engine: "restic"
+rocket_chat_repliqate_schedule: "@daily 3am"
+rocket_chat_repliqate_backup_id: "{{ rocket_chat_container_name }}"
+rocket_chat_repliqate_retention: "30d"
+rocket_chat_db_repliqate_enabled: "false"
+rocket_chat_db_repliqate_engine: "restic"
+rocket_chat_db_repliqate_schedule: "@daily 3am"
+rocket_chat_db_repliqate_backup_id: "{{ rocket_chat_container_name }}"
+rocket_chat_db_repliqate_retention: "30d"
 
 # watchtower
-rocketchat_watchtower_enable: "false"
-rocketchat_db_watchtower_enable: "false"
+rocket_chat_watchtower_enable: "false"
+rocket_chat_db_watchtower_enable: "false"
