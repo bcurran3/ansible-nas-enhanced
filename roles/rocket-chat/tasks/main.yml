@@ -69,9 +69,10 @@
           repliqate.backup_id: "{{ rocket_chat_db_repliqate_backup_id }}"
           repliqate.retention: "{{ rocket_chat_db_repliqate_retention }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+#          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.include: '^6\.0\.\d+.*$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/bitnami/mongodb"
+          wud.link.template: "https://hub.docker.com/r/bitnamilegacy/mongodb/tags"
         cpu_shares: "{{ rocket_chat_db_cpu_shares }}"
         memory: "{{ rocket_chat_db_memory }}"
         restart_policy: unless-stopped
