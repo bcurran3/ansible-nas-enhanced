@@ -17,10 +17,12 @@
         image: "{{ music_assistant_image_name }}:{{ music_assistant_image_tag }}"
         pull: true
         privileged: true
+        network_mode: host
         volumes:
           - "{{ music_assistant_data_directory }}/data:/data"
           - "{{ music_root }}:/media:ro"
-        network_mode: host
+#        ports:
+#          - 8095:8095
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:

@@ -167,7 +167,7 @@ By default, applications can be found on the ports listed below.
 | Mosquitto        | 1883    | Bridge  | Websocket      |
 | Mosquitto        | 9001    | Bridge  | HTTP           |
 | Mumble           | 64738 tcp + udp
-| Music Assistant  | n/a (???????)
+| Music Assistant  | 8095    | Host
 | MyBibliotheca    | 5054    | Bridge  | HTTP           |
 | Mylar            | 8585    | Bridge  | HTTP           |
 | MyMediaForAlexa  | 52050   | Bridge  | TCP            |
@@ -187,7 +187,7 @@ By default, applications can be found on the ports listed below.
 | Nomad            | 4648
 | ntfy             | 3018    | Bridge  | HTTP           |
 | NZBGet           | 6789    | Bridge  | HTTP           |
-| OctoPrint        | 8095
+| OctoPrint        | 3050    | Bridge  | HTTP           |
 | Odoo             | 8069
 | Odoo             | 8072
 | OfflineU         | 5000    | Bridge  | HTTP           |
@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3050
+# next avail = 3051
 # next avail = 9022
 
 # NOTE: Conflicts on ports 9000 + 9002
