@@ -51,7 +51,7 @@
           repliqate.schedule: "{{ krusader_repliqate_schedule }}"
           repliqate.backup_id: "{{ krusader_repliqate_backup_id }}"
           repliqate.retention: "{{ krusader_repliqate_retention }}"
-          traefik.enable: "{{ krusader_available_externally }}"
+          traefik.enable: "{{ krusader_available_externally | string }}"
           traefik.http.routers.krusader.rule: "Host(`{{ krusader_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.krusader.tls.certresolver: "letsencrypt"
           traefik.http.routers.krusader.tls.domains[0].main: "{{ ansible_nas_domain }}"
