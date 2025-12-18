@@ -8,11 +8,14 @@ music_assistant_data_directory: "{{ docker_home }}/music-assistant"
 
 # network
 music_assistant_hostname: "musicassistant"
+music_assistant_port_http: "8095"
 
 # docker
 music_assistant_container_name: "music-assistant"
 music_assistant_image_name: "ghcr.io/music-assistant/server"
 music_assistant_image_tag: "latest"
+
+# specs
 music_assistant_cpu_shares: 1024
 music_assistant_memory: "1G"
 
@@ -22,6 +25,7 @@ music_assistant_autoheal: "false"
 # homepage
 music_assistant_homepage_group: "Apps"
 music_assistant_homepage_icon: "music-assistant.png"
+music_assistant_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ music_assistant__port_tcp }}"
 music_assistant_homepage_showstats: "false"
 
 # repliqate
