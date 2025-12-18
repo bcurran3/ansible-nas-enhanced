@@ -1,100 +1,100 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create Booksonic Directories
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
         mode: 0755
       with_items:
-        - "{{ booksonic_data_directory }}/data"
-        - "{{ booksonic_data_directory }}/playlists"
+        - "{{ booksonic_air_data_directory }}/data"
+        - "{{ booksonic_air_data_directory }}/playlists"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ booksonic_container_name }}"
-        hostname: "{{ booksonic_container_name }}"
-        image: "{{ booksonic_image_name }}:{{ booksonic_image_tag }}"
+        name: "{{ booksonic_air_container_name }}"
+        hostname: "{{ booksonic_air_container_name }}"
+        image: "{{ booksonic_air_image_name }}:{{ booksonic_air_image_tag }}"
         pull: true
         volumes:
-          - "{{ booksonic_data_directory }}/data:/booksonic/data:rw"
-          - "{{ booksonic_data_directory }}/playlists:/booksonic/playlists:rw"
-          - "{{ booksonic_audiobooks_directory }}:/booksonic/audiobooks:rw"
-          - "{{ booksonic_podcasts_directory }}:/booksonic/podcasts:rw"
+          - "{{ booksonic_air_data_directory }}/data:/booksonic_air/data:rw"
+          - "{{ booksonic_air_data_directory }}/playlists:/booksonic_air/playlists:rw"
+          - "{{ booksonic_air_audiobooks_directory }}:/booksonic_air/audiobooks:rw"
+          - "{{ booksonic_air_podcasts_directory }}:/booksonic_air/podcasts:rw"
         ports:
-          - "{{ booksonic_port_http }}:4040"
+          - "{{ booksonic_air_port_http }}:4040"
         env:
-          DOCKER_MODS: "{{ booksonic_env_docker_mods }}"
-          INSTALL_PACKAGES: "{{ booksonic_env_docker_mods_install_packages }}"
-          INSTALL_PIP_PACKAGES: "{{ booksonic_env_docker_mods_install_pip_packages}}"
-          PUID: "{{ booksonic_user_id }}"
-          PGID: "{{ booksonic_group_id }}"
+          DOCKER_MODS: "{{ booksonic_air_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ booksonic_air_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ booksonic_air_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ booksonic_air_user_id }}"
+          PGID: "{{ booksonic_air_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ booksonic_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ booksonic_watchtower_enable }}"
-          dockflare.enable: "{{ booksonic_dockflare_tunnel }}"
-          dockflare.access.group: "{{ booksonic_dockflare_access_group }}"
-          dockflare.hostname: "{{ booksonic_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ booksonic_port_http }}"
+          autoheal: "{{ booksonic_air_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ booksonic_air_watchtower_enable }}"
+          dockflare.enable: "{{ booksonic_air_dockflare_tunnel }}"
+          dockflare.access.group: "{{ booksonic_air_dockflare_access_group }}"
+          dockflare.hostname: "{{ booksonic_air_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ booksonic_air_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ booksonic_homepage_group }}"
-          homepage.icon: "{{ booksonic_homepage_icon }}"
-          homepage.href: "{{ booksonic_homepage_href }}"
-          homepage.description: "{{ 'booksonic description' if homepage_show_description else omit }}"
+          homepage.group: "{{ booksonic_air_homepage_group }}"
+          homepage.icon: "{{ booksonic_air_homepage_icon }}"
+          homepage.href: "{{ booksonic_air_homepage_href }}"
+          homepage.description: "{{ 'booksonic_air description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ booksonic_container_name }}"
-          homepage.showStats: "{{ booksonic_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ booksonic_port_http }}"
-          repliqate.enabled: "{{ booksonic_repliqate_enabled }}"
-          repliqate.engine: "{{ booksonic_repliqate_engine }}"
-          repliqate.schedule: "{{ booksonic_repliqate_schedule }}"
-          repliqate.backup_id: "{{ booksonic_repliqate_backup_id }}"
-          repliqate.retention: "{{ booksonic_repliqate_retention }}"
-          traefik.enable: "{{ booksonic_available_externally | string }}"
-          traefik.http.routers.booksonic.rule: "Host(`{{ booksonic_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.booksonic.tls.certresolver: "letsencrypt"
-          traefik.http.routers.booksonic.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.booksonic.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ booksonic_hostname }}"
-          traefik.http.routers.booksonic.middlewares: "{{ booksonic_hostname }}@docker"
-          traefik.http.middlewares.booksonic.IPAllowList.sourcerange: "{{ booksonic_traefik_whitelist }}"
-          traefik.http.services.booksonic.loadbalancer.server.port: "4040"
+          homepage.container: "{{ booksonic_air_container_name }}"
+          homepage.showStats: "{{ booksonic_air_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ booksonic_air_port_http }}"
+          repliqate.enabled: "{{ booksonic_air_repliqate_enabled }}"
+          repliqate.engine: "{{ booksonic_air_repliqate_engine }}"
+          repliqate.schedule: "{{ booksonic_air_repliqate_schedule }}"
+          repliqate.backup_id: "{{ booksonic_air_repliqate_backup_id }}"
+          repliqate.retention: "{{ booksonic_air_repliqate_retention }}"
+          traefik.enable: "{{ booksonic_air_available_externally | string }}"
+          traefik.http.routers.booksonic_air.rule: "Host(`{{ booksonic_air_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.booksonic_air.tls.certresolver: "letsencrypt"
+          traefik.http.routers.booksonic_air.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.booksonic_air.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ booksonic_air_hostname }}"
+          traefik.http.routers.booksonic_air.middlewares: "{{ booksonic_air_hostname }}@docker"
+          traefik.http.middlewares.booksonic_air.IPAllowList.sourcerange: "{{ booksonic_air_traefik_whitelist }}"
+          traefik.http.services.booksonic_air.loadbalancer.server.port: "4040"
           wud.tag.include: '^\d{4}\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "lscr.io/linuxserver/booksonic-air"
-        cpu_shares: "{{ booksonic_cpu_shares }}"
-        memory: "{{ booksonic_memory }}"
+        cpu_shares: "{{ booksonic_air_cpu_shares }}"
+        memory: "{{ booksonic_air_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (booksonic_port_http | string)] +
-                (['https://' + booksonic_hostname + '.' + ansible_nas_domain] if (booksonic_available_externally is true or booksonic_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (booksonic_air_port_http | string)] +
+                (['https://' + booksonic_air_hostname + '.' + ansible_nas_domain] if (booksonic_air_available_externally is true or booksonic_air_dockflare_tunnel is true) else [])
               }}
-  when: booksonic_enabled is true
+  when: booksonic_air_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ booksonic_container_name }}"
+        name: "{{ booksonic_air_container_name }}"
         state: absent
-  when: booksonic_enabled is false
+  when: booksonic_air_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ booksonic_data_directory }}"
+        path: "{{ booksonic_air_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ booksonic_data_directory }}"
+        path: "{{ booksonic_air_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
@@ -103,4 +103,4 @@
         mode: u=rw,g=rw
         remove: true
       when: dir_stat.stat.exists
-  when: booksonic_enabled is false and archive_app_data_enabled is true
+  when: booksonic_air_enabled is false and archive_app_data_enabled is true

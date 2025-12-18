@@ -1,57 +1,57 @@
 ---
 # ANE
 ansible_nas_app_name: "Booksonic Air"
-booksonic_enabled: false
-booksonic_available_externally: false
-booksonic_traefik_whitelist: "{{ lan }}"
+booksonic_air_enabled: false
+booksonic_air_available_externally: false
+booksonic_air_traefik_whitelist: "{{ lan }}"
 
 # uid / gid
-booksonic_user_id: "1000"
-booksonic_group_id: "1000"
+booksonic_air_user_id: "1000"
+booksonic_air_group_id: "1000"
 
 # directories
-booksonic_data_directory: "{{ docker_home }}/booksonic-air"
-booksonic_audiobooks_directory: "{{ audiobooks_root }}"
-booksonic_podcasts_directory: "{{ podcasts_root }}"
+booksonic_air_data_directory: "{{ docker_home }}/booksonic-air"
+booksonic_air_audiobooks_directory: "{{ audiobooks_root }}"
+booksonic_air_podcasts_directory: "{{ podcasts_root }}"
 
 # network
-booksonic_port_http: "4041"
-booksonic_hostname: "booksonic"
+booksonic_air_port_http: "4041"
+booksonic_air_hostname: "booksonic"
 
 # specs
-booksonic_cpu_shares: 1024
-booksonic_memory: "1G"
+booksonic_air_cpu_shares: 1024
+booksonic_air_memory: "1G"
 
 # docker
-booksonic_container_name: "booksonic-air"
+booksonic_air_container_name: "booksonic-air"
 # This image is deprecated. We will not offer support for this image and it will not be updated.
-booksonic_image_name: "lscr.io/linuxserver/booksonic-air"
-booksonic_image_tag: "latest"
+booksonic_air_image_name: "lscr.io/linuxserver/booksonic-air"
+booksonic_air_image_tag: "latest"
 
 # autoheal
-booksonic_autoheal: "false"
+booksonic_air_autoheal: "false"
 
 # dockflare
-booksonic_dockflare_tunnel: "false"
-booksonic_dockflare_access_group: ""
+booksonic_air_dockflare_tunnel: "false"
+booksonic_air_dockflare_access_group: ""
 
 # homepage
-booksonic_homepage_group: "Apps"
-booksonic_homepage_icon: "booksonic.png"
-booksonic_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ booksonic_port_http }}"
-booksonic_homepage_showstats: "false"
+booksonic_air_homepage_group: "Apps"
+booksonic_air_homepage_icon: "booksonic.png"
+booksonic_air_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ booksonic_port_http }}"
+booksonic_air_homepage_showstats: "false"
 
 # linuxserver.io docker mods
-booksonic_env_docker_mods: ""
-booksonic_env_docker_mods_install_packages: ""
-booksonic_env_docker_mods_install_pip_packages: ""
+booksonic_air_env_docker_mods: ""
+booksonic_air_env_docker_mods_install_packages: ""
+booksonic_air_env_docker_mods_install_pip_packages: ""
 
 # repliqate
-booksonic_repliqate_enabled: "false"
-booksonic_repliqate_engine: "restic"
-booksonic_repliqate_schedule: "@daily 3am"
-booksonic_repliqate_backup_id: "{{ booksonic_container_name }}"
-booksonic_repliqate_retention: "30d"
+booksonic_air_repliqate_enabled: "false"
+booksonic_air_repliqate_engine: "restic"
+booksonic_air_repliqate_schedule: "@daily 3am"
+booksonic_air_repliqate_backup_id: "{{ booksonic_container_name }}"
+booksonic_air_repliqate_retention: "30d"
 
 # watchtower
-booksonic_watchtower_enable: "false"
+booksonic_air_watchtower_enable: "false"
