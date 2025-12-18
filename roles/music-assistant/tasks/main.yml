@@ -6,66 +6,66 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ musicassistant_data_directory }}"
-        - "{{ musicassistant_data_directory }}/data"
+        - "{{ music_assistant_data_directory }}"
+        - "{{ music_assistant_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ musicassistant_container_name }}"
-        hostname: "{{ musicassistant_container_name }}"
-        image: "{{ musicassistant_image_name }}:{{ musicassistant_image_tag }}"
+        name: "{{ music_assistant_container_name }}"
+        hostname: "{{ music_assistant_container_name }}"
+        image: "{{ music_assistant_image_name }}:{{ music_assistant_image_tag }}"
         pull: true
         privileged: true
         volumes:
-          - "{{ musicassistant_data_directory }}/data:/data"
+          - "{{ music_assistant_data_directory }}/data:/data"
           - "{{ music_root }}:/media:ro"
         network_mode: host
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ musicassistant_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ musicassistant_watchtower_enable }}"
+          autoheal: "{{ music_assistant_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ music_assistant_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ musicassistant_homepage_group }}"
-          homepage.icon: "{{ musicassistant_homepage_icon }}"
+          homepage.group: "{{ music_assistant_homepage_group }}"
+          homepage.icon: "{{ music_assistant_homepage_icon }}"
           homepage.description: "{{ 'a free, opensource Media library manager that connects to your streaming services and a wide range of connected speakers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ musicassistant_container_name }}"
-          homepage.showStats: "{{ musicassistant_homepage_showstats }}"
-          repliqate.enabled: "{{ musicassistant_repliqate_enabled }}"
-          repliqate.engine: "{{ musicassistant_repliqate_engine }}"
-          repliqate.schedule: "{{ musicassistant_repliqate_schedule }}"
-          repliqate.backup_id: "{{ musicassistant_repliqate_backup_id }}"
-          repliqate.retention: "{{ musicassistant_repliqate_retention }}"
+          homepage.container: "{{ music_assistant_container_name }}"
+          homepage.showStats: "{{ music_assistant_homepage_showstats }}"
+          repliqate.enabled: "{{ music_assistant_repliqate_enabled }}"
+          repliqate.engine: "{{ music_assistant_repliqate_engine }}"
+          repliqate.schedule: "{{ music_assistant_repliqate_schedule }}"
+          repliqate.backup_id: "{{ music_assistant_repliqate_backup_id }}"
+          repliqate.retention: "{{ music_assistant_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/music-assistant/server/pkgs/container/server"
-        cpu_shares: "{{ musicassistant_cpu_shares }}"
-        memory: "{{ musicassistant_memory }}"
+        cpu_shares: "{{ music_assistant_cpu_shares }}"
+        memory: "{{ music_assistant_memory }}"
         restart_policy: unless-stopped
-  when: musicassistant_enabled is true
+  when: music_assistant_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ musicassistant_container_name }}"
+        name: "{{ music_assistant_container_name }}"
         state: absent
-  when: musicassistant_enabled is false
+  when: music_assistant_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ musicassistant_data_directory }}"
+        path: "{{ music_assistant_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ musicassistant_data_directory }}"
+        path: "{{ music_assistant_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
@@ -74,4 +74,4 @@
         mode: u=rw,g=rw
         remove: true
       when: dir_stat.stat.exists
-  when: musicassistant_enabled is false and archive_app_data_enabled is true
+  when: music_assistant_enabled is false and archive_app_data_enabled is true
