@@ -40,7 +40,7 @@ komodo_env_komodo_host: "https://{{ komodo_hostname }}{{ ansible_nas_domain }}" 
 komodo_env_komodo_title: "Komodo" ## Displayed in the browser tab.
 komodo_env_komodo_first_server: "https://{{ komodo_periphery_container_name }}:8120" ## Create a server matching this address as the "first server".
 komodo_env_komodo_first_server_name: "{{ ansible_nas_hostname }}" ## Give the first server a custom name.
-komodo_env_komodo_disable_confirm_dialog: false ## Make all buttons just double-click, rather than the full confirmation dialog.
+komodo_env_komodo_disable_confirm_dialog: "false" ## Make all buttons just double-click, rather than the full confirmation dialog.
 komodo_env_komodo_monitoring_interval: "15-sec" ## Rate Komodo polls your servers for status / container status / system stats / alerting. Options: 1-sec, 5-sec, 15-sec, 1-min, 5-min, 15-min
 komodo_env_komodo_resource_poll_interval: "1-hr" ## Interval at which to poll Resources for any updates / automated actions. Options: 15-min, 1-hr, 2-hr, 6-hr, 12-hr, 1-day
 komodo_env_komodo_webhook_secret: "XSP9i2V8YxkyKekTjBO8G4JBPT4rPmcg" ## Used to auth incoming webhooks. Alt: KOMODO_WEBHOOK_SECRET_FILE
@@ -50,14 +50,14 @@ komodo_env_komodo_passkey: "OdgswggH6J5mF0kOXfh18KL1QSGKB06t"
 komodo_env_komodo_local_auth: "true" ## Enable login with username + password.
 komodo_env_komodo_init_admin_username: "admin" ## Set the initial admin username created upon first launch. Comment out to disable initial user creation, and create first user using signup button.
 komodo_env_komodo_init_admin_password: "{{ ansible_nas_app_admin_password }}" ## Set the initial admin password
-komodo_env_komodo_disable_user_registration: false ## Disable new user signups.
-komodo_env_komodo_enable_new_users: false ## All new logins are auto enabled
-komodo_env_komodo_disable_non_admin_create: false ## Disable non-admins from creating new resources.
-komodo_env_komodo_transparent_mode: false ## Allows all users to have Read level access to all resources.
-komodo_env_komodo_logging_pretty: false ## Prettier logging with empty lines between logs
-komodo_env_komodo_pretty_startup_config: false ## More human readable logging of startup config (multi-line)
+komodo_env_komodo_disable_user_registration: "false" ## Disable new user signups.
+komodo_env_komodo_enable_new_users: "false" ## All new logins are auto enabled
+komodo_env_komodo_disable_non_admin_create: "false" ## Disable non-admins from creating new resources.
+komodo_env_komodo_transparent_mode: "false" ## Allows all users to have Read level access to all resources.
+komodo_env_komodo_logging_pretty: "false" ## Prettier logging with empty lines between logs
+komodo_env_komodo_pretty_startup_config: "false" ## More human readable logging of startup config (multi-line)
 ## OIDC Login
-komodo_env_komodo_oidc_enabled: false
+komodo_env_komodo_oidc_enabled: "false"
 komodo_env_komodo_oidc_provider: "" ## Must reachable from Komodo Core container https://oidc.provider.internal/application/o/komodo
 komodo_env_komodo_oidc_redirect_host: "" ## Change the host to one reachable be reachable by users (optional if it is the same as above). DO NOT include the `path` part of the URL. https://oidc.provider.external
 komodo_env_komodo_oidc_client_id: "" ## Your OIDC client id Alt: KOMODO_OIDC_CLIENT_ID_FILE
@@ -65,11 +65,11 @@ komodo_env_komodo_oidc_client_secret: "" ## Your OIDC client secret. If your pro
 komodo_env_komodo_oidc_use_full_email: "" ## Make usernames the full email. example true/false Note. This does not work for all OIDC providers.
 komodo_env_komodo_oidc_additional_audiences: "" ## Add additional trusted audiences for token claims verification. Supports comma separated list, and passing with _FILE (for compose secrets). example abc,123 Alt: KOMODO_OIDC_ADDITIONAL_AUDIENCES_FILE
 ## Github Oauth
-komodo_env_komodo_github_oauth_enabled: false
+komodo_env_komodo_github_oauth_enabled: "false"
 komodo_env_komodo_github_oauth_id: "" # Alt: KOMODO_GITHUB_OAUTH_ID_FILE
 komodo_env_komodo_github_oauth_secret: "" # Alt: KOMODO_GITHUB_OAUTH_SECRET_FILE
 ## Google Oauth
-komodo_env_komodo_google_oauth_enabled: false
+komodo_env_komodo_google_oauth_enabled: "false"
 komodo_env_komodo_google_oauth_id: "" # Alt: KOMODO_GOOGLE_OAUTH_ID_FILE
 komodo_env_komodo_google_oauth_secret: "" # Alt: KOMODO_GOOGLE_OAUTH_SECRET_FILE
 ## Aws - Used to launch Builder instances.
@@ -78,12 +78,12 @@ komodo_env_komodo_aws_secret_access_key: "" # Alt: KOMODO_AWS_SECRET_ACCESS_KEY_
 ## Periphery Container
 komodo_periphery_env_periphery_root_directory: "/etc/komodo" ## Specify the root directory used by Periphery agent.
 komodo_periphery_env_periphery_passkeys: "OdgswggH6J5mF0kOXfh18KL1QSGKB06t" ## Periphery passkeys must include KOMODO_PASSKEY to authenticate.
-komodo_periphery_env_periphery_disable_terminals: false ## Specify whether to disable the terminals feature and disallow remote shell access (inside the Periphery container).
+komodo_periphery_env_periphery_disable_terminals: "false" ## Specify whether to disable the terminals feature and disallow remote shell access (inside the Periphery container).
 komodo_periphery_env_periphery_ssl_enabled: "true" ## Enable SSL using self signed certificates. Connect to Periphery at https://address:8120.
 komodo_periphery_env_periphery_include_disk_mounts: "/etc/hostname" ## If the disk size is overreporting, can use one of these to whitelist / blacklist the disks to filter them, whichever is easier. Accepts comma separated list of paths. Usually whitelisting just /etc/hostname gives correct size.
 komodo_periphery_env_periphery_exclude_disk_mounts: "/snap,/etc/repos"
-komodo_periphery_env_periphery_logging_pretty: false ## Prettier logging with empty lines between logs
-komodo_periphery_env_periphery_pretty_startup_config: false ## More human readable logging of startup config (multi-line)
+komodo_periphery_env_periphery_logging_pretty: "false" ## Prettier logging with empty lines between logs
+komodo_periphery_env_periphery_pretty_startup_config: "false" ## More human readable logging of startup config (multi-line)
 
 # autoheal
 komodo_autoheal: "false"
