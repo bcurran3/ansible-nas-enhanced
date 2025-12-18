@@ -6,90 +6,90 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ uptimekuma_data_directory }}"
-        - "{{ uptimekuma_data_directory }}/data"
+        - "{{ uptime_kuma_data_directory }}"
+        - "{{ uptime_kuma_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ uptimekuma_container_name }}"
-        hostname: "{{ uptimekuma_container_name }}"
-        image: "{{ uptimekuma_image_name }}:{{ uptimekuma_image_tag }}"
+        name: "{{ uptime_kuma_container_name }}"
+        hostname: "{{ uptime_kuma_container_name }}"
+        image: "{{ uptime_kuma_image_name }}:{{ uptime_kuma_image_tag }}"
         pull: true
         volumes:
-          - "{{ uptimekuma_data_directory }}/data:/app/data"
+          - "{{ uptime_kuma_data_directory }}/data:/app/data"
           - "/var/run/docker.sock:/var/run/docker.sock"
         ports:
-          - "{{ uptimekuma_port_http }}:3001"
+          - "{{ uptime_kuma_port_http }}:3001"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ uptimekuma_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ uptimekuma_watchtower_enable }}"
-          dockflare.enable: "{{ uptimekuma_dockflare_tunnel }}"
-          dockflare.access.group: "{{ uptimekuma_dockflare_access_group }}"
-          dockflare.hostname: "{{ uptimekuma_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptimekuma_port_http }}"
+          autoheal: "{{ uptime_kuma_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ uptime_kuma_watchtower_enable }}"
+          dockflare.enable: "{{ uptime_kuma_dockflare_tunnel }}"
+          dockflare.access.group: "{{ uptime_kuma_dockflare_access_group }}"
+          dockflare.hostname: "{{ uptime_kuma_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptime_kuma_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ uptimekuma_homepage_group }}"
-          homepage.href: "{{ uptimekuma_homepage_href }}"
-          homepage.icon: "{{ uptimekuma_homepage_icon }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptimekuma_port_http }}"
+          homepage.group: "{{ uptime_kuma_homepage_group }}"
+          homepage.href: "{{ uptime_kuma_homepage_href }}"
+          homepage.icon: "{{ uptime_kuma_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptime_kuma_port_http }}"
           homepage.description: "{{ 'A fancy self-hosted monitoring tool' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ uptimekuma_container_name }}"
-          homepage.showStats: "{{ uptimekuma_homepage_showstats }}"
-          homepage.widget.type: "uptimekuma"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptimekuma_port_http }}"
-          homepage.widget.slug: "{{ uptimekuma_homepage_widget_slug }}"
-          repliqate.enabled: "{{ uptimekuma_repliqate_enabled }}"
-          repliqate.engine: "{{ uptimekuma_repliqate_engine }}"
-          repliqate.schedule: "{{ uptimekuma_repliqate_schedule }}"
-          repliqate.backup_id: "{{ uptimekuma_repliqate_backup_id }}"
-          repliqate.retention: "{{ uptimekuma_repliqate_retention }}"
-          traefik.enable: "{{ uptimekuma_available_externally | string }}"
-          traefik.http.routers.uptimekuma.rule: "Host(`uptimekuma.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.uptimekuma.tls.certresolver: "letsencrypt"
-          traefik.http.routers.uptimekuma.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.uptimekuma.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ uptimekuma_hostname }}"
-          traefik.http.routers.uptimekuma.middlewares: "{{ uptimekuma_hostname }}@docker"
-          traefik.http.middlewares.uptimekuma.IPAllowList.sourcerange: "{{ uptimekuma_traefik_whitelist }}"
-          traefik.http.services.uptimekuma.loadbalancer.server.port: "3001"
+          homepage.container: "{{ uptime_kuma_container_name }}"
+          homepage.showStats: "{{ uptime_kuma_homepage_showstats }}"
+          homepage.widget.type: "uptime_kuma"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptime_kuma_port_http }}"
+          homepage.widget.slug: "{{ uptime_kuma_homepage_widget_slug }}"
+          repliqate.enabled: "{{ uptime_kuma_repliqate_enabled }}"
+          repliqate.engine: "{{ uptime_kuma_repliqate_engine }}"
+          repliqate.schedule: "{{ uptime_kuma_repliqate_schedule }}"
+          repliqate.backup_id: "{{ uptime_kuma_repliqate_backup_id }}"
+          repliqate.retention: "{{ uptime_kuma_repliqate_retention }}"
+          traefik.enable: "{{ uptime_kuma_available_externally | string }}"
+          traefik.http.routers.uptime_kuma.rule: "Host(`uptime_kuma.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.uptime_kuma.tls.certresolver: "letsencrypt"
+          traefik.http.routers.uptime_kuma.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.uptime_kuma.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ uptime_kuma_hostname }}"
+          traefik.http.routers.uptime_kuma.middlewares: "{{ uptime_kuma_hostname }}@docker"
+          traefik.http.middlewares.uptime_kuma.IPAllowList.sourcerange: "{{ uptime_kuma_traefik_whitelist }}"
+          traefik.http.services.uptime_kuma.loadbalancer.server.port: "3001"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/louislam/uptime-kuma/pkgs/container/uptime-kuma"
-        cpu_shares: "{{ uptimekuma_cpu_shares }}"
-        memory: "{{ uptimekuma_memory }}"
+        cpu_shares: "{{ uptime_kuma_cpu_shares }}"
+        memory: "{{ uptime_kuma_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (uptimekuma_port_http | string)] +
-                (['https://' + uptimekuma_hostname + '.' + ansible_nas_domain] if (uptimekuma_available_externally is true or uptimekuma_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (uptime_kuma_port_http | string)] +
+                (['https://' + uptime_kuma_hostname + '.' + ansible_nas_domain] if (uptime_kuma_available_externally is true or uptime_kuma_dockflare_tunnel is true) else [])
               }}
-  when: uptimekuma_enabled is true
+  when: uptime_kuma_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ uptimekuma_container_name }}"
+        name: "{{ uptime_kuma_container_name }}"
         state: absent
-  when: uptimekuma_enabled is false
+  when: uptime_kuma_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ uptimekuma_data_directory }}"
+        path: "{{ uptime_kuma_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ uptimekuma_data_directory }}"
+        path: "{{ uptime_kuma_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
@@ -98,4 +98,4 @@
         mode: u=rw,g=rw
         remove: true
       when: dir_stat.stat.exists
-  when: uptimekuma_enabled is false and archive_app_data_enabled is true
+  when: uptime_kuma_enabled is false and archive_app_data_enabled is true
