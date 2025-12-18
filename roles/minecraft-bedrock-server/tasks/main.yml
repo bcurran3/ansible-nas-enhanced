@@ -13,7 +13,7 @@
         container_default_behavior: "compatibility"
         name: "{{ minecraft_bedrock_server_container_name }}"
         hostname: "{{ minecraft_bedrock_server_container_name }}"
-        image: "{{ minecraft_bedrock_server_image }}:{{ inecraft_bedrock_server_image_tag }}"
+        image: "{{ minecraft_bedrock_server_image }}:{{ minecraft_bedrock_server_image_tag }}"
         pull: true
         volumes:
           - "{{ minecraft_bedrock_server_data_directory }}:/data:rw"
@@ -47,9 +47,9 @@
           repliqate.backup_id: "{{ minecraft_bedrock_server_repliqate_backup_id }}"
           repliqate.retention: "{{ minecraft_bedrock_server_repliqate_retention }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/itzg/minecraft-bedrock-server"
+          wud.link.template: "https://github.com/itzg/docker-minecraft-bedrock-server/pkgs/container/minecraft-bedrock-server"
         cpu_shares: "{{ minecraft_bedrock_server_cpu_shares }}"
         memory: "{{ minecraft_bedrock_server_memory }}"
         restart_policy: unless-stopped
