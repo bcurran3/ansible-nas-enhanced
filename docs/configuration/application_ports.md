@@ -218,7 +218,7 @@ By default, applications can be found on the ports listed below.
 | Pi-hole          | 67
 | Pi-hole          | 123
 | Pinchflat        | 8945
-| Pingvin Share    | 3001    | Bridge  | HTTP           |
+| Pingvin Share    | 3051    | Bridge  | HTTP           |
 | Piwigo           | 16923   | Bridge  | HTTP           |
 | Plex             | 32400   | Bridge  | HTTP           |
 | Plex             | 32400   | Bridge  | UDP            |
@@ -265,7 +265,7 @@ By default, applications can be found on the ports listed below.
 | Scrutiny         | 9010    | Bridge  | HTTP           |
 | SearXNG          | 3008    | Bridge  | HTTP           |
 | SeedSync         | 8800
-| Semaphore        | 3001
+| Semaphore        | 3052
 | Shaarli          | 5804    | Bridge  | HTTP           |
 | Shoutcast Server | 8002
 | Sickchill        | 8081    | Bridge  | HTTP           |
@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3052
+# next avail = 3053
 # next avail = 9022
 
 # NOTE: Conflicts on ports 9000 + 9002
