@@ -15,10 +15,13 @@
         name: "{{ mymediaforalexa_container_name }}"
         image: "{{ mymediaforalexa_image_name }}:{{ mymediaforalexa_image_version }}"
         pull: true
+        ports:
+          - 52050:52050
+          - 52051:52051
         volumes:
           - "{{ mymediaforalexa_media_directory }}:/medialibrary:rw"
           - "{{ mymediaforalexa_data_directory }}:/datadir:rw"
-        network_mode: host
+        network_mode: bridge
         labels:
           autoheal: "{{ mymediaforalexa_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ mymediaforalexa_watchtower_enable }}"
@@ -26,7 +29,7 @@
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mymediaforalexa_homepage_group }}"
           homepage.icon: "{{ mymediaforalexa_homepage_icon }}"
-          homepage.description: "{{ 'mymediaforalexa description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'a tiny media server that integrates with Alexa for controlling your media collection' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mymediaforalexa_container_name }}"
           homepage.showStats: "{{ mymediaforalexa_homepage_showstats }}"

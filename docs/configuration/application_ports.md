@@ -170,7 +170,8 @@ By default, applications can be found on the ports listed below.
 | Music Assistant  | n/a (???????)
 | MyBibliotheca    | 5054    | Bridge  | HTTP           |
 | Mylar            | 8585    | Bridge  | HTTP           |
-| MyMediaForAlexa  | 52051   | Host    | HTTP           |
+| MyMediaForAlexa  | 52050   | Bridge  | TCP            |
+| MyMediaForAlexa  | 52051   | Bridge  | TCP            |
 | n8n              | 5678    | Bridge  | HTTP           |
 | Navidrome        | 4533    | Bridge  | HTTP           |
 | NetAlertX        | 20211
