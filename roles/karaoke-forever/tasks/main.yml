@@ -4,68 +4,68 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ karaokeforever_container_name }}"
-        hostname: "{{ karaokeforever_container_name }}"
-        image: "{{ karaokeforever_image_name }}:{{ karaokeforever_image_tag }}"
+        name: "{{ karaoke_forever_container_name }}"
+        hostname: "{{ karaoke_forever_container_name }}"
+        image: "{{ karaoke_forever_image_name }}:{{ karaoke_forever_image_tag }}"
         pull: true
         volumes:
-          - "{{ karaokeforever_cdgfiles }}:/cdgfiles:ro"
+          - "{{ karaoke_forever_cdgfiles }}:/cdgfiles:ro"
         ports:
-          - "{{ karaokeforever_port_http }}:80"
+          - "{{ karaoke_forever_port_http }}:80"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ karaokeforever_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ karaokeforever_watchtower_enable }}"
-          dockflare.enable: "{{ karaokeforever_dockflare_tunnel }}"
-          dockflare.access.group: "{{ karaokeforever_dockflare_access_group }}"
-          dockflare.hostname: "{{ karaokeforever_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaokeforever_port_http }}"
+          autoheal: "{{ karaoke_forever_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ karaoke_forever_watchtower_enable }}"
+          dockflare.enable: "{{ karaoke_forever_dockflare_tunnel }}"
+          dockflare.access.group: "{{ karaoke_forever_dockflare_access_group }}"
+          dockflare.hostname: "{{ karaoke_forever_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaoke_forever_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ karaokeforever_homepage_group }}"
-          homepage.icon: "{{ karaokeforever_homepage_icon }}"
-          homepage.href: "{{ karaokeforever_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaokeforever_port_http }}"
+          homepage.group: "{{ karaoke_forever_homepage_group }}"
+          homepage.icon: "{{ karaoke_forever_homepage_icon }}"
+          homepage.href: "{{ karaoke_forever_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaoke_forever_port_http }}"
           homepage.description: "{{ 'Open karaoke party system' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ karaokeforever_container_name }}"
-          homepage.showStats: "{{ karaokeforever_homepage_showstats }}"
-          repliqate.enabled: "{{ karaokeforever_repliqate_enabled }}"
-          repliqate.engine: "{{ karaokeforever_repliqate_engine }}"
-          repliqate.schedule: "{{ karaokeforever_repliqate_schedule }}"
-          repliqate.backup_id: "{{ karaokeforever_repliqate_backup_id }}"
-          repliqate.retention: "{{ karaokeforever_repliqate_retention }}"
-          traefik.enable: "{{ karaokeforever_available_externally | string }}"
-          traefik.http.routers.karaokeforever.rule: "Host(`karaokeforever.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.karaokeforever.tls.certresolver: "letsencrypt"
-          traefik.http.routers.karaokeforever.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.karaokeforever.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ karaokeforever_hostname }}"
-          traefik.http.routers.karaokeforever.middlewares: "{{ karaokeforever_hostname }}@docker"
-          traefik.http.middlewares.karaokeforever.IPAllowList.sourcerange: "{{ karaokeforever_traefik_whitelist }}"
-          traefik.http.services.karaokeforever.loadbalancer.server.port: "80"
+          homepage.container: "{{ karaoke_forever_container_name }}"
+          homepage.showStats: "{{ karaoke_forever_homepage_showstats }}"
+          repliqate.enabled: "{{ karaoke_forever_repliqate_enabled }}"
+          repliqate.engine: "{{ karaoke_forever_repliqate_engine }}"
+          repliqate.schedule: "{{ karaoke_forever_repliqate_schedule }}"
+          repliqate.backup_id: "{{ karaoke_forever_repliqate_backup_id }}"
+          repliqate.retention: "{{ karaoke_forever_repliqate_retention }}"
+          traefik.enable: "{{ karaoke_forever_available_externally | string }}"
+          traefik.http.routers.karaoke_forever.rule: "Host(`karaoke_forever.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.karaoke_forever.tls.certresolver: "letsencrypt"
+          traefik.http.routers.karaoke_forever.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.karaoke_forever.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ karaoke_forever_hostname }}"
+          traefik.http.routers.karaoke_forever.middlewares: "{{ karaoke_forever_hostname }}@docker"
+          traefik.http.middlewares.karaoke_forever.IPAllowList.sourcerange: "{{ karaoke_forever_traefik_whitelist }}"
+          traefik.http.services.karaoke_forever.loadbalancer.server.port: "80"
           wud.watch.digest: "true"
           wud.link.template: "https://hub.docker.com/r/david510c/karaoke-forever"
-        cpu_shares: "{{ karaokeforever_cpu_shares }}"
-        memory: "{{ karaokeforever_memory }}"
+        cpu_shares: "{{ karaoke_forever_cpu_shares }}"
+        memory: "{{ karaoke_forever_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (karaokeforever_port_http | string)] +
-                (['https://' + karaokeforever_hostname + '.' + ansible_nas_domain] if (karaokeforever_available_externally is true or karaokeforever_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (karaoke_forever_port_http | string)] +
+                (['https://' + karaoke_forever_hostname + '.' + ansible_nas_domain] if (karaoke_forever_available_externally is true or karaoke_forever_dockflare_tunnel is true) else [])
               }}
-  when: karaokeforever_enabled is true
+  when: karaoke_forever_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ karaokeforever_container_name }}"
+        name: "{{ karaoke_forever_container_name }}"
         state: absent
-  when: karaokeforever_enabled is false
+  when: karaoke_forever_enabled is false
 
 # NOTE:
 # probably not up-to-date with source
