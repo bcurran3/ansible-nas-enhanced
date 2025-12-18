@@ -252,7 +252,7 @@ By default, applications can be found on the ports listed below.
 | Radarr           | 7878    | Bridge  | HTTP           |
 | Readarr          | 8787    | Bridge  | HTTP           |
 | Recyclarr        | n/a
-| Remotely         | 5000    | Bridge  | HTTP           |
+| Remotely         | 3054    | Bridge  | HTTP           |
 | Repliqate        | n/a
 | Resilio Sync     | 3014    | Bridge  | HTTP           |
 | Resilio Sync     | 55555
@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3054
+# next avail = 3055
 # next avail = 9022
 
 # NOTE: Conflicts on ports 9000 + 9002
