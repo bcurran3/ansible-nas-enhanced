@@ -24,7 +24,7 @@
                   qbittorrent_data_directory ~ '/custom-cont-init.d:/custom-cont-init.d:ro',
                   qbittorrent_download_directory ~ ':/downloads:rw',
                   (qbittorrent_watch_directory ~ ':/torrents:rw') if qbittorrent_watch_directory | default('') != '' else none,
-                  qbittorrent_extra_directory_mapping if qbittorrent_extra_directory_mapping | default('') != '' else none
+                  qbittorrent_extra_directory_mapping | default(none)
                 ] | reject('none') | list }}"
         ports:
           - "{{ qbittorrent_port_http }}:{{ qbittorrent_port_http }}"
