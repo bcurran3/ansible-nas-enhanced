@@ -9,10 +9,10 @@ woodpecker_ci_traefik_whitelist: "{{ lan }}"
 woodpecker_ci_data_directory: "{{ docker_home }}/woodpecker-ci"
 
 # network
-woodpecker_ci_port_http: 8000
-woodpecker_ci_port_grpc: 9000
+woodpecker_ci_port_http: "8000"
+woodpecker_ci_port_grpc: "9000"
 woodpecker_ci_address: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port_http }}"
-woodpecker_ci_hostname: "woodpecker-ci"
+woodpecker_ci_hostname: "woodpeckerci"
 
 # docker
 woodpecker_ci_container_name: "woodpecker-ci"
@@ -31,7 +31,7 @@ woodpecker_ci_agent_memory: "1G"
 
 # Woodpecker-CI Application Config
 # the users that'll be granted admin, comma separated
-woodpecker_ci_admin_user: david
+woodpecker_ci_admin_user: "{{ ansible_nas_user }}"
 
 # shared secret - use openssl rand -hex 32 to generate your own
 woodpecker_ci_agent_secret: 9f3aeaa7bbabcf42b724f65d4acb38456899ca32511677a8c3837869621c3798
