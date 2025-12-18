@@ -5,151 +5,151 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-#        owner: "{{ youtubedlmaterial_uid }}"
-#        group: "{{ youtubedlmaterial_gid }}"
+#        owner: "{{ youtubedl_material_uid }}"
+#        group: "{{ youtubedl_material_gid }}"
         # mode: 0755
       with_items:
-        - "{{ youtubedlmaterial_data_directory }}/appdata"
-        - "{{ youtubedlmaterial_data_directory }}/db"
-        - "{{ youtubedlmaterial_dl_audio_directory }}"
-        - "{{ youtubedlmaterial_dl_video_directory }}"
-        - "{{ youtubedlmaterial_dl_subscriptions_directory }}"
-        - "{{ youtubedlmaterial_dl_channels_directory }}"
-        - "{{ youtubedlmaterial_dl_users_directory }}"
+        - "{{ youtubedl_material_data_directory }}/appdata"
+        - "{{ youtubedl_material_data_directory }}/db"
+        - "{{ youtubedl_material_dl_audio_directory }}"
+        - "{{ youtubedl_material_dl_video_directory }}"
+        - "{{ youtubedl_material_dl_subscriptions_directory }}"
+        - "{{ youtubedl_material_dl_channels_directory }}"
+        - "{{ youtubedl_material_dl_users_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ youtubedlmaterial_db_container_name }}"
-        hostname: "{{ youtubedlmaterial_db_container_name }}"
-        image: "{{ youtubedlmaterial_db_image_name }}:{{ youtubedlmaterial_db_image_version }}"
+        name: "{{ youtubedl_material_db_container_name }}"
+        hostname: "{{ youtubedl_material_db_container_name }}"
+        image: "{{ youtubedl_material_db_image_name }}:{{ youtubedl_material_db_image_version }}"
         pull: true
         volumes:
-          - "{{ youtubedlmaterial_data_directory }}/db:/data/db"
+          - "{{ youtubedl_material_data_directory }}/db:/data/db"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ youtubedlmaterial_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ youtubedlmaterial_db_watchtower_enable }}"
+          autoheal: "{{ youtubedl_material_db_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ youtubedl_material_db_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
-          homepage.group: "{{ youtubedlmaterial_db_homepage_group }}"
-          homepage.icon: "{{ youtubedlmaterial_db_homepage_icon }}"
-          homepage.href: "{{ youtubedlmaterial_homepage_href }}"
+          homepage.group: "{{ youtubedl_material_db_homepage_group }}"
+          homepage.icon: "{{ youtubedl_material_db_homepage_icon }}"
+          homepage.href: "{{ youtubedl_material_homepage_href }}"
           homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ youtubedlmaterial_db_container_name }}"
-          homepage.showStats: "{{ youtubedlmaterial_db_homepage_showstats }}"
-          repliqate.enabled: "{{ youtubedlmaterial_db_repliqate_enabled }}"
-          repliqate.engine: "{{ youtubedlmaterial_db_repliqate_engine }}"
-          repliqate.schedule: "{{ youtubedlmaterial_db_repliqate_schedule }}"
-          repliqate.backup_id: "{{ youtubedlmaterial_db_repliqate_backup_id }}"
-          repliqate.retention: "{{ youtubedlmaterial_db_repliqate_retention }}"
+          homepage.container: "{{ youtubedl_material_db_container_name }}"
+          homepage.showStats: "{{ youtubedl_material_db_homepage_showstats }}"
+          repliqate.enabled: "{{ youtubedl_material_db_repliqate_enabled }}"
+          repliqate.engine: "{{ youtubedl_material_db_repliqate_engine }}"
+          repliqate.schedule: "{{ youtubedl_material_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ youtubedl_material_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ youtubedl_material_db_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/mongo"
-        cpu_shares: "{{ youtubedlmaterial_db_cpu_shares }}"
-        memory: "{{ youtubedlmaterial_db_memory }}"
+        cpu_shares: "{{ youtubedl_material_db_cpu_shares }}"
+        memory: "{{ youtubedl_material_db_memory }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ youtubedlmaterial_container_name }}"
-        hostname: "{{ youtubedlmaterial_container_name }}"
-        image: "{{ youtubedlmaterial_image_name }}:{{ youtubedlmaterial_image_version }}"
+        name: "{{ youtubedl_material_container_name }}"
+        hostname: "{{ youtubedl_material_container_name }}"
+        image: "{{ youtubedl_material_image_name }}:{{ youtubedl_material_image_version }}"
         pull: true
         volumes:
-          - "{{ youtubedlmaterial_data_directory }}/appdata:/app/appdata:rw"
-          - "{{ youtubedlmaterial_dl_audio_directory }}:/app/audio:rw"
-          - "{{ youtubedlmaterial_dl_video_directory }}:/app/video:rw"
-          - "{{ youtubedlmaterial_dl_subscriptions_directory }}:/app/subscriptions:rw"
-          - "{{ youtubedlmaterial_dl_channels_directory }}:/app/subscriptions/channels:rw"
-          - "{{ youtubedlmaterial_dl_users_directory }}:/app/users:rw"
+          - "{{ youtubedl_material_data_directory }}/appdata:/app/appdata:rw"
+          - "{{ youtubedl_material_dl_audio_directory }}:/app/audio:rw"
+          - "{{ youtubedl_material_dl_video_directory }}:/app/video:rw"
+          - "{{ youtubedl_material_dl_subscriptions_directory }}:/app/subscriptions:rw"
+          - "{{ youtubedl_material_dl_channels_directory }}:/app/subscriptions/channels:rw"
+          - "{{ youtubedl_material_dl_users_directory }}:/app/users:rw"
         network_mode: "bridge"
         ports:
-          - "{{ youtubedlmaterial_port_http }}:17442"
+          - "{{ youtubedl_material_port_http }}:17442"
         env:
-          USER: "{{ youtubedlmaterial_env_user }}"
-          ALLOW_CONFIG_MUTATIONS: "{{ youtubedlmaterial_env_allow_config_mutations }}"
-          ytdl_mongodb_connection_string: "mongodb://{{ youtubedlmaterial_db_container_name }}:27017"
-          ytdl_use_local_db: "{{ youtubedlmaterial_env_ytdl_use_local_db }}"
-          write_ytdl_config: "{{ youtubedlmaterial_env_write_ytdl_config }}"
-#         UID: "{{ youtubedlmaterial_uid }}"
-#         GID: "{{ youtubedlmaterial_gid }}"
+          USER: "{{ youtubedl_material_env_user }}"
+          ALLOW_CONFIG_MUTATIONS: "{{ youtubedl_material_env_allow_config_mutations }}"
+          ytdl_mongodb_connection_string: "mongodb://{{ youtubedl_material_db_container_name }}:27017"
+          ytdl_use_local_db: "{{ youtubedl_material_env_ytdl_use_local_db }}"
+          write_ytdl_config: "{{ youtubedl_material_env_write_ytdl_config }}"
+#         UID: "{{ youtubedl_material_uid }}"
+#         GID: "{{ youtubedl_material_gid }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
-          - "{{ youtubedlmaterial_db_container_name }}"
+          - "{{ youtubedl_material_db_container_name }}"
         labels:
-          autoheal: "{{ youtubedlmaterial_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ youtubedlmaterial_watchtower_enable }}"
-          dockflare.enable: "{{ youtubedlmaterial_dockflare_tunnel }}"
-          dockflare.access.group: "{{ youtubedlmaterial_dockflare_access_group }}"
-          dockflare.hostname: "{{ youtubedlmaterial_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtubedlmaterial_port_http }}"
+          autoheal: "{{ youtubedl_material_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ youtubedl_material_watchtower_enable }}"
+          dockflare.enable: "{{ youtubedl_material_dockflare_tunnel }}"
+          dockflare.access.group: "{{ youtubedl_material_dockflare_access_group }}"
+          dockflare.hostname: "{{ youtubedl_material_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtubedl_material_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ youtubedlmaterial_homepage_group }}"
-          homepage.icon: "{{ youtubedlmaterial_homepage_icon }}"
-          homepage.href: "{{ youtubedlmaterial_homepage_href }}"
+          homepage.group: "{{ youtubedl_material_homepage_group }}"
+          homepage.icon: "{{ youtubedl_material_homepage_icon }}"
+          homepage.href: "{{ youtubedl_material_homepage_href }}"
           homepage.description: "{{ 'Self-hosted YouTube downloader built on Material Design' if homepage_show_description else omit }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ youtubedlmaterial_container_name }}"
-          homepage.showStats: "{{ youtubedlmaterial_homepage_showstats }}"
-          repliqate.enabled: "{{ youtubedlmaterial_repliqate_enabled }}"
-          repliqate.engine: "{{ youtubedlmaterial_repliqate_engine }}"
-          repliqate.schedule: "{{ youtubedlmaterial_repliqate_schedule }}"
-          repliqate.backup_id: "{{ youtubedlmaterial_repliqate_backup_id }}"
-          repliqate.retention: "{{ youtubedlmaterial_repliqate_retention }}"
-          traefik.enable: "{{ youtubedlmaterial_available_externally | string }}"
-          traefik.http.routers.youtubedlmaterial.rule: "Host(`{{ youtubedlmaterial_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.youtubedlmaterial.tls.certresolver: "letsencrypt"
-          traefik.http.routers.youtubedlmaterial.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.youtubedlmaterial.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.services.youtubedlmaterial.loadbalancer.server.port: "17442"
-          traefik.http.routers.frontend.middlewares: "{{ youtubedlmaterial_hostname }}"
-          traefik.http.routers.youtubedlmaterial.middlewares: "{{ youtubedlmaterial_hostname }}@docker"
-          traefik.http.middlewares.youtubedlmaterial.IPAllowList.sourcerange: "{{ youtubedlmaterial_traefik_whitelist }}"
+          homepage.container: "{{ youtubedl_material_container_name }}"
+          homepage.showStats: "{{ youtubedl_material_homepage_showstats }}"
+          repliqate.enabled: "{{ youtubedl_material_repliqate_enabled }}"
+          repliqate.engine: "{{ youtubedl_material_repliqate_engine }}"
+          repliqate.schedule: "{{ youtubedl_material_repliqate_schedule }}"
+          repliqate.backup_id: "{{ youtubedl_material_repliqate_backup_id }}"
+          repliqate.retention: "{{ youtubedl_material_repliqate_retention }}"
+          traefik.enable: "{{ youtubedl_material_available_externally | string }}"
+          traefik.http.routers.youtubedl_material.rule: "Host(`{{ youtubedl_material_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.youtubedl_material.tls.certresolver: "letsencrypt"
+          traefik.http.routers.youtubedl_material.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.youtubedl_material.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.services.youtubedl_material.loadbalancer.server.port: "17442"
+          traefik.http.routers.frontend.middlewares: "{{ youtubedl_material_hostname }}"
+          traefik.http.routers.youtubedl_material.middlewares: "{{ youtubedl_material_hostname }}@docker"
+          traefik.http.middlewares.youtubedl_material.IPAllowList.sourcerange: "{{ youtubedl_material_traefik_whitelist }}"
           wud.tag.include: '^\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/tzahi12345/youtubedl-material"
-        cpu_shares: "{{ youtubedlmaterial_cpu_shares }}"
-        memory: "{{ youtubedlmaterial_memory }}"
+        cpu_shares: "{{ youtubedl_material_cpu_shares }}"
+        memory: "{{ youtubedl_material_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (youtubedlmaterial_port_http | string)] +
-                (['https://' + youtubedlmaterial_hostname + '.' + ansible_nas_domain] if (youtubedlmaterial_available_externally is true or youtubedlmaterial_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (youtubedl_material_port_http | string)] +
+                (['https://' + youtubedl_material_hostname + '.' + ansible_nas_domain] if (youtubedl_material_available_externally is true or youtubedl_material_dockflare_tunnel is true) else [])
               }}
-  when: youtubedlmaterial_enabled is true
+  when: youtubedl_material_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ youtubedlmaterial_container_name }}"
+        name: "{{ youtubedl_material_container_name }}"
         state: absent
 
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
-        name: "{{ youtubedlmaterial_db_container_name }}"
+        name: "{{ youtubedl_material_db_container_name }}"
         state: absent
-  when: youtubedlmaterial_enabled is false
+  when: youtubedl_material_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ youtubedlmaterial_data_directory }}"
+        path: "{{ youtubedl_material_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ youtubedlmaterial_data_directory }}"
+        path: "{{ youtubedl_material_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
@@ -158,4 +158,4 @@
         mode: u=rw,g=rw
         remove: true
       when: dir_stat.stat.exists
-  when: youtubedlmaterial_enabled is false and archive_app_data_enabled is true
+  when: youtubedl_material_enabled is false and archive_app_data_enabled is true
