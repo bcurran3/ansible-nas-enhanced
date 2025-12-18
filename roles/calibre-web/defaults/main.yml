@@ -1,63 +1,63 @@
 ---
 # ANE
 ansible_nas_app_name: "Calibre-Web"
-calibreweb_enabled: false
-calibreweb_available_externally: false
-calibreweb_traefik_whitelist: "{{ lan }}"
+calibre_web_enabled: false
+calibre_web_available_externally: false
+calibre_web_traefik_whitelist: "{{ lan }}"
 
 # uid / gid
-calibreweb_user_id: "0"
-calibreweb_group_id: "0"
+calibre_web_user_id: "0"
+calibre_web_group_id: "0"
 
 # directories
-calibreweb_data_directory: "{{ docker_home }}/calibreweb"
-calibreweb_books_root: "{{ books_root }}"
+calibre_web_data_directory: "{{ docker_home }}/calibre-web"
+calibre_web_books_root: "{{ books_root }}"
 
 # network
-calibreweb_port_http: "8084"
-calibreweb_hostname: "calibreweb"
+calibre_web_port_http: "8084"
+calibre_web_hostname: "calibre_web"
 
 # specs
-calibreweb_memory: "1G"
+calibre_web_memory: "1G"
 
 # docker
-calibreweb_container_name: "calibre-web"
-calibreweb_cpu_shares: 1024
-calibreweb_image_name: "lscr.io/linuxserver/calibre-web"
-calibreweb_image_tag: "latest"
+calibre_web_container_name: "calibre-web"
+calibre_web_cpu_shares: 1024
+calibre_web_image_name: "lscr.io/linuxserver/calibre-web"
+calibre_web_image_tag: "latest"
 
 # autoheal
-calibreweb_autoheal: "false"
+calibre_web_autoheal: "false"
 
 # dockflare
-calibreweb_dockflare_tunnel: "false"
-calibreweb_dockflare_access_group: ""
+calibre_web_dockflare_tunnel: "false"
+calibre_web_dockflare_access_group: ""
 
 # homepage
-calibreweb_homepage_group: "Apps"
-calibreweb_homepage_icon: "calibreweb.png"
-calibreweb_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibreweb_port_http }}"
-calibreweb_homepage_showstats: "false"
+calibre_web_homepage_group: "Apps"
+calibre_web_homepage_icon: "calibre-web.png"
+calibre_web_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
+calibre_web_homepage_showstats: "false"
 
 # linuxserver.io docker mods
 # https://mods.linuxserver.io/?mod=calibre-web
-calibreweb_env_docker_mods: "lscr.io/linuxserver/calibre-web:calibre"
-calibreweb_env_docker_mods_install_packages: ""
-calibreweb_env_docker_mods_install_pip_packages: ""
+calibre_web_env_docker_mods: "lscr.io/linuxserver/calibre-web:calibre"
+calibre_web_env_docker_mods_install_packages: ""
+calibre_web_env_docker_mods_install_pip_packages: ""
 
 # theme.park themes
-# https://docs.theme-park.dev/themes/calibreweb/
-calibreweb_env_docker_mods_tp_theme: ""
-calibreweb_env_docker_mods_tp_community_theme: ""
-calibreweb_env_docker_mods_tp_domain: ""
-calibreweb_env_docker_mods_tp_addon: ""
+# https://docs.theme-park.dev/themes/calibre_web/
+calibre_web_env_docker_mods_tp_theme: ""
+calibre_web_env_docker_mods_tp_community_theme: ""
+calibre_web_env_docker_mods_tp_domain: ""
+calibre_web_env_docker_mods_tp_addon: ""
 
 # repliqate
-calibreweb_repliqate_enabled: "false"
-calibreweb_repliqate_engine: "restic"
-calibreweb_repliqate_schedule: "@daily 3am"
-calibreweb_repliqate_backup_id: "{{ calibreweb_container_name }}"
-calibreweb_repliqate_retention: "30d"
+calibre_web_repliqate_enabled: "false"
+calibre_web_repliqate_engine: "restic"
+calibre_web_repliqate_schedule: "@daily 3am"
+calibre_web_repliqate_backup_id: "{{ calibre_web_container_name }}"
+calibre_web_repliqate_retention: "30d"
 
 # watchtower
-calibreweb_watchtower_enable: "false"
+calibre_web_watchtower_enable: "false"

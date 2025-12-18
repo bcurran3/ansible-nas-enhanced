@@ -6,97 +6,97 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ calibreweb_data_directory }}/config"
-        - "{{ calibreweb_data_directory }}/data"
+        - "{{ calibre_web_data_directory }}/config"
+        - "{{ calibre_web_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ calibreweb_container_name }}"
-        hostname: "{{ calibreweb_container_name }}"
-        image: "{{ calibreweb_image_name }}:{{ calibreweb_image_tag }}"
+        name: "{{ calibre_web_container_name }}"
+        hostname: "{{ calibre_web_container_name }}"
+        image: "{{ calibre_web_image_name }}:{{ calibre_web_image_tag }}"
         pull: true
         volumes:
-          - "{{ calibreweb_data_directory }}/config:/config"
-          - "{{ calibreweb_books_root }}:/books"
-          - "{{ calibreweb_data_directory }}/data:/data"
+          - "{{ calibre_web_data_directory }}/config:/config"
+          - "{{ calibre_web_books_root }}:/books"
+          - "{{ calibre_web_data_directory }}/data:/data"
         env:
-          DOCKER_MODS: "{{ calibreweb_env_docker_mods }}"
-          INSTALL_PACKAGES: "{{ calibreweb_env_docker_mods_install_packages }}"
-          INSTALL_PIP_PACKAGES: "{{ calibreweb_env_docker_mods_install_pip_packages}}"
-          TP_DOMAIN: "{{ calibreweb_env_docker_mods_tp_domain }}"
-          TP_THEME: "{{ calibreweb_env_docker_mods_tp_theme }}"
-          TP_COMMUNITY_THEME: "{{ calibreweb_env_docker_mods_tp_community_theme }}"
-          TP_ADDON: "{{ calibreweb_env_docker_mods_tp_addon }}"
-          PUID: "{{ calibreweb_user_id }}"
-          PGID: "{{ calibreweb_group_id }}"
+          DOCKER_MODS: "{{ calibre_web_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ calibre_web_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ calibre_web_env_docker_mods_install_pip_packages}}"
+          TP_DOMAIN: "{{ calibre_web_env_docker_mods_tp_domain }}"
+          TP_THEME: "{{ calibre_web_env_docker_mods_tp_theme }}"
+          TP_COMMUNITY_THEME: "{{ calibre_web_env_docker_mods_tp_community_theme }}"
+          TP_ADDON: "{{ calibre_web_env_docker_mods_tp_addon }}"
+          PUID: "{{ calibre_web_user_id }}"
+          PGID: "{{ calibre_web_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
-          - "{{ calibreweb_port_http }}:8083"
+          - "{{ calibre_web_port_http }}:8083"
         labels:
-          autoheal: "{{ calibreweb_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ calibreweb_watchtower_enable }}"
-          dockflare.enable: "{{ calibreweb_dockflare_tunnel }}"
-          dockflare.access.group: "{{ calibreweb_dockflare_access_group }}"
-          dockflare.hostname: "{{ calibreweb_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibreweb_port_http }}"
+          autoheal: "{{ calibre_web_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ calibre_web_watchtower_enable }}"
+          dockflare.enable: "{{ calibre_web_dockflare_tunnel }}"
+          dockflare.access.group: "{{ calibre_web_dockflare_access_group }}"
+          dockflare.hostname: "{{ calibre_web_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ calibreweb_homepage_group }}"
-          homepage.icon: "{{ calibreweb_homepage_icon }}"
-          homepage.href: "{{ calibreweb_homepage_href }}"
+          homepage.group: "{{ calibre_web_homepage_group }}"
+          homepage.icon: "{{ calibre_web_homepage_icon }}"
+          homepage.href: "{{ calibre_web_homepage_href }}"
           homepage.description: "{{ 'Web app for browsing, reading and downloading eBooks stored in a Calibre database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ calibreweb_container_name }}"
-          homepage.showStats: "{{ calibreweb_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibreweb_port_http }}"
-          repliqate.enabled: "{{ calibreweb_repliqate_enabled }}"
-          repliqate.engine: "{{ calibreweb_repliqate_engine }}"
-          repliqate.schedule: "{{ calibreweb_repliqate_schedule }}"
-          repliqate.backup_id: "{{ calibreweb_repliqate_backup_id }}"
-          repliqate.retention: "{{ calibreweb_repliqate_retention }}"
-          traefik.enable: "{{ calibreweb_available_externally | string }}"
-          traefik.http.routers.calibreweb.rule: "Host(`{{ calibreweb_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.calibreweb.tls.certresolver: "letsencrypt"
-          traefik.http.routers.calibreweb.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.calibreweb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ calibreweb_hostname }}"
-          traefik.http.routers.calibreweb.middlewares: "{{ calibreweb_hostname }}@docker"
-          traefik.http.middlewares.calibreweb.IPAllowList.sourcerange: "{{ calibreweb_traefik_whitelist }}"
-          traefik.http.services.calibreweb.loadbalancer.server.port: "8083"
+          homepage.container: "{{ calibre_web_container_name }}"
+          homepage.showStats: "{{ calibre_web_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
+          repliqate.enabled: "{{ calibre_web_repliqate_enabled }}"
+          repliqate.engine: "{{ calibre_web_repliqate_engine }}"
+          repliqate.schedule: "{{ calibre_web_repliqate_schedule }}"
+          repliqate.backup_id: "{{ calibre_web_repliqate_backup_id }}"
+          repliqate.retention: "{{ calibre_web_repliqate_retention }}"
+          traefik.enable: "{{ calibre_web_available_externally | string }}"
+          traefik.http.routers.calibre_web.rule: "Host(`{{ calibre_web_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.calibre_web.tls.certresolver: "letsencrypt"
+          traefik.http.routers.calibre_web.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.calibre_web.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ calibre_web_hostname }}"
+          traefik.http.routers.calibre_web.middlewares: "{{ calibre_web_hostname }}@docker"
+          traefik.http.middlewares.calibre_web.IPAllowList.sourcerange: "{{ calibre_web_traefik_whitelist }}"
+          traefik.http.services.calibre_web.loadbalancer.server.port: "8083"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "lscr.io/linuxserver/calibre-web"
-        cpu_shares: "{{ calibreweb_cpu_shares }}"
-        memory: "{{ calibreweb_memory }}"
+        cpu_shares: "{{ calibre_web_cpu_shares }}"
+        memory: "{{ calibre_web_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (calibreweb_port_http | string)] +
-                (['https://' + calibreweb_hostname + '.' + ansible_nas_domain] if (calibreweb_available_externally is true or calibreweb_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (calibre_web_port_http | string)] +
+                (['https://' + calibre_web_hostname + '.' + ansible_nas_domain] if (calibre_web_available_externally is true or calibre_web_dockflare_tunnel is true) else [])
               }}
-  when: calibreweb_enabled is true
+  when: calibre_web_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ calibreweb_container_name }}"
+        name: "{{ calibre_web_container_name }}"
         state: absent
-  when: calibreweb_enabled is false
+  when: calibre_web_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ calibreweb_data_directory }}"
+        path: "{{ calibre_web_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ calibreweb_data_directory }}"
+        path: "{{ calibre_web_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
@@ -105,4 +105,4 @@
         mode: u=rw,g=rw
         remove: true
       when: dir_stat.stat.exists
-  when: calibreweb_enabled is false and archive_app_data_enabled is true
+  when: calibre_web_enabled is false and archive_app_data_enabled is true
