@@ -257,7 +257,7 @@ By default, applications can be found on the ports listed below.
 | Resilio Sync     | 3014    | Bridge  | HTTP           |
 | Resilio Sync     | 55555
 | Reubah           | 3020    | Bridge  | HTTP           |
-| Rocket.Chat      | 3333    | Bridge  | HTTP           |
+| Rocket.Chat      | 3055    | Bridge  | HTTP           |
 | RomM             | 8484    | Bridge  | HTTP           |
 | ddns-route53     | n/a (????)
 | RSS-Bridge       | 8091    | Bridge  | HTTP           |
@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3055
+# next avail = 3056
 # next avail = 9022
 
 # NOTE: Conflicts on ports 9000 + 9002
