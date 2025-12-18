@@ -10,7 +10,7 @@
         - "{{ qbittorrent_data_directory }}/config"
         - "{{ qbittorrent_data_directory }}/custom-cont-init.d"
         - "{{ qbittorrent_download_directory }}"
-        - "{{ qbittorrent_extra_directory | default(omit) }}"
+        - "{{ qbittorrent_watch_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -23,8 +23,8 @@
           - "{{ qbittorrent_data_directory }}/config:/config:rw"
           - "{{ qbittorrent_data_directory }}/custom-cont-init.d:/custom-cont-init.d:ro"
           - "{{ qbittorrent_download_directory }}:/downloads:rw"
-          - "{{ qbittorrent_extra_directory | default(omit) }}"
           - "{{ qbittorrent_watch_directory }}:/torrents:rw"
+          - "{{ qbittorrent_extra_directory_mapping | default(omit) }}"
         ports:
           - "{{ qbittorrent_port_http }}:{{ qbittorrent_port_http }}"
           - "{{ qbittorrent_port_bt }}:6881"
@@ -75,7 +75,7 @@
           traefik.http.routers.frontend.middlewares: "{{ qbittorrent_hostname }}"
           traefik.http.routers.qbittorrent.middlewares: "{{ qbittorrent_hostname }}@docker"
           traefik.http.middlewares.qbittorrent.IPAllowList.sourcerange: "{{ qbittorrent_traefik_whitelist }}"
-          traefik.http.services.qbittorrent.loadbalancer.server.port: "8113"
+          traefik.http.services.qbittorrent.loadbalancer.server.port: "{{ qbittorrent_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://lscr.io/linuxserver/qbittorrent"
