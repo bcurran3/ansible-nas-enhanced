@@ -30,7 +30,7 @@ By default, applications can be found on the ports listed below.
 | Calibre          | 8094
 | Calibre-Web      | 8084    | Bridge  | HTTP           |
 | Change Detection | 3029    | Bridge  | HTTP           |
-| Chatpad AI       | 9009    | Bridge  | HTTP           |
+| Chatpad AI       | 9022    | Bridge  | HTTP           |
 | CheckCle         | 8098
 | Checkmate        | 4001
 | Checkmate        | 4002
@@ -371,6 +371,6 @@ By default, applications can be found on the ports listed below.
 
 
 # next avail = 3050
-# next avail = 9021
+# next avail = 9022
 
 # NOTE: Conflicts on ports 9000 + 9002
