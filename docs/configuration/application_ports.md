@@ -196,7 +196,7 @@ By default, applications can be found on the ports listed below.
 | Ombi             | 3579    | Bridge  | HTTP           |
 | Open WebUI       | 11435
 | Open WebUI       | 11436
-| OpenCloud        | 9200
+| OpenCloud        | 9201
 | OpenEats         | 3306
 | OpenEats         | 5807
 | OpenEats         | 8082
