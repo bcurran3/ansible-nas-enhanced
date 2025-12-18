@@ -190,7 +190,7 @@ By default, applications can be found on the ports listed below.
 | OctoPrint        | 3050    | Bridge  | HTTP           |
 | Odoo             | 8069
 | Odoo             | 8072
-| OfflineU         | 3051    | Bridge  | HTTP           |
+| OfflineU         | 3053    | Bridge  | HTTP           |
 | Ollama           | 11434   | Bridge  | HTTP           |
 | ONLYOFFICE Docs  | 9015    | Bridge  | HTTP           |
 | Ombi             | 3579    | Bridge  | HTTP           |
@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3053
+# next avail = 3054
 # next avail = 9022
 
 # NOTE: Conflicts on ports 9000 + 9002
