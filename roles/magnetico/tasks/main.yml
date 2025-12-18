@@ -68,9 +68,9 @@
     - name: Create {{ ansible_nas_app_name }} Web UI Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ magneticow_container_name }}"
-        hostname: "{{ magneticow_container_name }}"
-        image: "{{ magneticow_image_name }}:{{ magneticow_image_tag }}"
+        name: "{{ magnetico_container_name }}"
+        hostname: "{{ magnetico_container_name }}"
+        image: "{{ magnetico_image_name }}:{{ magnetico_image_tag }}"
         pull: true
         ports:
           - "{{ magnetico_port_http }}:8080"
@@ -82,7 +82,7 @@
         links:
           - "{{ magneticod_container_name }}"
         labels:
-          autoheal: "{{ magneticow_autoheal }}"
+          autoheal: "{{ magnetico_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enable }}"
           dockflare.enable: "{{ magnetico_dockflare_tunnel }}"
           dockflare.access.group: "{{ magnetico_dockflare_access_group }}"
@@ -95,7 +95,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ magnetico_port_http }}"
           homepage.description: "{{ 'Autonomous (self-hosted) BitTorrent DHT search engine suite.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ magneticow_container_name }}"
+          homepage.container: "{{ magnetico_container_name }}"
           homepage.showStats: "{{ magnetico_homepage_showstats }}"
           repliqate.enabled: "{{ magnetico_repliqate_enabled }}"
           repliqate.engine: "{{ magnetico_repliqate_engine }}"
@@ -114,8 +114,8 @@
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/boramalper/magneticow"
-        cpu_shares: "{{ magneticow_cpu_shares }}"
-        memory: "{{ magneticow_memory }}"
+        cpu_shares: "{{ magnetico_cpu_shares }}"
+        memory: "{{ magnetico_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
@@ -131,7 +131,7 @@
   block:
     - name: Stop {{ ansible_nas_app_name }} Web UI Container
       community.docker.docker_container:
-        name: "{{ magneticow_container_name }}"
+        name: "{{ magnetico_container_name }}"
         state: absent
 
     - name: Stop {{ ansible_nas_app_name }} Crawler Container

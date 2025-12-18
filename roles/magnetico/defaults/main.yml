@@ -12,18 +12,18 @@ magnetico_hostname: "magnetico"
 magnetico_port_http: "9017"
 
 # docker
+magnetico_container_name: "magnetico"
+magnetico_image_name: "boramalper/magneticow"
+magnetico_image_tag: "latest"
 magneticod_container_name: "magnetico-crawler"
 magneticod_image_name: "boramalper/magneticod"
 magneticod_image_tag: "latest"
-magneticow_container_name: "magnetico"
-magneticow_image_name: "boramalper/magneticow"
-magneticow_image_tag: "latest"
 
 # specs
 magneticod_cpu_shares: 1024
 magneticod_memory: "1G"
-magneticow_cpu_shares: 1024
-magneticow_memory: "1G"
+magnetico_cpu_shares: 1024
+magnetico_memory: "1G"
 
 # app
 magnetico_username: "{{ ansible_nas_user }}"
@@ -31,7 +31,7 @@ magnetico_password: "{{ ansible_nas_app_admin_password }}"
 
 # autoheal
 magneticod_autoheal: "false"
-magneticow_autoheal: "false"
+magnetico_autoheal: "false"
 
 # dockflare
 magnetico_dockflare_tunnel: "false"
@@ -49,7 +49,7 @@ magneticod_homepage_showstats: "false"
 magnetico_repliqate_enabled: "false"
 magnetico_repliqate_engine: "restic"
 magnetico_repliqate_schedule: "@daily 3am"
-magnetico_repliqate_backup_id: "{{ magneticow_container_name }}"
+magnetico_repliqate_backup_id: "{{ magnetico_container_name }}"
 magnetico_repliqate_retention: "30d"
 magneticod_repliqate_enabled: "false"
 magneticod_repliqate_engine: "restic"
