@@ -3,64 +3,64 @@
   block:
     - name: Check for deprecated API key
       ansible.builtin.fail:
-        msg: "Using a Cloudflare global API key is no longer supported. Please unset cloudflare_api_key and set cloudflare_token"
+        msg: "Using a Cloudflare global API key is no longer supported. Please unset cloudflare_api_key and set cloudflare_ddns_token"
       when: cloudflare_api_key is defined
 
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
-        path: "{{ cloudflare_data_directory }}"
+        path: "{{ cloudflare_ddns_data_directory }}"
         state: directory
 
     - name: Template {{ ansible_nas_app_name }} config.yml with scoped token
       ansible.builtin.template:
         src: config.yml
-        dest: "{{ cloudflare_data_directory }}/config.yml"
+        dest: "{{ cloudflare_ddns_data_directory }}/config.yml"
       register: template_files_result
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ cloudflare_container_name }}"
-        hostname: "{{ cloudflare_container_name }}"
-        image: "{{ cloudflare_image_name }}:{{ cloudflare_image_version }}"
+        name: "{{ cloudflare_ddns_container_name }}"
+        hostname: "{{ cloudflare_ddns_container_name }}"
+        image: "{{ cloudflare_ddns_image_name }}:{{ cloudflare_ddns_image_version }}"
         pull: true
         volumes:
-          - "{{ cloudflare_data_directory }}/config.yml:/app/config.yaml"
+          - "{{ cloudflare_ddns_data_directory }}/config.yml:/app/config.yaml"
           - "/etc/timezone:/etc/timezone:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         recreate: "{{ template_files_result is changed }}"
         labels:
-          autoheal: "{{ cloudflare_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ cloudflare_watchtower_enable }}"
+          autoheal: "{{ cloudflare_ddns_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ cloudflare_ddns_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ cloudflare_homepage_group }}"
-          homepage.icon: "{{ cloudflare_homepage_icon }}"
+          homepage.group: "{{ cloudflare_ddns_homepage_group }}"
+          homepage.icon: "{{ cloudflare_ddns_homepage_icon }}"
           homepage.href: "https://dash.cloudflare.com/login"
           homepage.description: "{{ 'Cloudflare DDNS minimal docker.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ cloudflare_container_name }}"
-          homepage.showStats: "{{ cloudflare_homepage_showstats }}"
-          repliqate.enabled: "{{ cloudflare_repliqate_enabled }}"
-          repliqate.engine: "{{ cloudflare_repliqate_engine }}"
-          repliqate.schedule: "{{ cloudflare_repliqate_schedule }}"
-          repliqate.backup_id: "{{ cloudflare_repliqate_backup_id }}"
-          repliqate.retention: "{{ cloudflare_repliqate_retention }}"
+          homepage.container: "{{ cloudflare_ddns_container_name }}"
+          homepage.showStats: "{{ cloudflare_ddns_homepage_showstats }}"
+          repliqate.enabled: "{{ cloudflare_ddns_repliqate_enabled }}"
+          repliqate.engine: "{{ cloudflare_ddns_repliqate_engine }}"
+          repliqate.schedule: "{{ cloudflare_ddns_repliqate_schedule }}"
+          repliqate.backup_id: "{{ cloudflare_ddns_repliqate_backup_id }}"
+          repliqate.retention: "{{ cloudflare_ddns_repliqate_retention }}"
           traefik.enable: "false"
           wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/joshava/cloudflare-ddns"
-        cpu_shares: "{{ cloudflare_cpu_shares }}"
+        cpu_shares: "{{ cloudflare_ddns_cpu_shares }}"
         restart_policy: unless-stopped
-        memory: "{{ cloudflare_memory }}"
+        memory: "{{ cloudflare_ddns_memory }}"
   when: cloudflare_ddns_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ cloudflare_container_name }}"
+        name: "{{ cloudflare_ddns_container_name }}"
         state: absent
   when: cloudflare_ddns_enabled is false
 
@@ -68,12 +68,12 @@
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ cloudflare_data_directory }}"
+        path: "{{ cloudflare_ddns_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ cloudflare_data_directory }}"
+        path: "{{ cloudflare_ddns_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
