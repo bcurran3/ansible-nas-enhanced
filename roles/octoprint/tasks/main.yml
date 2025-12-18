@@ -20,7 +20,7 @@
         ports:
           - "{{ octoprint_port_http }}:80"
         devices:
-          - "{{ octoprint_printer_mountpoint }}"
+          - "{{ octoprint_enable_printer | ternary(octoprint_printer_mountpoint, '/dev/null') }}"
           - "{{ octoprint_enable_webcam | ternary(octoprint_webcam_mountpoint, '/dev/null') }}"
         env:
           ENABLE_MJPG_STREAMER: "{{ octoprint_enable_webcam | string }}"
