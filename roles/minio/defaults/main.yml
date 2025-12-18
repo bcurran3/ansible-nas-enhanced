@@ -9,8 +9,8 @@ minio_traefik_whitelist: "{{ lan }}"
 minio_data_directory: "{{ docker_home }}/minio"
 
 # env
-minio_admin_username: admin
-minio_admin_password: supersecure
+minio_admin_username: "admin"
+minio_admin_password: "{{ ansible_nas_app_admin_password }}"
 
 # network
 minio_hostname: "minio"
@@ -22,9 +22,9 @@ minio_console_port: "9009"
 minio_container_name: "minio"
 minio_image_name: "minio/minio"
 minio_image_version: "latest"
-minio_cpu_shares: 1024
 
 # specs
+minio_cpu_shares: 1024
 minio_memory: "1G"
 
 # autoheal
@@ -37,7 +37,7 @@ minio_dockflare_access_group: ""
 # homepage
 minio_homepage_group: "Apps"
 minio_homepage_icon: "minio.png"
-minio_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ minio_port }}"
+minio_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ minio_port_http }}"
 minio_homepage_showstats: "false"
 
 # repliqate
