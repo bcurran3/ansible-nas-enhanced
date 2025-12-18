@@ -1,43 +1,43 @@
 ---
 # ANE
 ansible_nas_app_name: "Pingvin Share"
-pingvinshare_enabled: false
-pingvinshare_available_externally: false
-pingvinshare_traefik_whitelist: "{{ lan }}"
-pingvinshare_data_directory: "{{ docker_home }}/pingvin-share"
+pingvin_share_enabled: false
+pingvin_share_available_externally: false
+pingvin_share_traefik_whitelist: "{{ lan }}"
+pingvin_share_data_directory: "{{ docker_home }}/pingvin-share"
 
 # network
-pingvinshare_hostname: "pingvinshare"
-pingvinshare_port_http: "3001"
+pingvin_share_hostname: "pingvinshare"
+pingvin_share_port_http: "3001"
 
 # docker
-pingvinshare_container_name: "pingvin-share"
-pingvinshare_image_name: "ghcr.io/stonith404/pingvin-share"
-pingvinshare_image_tag: "latest"
+pingvin_share_container_name: "pingvin-share"
+pingvin_share_image_name: "ghcr.io/stonith404/pingvin-share"
+pingvin_share_image_tag: "latest"
 
 # specs
-pingvinshare_cpu_shares: 1024
-pingvinshare_memory: "1G"
+pingvin_share_cpu_shares: 1024
+pingvin_share_memory: "1G"
 
 # autoheal
-pingvinshare_autoheal: "false"
+pingvin_share_autoheal: "false"
 
 # dockflare
-pingvinshare_dockflare_tunnel: "false"
-pingvinshare_dockflare_access_group: ""
+pingvin_share_dockflare_tunnel: "false"
+pingvin_share_dockflare_access_group: ""
 
 # homepage
-pingvinshare_homepage_group: "Apps"
-pingvinshare_homepage_icon: "pingvinshare.png"
-pingvinshare_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pingvinshare_port_http }}"
-pingvinshare_homepage_showstats: "false"
+pingvin_share_homepage_group: "Apps"
+pingvin_share_homepage_icon: "pingvin-share.png"
+pingvin_share_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pingvin_share_port_http }}"
+pingvin_share_homepage_showstats: "false"
 
 # repliqate
-pingvinshare_repliqate_enabled: "false"
-pingvinshare_repliqate_engine: "restic"
-pingvinshare_repliqate_schedule: "@daily 3am"
-pingvinshare_repliqate_backup_id: "{{ pingvinshare_container_name }}"
-pingvinshare_repliqate_retention: "30d"
+pingvin_share_repliqate_enabled: "false"
+pingvin_share_repliqate_engine: "restic"
+pingvin_share_repliqate_schedule: "@daily 3am"
+pingvin_share_repliqate_backup_id: "{{ pingvin_share_container_name }}"
+pingvin_share_repliqate_retention: "30d"
 
 # watchtower
-pingvinshare_watchtower_enable: "false"
+pingvin_share_watchtower_enable: "false"

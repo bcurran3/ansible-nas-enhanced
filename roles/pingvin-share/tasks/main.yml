@@ -7,89 +7,89 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ pingvinshare_data_directory }}"
-        - "{{ pingvinshare_data_directory }}/data"
-        - "{{ pingvinshare_data_directory }}/data/images"
+        - "{{ pingvin_share_data_directory }}"
+        - "{{ pingvin_share_data_directory }}/data"
+        - "{{ pingvin_share_data_directory }}/data/images"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ pingvinshare_container_name }}"
-        hostname: "{{ pingvinshare_container_name }}"
-        image: "{{ pingvinshare_image_name }}:{{ pingvinshare_image_tag }}"
+        name: "{{ pingvin_share_container_name }}"
+        hostname: "{{ pingvin_share_container_name }}"
+        image: "{{ pingvin_share_image_name }}:{{ pingvin_share_image_tag }}"
         pull: true
         ports:
-          - "{{ pingvinshare_port_http }}:3000"
+          - "{{ pingvin_share_port_http }}:3000"
         volumes:
-          - "{{ pingvinshare_data_directory }}/data:/opt/app/backend/data"
-          - "{{ pingvinshare_data_directory }}/data/images:/opt/app/frontend/public/img"
+          - "{{ pingvin_share_data_directory }}/data:/opt/app/backend/data"
+          - "{{ pingvin_share_data_directory }}/data/images:/opt/app/frontend/public/img"
         network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ pingvinshare_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ pingvinshare_watchtower_enable }}"
-          dockflare.enable: "{{ pingvinshare_dockflare_tunnel }}"
-          dockflare.access.group: "{{ pingvinshare_dockflare_access_group }}"
-          dockflare.hostname: "{{ pingvinshare_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pingvinshare_port_http }}"
+          autoheal: "{{ pingvin_share_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ pingvin_share_watchtower_enable }}"
+          dockflare.enable: "{{ pingvin_share_dockflare_tunnel }}"
+          dockflare.access.group: "{{ pingvin_share_dockflare_access_group }}"
+          dockflare.hostname: "{{ pingvin_share_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pingvin_share_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ pingvinshare_homepage_group }}"
-          homepage.icon: "{{ pingvinshare_homepage_icon }}"
-          homepage.href: "{{ pingvinshare_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pingvinshare_port_http }}"
+          homepage.group: "{{ pingvin_share_homepage_group }}"
+          homepage.icon: "{{ pingvin_share_homepage_icon }}"
+          homepage.href: "{{ pingvin_share_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pingvin_share_port_http }}"
           homepage.description: "{{ 'A self-hosted file sharing platform that combines lightness and beauty, perfect for seamless and efficient file sharing.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ pingvinshare_container_name }}"
-          homepage.showStats: "{{ pingvinshare_homepage_showstats }}"
-          repliqate.enabled: "{{ pingvinshare_repliqate_enabled }}"
-          repliqate.engine: "{{ pingvinshare_repliqate_engine }}"
-          repliqate.schedule: "{{ pingvinshare_repliqate_schedule }}"
-          repliqate.backup_id: "{{ pingvinshare_repliqate_backup_id }}"
-          repliqate.retention: "{{ pingvinshare_repliqate_retention }}"
-          traefik.enable: "{{ pingvinshare_available_externally | string }}"
-          traefik.http.routers.pingvinshare.rule: "Host(`{{ pingvinshare_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.pingvinshare.tls.certresolver: "letsencrypt"
-          traefik.http.routers.pingvinshare.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.pingvinshare.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ pingvinshare_hostname }}"
-          traefik.http.routers.pingvinshare.middlewares: "{{ pingvinshare_hostname }}@docker"
-          traefik.http.middlewares.pingvinshare.IPAllowList.sourcerange: "{{ pingvinshare_traefik_whitelist }}"
-          traefik.http.services.pingvinshare.loadbalancer.server.port: "3000"
+          homepage.container: "{{ pingvin_share_container_name }}"
+          homepage.showStats: "{{ pingvin_share_homepage_showstats }}"
+          repliqate.enabled: "{{ pingvin_share_repliqate_enabled }}"
+          repliqate.engine: "{{ pingvin_share_repliqate_engine }}"
+          repliqate.schedule: "{{ pingvin_share_repliqate_schedule }}"
+          repliqate.backup_id: "{{ pingvin_share_repliqate_backup_id }}"
+          repliqate.retention: "{{ pingvin_share_repliqate_retention }}"
+          traefik.enable: "{{ pingvin_share_available_externally | string }}"
+          traefik.http.routers.pingvin_share.rule: "Host(`{{ pingvin_share_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.pingvin_share.tls.certresolver: "letsencrypt"
+          traefik.http.routers.pingvin_share.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.pingvin_share.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ pingvin_share_hostname }}"
+          traefik.http.routers.pingvin_share.middlewares: "{{ pingvin_share_hostname }}@docker"
+          traefik.http.middlewares.pingvin_share.IPAllowList.sourcerange: "{{ pingvin_share_traefik_whitelist }}"
+          traefik.http.services.pingvin_share.loadbalancer.server.port: "3000"
           wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/stonith404/pingvin-share/pkgs/container/pingvin-share"
-        cpu_shares: "{{ pingvinshare_cpu_shares }}"
-        memory: "{{ pingvinshare_memory }}"
+        cpu_shares: "{{ pingvin_share_cpu_shares }}"
+        memory: "{{ pingvin_share_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pingvinshare_port_http | string)] +
-                (['https://' + pingvinshare_hostname + '.' + ansible_nas_domain] if (pingvinshare_available_externally is true or pingvinshare_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pingvin_share_port_http | string)] +
+                (['https://' + pingvin_share_hostname + '.' + ansible_nas_domain] if (pingvin_share_available_externally is true or pingvin_share_dockflare_tunnel is true) else [])
               }}
-  when: pingvinshare_enabled is true
+  when: pingvin_share_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ pingvinshare_container_name }}"
+        name: "{{ pingvin_share_container_name }}"
         state: absent
-  when: pingvinshare_enabled is false
+  when: pingvin_share_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ pingvinshare_data_directory }}"
+        path: "{{ pingvin_share_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ pingvinshare_data_directory }}"
+        path: "{{ pingvin_share_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
@@ -98,4 +98,4 @@
         mode: u=rw,g=rw
         remove: true
       when: dir_stat.stat.exists
-  when: pingvinshare_enabled is false and archive_app_data_enabled is true
+  when: pingvin_share_enabled is false and archive_app_data_enabled is true
