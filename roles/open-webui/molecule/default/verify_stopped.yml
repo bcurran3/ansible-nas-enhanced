@@ -8,18 +8,18 @@
 
     - name: Try and stop and remove {{ ansible_nas_app_name }}
       community.docker.docker_container:
-        name: "{{ openwebui_container_name }}"
+        name: "{{ open_webui_container_name }}"
         state: absent
-      register: result_openwebui
+      register: result_open_webui
 
     - name: Try and stop and remove {{ ansible_nas_app_name }} OpenedAI
       community.docker.docker_container:
-        name: "{{ openwebui_openedai_container_name }}"
+        name: "{{ open_webui_openedai_container_name }}"
         state: absent
       register: result_openedai
 
     - name: Check {{ ansible_nas_app_name }} is stopped
       ansible.builtin.assert:
         that:
-          - not result_openwebui.changed
+          - not result_open_webui.changed
           - not result_openedai.changed
