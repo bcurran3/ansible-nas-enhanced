@@ -8,100 +8,100 @@
         owner: "1000"
         group: ansible-nas
       with_items:
-        - "{{ codeserver_data_directory }}"
-        - "{{ codeserver_data_directory }}/project"
-        - "{{ codeserver_data_directory }}/.config"
-        - "{{ codeserver_data_directory }}/.config/code-server"
-        - "{{ codeserver_data_directory }}/.local"
-        - "{{ codeserver_data_directory }}/.local/share"
-        - "{{ codeserver_data_directory }}/.local/share/code-server"
-        - "{{ codeserver_data_directory }}/.local/share/code-server/extensions"
+        - "{{ code_server_data_directory }}"
+        - "{{ code_server_data_directory }}/project"
+        - "{{ code_server_data_directory }}/.config"
+        - "{{ code_server_data_directory }}/.config/code-server"
+        - "{{ code_server_data_directory }}/.local"
+        - "{{ code_server_data_directory }}/.local/share"
+        - "{{ code_server_data_directory }}/.local/share/code-server"
+        - "{{ code_server_data_directory }}/.local/share/code-server/extensions"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ codeserver_container_name }}"
-        hostname: "{{ codeserver_container_name }}"
-        image: "{{ codeserver_image_name }}:{{ codeserver_image_tag }}"
+        name: "{{ code_server_container_name }}"
+        hostname: "{{ code_server_container_name }}"
+        image: "{{ code_server_image_name }}:{{ code_server_image_tag }}"
         pull: true
         ports:
-          - "{{ codeserver_port_http }}:8080"
+          - "{{ code_server_port_http }}:8080"
         volumes:
-#         - "{{ codeserver_data_directory }}/project:/home/coder/project"
-          - "{{ codeserver_data_directory }}/.config:/home/coder/.config"
-          - "{{ codeserver_data_directory }}/.local:/home/coder/.local"
+#         - "{{ code_server_data_directory }}/project:/home/coder/project"
+          - "{{ code_server_data_directory }}/.config:/home/coder/.config"
+          - "{{ code_server_data_directory }}/.local:/home/coder/.local"
           - "/etc/timezone:/etc/timezone:ro"
           - "/home/{{ ansible_nas_user }}:/home/coder/{{ ansible_nas_user }}" # added
           - "{{ docker_home }}:/home/coder/dockerdata" # added
         network_mode: bridge
         env:
           DOCKER_USER: "{{ ansible_nas_user }}"
-          PASSWORD: "{{ codeserver_password }}"
+          PASSWORD: "{{ code_server_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ codeserver_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ codeserver_watchtower_enable }}"
-          dockflare.enable: "{{ codeserver_dockflare_tunnel }}"
-          dockflare.access.group: "{{ codeserver_dockflare_access_group }}"
-          dockflare.hostname: "{{ codeserver_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ codeserver_port_http }}"
-          homepage.group: "{{ codeserver_homepage_group }}"
+          autoheal: "{{ code_server_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ code_server_watchtower_enable }}"
+          dockflare.enable: "{{ code_server_dockflare_tunnel }}"
+          dockflare.access.group: "{{ code_server_dockflare_access_group }}"
+          dockflare.hostname: "{{ code_server_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ code_server_port_http }}"
+          homepage.group: "{{ code_server_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.icon: "{{ codeserver_homepgae_icon }}"
-          homepage.href: "{{ codeserver_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ codeserver_port_http }}"
+          homepage.icon: "{{ code_server_homepgae_icon }}"
+          homepage.href: "{{ code_server_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ code_server_port_http }}"
           homepage.description: "{{ 'VS Code in the browser' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "code-server"
-          homepage.showStats: "{{ codeserver_homepage_showstats }}"
-          repliqate.enabled: "{{ codeserver_repliqate_enabled }}"
-          repliqate.engine: "{{ codeserver_repliqate_engine }}"
-          repliqate.schedule: "{{ codeserver_repliqate_schedule }}"
-          repliqate.backup_id: "{{ codeserver_repliqate_backup_id }}"
-          repliqate.retention: "{{ codeserver_repliqate_retention }}"
-          traefik.enable: "{{ codeserver_available_externally | string }}"
-          traefik.http.routers.codeserver.rule: "Host(`{{ codeserver_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.codeserver.tls.certresolver: "letsencrypt"
-          traefik.http.routers.codeserver.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.codeserver.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ codeserver_hostname }}"
-          traefik.http.routers.codeserver.middlewares: "{{ codeserver_hostname }}@docker"
-          traefik.http.middlewares.codeserver.IPAllowList.sourcerange: "{{ codeserver_traefik_whitelist }}"
-          traefik.http.services.codeserver.loadbalancer.server.port: "8080"
+          homepage.showStats: "{{ code_server_homepage_showstats }}"
+          repliqate.enabled: "{{ code_server_repliqate_enabled }}"
+          repliqate.engine: "{{ code_server_repliqate_engine }}"
+          repliqate.schedule: "{{ code_server_repliqate_schedule }}"
+          repliqate.backup_id: "{{ code_server_repliqate_backup_id }}"
+          repliqate.retention: "{{ code_server_repliqate_retention }}"
+          traefik.enable: "{{ code_server_available_externally | string }}"
+          traefik.http.routers.code_server.rule: "Host(`{{ code_server_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.code_server.tls.certresolver: "letsencrypt"
+          traefik.http.routers.code_server.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.code_server.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ code_server_hostname }}"
+          traefik.http.routers.code_server.middlewares: "{{ code_server_hostname }}@docker"
+          traefik.http.middlewares.code_server.IPAllowList.sourcerange: "{{ code_server_traefik_whitelist }}"
+          traefik.http.services.code_server.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/codercom/code-server"
-        cpu_shares: "{{ codeserver_cpu_shares }}"
-        memory: "{{ codeserver_memory }}"
+        cpu_shares: "{{ code_server_cpu_shares }}"
+        memory: "{{ code_server_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (codeserver_port_http | string)] +
-                (['https://' + codeserver_hostname + '.' + ansible_nas_domain] if (codeserver_available_externally is true or codeserver_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (code_server_port_http | string)] +
+                (['https://' + code_server_hostname + '.' + ansible_nas_domain] if (code_server_available_externally is true or code_server_dockflare_tunnel is true) else [])
               }}
-  when: codeserver_enabled is true
+  when: code_server_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ codeserver_container_name }}"
+        name: "{{ code_server_container_name }}"
         state: absent
-  when: codeserver_enabled is false
+  when: code_server_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ codeserver_data_directory }}"
+        path: "{{ code_server_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ codeserver_data_directory }}"
+        path: "{{ code_server_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
@@ -110,4 +110,4 @@
         mode: u=rw,g=rw
         remove: true
       when: dir_stat.stat.exists
-  when: codeserver_enabled is false and archive_app_data_enabled is true
+  when: code_server_enabled is false and archive_app_data_enabled is true

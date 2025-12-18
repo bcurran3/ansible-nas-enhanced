@@ -1,44 +1,44 @@
 ---
 # ANE
 ansible_nas_app_name: "code-server"
-codeserver_enabled: false
-codeserver_available_externally: false
-codeserver_traefik_whitelist: "{{ lan }}"
-codeserver_data_directory: "{{ docker_home }}/code-server"
+code_server_enabled: false
+code_server_available_externally: false
+code_server_traefik_whitelist: "{{ lan }}"
+code_server_data_directory: "{{ docker_home }}/code-server"
 
 # network
-codeserver_hostname: "codeserver"
-codeserver_port_http: "3009"
+code_server_hostname: "code_server"
+code_server_port_http: "3009"
 
 # config
-codeserver_password: "{{ ansible_nas_app_admin_password }}"
+code_server_password: "{{ ansible_nas_app_admin_password }}"
 
 # docker
-codeserver_container_name: "code-server"
-codeserver_image_name: "codercom/code-server"
-codeserver_image_tag: "latest"
-codeserver_cpu_shares: 1024
-codeserver_memory: "1G"
+code_server_container_name: "code-server"
+code_server_image_name: "codercom/code-server"
+code_server_image_tag: "latest"
+code_server_cpu_shares: 1024
+code_server_memory: "1G"
 
 # autoheal
-codeserver_autoheal: "false"
+code_server_autoheal: "false"
 
 # dockflare
-codeserver_dockflare_tunnel: "false"
-codeserver_dockflare_access_group: ""
+code_server_dockflare_tunnel: "false"
+code_server_dockflare_access_group: ""
 
 # homepage
-codeserver_homepage_group: "Apps"
-codeserver_homepgae_icon: "code-server.png"
-codeserver_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ codeserver_port_http }}"
-codeserver_homepage_showstats: "false"
+code_server_homepage_group: "Apps"
+code_server_homepgae_icon: "code-server.png"
+code_server_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ code_server_port_http }}"
+code_server_homepage_showstats: "false"
 
 # repliqate
-codeserver_repliqate_enabled: "false"
-codeserver_repliqate_engine: "restic"
-codeserver_repliqate_schedule: "@daily 3am"
-codeserver_repliqate_backup_id: "{{ codeserver_container_name }}"
-codeserver_repliqate_retention: "30d"
+code_server_repliqate_enabled: "false"
+code_server_repliqate_engine: "restic"
+code_server_repliqate_schedule: "@daily 3am"
+code_server_repliqate_backup_id: "{{ code_server_container_name }}"
+code_server_repliqate_retention: "30d"
 
 # watchtower
-codeserver_watchtower_enable: "false"
+code_server_watchtower_enable: "false"
