@@ -75,7 +75,6 @@
         hostname: "{{ openemr_container_name }}"
         image: "{{ openemr_image_name }}:{{ opmenemr_image_tag }}"
         pull: true
-        cpu_shares: "{{ openemr_cpu_shares }}"
         network_mode: "bridge"
         networks:
           - name: "{{ openemr_network_name }}"
@@ -131,6 +130,7 @@
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/openemr/openemr"
+        cpu_shares: "{{ openemr_cpu_shares }}"
         memory: "{{ openemr_memory }}"
         restart_policy: unless-stopped
 
