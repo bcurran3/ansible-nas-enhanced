@@ -309,7 +309,7 @@ By default, applications can be found on the ports listed below.
 | Technitium DNS   | 8053
 | Technitium DNS   | 53443
 | The Lounge       | 113     | Bridge  |                |
-| The Lounge       | 9022    | Bridge  | HTTP           |
+| The Lounge       | 9023    | Bridge  | HTTP           |
 | Threadfin        | 34400
 | Tianji           | 3031    | Bridge  | HTTP           |
 | TiddlyWiki       | 8092    | Bridge  | HTTP           |
@@ -372,6 +372,6 @@ By default, applications can be found on the ports listed below.
 
 
 # next avail = 3059
-# next avail = 9023
+# next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
