@@ -18,6 +18,7 @@
         name: "{{ openeats_db_container_name }}"
         image: "{{ openeats_db_image_name }}:{{ openeats_db_image_tag }}"
         pull: true
+        network_mode: "bridge"
         volumes:
           - "{{ openeats_data_directory }}/database:/var/lib/mysql"
         ports:
@@ -55,6 +56,7 @@
         name: "{{ openeats_api_container_name }}"
         image: "{{ openeats_api_image_name }}:{{ openeats_api_image_tag }}"
         pull: true
+        network_mode: "bridge"
         links:
           - "{{ openeats_db_container_name }}"
         volumes:
@@ -97,6 +99,7 @@
         hostname: "{{ openeats_container_name }}"
         image: "{{ openeats_image_name }}:{{ openeats_image_tag }}"
         pull: true
+        network_mode: "bridge"
         links:
           - "{{ openeats_api_container_name }}"
           - "{{ openeats_db_container_name }}"
