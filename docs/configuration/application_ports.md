@@ -70,7 +70,7 @@ By default, applications can be found on the ports listed below.
 | Dozzle Agent     | 7007
 | Drone CI         | 8001
 | Drone CI         | 8002
-| DumbAssets       | 3000    | Bridge  | HTTP           |
+| DumbAssets       | 3057    | Bridge  | HTTP           |
 | Duplicacy        | 3875    | Bridge  | HTTP           |
 | Duplicati        | 8200    | Bridge  | HTTP           |
 | DweebUI          | 8004
@@ -351,7 +351,7 @@ By default, applications can be found on the ports listed below.
 | Watchtower       | 2347
 | WatchYourLAN     | 8840    | Bridge  | HTTP           |
 | Webmin           | 10000   | Host    | HTTP           |
-| Webtop           | 3000    | Bridge  | HTTP           |
+| Webtop           | 3058    | Bridge  | HTTP           |
 | What's Running   | 3411    | Bridge  | HTTP           |
 | Whisparr         | 6969    | Bridge  | HTTP           |
 | Windows          | 8006
@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3057
+# next avail = 3059
 # next avail = 9022
 
 # NOTE: Conflicts on ports 9000 + 9002
