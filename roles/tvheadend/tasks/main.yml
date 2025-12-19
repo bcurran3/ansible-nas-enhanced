@@ -64,7 +64,7 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "lscr.io/linuxserver/tvheadend"
         cpu_shares: "{{ tvheadend_cpu_shares }}"
-        devices: "{{ tvheadend_devices }}"
+        devices: "{{ tvheadend_devices | default(omit) }}"
         memory: "{{ tvheadend_memory }}"
         restart_policy: unless-stopped
 
