@@ -18,6 +18,8 @@
         ports:
           - "{{ threadfin_port_http }}:34400"
         env:
+          PUID: "{{ threadfin_user_id }}"
+          PGID: "{{ threadfin_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ threadfin_data_directory }}:/home/threadfin/conf"
@@ -29,7 +31,7 @@
           homepage.group: "{{ threadfin_homepage_group }}"
           homepage.icon: "{{ threadfin_homepage_icon }}"
           homepage.href: "{{ threadfin_homepage_href }}"
-          homepage.description: "{{ 'IPTV bridge' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'M3U proxy for media servers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ threadfin_container_name }}"
           homepage.showStats: "{{ threadfin_homepage_showstats }}"
@@ -41,10 +43,10 @@
           repliqate.schedule: "{{ threadfin_repliqate_schedule }}"
           repliqate.backup_id: "{{ threadfin_repliqate_backup_id }}"
           repliqate.retention: "{{ threadfin_repliqate_retention }}"
+          traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/fyb3roptik/threadfin"
-# Does this have a web interface??????????
         cpu_shares: "{{ threadfin_cpu_shares }}"
         memory: "{{ threadfin_memory }}"
         restart_policy: unless-stopped
