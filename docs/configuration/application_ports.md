@@ -358,7 +358,7 @@ By default, applications can be found on the ports listed below.
 | Windows          | 3388 RDP
 | WireGuard        | 51820
 | WireGuard        | 51821
-| Wireshark        | 3000    | Host    | HTTP           |
+| Wireshark        | 3059    | Host    | HTTP           |
 | Wireshark        | 3001    | Host    | HTTP           |
 | Wizarr           | 5690    | Bridge  | HTTP           |
 | Woodpecker CI    | 8000
@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3059
+# next avail = 3060
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
