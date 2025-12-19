@@ -1,0 +1,40 @@
+---
+# ANE
+ansible_nas_app_name: "ddns-route53"
+ddns_route53_enabled: false
+ddns_route53_data_directory: "{{ docker_home }}/ddns-route53"
+
+# AWS access credentials
+ddns_route53_key_id: "{{ mandatory }}"
+ddns_route53_secret_key: "{{ mandatory }}"
+
+# Managed DNS zone ID
+ddns_route53_hosted_zone_id: "{{ mandatory }}"
+
+# The hostname to update
+ddns_route53_host: "*.{{ ansible_nas_domain }}"
+
+# The Time-To-Live for the DNS entry
+ddns_route53_ttl: 600
+
+# The CRON string schedule for checking and updating
+ddns_route53_schedule: "*/30 * * * *"
+
+# Container
+ddns_route53_cpu_shares: 1024
+ddns_route53_memory: "512M"
+
+ddns_route53_container_name: "ddns-route53"
+ddns_route53_image_name: "ghcr.io/crazy-max/ddns-route53"
+ddns_route53_image_version: "latest"
+
+# autoheal
+ddns_route53_autoheal: "false"
+
+# homepage
+ddns_route53_homepage_group: "Apps"
+ddns_route53_homepage_icon: "route53.png"
+ddns_route53_homepage_showstats: "false"
+
+# watchtower
+ddns_route53_watchtower_enable: "false"

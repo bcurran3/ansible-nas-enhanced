@@ -3,67 +3,67 @@
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
-        path: "{{ route53_data_directory }}"
+        path: "{{ ddns_route53_data_directory }}"
         state: directory
 
     - name: Generate {{ ansible_nas_app_name }} config file
       ansible.builtin.template:
         src: config.yml
-        dest: "{{ route53_data_directory }}/ddns-route53.yml"
+        dest: "{{ ddns_route53_data_directory }}/ddns-route53.yml"
       register: template_config
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ route53_container_name }}"
-        hostname: "{{ route53_container_name }}"
-        image: "{{ route53_image_name }}:{{ route53_image_version }}"
+        name: "{{ ddns_route53_container_name }}"
+        hostname: "{{ ddns_route53_container_name }}"
+        image: "{{ ddns_route53_image_name }}:{{ ddns_route53_image_version }}"
         pull: true
         env:
-          SCHEDULE: "{{ route53_schedule | string }}"
+          SCHEDULE: "{{ ddns_route53_schedule | string }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
-          - "{{ route53_data_directory }}/ddns-route53.yml:/etc/ddns-route53/ddns-route53.yml"
+          - "{{ ddns_route53_data_directory }}/ddns-route53.yml:/etc/ddns-route53/ddns-route53.yml"
         labels:
-          autoheal: "{{ route53_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ route53_watchtower_enable }}"
+          autoheal: "{{ ddns_route53_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ ddns_route53_watchtower_enable }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ route53_homepage_group }}"
-          homepage.icon: "{{ route53_homepage_icon }}"
-          homepage.description: "{{ 'route53 description' if homepage_show_description else omit }}"
+          homepage.group: "{{ ddns_route53_homepage_group }}"
+          homepage.icon: "{{ ddns_route53_homepage_icon }}"
+          homepage.description: "{{ 'Dynamic DNS for Amazon Route 53 on a time-based schedule' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ route53_container_name }}"
-          homepage.showStats: "{{ route53_homepage_showstats }}"
+          homepage.container: "{{ ddns_route53_container_name }}"
+          homepage.showStats: "{{ ddns_route53_homepage_showstats }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/crazy-max/ddns-route53/pkgs/container/ddns-route53"
-        cpu_shares: "{{ route53_cpu_shares }}"
-        memory: "{{ route53_memory }}"
+        cpu_shares: "{{ ddns_route53_cpu_shares }}"
+        memory: "{{ ddns_route53_memory }}"
         recreate: "{{ template_config is changed }}"
         restart_policy: unless-stopped
-  when: route53_enabled is true
+  when: ddns_route53_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ route53_container_name }}"
+        name: "{{ ddns_route53_container_name }}"
         state: absent
-  when: route53_enabled is false
+  when: ddns_route53_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   block:
     - name: Check for {{ ansible_nas_app_name }} Data Directory
       stat:
-        path: "{{ route53_data_directory }}"
+        path: "{{ ddns_route53_data_directory }}"
       register: dir_stat
 
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
-        path: "{{ route53_data_directory }}"
+        path: "{{ ddns_route53_data_directory }}"
         dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
         force_archive: true
         format: zip
@@ -72,4 +72,4 @@
         mode: u=rw,g=rw
         remove: true
       when: dir_stat.stat.exists
-  when: route53_enabled is false and archive_app_data_enabled is true
+  when: ddns_route53_enabled is false and archive_app_data_enabled is true

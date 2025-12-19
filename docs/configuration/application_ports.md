@@ -295,7 +295,7 @@ By default, applications can be found on the ports listed below.
 | Stump            | 10801
 | Syncthing admin  | 8384    | Host    | HTTP           |
 | Syncthing P2P    | 22000   | Host    | TCP+UDP        |
-| Tailscale        | ?????  Host mode
+| Tailscale        | n/a     | Host
 | Tandoor Recipes  | 3037    | Bridge  | HTTP           |
 | Tasks.md         | 3048    | Bridge  | HTTP           |
 | Tautulli         | 8185    | Bridge  | HTTP           |
