@@ -157,6 +157,13 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
     exit
 fi
 
+# List ANE disabled apps
+if [[ "$1" = "--disabled" || "$1" = "-disabled" ]]; then
+     echo "ANE disabled apps:"
+     cat inventories/ANE/group_vars/nas.yml | grep 'enabled: false'
+     exit
+fi
+
 # Enable ANE app
 if [[ "$1" = "--enable" || "$1" = "-enable" ]]; then
     shift
