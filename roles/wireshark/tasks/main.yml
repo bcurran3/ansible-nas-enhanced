@@ -40,7 +40,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ wireshark_container_name }}"
           homepage.showStats: "{{ wireshark_homepage_showstats }}"
-          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireshark_ports }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireshark_port_http }}"
           repliqate.enabled: "{{ wireshark_repliqate_enabled }}"
           repliqate.engine: "{{ wireshark_repliqate_engine }}"
           repliqate.schedule: "{{ wireshark_repliqate_schedule }}"
@@ -58,7 +58,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wireshark_port_https | string)]
+                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wireshark_port_http | string)]
               }}
   when: wireshark_enabled is true
 

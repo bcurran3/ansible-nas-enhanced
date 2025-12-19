@@ -359,7 +359,7 @@ By default, applications can be found on the ports listed below.
 | WireGuard        | 51820
 | WireGuard        | 51821
 | Wireshark        | 3059    | Host    | HTTP           |
-| Wireshark        | 3001    | Host    | HTTP           |
+| Wireshark        | 3060    | Host    | HTTP           |
 | Wizarr           | 5690    | Bridge  | HTTP           |
 | Woodpecker CI    | 8000
 | Woodpecker CI    | 9000
