@@ -271,7 +271,7 @@ By default, applications can be found on the ports listed below.
 | Sickchill        | 8081    | Bridge  | HTTP           |
 | Silver Bullet    | 3007
 | Sonarr           | 8989    | Bridge  | HTTP           |
-| Sonos-Web        | 5050
+| Sonos-Web        | 5050    | Host    | HTTP           |
 | Speedtest-Trk    | 8765    | HTTP    |                |
 | Spoolman         | 7912
 | Stalwart Mail    | 3043
