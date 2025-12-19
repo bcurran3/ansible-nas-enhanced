@@ -124,6 +124,11 @@
       community.docker.docker_container:
         name: "{{ miniflux_db_container_name }}"
         state: absent
+
+    - name: Delete {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ miniflux_network_name }}"
+        state: absent
   when: miniflux_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}

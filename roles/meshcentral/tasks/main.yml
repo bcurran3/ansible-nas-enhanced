@@ -16,7 +16,7 @@
 
     - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
-        name: "{{ meshcentral_network }}"
+        name: "{{ meshcentral_network_name }}"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -28,7 +28,7 @@
         image: "{{ meshcentral_db_image_name }}:{{ meshcentral_db_image_tag }}"
         pull: true
         networks:
-          - name: "{{ meshcentral_network }}"
+          - name: "{{ meshcentral_network_name }}"
         networks_cli_compatible: "yes"
         volumes:
           - "{{ meshcentral_data_directory }}/db:/data/db"
@@ -68,7 +68,7 @@
         image: "{{ meshcentral_image_name }}:{{ meshcentral_image_tag }}"
         pull: true
         networks:
-          - name: "{{ meshcentral_network }}"
+          - name: "{{ meshcentral_network_name }}"
         networks_cli_compatible: "yes"
         ports:
           - "{{ meshcentral_port_http }}:4430"
@@ -152,6 +152,11 @@
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ meshcentral_db_container_name }}"
+        state: absent
+
+    - name: Delete {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ meshcentral_network_name }}"
         state: absent
   when: meshcentral_enabled is false
 
