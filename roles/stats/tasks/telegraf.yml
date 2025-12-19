@@ -6,13 +6,12 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ stats_telegraf_data_directory }}"
-        - "{{ stats_telegraf_data_directory }}/data"
+        - "{{ stats_telegraf_config_directory }}"
 
     - name: Template telegraf.conf
       ansible.builtin.template:
         src: telegraf.conf.j2
-        dest: "{{ stats_telegraf_data_directory }}/data/telegraf.conf"
+        dest: "{{ stats_telegraf_config_directory }}/telegraf.conf"
       register: telegraf_config
 
     - name: Get Docker daemon uid
@@ -33,7 +32,7 @@
           - "{{ stats_telegraf_port }}:9273"
         user: "telegraf:{{ docker_uid.stdout }}"
         volumes:
-          - "{{ stats_telegraf_data_directory }}/data:/etc/telegraf/:ro"
+          - "{{ stats_telegraf_config_directory }}:/etc/telegraf/:ro"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
           - "/:/hostfs:ro"
           - "/etc:/hostfs/etc:ro"

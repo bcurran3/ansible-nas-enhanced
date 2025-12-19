@@ -10,12 +10,10 @@
       changed_when: false
       with_items:
         - "{{ stats_grafana_data_directory }}"
-        - "{{ stats_grafana_data_directory }}/config"
-        - "{{ stats_grafana_data_directory }}/config:/dashboards"
-        - "{{ stats_grafana_data_directory }}/config:/provisioning"
-        - "{{ stats_grafana_data_directory }}/config:/provisioning/datasources"
-        - "{{ stats_grafana_data_directory }}/config:/provisioning/dashboards"
-        - "{{ stats_grafana_data_directory }}/data"
+        - "{{ stats_grafana_config_directory }}"
+        - "{{ stats_grafana_config_directory }}/dashboards"
+        - "{{ stats_grafana_config_directory }}/provisioning/datasources"
+        - "{{ stats_grafana_config_directory }}/provisioning/dashboards"
 
     - name: Template Grafana data source
       ansible.builtin.template:
