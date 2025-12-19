@@ -37,9 +37,9 @@
         image: "{{ stats_grafana_image_name }}:{{ stats_grafana_image_version }}"
         pull: true
         volumes:
-          - "{{ stats_grafana_data_directory }}/data:/var/lib/grafana:rw"
-          - "{{ stats_grafana_data_directory }}/config/provisioning:/etc/grafana/provisioning:ro"
-          - "{{ stats_grafana_data_directory }}/config/dashboards:/etc/dashboards:ro"
+          - "{{ stats_grafana_data_directory }}:/var/lib/grafana:rw"
+          - "{{ stats_grafana_config_directory }}/provisioning:/etc/grafana/provisioning:ro"
+          - "{{ stats_grafana_config_directory }}/dashboards:/etc/dashboards:ro"
         ports:
           - "{{ stats_grafana_port }}:3000"
         env:
