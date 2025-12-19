@@ -18,17 +18,17 @@
     - name: Template Grafana data source
       ansible.builtin.template:
         src: datasources/ansible-nas.yml
-        dest: "{{ stats_grafana_data_directory }}/config/provisioning/datasources/ansible-nas.yml"
+        dest: "{{ stats_grafana_config_directory }}/provisioning/datasources/ansible-nas.yml"
 
     - name: Copy Grafana dashboards configuration
       ansible.builtin.copy:
         src: dashboards/ansible-nas.yml
-        dest: "{{ stats_grafana_data_directory }}/config/provisioning/dashboards/ansible-nas.yml"
+        dest: "{{ stats_grafana_config_directory }}/provisioning/dashboards/ansible-nas.yml"
 
     - name: Copy Grafana Ansible-NAS dashboard
       ansible.builtin.copy:
         src: dashboards/ansible-nas-overview.json
-        dest: "{{ stats_grafana_data_directory }}/config/dashboards/ansible-nas-overview.json"
+        dest: "{{ stats_grafana_config_directory }}/dashboards/ansible-nas-overview.json"
 
     - name: Grafana Docker Container
       community.docker.docker_container:
