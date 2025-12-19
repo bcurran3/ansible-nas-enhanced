@@ -266,7 +266,7 @@ By default, applications can be found on the ports listed below.
 | SearXNG          | 3008    | Bridge  | HTTP           |
 | SeedSync         | 8800
 | Semaphore        | 3052
-| Shaarli          | 5804    | Bridge  | HTTP           |
+| Shaarli          | 3056    | Bridge  | HTTP           |
 | Shoutcast Server | 8002
 | Sickchill        | 8081    | Bridge  | HTTP           |
 | Silver Bullet    | 3007
@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3056
+# next avail = 3057
 # next avail = 9022
 
 # NOTE: Conflicts on ports 9000 + 9002

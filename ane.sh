@@ -184,11 +184,11 @@ if [[ "$1" = "--enable" || "$1" = "-enable" ]]; then
                 echo "$ENABLED_LINE" >> "$FILE"
                 if [ -f "$FILE" ] && grep -xq "traefik_enabled: true" "$FILE"; then
                     echo "${arg_clean}_available_externally: true" >> "$FILE"
-                    echo "${arg_clean}_homepage_href: \"https://{{ ${arg}_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
+                    echo "${arg_clean}_homepage_href: \"https://{{ ${arg_clean}_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
                 fi
                 if $ANE_ENABLE_ALSO_STARTS; then
                     echo "  ** ${arg} enabled. Installing..."
-                    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg_clean}
+                    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
                 else
                     echo "  ** ${arg} enabled. \"./ane.sh --app ${arg}\" to install."
                 fi
