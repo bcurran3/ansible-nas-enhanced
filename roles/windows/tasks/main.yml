@@ -25,8 +25,7 @@
           - "{{ windows_port_rdp }}:3389/udp"
         volumes:
           - "{{ windows_data_directory }}:/storage"
-#         - "{{ samba_shares_root }}/public:/shared"
-          - "{{ samba_shares_other_root }}/public:/shared"
+          - "{{ public_root }}:/shared"
         network_mode: bridge
         env:
           CPU_CORES: "{{ windows_cpu_cores }}"
