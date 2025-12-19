@@ -308,7 +308,7 @@ By default, applications can be found on the ports listed below.
 | Technitium DNS   | 853
 | Technitium DNS   | 8053
 | Technitium DNS   | 53443
-| The Lounge       | 113     | Bridge  |                |
+| The Lounge       | 113     | Bridge  | Ident          |
 | The Lounge       | 9023    | Bridge  | HTTP           |
 | Threadfin        | 34400
 | Tianji           | 3031    | Bridge  | HTTP           |
