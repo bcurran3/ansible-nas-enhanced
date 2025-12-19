@@ -60,9 +60,8 @@
           traefik.http.routers.sickchill.middlewares: "{{ sickchill_hostname }}@docker"
           traefik.http.middlewares.sickchill.IPAllowList.sourcerange: "{{ sickchill_traefik_whitelist }}"
           traefik.http.services.sickchill.loadbalancer.server.port: "8081"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://lscr.io/linuxserver/sickchill"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/linuxserver/sickchill/tags"
         cpu_shares: "{{ sickchill_cpu_shares }}"
         memory: "{{ sickchill_memory }}"
         restart_policy: unless-stopped
