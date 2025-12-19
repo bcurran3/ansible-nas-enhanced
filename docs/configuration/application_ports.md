@@ -93,7 +93,7 @@ By default, applications can be found on the ports listed below.
 | Gaseous Server   | 5198
 | get_iplayer      | 8182    | Bridge  | HTTP           |
 | Ghost            | 2368    | Bridge  | HTTP           |
-| Gitea            | 3001    | Bridge  | HTTP           |
+| Gitea            | 3059    | Bridge  | HTTP           |
 | Gitea            | 2221    | Bridge  | SSH            |
 | GitLab           | 4080    | Bridge  | HTTP           |
 | GitLab           | 4443    | Bridge  | HTTPS          |
@@ -358,8 +358,8 @@ By default, applications can be found on the ports listed below.
 | Windows          | 3388 RDP
 | WireGuard        | 51820
 | WireGuard        | 51821
-| Wireshark        | 3059    | Host    | HTTP           |
-| Wireshark        | 3060    | Host    | HTTP           |
+| Wireshark        | 3001    | Host    | HTTP           |
+| Wireshark        | 3060    | Host    | HTTPS           |
 | Wizarr           | 5690    | Bridge  | HTTP           |
 | Woodpecker CI    | 8000
 | Woodpecker CI    | 9000
