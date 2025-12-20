@@ -6,18 +6,20 @@ openemr_available_externally: false
 openemr_traefik_whitelist: "{{ lan }}"
 openemr_data_directory: "{{ docker_home }}/openemr"
 
-openemr_admin_password: "{{ ansible_nas_app_admin_password }}"
-
 # network
 openemr_hostname: "openemr"
 openemr_port_http: "3016"
 openemr_network_name: "openemr"
 
+# uid / gid
+openemr_db_user_id: "1000"
+openemr_db_group_id: "1000"
+
 # docker
 openemr_container_name: "openemr"
 openemr_image_name: "openemr/openemr"
-openemr_image_tag: "7.0.2"
-openemr_db_container_name: "openemr_mariadb"
+openemr_image_tag: "7.0.3"
+openemr_db_container_name: "openemr-db"
 openemr_db_image_name: "lscr.io/linuxserver/mariadb"
 openemr_db_image_tag: "latest"
 
@@ -26,6 +28,18 @@ openemr_cpu_shares: 1024
 openemr_memory: "1G"
 openemr_db_cpu_shares: 1024
 openemr_db_memory: "1G"
+
+# app
+openemr_admin_password: "{{ ansible_nas_app_admin_password }}"
+openemr_env_mysql_root_pass: "KfGuj4xWHO119hqx0uUoUUFX1wB5Xq8Y"
+openemr_env_mysql_user: "openemr"
+openemr_env_mysql_pass: "openemr"
+openemr_env_mysql_database: "openemr"
+openemr_env_oe_user: "admin"
+openemr_env_oe_pass: "{{ openemr_admin_password }}"
+openemr_env_openemr__environment: "prod"
+openemr_db_env_allow_empty_password: "no"
+openemr_db_env_mysql_root_password: "topsecret"
 
 # autoheal
 openemr_autoheal: "false"

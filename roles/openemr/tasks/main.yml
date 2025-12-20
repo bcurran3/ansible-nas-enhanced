@@ -30,18 +30,18 @@
           - name: "{{ openemr_network_name }}"
         networks_cli_compatible: "yes"
         volumes:
-          - "{{ openemr_data_directory }}/db:/config"
+          - "{{ openemr_data_directory }}/db:/var/lib/mysql"
         env:
-#         ALLOW_EMPTY_PASSWORD: "no"
+          ALLOW_EMPTY_PASSWORD: "{{ openemr_db_env_allow_empty_password }}"
           DOCKER_MODS: "{{ openemr_db_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ openemr_db_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ openemr_db_env_docker_mods_install_pip_packages}}"
-          MYSQL_ROOT_PASSWORD: "topsecret"
-          MYSQL_USER: "openemr"
-          MYSQL_PASSWORD: "openemr"
-          MYSQL_DATABASE: "openemr" # Do NOT rename!
-          PGID: "1000"
-          PUID: "1000"
+          MYSQL_ROOT_PASSWORD: "{{ openemr_db_env_mysql_root_password }}"
+          MYSQL_USER: "{{ openemr_env_mysql_user }}"
+          MYSQL_PASSWORD: "{{ openemr_env_mysql_pass }}"
+          MYSQL_DATABASE: "{{ openemr_env_mysql_database }}"
+          PGID: "{{ openemr_db_group_id }}"
+          PUID: "{{ openemr_db_user_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ openemr_db_autoheal }}"
@@ -82,19 +82,33 @@
         ports:
           - "{{ openemr_port_http }}:80"
         volumes:
-#         - "{{ openemr_data_directory }}/log:/var/log"
-          - "{{ openemr_data_directory }}/log:/var/www/logs"
-#         - "{{ openemr_data_directory }}/sites:/var/www/localhost/htdocs/openemr/sites"
+          - "{{ openemr_data_directory }}/log:/var/log"
+          - "{{ openemr_data_directory }}/sites:/var/www/localhost/htdocs/openemr/sites"
         env:
           MYSQL_HOST: "{{ openemr_db_container_name }}"
-          MYSQL_ROOT_PASS: "Ansible-NAS"
-          MYSQL_USER: "openemr"
-          MYSQL_PASS: "openemr"
-#         MYSQL_DATABASE: "openemr_db"
-          OE_USER: "admin"
+          MYSQL_ROOT_PASS: "{{ openemr_env_mysql_root_pass }}"
+          MYSQL_USER: "{{ openemr_env_mysql_user }}"
+          MYSQL_PASS: "{{ openemr_env_mysql_pass }}"
+          MYSQL_DATABASE: "{{ openemr_env_mysql_database }}"
+          OE_USER: "{{ openemr_env_oe_user }}"
           OE_PASS: "{{ openemr_admin_password }}"
-          OPENEMR__ENVIRONMENT: "prod"
+          OPENEMR__ENVIRONMENT: "{{ openemr_env_openemr__environment }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test:
+          - CMD
+          - /usr/bin/curl
+          - --fail
+          - --insecure
+          - --location
+          - --show-error
+          - --silent
+          - https://localhost/
+          start_period: "3m"
+          start_interval: "10s"
+          interval: "1m"
+          timeout: "5s"
+          retries: 3
         links:
           - "{{ openemr_db_container_name }}"
         labels:
