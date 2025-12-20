@@ -72,6 +72,8 @@
           JOOMLA_DB_HOST: "{{ joomla_db_container_name }}"
           JOOMLA_DB_USER: "root"
           JOOMLA_DB_PASSWORD: "{{ joomla_database_password }}"
+        links:
+          - "{{ joomla_db_container_name }}"
         labels:
           autoheal: "{{ joomla_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ joomla_watchtower_enable }}"
