@@ -25,51 +25,47 @@
           - "{{ mumble_port_tcp }}:64738/tcp"
           - "{{ mumble_port_udp }}:64738/udp"
         env:
-          MUMBLE_CONFIG_SERVER_PASSWORD: "{{ mumble_server_password }}"
+          MUMBLE_CONFIG_SERVER_PASSWORD: "{{ mumble_env_mumble_config_server_password }}"
+          MUMBLE_CONFIG_IMAGEMESSAGELENGTH: "{{ mumble_env_mumble_config_imagemessagelength }}"
+          MUMBLE_CONFIG_REGISTERNAME: "{{ mumble_env_mumble_config_registername }}"
+          MUMBLE_CONFIG_USERNAME: "{{ mumble_env_mumble_config_username }}"
+          MUMBLE_CONFIG_CHANNELNAME: "{{ mumble_env_mumble_config_channelname }}"
+          MUMBLE_CONFIG_WELCOMETEXT: "{{ mumble_env_mumble_config_welcometext }}"
+          MUMBLE_SUPERUSER_PASSWORD: "{{ mumble_env_mumble_serveruser_password }}"
+          MUMBLE_CONFIG_ICE: "{{ mumble_env_mumble_config_ice }}"
+          MUMBLE_CONFIG_ICESECRETWRITE: "{{ mumble_env_mumble_config_icesecretwrite }}"
+          MUMBLE_CONFIG_PORT: "{{ mumble_env_mumble_config_port }}"
+          MUMBLE_CONFIG_TIMEOUT: "{{ mumble_env_mumble_config_timeout }}"
+          MUMBLE_CONFIG_USERS: "{{ mumble_env_mumble_config_users }}"
+          MUMBLE_CONFIG_REMEMBERCHANNEL: "{{ mumble_env_mumble_config_rememberchannel }}"
+          MUMBLE_CONFIG_ALLOWHTML: "{{ mumble_env_mumble_config_allowhtml }}"
+          MUMBLE_VERBOSE: "{{ mumble_env_mumble_verbose }}"
+          PUID: "{{ mumble_puid }}"
+          PGID: "{{ mumble_pgid }}"
         labels:
           autoheal: "{{ mumble_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ mumble_watchtower_enable }}"
-          dockflare.enable: "{{ mumble_dockflare_tunnel }}"
-          dockflare.access.group: "{{ mumble_dockflare_access_group }}"
-          dockflare.hostname: "{{ mumble_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port_tcp }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mumble_homepage_group }}"
           homepage.icon: "{{ mumble_homepage_icon }}"
           homepage.href: "{{ mumble_homepage_href }}"
-          homepage.description: "{{ 'mumble description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'a free, open source, low latency, high quality voice chat application' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mumble_container_name }}"
           homepage.showStats: "{{ mumble_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port_tcp }}"
           repliqate.enabled: "{{ mumble_repliqate_enabled }}"
           repliqate.engine: "{{ mumble_repliqate_engine }}"
           repliqate.schedule: "{{ mumble_repliqate_schedule }}"
           repliqate.backup_id: "{{ mumble_repliqate_backup_id }}"
           repliqate.retention: "{{ mumble_repliqate_retention }}"
-          traefik.enable: "{{ mumble_available_externally | string }}"
-          traefik.http.routers.mumble.rule: "Host(`{{ mumble_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.mumble.tls.certresolver: "letsencrypt"
-          traefik.http.routers.mumble.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.mumble.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ mumble_hostname }}"
-          traefik.http.routers.mumble.middlewares: "{{ mumble_hostname }}@docker"
-          traefik.http.middlewares.mumble.IPAllowList.sourcerange: "{{ mumble_traefik_whitelist }}"
-          traefik.http.services.mumble.loadbalancer.server.port: "64738"
+          traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/mumblevoip/mumble-server"
         cpu_shares: "{{ mumble_cpu_shares }}"
         memory: "{{ mumble_memory }}"
         restart_policy: unless-stopped
-
-    - name: Access {{ ansible_nas_app_name }} at
-      ansible.builtin.debug:
-        msg: >-
-              {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mumble_port_tcp | string)] +
-                (['https://' + mumble_hostname + '.' + ansible_nas_domain] if (mumble_available_externally is true or mumble_dockflare_tunnel is true) else [])
-              }}
   when: mumble_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

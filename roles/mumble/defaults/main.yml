@@ -13,15 +13,34 @@ mumble_port_tcp: "64738"
 mumble_port_udp: "64738"
 mumble_hostname: "mumble"
 
-# Configuration
-mumble_server_password: "{{ ansible_nas_app_admin_password }}"
+mumble_puid: "1000"
+mumble_pgid: "1000"
 
 # docker
 mumble_container_name: "mumble-server"
-mumble_cpu_shares: 1024
-mumble_memory: "1G"
 mumble_image_name: "mumblevoip/mumble-server"
 mumble_image_tag: "latest"
+
+# specs
+mumble_cpu_shares: 1024
+mumble_memory: "1G"
+
+# app
+mumble_env_mumble_config_server_password: "{{ ansible_nas_app_admin_password }}"
+mumble_env_mumble_config_imagemessagelength: "1310720"
+mumble_env_mumble_config_registername: "Main Channel Name"
+mumble_env_mumble_config_username: '[ -=\\w\\[\\]\\{\\}\\(\\)\\@\\|\\.]+'
+mumble_env_mumble_config_channelname: '[ \\-=\\w\\#\\[\\]\\{\\}\\(\\)\\@\\|\\%\\'']+'
+mumble_env_mumble_config_welcometext: 'Hello there !'
+mumble_env_mumble_config_ice: "tcp -h 127.0.0.1 -p 6502"
+mumble_env_mumble_config_icesecretwrite: "***"
+mumble_env_mumble_config_port: "64738"
+mumble_env_mumble_config_timeout: "30"
+mumble_env_mumble_config_users: "100"
+mumble_env_mumble_config_rememberchannel: "true"
+mumble_env_mumble_config_allowhtml: "true"
+mumble_env_mumble_serveruser_password: "{{ ansible_nas_app_admin_password }}"
+mumble_env_mumble_verbose: "false"
 
 # autoheal
 mumble_autoheal: "false"
@@ -33,7 +52,6 @@ mumble_dockflare_access_group: ""
 # homepage
 mumble_homepage_group: "Apps"
 mumble_homepage_icon: "mumble.png"
-mumble_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mumble_port_tcp }}"
 mumble_homepage_showstats: "false"
 
 # repliqate
