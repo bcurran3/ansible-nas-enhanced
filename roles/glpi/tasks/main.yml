@@ -25,6 +25,17 @@
           MARIADB_USER: "glpi_user"
           MARIADB_PASSWORD: "{{ glpi_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test:
+                - CMD
+                - /usr/local/bin/healthcheck.sh
+                - --su-mysql
+                - --connect
+                - --innodb_initialized
+              interval: "30s"
+              timeout: "10s"
+              retries: "3"
+              start_period: "30s"
         labels:
           autoheal: "{{ glpi_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ glpi_db_watchtower_enable }}"
