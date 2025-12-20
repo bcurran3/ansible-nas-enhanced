@@ -16,16 +16,22 @@ duplicati_user_id: "0"
 duplicati_group_id: "0"
 
 # network
-duplicati_port_http: "8200"
 duplicati_hostname: "duplicati"
-
-duplicati_memory: "1G"
+duplicati_port_http: "8200"
 
 # docker
 duplicati_container_name: "duplicati"
-duplicati_cpu_shares: 1024
 duplicati_image_name: "lscr.io/linuxserver/duplicati"
 duplicati_image_tag: "latest"
+
+# specs
+duplicati_cpu_shares: 1024
+duplicati_memory: "1G"
+
+# app
+duplicati_env_settings_encryption_key: "QcLoqTdBMeayBvIqbrItOBrfLP4L9g2Q"
+duplicati_env_duplicati_webservice_password: "{{ ansible_nas_app_admin_password }}"
+duplicati_env_cli_args: ""
 
 # autoheal
 duplicati_autoheal: "false"

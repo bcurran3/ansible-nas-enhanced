@@ -29,6 +29,9 @@
           - NET_ADMIN
           - DAC_READ_SEARCH
         env:
+          SETTINGS_ENCRYPTION_KEY: "{{ duplicati_env_settings_encryption_key }}"
+          DUPLICATI__WEBSERVICE_PASSWORD: "{{ duplicati_env_duplicati_webservice_password }}"
+          CLI_ARGS: "{{ duplicati_env_cli_args }}"
           DOCKER_MODS: "{{ duplicati_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ duplicati_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ duplicati_env_docker_mods_install_pip_packages}}"
@@ -50,7 +53,7 @@
           homepage.group: "{{ duplicati_homepage_group }}"
           homepage.icon: "{{ duplicati_homepage_icon }}"
           homepage.href: "{{ duplicati_homepage_href }}"
-          homepage.description: "{{ 'duplicati description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'backup client that securely stores encrypted, incremental, compressed backups' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ duplicati_container_name }}"
           homepage.showStats: "{{ duplicati_homepage_showstats }}"
