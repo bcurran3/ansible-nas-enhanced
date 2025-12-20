@@ -20,16 +20,19 @@
         volumes:
           - "{{ krusader_data_directory }}/config:/config:rw"
           - "{{ krusader_browse_directory }}:/mnt/fs"
+          - "/etc/localtime:/etc/localtime:ro"
         ports:
-          - "{{ krusader_port_http }}:6080"
+          - "{{ krusader_port_http }}:{{ krusader_port_http }}"
           - "{{ krusader_port_vnc }}:5900"
         env:
           PUID: "{{ krusader_user_id }}"
           PGID: "{{ krusader_group_id }}"
-          VNC_PASSWORD: "{{ krusader_vnc_password }}"
           TEMP_FOLDER: "{{ krusader_temp_folder }}"
-          WEBPAGE_TITLE: "{{ krusader_webpage_title }}"
           UMASK: "{{ krusader_umask }}"
+          VNC_PASSWORD: "{{ krusader_vnc_password }}"
+          WEBPAGE_TITLE: "{{ krusader_webpage_title }}"
+          WEBUI_PORT: "{{ krusader_port_http }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ krusader_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ krusader_watchtower_enable }}"
@@ -59,7 +62,7 @@
           traefik.http.routers.frontend.middlewares: "{{ krusader_hostname }}"
           traefik.http.routers.krusader.middlewares: "{{ krusader_hostname }}@docker"
           traefik.http.middlewares.krusader.IPAllowList.sourcerange: "{{ krusader_traefik_whitelist }}"
-          traefik.http.services.krusader.loadbalancer.server.port: "6080"
+          traefik.http.services.krusader.loadbalancer.server.port: "{{ krusader_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+-\d+-\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/binhex/arch-krusader/pkgs/container/arch-krusader"
@@ -71,7 +74,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (krusader_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (krusader_port_http | string)/vnc.html?resize=remote&host={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}&port=(krusader_port_http | string)&&autoconnect=1] +
                 (['https://' + krusader_hostname + '.' + ansible_nas_domain] if (krusader_available_externally is true or krusader_dockflare_tunnel is true) else [])
               }}
   when: krusader_enabled is true

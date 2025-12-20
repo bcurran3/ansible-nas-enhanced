@@ -28,10 +28,10 @@ krusader_cpu_shares: 1024
 krusader_memory: "1G"
 
 # krusader
-krusader_umask: "000"
-krusader_webpage_title: "Tower"
 krusader_temp_folder: "/config/krusader/tmp"
+krusader_umask: "000"
 krusader_vnc_password: "{{ ansible_nas_app_admin_password }}"
+krusader_webpage_title: "{{ ansbile_nas_hostname }}"
 
 # autoheal
 krusader_autoheal: "false"
@@ -43,7 +43,7 @@ krusader_dockflare_access_group: ""
 # homepage
 krusader_homepage_group: "Apps"
 krusader_homepage_icon: "krusader.png"
-krusader_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ krusader_port_http }}"
+krusader_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ krusader_port_http }}/vnc.html?resize=remote&host={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}&port={{ krusader_port_http }}&&autoconnect=1"
 krusader_homepage_showstats: "false"
 
 # repliqate
