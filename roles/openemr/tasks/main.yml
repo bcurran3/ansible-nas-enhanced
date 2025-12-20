@@ -10,6 +10,7 @@
         - "{{ openemr_data_directory }}"
         - "{{ openemr_data_directory }}/db"
         - "{{ openemr_data_directory }}/log"
+        - "{{ openemr_data_directory }}/log/apache2"
 
     - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
@@ -88,6 +89,7 @@
           - "{{ openemr_port_http }}:80"
         volumes:
           - "{{ openemr_data_directory }}/log:/var/log"
+          - "{{ openemr_data_directory }}/log/apache2:/var/log/apache2"
           - "openemr_sites:/var/www/localhost/htdocs/openemr/sites"
         env:
           MYSQL_HOST: "{{ openemr_db_container_name }}"
