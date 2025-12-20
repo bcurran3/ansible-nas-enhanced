@@ -371,7 +371,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3060
+# next avail = 3061
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
