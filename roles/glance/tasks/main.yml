@@ -9,6 +9,14 @@
         - "{{ glance_data_directory }}"
         - "{{ glance_data_directory }}/assets"
 
+    - name: Create {{ ansible_nas_app_name }} Template config file
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ glance_data_directory }}/{{ item }}"
+      with_items:
+        - glance.yml
+      register: glance_config
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
