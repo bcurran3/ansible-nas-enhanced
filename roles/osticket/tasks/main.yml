@@ -32,6 +32,13 @@
           MYSQL_USER: "{{ osticket_env_mysql_user }}"
           MYSQL_PASSWORD: "{{ osticket_env_mysql_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test:
+                - CMD-SHELL
+                - 'mariadb-admin ping -h localhost --silent'
+              interval: "20s"
+              timeout: "10s"
+              retries: "5"
         labels:
           autoheal: "{{ osticket_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ osticket_db_watchtower_enable }}"
