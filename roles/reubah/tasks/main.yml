@@ -75,4 +75,11 @@
       community.docker.docker_container:
         name: "{{ reubah_container_name }}"
         state: absent
+
+    - name: Remove {{ ansible_nas_app_name }} Directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - "{{ reubah_data_directory }}"
   when: reubah_enabled is false
