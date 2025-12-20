@@ -276,7 +276,7 @@ By default, applications can be found on the ports listed below.
 | Sonos-Web        | 5050    | Host    | HTTP           |
 | Speedtest-Trk    | 8765    | HTTP    |                |
 | Spoolman         | 7912
-| Stalwart Mail    | 3043
+| Stalwart Mail    | 3043    | HTTP    |                |
 | Stalwart Mail    | 25
 | Stalwart Mail    | 587
 | Stalwart Mail    | 465
