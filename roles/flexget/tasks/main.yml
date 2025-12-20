@@ -17,14 +17,14 @@
         image: "{{ flexget_image_name }}:{{ flexget_image_tag }}"
         pull: true
         volumes:
-          - "{{ flexget_data_directory }}/config"
-          - "{{ flexget_data_directory }}/data"
+          - "{{ flexget_data_directory }}/config:/config"
+          - "{{ flexget_data_directory }}/data:/data"
         ports:
           - "{{ flexget_port_http }}:5050"
         env:
-          FG_WEBUI_PASSWD: "{{ flexget_FG_WEBUI_PASSWD }}"
-          FG_LOG_LEVEL: "info"
-          FG_PLUGINS: "write_magnet"
+          FG_LOG_LEVEL: "{{ flexget_env_fg_log_level }}"
+          FG_PLUGINS: "{{ flexget_env_fg_plugins }}"
+          FG_WEBUI_PASSWD: "{{ flexget_env_fg_webui_passwd }}"
           PUID: "{{ flexget_user_id }}"
           PGID: "{{ flexget_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
