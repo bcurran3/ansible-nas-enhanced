@@ -16,9 +16,9 @@
         hostname: "{{ cup_container_name }}"
         image: "{{ cup_image_name }}:{{ cup_image_tag }}"
         pull: true
-        command: "serve -p 8000"
+        command: "serve -p {{ cup_port_http }}"
         ports:
-          - "{{ cup_port_http }}:8000"
+          - "{{ cup_port_http }}:{{ cup_port_http }}"
         volumes:
           - "{{ cup_data_directory }}/config:/config/cup.json"
           - "/var/run/docker.sock:/var/run/docker.sock"
@@ -65,7 +65,7 @@
           traefik.http.routers.frontend.middlewares: "{{ cup_hostname }}"
           traefik.http.routers.cup.middlewares: "{{ cup_hostname }}@docker"
           traefik.http.middlewares.cup.IPAllowList.sourcerange: "{{ cup_traefik_whitelist }}"
-          traefik.http.services.cup.loadbalancer.server.port: "8000"
+          traefik.http.services.cup.loadbalancer.server.port: "{{ cup_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/sergi0g/CUP/releases"
