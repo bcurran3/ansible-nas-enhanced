@@ -38,6 +38,17 @@
           MYSQL_USER: "{{ koel_env_db_username }}"
           MYSQL_PASSWORD: "{{ koel_env_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test:
+                - CMD
+                - /usr/local/bin/healthcheck.sh
+                - --su-mysql
+                - --connect
+                - --innodb_initialized
+              interval: "30s"
+              timeout: "10s"
+              retries: "3"
+              start_period: "30s"
         labels:
           autoheal: "{{ koel_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ koel_db_watchtower_enable }}"
