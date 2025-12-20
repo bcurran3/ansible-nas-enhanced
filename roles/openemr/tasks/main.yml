@@ -30,19 +30,26 @@
           - name: "{{ openemr_network_name }}"
         networks_cli_compatible: "yes"
         volumes:
-          - "{{ openemr_data_directory }}/db:/var/lib/mysql"
+          - "{{ openemr_data_directory }}/db:/config"
         env:
           ALLOW_EMPTY_PASSWORD: "{{ openemr_db_env_allow_empty_password }}"
           DOCKER_MODS: "{{ openemr_db_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ openemr_db_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ openemr_db_env_docker_mods_install_pip_packages}}"
-          MYSQL_ROOT_PASSWORD: "{{ openemr_db_env_mysql_root_password }}"
+          MYSQL_DATABASE: "{{ openemr_env_mysql_database }}"
           MYSQL_USER: "{{ openemr_env_mysql_user }}"
           MYSQL_PASSWORD: "{{ openemr_env_mysql_pass }}"
-          MYSQL_DATABASE: "{{ openemr_env_mysql_database }}"
+          MYSQL_ROOT_PASSWORD: "{{ openemr_db_env_mysql_root_password }}"
           PGID: "{{ openemr_db_group_id }}"
           PUID: "{{ openemr_db_user_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test:
+                - CMD-SHELL
+                - 'mariadb-admin ping -h localhost --silent'
+              interval: "20s"
+              timeout: "10s"
+              retries: "5"
         labels:
           autoheal: "{{ openemr_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ openemr_db_watchtower_enable }}"
@@ -86,24 +93,24 @@
 #          - "{{ openemr_data_directory }}/sites:/var/www/localhost/htdocs/openemr/sites"
         env:
           MYSQL_HOST: "{{ openemr_db_container_name }}"
-          MYSQL_ROOT_PASS: "{{ openemr_env_mysql_root_pass }}"
+          MYSQL_DATABASE: "{{ openemr_env_mysql_database }}"
           MYSQL_USER: "{{ openemr_env_mysql_user }}"
           MYSQL_PASS: "{{ openemr_env_mysql_pass }}"
-          MYSQL_DATABASE: "{{ openemr_env_mysql_database }}"
+          MYSQL_ROOT_PASS: "{{ openemr_env_mysql_root_pass }}"
           OE_USER: "{{ openemr_env_oe_user }}"
           OE_PASS: "{{ openemr_admin_password }}"
           OPENEMR__ENVIRONMENT: "{{ openemr_env_openemr__environment }}"
           TZ: "{{ ansible_nas_timezone }}"
-        healthcheck:
-          test:
-          - CMD
-          - /usr/bin/curl
-          - --fail
-          - --insecure
-          - --location
-          - --show-error
-          - --silent
-          - https://localhost/
+#        healthcheck:
+#          test:
+#          - CMD
+#          - /usr/bin/curl
+#          - --fail
+#          - --insecure
+#          - --location
+#          - --show-error
+#          - --silent
+#          - https://localhost/
           start_period: "3m"
           start_interval: "10s"
           interval: "1m"
