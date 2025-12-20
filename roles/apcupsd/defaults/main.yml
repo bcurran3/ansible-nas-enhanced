@@ -9,15 +9,15 @@ apcupsd_data_directory: "{{ docker_home }}/apcupsd"
 # network
 apcupsd_port_http: "3551"
 
-# specs
-apcupsd_memory: "1G"
-
 # docker
 apcupsd_container_name: "apcupsd"
-apcupsd_cpu_shares: 1024
 apcupsd_image_name: "gregewing/apcupsd"
 apcupsd_image_tag: "latest"
 apcupsd_device: "/dev/usb/hiddev0" # This device needs to match what the APC UPS on your system uses.
+
+# specs
+apcupsd_cpu_shares: 1024
+apcupsd_memory: "1G"
 
 # ups config
 apcupsd_onbatterydelay: 6
@@ -33,9 +33,8 @@ apcupsd_killdelay: 0
 apcupsd_autoheal: "false"
 
 # homepage
-apcupsd_homepage_group: "Apps"
+apcupsd_homepage_group: "Misc"
 apcupsd_homepage_icon: "apc.png"
-apcupsd_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ apcupsd_port_http }}"
 apcupsd_homepage_showstats: "false"
 
 # repliqate
