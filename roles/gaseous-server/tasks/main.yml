@@ -32,13 +32,17 @@
           MARIADB_USER: "gaseous"
           MARIADB_PASSWORD: "{{ gaseous_server_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
-#        healthcheck:
-#          test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
-#          start_period: 30s
-#          start_interval: 10s
-#          interval: 10s
-#          timeout: 5s
-#          retries: 5
+        healthcheck:
+              test:
+                - CMD
+                - /usr/local/bin/healthcheck.sh
+                - --su-mysql
+                - --connect
+                - --innodb_initialized
+              interval: "30s"
+              timeout: "10s"
+              retries: "3"
+              start_period: "30s"
         labels:
           autoheal: "{{ gaseous_server_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ gaseous_server_db_watchtower_enable }}"
