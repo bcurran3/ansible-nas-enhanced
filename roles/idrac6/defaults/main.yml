@@ -8,8 +8,8 @@ idrac6_data_directory: "{{ docker_home }}/idrac6"
 
 # network
 idrac6_hostname: "idrac6"
-idrac6_port_http: "5800"
-idrac6_port_vnc: "5900"
+idrac6_port_http: "3062"
+idrac6_port_vnc: "5901"
 
 # docker
 idrac6_container_name: "idrac6"
@@ -19,11 +19,14 @@ idrac6_cpu_shares: 1024
 idrac6_memory: "512M"
 
 # app
-idrac6_ip: "192.168.1.2" # set to your iDRAC IP
-idrac6_username: "root"
-idrac6_password: "{{ ansible_nas_app_admin_password }}"
-idrac6_vnc_password: "{{ ansible_nas_app_admin_password }}"
-idrac6_virtualmedia: ""
+idrac6_env_idrac_host: "192.168.1.2" # set to your iDRAC IP
+idrac6_env_idrac_user: "root"
+idrac6_env_idrac_password: "" # set to your iDRAC password
+idrac6_env_vnc_password: "{{ ansible_nas_app_admin_password }}"
+idrac6_env_virtual_iso: ""
+idrac6_env_user_id: "0"
+idrac6_env_group_id: "0"
+
 
 # autoheal
 idrac6_autoheal: "false"

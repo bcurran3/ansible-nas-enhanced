@@ -122,8 +122,8 @@ By default, applications can be found on the ports listed below.
 | Homepage         | 11111   | Bridge  | HTTP           |
 | HTPC Manager     | 9011
 | Huntarr          | 9705
-| iDRAC6           | 5800    | Bridge  | HTTP           |
-| iDRAC6           | 5900 vnc
+| iDRAC6           | 3062    | Bridge  | HTTP           |
+| iDRAC6           | 5901 vnc
 | IDrive           | n/a
 | Immich           | 2283    | Bridge  | HTTP           |
 | InfluxDB         | 8086    | Bridge  | HTTP           |
@@ -373,7 +373,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3062
+# next avail = 3063
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
