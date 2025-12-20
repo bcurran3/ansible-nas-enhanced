@@ -22,7 +22,7 @@
         ports:
           - "{{ offlineu_port_http }}:5000"
         env:
-          FLASK_ENV: "production"
+          FLASK_ENV: "{{ offlineu_env_flask_env }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD", "curl", "-f", "http://localhost:5000/"]
@@ -41,7 +41,7 @@
           homepage.group: "{{ offlineu_homepage_group }}"
           homepage.icon: "{{ offlineu_homepage_icon }}"
           homepage.href: "{{ offlineu_homepage_href }}"
-          homepage.description: "{{ 'a sleek, self-hosted web app designed to load and view your offline video, audio, text, and quiz-based training courses' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'Self-Hosted Local Course Loader & Progress Tracker' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ offlineu_container_name }}"
           homepage.showStats: "{{ offlineu_homepage_showstats }}"
@@ -60,9 +60,9 @@
           traefik.http.routers.offlineu.middlewares: "{{ offlineu_hostname }}@docker"
           traefik.http.middlewares.offlineu.IPAllowList.sourcerange: "{{ offlineu_traefik_whitelist }}"
           traefik.http.services.offlineu.loadbalancer.server.port: "5000"
-          wud.tag.include: '^v\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/skippysteve/OfflineU/pkgs/container/offlineu"
+          wud.tag.include: '^main$'
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/WhiskeyCoder/OfflineU/pkgs/container/offlineu"
         cpu_shares: "{{ offlineu_cpu_shares }}"
         memory: "{{ offlineu_memory }}"
         restart_policy: unless-stopped
