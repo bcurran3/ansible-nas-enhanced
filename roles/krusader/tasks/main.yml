@@ -44,7 +44,7 @@
           homepage.group: "{{ krusader_homepage_group }}"
           homepage.icon: "{{ krusader_homepage_icon }}"
           homepage.href: "{{ krusader_homepage_href }}"
-          homepage.description: "{{ 'krusader description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'Krusader is an advanced orthodox file manager ' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ krusader_container_name }}"
           homepage.showStats: "{{ krusader_homepage_showstats }}"
@@ -72,12 +72,17 @@
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
-        msg: >-
-              {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (krusader_port_http | string)/vnc.html?resize=remote&host={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}&port=(krusader_port_http | string)&&autoconnect=1] +
-                (['https://' + krusader_hostname + '.' + ansible_nas_domain] if (krusader_available_externally is true or krusader_dockflare_tunnel is true) else [])
-              }}
-# /\ add VNC instructions
+          msg: >-
+            {{
+              [
+                'http://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ krusader_port_http ~ '/vnc.html?resize=remote&host=' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ '&port=' ~ krusader_port_http ~ '&autoconnect=1'
+              ] + (
+                ['https://' ~ krusader_hostname ~ '.' ~ ansible_nas_domain]
+                if (krusader_available_externally is true or krusader_dockflare_tunnel is true) else []
+              ) + [
+                'VNC access at ' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ krusader_port_vnc
+              ]
+            }}
   when: krusader_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
