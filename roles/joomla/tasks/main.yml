@@ -70,7 +70,7 @@
           - "{{ joomla_port_http }}:80"
         env:
           JOOMLA_DB_HOST: "{{ joomla_db_container_name }}"
-          JOOMLA_DB_USER: "root"
+          JOOMLA_DB_USER: "joomla"
           JOOMLA_DB_PASSWORD: "{{ joomla_database_password }}"
         links:
           - "{{ joomla_db_container_name }}"
@@ -130,6 +130,11 @@
     - name: Stop {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         name: "{{ joomla_db_container_name }}"
+        state: absent
+
+    - name: Delete {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ joomla_network_name }}"
         state: absent
   when: joomla_enabled is false
 
