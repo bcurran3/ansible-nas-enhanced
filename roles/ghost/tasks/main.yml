@@ -103,7 +103,7 @@
           dockflare.enable: "{{ ghost_dockflare_tunnel }}"
           dockflare.access.group: "{{ ghost_dockflare_access_group }}"
           dockflare.hostname: "{{ ghost_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
+          dockflare.service: "https://{{ ghost_hostname }}.{{ ansible_nas_domain }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ ghost_homepage_group }}"
           homepage.icon: "{{ ghost_homepage_icon }}"
@@ -138,7 +138,6 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ghost_port_http | string)] +
                 (['https://' + ghost_hostname + '.' + ansible_nas_domain] if (ghost_available_externally is true or ghost_dockflare_tunnel is true) else [])
               }}
   when: ghost_enabled is true
