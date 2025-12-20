@@ -27,11 +27,10 @@
         volumes:
           - "{{ joomla_data_directory }}/db:/var/lib/mysql"
         env:
-          MYSQL_DATABASE: "joomla_db"
-          MYSQL_USER: "joomla"
-          MYSQL_PASSWORD: "{{ joomla_database_password }}"
+          MYSQL_DATABASE: "{{ joomla_env_joomla_db_name }}"
+          MYSQL_USER: "{{ joomla_env_joomla_db_user }}"
+          MYSQL_PASSWORD: "{{ joomla_env_joomla_db_password }}"
           MYSQL_RANDOM_ROOT_PASSWORD: '1'
-#          MYSQL_ROOT_PASSWORD: "{{ joomla_database_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ joomla_db_autoheal }}"
@@ -73,20 +72,19 @@
         ports:
           - "{{ joomla_port_http }}:80"
         env:
-          JOOMLA_DB_HOST: "{{ joomla_db_container_name }}"
-          JOOMLA_DB_USER: "joomla"
-          JOOMLA_DB_NAME: "joomla_db"
-          JOOMLA_DB_PASSWORD: "{{ joomla_database_password }}"
-          JOOMLA_DB_TYPE: "mysqli"
-          JOOMLA_SITE_NAME: ""
-          JOOMLA_ADMIN_USER: "ANE {{ ansible_nas_user }}"
-          JOOMLA_ADMIN_USERNAME: "admin"
-          JOOMLA_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
-          JOOMLA_ADMIN_EMAIL: ""
-          JOOMLA_EXTENSIONS_URLS: ""
-          JOOMLA_EXTENSIONS_PATHS: ""
-          JOOMLA_SMTP_HOST: ""
-          JOOMLA_SMTP_HOST_PORT: ""
+          JOOMLA_DB_USER: "{{ joomla_env_joomla_db_user }}"
+          JOOMLA_DB_NAME: "{{ joomla_env_joomla_db_name }}"
+          JOOMLA_DB_PASSWORD: "{{ joomla_env_joomla_db_password }}"
+          JOOMLA_DB_TYPE: "{{ joomla_env_joomla_db_type }}"
+          JOOMLA_SITE_NAME: "{{ joomla_env_joomla_site_name }}"
+          JOOMLA_ADMIN_USER: "{{ joomla_env_joomla_admin_user }}"
+          JOOMLA_ADMIN_USERNAME: "{{ joomla_env_joomla_admin_username }}"
+          JOOMLA_ADMIN_PASSWORD: "{{ joomla_env_joomla_admin_password }}"
+          JOOMLA_ADMIN_EMAIL: "{{ joomla_env_joomla_admin_email }}"
+          JOOMLA_EXTENSIONS_URLS: "{{ joomla_env_joomla_extensions_urls }}"
+          JOOMLA_EXTENSIONS_PATHS: "{{ joomla_env_joomla_extensions_paths }}"
+          JOOMLA_SMTP_HOST: "{{ joomla_env_joomla_smtp_host }}"
+          JOOMLA_SMTP_HOST_PORT: "{{ joomla_env_joomla_smtp_host_port }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ joomla_db_container_name }}"

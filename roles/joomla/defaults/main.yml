@@ -5,8 +5,6 @@ joomla_enabled: false
 joomla_available_externally: false
 joomla_traefik_whitelist: "{{ lan }}"
 
-joomla_database_password: top_secret
-
 # directories
 joomla_data_directory: "{{ docker_home }}/joomla"
 
@@ -28,6 +26,21 @@ joomla_cpu_shares: 1024
 joomla_memory: "1G"
 joomla_db_cpu_shares: 1024
 joomla_db_memory: "1G"
+
+# app
+joomla_env_joomla_db_user: "joomla"
+joomla_env_joomla_db_name: "joomla_db"
+joomla_env_joomla_db_password: "topsecret"
+joomla_env_joomla_db_type: "mysqli"
+joomla_env_joomla_site_name:
+joomla_env_joomla_admin_user: "ANE {{ ansible_nas_user }}"
+joomla_env_joomla_admin_username: "admin"
+joomla_env_joomla_admin_password: "{{ ansible_nas_app_admin_password }}"
+joomla_env_joomla_admin_email: ""
+joomla_env_joomla_extensions_urls: ""
+joomla_env_joomla_extensions_paths: ""
+joomla_env_joomla_smtp_host: ""
+joomla_env_joomla_smtp_host_port: ""
 
 # autoheal
 joomla_autoheal: "false"
