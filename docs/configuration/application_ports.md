@@ -28,6 +28,8 @@ By default, applications can be found on the ports listed below.
 | Booksonic Air    | 4041    | Bridge  | HTTP           |
 | Calibre          | 8093
 | Calibre          | 8094
+| Calibre          | 3060
+| Calibre          | 3061
 | Calibre-Web      | 8084    | Bridge  | HTTP           |
 | Change Detection | 3029    | Bridge  | HTTP           |
 | Chatpad AI       | 9022    | Bridge  | HTTP           |
@@ -371,7 +373,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3061
+# next avail = 3062
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
