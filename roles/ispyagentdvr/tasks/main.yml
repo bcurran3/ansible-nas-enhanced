@@ -26,7 +26,18 @@
         ports:
           - "{{ ispyagentdvr_port_http }}:8090"
           - "{{ ispyagentdvr_port_turn }}:3478/udp"
-          - "{{ ispyagentdvr_agentdvr_host_port }}:50000-50010/udp"
+          - "{{ ispyagentdvr_agentdvr_host_port }}:50000-50100/udp"
+        devices: >-
+                  {{
+                    (handbrake_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (handbrake_devices | default(omit))
+                  }}
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
           WEBUI_PORT: "{{ ispyagentdvr_port_http }}"
