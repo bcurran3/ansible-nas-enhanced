@@ -170,9 +170,9 @@
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
         path: "{{ ghost_data_directory }}"
-        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.tar.gz"
         force_archive: true
-        format: zip
+        format: gz
         owner: ansible-nas
         group: ansible-nas
         mode: u=rw,g=rw
