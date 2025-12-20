@@ -6,6 +6,7 @@
         path: "{{ item }}"
         state: directory
       with_items:
+        - "{{ chowdown_data_directory }}"
         - "{{ chowdown_data_directory }}/config"
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -15,7 +16,6 @@
         hostname: "{{ chowdown_container_name }}"
         image: "{{ chowdown_image_name }}:{{ chowdown_image_tag }}"
         pull: true
-        cpu_shares: "{{ chowdown_cpu_shares }}"
         network_mode: "bridge"
         volumes:
           - "{{ chowdown_data_directory }}/config:/config:rw"
@@ -46,17 +46,18 @@
           repliqate.schedule: "{{ chowdown_repliqate_schedule }}"
           repliqate.backup_id: "{{ chowdown_repliqate_backup_id }}"
           repliqate.retention: "{{ chowdown_repliqate_retention }}"
-          traefik.http.routers.chowdown.rule: "Host(`chowdown.{{ ansible_nas_domain }}`)"
+          traefik.enable: "{{ chowdown_available_externally | string }}"
+          traefik.http.routers.chowdown.rule: "Host(`{{ chowdown_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.chowdown.tls.certresolver: "letsencrypt"
           traefik.http.routers.chowdown.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.chowdown.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ chowdown_hostname }}"
+          traefik.http.routers.chowdown.middlewares: "{{ chowdown_hostname }}@docker"
           traefik.http.middlewares.chowdown.IPAllowList.sourcerange: "{{ chowdown_traefik_whitelist }}"
           traefik.http.services.chowdown.loadbalancer.server.port: "4000"
-          traefik.frontend.rule: "Host:chowdown.{{ ansible_nas_domain }}"
-          traefik.enable: "{{ chowdown_available_externally | string }}"
-          traefik.port: "4000"
           wud.watch.digest: "true"
           wud.link.template: "https://hub.docker.com/r/gregyankovoy/chowdown"
+        cpu_shares: "{{ chowdown_cpu_shares }}"
         memory: "{{ chowdown_memory }}"
         restart_policy: unless-stopped
 
