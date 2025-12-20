@@ -10,6 +10,14 @@
         - "{{ glance_data_directory }}/assets"
         - "{{ glance_data_directory }}/config"
 
+    - name: Create {{ ansible_nas_app_name }} Template config file
+      ansible.builtin.template:
+        src: "{{ item }}"
+        dest: "{{ glance_data_directory }}/config/{{ item }}"
+      with_items:
+        - glance.yml
+      register: glance_config
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -20,6 +28,7 @@
         ports:
           - "{{ glance_port_http }}:8080"
         volumes:
+#          - "{{ glance_data_directory }}/config/glance.yml:/app/config/glance.yml"
           - "{{ glance_data_directory }}/assets:/app/assets"
           - "{{ glance_data_directory }}/config:/app/config"
           - "/etc/localtime:/etc/localtime:ro"
