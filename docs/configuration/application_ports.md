@@ -195,6 +195,7 @@ By default, applications can be found on the ports listed below.
 | OfflineU         | 3053    | Bridge  | HTTP           |
 | Ollama           | 11434   | Bridge  | HTTP           |
 | ONLYOFFICE Docs  | 9015    | Bridge  | HTTP           |
+| ONLYOFFICE Docs  | 5222    | Bridge  | XMPP           |
 | Ombi             | 3579    | Bridge  | HTTP           |
 | Open WebUI       | 11435
 | Open WebUI       | 11436
