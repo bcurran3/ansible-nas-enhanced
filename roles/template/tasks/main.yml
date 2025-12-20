@@ -149,6 +149,17 @@
           MYSQL_USER: "appname"
           MYSQL_PASSWORD: "{{ appname_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test:
+                - CMD
+                - /usr/local/bin/healthcheck.sh
+                - --su-mysql
+                - --connect
+                - --innodb_initialized
+              interval: "30s"
+              timeout: "10s"
+              retries: "3"
+              start_period: "30s"
         labels:
           autoheal: "{{ appname_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable }}"
