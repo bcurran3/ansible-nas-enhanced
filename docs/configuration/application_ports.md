@@ -123,7 +123,7 @@ By default, applications can be found on the ports listed below.
 | HTPC Manager     | 9011
 | Huntarr          | 9705
 | iDRAC6           | 3062    | Bridge  | HTTP           |
-| iDRAC6           | 5901 vnc
+| iDRAC6           | 5902    | Bridge  | VNC            |
 | IDrive           | n/a
 | Immich           | 2283    | Bridge  | HTTP           |
 | InfluxDB         | 8086    | Bridge  | HTTP           |
@@ -146,7 +146,7 @@ By default, applications can be found on the ports listed below.
 | Komga            | 8088    | Bridge  | HTTPS          |
 | Komodo           | 9120    | Bridge  | HTTP           |
 | Krusader         | 6080    | Bridge  | HTTP           |
-| Krusader         | 5900    | Bridge  | VNC            |
+| Krusader         | 5901    | Bridge  | VNC            |
 | LANCommander     | 1337    | Bridge  | HTTP           |
 | Lidarr           | 8686    | Bridge  | HTTP           |
 | Linkwarden       | 8990    | Bridge  | HTTP           |
