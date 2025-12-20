@@ -31,12 +31,12 @@
           MYSQL_PASSWORD: "{{ ghost_env_db_password }}"
           MYSQL_DATABASE: "ghost"
 #         MYSQL_MULTIPLE_DATABASES: "activitypub"
-          MYSQL_ROOT_PASSWORD: "{{ ghost_db_envmsql_root_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ ghost_db_env_msql_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ ghost_data_directory }}/db:/var/lib/mysql"
         healthcheck:
-          test: "mysqladmin ping -p${{ ghost_db_envmsql_root_password }} -h 127.0.0.1"
+          test: "mysqladmin ping -p${{ ghost_db_env_msql_root_password }} -h 127.0.0.1"
           interval: "1s"
           start_period: "30s"
           start_interval: "10s"
