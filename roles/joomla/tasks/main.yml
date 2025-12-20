@@ -7,6 +7,7 @@
         state: directory
       with_items:
         - "{{ joomla_data_directory }}"
+        - "{{ joomla_data_directory }}/data"
         - "{{ joomla_data_directory }}/db"
 
     - name: Create {{ ansible_nas_app_name }} network
@@ -26,9 +27,11 @@
         volumes:
           - "{{ joomla_data_directory }}/db:/var/lib/mysql"
         env:
-          MYSQL_DATABASE: "joomla"
+          MYSQL_DATABASE: "joomla_db"
           MYSQL_USER: "joomla"
-          MYSQL_ROOT_PASSWORD: "{{ joomla_database_password }}"
+          MYSQL_PASSWORD: "{{ joomla_database_password }}"
+          MYSQL_RANDOM_ROOT_PASSWORD: '1'
+#          MYSQL_ROOT_PASSWORD: "{{ joomla_database_password }}"
         labels:
           autoheal: "{{ joomla_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ joomla_db_watchtower_enable }}"
@@ -65,13 +68,24 @@
           - name: "{{ joomla_network_name }}"
         network_mode: "{{ joomla_network_name }}"
         volumes:
-          - "{{ joomla_data_directory }}:/var/www/html:rw"
+          - "{{ joomla_data_directory }}:/var/www/html"
         ports:
           - "{{ joomla_port_http }}:80"
         env:
           JOOMLA_DB_HOST: "{{ joomla_db_container_name }}"
           JOOMLA_DB_USER: "joomla"
+          JOOMLA_DB_NAME: "joomla_db"
           JOOMLA_DB_PASSWORD: "{{ joomla_database_password }}"
+          JOOMLA_DB_TYPE: "mysqli"
+          JOOMLA_SITE_NAME: ""
+          JOOMLA_ADMIN_USER: "ANE {{ ansible_nas_user }}"
+          JOOMLA_ADMIN_USERNAME: "admin"
+          JOOMLA_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
+          JOOMLA_ADMIN_EMAIL: ""
+          JOOMLA_EXTENSIONS_URLS: ""
+          JOOMLA_EXTENSIONS_PATHS: ""
+          JOOMLA_SMTP_HOST: ""
+          JOOMLA_SMTP_HOST_PORT: ""
         links:
           - "{{ joomla_db_container_name }}"
         labels:
@@ -85,7 +99,7 @@
           homepage.group: "{{ joomla_homepage_group }}"
           homepage.icon: "{{ joomla_homepage_icon }}"
           homepage.href: "{{ joomla_homepage_href }}"
-          homepage.description: "{{ 'joomla description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'open source content management system' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ joomla_container_name }}"
           homepage.showStats: "{{ joomla_homepage_showstats }}"
