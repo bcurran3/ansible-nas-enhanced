@@ -16,15 +16,21 @@ joplin_port_http: "22300"
 joplin_container_name: "joplin"
 joplin_image_name: "joplin/server"
 joplin_image_tag: "latest"
-joplin_cpu_shares: 1024
-joplin_memory: "1G"
 joplin_db_container_name: "joplin-db"
-joplin_db_cpu_shares: 1024
 joplin_db_image_name: "postgres"
 joplin_db_image_tag: "16-alpine"
+
+# specs
+joplin_cpu_shares: 1024
+joplin_memory: "1G"
+joplin_db_cpu_shares: 1024
 joplin_db_memory: "1G"
 
 # app
+joplin_env_postgres_password: "joplin"
+joplin_env_postgres_database: "joplin_db"
+joplin_env_postgres_user: "joplin"
+joplin_env_postgres_port: "5432"
 joplin_env_mailer_enabled: "0" # 1 to enable
 joplin_env_mailer_host: "smtp.{{ ansible_nas_domain }}"
 joplin_env_mailer_port: "587"

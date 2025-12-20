@@ -19,9 +19,9 @@
         volumes:
           - "{{ joplin_data_directory }}/db:/var/lib/postgresql/data"
         env:
-          POSTGRES_USER: "joplin"
-          POSTGRES_PASSWORD: "joplin"
-          POSTGRES_DB: "joplin"
+          POSTGRES_USER: "{{ joplin_env_postgres_user }}"
+          POSTGRES_PASSWORD: "{{ joplin_env_postgres_password }}"
+          POSTGRES_DB: "{{ joplin_env_postgres_database }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ joplin_db_autoheal }}"
@@ -71,10 +71,10 @@
           MAILER_AUTH_PASSWORD: "{{ joplin_env_mailer_auth_password }}"
           MAILER_NOREPLY_NAME: "{{ joplin_env_mailer_noreply_name }}"
           MAILER_NOREPLY_EMAIL: "{{ joplin_env_mailer_noreply_email }}"
-          POSTGRES_PASSWORD: "joplin"
-          POSTGRES_DATABASE: "joplin"
-          POSTGRES_USER: "joplin"
-          POSTGRES_PORT: "5432"
+          POSTGRES_PASSWORD: "{{ joplin_env_postgres_password }}"
+          POSTGRES_DATABASE: "{{ joplin_env_postgres_database }}"
+          POSTGRES_USER: "{{ joplin_env_postgres_user }}"
+          POSTGRES_PORT: "{{ joplin_env_postgres_port }}"
           POSTGRES_HOST: "{{ joplin_db_container_name }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
