@@ -15,12 +15,16 @@ calibre_books_directory: "{{ books_root }}"
 calibre_comics_directory: "{{ comics_root }}"
 
 # network
-calibre_port_http: "8093"
-calibre_webserver_port_http: "8094"
 calibre_hostname: "calibre"
+calibre_port_http: "8093"
+calibre_port_https: "8181"
+calibre_port_ws: "8082"
+#calibre_port_webserver_http: "8094"
 
 # env
-calibre_password: ""
+# https://github.com/linuxserver/docker-calibre
+calibre_user: "admin"
+calibre_password: "{{ ansible_nas_app_admin_password }}"
 calibre_cli_args: ""
 calibre_security_opts: "seccomp=unconfined" # For why this is here, see https://github.com/linuxserver/docker-calibre/issues/102
 

@@ -20,18 +20,28 @@
           - "{{ calibre_data_directory }}/data:/config:rw"
           - "{{ calibre_books_directory }}:/books:rw"
           - "{{ calibre_comics_directory }}:/comics:rw"
+        devices: >-
+                  {{
+                    (handbrake_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (handbrake_devices | default(omit))
+                  }}
         env:
           CLI_ARGS: "{{ calibre_cli_args }}"
+          CUSTOM_PORT: "{{ calibre_port_http }}:{{ calibre_port_http }}"
+          CUSTOM_USER: "{{ calibre_user }}"
+          CUSTOM_WS_PORT: "{{ calibre_port_ws }}"
+          PASSWORD: "{{ calibre_password }}"
           DOCKER_MODS: "{{ calibre_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ calibre_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ calibre_env_docker_mods_install_pip_packages}}"
-          PASSWORD: "{{ calibre_password }}"
           PUID: "{{ calibre_user_id }}"
           PGID: "{{ calibre_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
-          - "{{ calibre_port_http }}:8080"
-          - "{{ calibre_webserver_port_http }}:8081"
+          - "{{ calibre_port_http }}:{{ calibre_port_http }}"
+          - "{{ calibre_port_https }}:8181"
+          - "{{ calibre_port_ws }}:{{ calibre_port_ws }}"
         security_opts: "{{ calibre_security_opts }}"
         labels:
           autoheal: "{{ calibre_autoheal }}"
@@ -62,12 +72,13 @@
           traefik.http.routers.frontend.middlewares: "{{ calibre_hostname }}"
           traefik.http.routers.calibre.middlewares: "{{ calibre_hostname }}@docker"
           traefik.http.middlewares.calibre.IPAllowList.sourcerange: "{{ calibre_traefik_whitelist }}"
-          traefik.http.services.calibre.loadbalancer.server.port: "8080"
+          traefik.http.services.calibre.loadbalancer.server.port: "{{ calibre_port_http }}"
           wud.tag.include: '^version-\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "lscr.io/linuxserver/calibre"
         cpu_shares: "{{ calibre_cpu_shares }}"
         memory: "{{ calibre_memory }}"
+        shm_size: "1gb"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
