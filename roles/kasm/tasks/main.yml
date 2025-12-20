@@ -22,8 +22,13 @@
         volumes:
           - "{{ kasm_data_directory }}/opt:/opt"
           - "{{ kasm_data_directory }}/profiles:/profiles" #optional
-          - /dev/input:/dev/input #optional
-          - /run/udev/data:/run/udev/data #optional
+          - "/dev/input:/dev/input" #optional
+          - "/run/udev/data:/run/udev/data" #optional
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
         env:
           KASM_PORT: "{{ kasm_port_http }}"
           DOCKER_HUB_USERNAME: "{{ kasm_docker_hub_username }}" #optional
