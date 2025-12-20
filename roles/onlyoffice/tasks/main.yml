@@ -24,10 +24,8 @@
           - "{{ onlyoffice_data_directory }}/data:/var/www/onlyoffice/Data"
           - "{{ onlyoffice_data_directory }}/logs:/var/log/onlyoffice"
         env:
-          JWT_SECRET: "nextcloud"
-#         DOCUMENT_SERVER_PORT_80_TCP_ADDR: "{{ onlyoffice_env_document_server_port_80_tcp_addr }}"
-          # ^ needed?
-          USE_UNAUTHORIZED_STORAGE: "true"
+          JWT_SECRET: "{{ onlyoffice_env_jwt_secret }}"
+          USE_UNAUTHORIZED_STORAGE: "{{ onlyoffice_env_use_unauthorized_storage }}"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ onlyoffice_port_http }}:80"
