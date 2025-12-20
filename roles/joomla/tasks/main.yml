@@ -32,6 +32,7 @@
           MYSQL_PASSWORD: "{{ joomla_database_password }}"
           MYSQL_RANDOM_ROOT_PASSWORD: '1'
 #          MYSQL_ROOT_PASSWORD: "{{ joomla_database_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ joomla_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ joomla_db_watchtower_enable }}"
@@ -86,6 +87,7 @@
           JOOMLA_EXTENSIONS_PATHS: ""
           JOOMLA_SMTP_HOST: ""
           JOOMLA_SMTP_HOST_PORT: ""
+          TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ joomla_db_container_name }}"
         labels:
