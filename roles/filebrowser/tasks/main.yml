@@ -7,6 +7,8 @@
         state: directory
       with_items:
         - "{{ filebrowser_data_directory }}"
+        - "{{ filebrowser_data_directory }}/config"
+        - "{{ filebrowser_data_directory }}/db"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -17,8 +19,8 @@
         pull: true
         volumes:
           - "{{ filebrowser_root_dir }}:/srv"
-          - "{{ filebrowser_data_directory }}/filebrowser.db:/database/filebrowser.db"
-          - "{{ filebrowser_data_directory }}/settings.json:/config/settings.json"
+          - "{{ filebrowser_data_directory }}/config:/config"
+          - "{{ filebrowser_data_directory }}/db:/database"
         ports:
           - "{{ filebrowser_port_http }}:80"
         network_mode: bridge
