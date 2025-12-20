@@ -24,7 +24,7 @@
         hostname: "{{ openemr_db_container_name }}"
         image: "{{ openemr_db_image_name }}:{{ openemr_db_image_tag }}"
         pull: true
-        command: 'mariadb --character-set-server=utf8mb4'
+#        command: 'mariadb --character-set-server=utf8mb4'
         network_mode: "bridge"
         networks:
           - name: "{{ openemr_network_name }}"
@@ -101,16 +101,16 @@
           OE_PASS: "{{ openemr_admin_password }}"
           OPENEMR__ENVIRONMENT: "{{ openemr_env_openemr__environment }}"
           TZ: "{{ ansible_nas_timezone }}"
-#        healthcheck:
-#          test:
-#          - CMD
-#          - /usr/bin/curl
-#          - --fail
-#          - --insecure
-#          - --location
-#          - --show-error
-#          - --silent
-#          - https://localhost/
+        healthcheck:
+          test:
+          - CMD
+          - /usr/bin/curl
+          - --fail
+          - --insecure
+          - --location
+          - --show-error
+          - --silent
+          - https://localhost/
           start_period: "3m"
           start_interval: "10s"
           interval: "1m"
