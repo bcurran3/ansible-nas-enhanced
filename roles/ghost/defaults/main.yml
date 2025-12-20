@@ -16,7 +16,7 @@ ghost_image_name: "ghost"
 ghost_image_tag: "latest"
 ghost_db_container_name: "ghost-db"
 ghost_db_image_name: "mysql"
-ghost_db_image_tag: "8.0"
+ghost_db_image_tag: "8.0.44"
 
 # specs
 ghost_cpu_shares: 1024
@@ -25,14 +25,15 @@ ghost_db_cpu_shares: 1024
 ghost_db_memory: "1G"
 
 # app
+# https://ghost.org/docs/config/#configuration-options
 ghost_env_mail_from: "" # "'MyDomain' <postmaster@{{ ansible_nas_domain }}>"
 ghost_env_mail_transport: "SMTP"
 ghost_env_mail_options_host: "" # "smtp.{{ ansible_nas_domain }}"
 ghost_env_mail_options_port: "465"
+ghost_env_db_password: "d1746c5207f2bc63589be6c3ee89ddd2f9ffb1aa351c34ff5050149b6463d4c3"
 ghost_env_node_env: "production"
-#ghost_env_url: "https://{{ ghost_hostname }}.{{ ansible_nas_domain }}"
-ghost_env_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ghost_port_http }}"
-ghost_db_password: "topsecret"
+ghost_env_url: "https://{{ ghost_hostname }}.{{ ansible_nas_domain }}"
+ghost_db_env_msql_root_password: "90491b9e19c35feb5c68969d3fbf92a85fdffefe777dc20aab6c6c929e45a84a"
 
 # autoheal
 ghost_autoheal: "false"

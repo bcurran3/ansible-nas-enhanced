@@ -27,10 +27,20 @@
         networks_cli_compatible: "yes"
         network_mode: bridge
         env:
-          MYSQL_ROOT_PASSWORD: "{{ ghost_db_password }}"
+          MYSQL_USER: "ghost"
+          MYSQL_PASSWORD: "{{ ghost_env_db_password }}"
+          MYSQL_DATABASE: "ghost"
+#         MYSQL_MULTIPLE_DATABASES: "activitypub"
+          MYSQL_ROOT_PASSWORD: "{{ ghost_db_envmsql_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ ghost_data_directory }}/db:/var/lib/mysql"
+        healthcheck:
+          test: "mysqladmin ping -p${{ ghost_db_envmsql_root_password }} -h 127.0.0.1"
+          interval: "1s"
+          start_period: "30s"
+          start_interval: "10s"
+          retries: 120
         labels:
           autoheal: "{{ ghost_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ ghost_db_watchtower_enable }}"
@@ -70,18 +80,17 @@
         ports:
           - "{{ ghost_port_http }}:2368"
         env:
-          # see https://ghost.org/docs/config/#configuration-options
+          url: "{{ ghost_env_url }}"
           database__client: "mysql"
           database__connection__host: "{{ ghost_db_container_name }}"
           database__connection__user: "root"
-          database__connection__password: "{{ ghost_db_password }}"
+          database__connection__password: "{{ ghost_env_db_password }}"
           database__connection__database: "ghost"
           mail__from: "{{ ghost_env_mail_from }}"
           mail__transport: "{{ ghost_env_mail_transport }}"
           mail__options__host: "{{ ghost_env_mail_options_host }}"
           mail__options__port: "{{ ghost_env_mail_options_port }}"
           NODE_ENV: "{{ ghost_env_node_env }}"
-          url: "{{ ghost_env_url }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ ghost_data_directory }}/content:/var/lib/ghost/content"
