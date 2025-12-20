@@ -12,6 +12,16 @@
         - "{{ koel_data_directory }}/storage"
         - "{{ koel_data_directory }}/sql"
 
+##############################################
+# this needs an initialization
+# https://github.com/koel/docker?tab=readme-ov-file
+
+# docker exec --user www-data -it "{{ koel_container_name }}" bash
+# php artisan koel:init --no-assets
+# docker exec -it "{{ koel_container_name }}" php artisan koel:admin:change-password
+
+##############################################
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -67,6 +77,15 @@
         ports:
           - "{{ koel_port_http }}:80"
         env:
+######### TEST ##########
+          APP_KEY: "base64:4iWpqeVBcYI2O1rXhxGhFxc0gAPgwrfajeJYD8apUJc="
+          MEDIA_PATH: "/music"
+          MEMORY_LIMIT: "{{ koel_memory }}"
+          LASTFM_API_KEY: ""
+          LASTFM_API_SECRET: ""
+          SPOTIFY_CLIENT_ID: ""
+          SPOTIFY_CLIENT_SECRET: ""
+######### TEST ##########
           DB_CONNECTION: "{{ koel_env_db_connection }}"
           DB_HOST: "{{ koel_db_container_name }}"
           DB_USERNAME: "{{ koel_env_db_username }}"
