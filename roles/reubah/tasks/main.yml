@@ -9,7 +9,6 @@
         group: 1000
       with_items:
         - "{{ reubah_data_directory }}"
-        - "{{ reubah_data_directory }}/tmp"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -19,11 +18,11 @@
         image: "{{ reubah_image_name }}:{{ reubah_image_tag }}"
         pull: true
         volumes:
-          - "{{ reubah_data_directory }}/tmp:/tmp"
+          - "{{ reubah_data_directory }}:/tmp"
         ports:
-          - "{{ reubah_port_http }}:{{ reubah_port_http }}"
+          - "{{ reubah_port_http }}:8081"
         env:
-          PORT: "{{ reubah_port_http }}"
+#          PORT: "{{ reubah_port_http }}" # reassigning the port causes healthcheck failure: https://github.com/dendianugerah/reubah/issues/31
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ reubah_autoheal }}"
@@ -54,7 +53,7 @@
           traefik.http.routers.frontend.middlewares: "{{ reubah_hostname }}"
           traefik.http.routers.reubah.middlewares: "{{ reubah_hostname }}@docker"
           traefik.http.middlewares.reubah.IPAllowList.sourcerange: "{{ reubah_traefik_whitelist }}"
-          traefik.http.services.reubah.loadbalancer.server.port: "{{ reubah_port_http }}"
+          traefik.http.services.reubah.loadbalancer.server.port: "8081"
           wud.watch.digest: "true"
           wud.link.template: "https://github.com/dendianugerah/reubah/pkgs/container/reubah"
         cpu_shares: "{{ reubah_cpu_shares }}"
@@ -77,23 +76,3 @@
         name: "{{ reubah_container_name }}"
         state: absent
   when: reubah_enabled is false
-
-- name: Data Archive {{ ansible_nas_app_name }}
-  block:
-    - name: Check for {{ ansible_nas_app_name }} Data Directory
-      stat:
-        path: "{{ reubah_data_directory }}"
-      register: dir_stat
-
-    - name: Archive {{ ansible_nas_app_name }} Data Directory
-      ansible.builtin.archive:
-        path: "{{ reubah_data_directory }}"
-        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
-        force_archive: true
-        format: zip
-        owner: ansible-nas
-        group: ansible-nas
-        mode: u=rw,g=rw
-        remove: true
-      when: dir_stat.stat.exists
-  when: reubah_enabled is false and archive_app_data_enabled is true
