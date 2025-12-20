@@ -30,7 +30,7 @@
           CLI_ARGS: "{{ calibre_cli_args }}"
           CUSTOM_PORT: "{{ calibre_port_http }}:{{ calibre_port_http }}"
           CUSTOM_USER: "{{ calibre_user }}"
-          CUSTOM_WS_PORT: "{{ calibre_port_ws }}"
+          CUSTOM_WS_PORT: "{{ calibre_port_websocket }}"
           PASSWORD: "{{ calibre_password }}"
           DOCKER_MODS: "{{ calibre_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ calibre_env_docker_mods_install_packages }}"
@@ -41,6 +41,7 @@
         ports:
           - "{{ calibre_port_http }}:{{ calibre_port_http }}"
           - "{{ calibre_port_https }}:8181"
+          - "{{ calibre_port_webserver_http }}:8094"
           - "{{ calibre_port_ws }}:{{ calibre_port_ws }}"
         security_opts: "{{ calibre_security_opts }}"
         labels:
