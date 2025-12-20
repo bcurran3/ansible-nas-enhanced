@@ -22,10 +22,10 @@
         volumes:
           - "{{ koel_data_directory }}/db:/var/lib/mysql"
         env:
-          MYSQL_ROOT_PASSWORD: "topsecretroot"
-          MYSQL_DATABASE: "koel"
-          MYSQL_USER: "koel"
-          MYSQL_PASSWORD: "koel"
+          MYSQL_ROOT_PASSWORD: "{{ koel_db_env_mysql_root_password }}"
+          MYSQL_DATABASE: "{{ koel_env_db_database }}"
+          MYSQL_USER: "{{ koel_env_db_username }}"
+          MYSQL_PASSWORD: "{{ koel_env_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ koel_db_autoheal }}"
@@ -67,11 +67,11 @@
         ports:
           - "{{ koel_port_http }}:80"
         env:
-          DB_CONNECTION: "mysql"
+          DB_CONNECTION: "{{ koel_env_db_connection }}"
           DB_HOST: "{{ koel_db_container_name }}"
-          DB_USERNAME: "koel"
-          DB_PASSWORD: "koel"
-          DB_DATABASE: "koel"
+          DB_USERNAME: "{{ koel_env_db_username }}"
+          DB_PASSWORD: "{{ koel_env_db_password }}"
+          DB_DATABASE: "{{ koel_env_db_database }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ koel_db_container_name }}"
