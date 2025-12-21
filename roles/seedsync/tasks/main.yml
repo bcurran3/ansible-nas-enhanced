@@ -12,16 +12,18 @@
         - "{{ seedsync_data_directory }}/config"
         - "{{ seedsync_data_directory }}/downloads"
 
-    - name: Check if .ssh directory exists
+    - name: Check for SSH keys
       ansible.builtin.stat:
         path: "{{ seedsync_ssh_directory }}"
       register: ssh_dir_check
 
-    - name: Display message if .ssh does NOT exist
-      ansible.builtin.debug:
-        msg: 
-          - "There is no .ssh directory at {{ seedsync_ssh_directory }}."
-          - "Run `ssh-keygen -t rsa` to create it and your keys"
+    - name: Generate SSH key with passphrase
+      community.crypto.openssh_keypair:
+        path: "{{ seedsync_ssh_directory }}/id_rsa"
+        type: rsa
+        size: 4096
+        passphrase: "{{ ansible_nas_app_admin_password }}"
+        state: present
       when: not ssh_dir_check.stat.exists
 
     - name: Create {{ ansible_nas_app_name }} Container
