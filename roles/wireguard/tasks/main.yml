@@ -7,6 +7,8 @@
         state: directory
       with_items:
         - "{{ wireguard_data_directory }}"
+        - "{{ wireguard_data_directory }}/etc"
+        - "{{ wireguard_data_directory }}/modules"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -16,12 +18,12 @@
         image: "{{ wireguard_image_name }}:{{ wireguard_image_tag }}"
         pull: true
         env:
-          PORT: "{{ wireguard_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
-          - "{{ wireguard_data_directory }}:/etc/wireguard"
+          - "{{ wireguard_data_directory }}/etc:/etc/wireguard"
+          - "{{ wireguard_data_directory }}/modules:/lib/modules:ro"
         ports:
-          - "{{ wireguard_port_http }}:{{ wireguard_port_http }}"
+          - "{{ wireguard_port_http }}:51821"
           - "{{ wireguard_port_udp }}:51820/udp"
         capabilities:
           - NET_ADMIN
@@ -61,7 +63,7 @@
           traefik.http.routers.frontend.middlewares: "{{ wireguard_hostname }}"
           traefik.http.routers.wireguard.middlewares: "{{ wireguard_hostname }}@docker"
           traefik.http.middlewares.wireguard.IPAllowList.sourcerange: "{{ wireguard_traefik_whitelist }}"
-          traefik.http.services.wireguard.loadbalancer.server.port: "{{ wireguard_port_http }}"
+          traefik.http.services.wireguard.loadbalancer.server.port: "51821"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/wg-easy/wg-easy/pkgs/container/wg-easy"
