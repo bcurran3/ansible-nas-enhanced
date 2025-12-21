@@ -61,12 +61,7 @@
           {{
             [
               'rdp://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ virtual_desktop_port_rdp
-            ] + (
-              [
-                'rdp://' ~ virtual_desktop_hostname ~ '.' ~ ansible_nas_domain ~ ':' ~ virtual_desktop_port_rdp
-              ]
-              if (virtual_desktop_available_externally is true or virtual_desktop_dockflare_tunnel is true) else []
-            )
+            ]
           }}
   when: virtual_desktop_enabled is true
 
