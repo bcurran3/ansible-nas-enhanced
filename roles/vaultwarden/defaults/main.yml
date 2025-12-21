@@ -40,11 +40,11 @@ vaultwarden_env_allow_signups: "false"
 ## Mail specific settings, set SMTP_FROM and either SMTP_HOST or USE_SENDMAIL to enable the mail service.
 ## To make sure the email links are pointing to the correct host, set the DOMAIN variable.
 ## Note: if SMTP_USERNAME is specified, SMTP_PASSWORD is mandatory
-vaultwarden_env_smtp_host: '' # "smtp.domain.tld"
-vaultwarden_env_smtp_from: '' # "vaultwarden@domain.tld"
-vaultwarden_env_smtp_from_name: '' # "Vaultwarden"
-vaultwarden_env_smtp_security: '' # "starttls" # ("starttls", "force_tls", "off") Enable a secure connection. Default is "starttls" (Explicit - ports 587 or 25), "force_tls" (Implicit - port 465) or "off", no encryption (port 25)
-vaultwarden_env_smtp_port: '' # "587" # Ports 587 (submission) and 25 (smtp) are standard without encryption and with encryption via STARTTLS (Explicit TLS). Port 465 (submissions) is used for encrypted submission (Implicit TLS).
+vaultwarden_env_smtp_host: '' # "smtp.{{ ansbile_nas_domain }}"
+vaultwarden_env_smtp_from: '' # "vaultwarden@{{ ansbile_nas_domain }}"
+vaultwarden_env_smtp_from_name: # "Vaultwarden"
+vaultwarden_env_smtp_security: "starttls" # ("starttls", "force_tls", "off") Enable a secure connection. Default is "starttls" (Explicit - ports 587 or 25), "force_tls" (Implicit - port 465) or "off", no encryption (port 25)
+vaultwarden_env_smtp_port: "587" # Ports 587 (submission) and 25 (smtp) are standard without encryption and with encryption via STARTTLS (Explicit TLS). Port 465 (submissions) is used for encrypted submission (Implicit TLS).
 vaultwarden_env_smtp_username: '' # "username"
 vaultwarden_env_smtp_password: '' # "password"
 vaultwarden_env_smtp_timeout: '' # "15"
