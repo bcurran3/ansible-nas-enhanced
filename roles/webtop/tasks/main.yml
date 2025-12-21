@@ -29,7 +29,7 @@
           SUBFOLDER: "{{ webtop_env_subfolder }}"
           TZ: "{{ ansible_nas_timezone }}"
         ports:
-          - "{{ webtop_port_http }}:3000"
+          - "{{ webtop_port_http }}:3001"
         security_opts:
           - seccomp:unconfined          #optional
         labels:
@@ -61,7 +61,7 @@
           traefik.http.routers.frontend.middlewares: "{{ webtop_hostname }}"
           traefik.http.routers.webtop.middlewares: "{{ webtop_hostname }}@docker"
           traefik.http.middlewares.webtop.IPAllowList.sourcerange: "{{ webtop_traefik_whitelist }}"
-          traefik.http.services.webtop.loadbalancer.server.port: "3000"
+          traefik.http.services.webtop.loadbalancer.server.port: "3001"
           wud.watch.digest: "true"
           wud.link.template: "lscr.io/linuxserver/webtop"
         cpu_shares: "{{ webtop_cpu_shares }}"
