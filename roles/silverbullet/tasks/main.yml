@@ -12,11 +12,11 @@
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ silverbullet_container_name }}"
-        hostname: "{{ silverbullet_container_name }}"
+        hostname: "{{ silverbullet_hostname }}"
         image: "{{ silverbullet_image_name }}:{{ silverbullet_image_version }}"
         pull: true
         ports:
-          - "{{ silverbullet_port_http }}:3000"
+          - "{{ silverbullet_port_http }}:3002"
         volumes:
           - "{{ silverbullet_data_directory }}:/space"
         env:
