@@ -27,6 +27,10 @@
       register: dns_check
       changed_when: false
 
+    - name: Set DNS status fact
+          ansible.builtin.set_fact:
+            dns_exists: "{{ dns_check.stdout | length > 0 }}"
+
     - name: Warn on DNS lookup failure
       ansible.builtin.debug:
         msg: "DNS record not found. Skipping SSL and Network tasks, but continuing with the rest..."
