@@ -19,7 +19,7 @@
         image: "{{ pingvin_share_image_name }}:{{ pingvin_share_image_tag }}"
         pull: true
         ports:
-          - "{{ pingvin_share_port_http }}:3000"
+          - "{{ pingvin_share_port_http }}:3333"
         volumes:
           - "{{ pingvin_share_data_directory }}/data:/opt/app/backend/data"
           - "{{ pingvin_share_data_directory }}/data/images:/opt/app/frontend/public/img"
@@ -55,7 +55,7 @@
           traefik.http.routers.frontend.middlewares: "{{ pingvin_share_hostname }}"
           traefik.http.routers.pingvin_share.middlewares: "{{ pingvin_share_hostname }}@docker"
           traefik.http.middlewares.pingvin_share.IPAllowList.sourcerange: "{{ pingvin_share_traefik_whitelist }}"
-          traefik.http.services.pingvin_share.loadbalancer.server.port: "3000"
+          traefik.http.services.pingvin_share.loadbalancer.server.port: "3333"
           wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/stonith404/pingvin-share/pkgs/container/pingvin-share"
