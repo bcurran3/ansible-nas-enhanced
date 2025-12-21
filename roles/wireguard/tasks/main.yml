@@ -20,15 +20,11 @@
         env:
           HOST: "0.0.0.0"
           INSECURE: "true"
-          INIT_ENABLED: "true"
-          INIT_USERNAME: "{{ ansible_nas_user }}"
-          INIT_PASSWORD: "{{ ansible_nas_app_admin_password }}"
-          INTI_PORT: "{{ wireguard_port_http }}"
           PORT: "{{ wireguard_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ wireguard_data_directory }}/etc:/etc/wireguard"
-          - "{{ wireguard_data_directory }}/modules:/lib/modules:ro"
+          - "/lib/modules:/lib/modules:ro"
         ports:
           - "{{ wireguard_port_http }}:{{ wireguard_port_http }}"
           - "{{ wireguard_port_udp }}:51820/udp"
