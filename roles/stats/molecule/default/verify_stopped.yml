@@ -18,13 +18,13 @@
         state: absent
       register: result_hddtemp
 
-    - name: Try and stop and remove Prometheus smartctl Exporter
+    - name: Try and stop and remove Prometheus
       community.docker.docker_container:
         name: "{{ stats_prometheus_container_name }}"
         state: absent
       register: result_prometheus
 
-    - name: Try and stop and remove prometheus-smartctl
+    - name: Try and stop and remove Prometheus smartctl Exporter
       community.docker.docker_container:
         name: "{{ stats_smartctl_container_name }}"
         state: absent

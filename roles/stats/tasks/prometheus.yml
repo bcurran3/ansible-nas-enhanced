@@ -1,5 +1,5 @@
 ---
-- name: Start Prometheus smartctl Exporter
+- name: Start Prometheus
   block:
     - name: Create Prometheus smartctl Exporter Config Directory
       ansible.builtin.file:
@@ -9,7 +9,7 @@
         - "{{ stats_prometheus_data_directory }}"
         - "{{ stats_prometheus_config_directory }}"
 
-    - name: Create Prometheus smartctl Exporter Data Directory
+    - name: Create Prometheus Data Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -18,13 +18,13 @@
         - "{{ stats_prometheus_data_directory }}"
         - "{{ stats_prometheus_config_directory }}"
 
-    - name: Template Prometheus smartctl Exporter config
+    - name: Template Prometheus config
       ansible.builtin.template:
         src: prometheus.yml.j2
         dest: "{{ stats_prometheus_config_directory }}/prometheus.yml"
       register: prometheus_config
 
-    - name: Create Prometheus smartctl Exporter Docker Container
+    - name: Create Prometheus Docker Container
       community.docker.docker_container:
         name: "{{ stats_prometheus_container_name }}"
         hostname: "{{ stats_prometheus_container_name }}"
@@ -47,7 +47,7 @@
           dockflare.hostname: "{{ stats_prometheus_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_port }}"
           homepage.group: "{{ stats_prometheus_homepage_group }}"
-          homepage.name: "Prometheus smartctl Exporter"
+          homepage.name: "Prometheus"
           homepage.icon: "{{ stats_prometheus_homepage_icon }}"
           homepage.href: "{{ stats_prometheus_homepage_href }}"
           homepage.description: "{{ 'The Prometheus monitoring system and time series database.' if homepage_show_description else omit }}"
@@ -85,20 +85,20 @@
 
 - name: Stop Prometheus
   block:
-    - name: Stop Prometheus smartctl Exporter
+    - name: Stop Prometheus
       community.docker.docker_container:
         name: "{{ stats_prometheus_container_name }}"
         state: absent
   when: stats_enabled is false
 
-- name: Data Archive Prometheus smartctl Exporter
+- name: Data Archive Prometheus
   block:
     - name: Check for Prometheus Data Directory
       stat:
         path: "{{ stats_prometheus_data_directory }}"
       register: dir_stat
 
-    - name: Archive Prometheus smartctl Exporter Data Directory
+    - name: Archive Prometheus Data Directory
       ansible.builtin.archive:
         path: "{{ stats_prometheus_data_directory }}"
         dest: "{{ docker_home }}/prometheus.zip"
