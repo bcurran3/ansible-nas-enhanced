@@ -24,7 +24,7 @@
         dest: "{{ stats_prometheus_config_directory }}/prometheus.yml"
       register: prometheus_config
 
-    - name: Prometheus Docker Container
+    - name: Create Prometheus Docker Container
       community.docker.docker_container:
         name: "{{ stats_prometheus_container_name }}"
         hostname: "{{ stats_prometheus_container_name }}"
@@ -74,7 +74,7 @@
         restart: "{{ prometheus_config is changed }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access Prometheus at
       ansible.builtin.debug:
         msg: >-
               {{

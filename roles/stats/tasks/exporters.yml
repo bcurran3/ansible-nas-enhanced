@@ -1,7 +1,7 @@
 ---
 - name: Start Exporters
   block:
-    - name: prometheus-smartctl Docker Container
+    - name: Create prometheus-smartctl Docker Container
       community.docker.docker_container:
         name: "{{ stats_smartctl_container_name }}"
         hostname: "{{ stats_smartctl_container_name }}"
@@ -32,7 +32,7 @@
         memory: "{{ stats_prometheus_smartctl_memory }}"
         restart_policy: unless-stopped
 
-    - name: HDDTemp Docker Container
+    - name: Create HDDTemp Docker Container
       community.docker.docker_container:
         name: "{{ stats_hddtemp_container_name }}"
         hostname: "{{ stats_hddtemp_container_name }}"
@@ -65,7 +65,7 @@
         memory: "{{ stats_hddtemp_memory }}"
         restart_policy: unless-stopped
 
-    - name: Speedtest-Exporter Docker Container
+    - name: Create Speedtest-Exporter Docker Container
       community.docker.docker_container:
         name: "{{ stats_speedtest_container_name }}"
         hostname: "{{ stats_speedtest_container_name }}"

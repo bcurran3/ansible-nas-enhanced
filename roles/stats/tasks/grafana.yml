@@ -30,7 +30,7 @@
         src: dashboards/ansible-nas-overview.json
         dest: "{{ stats_grafana_config_directory }}/dashboards/ansible-nas-overview.json"
 
-    - name: Grafana Docker Container
+    - name: Create Grafana Docker Container
       community.docker.docker_container:
         name: "{{ stats_grafana_container_name }}"
         hostname: "{{ stats_grafana_container_name }}"
@@ -78,7 +78,7 @@
         memory: "{{ stats_grafana_memory}}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access Grafana at
       ansible.builtin.debug:
         msg: >-
               {{
