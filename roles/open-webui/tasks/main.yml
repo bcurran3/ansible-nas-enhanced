@@ -2,11 +2,6 @@
 # Notice: This software is mostly obsolete and will no longer be updated.
 - name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Check for Ollama installation
-      ansible.builtin.fail:
-        msg: "{{ ansible_nas_app_name }} requires Ollama enabled to access LLMs, please set that up first."
-      when: ollama_enabled is false
-
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
@@ -17,6 +12,11 @@
         - "{{ open_webui_data_directory }}/openedai"
         - "{{ open_webui_data_directory }}/openedai/config"
         - "{{ open_webui_data_directory }}/openedai/voices"
+
+    - name: Check for Ollama installation
+      ansible.builtin.fail:
+        msg: "{{ ansible_nas_app_name }} requires Ollama enabled to access LLMs, please set that up first."
+      when: ollama_enabled is false
 
     - name: Create {{ ansible_nas_app_name }} OpenedAI Speech Container
       community.docker.docker_container:
