@@ -295,7 +295,6 @@ By default, applications can be found on the ports listed below.
 | - telegraf 9273
 | - telegraf 8086
 | Stirling PDF     | 3011    | Bridge  | HTTP           |
-| Striparr         | 40000   | Bridge  | HTTP           |
 | Stump            | 10801
 | Syncthing admin  | 8384    | Host    | HTTP           |
 | Syncthing P2P    | 22000   | Host    | TCP+UDP        |

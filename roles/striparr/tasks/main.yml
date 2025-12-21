@@ -9,10 +9,8 @@
         image: "{{ striparr_image_name }}:{{ striparr_image_tag }}"
         pull: true
         volumes:
-          - "{{ sonarr_tv_directory }}:/tv:rw"
-          - "{{ radarr_movies_directory }}:/movies:rw"
-        ports:
-          - "{{ striparr_port_http }}:40000"
+          - "{{ sonarr_tv_directory }}:/path/to/tv:rw"
+          - "{{ radarr_movies_directory }}:/path/to/movies:rw"
         network_mode: bridge
         env:
           PUID: "{{ striparr_puid }}"
