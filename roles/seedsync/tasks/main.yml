@@ -12,10 +12,19 @@
         - "{{ seedsync_data_directory }}/config"
         - "{{ seedsync_data_directory }}/downloads"
 
-    - name: Check for SSH keys
+    - name: Check for SSH Directory
       ansible.builtin.stat:
         path: "{{ seedsync_ssh_directory }}"
       register: ssh_dir_check
+
+    - name: Create SSH Directory
+      ansible.builtin.file:
+        path: "{{ seedsync_ssh_directory }}"
+        state: directory
+        mode: '0700'
+        owner: "{{ ansible_user_id }}"
+        group: "{{ ansible_user_id }}"
+      when: not ssh_dir_check.stat.exists
 
     - name: Generate SSH key with passphrase
       community.crypto.openssh_keypair:
