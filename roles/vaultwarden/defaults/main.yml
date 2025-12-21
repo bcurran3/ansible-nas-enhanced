@@ -32,22 +32,22 @@ vaultwarden_backup_memory: "512M"
 # Keep this token secret, this is password to access admin area of your server!
 # This token can be anything, but it's recommended to use a long, randomly generated string of characters,
 # for example running openssl rand -base64 48
-vaultwarden_admin_token: "Dkgp/XHTYIQCFlCTqxpii9yiaSrjxWEZo/ctQBthxwrWuarHc2qyYpt4jlVKA+YU"
+vaultwarden_env_admin_token: "Dkgp/XHTYIQCFlCTqxpii9yiaSrjxWEZo/ctQBthxwrWuarHc2qyYpt4jlVKA+YU"
 # To create a user set this to "true", and reprovision the container by re-running the anarion-nas playbook.
 # Once you have created your user, set to "false" and run one more time.
 # Target just Vaultwarden by running: ansible-playbook -i inventory nas.yml -b -K -t vaultwarden
-vaultwarden_allow_signups: "false"
+vaultwarden_env_allow_signups: "false"
 ## Mail specific settings, set SMTP_FROM and either SMTP_HOST or USE_SENDMAIL to enable the mail service.
 ## To make sure the email links are pointing to the correct host, set the DOMAIN variable.
 ## Note: if SMTP_USERNAME is specified, SMTP_PASSWORD is mandatory
-vaultwarden_SMTP_host: "" # "smtp.domain.tld"
-vaultwarden_SMTP_from: "" # "vaultwarden@domain.tld"
-vaultwarden_SMTP_from_name: "Vaultwarden"
-vaultwarden_SMTP_security: "starttls" # ("starttls", "force_tls", "off") Enable a secure connection. Default is "starttls" (Explicit - ports 587 or 25), "force_tls" (Implicit - port 465) or "off", no encryption (port 25)
-vaultwarden_SMTP_port: "" # "587" # Ports 587 (submission) and 25 (smtp) are standard without encryption and with encryption via STARTTLS (Explicit TLS). Port 465 (submissions) is used for encrypted submission (Implicit TLS).
-vaultwarden_SMTP_username: "" # "username"
-vaultwarden_SMTP_password: "" # "password"
-vaultwarden_SMTP_timeout: "" # "15"
+vaultwarden_env_smtp_host: "" # "smtp.domain.tld"
+vaultwarden_env_smtp_from: "" # "vaultwarden@domain.tld"
+vaultwarden_env_smtp_from_name: "" # "Vaultwarden"
+vaultwarden_env_smtp_security: "" # "starttls" # ("starttls", "force_tls", "off") Enable a secure connection. Default is "starttls" (Explicit - ports 587 or 25), "force_tls" (Implicit - port 465) or "off", no encryption (port 25)
+vaultwarden_env_smtp_port: "" # "587" # Ports 587 (submission) and 25 (smtp) are standard without encryption and with encryption via STARTTLS (Explicit TLS). Port 465 (submissions) is used for encrypted submission (Implicit TLS).
+vaultwarden_env_smtp_username: "" # "username"
+vaultwarden_env_smtp_password: "" # "password"
+vaultwarden_env_smtp_timeout: "" # "15"
 vaultwarden_websocket_enabled: "false"
 
 # autoheal
