@@ -17,6 +17,22 @@
         - "{{ opencloud_data_directory }}/config"
         - "{{ opencloud_data_directory }}/data"
 
+    - name: Install dnsutils
+      ansible.builtin.apt:
+        name: dnsutils
+        state: present
+
+    - name: Check if {{ opencloud_hostname }}.{{ ansible_nas_domain }} resolves
+      ansible.builtin.command: host {{ opencloud_hostname }}.{{ ansible_nas_domain }}
+      register: dns_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Abort if DNS lookup failed
+      ansible.builtin.fail:
+        msg: "DNS lookup for {{ ansible_nas_domain }} failed. Cannot proceed."
+      when: dns_check.rc != 0
+
     - name: Get {{ ansible_nas_app_name }} config status
       ansible.builtin.stat:
         path: "{{ opencloud_data_directory }}/config/opencloud.yaml"
@@ -35,7 +51,7 @@
           IDM_ADMIN_PASSWORD: "{{ opencloud_env_idm_admin_password }}"
         entrypoint:
           - /bin/sh
-        command: ["-c", "yes | opencloud init"]
+        command: ["-c", "opencloud init || true; opencloud server"]
       when: not config_status.stat.exists
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -78,7 +94,7 @@
           homepage.group: "{{ opencloud_homepage_group }}"
           homepage.icon: "{{ opencloud_homepage_icon }}"
           homepage.href: "{{ opencloud_homepage_href }}"
-          homepage.description: "{{ 'OpenCloud is an open-source project that gives you a secure and private way to store, access, and share your files.' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'open source platform for file management, sharing and collaboration' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ opencloud_container_name }}"
           homepage.showStats: "{{ opencloud_homepage_showstats }}"
