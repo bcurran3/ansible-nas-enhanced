@@ -5,8 +5,8 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        owner: 1000
-        group: 1000
+        owner: "{{ webtop_user_id }}"
+        group: "{{ webtop_group_id }}"
       with_items:
         - "{{ webtop_data_directory }}"
         - "{{ webtop_data_directory }}/config"
@@ -100,7 +100,6 @@
         msg: >-
           {{
             [
-              'http://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ webtop_port_http,
               'https://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ webtop_port_https
             ] + (
               ['https://' ~ webtop_hostname ~ '.' ~ ansible_nas_domain]
