@@ -23,110 +23,112 @@
         state: present
 
     - name: Check if {{ opencloud_hostname }}.{{ ansible_nas_domain }} resolves
-      ansible.builtin.command: host {{ opencloud_hostname }}.{{ ansible_nas_domain }}
+      ansible.builtin.shell: dig +short {{ opencloud_hostname }}.{{ ansible_nas_domain }}
       register: dns_check
-      ignore_errors: true
       changed_when: false
 
-    - name: Abort if DNS lookup failed
-      ansible.builtin.fail:
-        msg: "DNS lookup for {{ ansible_nas_domain }} failed. Cannot proceed."
-      when: dns_check.rc != 0
-
-    - name: Get {{ ansible_nas_app_name }} config status
-      ansible.builtin.stat:
-        path: "{{ opencloud_data_directory }}/config/opencloud.yaml"
-      register: config_status
-
-    - name: Initialize {{ ansible_nas_app_name }}
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ opencloud_container_name }}"
-        image: "{{ opencloud_image_name }}:{{ opencloud_image_tag }}"
-        pull: true
-        volumes:
-          - "{{ opencloud_data_directory }}/config:/etc/opencloud"
-          - "{{ opencloud_data_directory }}/data:/var/lib/opencloud"
-        env:
-          IDM_ADMIN_PASSWORD: "{{ opencloud_env_idm_admin_password }}"
-        entrypoint:
-          - /bin/sh
-        command: ["-c", "opencloud init || true; opencloud server"]
-      when: not config_status.stat.exists
-
-    - name: Create {{ ansible_nas_app_name }} Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ opencloud_container_name }}"
-        hostname: "{{ opencloud_container_name }}"
-        image: "{{ opencloud_image_name }}:{{ opencloud_image_tag }}"
-        pull: true
-        volumes:
-          - "{{ opencloud_data_directory }}/config:/etc/opencloud"
-          - "{{ opencloud_data_directory }}/data:/var/lib/opencloud"
-        ports:
-          - "{{ opencloud_port_http }}:9200"
-        env:
-          OC_URL: "{{ opencloud_env_oc_url }}"
-          OC_INSECURE: "true"
-          OC_LOG_LEVEL: "info"
-          OC_LOG_COLOR: "true"
-          OC_LOG_PRETTY: "true"
-          PROXY_HTTP_ADDR: "0.0.0.0:9200"
-          PROXY_TLS: "false"
-          NOTIFICATIONS_SMTP_HOST: "{{ opencloud_env_smtp_host }}"
-          NOTIFICATIONS_SMTP_PORT: "{{ opencloud_env_smtp_port }}"
-          NOTIFICATIONS_SMTP_SENDER: "{{ opencloud_env_smtp_sender }}"
-          NOTIFICATIONS_SMTP_USERNAME: "{{ opencloud_env_smtp_username }}"
-          NOTIFICATIONS_SMTP_PASSWORD: "{{ opencloud_env_smtp_password }}"
-          NOTIFICATIONS_SMTP_INSECURE: "{{ opencloud_env_smtp_insecure }}"
-          NOTIFICATIONS_SMTP_AUTHENTICATION: "{{ opencloud_env_smtp_authentication }}"
-          NOTIFICATIONS_SMTP_ENCRYPTION: "{{ opencloud_env_smtp_encryption }}"
-          TZ: "{{ ansible_nas_timezone }}"
-        labels:
-          autoheal: "{{ opencloud_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ opencloud_watchtower_enable }}"
-          dockflare.enable: "{{ opencloud_dockflare_tunnel }}"
-          dockflare.access.group: "{{ opencloud_dockflare_access_group }}"
-          dockflare.hostname: "{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ opencloud_homepage_group }}"
-          homepage.icon: "{{ opencloud_homepage_icon }}"
-          homepage.href: "{{ opencloud_homepage_href }}"
-          homepage.description: "{{ 'open source platform for file management, sharing and collaboration' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ opencloud_container_name }}"
-          homepage.showStats: "{{ opencloud_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port_http }}"
-          repliqate.enabled: "{{ opencloud_repliqate_enabled }}"
-          repliqate.engine: "{{ opencloud_repliqate_engine }}"
-          repliqate.schedule: "{{ opencloud_repliqate_schedule }}"
-          repliqate.backup_id: "{{ opencloud_repliqate_backup_id }}"
-          repliqate.retention: "{{ opencloud_repliqate_retention }}"
-          traefik.enable: "{{ opencloud_available_externally | string }}"
-          traefik.http.routers.opencloud.rule: "Host(`{{ opencloud_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.opencloud.tls.certresolver: "letsencrypt"
-          traefik.http.routers.opencloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.opencloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ opencloud_hostname }}"
-          traefik.http.routers.opencloud.middlewares: "{{ opencloud_hostname }}@docker"
-          traefik.http.middlewares.opencloud.IPAllowList.sourcerange: "{{ opencloud_traefik_whitelist }}"
-          traefik.http.services.opencloud.loadbalancer.server.port: "9200"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/opencloudeu/opencloud-rolling"
-        cpu_shares: "{{ opencloud_cpu_shares }}"
-        memory: "{{ opencloud_memory }}"
-        restart_policy: unless-stopped
-
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Warn on DNS lookup failure
       ansible.builtin.debug:
-        msg: >-
-              {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (opencloud_port_http | string)] +
-                (['https://' + opencloud_hostname + '.' + ansible_nas_domain] if (opencloud_available_externally is true or opencloud_dockflare_tunnel is true) else [])
-              }}
+        msg: "DNS record not found. Skipping SSL and Network tasks, but continuing with the rest..."
+      when: not dns_exists
+
+    - name: Continue {{ ansible_nas_app_name }}
+      block:
+        - name: Get {{ ansible_nas_app_name }} config status
+          ansible.builtin.stat:
+            path: "{{ opencloud_data_directory }}/config/opencloud.yaml"
+          register: config_status
+
+        - name: Initialize {{ ansible_nas_app_name }}
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ opencloud_container_name }}"
+            image: "{{ opencloud_image_name }}:{{ opencloud_image_tag }}"
+            pull: true
+            volumes:
+              - "{{ opencloud_data_directory }}/config:/etc/opencloud"
+              - "{{ opencloud_data_directory }}/data:/var/lib/opencloud"
+            env:
+              IDM_ADMIN_PASSWORD: "{{ opencloud_env_idm_admin_password }}"
+            entrypoint:
+              - /bin/sh
+            command: ["-c", "opencloud init || true; opencloud server"]
+          when: not config_status.stat.exists
+
+        - name: Create {{ ansible_nas_app_name }} Container
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ opencloud_container_name }}"
+            hostname: "{{ opencloud_container_name }}"
+            image: "{{ opencloud_image_name }}:{{ opencloud_image_tag }}"
+            pull: true
+            volumes:
+              - "{{ opencloud_data_directory }}/config:/etc/opencloud"
+              - "{{ opencloud_data_directory }}/data:/var/lib/opencloud"
+            ports:
+              - "{{ opencloud_port_http }}:9200"
+            env:
+              OC_URL: "{{ opencloud_env_oc_url }}"
+              OC_INSECURE: "true"
+              OC_LOG_LEVEL: "info"
+              OC_LOG_COLOR: "true"
+              OC_LOG_PRETTY: "true"
+              PROXY_HTTP_ADDR: "0.0.0.0:9200"
+              PROXY_TLS: "false"
+              NOTIFICATIONS_SMTP_HOST: "{{ opencloud_env_smtp_host }}"
+              NOTIFICATIONS_SMTP_PORT: "{{ opencloud_env_smtp_port }}"
+              NOTIFICATIONS_SMTP_SENDER: "{{ opencloud_env_smtp_sender }}"
+              NOTIFICATIONS_SMTP_USERNAME: "{{ opencloud_env_smtp_username }}"
+              NOTIFICATIONS_SMTP_PASSWORD: "{{ opencloud_env_smtp_password }}"
+              NOTIFICATIONS_SMTP_INSECURE: "{{ opencloud_env_smtp_insecure }}"
+              NOTIFICATIONS_SMTP_AUTHENTICATION: "{{ opencloud_env_smtp_authentication }}"
+              NOTIFICATIONS_SMTP_ENCRYPTION: "{{ opencloud_env_smtp_encryption }}"
+              TZ: "{{ ansible_nas_timezone }}"
+            labels:
+              autoheal: "{{ opencloud_autoheal }}"
+              com.centurylinklabs.watchtower.enable: "{{ opencloud_watchtower_enable }}"
+              dockflare.enable: "{{ opencloud_dockflare_tunnel }}"
+              dockflare.access.group: "{{ opencloud_dockflare_access_group }}"
+              dockflare.hostname: "{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
+              dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port_http }}"
+              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.group: "{{ opencloud_homepage_group }}"
+              homepage.icon: "{{ opencloud_homepage_icon }}"
+              homepage.href: "{{ opencloud_homepage_href }}"
+              homepage.description: "{{ 'open source platform for file management, sharing and collaboration' if homepage_show_description else omit }}"
+              homepage.server: "my-docker"
+              homepage.container: "{{ opencloud_container_name }}"
+              homepage.showStats: "{{ opencloud_homepage_showstats }}"
+              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port_http }}"
+              repliqate.enabled: "{{ opencloud_repliqate_enabled }}"
+              repliqate.engine: "{{ opencloud_repliqate_engine }}"
+              repliqate.schedule: "{{ opencloud_repliqate_schedule }}"
+              repliqate.backup_id: "{{ opencloud_repliqate_backup_id }}"
+              repliqate.retention: "{{ opencloud_repliqate_retention }}"
+              traefik.enable: "{{ opencloud_available_externally | string }}"
+              traefik.http.routers.opencloud.rule: "Host(`{{ opencloud_hostname }}.{{ ansible_nas_domain }}`)"
+              traefik.http.routers.opencloud.tls.certresolver: "letsencrypt"
+              traefik.http.routers.opencloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
+              traefik.http.routers.opencloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+              traefik.http.routers.frontend.middlewares: "{{ opencloud_hostname }}"
+              traefik.http.routers.opencloud.middlewares: "{{ opencloud_hostname }}@docker"
+              traefik.http.middlewares.opencloud.IPAllowList.sourcerange: "{{ opencloud_traefik_whitelist }}"
+              traefik.http.services.opencloud.loadbalancer.server.port: "9200"
+              wud.tag.include: '^\d+\.\d+\.\d+.*$'
+              wud.tag.transform.type: "semver"
+              wud.link.template: "https://hub.docker.com/r/opencloudeu/opencloud-rolling"
+            cpu_shares: "{{ opencloud_cpu_shares }}"
+            memory: "{{ opencloud_memory }}"
+            restart_policy: unless-stopped
+
+        - name: Access {{ ansible_nas_app_name }} at
+          ansible.builtin.debug:
+            msg: >-
+                  {{
+                    ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (opencloud_port_http | string)] +
+                    (['https://' + opencloud_hostname + '.' + ansible_nas_domain] if (opencloud_available_externally is true or opencloud_dockflare_tunnel is true) else [])
+                  }}
+      when: dns_exists
   when: opencloud_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
