@@ -34,10 +34,11 @@
           TTS_HOME: "voices"
           HF_HOME: "voices"
           TZ: "{{ ansible_nas_timezone }}"
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled else omit }}"
-        device_requests:
-          - capabilities: [gpu]
-            count: -1
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
         # below needs OpenVINO toolkit or IPEX-LLM library
         devices: >-
                   {{
