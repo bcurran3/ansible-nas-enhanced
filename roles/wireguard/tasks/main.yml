@@ -5,10 +5,9 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+        mode: 0750
       with_items:
         - "{{ wireguard_data_directory }}"
-        - "{{ wireguard_data_directory }}/etc"
-        - "{{ wireguard_data_directory }}/modules"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,12 +17,12 @@
         image: "{{ wireguard_image_name }}:{{ wireguard_image_tag }}"
         pull: true
         env:
-          HOST: "0.0.0.0"
-          INSECURE: "true"
+          HOST: "{{ wireguard_env_host }}"
+          INSECURE: "{{ wireguard_env_insecure}}"
           PORT: "{{ wireguard_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
-          - "{{ wireguard_data_directory }}/etc:/etc/wireguard"
+          - "{{ wireguard_data_directory }}:/etc/wireguard"
           - "/lib/modules:/lib/modules:ro"
         ports:
           - "{{ wireguard_port_http }}:{{ wireguard_port_http }}"
