@@ -12,11 +12,29 @@
         state: absent
       register: result_grafana
 
+    - name: Try and stop and remove HDDTemp
+      community.docker.docker_container:
+        name: "{{ stats_hddtemp_container_name }}"
+        state: absent
+      register: result_hddtemp
+
     - name: Try and stop and remove Prometheus
       community.docker.docker_container:
         name: "{{ stats_prometheus_container_name }}"
         state: absent
       register: result_prometheus
+
+    - name: Try and stop and remove prometheus-smartctl
+      community.docker.docker_container:
+        name: "{{ stats_smartctl_container_name }}"
+        state: absent
+      register: result_smartctl
+
+    - name: Try and stop and remove Speedtest-Exporter
+      community.docker.docker_container:
+        name: "{{ stats_speedtest_container_name }}"
+        state: absent
+      register: result_speedtest
 
     - name: Try and stop and remove Telegraf
       community.docker.docker_container:
@@ -24,23 +42,12 @@
         state: absent
       register: result_telegraf
 
-    - name: Try and stop and remove Smartctl
-      community.docker.docker_container:
-        name: "{{ stats_smartctl_container_name }}"
-        state: absent
-      register: result_smartctl
-
-    - name: Try and stop and remove Speedtest
-      community.docker.docker_container:
-        name: "{{ stats_speedtest_container_name }}"
-        state: absent
-      register: result_speedtest
-
     - name: Check if stats containers are stopped
       ansible.builtin.assert:
         that:
           - not result_grafana.changed
+          - not result_hddtemp.changed
           - not result_prometheus.changed
-          - not result_telegraf.changed
           - not result_smartctl.changed
           - not result_speedtest.changed
+          - not result_telegraf.changed

@@ -72,8 +72,9 @@
         image: "{{ stats_speedtest_docker_image_name }}:{{ stats_speedtest_docker_image_version }}"
         pull: true
         ports:
-          "{{ stats_speedtest_exporter_port }}:9798"
+          "{{ stats_speedtest_exporter_port }}:{{ stats_speedtest_exporter_port }}"
         env:
+          SPEEDTEST_PORT: "{{ stats_speedtest_exporter_port }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ stats_speedtest_autoheal }}"
@@ -99,7 +100,7 @@
 
 - name: Stop Exporters
   block:
-    - name: Stop smartctl_exporter
+    - name: Stop prometheus-smartctl
       community.docker.docker_container:
         name: "{{ stats_smartctl_container_name }}"
         state: absent
