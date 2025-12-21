@@ -49,7 +49,7 @@ By default, applications can be found on the ports listed below.
 | Containery       | 5002
 | CouchDB          | 5984
 | Couchpotato      | 5050    | Bridge  | HTTP           |
-| CrashPlan Pro    | 5800
+| CrashPlan Pro    | 3063    | Bridge  | HTTP           |
 | Cup              | 3017
 | DailyTxT         | 8766    | Bridge  | HTTP           |
 | Dasharr          | 3035
@@ -252,6 +252,7 @@ By default, applications can be found on the ports listed below.
 | qBittorrent      | 8113    | Bridge  | HTTP           |
 | qBittorrent      | 6882    | Bridge  | bt             |
 | QDirStat         | 5800    | Bridge  | HTTP           |
+| QDirStat         | 5903    | Bridge  | VNC            |
 | Radarr           | 7878    | Bridge  | HTTP           |
 | Readarr          | 8787    | Bridge  | HTTP           |
 | Recyclarr        | n/a
@@ -374,7 +375,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3063
+# next avail = 3064
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002

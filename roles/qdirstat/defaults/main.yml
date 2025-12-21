@@ -9,6 +9,7 @@ qdirstat_data_directory: "{{ docker_home }}/qdirstat"
 # network
 qdirstat_hostname: "qdirstat"
 qdirstat_port_http: "5800"
+qdirstat_port_vnc: "5800"
 
 qdirstat_storage_directory: "{{ samba_shares_root }}"
 
@@ -20,6 +21,10 @@ qdirstat_image_tag: "latest"
 # specs
 qdirstat_cpu_shares: 1024
 qdirstat_memory: "512M"
+
+# app
+# https://github.com/jlesage/docker-qdirstat
+qdirstat_env_vnc_password: "{{ ansible_nas_app_admin_password }}"
 
 # autoheal
 qdirstat_autoheal: "false"

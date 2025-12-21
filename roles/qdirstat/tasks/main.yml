@@ -20,8 +20,12 @@
           - "{{ qdirstat_data_directory }}/config:/config:rw"
           - "{{ qdirstat_storage_directory }}:/storage:ro"
         ports:
-          - "{{ qdirstat_port_http }}:5800"
+          - "{{ qdirstat_port_http }}:{{ qdirstat_port_http }}"
+          - "{{ qdirstat_port_vnc }}:{{ qdirstat_port_vnc }}"
         env:
+          VNC_LISTENING_PORT: "{{ qdirstat_port_vnc }}"
+          VNC_PASSWORD: "{{ qdirstat_env_vnc_password }}"
+          WEB_LISTENING_PORT: "{{ qdirstat_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ qdirstat_autoheal }}"
@@ -52,7 +56,7 @@
           traefik.http.routers.frontend.middlewares: "{{ qdirstat_hostname }}"
           traefik.http.routers.qdirstat.middlewares: "{{ qdirstat_hostname }}@docker"
           traefik.http.middlewares.qdirstat.IPAllowList.sourcerange: "{{ qdirstat_traefik_whitelist }}"
-          traefik.http.services.qdirstat.loadbalancer.server.port: "5800"
+          traefik.http.services.qdirstat.loadbalancer.server.port: "{{ qdirstat_port_http }}"
           wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/jlesage/docker-qdirstat/pkgs/container/qdirstat"
