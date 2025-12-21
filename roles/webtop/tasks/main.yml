@@ -21,6 +21,7 @@
         volumes:
           - "{{ webtop_data_directory }}/config:/config"
           - "/var/run/docker.sock:/var/run/docker.sock"
+          - "/etc/timezone:/etc/timezone:ro"
         devices: >-
                   {{
                     (webtop_devices | default([])) + ['/dev/dri:/dev/dri']
@@ -64,12 +65,12 @@
           dockflare.enable: "{{ webtop_dockflare_tunnel }}"
           dockflare.access.group: "{{ webtop_dockflare_access_group }}"
           dockflare.hostname: "{{ webtop_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webtop_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webtop_port_https }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ webtop_homepage_group }}"
           homepage.icon: "{{ webtop_homepage_icon }}"
           homepage.href: "{{ webtop_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webtop_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webtop_port_https }}"
           homepage.description: "{{ 'Alpine, Ubuntu, Fedora, and Arch based containers containing full desktop environments in officially supported flavors' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ webtop_container_name }}"
