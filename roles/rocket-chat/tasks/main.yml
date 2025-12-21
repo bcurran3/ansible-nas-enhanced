@@ -34,9 +34,9 @@
         image: "{{ rocket_chat_db_image_name }}:{{ rocket_chat_db_image_tag }}"
         pull: true
         network_mode: "bridge"
-        networks:
-          - name: "{{ rocket_chat_network_name }}"
-        networks_cli_compatible: "yes"
+#        networks:
+#          - name: "{{ rocket_chat_network_name }}"
+#        networks_cli_compatible: "yes"
         env:
           MONGODB_REPLICA_SET_MODE: "primary"
           MONGODB_REPLICA_SET_NAME: "rs0"
@@ -85,9 +85,9 @@
         image: "{{ rocket_chat_image_name }}:{{ rocket_chat_image_tag }}"
         pull: true
         network_mode: "bridge"
-        networks:
-          - name: "{{ rocket_chat_network_name }}"
-        networks_cli_compatible: "yes"
+#        networks:
+#          - name: "{{ rocket_chat_network_name }}"
+#        networks_cli_compatible: "yes"
         links:
           - "{{ rocket_chat_db_container_name }}"
         ports:
@@ -160,6 +160,11 @@
       community.docker.docker_container:
         name: "{{ rocket_chat_db_container_name }}"
         state: absent
+
+#    - name: Delete {{ ansible_nas_app_name }} Network
+#      community.docker.docker_network:
+#        name: "{{ rocket_chat_network_name }}"
+#        state: absent
   when: rocket_chat_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
