@@ -29,9 +29,9 @@
           - "{{ ispyagentdvr_agentdvr_host_port }}:50000-50100/udp"
         devices: >-
                   {{
-                    (handbrake_devices | default([])) + ['/dev/dri:/dev/dri']
+                    (ispyagentdvr_devices | default([])) + ['/dev/dri:/dev/dri']
                     if intel_igpu_enabled | default(false) | bool
-                    else (handbrake_devices | default(omit))
+                    else (ispyagentdvr_devices | default(omit))
                   }}
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
         device_requests: "{{

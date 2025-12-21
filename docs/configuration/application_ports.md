@@ -95,7 +95,7 @@ By default, applications can be found on the ports listed below.
 | Gaseous Server   | 5198
 | get_iplayer      | 8182    | Bridge  | HTTP           |
 | Ghost            | 2368    | Bridge  | HTTP           |
-| Gitea            | 3059    | Bridge  | HTTP           |
+| Gitea            | 3065    | Bridge  | HTTP           |
 | Gitea            | 2221    | Bridge  | SSH            |
 | GitLab           | 4080    | Bridge  | HTTP           |
 | GitLab           | 4443    | Bridge  | HTTPS          |
@@ -356,6 +356,7 @@ By default, applications can be found on the ports listed below.
 | WatchYourLAN     | 8840    | Bridge  | HTTP           |
 | Webmin           | 10000   | Host    | HTTP           |
 | Webtop           | 3058    | Bridge  | HTTP           |
+| Webtop           | 3059    | Bridge  | HTTPS           |
 | What's Running   | 3411    | Bridge  | HTTP           |
 | Whisparr         | 6969    | Bridge  | HTTP           |
 | Windows          | 8006
@@ -375,7 +376,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3065
+# next avail = 3066
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002

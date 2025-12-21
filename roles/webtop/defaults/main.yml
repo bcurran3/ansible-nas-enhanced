@@ -6,9 +6,14 @@ webtop_available_externally: false
 webtop_traefik_whitelist: "{{ lan }}"
 webtop_data_directory: "{{ docker_home }}/webtop"
 
+webtop_user_id: "1000"
+webtop_group_id: "1000"
+webtop_umask: "000"
+
 # network
 webtop_hostname: "webtop"
 webtop_port_http: "3058"
+webtop_port_https: "3059"
 
 # docker
 webtop_container_name: "webtop"
@@ -17,15 +22,21 @@ webtop_image_tag: "latest"
 
 # specs
 webtop_cpu_shares: 1024
-webtop_memory: "2g"
+webtop_memory: "2G"
 
 # app
-webtop_user_id: "0"
-webtop_group_id: "0"
+# https://docs.linuxserver.io/images/docker-webtop/#optional-environment-variables
 webtop_env_keyboard: "en-us-qwerty"
 webtop_env_subfolder: "/"
 webtop_env_custom_user: "{{ ansible_nas_user }}"
 webtop_env_password: "{{ ansible_nas_app_admin_password }}"
+webtop_env_disable_open_tools: "false"
+webtop_env_disable_sudo: "false"
+webtop_env_disable_terminals: "false"
+webtop_env_disable_close_button: "false"
+webtop_env_disable_mouse_buttons: "false"
+webtop_env_disable_harden_keybinds: "false"
+webtop_env_disable_restart_app: "false"
 
 # autoheal
 webtop_autoheal: "false"

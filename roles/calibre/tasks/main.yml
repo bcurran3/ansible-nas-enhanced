@@ -22,9 +22,9 @@
           - "{{ calibre_comics_directory }}:/comics:rw"
         devices: >-
                   {{
-                    (handbrake_devices | default([])) + ['/dev/dri:/dev/dri']
+                    (calibre_devices | default([])) + ['/dev/dri:/dev/dri']
                     if intel_igpu_enabled | default(false) | bool
-                    else (handbrake_devices | default(omit))
+                    else (calibre_devices | default(omit))
                   }}
         env:
           CLI_ARGS: "{{ calibre_cli_args }}"
