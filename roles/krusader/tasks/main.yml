@@ -19,7 +19,7 @@
         privileged: true
         volumes:
           - "{{ krusader_data_directory }}/config:/config:rw"
-          - "{{ krusader_browse_directory }}:/mnt/fs"
+          - "{{ krusader_browse_directory }}:/mnt/host"
           - "/etc/localtime:/etc/localtime:ro"
         ports:
           - "{{ krusader_port_http }}:{{ krusader_port_http }}"
@@ -80,7 +80,7 @@
                 ['https://' ~ krusader_hostname ~ '.' ~ ansible_nas_domain]
                 if (krusader_available_externally is true or krusader_dockflare_tunnel is true) else []
               ) + [
-                'VNC access at ' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ krusader_port_vnc
+                'VNC client access via ' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ krusader_port_vnc
               ]
             }}
   when: krusader_enabled is true
