@@ -108,7 +108,7 @@ By default, applications can be found on the ports listed below.
 | Gotify           | 2346    | Bridge  | HTTP           |
 | GoToSocial       | 3046
 | GPU Hot          | 1312    | Bridge  | HTTP           |
-| Grafana          | 3000    | Bridge  | HTTP           |
+| Grafana          | 3002    | Bridge  | HTTP           |
 | Grocy            | 9283    | Bridge  | HTTP           |
 | Guacamole        | 8090    | Bridge  | HTTP           |
 | Hammond          | 3041    | Bridge  | HTTP           |
@@ -287,7 +287,7 @@ By default, applications can be found on the ports listed below.
 | Stalwart Mail    | 4190
 | Stash            | 9998
 | stats stack
-| - grafana 3000
+| - grafana 3002
 | - hddtemp 7634
 | - prometheus 9090
 | - prometheus 9902
