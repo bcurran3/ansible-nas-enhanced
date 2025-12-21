@@ -41,9 +41,11 @@
           MONGODB_REPLICA_SET_MODE: "primary"
           MONGODB_REPLICA_SET_NAME: "rs0"
           MONGODB_PORT_NUMBER: "27017"
-          MONGODB_INITIAL_PRIMARY_HOST: "mongodb"
+#          MONGODB_INITIAL_PRIMARY_HOST: "mongodb"
+          MONGODB_INITIAL_PRIMARY_HOST: "{{ rocket_chat_db_container_name }}"
           MONGODB_INITIAL_PRIMARY_PORT_NUMBER: "27017"
-          MONGODB_ADVERTISED_HOSTNAME: "mongodb"
+#          MONGODB_ADVERTISED_HOSTNAME: "mongodb"
+          MONGODB_ADVERTISED_HOSTNAME: "{{ rocket_chat_db_container_name }}"
           MONGODB_ENABLE_JOURNAL: "true"
           ALLOW_EMPTY_PASSWORD: "yes"
           TZ: "{{ ansible_nas_timezone }}"
@@ -88,8 +90,6 @@
 #        networks:
 #          - name: "{{ rocket_chat_network_name }}"
 #        networks_cli_compatible: "yes"
-        links:
-          - "{{ rocket_chat_db_container_name }}"
         ports:
           - "{{ rocket_chat_port_http }}:3000"
         env:
@@ -103,6 +103,8 @@
         volumes:
           - "/etc/localtime:/etc/localtime:ro"
           - "{{ rocket_chat_data_directory }}/uploads:/app/uploads"
+        links:
+          - "{{ rocket_chat_db_container_name }}"
         labels:
           autoheal: "{{ rocket_chat_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ rocket_chat_watchtower_enable }}"
