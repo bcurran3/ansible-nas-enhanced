@@ -1,6 +1,6 @@
 ---
 # ANE
-ansible_nas_app_name: "virtualtabletop"
+ansible_nas_app_name: "Virtual Tabletop"
 virtualtabletop_enabled: false
 virtualtabletop_available_externally: false
 virtualtabletop_traefik_whitelist: "{{ lan }}"
@@ -9,7 +9,7 @@ virtualtabletop_traefik_whitelist: "{{ lan }}"
 virtualtabletop_data_directory: "{{ docker_home }}/virtualtabletop"
 
 # docker
-virtualtabletop_container_name: "virtualtabletop"
+virtualtabletop_container_name: "virtual-tabletop"
 virtualtabletop_image_name: "arnoldsmith86/virtualtabletop"
 virtualtabletop_image_tag: "latest"
 
@@ -24,11 +24,12 @@ virtualtabletop_memory: "1G"
 # app
 virtualtabletop_env_adminurl: "/admin"
 virtualtabletop_env_allowpubliclibraryedits: "false"
-virtualtabletop_env_customtab: "{{ ansible_nas_hostname }}"
-virtualtabletop_env_externalurl: "https://{{ virtualtabletop_hostname }}.{{ ansible_nas_domain }}"
+virtualtabletop_env_customtab: "Virtual Tabletop ({{ ansible_nas_hostname }})"
+#virtualtabletop_env_externalurl: "https://{{ virtualtabletop_hostname }}.{{ ansible_nas_domain }}"
+virtualtabletop_env_externalurl: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtualtabletop_port_http }}"
 virtualtabletop_env_forcetracing: "false"
 virtualtabletop_env_minifyjavascript: "false"
-virtualtabletop_env_servername: ""
+virtualtabletop_env_servername: "{{ ansible_nas_hostname }}"
 virtualtabletop_env_simulateserverlag: "0"
 virtualtabletop_env_urlprefix: ""
 
