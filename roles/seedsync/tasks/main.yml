@@ -11,20 +11,7 @@
         - "{{ seedsync_data_directory }}"
         - "{{ seedsync_data_directory }}/config"
         - "{{ seedsync_data_directory }}/downloads"
-
-    - name: Check for SSH Directory
-      ansible.builtin.stat:
-        path: "{{ seedsync_ssh_directory }}"
-      register: ssh_dir_check
-
-    - name: Create SSH Directory
-      ansible.builtin.file:
-        path: "{{ seedsync_ssh_directory }}"
-        state: directory
-        mode: '0700'
-        owner: "{{ ansible_user_id }}"
-        group: "{{ ansible_user_id }}"
-      when: not ssh_dir_check.stat.exists
+        - "{{ seedsync_ssh_directory }}"
 
     - name: Generate SSH key with passphrase
       community.crypto.openssh_keypair:
@@ -33,7 +20,6 @@
         size: 4096
         passphrase: "{{ ansible_nas_app_admin_password }}"
         state: present
-      when: not ssh_dir_check.stat.exists
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
