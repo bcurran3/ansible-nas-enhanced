@@ -155,7 +155,7 @@ By default, applications can be found on the ports listed below.
 | Loki             | 3100
 | Luanti           | 30000
 | magnetico        | 9017    | Bridge  | HTTP           |
-| Maintainerr      | 8154
+| Maintainerr      | 6246
 | MakeMKV          | 5804    | Bridge  | HTTP           |
 | Mealie           | 9925    | Host    | HTTP           |
 | Medialytics      | 3044

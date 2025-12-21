@@ -16,8 +16,9 @@
         hostname: "{{ maintainerr_container_name }}"
         image: "{{ maintainerr_image_name }}:{{ maintainerr_image_tag }}"
         pull: true
+        user: 1000:1000
         ports:
-          - "{{ maintainerr_port_http }}:80"
+          - "{{ maintainerr_port_http }}:6246"
         volumes:
           - "{{ maintainerr_data_directory }}/data:/opt/data"
         env:
@@ -52,7 +53,7 @@
           traefik.http.routers.frontend.middlewares: "{{ maintainerr_hostname }}"
           traefik.http.routers.maintainerr.middlewares: "{{ maintainerr_hostname }}@docker"
           traefik.http.middlewares.maintainerr.IPAllowList.sourcerange: "{{ maintainerr_traefik_whitelist }}"      
-          traefik.http.services.maintainerr.loadbalancer.server.port: "80"
+          traefik.http.services.maintainerr.loadbalancer.server.port: "6246"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/jorenn92/Maintainerr/releases"
