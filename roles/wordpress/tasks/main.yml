@@ -68,6 +68,8 @@
           WORDPRESS_DB_PASSWORD: "{{ wordpress_env_wordpress_db_password }}"
           WORDPRESS_DB_NAME: "{{ wordpress_env_wordpress_db_name }}"
           TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ wordpress_db_container_name }}"
         labels:
           autoheal: "{{ wordpress_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ wordpress_watchtower_enable }}"
