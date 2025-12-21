@@ -9,8 +9,8 @@
         image: "{{ striparr_image_name }}:{{ striparr_image_tag }}"
         pull: true
         volumes:
-          - "{{ sonarr_tv_directory }}:/path/to/tv:rw"
-          - "{{ radarr_movies_directory }}:/path/to/movies:rw"
+          - "{{ tv_root }}:/path/to/tv:rw"
+          - "{{ movies_root }}:/path/to/movies:rw"
         network_mode: bridge
         env:
           PUID: "{{ striparr_puid }}"
