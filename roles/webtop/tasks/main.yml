@@ -20,6 +20,8 @@
           - "{{ webtop_data_directory }}/config:/config"
           - "/var/run/docker.sock:/var/run/docker.sock" #optional
         env:
+          CUSTOMER_USER: "{{ webtop_env_custom_user }}"
+          PASSWORD: "{{ webtop_env_password }}"
           DOCKER_MODS: "{{ webtop_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ webtop_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ webtop_env_docker_mods_install_pip_packages}}"
