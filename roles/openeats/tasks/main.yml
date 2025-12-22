@@ -6,11 +6,11 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ openeats_data_directory }}/openeats-api"
-        - "{{ openeats_data_directory }}/static-files"
-        - "{{ openeats_data_directory }}/site-media"
-        - "{{ openeats_data_directory }}/openeats-web"
-        - "{{ openeats_data_directory }}/database"
+        - "{{ openeats_data_directory }}/api"
+        - "{{ openeats_data_directory }}/api/site-media"
+        - "{{ openeats_data_directory }}/api/static-files"
+        - "{{ openeats_data_directory }}/db"
+        - "{{ openeats_data_directory }}/web"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -20,23 +20,16 @@
         pull: true
         network_mode: "bridge"
         volumes:
-          - "{{ openeats_data_directory }}/database:/var/lib/mysql"
-        ports:
-          - "{{ openeats_port_db }}:3306"
+          - "{{ openeats_data_directory }}/db:/var/lib/mysql"
+#        ports:
+#          - "{{ openeats_port_db }}:3306"
         env:
-          MARIADB_ROOT_PASSWORD: "openeatspw"
+          MARIADB_ROOT_PASSWORD: "{{ openeats_db_env_mariadb_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-              test:
-                - CMD
-                - /usr/local/bin/healthcheck.sh
-                - --su-mysql
-                - --connect
-                - --innodb_initialized
-              interval: "30s"
-              timeout: "10s"
-              retries: "3"
-              start_period: "30s"
+          test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+          timeout: "20s"
+          retries: 20
         labels:
           autoheal: "{{ openeats_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ openeats_db_watchtower_enable }}"
@@ -68,17 +61,17 @@
         image: "{{ openeats_api_image_name }}:{{ openeats_api_image_tag }}"
         pull: true
         network_mode: "bridge"
-        links:
-          - "{{ openeats_db_container_name }}"
+        command: "/startup/prod-entrypoint.sh"
         volumes:
-          - "{{ openeats_data_directory }}/openeats-api:/code"
-          - "{{ openeats_data_directory }}/static-files:/code/static-files"
-          - "{{ openeats_data_directory }}/site-media:/code/site-media"
+          - "{{ openeats_data_directory }}/api/site-media:/code/site-media"
+          - "{{ openeats_data_directory }}/api/static-files:/code/static-files"
         ports:
           - "{{ openeats_port_api }}:8000"
         env:
-          MARIADB_ROOT_PASSWORD: "openeats"
+          MARIADB_ROOT_PASSWORD: "{{ openeats_db_env_mariadb_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ openeats_db_container_name }}"
         labels:
           autoheal: "{{ openeats_api_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ openeats_api_watchtower_enable }}"
@@ -111,10 +104,11 @@
         image: "{{ openeats_image_name }}:{{ openeats_image_tag }}"
         pull: true
         network_mode: "bridge"
+        command: "yarn start"
         links:
           - "{{ openeats_api_container_name }}"
         volumes:
-          - "{{ openeats_data_directory }}/openeats-web:/code"
+          - "{{ openeats_data_directory }}/web:/code"
         ports:
           - "{{ openeats_port_http }}:80"
         env:
