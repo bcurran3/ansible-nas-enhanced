@@ -84,6 +84,7 @@
           MYSQL_USER: "{{ openeats_db_env_mysql_user }}"
           MYSQL_PASSWORD: "{{ openeats_db_env_mysql_password }}"
           MYSQL_DATABASE: "{{ openeats_db_env_mysql_database }}"
+          DB_PASSWORD: "{{ openeats_db_env_mysql_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ openeats_db_container_name }}"
@@ -123,8 +124,8 @@
         command: "yarn start"
         links:
           - "{{ openeats_api_container_name }}"
-        volumes:
-          - "{{ openeats_data_directory }}/web:/code"
+#        volumes:
+#          - "{{ openeats_data_directory }}/web:/code"
         env:
           NODE_ENV: "{{ openeats_env_node_env }}"
           NODE_URL: "{{ openeats_env_node_url }}"
