@@ -33,6 +33,21 @@ openeats_db_memory: "1G"
 
 # app
 openeats_db_env_mariadb_root_password: "openeatspw"
+openeats_db_env_mysql_host: "{{ openeats_db_container_name }}"
+openeats_db_env_mysql_database: "openeats_db"
+openeats_db_env_mysql_user: "openeats"
+openeats_db_env_mysql_password: "topsecret"
+openeats_api_env_api_url: "127.0.0.1:{{ openeats_port_api }}"
+openeats_api_env_django_secret_key: "7dxxz32pws-t%u!ao3me*l5u#abwhf85ykapm^f9_ow+9p()ke"
+openeats_api_env_django_settings_module: "base.settings"
+openeats_api_env_django_debug: "False"
+#openeats_api_env_allowed_host: '['*']' # "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
+openeats_api_env_allowed_host: '*' # "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
+openeats_api_env_http_x_forwarded_proto: "false"  # If you are serving content behind an HTTPS proxy, Set this to `true`.
+openeats_env_node_env: "development"
+openeats_env_node_url: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
+openeats_env_node_api_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_api }}"
+openeats_env_node_locale: "en"
 
 # autoheal
 openeats_autoheal: "false"

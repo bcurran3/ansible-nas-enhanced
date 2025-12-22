@@ -16,6 +16,7 @@
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_db_container_name }}"
+        hostname: "{{ openeats_db_container_name }}"
         image: "{{ openeats_db_image_name }}:{{ openeats_db_image_tag }}"
         pull: true
         network_mode: "bridge"
@@ -25,6 +26,10 @@
 #          - "{{ openeats_port_db }}:3306"
         env:
           MARIADB_ROOT_PASSWORD: "{{ openeats_db_env_mariadb_root_password }}"
+          MYSQL_HOST: "{{ openeats_db_env_mysql_host }}"
+          MYSQL_DATABASE: "{{ openeats_db_env_mysql_database }}"
+          MYSQL_USER: "{{ openeats_db_env_mysql_user }}"
+          MYSQL_ROOT_PASSWORD: "{{ openeats_db_env_mysql_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
@@ -58,6 +63,7 @@
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_api_container_name }}"
+        hostname: "{{ openeats_api_container_name }}"
         image: "{{ openeats_api_image_name }}:{{ openeats_api_image_tag }}"
         pull: true
         network_mode: "bridge"
@@ -66,8 +72,15 @@
           - "{{ openeats_data_directory }}/api/site-media:/code/site-media"
           - "{{ openeats_data_directory }}/api/static-files:/code/static-files"
         ports:
-          - "{{ openeats_port_api }}:8000"
+          - "{{ openeats_port_api }}:{{ openeats_port_api }}"
         env:
+          API_URL: "{{ openeats_api_env_api_url }}"
+          API_PORT: "{{ openeats_port_api }}"
+          DJANGO_SECRET_KEY: "{{ openeats_api_env_django_secret_key}}"
+          DJANGO_SETTINGS_MODULE: "{{ openeats_api_env_django_settings_module }}"
+          DJANGO_DEBUG: "{{ openeats_api_env_django_debug }}"
+          ALLOWED_HOST: "{{ openeats_api_env_allowed_host }}"
+          HTTP_X_FORWARDED_PROTO: "{{ openeats_api_env_http_x_forwarded_proto }}"
           MARIADB_ROOT_PASSWORD: "{{ openeats_db_env_mariadb_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
@@ -112,6 +125,10 @@
         ports:
           - "{{ openeats_port_http }}:80"
         env:
+          NODE_ENV: "{{ openeats_env_node_env }}"
+          NODE_URL: "{{ openeats_env_node_url }}"
+          NODE_API_URL: "{{ openeats_env_node_api_url }}"
+          NODE_LOCALE: "{{ openeats_env_node_locale }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ openeats_autoheal }}"
