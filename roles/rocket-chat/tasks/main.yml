@@ -50,9 +50,13 @@
           ALLOW_EMPTY_PASSWORD: "yes"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
-          - "{{ rocket_chat_data_directory }}/mongodb:/bitnami/mongodb/data/db"
-#         - "{{ rocket_chat_data_directory }}/mongodb:/bitnami/mongodb"
-#         - "{{ rocket_chat_data_directory }}/mongodb/dump:/dump"
+          - "{{ rocket_chat_data_directory }}/mongodb:/bitnami/mongodb:rw"
+        healthcheck:
+          test: ["CMD", "mongosh", "--host", "{{ rocket_chat_db_container_name }}", "--port", "27017", "--eval", "db.adminCommand('ping')"]
+          interval: "30s"
+          timeout: "30s"
+          retries: "10"
+          start_period: "30s"
         labels:
           autoheal: "{{ rocket_chat_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ rocket_chat_db_watchtower_enable }}"
@@ -91,11 +95,11 @@
 #          - name: "{{ rocket_chat_network_name }}"
 #        networks_cli_compatible: "yes"
         ports:
-          - "{{ rocket_chat_port_http }}:3000"
+          - "{{ rocket_chat_port_http }}:{{ rocket_chat_port_http }}"
         env:
-          MONGO_URL: "mongodb://{{ rocket_chat_db_container_name }}:27017/rocket_chat"
+          MONGO_URL: "mongodb://{{ rocket_chat_db_container_name }}:27017/rocketchat?replicaSet=rs0"
           ROOT_URL: "https://{{ rocket_chat_hostname }}.{{ ansible_nas_domain }}"
-          PORT: "3000"
+          PORT: "{{ rocket_chat_port_http }}"
           DEPLOY_METHOD: "docker"
           TZ: "{{ ansible_nas_timezone }}"
           DEPLOY_PLATFORM: ""
@@ -103,6 +107,12 @@
         volumes:
           - "/etc/localtime:/etc/localtime:ro"
           - "{{ rocket_chat_data_directory }}/uploads:/app/uploads"
+        healthcheck:
+          test: ["CMD", "nc", "-zv", "-w", "10", "rocketchat", "{{ rocket_chat_port_http }}"]
+          interval: "30s"
+          timeout: "10s"
+          retries: "10"
+          start_period: "30s"
         links:
           - "{{ rocket_chat_db_container_name }}"
         labels:
@@ -134,7 +144,7 @@
           traefik.http.routers.frontend.middlewares: "{{ rocket_chat_hostname }}"
           traefik.http.routers.rocket_chat.middlewares: "{{ rocket_chat_hostname }}@docker"
           traefik.http.middlewares.rocket_chat.IPAllowList.sourcerange: "{{ rocket_chat_traefik_whitelist }}"
-          traefik.http.services.rocket_chat.loadbalancer.server.port: "3000"
+          traefik.http.services.rocket_chat.loadbalancer.server.port: "{{ rocket_chat_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/rocketchat/rocket.chat/tags"
