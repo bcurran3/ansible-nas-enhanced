@@ -4,6 +4,7 @@ ansible_nas_app_name: "OpenEats"
 openeats_enabled: false
 openeats_available_externally: false
 openeats_traefik_whitelist: "{{ lan }}"
+
 openeats_data_directory: "{{ docker_home }}/openeats"
 
 # network
@@ -13,9 +14,6 @@ openeats_port_api: "3066"
 openeats_port_db: "3306"
 
 # docker
-openeats_container_name: "openeats-web"
-openeats_image_name: "openeats/openeats-web"
-openeats_image_tag: "latest"
 openeats_api_container_name: "openeats-api"
 openeats_api_image_name: "openeats/openeats-api"
 openeats_api_image_tag: "latest"
@@ -25,16 +23,19 @@ openeats_db_image_tag: "5.5.64"
 openeats_nginx_container_name: "openeats-nginx"
 openeats_nginx_image_name: "openeats/openeats-nginx"
 openeats_nginx_image_tag: "latest"
+openeats_web_container_name: "openeats-web"
+openeats_web_image_name: "openeats/openeats-web"
+openeats_web_image_tag: "latest"
 
 # specs
-openeats_cpu_shares: 1024
-openeats_memory: "1G"
 openeats_api_cpu_shares: 1024
 openeats_api_memory: "1G"
 openeats_db_cpu_shares: 1024
 openeats_db_memory: "1G"
 openeats_nginx_cpu_shares: 1024
 openeats_nginx_memory: "1G"
+openeats_web_cpu_shares: 1024
+openeats_web_memory: "1G"
 
 # app
 openeats_db_env_mariadb_root_password: "openeatspw"
@@ -56,20 +57,16 @@ openeats_env_node_api_url: "http://{{ hostvars[inventory_hostname]['ansible_defa
 openeats_env_node_locale: "en"
 
 # autoheal
-openeats_autoheal: "false"
 openeats_api_autoheal: "false"
 openeats_db_autoheal: "false"
 openeats_nginx_autoheal: "false"
+openeats_web_autoheal: "false"
 
 # dockflare
 openeats_dockflare_tunnel: "false"
 openeats_dockflare_access_group: ""
 
 # homepage
-openeats_homepage_group: "Misc"
-openeats_homepage_icon: "openeats.png"
-openeats_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
-openeats_homepage_showstats: "false"
 openeats_api_homepage_group: "Misc"
 openeats_api_homepage_icon: "openeats.png"
 openeats_api_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
@@ -82,31 +79,35 @@ openeats_nginx_homepage_group: "Apps"
 openeats_nginx_homepage_icon: "openeats.png"
 openeats_nginx_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
 openeats_nginx_homepage_showstats: "false"
+openeats_web_homepage_group: "Misc"
+openeats_web_homepage_icon: "openeats.png"
+openeats_web_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
+openeats_web_homepage_showstats: "false"
 
 # repliqate
-openeats_repliqate_enabled: "false"
-openeats_repliqate_engine: "restic"
-openeats_repliqate_schedule: "@daily 3am"
-openeats_repliqate_backup_id: "{{ openeats_container_name }}"
-openeats_repliqate_retention: "30d"
 openeats_api_repliqate_enabled: "false"
 openeats_api_repliqate_engine: "restic"
 openeats_api_repliqate_schedule: "@daily 3am"
-openeats_api_repliqate_backup_id: "{{ openeats_container_name }}"
+openeats_api_repliqate_backup_id: "{{ openeats_api_container_name }}"
 openeats_api_repliqate_retention: "30d"
 openeats_db_repliqate_enabled: "false"
 openeats_db_repliqate_engine: "restic"
 openeats_db_repliqate_schedule: "@daily 3am"
-openeats_db_repliqate_backup_id: "{{ openeats_container_name }}"
+openeats_db_repliqate_backup_id: "{{ openeats_db_container_name }}"
 openeats_db_repliqate_retention: "30d"
 openeats_nginx_repliqate_enabled: "false"
 openeats_nginx_repliqate_engine: "restic"
 openeats_nginx_repliqate_schedule: "@daily 3am"
-openeats_nginx_repliqate_backup_id: "{{ openeats_container_name }}"
+openeats_nginx_repliqate_backup_id: "{{ openeats_nginx_container_name }}"
 openeats_nginx_repliqate_retention: "30d"
+openeats_web_repliqate_enabled: "false"
+openeats_web_repliqate_engine: "restic"
+openeats_web_repliqate_schedule: "@daily 3am"
+openeats_web_repliqate_backup_id: "{{ openeats_web_container_name }}"
+openeats_web_repliqate_retention: "30d"
 
 # watchtower
-openeats_watchtower_enable: "false"
 openeats_api_watchtower_enable: "false"
 openeats_db_watchtower_enable: "false"
 openeats_nginx_watchtower_enable: "false"
+openeats_web_watchtower_enable: "false"
