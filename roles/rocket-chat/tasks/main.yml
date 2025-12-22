@@ -19,8 +19,8 @@
         - "{{ rocket_chat_data_directory }}"
         - "{{ rocket_chat_data_directory }}/db"
 
-    - name: Check if {{ vaultwarden_hostname }}.{{ ansible_nas_domain }} resolves
-      ansible.builtin.shell: dig +short {{ vaultwarden_hostname }}.{{ ansible_nas_domain }}
+    - name: Check if {{ rocket_chat_hostname }}.{{ ansible_nas_domain }} resolves
+      ansible.builtin.shell: dig +short {{ rocket_chat_hostname }}.{{ ansible_nas_domain }}
       register: dns_check
       changed_when: false
 
@@ -29,10 +29,18 @@
         dns_exists: "{{ dns_check.stdout | length > 0 }}"
 
 # https://docs.rocket.chat/v1/docs/deploy-with-docker-docker-compose#step-1-install-docker-and-docker-compose
-    - name: Warn on DNS lookup failure
+    - name: Report DNS and Access Status
       ansible.builtin.debug:
-        msg: "DNS record not found. Skipping the rest..."
-      when: not dns_exists
+        msg: >-
+          {{
+            "DNS record found!"
+            if dns_exists
+            else
+            "DNS record not found. External access to be configured."
+            if (rocket_chat_available_externally | bool or rocket_chat_dockflare_tunnel | bool)
+            else
+            "DNS record not found. External access not configured, skipping container creation."
+          }}
 
     - name: Continue {{ ansible_nas_app_name }}
       block:

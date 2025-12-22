@@ -20,10 +20,18 @@
         dns_exists: "{{ dns_check.stdout | length > 0 }}"
 
 # https://github.com/dani-garcia/vaultwarden#Usage
-    - name: Warn on DNS lookup failure
+    - name: Report DNS and Access Status
       ansible.builtin.debug:
-        msg: "DNS record not found. Skipping the rest..."
-      when: not dns_exists
+        msg: >-
+          {{
+            "DNS record found!"
+            if dns_exists
+            else
+            "DNS record not found. External access to be configured."
+            if (vaultwarden_available_externally | bool or vaultwarden_dockflare_tunnel | bool)
+            else
+            "DNS record not found. External access not configured, skipping container creation."
+          }}
 
     - name: Continue {{ ansible_nas_app_name }}
       block:
