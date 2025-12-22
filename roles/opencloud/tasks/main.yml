@@ -1,8 +1,6 @@
 ---
-# https://github.com/opencloud-eu/opencloud-compose/blob/main/docker-compose.yml
 ### WORK IN PROGRESS
-# login error
-# see https://github.com/opencloud-eu/opencloud/issues/818
+# https://github.com/opencloud-eu/opencloud-compose/blob/main/docker-compose.yml
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -31,9 +29,10 @@
       set_fact:
         dns_exists: "{{ dns_check.stdout | length > 0 }}"
 
+# https://docs.opencloud.eu/docs/admin/getting-started/container/docker-compose/docker-compose-base
     - name: Warn on DNS lookup failure
       ansible.builtin.debug:
-        msg: "DNS record not found. Skipping SSL and Network tasks, but continuing with the rest..."
+        msg: "DNS record not found. Skipping the rest..."
       when: not dns_exists
 
     - name: Continue {{ ansible_nas_app_name }}
@@ -129,7 +128,6 @@
           ansible.builtin.debug:
             msg: >-
                   {{
-                    ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (opencloud_port_http | string)] +
                     (['https://' + opencloud_hostname + '.' + ansible_nas_domain] if (opencloud_available_externally is true or opencloud_dockflare_tunnel is true) else [])
                   }}
       when: dns_exists

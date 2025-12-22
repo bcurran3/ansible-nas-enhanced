@@ -171,7 +171,7 @@
           traefik.http.routers.frontend.middlewares: "{{ tandoor_recipes_hostname }}"
           traefik.http.routers.tandoor_recipes.middlewares: "tandoor_recipes@docker"
           traefik.http.middlewares.tandoor_recipes.IPAllowList.sourcerange: "{{ tandoor_recipes_traefik_whitelist }}"
-          traefik.http.services.tandoor_recipes.loadbalancer.server.port: "{{ tandoor_recipes_port_http }}"
+          traefik.http.services.tandoor_recipes.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/TandoorRecipes/recipes/pkgs/container/recipes"
