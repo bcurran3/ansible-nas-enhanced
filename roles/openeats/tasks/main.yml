@@ -52,6 +52,12 @@
         cpu_shares: "{{ openeats_db_cpu_shares }}"
         memory: "{{ openeats_db_memory }}"
         restart_policy: unless-stopped
+      register: openeats_db_status
+
+    - name: Wait for {{ ansible_nas_app_name }} DB to initialize
+      ansible.builtin.pause:
+        seconds: 30
+      when: openeats_db_status.changed
 
     - name: Create {{ ansible_nas_app_name }} API Container
       community.docker.docker_container:
@@ -117,7 +123,8 @@
         image: "{{ openeats_web_image_name }}:{{ openeats_web_image_tag }}"
         pull: true
         network_mode: "bridge"
-        command: "yarn start"
+#       command: "yarn start"
+        command: sh -c "yarn build && tail -f /dev/null"
         links:
           - "{{ openeats_api_container_name }}"
         volumes:
