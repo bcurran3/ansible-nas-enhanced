@@ -200,9 +200,8 @@ By default, applications can be found on the ports listed below.
 | Open WebUI       | 11435
 | Open WebUI       | 11436
 | OpenCloud        | 9201
-| OpenEats         | 3306
-| OpenEats         | 5807
-| OpenEats         | 3066
+| OpenEats         | 5807    | Bridge  | HTTP           |
+| OpenEats         | 8000    | Bridge  | HTTP           |
 | OpenEMR          | 3016    | Bridge  | HTTP           |
 | openHAB          | 7777    | Host    | HTTP           |
 | openHAB          | 7778    | Host    | HTTPS          |
