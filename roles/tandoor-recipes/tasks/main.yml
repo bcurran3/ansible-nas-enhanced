@@ -21,9 +21,9 @@
         volumes:
           - "{{ tandoor_recipes_data_directory }}/db:/var/lib/postgresql/data"
         env:
-          POSTGRES_USER: "djangodb"
+          POSTGRES_USER: "{{ tandoor_recipes_env_postgres_user }}"
           POSTGRES_PASSWORD: "{{ tandoor_recipes_env_postgres_password }}"
-          POSTGRES_DB: "djangodb"
+          POSTGRES_DB: "{{ tandoor_recipes_env_db }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ tandoor_recipes_db_autoheal }}"
@@ -67,9 +67,9 @@
           DB_ENGINE: "django.db.backends.postgresql"
           POSTGRES_HOST: "{{ tandoor_recipes_db_container_name }}"
           POSTGRES_PORT: "5432"
-          POSTGRES_USER: "djangodb"
+          POSTGRES_USER: "{{ tandoor_recipes_env_postgres_user }}"
           POSTGRES_PASSWORD: "{{ tandoor_recipes_env_postgres_password }}"
-          POSTGRES_DB: "djangodb"
+          POSTGRES_DB: "{{ tandoor_recipes_env_db }}"
           SECRET_KEY: "{{ tandoor_recipes_env_secret_key }}"
           TANDOOR_PORT: "{{ tandoor_recipes_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
