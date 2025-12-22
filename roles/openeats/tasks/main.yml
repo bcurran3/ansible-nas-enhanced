@@ -139,7 +139,7 @@
           homepage.group: "{{ openeats_web_homepage_group }}"
           homepage.icon: "{{ openeats_web_homepage_icon }}"
           homepage.href: "{{ openeats_web_homepage_href }}"
-          homepage.description: "{{ 'Self Hosted Recipe Management App' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'OpenEats Web UI' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_web_container_name }}"
           homepage.showStats: "{{ openeats_web_homepage_showstats }}"
@@ -187,7 +187,7 @@
           homepage.group: "{{ openeats_nginx_homepage_group }}"
           homepage.icon: "{{ openeats_nginx_homepage_icon }}"
           homepage.href: "{{ openeats_nginx_homepage_href }}"
-          homepage.description: "{{ 'OpenEats Nginx' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'Self Hosted Recipe Management App' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_nginx_container_name }}"
           homepage.showStats: "{{ openeats_nginx_homepage_showstats }}"
@@ -228,14 +228,14 @@
         name: "{{ openeats_nginx_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Web Container
-      community.docker.docker_container:
-        name: "{{ openeats_container_name }}"
-        state: absent
-
     - name: Stop {{ ansible_nas_app_name }} API Container
       community.docker.docker_container:
         name: "{{ openeats_api_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Web Container
+      community.docker.docker_container:
+        name: "{{ openeats_web_container_name }}"
         state: absent
 
     - name: Stop {{ ansible_nas_app_name }} DB Container
