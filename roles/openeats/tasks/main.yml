@@ -6,11 +6,7 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ openeats_data_directory }}/api"
-        - "{{ openeats_data_directory }}/api/site-media"
-        - "{{ openeats_data_directory }}/api/static-files"
         - "{{ openeats_data_directory }}/db"
-        - "{{ openeats_data_directory }}/web"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -254,12 +250,25 @@
         path: "{{ openeats_data_directory }}"
       register: dir_stat
 
+    - name: Export site-media Volume to Host
+      community.docker.docker_container:
+        name: "openeats-backup-helper"
+        image: busybox
+        state: started
+        detach: false
+        cleanup: true
+        volumes:
+          - "site-media:/volume_data"
+          - "{{ openeats_data_directory }}:/backup_dir"
+        command: "tar -cvf /backup_dir/site-media-volume.tar -C /volume_data ."
+      when: dir_stat.stat.exists
+
     - name: Archive {{ ansible_nas_app_name }} Data Directory
       ansible.builtin.archive:
         path: "{{ openeats_data_directory }}"
-        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
+        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.tar.gz"
         force_archive: true
-        format: zip
+        format: gz
         owner: ansible-nas
         group: ansible-nas
         mode: u=rw,g=rw
