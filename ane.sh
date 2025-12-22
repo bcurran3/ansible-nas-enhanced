@@ -89,7 +89,7 @@ function check_behind {
     if [ $BEHIND -gt 0 ]; then
        echo "  ** \"./ane.sh --upgrade\" to update"
     fi
-    echo
+    #echo
 }
 
 # prune Docker images and volumes
@@ -159,6 +159,7 @@ fi
 
 # Check git commits ANE is behind
 if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" ]]; then
+    if $ANE_ALWAYS_CHECK_BEHIND; then exit; fi
     check_behind
     exit
 fi

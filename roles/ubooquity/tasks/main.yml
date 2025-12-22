@@ -18,8 +18,8 @@
         volumes:
           - "{{ ubooquity_data_directory }}/config:/config:rw"
           - "{{ ubooquity_data_directory }}/files:/files:rw"
-          - "{{ comics_root }}:/comics"
           - "{{ books_root }}:/books"
+          - "{{ comics_root }}:/comics"
         env:
           DOCKER_MODS: "{{ ubooquity_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ ubooquity_env_docker_mods_install_packages }}"
@@ -37,16 +37,16 @@
           dockflare.enable: "{{ ubooquity_dockflare_tunnel }}"
           dockflare.access.group: "{{ ubooquity_dockflare_access_group }}"
           dockflare.hostname: "{{ ubooquity_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ubooquity_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ubooquity_port_http }}/ubooquity"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ ubooquity_homepage_group }}"
           homepage.icon: "{{ ubooquity_homepage_icon }}"
           homepage.href: "{{ ubooquity_homepage_href }}"
-          homepage.description: "{{ 'ubooquity description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'free, lightweight and easy-to-use home server for your comics and ebooks' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ubooquity_container_name }}"
           homepage.showStats: "{{ ubooquity_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ubooquity_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ubooquity_port_http }}/ubooquity"
           repliqate.enabled: "{{ ubooquity_repliqate_enabled }}"
           repliqate.engine: "{{ ubooquity_repliqate_engine }}"
           repliqate.schedule: "{{ ubooquity_repliqate_schedule }}"
@@ -72,8 +72,8 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ubooquity_port_http | string)] +
-                (['https://' + ubooquity_hostname + '.' + ansible_nas_domain] if (ubooquity_available_externally is true or ubooquity_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ubooquity_port_http | string)] + '/ubooquity' +
+                (['https://' + ubooquity_hostname + '.' + ansible_nas_domain] + '/ubooquity'if (ubooquity_available_externally is true or ubooquity_dockflare_tunnel is true) else [])
               }}
   when: ubooquity_enabled is true
 
