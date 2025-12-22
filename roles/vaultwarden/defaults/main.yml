@@ -40,16 +40,16 @@ vaultwarden_env_allow_signups: "false"
 ## Mail specific settings, set SMTP_FROM and either SMTP_HOST or USE_SENDMAIL to enable the mail service.
 ## To make sure the email links are pointing to the correct host, set the DOMAIN variable.
 ## Note: if SMTP_USERNAME is specified, SMTP_PASSWORD is mandatory
-vaultwarden_env_domain: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
-vaultwarden_env_smtp_host: null # "smtp.{{ ansbile_nas_domain }}"
-vaultwarden_env_smtp_from: null # "vaultwarden@{{ ansbile_nas_domain }}"
+vaultwarden_env_domain: "https://{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
+vaultwarden_env_smtp_host: null # "smtp.{{ ansible_nas_domain }}"
+vaultwarden_env_smtp_from: null # "vaultwarden@{{ ansible_nas_domain }}"
 vaultwarden_env_smtp_from_name: null # "Vaultwarden"
 vaultwarden_env_smtp_security: null # ("starttls", "force_tls", "off") Enable a secure connection. Default is "starttls" (Explicit - ports 587 or 25), "force_tls" (Implicit - port 465) or "off", no encryption (port 25)
 vaultwarden_env_smtp_port: null # "587" # Ports 587 (submission) and 25 (smtp) are standard without encryption and with encryption via STARTTLS (Explicit TLS). Port 465 (submissions) is used for encrypted submission (Implicit TLS).
 vaultwarden_env_smtp_username: null # "username"
 vaultwarden_env_smtp_password: null # "password"
 vaultwarden_env_smtp_timeout: null # "15"
-vaultwarden_websocket_enabled: "false"
+vaultwarden_websocket_enabled: "true"
 
 # autoheal
 vaultwarden_autoheal: "false"
@@ -62,11 +62,11 @@ vaultwarden_dockflare_access_group: ""
 # homepage
 vaultwarden_homepage_group: "Apps"
 vaultwarden_homepage_icon: "vaultwarden.png"
-vaultwarden_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
+vaultwarden_homepage_href: "https://{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
 vaultwarden_homepage_showstats: "false"
 vaultwarden_backup_homepage_group: "Misc"
 vaultwarden_backup_homepage_icon: "vaultwarden.png"
-vaultwarden_backup_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
+vaultwarden_backup_homepage_href: "https://{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
 vaultwarden_backup_homepage_showstats: "false"
 
 # repliqate

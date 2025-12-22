@@ -10,137 +10,144 @@
         - "{{ vaultwarden_data_directory }}"
         - "{{ vaultwarden_data_directory }}/data"
 
-    - name: Create {{ ansible_nas_app_name }} Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ vaultwarden_container_name }}"
-        hostname: "{{ vaultwarden_container_name }}"
-        image: "{{ vaultwarden_image_name }}:{{ vaultwarden_image_tag }}"
-        pull: true
-        ports:
-          - "{{ vaultwarden_port_http }}:80"
-          - "{{ vaultwarden_port_websockets }}:3012"
-        volumes:
-          - "{{ vaultwarden_data_directory }}/data:/data:rw"
-        env: >-
-          {{
-            {
-              'SIGNUPS_ALLOWED': (vaultwarden_env_allow_signups | string),
-              'ADMIN_TOKEN': vaultwarden_env_admin_token,
-              'DOMAIN': vaultwarden_env_domain,
-              'LOG_FILE': '/data/vaultwarden.log',
-              'SMTP_HOST': vaultwarden_env_smtp_host,
-              'SMTP_FROM': vaultwarden_env_smtp_from,
-              'SMTP_FROM_NAME': vaultwarden_env_smtp_from_name,
-              'SMTP_SECURITY': vaultwarden_env_smtp_security,
-              'SMTP_PORT': vaultwarden_env_smtp_port,
-              'SMTP_USERNAME': vaultwarden_env_smtp_username,
-              'SMTP_PASSWORD': vaultwarden_env_smtp_password,
-              'SMTP_TIMEOUT': vaultwarden_env_smtp_timeout,
-              'WEBSOCKET_ENABLED': vaultwarden_websocket_enabled,
-              'TZ': ansible_nas_timezone
-            } | dict2items | selectattr('value', 'ne', none) | selectattr('value', 'ne', '') | items2dict
-          }}
-        labels:
-          autoheal: "{{ vaultwarden_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ vaultwarden_watchtower_enable }}"
-          dockflare.enable: "{{ vaultwarden_dockflare_tunnel }}"
-          dockflare.access.group: "{{ vaultwarden_dockflare_access_group }}"
-          dockflare.hostname: "{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ vaultwarden_homepage_group }}"
-          homepage.icon: "{{ vaultwarden_homepage_icon }}"
-          homepage.href: "{{ vaultwarden_homepage_href }}"
-          homepage.description: "{{ 'Unofficial Bitwarden compatible server written in Rust' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ vaultwarden_container_name }}"
-          homepage.showStats: "{{ vaultwarden_homepage_showstats }}"
-          repliqate.enabled: "{{ vaultwarden_repliqate_enabled }}"
-          repliqate.engine: "{{ vaultwarden_repliqate_engine }}"
-          repliqate.schedule: "{{ vaultwarden_repliqate_schedule }}"
-          repliqate.backup_id: "{{ vaultwarden_repliqate_backup_id }}"
-          repliqate.retention: "{{ vaultwarden_repliqate_retention }}"
-          traefik.enable: "{{ vaultwarden_available_externally | string }}"
-          traefik.http.routers.vaultwarden.rule: "Host(`{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.vaultwarden.tls.certresolver: "letsencrypt"
-          traefik.http.routers.vaultwarden.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.vaultwarden.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ vaultwarden_hostname }}"
-          traefik.http.routers.vaultwarden.middlewares: "{{ vaultwarden_hostname }}@docker"
-          traefik.http.middlewares.vaultwarden.IPAllowList.sourcerange: "{{ vaultwarden_traefik_whitelist }}"
-          traefik.http.services.vaultwarden.loadbalancer.server.port: "80"
-# Add Websockets support?
-#         traefik.http.routers.vaultwarden-ws.rule: "Host(`{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}`) && Path(`/notifications/hub`)"
-#         traefik.http.routers.vaultwarden-ws.tls.certresolver: "letsencrypt"
-#         traefik.http.routers.vaultwarden-ws.tls.domains[0].main: "{{ ansible_nas_domain }}"
-#         traefik.http.routers.vaultwarden-ws.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-#         traefik.http.routers.vaultwarden-ws.service: "vaultwarden-ws"
-##        traefik.http.routers.frontend.middlewares: "{{ vaultwarden_hostname }}-ws"
-#         traefik.http.routers.vaultwarden-ws.middlewares: "{{ vaultwarden_hostname }}-ws@docker"
-#         traefik.http.middlewares.vaultwarden-ws.IPAllowList.sourcerange: "{{ vaultwarden_traefik_whitelist }}"
-#         traefik.http.services.vaultwarden-ws.loadbalancer.server.port: "3012"
-          wud.tag.include: '^\\d+\\.\\d+\\.\\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/dani-garcia/vaultwarden/pkgs/container/vaultwarden"
-        cpu_shares: "{{ vaultwarden_cpu_shares }}"
-        memory: "{{ vaultwarden_memory }}"
-        restart_policy: unless-stopped
+    - name: Check if {{ vaultwarden_hostname }}.{{ ansible_nas_domain }} resolves
+      ansible.builtin.shell: dig +short {{ vaultwarden_hostname }}.{{ ansible_nas_domain }}
+      register: dns_check
+      changed_when: false
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Set DNS status fact
+      set_fact:
+        dns_exists: "{{ dns_check.stdout | length > 0 }}"
+
+# https://github.com/dani-garcia/vaultwarden#Usage
+    - name: Warn on DNS lookup failure
       ansible.builtin.debug:
-        msg: >-
+        msg: "DNS record not found. Skipping the rest..."
+      when: not dns_exists
+
+    - name: Continue {{ ansible_nas_app_name }}
+      block:
+        - name: Create {{ ansible_nas_app_name }} Container
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ vaultwarden_container_name }}"
+            hostname: "{{ vaultwarden_container_name }}"
+            image: "{{ vaultwarden_image_name }}:{{ vaultwarden_image_tag }}"
+            pull: true
+            ports:
+              - "{{ vaultwarden_port_http }}:80"
+              - "{{ vaultwarden_port_websockets }}:3012"
+            volumes:
+              - "{{ vaultwarden_data_directory }}/data:/data:rw"
+            env: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (vaultwarden_port_http | string)] +
-                (['https://' + vaultwarden_hostname + '.' + ansible_nas_domain] if (vaultwarden_available_externally is true or vaultwarden_dockflare_tunnel is true) else [])
+                {
+                  'SIGNUPS_ALLOWED': (vaultwarden_env_allow_signups | string),
+                  'ADMIN_TOKEN': vaultwarden_env_admin_token,
+                  'DOMAIN': vaultwarden_env_domain,
+                  'LOG_FILE': '/data/vaultwarden.log',
+                  'SMTP_HOST': vaultwarden_env_smtp_host,
+                  'SMTP_FROM': vaultwarden_env_smtp_from,
+                  'SMTP_FROM_NAME': vaultwarden_env_smtp_from_name,
+                  'SMTP_SECURITY': vaultwarden_env_smtp_security,
+                  'SMTP_PORT': vaultwarden_env_smtp_port,
+                  'SMTP_USERNAME': vaultwarden_env_smtp_username,
+                  'SMTP_PASSWORD': vaultwarden_env_smtp_password,
+                  'SMTP_TIMEOUT': vaultwarden_env_smtp_timeout,
+                  'WEBSOCKET_ENABLED': vaultwarden_websocket_enabled,
+                  'TZ': ansible_nas_timezone
+                } | dict2items | selectattr('value', 'ne', none) | selectattr('value', 'ne', '') | items2dict
               }}
-      when: vaultwarden_enabled is true
+            labels:
+              autoheal: "{{ vaultwarden_autoheal }}"
+              com.centurylinklabs.watchtower.enable: "{{ vaultwarden_watchtower_enable }}"
+              dockflare.enable: "{{ vaultwarden_dockflare_tunnel }}"
+              dockflare.access.group: "{{ vaultwarden_dockflare_access_group }}"
+              dockflare.hostname: "{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
+              dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
+              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.group: "{{ vaultwarden_homepage_group }}"
+              homepage.icon: "{{ vaultwarden_homepage_icon }}"
+              homepage.href: "{{ vaultwarden_homepage_href }}"
+              homepage.description: "{{ 'Unofficial Bitwarden compatible server written in Rust' if homepage_show_description else omit }}"
+              homepage.siteMonitor: "https://{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
+              homepage.server: "my-docker"
+              homepage.container: "{{ vaultwarden_container_name }}"
+              homepage.showStats: "{{ vaultwarden_homepage_showstats }}"
+              repliqate.enabled: "{{ vaultwarden_repliqate_enabled }}"
+              repliqate.engine: "{{ vaultwarden_repliqate_engine }}"
+              repliqate.schedule: "{{ vaultwarden_repliqate_schedule }}"
+              repliqate.backup_id: "{{ vaultwarden_repliqate_backup_id }}"
+              repliqate.retention: "{{ vaultwarden_repliqate_retention }}"
+              traefik.enable: "{{ vaultwarden_available_externally | string }}"
+              traefik.http.routers.vaultwarden.rule: "Host(`{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}`)"
+              traefik.http.routers.vaultwarden.tls.certresolver: "letsencrypt"
+              traefik.http.routers.vaultwarden.tls.domains[0].main: "{{ ansible_nas_domain }}"
+              traefik.http.routers.vaultwarden.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+              traefik.http.routers.vaultwarden.middlewares: "{{ vaultwarden_hostname }}-ipallow@docker"
+              traefik.http.middlewares.vaultwarden-ipallow.IPAllowList.sourcerange: "{{ vaultwarden_traefik_whitelist }}"
+              traefik.http.services.vaultwarden.loadbalancer.server.port: "80"
+              wud.tag.include: '^\\d+\\.\\d+\\.\\d+$'
+              wud.tag.transform.type: "semver"
+              wud.link.template: "https://github.com/dani-garcia/vaultwarden/pkgs/container/vaultwarden"
+            cpu_shares: "{{ vaultwarden_cpu_shares }}"
+            memory: "{{ vaultwarden_memory }}"
+            restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Backup Container Directory
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        mode: "0700"
-      with_items:
-        - "{{ vaultwarden_data_directory }}/backup"
+        - name: Access {{ ansible_nas_app_name }} at
+          ansible.builtin.debug:
+            msg: >-
+                  {{
+                    (['https://' + vaultwarden_hostname + '.' + ansible_nas_domain] if (vaultwarden_available_externally is true or vaultwarden_dockflare_tunnel is true) else [])
+                  }}
 
-    - name: Create {{ ansible_nas_app_name }} Backup Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ vaultwarden_backup_container_name }}"
-        hostname: "{{ vaultwarden_backup_container_name }}"
-        image: "{{ vaultwarden_backup_image_name }}:{{ vaultwarden_backup_image_tag }}"
-        pull: true
-        volumes:
-          - "{{ vaultwarden_data_directory }}/data:/data"
-          - "{{ vaultwarden_data_directory }}/backup:/backup"
-        env:
-          DELETE_AFTER: "30"
-          UID: "0"
-          TIMESTAMP: "true"
-          TZ: "{{ ansible_nas_timezone }}"
-        links:
-          - "{{ vaultwarden_container_name }}"
-        labels:
-          autoheal: "{{ vaultwarden_backup_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ vaultwarden_backup_watchtower_enable }}"
-          dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Backup"
-          homepage.group: "{{ vaultwarden_backup_homepage_group }}"
-          homepage.icon: "{{ vaultwarden_backup_homepage_icon }}"
-          homepage.href: "{{ vaultwarden_backup_homepage_href }}"
-          homepage.description: "{{ 'A simple cron powered backup image for vaultwarden.' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ vaultwarden_backup_container_name }}"
-          homepage.showStats: "{{ vaultwarden_backup_homepage_showstats }}"
-          traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/bruceforce/vaultwarden-backup"
-        cpu_shares: "{{ vaultwarden_backup_cpu_shares }}"
-        memory: "{{ vaultwarden_backup_memory }}"
-        restart_policy: unless-stopped
+        - name: Create {{ ansible_nas_app_name }} Backup Container Directory
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+            mode: "0700"
+          with_items:
+            - "{{ vaultwarden_data_directory }}/backup"
+
+        - name: Create {{ ansible_nas_app_name }} Backup Container
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ vaultwarden_backup_container_name }}"
+            hostname: "{{ vaultwarden_backup_container_name }}"
+            image: "{{ vaultwarden_backup_image_name }}:{{ vaultwarden_backup_image_tag }}"
+            pull: true
+            volumes:
+              - "{{ vaultwarden_data_directory }}/data:/data"
+              - "{{ vaultwarden_data_directory }}/backup:/backup"
+            env:
+              DELETE_AFTER: "30"
+              UID: "0"
+              TIMESTAMP: "true"
+              TZ: "{{ ansible_nas_timezone }}"
+            links:
+              - "{{ vaultwarden_container_name }}"
+            labels:
+              autoheal: "{{ vaultwarden_backup_autoheal }}"
+              com.centurylinklabs.watchtower.enable: "{{ vaultwarden_backup_watchtower_enable }}"
+              dockflare.enable: "false"
+              homepage.name: "{{ ansible_nas_app_name }} Backup"
+              homepage.group: "{{ vaultwarden_backup_homepage_group }}"
+              homepage.icon: "{{ vaultwarden_backup_homepage_icon }}"
+              homepage.href: "{{ vaultwarden_backup_homepage_href }}"
+              homepage.description: "{{ 'A simple cron powered backup image for vaultwarden.' if homepage_show_description else omit }}"
+              homepage.server: "my-docker"
+              homepage.container: "{{ vaultwarden_backup_container_name }}"
+              homepage.showStats: "{{ vaultwarden_backup_homepage_showstats }}"
+              traefik.enable: "false"
+              wud.tag.include: '^\d+\.\d+\.\d+$'
+              wud.tag.transform.type: "semver"
+              wud.link.template: "https://hub.docker.com/r/bruceforce/vaultwarden-backup"
+            cpu_shares: "{{ vaultwarden_backup_cpu_shares }}"
+            memory: "{{ vaultwarden_backup_memory }}"
+            restart_policy: unless-stopped
+      when:
+        - dns_exists
+        - (vaultwarden_dockflare_tunnel | bool or vaultwarden_available_externally | bool)
   when: vaultwarden_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

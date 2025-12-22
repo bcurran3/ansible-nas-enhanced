@@ -15,11 +15,6 @@
         - "{{ opencloud_data_directory }}/config"
         - "{{ opencloud_data_directory }}/data"
 
-    - name: Install dnsutils
-      ansible.builtin.apt:
-        name: dnsutils
-        state: present
-
     - name: Check if {{ opencloud_hostname }}.{{ ansible_nas_domain }} resolves
       ansible.builtin.shell: dig +short {{ opencloud_hostname }}.{{ ansible_nas_domain }}
       register: dns_check
@@ -130,7 +125,9 @@
                   {{
                     (['https://' + opencloud_hostname + '.' + ansible_nas_domain] if (opencloud_available_externally is true or opencloud_dockflare_tunnel is true) else [])
                   }}
-      when: dns_exists
+      when:
+        - dns_exists
+        - (opencloud_dockflare_tunnel | bool or opencloud_available_externally | bool)
   when: opencloud_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
