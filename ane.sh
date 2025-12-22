@@ -2,6 +2,7 @@
 # Ansible-NAS-Enhanced helper script
 
 : "${ANE_EDITOR:="nano"}"
+: "${ANE_ALWAYS_CHECK_BEHIND:=false}"
 : "${ANE_ALWAYS_PRUNE:=false}"
 : "${ANE_ALWAYS_UPGRADE:=false}"
 : "${ANE_DISABLE_ALSO_STOPS:=false}"
@@ -65,6 +66,8 @@ function protips {
     echo "Ansible-NAS-Enhanced (ANE) Pro Tips:"
     echo "  export ANE_EDITOR=\"editorname\""
     echo "    -- set a different default text editor for ane.sh; i.e. vi, vim, msedit"
+    echo "  export ANE_ALWAYS_CHECK_BEHIND=\"true\""
+    echo "    -- always check if ANE is up-to-date"
     echo "  export ANE_ALWAYS_PRUNE=\"true\""
     echo "    -- always prune docker images and volumes after running the full playbook"
     echo "  export ANE_ALWAYS_UPGRADE=\"true\""
@@ -75,6 +78,18 @@ function protips {
     echo "    -- remove/delete app container when you disable it"
     echo "  export ANE_ENABLE_ALSO_STARTS=\"true\""
     echo "    -- install app when you enable it"
+}
+
+# Check git commits ANE is behind function
+function check_behind {
+    git fetch --quiet
+    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
+    BEHIND=$(git rev-list --count HEAD..@{u})
+    echo "  ** Your ANE installation is $BEHIND git commits behind."
+    if [ $BEHIND -gt 0 ]; then
+       echo "  ** \"./ane.sh --upgrade\" to update"
+    fi
+    echo
 }
 
 # prune Docker images and volumes
@@ -107,6 +122,19 @@ if [ $? -ne 0 ]; then
    exit 1
 fi
 
+# Display ANE help menu
+if [[ "$1" = "--help" || "$1" = "-help" || "$1" = "--?" || "$1" = "-?" ]]; then
+   help
+fi
+
+# ANE Pro Tips menu
+if [[ "$1" = "--protips" || "$1" = "-protips" ]]; then
+    protips
+    exit
+fi
+
+if $ANE_ALWAYS_CHECK_BEHIND; then check_behind; fi
+
 # Install/update only specified ANE apps
 if [[ "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--up" || "$1" = "-up" || "$1" = "--tag" || "$1" = "--tags" || "$1" = "-t" ]]; then
      if [ "$2" = '' ]; then
@@ -131,13 +159,7 @@ fi
 
 # Check git commits ANE is behind
 if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" ]]; then
-    git fetch --quiet
-    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
-    BEHIND=$(git rev-list --count HEAD..@{u})
-    echo "  ** Your ANE installation is $BEHIND git commits behind."
-    if [ $BEHIND -gt 0 ]; then
-       echo "  ** \"./ane.sh --upgrade\" to update"
-    fi
+    check_behind
     exit
 fi
 
@@ -258,11 +280,6 @@ if [[ "$1" = "--gitforcepull" || "$1" = "-gitforcepull" ]]; then
     exit
 fi
 
-# Display ANE help menu
-if [[ "$1" = "--help" || "$1" = "-help" || "$1" = "--?" || "$1" = "-?" ]]; then
-   help
-fi
-
 # Install ANE (or reset)
 if [[ "$1" = "--install" || "$1" = "-install" ]]; then
     if [ -d "inventories/ANE" ]; then
@@ -286,12 +303,6 @@ fi
 # Reset ANE shared file permissions
 if [[ "$1" = "--permissions" || "$1" = "-permissions" ]]; then
     ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
-    exit
-fi
-
-# ANE Pro Tips menu
-if [[ "$1" = "--protips" || "$1" = "-protips" ]]; then
-    protips
     exit
 fi
 
