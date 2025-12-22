@@ -27,9 +27,11 @@
       register: dns_check
       changed_when: false
 
+    # --- FIX START: This task was missing or malformed ---
     - name: Set DNS status fact
       ansible.builtin.set_fact:
         dns_exists: "{{ dns_check.stdout | length > 0 }}"
+    # --- FIX END ---
 
     - name: Warn on DNS lookup failure
       ansible.builtin.debug:
