@@ -70,7 +70,7 @@
           - "{{ openeats_data_directory }}/api/site-media:/code/site-media"
           - "{{ openeats_data_directory }}/api/static-files:/code/static-files"
         ports:
-          - "{{ openeats_port_api }}:{{ openeats_port_api }}"
+          - "{{ openeats_port_api }}:8000"
         env:
           API_URL: "{{ openeats_api_env_api_url }}"
           API_PORT: "{{ openeats_port_api }}"
@@ -173,10 +173,12 @@
         ports:
           - "{{ openeats_port_http }}:80"
         env:
+          API_PORT: "{{ openeats_port_api }}"
+          WEB_PORT: "80"
           TZ: "{{ ansible_nas_timezone }}"
         links:
-          - "{{ openeats_api_container_name }}"
-          - "{{ openeats_web_container_name }}"
+          - "{{ openeats_api_container_name }}:api"
+          - "{{ openeats_web_container_name }}:web"
         labels:
           autoheal: "{{ openeats_nginx_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ openeats_nginx_watchtower_enable }}"

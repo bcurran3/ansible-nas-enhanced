@@ -6,27 +6,34 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get container state
-      community.docker.docker_container_info:
-        name: "{{ openeats_container_name }}"
-      register: result
-
-    - name: Get container state
+    - name: Get container state {{ ansible_nas_app_name }} API
       community.docker.docker_container_info:
         name: "{{ openeats_api_container_name }}"
       register: result_api
 
-    - name: Get container state
+    - name: Get container state {{ ansible_nas_app_name }} DB
       community.docker.docker_container_info:
         name: "{{ openeats_db_container_name }}"
       register: result_db
 
+    - name: Get container state {{ ansible_nas_app_name }} Nginx
+      community.docker.docker_container_info:
+        name: "{{ openeats_nginx_container_name }}"
+      register: result_nginx
+
+    - name: Get container state {{ ansible_nas_app_name }} Web UI
+      community.docker.docker_container_info:
+        name: "{{ openeats_web_container_name }}"
+      register: result_web
+
     - name: Check {{ ansible_nas_app_name }} is running
       ansible.builtin.assert:
         that:
-          - result.container['State']['Status'] == "running"
-          - result.container['State']['Restarting'] == false
           - result_api.container['State']['Status'] == "running"
           - result_api.container['State']['Restarting'] == false
           - result_db.container['State']['Status'] == "running"
           - result_db.container['State']['Restarting'] == false
+          - result_nginx.container['State']['Status'] == "running"
+          - result_nginx.container['State']['Restarting'] == false
+          - result_web.container['State']['Status'] == "running"
+          - result_web.container['State']['Restarting'] == false
