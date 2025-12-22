@@ -1,6 +1,5 @@
 ---
 # NOTE/TDL: would like migrate off bitnami/mongodb
-# - no need for network
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -19,12 +18,7 @@
         state: directory
       with_items:
         - "{{ rocket_chat_data_directory }}"
-        - "{{ rocket_chat_data_directory }}/mongodb"
-#       - "{{ rocket_chat_data_directory }}/mongodb/dump"
-
-#    - name: Create {{ ansible_nas_app_name }} network
-#      community.docker.docker_network:
-#        name: "{{ rocket_chat_network_name }}"
+        - "{{ rocket_chat_data_directory }}/db"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -34,23 +28,18 @@
         image: "{{ rocket_chat_db_image_name }}:{{ rocket_chat_db_image_tag }}"
         pull: true
         network_mode: "bridge"
-#        networks:
-#          - name: "{{ rocket_chat_network_name }}"
-#        networks_cli_compatible: "yes"
         env:
           MONGODB_REPLICA_SET_MODE: "primary"
           MONGODB_REPLICA_SET_NAME: "rs0"
           MONGODB_PORT_NUMBER: "27017"
-#          MONGODB_INITIAL_PRIMARY_HOST: "mongodb"
           MONGODB_INITIAL_PRIMARY_HOST: "{{ rocket_chat_db_container_name }}"
           MONGODB_INITIAL_PRIMARY_PORT_NUMBER: "27017"
-#          MONGODB_ADVERTISED_HOSTNAME: "mongodb"
           MONGODB_ADVERTISED_HOSTNAME: "{{ rocket_chat_db_container_name }}"
           MONGODB_ENABLE_JOURNAL: "true"
           ALLOW_EMPTY_PASSWORD: "yes"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
-          - "{{ rocket_chat_data_directory }}/mongodb:/bitnami/mongodb:rw"
+          - "{{ rocket_chat_data_directory }}/db:/bitnami/mongodb:rw"
         healthcheck:
           test: ["CMD", "mongosh", "--host", "{{ rocket_chat_db_container_name }}", "--port", "27017", "--eval", "db.adminCommand('ping')"]
           interval: "30s"
@@ -75,7 +64,6 @@
           repliqate.backup_id: "{{ rocket_chat_db_repliqate_backup_id }}"
           repliqate.retention: "{{ rocket_chat_db_repliqate_retention }}"
           traefik.enable: "false"
-#          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.include: '^6\.0\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/bitnamilegacy/mongodb/tags"
@@ -91,16 +79,14 @@
         image: "{{ rocket_chat_image_name }}:{{ rocket_chat_image_tag }}"
         pull: true
         network_mode: "bridge"
-#        networks:
-#          - name: "{{ rocket_chat_network_name }}"
-#        networks_cli_compatible: "yes"
         ports:
           - "{{ rocket_chat_port_http }}:{{ rocket_chat_port_http }}"
         env:
           MONGO_URL: "mongodb://{{ rocket_chat_db_container_name }}:27017/rocketchat?replicaSet=rs0"
-          ROOT_URL: "https://{{ rocket_chat_hostname }}.{{ ansible_nas_domain }}"
+          ROOT_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
           PORT: "{{ rocket_chat_port_http }}"
           DEPLOY_METHOD: "docker"
+          LICENSE_DEBUG: "true"
           TZ: "{{ ansible_nas_timezone }}"
           DEPLOY_PLATFORM: ""
           REG_TOKEN: ""
@@ -173,10 +159,6 @@
         name: "{{ rocket_chat_db_container_name }}"
         state: absent
 
-#    - name: Delete {{ ansible_nas_app_name }} Network
-#      community.docker.docker_network:
-#        name: "{{ rocket_chat_network_name }}"
-#        state: absent
   when: rocket_chat_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
