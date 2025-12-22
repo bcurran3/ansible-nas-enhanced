@@ -64,7 +64,7 @@
           - "{{ tandoor_recipes_port_http }}:{{ tandoor_recipes_port_http }}"
         env:
           ALLOWED_HOSTS: "{{ tandoor_recipes_env_allowed_hosts }}"
-          DATABASE_URL: "postgresql://{{ tandoor_recipes_env_postgres_user }}:{{ tandoor_recipes_env_postgres_password }}@{{ tandoor_recipes_db_container_name }}:5432/{{ tandoor_recipes_env_postgres_db }}"
+          DATABASE_URL: "postgresql://{{ tandoor_recipes_env_postgres_user }}:{{ tandoor_recipes_env_postgres_password }}@{{ tandoor_recipes_db_container_name }}:5432/{{ tandoor_recipes_env_postgres_db }}?sslmode=disable"
           DB_ENGINE: "django.db.backends.postgresql"
           POSTGRES_HOST: "{{ tandoor_recipes_db_container_name }}"
           POSTGRES_PORT: "5432"
