@@ -202,7 +202,7 @@ By default, applications can be found on the ports listed below.
 | OpenCloud        | 9201
 | OpenEats         | 3306
 | OpenEats         | 5807
-| OpenEats         | 8082
+| OpenEats         | 3066
 | OpenEMR          | 3016    | Bridge  | HTTP           |
 | openHAB          | 7777    | Host    | HTTP           |
 | openHAB          | 7778    | Host    | HTTPS          |
@@ -375,7 +375,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3066
+# next avail = 3067
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
