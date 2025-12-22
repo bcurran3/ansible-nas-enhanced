@@ -40,6 +40,7 @@ vaultwarden_env_allow_signups: "false"
 ## Mail specific settings, set SMTP_FROM and either SMTP_HOST or USE_SENDMAIL to enable the mail service.
 ## To make sure the email links are pointing to the correct host, set the DOMAIN variable.
 ## Note: if SMTP_USERNAME is specified, SMTP_PASSWORD is mandatory
+vaultwarden_env_domain: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
 vaultwarden_env_smtp_host: null # "smtp.{{ ansbile_nas_domain }}"
 vaultwarden_env_smtp_from: null # "vaultwarden@{{ ansbile_nas_domain }}"
 vaultwarden_env_smtp_from_name: null # "Vaultwarden"
