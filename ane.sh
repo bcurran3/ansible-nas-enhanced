@@ -5,6 +5,7 @@
 : "${ANE_ALWAYS_PRUNE:=false}"
 : "${ANE_ALWAYS_UPGRADE:=false}"
 : "${ANE_DISABLE_ALSO_STOPS:=false}"
+: "${ANE_DISABLE_ALSO_REMOVES:=false}"
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
 
 function print_logo {
@@ -23,7 +24,7 @@ function help {
     echo "Ansible-NAS-Enhanced (ANE) Help:"
     echo "  --help"
     echo "      What you see now!"
-    echo "  --app, --apps, -a, --tag, --tags, -t <app_name> <app_name> <app_name> <app_name>"
+    echo "  --app, --apps, -a, , --up, --tag, --tags, -t <app_name> <app_name> <app_name> <app_name>"
     echo "      Install or update apps by tag."
     echo "  --available"
     echo "      List ANE available apps."
@@ -87,7 +88,7 @@ if [ $? -ne 0 ]; then
 fi
 
 # Install/update only specified ANE apps
-if [[ "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--tag" || "$1" = "--tags" || "$1" = "-t" ]]; then
+if [[ "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--up" || "$1" = "-up" || "$1" = "--tag" || "$1" = "--tags" || "$1" = "-t" ]]; then
      if [ "$2" = '' ]; then
         echo "  ** You need to specify at least one app name/tag."
         exit 1
@@ -146,6 +147,14 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
                if [ $? -eq 0 ]; then
                   echo "  ** ${arg}-redis stopped."
                fi
+            fi
+            if $ANE_DISABLE_ALSO_REMOVES; then
+                appslist=""
+                for arg in "$@"; do
+                    appslist+=" -t $arg"
+                done
+                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $appslist
+                exit
             fi
         elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
             echo "  ** ${arg} is already disabled."
