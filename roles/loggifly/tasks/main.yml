@@ -9,6 +9,12 @@
       with_items:
         - "{{ loggifly_data_directory }}"
 
+    - name: Copy {{ ansible_nas_app_name }} Template config.toml
+      ansible.builtin.template:
+        src: config.yaml
+        dest: "{{ loggifly_data_directory }}/config.yaml"
+      register: template_config
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         name: "{{ loggifly_container_name }}"
