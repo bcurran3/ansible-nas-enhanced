@@ -1,5 +1,4 @@
 ---
-# NOTE/TDL: would like migrate off bitnami/mongodb
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -20,131 +19,150 @@
         - "{{ rocket_chat_data_directory }}"
         - "{{ rocket_chat_data_directory }}/db"
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ rocket_chat_db_container_name }}"
-        hostname: "{{ rocket_chat_db_container_name }}"
-        image: "{{ rocket_chat_db_image_name }}:{{ rocket_chat_db_image_tag }}"
-        pull: true
-        network_mode: "bridge"
-        env:
-          MONGODB_REPLICA_SET_MODE: "primary"
-          MONGODB_REPLICA_SET_NAME: "rs0"
-          MONGODB_PORT_NUMBER: "27017"
-          MONGODB_INITIAL_PRIMARY_HOST: "{{ rocket_chat_db_container_name }}"
-          MONGODB_INITIAL_PRIMARY_PORT_NUMBER: "27017"
-          MONGODB_ADVERTISED_HOSTNAME: "{{ rocket_chat_db_container_name }}"
-          MONGODB_ENABLE_JOURNAL: "true"
-          ALLOW_EMPTY_PASSWORD: "yes"
-          TZ: "{{ ansible_nas_timezone }}"
-        volumes:
-          - "{{ rocket_chat_data_directory }}/db:/bitnami/mongodb:rw"
-        healthcheck:
-          test: ["CMD", "mongosh", "--host", "{{ rocket_chat_db_container_name }}", "--port", "27017", "--eval", "db.adminCommand('ping')"]
-          interval: "30s"
-          timeout: "30s"
-          retries: "10"
-          start_period: "30s"
-        labels:
-          autoheal: "{{ rocket_chat_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ rocket_chat_db_watchtower_enable }}"
-          dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
-          homepage.group: "{{ rocket_chat_db_homepage_group }}"
-          homepage.icon: "{{ rocket_chat_db_homepage_icon }}"
-          homepage.href: "{{ rocket_chat_db_homepage_href }}"
-          homepage.description: "{{ 'The MongoDB Database' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ rocket_chat_db_container_name }}"
-          homepage.showStats: "{{ rocket_chat_db_homepage_showstats }}"
-          repliqate.enabled: "{{ rocket_chat_db_repliqate_enabled }}"
-          repliqate.engine: "{{ rocket_chat_db_repliqate_engine }}"
-          repliqate.schedule: "{{ rocket_chat_db_repliqate_schedule }}"
-          repliqate.backup_id: "{{ rocket_chat_db_repliqate_backup_id }}"
-          repliqate.retention: "{{ rocket_chat_db_repliqate_retention }}"
-          traefik.enable: "false"
-          wud.tag.include: '^6\.0\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/bitnamilegacy/mongodb/tags"
-        cpu_shares: "{{ rocket_chat_db_cpu_shares }}"
-        memory: "{{ rocket_chat_db_memory }}"
-        restart_policy: unless-stopped
+    - name: Check if {{ vaultwarden_hostname }}.{{ ansible_nas_domain }} resolves
+      ansible.builtin.shell: dig +short {{ vaultwarden_hostname }}.{{ ansible_nas_domain }}
+      register: dns_check
+      changed_when: false
 
-    - name: Create {{ ansible_nas_app_name }} Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ rocket_chat_container_name }}"
-        hostname: "{{ rocket_chat_container_name }}"
-        image: "{{ rocket_chat_image_name }}:{{ rocket_chat_image_tag }}"
-        pull: true
-        network_mode: "bridge"
-        ports:
-          - "{{ rocket_chat_port_http }}:{{ rocket_chat_port_http }}"
-        env:
-          MONGO_URL: "mongodb://{{ rocket_chat_db_container_name }}:27017/rocketchat?replicaSet=rs0"
-          ROOT_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
-          PORT: "{{ rocket_chat_port_http }}"
-          DEPLOY_METHOD: "docker"
-          LICENSE_DEBUG: "true"
-          TZ: "{{ ansible_nas_timezone }}"
-          DEPLOY_PLATFORM: ""
-          REG_TOKEN: ""
-        volumes:
-          - "/etc/localtime:/etc/localtime:ro"
-          - "{{ rocket_chat_data_directory }}/uploads:/app/uploads"
-        healthcheck:
-          test: ["CMD", "nc", "-zv", "-w", "10", "rocketchat", "{{ rocket_chat_port_http }}"]
-          interval: "30s"
-          timeout: "10s"
-          retries: "10"
-          start_period: "30s"
-        links:
-          - "{{ rocket_chat_db_container_name }}"
-        labels:
-          autoheal: "{{ rocket_chat_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ rocket_chat_watchtower_enable }}"
-          dockflare.enable: "{{ rocket_chat_dockflare_tunnel }}"
-          dockflare.access.group: "{{ rocket_chat_dockflare_access_group }}"
-          dockflare.hostname: "{{ rocket_chat_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ rocket_chat_homepage_group }}"
-          homepage.icon: "{{ rocket_chat_homepage_icon }}"
-          homepage.href: "{{ rocket_chat_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
-          homepage.description: "{{ 'The communications platform that puts data protection first.' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ rocket_chat_container_name }}"
-          homepage.showStats: "{{ rocket_chat_homepage_showstats }}"
-          repliqate.enabled: "{{ rocket_chat_repliqate_enabled }}"
-          repliqate.engine: "{{ rocket_chat_repliqate_engine }}"
-          repliqate.schedule: "{{ rocket_chat_repliqate_schedule }}"
-          repliqate.backup_id: "{{ rocket_chat_repliqate_backup_id }}"
-          repliqate.retention: "{{ rocket_chat_repliqate_retention }}"
-          traefik.enable: "{{ rocket_chat_available_externally | string }}"
-          traefik.http.routers.rocket_chat.rule: "Host(`rocket_chat.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.rocket_chat.tls.certresolver: "letsencrypt"
-          traefik.http.routers.rocket_chat.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.rocket_chat.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ rocket_chat_hostname }}"
-          traefik.http.routers.rocket_chat.middlewares: "{{ rocket_chat_hostname }}@docker"
-          traefik.http.middlewares.rocket_chat.IPAllowList.sourcerange: "{{ rocket_chat_traefik_whitelist }}"
-          traefik.http.services.rocket_chat.loadbalancer.server.port: "{{ rocket_chat_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/rocketchat/rocket.chat/tags"
-        cpu_shares: "{{ rocket_chat_cpu_shares }}"
-        memory: "{{ rocket_chat_memory }}"
-        restart_policy: unless-stopped
+    - name: Set DNS status fact
+      set_fact:
+        dns_exists: "{{ dns_check.stdout | length > 0 }}"
 
-    - name: Access {{ ansible_nas_app_name }} at
+# https://docs.rocket.chat/v1/docs/deploy-with-docker-docker-compose#step-1-install-docker-and-docker-compose
+    - name: Warn on DNS lookup failure
       ansible.builtin.debug:
-        msg: >-
-              {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (rocket_chat_port_http | string)] +
-                (['https://' + rocket_chat_hostname + '.' + ansible_nas_domain] if (rocket_chat_available_externally is true or rocket_chat_dockflare_tunnel is true) else [])
-              }}
+        msg: "DNS record not found. Skipping the rest..."
+      when: not dns_exists
+
+    - name: Continue {{ ansible_nas_app_name }}
+      block:
+        - name: Create {{ ansible_nas_app_name }} DB Container
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ rocket_chat_db_container_name }}"
+            hostname: "{{ rocket_chat_db_container_name }}"
+            image: "{{ rocket_chat_db_image_name }}:{{ rocket_chat_db_image_tag }}"
+            pull: true
+            network_mode: "bridge"
+            env:
+              MONGODB_REPLICA_SET_MODE: "primary"
+              MONGODB_REPLICA_SET_NAME: "rs0"
+              MONGODB_PORT_NUMBER: "27017"
+              MONGODB_INITIAL_PRIMARY_HOST: "{{ rocket_chat_db_container_name }}"
+              MONGODB_INITIAL_PRIMARY_PORT_NUMBER: "27017"
+              MONGODB_ADVERTISED_HOSTNAME: "{{ rocket_chat_db_container_name }}"
+              MONGODB_ENABLE_JOURNAL: "true"
+              ALLOW_EMPTY_PASSWORD: "yes"
+              TZ: "{{ ansible_nas_timezone }}"
+            volumes:
+              - "{{ rocket_chat_data_directory }}/db:/bitnami/mongodb:rw"
+            healthcheck:
+              test: ["CMD", "mongosh", "--host", "{{ rocket_chat_db_container_name }}", "--port", "27017", "--eval", "db.adminCommand('ping')"]
+              interval: "30s"
+              timeout: "30s"
+              retries: "10"
+              start_period: "30s"
+            labels:
+              autoheal: "{{ rocket_chat_db_autoheal }}"
+              com.centurylinklabs.watchtower.enable: "{{ rocket_chat_db_watchtower_enable }}"
+              dockflare.enable: "false"
+              homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+              homepage.group: "{{ rocket_chat_db_homepage_group }}"
+              homepage.icon: "{{ rocket_chat_db_homepage_icon }}"
+              homepage.href: "{{ rocket_chat_db_homepage_href }}"
+              homepage.description: "{{ 'The MongoDB Database' if homepage_show_description else omit }}"
+              homepage.server: "my-docker"
+              homepage.container: "{{ rocket_chat_db_container_name }}"
+              homepage.showStats: "{{ rocket_chat_db_homepage_showstats }}"
+              repliqate.enabled: "{{ rocket_chat_db_repliqate_enabled }}"
+              repliqate.engine: "{{ rocket_chat_db_repliqate_engine }}"
+              repliqate.schedule: "{{ rocket_chat_db_repliqate_schedule }}"
+              repliqate.backup_id: "{{ rocket_chat_db_repliqate_backup_id }}"
+              repliqate.retention: "{{ rocket_chat_db_repliqate_retention }}"
+              traefik.enable: "false"
+              wud.tag.include: '^6\.0\.\d+.*$'
+              wud.tag.transform.type: "semver"
+              wud.link.template: "https://hub.docker.com/r/bitnamilegacy/mongodb/tags"
+            cpu_shares: "{{ rocket_chat_db_cpu_shares }}"
+            memory: "{{ rocket_chat_db_memory }}"
+            restart_policy: unless-stopped
+
+        - name: Create {{ ansible_nas_app_name }} Container
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ rocket_chat_container_name }}"
+            hostname: "{{ rocket_chat_container_name }}"
+            image: "{{ rocket_chat_image_name }}:{{ rocket_chat_image_tag }}"
+            pull: true
+            network_mode: "bridge"
+            ports:
+              - "{{ rocket_chat_port_http }}:{{ rocket_chat_port_http }}"
+            env:
+              MONGO_URL: "mongodb://{{ rocket_chat_db_container_name }}:27017/rocketchat?replicaSet=rs0"
+              ROOT_URL: "https://{{ rocket_chat_hostname }}.{{ ansible_nas_domain }}"
+              PORT: "{{ rocket_chat_port_http }}"
+              DEPLOY_METHOD: "docker"
+              LICENSE_DEBUG: "true"
+              DEPLOY_PLATFORM: "Ansible"
+              REG_TOKEN: "{{ rocket_chat_env_reg_token }}"
+              TZ: "{{ ansible_nas_timezone }}"
+            volumes:
+              - "/etc/localtime:/etc/localtime:ro"
+              - "{{ rocket_chat_data_directory }}/uploads:/app/uploads"
+            healthcheck:
+              test: ["CMD", "nc", "-zv", "-w", "10", "rocketchat", "{{ rocket_chat_port_http }}"]
+              interval: "30s"
+              timeout: "10s"
+              retries: "10"
+              start_period: "30s"
+            links:
+              - "{{ rocket_chat_db_container_name }}"
+            labels:
+              autoheal: "{{ rocket_chat_autoheal }}"
+              com.centurylinklabs.watchtower.enable: "{{ rocket_chat_watchtower_enable }}"
+              dockflare.enable: "{{ rocket_chat_dockflare_tunnel }}"
+              dockflare.access.group: "{{ rocket_chat_dockflare_access_group }}"
+              dockflare.hostname: "{{ rocket_chat_hostname }}.{{ ansible_nas_domain }}"
+              dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
+              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.group: "{{ rocket_chat_homepage_group }}"
+              homepage.icon: "{{ rocket_chat_homepage_icon }}"
+              homepage.href: "{{ rocket_chat_homepage_href }}"
+              homepage.siteMonitor: "https://{{ rocket_chat_hostname }}.{{ ansible_nas_domain }}"
+              homepage.description: "{{ 'The communications platform that puts data protection first.' if homepage_show_description else omit }}"
+              homepage.server: "my-docker"
+              homepage.container: "{{ rocket_chat_container_name }}"
+              homepage.showStats: "{{ rocket_chat_homepage_showstats }}"
+              repliqate.enabled: "{{ rocket_chat_repliqate_enabled }}"
+              repliqate.engine: "{{ rocket_chat_repliqate_engine }}"
+              repliqate.schedule: "{{ rocket_chat_repliqate_schedule }}"
+              repliqate.backup_id: "{{ rocket_chat_repliqate_backup_id }}"
+              repliqate.retention: "{{ rocket_chat_repliqate_retention }}"
+              traefik.enable: "{{ rocket_chat_available_externally | string }}"
+              traefik.http.routers.rocket_chat.rule: "Host(`rocket_chat.{{ ansible_nas_domain }}`)"
+              traefik.http.routers.rocket_chat.tls.certresolver: "letsencrypt"
+              traefik.http.routers.rocket_chat.tls.domains[0].main: "{{ ansible_nas_domain }}"
+              traefik.http.routers.rocket_chat.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+              traefik.http.routers.frontend.middlewares: "{{ rocket_chat_hostname }}"
+              traefik.http.routers.rocket_chat.middlewares: "{{ rocket_chat_hostname }}@docker"
+              traefik.http.middlewares.rocket_chat.IPAllowList.sourcerange: "{{ rocket_chat_traefik_whitelist }}"
+              traefik.http.services.rocket_chat.loadbalancer.server.port: "{{ rocket_chat_port_http }}"
+              wud.tag.include: '^\d+\.\d+\.\d+$'
+              wud.tag.transform.type: "semver"
+              wud.link.template: "https://hub.docker.com/r/rocketchat/rocket.chat/tags"
+            cpu_shares: "{{ rocket_chat_cpu_shares }}"
+            memory: "{{ rocket_chat_memory }}"
+            restart_policy: unless-stopped
+
+        - name: Access {{ ansible_nas_app_name }} at
+          ansible.builtin.debug:
+            msg: >-
+                  {{
+                    (['https://' + rocket_chat_hostname + '.' + ansible_nas_domain] if (rocket_chat_available_externally is true or rocket_chat_dockflare_tunnel is true) else [])
+                  }}
+      when:
+        - dns_exists
+        - (rocket_chat_dockflare_tunnel | bool or rocket_chat_available_externally | bool)
   when: rocket_chat_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
