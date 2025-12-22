@@ -61,9 +61,9 @@
           - "{{ tandoor_recipes_data_directory }}/mediafiles:/opt/recipes/mediafiles"
           - "{{ tandoor_recipes_data_directory }}/staticfiles:/opt/recipes/staticfiles"
         ports:
-          - "{{ tandoor_recipes_port_http }}:80"
+          - "{{ tandoor_recipes_port_http }}:{{ tandoor_recipes_port_http }}"
         env:
-#          ALLOWED_HOSTS: "{{ tandoor_recipes_env_allowed_hosts }}"
+          ALLOWED_HOSTS: "*"
           DB_ENGINE: "django.db.backends.postgresql"
           POSTGRES_HOST: "{{ tandoor_recipes_db_container_name }}"
           POSTGRES_PORT: "5432"
@@ -171,7 +171,7 @@
           traefik.http.routers.frontend.middlewares: "{{ tandoor_recipes_hostname }}"
           traefik.http.routers.tandoor_recipes.middlewares: "tandoor_recipes@docker"
           traefik.http.middlewares.tandoor_recipes.IPAllowList.sourcerange: "{{ tandoor_recipes_traefik_whitelist }}"
-          traefik.http.services.tandoor_recipes.loadbalancer.server.port: "80"
+          traefik.http.services.tandoor_recipes.loadbalancer.server.port: "{{ tandoor_recipes_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/TandoorRecipes/recipes/pkgs/container/recipes"
