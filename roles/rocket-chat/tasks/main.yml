@@ -1,24 +1,6 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-      with_items:
-        - "{{ rocket_chat_data_directory }}"
-        - "{{ rocket_chat_data_directory }}/scripts"
-        - "{{ rocket_chat_data_directory }}/uploads"
-
-    - name: Create {{ ansible_nas_app_name }} DB Directories
-      ansible.builtin.file:
-        path: "{{ item }}"
-        owner: "1001"
-        state: directory
-      with_items:
-        - "{{ rocket_chat_data_directory }}"
-        - "{{ rocket_chat_data_directory }}/db"
-
     - name: Check if {{ rocket_chat_hostname }}.{{ ansible_nas_domain }} resolves
       ansible.builtin.shell: dig +short {{ rocket_chat_hostname }}.{{ ansible_nas_domain }}
       register: dns_check
@@ -39,11 +21,29 @@
             "DNS record not found. External access to be configured."
             if (rocket_chat_available_externally | bool or rocket_chat_dockflare_tunnel | bool)
             else
-            "DNS record not found. External access not configured, skipping container creation."
+            "DNS record not found. External access not configured. Skipping container creation."
           }}
 
     - name: Continue {{ ansible_nas_app_name }}
       block:
+        - name: Create {{ ansible_nas_app_name }} Directories
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: directory
+          with_items:
+            - "{{ rocket_chat_data_directory }}"
+            - "{{ rocket_chat_data_directory }}/scripts"
+            - "{{ rocket_chat_data_directory }}/uploads"
+
+        - name: Create {{ ansible_nas_app_name }} DB Directories
+          ansible.builtin.file:
+            path: "{{ item }}"
+            owner: "1001"
+            state: directory
+          with_items:
+            - "{{ rocket_chat_data_directory }}"
+            - "{{ rocket_chat_data_directory }}/db"
+
         - name: Create {{ ansible_nas_app_name }} DB Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
