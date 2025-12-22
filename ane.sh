@@ -42,6 +42,8 @@ function help {
     echo "      Edit ANE inventory file."
     echo "  --permissions"
     echo "      Reset permissions on all shared files."
+    echo "  --protips"
+    echo "      Display ANE \"Pro Tips\""
     echo "  --prune"
     echo "      Prune unused Docker images and volumes."
     echo "  --requirements"
@@ -54,7 +56,25 @@ function help {
     echo "      Stop all running containers."
     echo "  --upgrade, --pull"
     echo "      Upgrade ANE files from repo"
+    echo ""
     exit
+}
+
+# ANE Pro Tips menu
+function protips {
+    echo "Ansible-NAS-Enhanced (ANE) Pro Tips:"
+    echo "  export ANE_EDITOR=\"editorname\""
+    echo "    -- set a different default text editor for ane.sh; i.e. vi, vim, msedit"
+    echo "  export ANE_ALWAYS_PRUNE=\"true\""
+    echo "    -- always prune docker images and volumes after running the full playbook"
+    echo "  export ANE_ALWAYS_UPGRADE=\"true\""
+    echo "    -- always pull the latest ANE files from GitHub before running the full playbook"
+    echo "  export ANE_DISABLE_ALSO_STOPS=\"true\""
+    echo "    -- stop app container when you disable it"
+    echo "  export ANE_DISABLE_ALSO_REMOVES=\"true\""
+    echo "    -- remove/delete app container when you disable it"
+    echo "  export ANE_ENABLE_ALSO_STARTS=\"true\""
+    echo "    -- install app when you enable it"
 }
 
 # prune Docker images and volumes
@@ -131,7 +151,12 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
         DISABLED_LINE="${arg_clean}_enabled: false"
         if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
             sed -i "s/$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
-            echo "  ** ${arg} disabled."
+            if $ANE_DISABLE_ALSO_REMOVES; then
+                    echo "  ** ${arg} disabled. Unstalling..."
+                    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
+                else
+                    echo "  ** ${arg} disabled. \"./ane.sh --app ${arg}\" to install."
+                fi
             if $ANE_DISABLE_ALSO_STOPS; then
                docker stop "${arg}" > /dev/null 2>&1
                if [ $? -eq 0 ]; then
@@ -261,6 +286,12 @@ fi
 # Reset ANE shared file permissions
 if [[ "$1" = "--permissions" || "$1" = "-permissions" ]]; then
     ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
+    exit
+fi
+
+# ANE Pro Tips menu
+if [[ "$1" = "--protips" || "$1" = "-protips" ]]; then
+    protips
     exit
 fi
 
