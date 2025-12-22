@@ -60,10 +60,12 @@
         cpu_shares: "{{ firefly_db_cpu_shares }}"
         memory: "{{ firefly_db_memory }}"
         restart_policy: unless-stopped
+      register: firefly_db_status
 
-    - name: Wait for DB to init
+    - name: Wait for {{ ansible_nas_app_name }} DB to initialize
       ansible.builtin.pause:
         seconds: 30
+      when: firefly_db_status.changed
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
