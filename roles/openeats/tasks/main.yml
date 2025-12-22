@@ -22,11 +22,8 @@
         network_mode: "bridge"
         volumes:
           - "{{ openeats_data_directory }}/db:/var/lib/mysql"
-#        ports:
-#          - "{{ openeats_port_db }}:3306"
         env:
           MARIADB_ROOT_PASSWORD: "{{ openeats_db_env_mariadb_root_password }}"
-          MYSQL_HOST: "{{ openeats_db_env_mysql_host }}"
           MYSQL_DATABASE: "{{ openeats_db_env_mysql_database }}"
           MYSQL_USER: "{{ openeats_db_env_mysql_user }}"
           MYSQL_ROOT_PASSWORD: "{{ openeats_db_env_mysql_password }}"
@@ -76,12 +73,16 @@
         env:
           API_URL: "{{ openeats_api_env_api_url }}"
           API_PORT: "{{ openeats_port_api }}"
-          DJANGO_SECRET_KEY: "{{ openeats_api_env_django_secret_key}}"
+          DJANGO_SECRET_KEY: "{{ openeats_api_env_django_secret_key }}"
           DJANGO_SETTINGS_MODULE: "{{ openeats_api_env_django_settings_module }}"
           DJANGO_DEBUG: "{{ openeats_api_env_django_debug }}"
           ALLOWED_HOST: "{{ openeats_api_env_allowed_host }}"
           HTTP_X_FORWARDED_PROTO: "{{ openeats_api_env_http_x_forwarded_proto }}"
           MARIADB_ROOT_PASSWORD: "{{ openeats_db_env_mariadb_root_password }}"
+          MYSQL_HOST: "{{ openeats_db_container_name }}"
+          MYSQL_USER: "{{ openeats_db_env_mysql_user }}"
+          MYSQL_PASSWORD: "{{ openeats_db_env_mysql_password }}"
+          MYSQL_DATABASE: "{{ openeats_db_env_mysql_database }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ openeats_db_container_name }}"
@@ -122,8 +123,6 @@
           - "{{ openeats_api_container_name }}"
         volumes:
           - "{{ openeats_data_directory }}/web:/code"
-        ports:
-          - "{{ openeats_port_http }}:80"
         env:
           NODE_ENV: "{{ openeats_env_node_env }}"
           NODE_URL: "{{ openeats_env_node_url }}"
@@ -133,10 +132,7 @@
         labels:
           autoheal: "{{ openeats_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ openeats_watchtower_enable }}"
-          dockflare.enable: "{{ openeats_dockflare_tunnel }}"
-          dockflare.access.group: "{{ openeats_dockflare_access_group }}"
-          dockflare.hostname: "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
+          dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ openeats_homepage_group }}"
           homepage.icon: "{{ openeats_homepage_icon }}"
@@ -151,8 +147,55 @@
           repliqate.schedule: "{{ openeats_repliqate_schedule }}"
           repliqate.backup_id: "{{ openeats_repliqate_backup_id }}"
           repliqate.retention: "{{ openeats_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/openeats/openeats-web"
+        cpu_shares: "{{ openeats_cpu_shares }}"
+        memory: "{{ openeats_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Nginx Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ openeats_nginx_container_name }}"
+        hostname: "{{ openeats_nginx_container_name }}"
+        image: "{{ openeats_nginx_image_name }}:{{ openeats_nginx_image_tag }}"
+        pull: true
+        network_mode: "bridge"
+        command: "./start.sh"
+        volumes:
+          - "{{ openeats_data_directory }}/api/site-media:/var/www/html/openeats-static/site-media"
+          - "{{ openeats_data_directory }}/api/static-files:/var/www/html/openeats-static/static-files"
+          - "{{ openeats_data_directory }}/web:/var/www/html/openeats-static/public-ui"
+        ports:
+          - "{{ openeats_port_http }}:80"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ openeats_api_container_name }}"
+          - "{{ openeats_container_name }}"
+        labels:
+          autoheal: "{{ openeats_nginx_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ openeats_nginx_watchtower_enable }}"
+          dockflare.enable: "{{ openeats_dockflare_tunnel }}"
+          dockflare.access.group: "{{ openeats_dockflare_access_group }}"
+          dockflare.hostname: "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }} Nginx"
+          homepage.group: "{{ openeats_nginx_homepage_group }}"
+          homepage.icon: "{{ openeats_nginx_homepage_icon }}"
+          homepage.description: "{{ 'OpenEats Nginx' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ openeats_nginx_container_name }}"
+          homepage.showStats: "{{ openeats_nginx_homepage_showstats }}"
+          repliqate.enabled: "{{ openeats_nginx_repliqate_enabled }}"
+          repliqate.engine: "{{ openeats_nginx_repliqate_engine }}"
+          repliqate.schedule: "{{ openeats_nginx_repliqate_schedule }}"
+          repliqate.backup_id: "{{ openeats_nginx_repliqate_backup_id }}"
+          repliqate.retention: "{{ openeats_nginx_repliqate_retention }}"
           traefik.enable: "{{ openeats_available_externally | string }}"
-          traefik.http.routers.openeats.rule: "Host(`openeats.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.openeats.rule: "Host(`{{ openeats_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.openeats.tls.certresolver: "letsencrypt"
           traefik.http.routers.openeats.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.openeats.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
@@ -160,11 +203,11 @@
           traefik.http.routers.openeats.middlewares: "{{ openeats_hostname }}@docker"
           traefik.http.middlewares.openeats.IPAllowList.sourcerange: "{{ openeats_traefik_whitelist }}"
           traefik.http.services.openeats.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/openeats/openeats-web"
-        cpu_shares: "{{ openeats_cpu_shares }}"
-        memory: "{{ openeats_memory }}"
+          wud.link.template: "https://hub.docker.com/r/openeats/openeats-nginx/tags"
+        cpu_shares: "{{ openeats_nginx_cpu_shares }}"
+        memory: "{{ openeats_nginx_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
@@ -178,6 +221,11 @@
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
+    - name: Stop {{ ansible_nas_app_name }} Nginx Container
+      community.docker.docker_container:
+        name: "{{ openeats_nginx_container_name }}"
+        state: absent
+
     - name: Stop {{ ansible_nas_app_name }} Web Container
       community.docker.docker_container:
         name: "{{ openeats_container_name }}"
