@@ -122,9 +122,20 @@ if [ $? -ne 0 ]; then
    exit 1
 fi
 
-# Display ANE help menu
+# ANE help
 if [[ "$1" = "--help" || "$1" = "-help" || "$1" = "--?" || "$1" = "-?" ]]; then
-   help
+    app_readme="./docs/applications/$2.md"
+    if [[ -n "$2" ]] && [[ -f "$app_readme" ]]; then
+        cat "$app_readme"
+        exit
+    fi
+    if [[ -n "$2" ]]; then
+        echo "  ** App ReadMe '$2' not found."
+        echo "  ** "./ane.sh --available" to view available apps."
+        exit 1
+    fi
+
+    help
 fi
 
 # ANE Pro Tips menu
