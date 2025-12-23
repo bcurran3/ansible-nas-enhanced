@@ -8,8 +8,6 @@
         group: "{{ invoiceninja_group_id }}"
         mode: "755"
       with_items:
-        - "{{ invoiceninja_data_directory }}/public"
-        - "{{ invoiceninja_data_directory }}/storage"
         - "{{ invoiceninja_data_directory }}/nginx"
 
     - name: Create {{ ansible_nas_app_name }} DB Directory
@@ -21,6 +19,17 @@
         mode: "755"
       with_items:
         - "{{ invoiceninja_data_directory }}/db"
+
+    - name: Create {{ ansible_nas_app_name }} Web UI Directory
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "33"
+        group: "33"
+        mode: "755"
+      with_items:
+        - "{{ invoiceninja_data_directory }}/public"
+        - "{{ invoiceninja_data_directory }}/storage"
 
     - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
@@ -183,7 +192,6 @@
           - "{{ invoiceninja_port_http }}:80"
         volumes:
           - "{{ invoiceninja_data_directory }}/nginx/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro"
-          #- "{{ invoiceninja_data_directory }}/public:/var/www/app/public:ro"
           - "{{ invoiceninja_data_directory }}/public:/var/www/html/public:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
