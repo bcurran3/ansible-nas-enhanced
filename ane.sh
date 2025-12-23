@@ -174,12 +174,6 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
         DISABLED_LINE="${arg_clean}_enabled: false"
         if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
             sed -i "s/$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
-            if $ANE_DISABLE_ALSO_REMOVES; then
-                    echo "  ** ${arg} disabled. Unstalling..."
-                    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
-                else
-                    echo "  ** ${arg} disabled."
-                fi
             if $ANE_DISABLE_ALSO_STOPS; then
                docker stop "${arg}" > /dev/null 2>&1
                if [ $? -eq 0 ]; then
@@ -197,12 +191,10 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
                fi
             fi
             if $ANE_DISABLE_ALSO_REMOVES; then
-                appslist=""
-                for arg in "$@"; do
-                    appslist+=" -t $arg"
-                done
-                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $appslist
-                exit
+                echo "  ** ${arg} disabled. Unstalling..."
+                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
+            else
+                echo "  ** ${arg} disabled."
             fi
         elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
             echo "  ** ${arg} is already disabled."
