@@ -183,7 +183,8 @@
           - "{{ invoiceninja_port_http }}:80"
         volumes:
           - "{{ invoiceninja_data_directory }}/nginx/in-vhost.conf:/etc/nginx/conf.d/in-vhost.conf:ro"
-          - "{{ invoiceninja_data_directory }}/public:/var/www/app/public:ro"
+          #- "{{ invoiceninja_data_directory }}/public:/var/www/app/public:ro"
+          - "{{ invoiceninja_data_directory }}/public:/var/www/html/public:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         links:
