@@ -2,40 +2,30 @@
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
-        path: "{{ item }}"
+        path: "{{ item.path }}"
         state: directory
-        owner: "{{ invoiceninja_user_id }}"
-        group: "{{ invoiceninja_group_id }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
         mode: "755"
-      with_items:
-        - "{{ invoiceninja_data_directory }}/nginx"
-
-    - name: Create {{ ansible_nas_app_name }} DB Directory
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: "999"
-        group: "999"
-        mode: "755"
-      with_items:
-        - "{{ invoiceninja_data_directory }}/db"
-
-    - name: Create {{ ansible_nas_app_name }} Web UI Directory
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: "33"
-        group: "33"
-        mode: "755"
-      with_items:
-        - "{{ invoiceninja_data_directory }}/public"
-        - "{{ invoiceninja_data_directory }}/storage"
+      loop:
+        - path: "{{ invoiceninja_data_directory }}/db"
+          owner: "{{ invoiceninja_db_user_id }}"
+          group: "{{ invoiceninja_db_user_id }}"
+        - path: "{{ invoiceninja_data_directory }}/nginx"
+          owner: "{{ invoiceninja_web_user_id }}"
+          group: "{{ invoiceninja_web_group_id }}"
+        - path: "{{ invoiceninja_data_directory }}/public"
+          owner: "{{ invoiceninja_user_id }}"
+          group: "{{ invoiceninja_user_id }}"
+        - path: "{{ invoiceninja_data_directory }}/storage"
+          owner: "{{ invoiceninja_user_id }}"
+          group: "{{ invoiceninja_user_id }}"
 
     - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ invoiceninja_network_name }}"
 
-    - name: Template nginx conf
+    - name: Template Nginx conf
       template:
         src: in-vhost.conf
         dest: "{{ invoiceninja_data_directory }}/nginx/in-vhost.conf"
