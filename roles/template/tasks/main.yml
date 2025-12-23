@@ -88,11 +88,11 @@
         state: absent
   when: appname_enabled is false
 
-- name: Archive {{ ansible_nas_app_name }} Data
+- name: Data Archive {{ ansible_nas_app_name }}
   include_role:
     name: ansible-nas-archive
   vars:
-    target_data_dir: "{{ ghost_data_directory }}"
+    target_data_dir: "{{ appname_data_directory }}"
   when:
     - archive_app_data_enabled is true
     - appname_enabled is false
