@@ -178,7 +178,7 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
                     echo "  ** ${arg} disabled. Unstalling..."
                     ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
                 else
-                    echo "  ** ${arg} disabled. \"./ane.sh --app ${arg}\" to install."
+                    echo "  ** ${arg} disabled."
                 fi
             if $ANE_DISABLE_ALSO_STOPS; then
                docker stop "${arg}" > /dev/null 2>&1
