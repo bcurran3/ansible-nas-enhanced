@@ -46,8 +46,8 @@
           - "{{ invoiceninja_data_directory }}/db:/var/lib/mysql"
           - "/etc/localtime:/etc/localtime:ro"
         env:
-          PUID: "{{ invoiceninja_db_user_id }}"
-          PGID: "{{ invoiceninja_db_group_id }}"
+          PUID: "{{ invoiceninja_db_user_id }} | string"
+          PGID: "{{ invoiceninja_db_group_id }} | string""
           MYSQL_ROOT_PASSWORD: "{{ invoiceninja_db_mysql_root_password }}"
           MYSQL_DATABASE: "{{ invoiceninja_db_mysql_database }}"
           MYSQL_USER: "{{ invoiceninja_db_mysql_user }}"
