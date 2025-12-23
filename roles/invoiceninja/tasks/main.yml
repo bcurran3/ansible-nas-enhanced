@@ -125,9 +125,11 @@
           ADDITIONAL_UPLOAD_EXTENSIONS: "{{ invoiceninja_additional_upload_extensions }}"
           DB_HOST: "{{ invoiceninja_db_container_name }}"
           DB_PORT: "3306"
+          DB_STRICT: "false"
+          DB_TYPE: "mysql"
           DB_DATABASE: "{{ invoiceninja_db_mysql_database }}"
           DB_USERNAME: "{{ invoiceninja_db_mysql_user }}"
-          DB_PASSWORD: "{{ invoiceninja_db_mysql_database }}"
+          DB_PASSWORD: "{{ invoiceninja_db_mysql_password }}"
           ERROR_EMAIL: "{{ invoiceninja_error_email }}"
           IN_USER_EMAIL: "{{ invoiceninja_in_user_email }}"
           IN_PASSWORD: "{{ invoiceninja_in_password }}"
@@ -160,9 +162,8 @@
           repliqate.backup_id: "{{ invoiceninja_app_repliqate_backup_id }}"
           repliqate.retention: "{{ invoiceninja_app_repliqate_retention }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/invoiceninja/invoiceninja"
+          wud.tag.include: ^5\.\d+\.\d+$
+          wud.link.template: https://github.com/invoiceninja/invoiceninja/releases/tag/v${major}.${minor}.${patch}
         cpu_shares: "{{ invoiceninja_app_cpu_shares }}"
         memory: "{{ invoiceninja_app_memory }}"
         restart_policy: unless-stopped
