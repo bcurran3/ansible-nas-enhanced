@@ -49,10 +49,10 @@
         env:
           PUID: "{{ invoiceninja_db_user_id }}"
           PGID: "{{ invoiceninja_db_group_id }}"
-          MYSQL_ROOT_PASSWORD: "topsecretroot"
-          MYSQL_DATABASE: "invoiceninja"
-          MYSQL_USER: "invoiceninja"
-          MYSQL_PASSWORD: "{{ invoiceninja_db_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ invoiceninja_db_mysql_root_password }}"
+          MYSQL_DATABASE: "{{ invoiceninja_db_mysql_database }}"
+          MYSQL_USER: "{{ invoiceninja_db_mysql_user }}"
+          MYSQL_PASSWORD: "{{ invoiceninja_db_mysql_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
               test:
@@ -63,7 +63,7 @@
                 - --innodb_initialized
               interval: "30s"
               timeout: "10s"
-              retries: "3"
+              retries: 3
               start_period: "30s"
         labels:
           autoheal: "{{ invoiceninja_db_autoheal }}"
@@ -125,9 +125,9 @@
           ADDITIONAL_UPLOAD_EXTENSIONS: "{{ invoiceninja_additional_upload_extensions }}"
           DB_HOST: "{{ invoiceninja_db_container_name }}"
           DB_PORT: "3306"
-          DB_DATABASE: "invoiceninja"
-          DB_USERNAME: "invoiceninja"
-          DB_PASSWORD: "{{ invoiceninja_db_password }}"
+          DB_DATABASE: "{{ invoiceninja_db_mysql_database }}"
+          DB_USERNAME: "{{ invoiceninja_db_mysql_user }}"
+          DB_PASSWORD: "{{ invoiceninja_db_mysql_database }}"
           ERROR_EMAIL: "{{ invoiceninja_error_email }}"
           IN_USER_EMAIL: "{{ invoiceninja_in_user_email }}"
           IN_PASSWORD: "{{ invoiceninja_in_password }}"

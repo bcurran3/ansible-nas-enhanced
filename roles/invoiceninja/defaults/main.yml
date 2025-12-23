@@ -8,8 +8,8 @@ invoiceninja_data_directory: "{{ docker_home }}/invoiceninja"
 
 # network
 invoiceninja_hostname: "invoiceninja"
-invoiceninja_port_http: "9009"
 invoiceninja_network_name: "invoiceninja"
+invoiceninja_port_http: "9009"
 
 # uid / gid
 invoiceninja_user_id: 1500
@@ -51,20 +51,22 @@ invoiceninja_nordigen_secret_id: ""
 invoiceninja_nordigen_secret_key: ""
 invoiceninja_delete_backup_days: "30"
 invoiceninja_additional_upload_extensions: ""
-invoiceninja_require_https: "false"
 invoiceninja_app_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ invoiceninja_port_http }}"
 invoiceninja_app_debug: "false"
 invoiceninja_app_name: "Invoice Ninja"
-invoiceninja_app_key: "_insert_generated_key_here_"
+invoiceninja_app_key: "base64:MjnTsSMXrdPtnuQZy18P8mySJ/plntseQ6kuJk/5iMM=" # docker run --rm -it invoiceninja/invoiceninja php artisan key:generate --show
 invoiceninja_license_key: ""
 invoiceninja_phantomjs_pdf_generation: "false"
 invoiceninja_pdf_generator: "snappdf"
 invoiceninja_trusted_proxies: '*'
 invoiceninja_api_secret: "topsecret"
 invoiceninja_update_secret: "YouShouldUpdateViaDocker"
-invoiceninja_db_password: "topsecret"
 invoiceninja_in_user_email: "youremail@domain.tld"
 invoiceninja_in_password: "yourpassword"
+invoiceninja_db_mysql_root_password: "topsecretroot"
+invoiceninja_db_mysql_database: "invoiceninja"
+invoiceninja_db_mysql_user: "invoiceninja"
+invoiceninja_db_mysql_password: "topsecret"
 
 # autoheal
 invoiceninja_app_autoheal: "false"
