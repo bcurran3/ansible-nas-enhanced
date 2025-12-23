@@ -15,6 +15,36 @@
         - "{{ nextcloud_data_directory }}/nextcloud/pre-upgrade" # added
         - "{{ nextcloud_data_directory }}/nextcloud/post-upgrade" # added
 
+#    - name: Create {{ ansible_nas_app_name }} Directories
+#        ansible.builtin.file:
+#          path: "{{ item.path }}"
+#          state: directory
+#          owner: "{{ item.owner }}"
+#          group: "{{ item.group }}"
+#          mode: "755"
+#        loop:
+#          - path: "{{ invoiceninja_data_directory }}/mysql"
+#            owner: "{{ invoiceninja_db_user_id }}"
+#            group: "{{ invoiceninja_db_user_id }}"
+#          - path: "{{ invoiceninja_data_directory }}/mysql/mysql"
+#            owner: "{{ invoiceninja_web_user_id }}"
+#            group: "{{ invoiceninja_web_group_id }}"
+#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
+#            owner: "{{ invoiceninja_user_id }}"
+#            group: "{{ invoiceninja_user_id }}"
+#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
+#            owner: "{{ invoiceninja_user_id }}"
+#            group: "{{ invoiceninja_user_id }}"
+#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
+#            owner: "{{ invoiceninja_user_id }}"
+#            group: "{{ invoiceninja_user_id }}"
+#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
+#            owner: "{{ invoiceninja_user_id }}"
+#            group: "{{ invoiceninja_user_id }}"
+#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
+#            owner: "{{ invoiceninja_user_id }}"
+#            group: "{{ invoiceninja_user_id }}"
+
     - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ nextcloud_network_name }}"
@@ -68,7 +98,7 @@
           - "{{ nextcloud_data_directory }}/mysql/mysql:/var/lib/mysql" # added
 #          - "{{ nextcloud_data_directory }}/mysql/my.cnf:/etc/my.cnf" # added
         env:
-          MYSQL_DATABASE: "nextcloud"
+          MYSQL_DATABASE: "{{ nextcloud_sql_database }}"
           MYSQL_USER: "{{ nextcloud_sql_user }}"
           MYSQL_PASSWORD: "{{ nextcloud_sql_password }}"
           MYSQL_ROOT_PASSWORD: "{{ nextcloud_sql_root_password }}"
@@ -126,7 +156,7 @@
           - "3478:3478" # TURN server for Talk
         env:
           MYSQL_HOST: "{{ nextcloud_db_container_name }}"
-          MYSQL_DATABASE: "nextcloud"
+          MYSQL_DATABASE: "{{ nextcloud_sql_database }}"
           MYSQL_USER: "{{ nextcloud_sql_user }}"
           MYSQL_PASSWORD: "{{ nextcloud_sql_password }}"
           MYSQL_ROOT_PASSWORD: "{{ nextcloud_sql_root_password }}"

@@ -1,0 +1,41 @@
+---
+- name: Setup Archive Variables
+  ansible.builtin.set_fact:
+    _archive_name: "{{ target_data_dir | basename }}"
+    _raw_fmt: "{{ archive_app_data_archive_type | default('gz') }}"
+    _archive_ext: >-
+      {{
+        {
+          'zip': 'zip',
+          'gz':  'tgz',
+          'bz2': 'tar.bz2',
+          'xz':  'tar.xz',
+          'tar': 'tar'
+        }[archive_app_data_archive_type | default('gz')] | default('tgz')
+      }}
+
+- name: Check {{ target_data_dir }} Data Directory
+  ansible.builtin.stat:
+    path: "{{ target_data_dir }}"
+  register: _dir_stat
+
+- name: Find symlinks to exclude
+  ansible.builtin.find:
+    paths: "{{ target_data_dir }}"
+    recurse: yes
+    file_type: link
+  register: _found_symlinks
+  when: _dir_stat.stat.exists
+
+- name: Archive Data to "{{ docker_home }}/{{ _archive_name | lower }}.{{ _archive_ext }}"
+  ansible.builtin.archive:
+    path: "{{ target_data_dir }}"
+    dest: "{{ docker_home }}/{{ _archive_name | lower }}.{{ _archive_ext }}"
+    force_archive: true
+    format: "{{ _raw_fmt }}"
+    owner: ansible-nas
+    group: ansible-nas
+    mode: '0660'
+    remove: true
+    exclude_path: "{{ _found_symlinks.files | map(attribute='path') | list + [target_data_dir ~ '/**/*.sock'] }}"
+  when: _dir_stat.stat.exists

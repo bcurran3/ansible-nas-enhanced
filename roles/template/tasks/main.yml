@@ -88,25 +88,15 @@
         state: absent
   when: appname_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
-  block:
-    - name: Check for {{ ansible_nas_app_name }} Data Directory
-      stat:
-        path: "{{ appname_data_directory }}"
-      register: dir_stat
+- name: Archive {{ ansible_nas_app_name }} Data
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ ghost_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - appname_enabled is false
 
-    - name: Archive {{ ansible_nas_app_name }} Data Directory
-      ansible.builtin.archive:
-        path: "{{ appname_data_directory }}"
-        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.tar.gz"
-        force_archive: true
-        format: gz
-        owner: ansible-nas
-        group: ansible-nas
-        mode: u=rw,g=rw
-        remove: true
-      when: dir_stat.stat.exists
-  when: appname_enabled is false and archive_app_data_enabled is true
 
 
 ##############################################################################
