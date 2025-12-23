@@ -27,7 +27,7 @@
   register: _found_symlinks
   when: _dir_stat.stat.exists
 
-- name: Archive Data to "{{ docker_home }}/{{ _archive_name | lower }}.{{ _archive_ext }}"
+- name: Archive Data to {{ docker_home }}/{{ _archive_name | lower }}.{{ _archive_ext }}
   ansible.builtin.archive:
     path: "{{ target_data_dir }}"
     dest: "{{ docker_home }}/{{ _archive_name | lower }}.{{ _archive_ext }}"
