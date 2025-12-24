@@ -18,7 +18,7 @@
         capabilities:
           - NET_ADMIN
         devices:
-          - /dev/kvm  # this worked on baremetal, not in my vm - what's up
+          - /dev/kvm
         ports:
           - "{{ windows_port_http }}:8006"
           - "{{ windows_port_rdp }}:3389"
@@ -89,21 +89,10 @@
   when: windows_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
-  block:
-    - name: Check for {{ ansible_nas_app_name }} Data Directory
-      stat:
-        path: "{{ windows_data_directory }}"
-      register: dir_stat
-
-    - name: Archive {{ ansible_nas_app_name }} Data Directory
-      ansible.builtin.archive:
-        path: "{{ windows_data_directory }}"
-        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
-        force_archive: true
-        format: zip
-        owner: ansible-nas
-        group: ansible-nas
-        mode: u=rw,g=rw
-        remove: true
-      when: dir_stat.stat.exists
-  when: windows_enabled is false and archive_app_data_enabled is true
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ windows_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - windows_enabled is false

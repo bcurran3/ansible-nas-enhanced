@@ -78,21 +78,10 @@
   when: spoolman_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
-  block:
-    - name: Check for {{ ansible_nas_app_name }} Data Directory
-      stat:
-        path: "{{ spoolman_data_directory }}"
-      register: dir_stat
-
-    - name: Archive {{ ansible_nas_app_name }} Data Directory
-      ansible.builtin.archive:
-        path: "{{ spoolman_data_directory }}"
-        dest: "{{ docker_home }}/{{ ansible_nas_app_name | lower }}.zip"
-        force_archive: true
-        format: zip
-        owner: ansible-nas
-        group: ansible-nas
-        mode: u=rw,g=rw
-        remove: true
-      when: dir_stat.stat.exists
-  when: spoolman_enabled is false and archive_app_data_enabled is true
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ spoolman_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - spoolman_enabled is false
