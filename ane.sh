@@ -23,20 +23,20 @@ echo
 # ANE help menu
 function help {
     echo "Ansible-NAS-Enhanced (ANE) Help:"
-    echo "  --help"
-    echo "      What you see now!"
-    echo "  --app, --apps, -a, , --up, --tag, --tags, -t <app_name> <app_name> <app_name> <app_name>"
+    echo "  --app, --apps, --tag, --tags, -t, --up, <app_name> <app_name> <app_name>"
     echo "      Install or update apps by tag."
     echo "  --available"
     echo "      List ANE available apps."
     echo "  --behind, --outdated"
     echo "      Check if your ANE files are up-to-date."
-    echo "  --disable <app_name>"
-    echo "      Disable an app."
-    echo "  --enable <app_name>"
-    echo "      Enable an app."
+    echo "  --disable <app_name> <app_name> <app_name>"
+    echo "      Disable app(s)."
+    echo "  --enable <app_name> <app_name> <app_name>"
+    echo "      Enable app(s)."
     echo "  --enabled, --installed"
     echo "      List ANE enabled apps."
+    echo "  --help <app_name>"
+    echo "      Display <app_name> configuration info."
     echo "  --install"
     echo "      Install or reset ANE config files."
     echo "  --inventory"
@@ -49,9 +49,9 @@ function help {
     echo "      Prune unused Docker images and volumes."
     echo "  --requirements"
     echo "      Install or re-install ANE requirements."
-    echo "  --run, -r, --update, -u"
+    echo "  --run, --update"
     echo "      Run ANE full playbook."
-    echo "  --settings, -s"
+    echo "  --settings, -s, --overrides"
     echo "      Edit ANE settings/overrides."
     echo "  --stop"
     echo "      Stop all running containers."
@@ -130,7 +130,7 @@ if [[ "$1" = "--help" || "$1" = "-help" || "$1" = "--?" || "$1" = "-?" ]]; then
         exit
     fi
     if [[ -n "$2" ]]; then
-        echo "  ** App ReadMe '$2' not found."
+        echo "  ** ERROR: $2.md not found."
         echo "  ** "./ane.sh --available" to view available apps."
         exit 1
     fi
@@ -163,8 +163,17 @@ fi
 
 # List ANE available apps (roles)
 if [[ "$1" = "--available" || "$1" = "-available" || "$1" = "--roles" || "$1" = "-roles" ]]; then
-     echo "ANE available apps:"
-     cat nas.yml |grep 'role:'
+     echo "  ** ANE available apps:"
+     echo "--------------------------------------------------------"
+     APP_LIST=$(grep 'role:' nas.yml | \
+        grep -v -E '#|ansible-nas-|WIP' | \
+        awk -F': ' '{print $2}' | \
+        sed 's/[#"].*//;s/ //g' | \
+        sort)
+     echo "$APP_LIST" | xargs printf "%-20s %-20s %-20s\n"
+     TOTAL=$(echo "$APP_LIST" | grep -c -v '^$')
+     echo "--------------------------------------------------------"
+     echo "  ** Total Apps Available: $TOTAL"
      exit
 fi
 
@@ -219,8 +228,18 @@ fi
 
 # List ANE disabled apps
 if [[ "$1" = "--disabled" || "$1" = "-disabled" ]]; then
-     echo "ANE disabled apps:"
-     cat inventories/ANE/group_vars/nas.yml | grep 'enabled: false'
+     echo "  ** ANE disabled apps:"
+     echo "--------------------------------------------------------"
+     EXCLUSIONS="#|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose"
+     DISABLED_LIST=$(grep 'enabled: false' inventories/ANE/group_vars/nas.yml | grep -v -E "$EXCLUSIONS" | sed 's/_enabled: false//;s/ //g' | sort)
+     if [[ -n "$DISABLED_LIST" ]]; then
+        echo "$DISABLED_LIST" | xargs printf "%-20s %-20s %-20s\n"
+        TOTAL=$(echo "$DISABLED_LIST" | grep -c -v '^$')
+     else
+        TOTAL=0
+     fi
+     echo "--------------------------------------------------------"
+     echo "  ** Total Apps Disabled: $TOTAL"
      exit
 fi
 
@@ -270,8 +289,18 @@ fi
 
 # List ANE enabled apps
 if [[ "$1" = "--enabled" || "$1" = "-enabled" || "$1" = "--installed" || "$1" = "-installed" ]]; then
-     echo "ANE enabled apps:"
-     cat inventories/ANE/group_vars/nas.yml | grep 'enabled: true'
+     echo "  ** ANE enabled apps:"
+     echo "--------------------------------------------------------"
+     EXCLUSIONS="#|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose"
+     ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | grep -v -E "$EXCLUSIONS" | sed 's/_enabled: true//;s/ //g' | sort)
+     if [[ -n "$ENABLED_LIST" ]]; then
+        echo "$ENABLED_LIST" | xargs printf "%-20s %-20s %-20s\n"
+        TOTAL=$(echo "$ENABLED_LIST" | grep -c -v '^$')
+     else
+        TOTAL=0
+     fi
+     echo "--------------------------------------------------------"
+     echo "  ** Total Apps Enabled: $TOTAL"
      exit
 fi
 
@@ -304,6 +333,23 @@ if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
     exit
 fi
 
+# Copy template for new app role development
+if [[ "$1" = "--newapp" || "$1" = "-newapp" ]]; then
+    if [[ -z "$2" ]]; then
+        echo "  ** ERROR: Please specify a name for the new app."
+        echo "  ** Usage: ./ane.sh --newapp <app_name>"
+        exit 1
+    fi
+    NEW_APP_PATH="roles/$2"
+    if [[ -d "$NEW_APP_PATH" ]]; then
+        echo "  ** ERROR: Role '$2' already exists at $NEW_APP_PATH"
+        exit 1
+    fi
+    cp -r roles/template "$NEW_APP_PATH"
+    echo "  ** Success: New app role created at $NEW_APP_PATH"
+    exit
+fi
+
 # Reset ANE shared file permissions
 if [[ "$1" = "--permissions" || "$1" = "-permissions" ]]; then
     ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
@@ -325,13 +371,13 @@ fi
 # Run ANE full playbook
 if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" || "$1" = "-update" || "$1" = "-u" ]]; then
     if ($ANE_ALWAYS_UPGRADE); then upgrade; fi
-    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $2 $3 $4 $5 $6 $7 $8 $9 ${10}
+    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K "${@:2}"
     if ($ANE_ALWAYS_PRUNE); then prune; fi
     exit
 fi
 
 # Edit ANE settings/variables
-if [[ "$1" = "--settings" || "$1" = "-settings" || "$1" = "-s" || "$1" = "--vars" || "$1" = "-vars" || "$1" = "-v" ]]; then
+if [[ "$1" = "--settings" || "$1" = "-settings" || "$1" = "-s" || "$1" = "--overrides" || "$1" = "-overrides" || "$1" = "--vars" || "$1" = "-vars" || "$1" = "-v" ]]; then
     $ANE_EDITOR inventories/ANE/group_vars/nas.yml
     exit
 fi
