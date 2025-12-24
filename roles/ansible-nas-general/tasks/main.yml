@@ -29,17 +29,6 @@
   tags:
     - skip_ansible_lint
 
-- name: Install app data archiving support
-  ansible.builtin.apt:
-    pkg:
-    - lzma
-    - unzip
-    - zip
-    state: present
-  register: result
-  until: result is succeeded
-  when: archive_app_data_enabled is true
-
 - name: Install extra packages
   ansible.builtin.apt:
     name: "{{ ansible_nas_extra_packages }}"
@@ -72,6 +61,27 @@
     state: present
   register: result
   until: result is succeeded
+
+- name: Install app data (un)archiving support
+  ansible.builtin.apt:
+    pkg:
+    - unzip
+    state: present
+  register: result
+  until: result is succeeded
+  when: archive_app_data_enabled is true
+
+- name: Install Intel iGPU support software
+  ansible.builtin.apt:
+    pkg:
+    - intel-media-va-driver-non-free
+#    - i965-va-driver  # for 9th gen CPUs and earlier
+    - intel-gpu-tools
+    - vainfo
+    state: present
+  register: result
+  until: result is succeeded
+  when: intel_igpu_enabled is true
 
 - name: Check if generated login banner exists
   ansible.builtin.stat:
