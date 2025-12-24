@@ -1,16 +1,7 @@
 ---
-# 0. DEBUG: Uncomment this if you are still getting ZIPs. 
-# It will tell you exactly what variable Ansible is receiving.
-# - name: Debug Archive Type
-#   debug:
-#     msg: "Incoming Archive Type is: {{ archive_app_data_archive_type | default('UNDEFINED') }}"
-
-# 1. Setup Variables
 - name: Setup Archive Variables
   ansible.builtin.set_fact:
     _archive_name: "{{ target_data_dir | basename }}"
-    # Defaults to 'gz' if the variable is missing. 
-    # If this resolves to 'zip', it means the variable is set to 'zip' elsewhere.
     _raw_fmt: "{{ archive_app_data_archive_type | default('gz') }}"
     _archive_ext: >-
       {{
@@ -23,24 +14,20 @@
         }[archive_app_data_archive_type | default('gz')] | default('tgz')
       }}
 
-# 2. Check existence
 - name: Check {{ target_data_dir }} Data Directory
   ansible.builtin.stat:
     path: "{{ target_data_dir }}"
   register: _dir_stat
 
-# 3. Find Symlinks (Prevent Crashes)
 - name: Find symlinks to exclude
   ansible.builtin.find:
     paths: "{{ target_data_dir }}"
     recurse: yes
     file_type: link
-    # CRITICAL FIX: Look inside hidden folders (e.g. .config)
     hidden: yes
   register: _found_symlinks
   when: _dir_stat.stat.exists
 
-# 4. Perform Archive
 - name: Archive Data to {{ docker_home }}/{{ _archive_name | lower }}.{{ _archive_ext }}
   ansible.builtin.archive:
     path: "{{ target_data_dir }}"
@@ -51,6 +38,5 @@
     group: ansible-nas
     mode: '0660'
     remove: true
-    # Combine the found links + sockets into one flat list
     exclude_path: "{{ _found_symlinks.files | map(attribute='path') | list + [target_data_dir ~ '/**/*.sock'] }}"
   when: _dir_stat.stat.exists
