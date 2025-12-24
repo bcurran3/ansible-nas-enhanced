@@ -70,12 +70,3 @@
         name: "{{ metube_container_name }}"
         state: absent
   when: metube_enabled is false
-
-- name: Data Archive {{ ansible_nas_app_name }}
-  include_role:
-    name: ansible-nas-archive
-  vars:
-    target_data_dir: "{{ metube_data_directory }}"
-  when:
-    - archive_app_data_enabled is true
-    - metube_enabled is false
