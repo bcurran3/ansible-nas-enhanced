@@ -27,15 +27,15 @@
 ############# WIP to automate ssd/hdd/nvme device detection
 
     - name: Get list of available storage devices
-          set_fact:
-            scrutiny_devices: "{{ ansible_facts.devices.keys() 
-              | map('regex_replace', '^(.*)$', '/dev/\\1:/dev/\\1') 
-              | select('match', '^/dev/(sd|nvme|vd)') 
-              | list }}"
+      set_fact:
+        scrutiny_devices: "{{ ansible_facts.devices.keys() 
+          | map('regex_replace', '^(.*)$', '/dev/\\1:/dev/\\1') 
+          | select('match', '^/dev/(sd|nvme|vd)') 
+          | list }}"
 
     - name: Debug detected devices
-          debug:
-            var: scrutiny_devices
+      debug:
+        var: scrutiny_devices
 
 ###################
 
