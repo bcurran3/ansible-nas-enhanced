@@ -7,7 +7,7 @@
         state: directory
       with_items:
         - "{{ stats_prometheus_data_directory }}"
-        - "{{ stats_prometheus_config_directory }}"
+        - "{{ stats_prometheus_data_directory }}"
 
     - name: Create Prometheus Data Directory
       ansible.builtin.file:
@@ -16,12 +16,12 @@
         mode: 0777
       with_items:
         - "{{ stats_prometheus_data_directory }}"
-        - "{{ stats_prometheus_config_directory }}"
+        - "{{ stats_prometheus_data_directory }}"
 
     - name: Template Prometheus config
       ansible.builtin.template:
         src: prometheus.yml.j2
-        dest: "{{ stats_prometheus_config_directory }}/prometheus.yml"
+        dest: "{{ stats_prometheus_data_directory }}/prometheus.yml"
       register: prometheus_config
 
     - name: Create Prometheus Docker Container
@@ -31,7 +31,7 @@
         image: "{{ stats_prometheus_image_name }}:{{ stats_prometheus_image_version }}"
         pull: true
         volumes:
-          - "{{ stats_prometheus_config_directory }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
+          - "{{ stats_prometheus_data_directory }}/prometheus.yml:/etc/prometheus/prometheus.yml:ro"
           - "{{ stats_prometheus_data_directory }}:/prometheus:rw"
           - "/etc/timezone:/etc/timezone:ro"
         ports:

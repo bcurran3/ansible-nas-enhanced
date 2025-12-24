@@ -10,25 +10,25 @@
       changed_when: false
       with_items:
         - "{{ stats_grafana_data_directory }}"
-        - "{{ stats_grafana_config_directory }}"
-        - "{{ stats_grafana_config_directory }}/dashboards"
-        - "{{ stats_grafana_config_directory }}/provisioning/datasources"
-        - "{{ stats_grafana_config_directory }}/provisioning/dashboards"
+        - "{{ stats_grafana_data_directory }}"
+        - "{{ stats_grafana_data_directory }}/dashboards"
+        - "{{ stats_grafana_data_directory }}/provisioning/datasources"
+        - "{{ stats_grafana_data_directory }}/provisioning/dashboards"
 
     - name: Template Grafana data source
       ansible.builtin.template:
         src: datasources/ansible-nas.yml
-        dest: "{{ stats_grafana_config_directory }}/provisioning/datasources/ansible-nas.yml"
+        dest: "{{ stats_grafana_data_directory }}/provisioning/datasources/ansible-nas.yml"
 
     - name: Copy Grafana dashboards configuration
       ansible.builtin.copy:
         src: dashboards/ansible-nas.yml
-        dest: "{{ stats_grafana_config_directory }}/provisioning/dashboards/ansible-nas.yml"
+        dest: "{{ stats_grafana_data_directory }}/provisioning/dashboards/ansible-nas.yml"
 
     - name: Copy Grafana Ansible-NAS dashboard
       ansible.builtin.copy:
         src: dashboards/ansible-nas-overview.json
-        dest: "{{ stats_grafana_config_directory }}/dashboards/ansible-nas-overview.json"
+        dest: "{{ stats_grafana_data_directory }}/dashboards/ansible-nas-overview.json"
 
     - name: Create Grafana Docker Container
       community.docker.docker_container:
@@ -38,8 +38,8 @@
         pull: true
         volumes:
           - "{{ stats_grafana_data_directory }}:/var/lib/grafana:rw"
-          - "{{ stats_grafana_config_directory }}/provisioning:/etc/grafana/provisioning:ro"
-          - "{{ stats_grafana_config_directory }}/dashboards:/etc/dashboards:ro"
+          - "{{ stats_grafana_data_directory }}/provisioning:/etc/grafana/provisioning:ro"
+          - "{{ stats_grafana_data_directory }}/dashboards:/etc/dashboards:ro"
         ports:
           - "{{ stats_grafana_port }}:3000"
         env:
