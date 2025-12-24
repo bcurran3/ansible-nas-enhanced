@@ -31,6 +31,8 @@ function help {
     echo "      Check if your ANE files are up-to-date."
     echo "  --disable <app_name> <app_name> <app_name>"
     echo "      Disable app(s)."
+    echo "  --down <app_name> <app_name> <app_name> NOT IMPLEMENTED YET"
+    echo "      Disable and stop app(s)."
     echo "  --enable <app_name> <app_name> <app_name>"
     echo "      Enable app(s)."
     echo "  --enabled, --installed"
