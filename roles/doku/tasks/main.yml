@@ -65,12 +65,3 @@
         name: "{{ doku_container_name }}"
         state: absent
   when: doku_enabled is false
-
-- name: Data Archive {{ ansible_nas_app_name }}
-  include_role:
-    name: ansible-nas-archive
-  vars:
-    target_data_dir: "{{ doku_data_directory }}"
-  when:
-    - archive_app_data_enabled is true
-    - doku_enabled is false
