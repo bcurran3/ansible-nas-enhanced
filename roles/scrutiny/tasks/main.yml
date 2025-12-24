@@ -24,8 +24,6 @@
         dest: "{{ scrutiny_data_directory }}/config/scrutiny.yaml"
       register: template_config
 
-############# WIP to automate ssd/hdd/nvme device detection
-
     - name: Detect storage devices
       set_fact:
         scrutiny_devices: "{{ ansible_facts.devices.keys() 
@@ -33,8 +31,6 @@
           | map('regex_replace', '^(.*)$', '/dev/\\1:/dev/\\1') 
           | list }}"
       when: scrutiny_devices is undefined
-
-###################
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
