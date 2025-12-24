@@ -1,0 +1,89 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ karaoke_eternal_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ karaoke_eternal_container_name }}"
+        hostname: "{{ karaoke_eternal_container_name }}"
+        image: "{{ karaoke_eternal_image_name }}:{{ karaoke_eternal_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ karaoke_eternal_data_directory }}:/config"
+          - "{{ karaoke_eternal_cdgfiles }}:/cdgfiles:ro"
+        ports:
+          - "{{ karaoke_eternal_port_http }}:8080"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ karaoke_eternal_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ karaoke_eternal_watchtower_enable }}"
+          dockflare.enable: "{{ karaoke_eternal_dockflare_tunnel }}"
+          dockflare.access.group: "{{ karaoke_eternal_dockflare_access_group }}"
+          dockflare.hostname: "{{ karaoke_eternal_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaoke_eternal_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ karaoke_eternal_homepage_group }}"
+          homepage.icon: "{{ karaoke_eternal_homepage_icon }}"
+          homepage.href: "{{ karaoke_eternal_homepage_href }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaoke_eternal_port_http }}"
+          homepage.description: "{{ 'Open karaoke party system' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ karaoke_eternal_container_name }}"
+          homepage.showStats: "{{ karaoke_eternal_homepage_showstats }}"
+          repliqate.enabled: "{{ karaoke_eternal_repliqate_enabled }}"
+          repliqate.engine: "{{ karaoke_eternal_repliqate_engine }}"
+          repliqate.schedule: "{{ karaoke_eternal_repliqate_schedule }}"
+          repliqate.backup_id: "{{ karaoke_eternal_repliqate_backup_id }}"
+          repliqate.retention: "{{ karaoke_eternal_repliqate_retention }}"
+          traefik.enable: "{{ karaoke_eternal_available_externally | string }}"
+          traefik.http.routers.karaoke_eternal.rule: "Host(`karaokeeternal.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.karaoke_eternal.tls.certresolver: "letsencrypt"
+          traefik.http.routers.karaoke_eternal.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.karaoke_eternal.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.frontend.middlewares: "{{ karaoke_eternal_hostname }}"
+          traefik.http.routers.karaokeforever.middlewares: "{{ karaoke_eternal_hostname }}@docker"
+          traefik.http.middlewares.karaoke_eternal.IPAllowList.sourcerange: "{{ karaoke_eternal_traefik_whitelist }}"
+          traefik.http.services.karaoke_eternal.loadbalancer.server.port: "8080"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/david510c/karaoke-forever"
+        cpu_shares: "{{ karaoke_eternal_cpu_shares }}"
+        memory: "{{ karaoke_eternal_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (karaoke_eternal_port_http | string)] +
+                (['https://' + karaoke_eternal_hostname + '.' + ansible_nas_domain] if (karaoke_eternal_available_externally is true or karaoke_eternal_dockflare_tunnel is true) else [])
+              }}
+  when: karaoke_eternal_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ karaoke_eternal_container_name }}"
+        state: absent
+  when: karaoke_eternal_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ karaoke_eternal_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - karaoke_eternal_enabled is false
+
+# NOTE:
+# probably not up-to-date with source
+# https://github.com/bhj/KaraokeEternal

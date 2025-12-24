@@ -1,0 +1,44 @@
+---
+# ANE
+ansible_nas_app_name: "Karaoke Eternal"
+karaoke_eternal_enabled: false
+karaoke_eternal_available_externally: false
+karaoke_eternal_traefik_whitelist: "{{ lan }}"
+karaoke_eternal_data_directory: "{{ docker_home }}/karaoke-eternal"
+
+# network
+karaoke_eternal_hostname: "karaokeeternal"
+karaoke_eternal_port_http: "9018"
+
+# app config
+karaoke_eternal_cdgfiles: "{{ music_root }}/karaoke"
+
+# docker
+karaoke_eternal_container_name: "karaoke-eternal"
+karaoke_eternal_image_name: "radrootllc/karaoke-eternal"
+karaoke_eternal_image_tag: "latest"
+karaoke_eternal_cpu_shares: 1024
+karaoke_eternal_memory: "512M"
+
+# autoheal
+karaoke_eternal_autoheal: "false"
+
+# dockflare
+karaoke_eternal_dockflare_tunnel: "false"
+karaoke_eternal_dockflare_access_group: ""
+
+# homepage
+karaoke_eternal_homepage_group: "Apps"
+karaoke_eternal_homepage_icon: "karaoke-eternal.png"
+karaoke_eternal_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaoke_eternal_port_http }}"
+karaoke_eternal_homepage_showstats: "false"
+
+# repliqate
+karaoke_eternal_repliqate_enabled: "false"
+karaoke_eternal_repliqate_engine: "restic"
+karaoke_eternal_repliqate_schedule: "@daily 3am"
+karaoke_eternal_repliqate_backup_id: "{{ karaoke_eternal_container_name }}"
+karaoke_eternal_repliqate_retention: "30d"
+
+# watchtower
+karaoke_eternal_watchtower_enable: "false"
