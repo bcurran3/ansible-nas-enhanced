@@ -23,15 +23,13 @@ echo
 # ANE help menu
 function help {
     echo "Ansible-NAS-Enhanced (ANE) Help:"
-    echo "  --app, --apps, --tag, --tags, -t, --up, <app_name> <app_name> <app_name>"
-    echo "      Install or update apps by tag."
     echo "  --available"
     echo "      List ANE available apps."
     echo "  --behind, --outdated"
     echo "      Check if your ANE files are up-to-date."
     echo "  --disable <app_name> <app_name> <app_name>"
     echo "      Disable app(s)."
-    echo "  --down <app_name> <app_name> <app_name> NOT IMPLEMENTED YET"
+    echo "  --down <app_name> <app_name> <app_name>"
     echo "      Disable and stop app(s)."
     echo "  --enable <app_name> <app_name> <app_name>"
     echo "      Enable app(s)."
@@ -57,6 +55,8 @@ function help {
     echo "      Edit ANE settings/overrides."
     echo "  --stop"
     echo "      Stop all running containers."
+    echo "  --up  <app_name> <app_name> <app_name>; aliases: --app, --apps, --tag, --tags, -t,"
+    echo "      Install or update apps by tag."
     echo "  --upgrade, --pull"
     echo "      Upgrade ANE files from repo"
     echo ""
@@ -223,6 +223,29 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
         else
             echo "  ** ${arg} does not exist in $FILE."
             echo "  ** \"./ane.sh --enabled\" to view enabled apps."
+        fi
+    done
+    exit
+fi
+
+# Down (stop) ANE app
+if [[ "$1" = "--down" || "$1" = "-down" ]]; then
+    shift
+    for arg in "$@"; do
+        arg_clean="${arg//-/_}"
+        docker stop "${arg}" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "  ** ${arg} stopped. ${arg} may have linked containers (i.e. DBs) still running."
+        else 
+            echo "  ** ${arg} container not found or already stopped."
+        fi
+        docker stop "${arg}-db" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "  ** ${arg}-db stopped."
+        fi
+        docker stop "${arg}-redis" > /dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "  ** ${arg}-redis stopped."
         fi
     done
     exit
