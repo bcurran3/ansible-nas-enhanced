@@ -27,6 +27,7 @@
 #              size: 1000000000
         ports:
           - "{{ frigate_port_http }}:8971"
+#         - "5000:5000"     # Internal unauthenticated access. Expose carefully.
           - "8554:8554"     # RTSP feeds
           - "8555:8555/tcp" # WebRTC over tcp
           - "8555:8555/udp" # WebRTC over udp
@@ -50,7 +51,7 @@
           dockflare.enable: "{{ frigate_dockflare_tunnel }}"
           dockflare.access.group: "{{ frigate_dockflare_access_group }}"
           dockflare.hostname: "{{ frigate_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
+          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ frigate_homepage_group }}"
           homepage.icon: "{{ frigate_homepage_icon }}"
@@ -59,9 +60,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ frigate_container_name }}"
           homepage.showStats: "{{ frigate_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
           homepage.widget.type: "frigate"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
+          homepage.widget.url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
           homepage.widget.enableRecentEvents: "{{ frigate_homepage_widget_enablerecentevents }}"
           homepage.widget.username: "{{ frigate_homepage_widget_username }}"
           homepage.widget.password: "{{ frigate_homepage_widget_password }}"
@@ -78,7 +79,7 @@
           traefik.http.routers.frontend.middlewares: "{{ frigate_hostname }}"
           traefik.http.routers.frigate.middlewares: "{{ frigate_hostname }}@docker"
           traefik.http.middlewares.frigate.IPAllowList.sourcerange: "{{ frigate_traefik_whitelist }}"
-          traefik.http.services.frigate.loadbalancer.server.port: "80"
+          traefik.http.services.frigate.loadbalancer.server.port: "8971"
           wud.tag.include: ^\d+\.\d+\.\d+$
           wud.link.template: https://github.com/blakeblackshear/frigate/releases/tag/v${major}.${minor}.${patch}
         shm_size: "{{ frigate_shm_size }}"
@@ -90,7 +91,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (frigate_port_http | string)] +
+                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (frigate_port_http | string)] +
                 (['https://' + frigate_hostname + '.' + ansible_nas_domain] if (frigate_available_externally is true or frigate_dockflare_tunnel is true) else [])
               }}
   when: frigate_enabled is true
