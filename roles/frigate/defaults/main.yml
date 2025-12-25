@@ -1,0 +1,63 @@
+---
+# ANE
+ansible_nas_app_name: "Frigate"
+frigate_enabled: false
+frigate_available_externally: false
+frigate_traefik_whitelist: "{{ lan }}"
+
+# directories
+frigate_data_directory: "{{ docker_home }}/frigate"
+
+# docker
+frigate_container_name: "frigate"
+frigate_image_name: "ghcr.io/blakeblackshear/frigate"
+frigate_image_tag: "stable" # Standard Frigate build for amd64 & RPi Optimized Frigate build for arm64. This build includes support for Hailo devices as well.
+#frigate_image_tag: "stable-standard-arm64" # Standard Frigate build for arm64
+#frigate_image_tag: "stable-tensorrt"       # Frigate build specific for amd64 devices running an nvidia GPU
+#frigate_image_tag: "stable-rocm"           # Frigate build for AMD GPUs
+#frigate_image_tag: "stable-tensorrt-jp6"   # Frigate build optimized for nvidia Jetson devices running Jetpack 6
+#frigate_image_tag: "stable-rk"             # Frigate build for SBCs with Rockchip SoC
+
+
+# network
+frigate_port_http: "8971"
+frigate_hostname: "frigate"
+
+# specs
+frigate_cpu_shares: 1024
+frigate_memory: "1G"
+frigate_shm_size: "512mb"
+
+# frigate_devices:
+# - /dev/bus/usb:/dev/bus/usb # Passes the USB Coral, needs to be modified for other versions
+# - /dev/apex_0:/dev/apex_0 # Passes a PCIe Coral, follow driver instructions here https://github.com/jnicolson/gasket-builder
+# - /dev/video11:/dev/video11 # For Raspberry Pi 4B
+
+# app
+frigate_env_frigate_rtsp_password: "topsecret"
+
+# autoheal
+frigate_autoheal: "false"
+
+# dockflare
+frigate_dockflare_tunnel: "false"
+frigate_dockflare_access_group: ""
+
+# homepage
+frigate_homepage_group: "Apps"
+frigate_homepage_icon: "frigate.png"
+frigate_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
+frigate_homepage_showstats: "false"
+frigate_homepage_widget_enablerecentevents: "true"
+frigate_homepage_widget_username: ""
+frigate_homepage_widget_password: ""
+
+# repliqate
+frigate_repliqate_enabled: "false"
+frigate_repliqate_engine: "restic"
+frigate_repliqate_schedule: "@daily 3am"
+frigate_repliqate_backup_id: "{{ frigate_container_name }}"
+frigate_repliqate_retention: "30d"
+
+# watchtower
+frigate_watchtower_enable: "false"
