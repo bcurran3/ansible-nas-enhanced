@@ -76,6 +76,7 @@
         name: "{{ nextcloud_db_container_name }}"
         hostname: "{{ nextcloud_db_container_name }}"
         image: "{{ nextcloud_db_image_name }}:{{ nextcloud_db_image_version }}"
+        command: "--transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW"
         networks:
           - name: "{{ nextcloud_network_name }}"
         network_mode: "{{ nextcloud_network_name }}"
