@@ -21,9 +21,9 @@ wud_cpu_shares: 1024
 wud_memory: "256MB"
 
 # app
-wud_env_wud_auth_basic_admin_username: "admin"
-# admin:\$apr1\$k8bTAQRv\$WJg/AE0YepxV3PutXZ8D/1 for admin/topsecret
-wud_env_wud_auth_basic_admin_hash: "{{ ansible_nas_app_admin_password }}"
+wud_admin_password:  "{{ ansible_nas_app_admin_password }}"
+wud_env_wud_auth_basic_admin_username: "{{ ansible_nas_user }}"
+wud_env_wud_auth_basic_admin_hash: "{{ ansible_nas_app_admin_password | hash('sha256') }}"
 wud_env_wud_registry_hub_public_login: ""    # your https://hub.docker.com account
 wud_env_wud_registry_hub_public_password: "" # your https://hub.docker.com token
 wud_env_wud_watcher_local_watchall: "true"

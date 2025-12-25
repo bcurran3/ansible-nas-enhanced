@@ -23,10 +23,13 @@
         env:
 # NOTE: Consider moving env vars to a list so that triggers can be added manually
           WUD_AUTH_BASIC_ADMIN_USER: "{{ wud_env_wud_auth_basic_admin_username }}"
-          WUD_AUTH_BASIC_ADMIN_HASH: "{{ wud_env_wud_auth_basic_admin_hash }}"
+          WUD_AUTH_BASIC_ADMIN_HASH: "{{ wud_admin_password | password_hash('md5') }}"
           WUD_REGISTRY_HUB_PUBLIC_LOGIN: "{{ wud_env_wud_registry_hub_public_login }}"
           WUD_REGISTRY_HUB_PUBLIC_PASSWORD: "{{ wud_env_wud_registry_hub_public_password }}"
           WUD_WATCHER_LOCAL_WATCHALL: "{{ wud_env_wud_watcher_local_watchall }}"
+          WUD_TRIGGER_WATCHTOWER_HTTP_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port_api }}/v1/update"
+          WUD_TRIGGER_WATCHTOWER_HTTP_METHOD: "POST"
+          WUD_TRIGGER_WATCHTOWER_HTTP_HEADERS: '{"Authorization":"Bearer {{ watchtower_api_token }}"}'
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: 'curl --fail http://localhost:3000/health || exit 1'
