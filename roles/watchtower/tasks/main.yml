@@ -1,4 +1,9 @@
 ---
+- name: Check if Watchtower config file exists
+  ansible.builtin.stat:
+    path: "{{ watchtower_docker_config }}"
+  register: docker_config_stat
+
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Container
@@ -10,9 +15,10 @@
         pull: true
         ports:
             - "{{ watchtower_port_http }}:8080"                             # added
-        volumes:
-          - "/var/run/docker.sock:/var/run/docker.sock"
-#          - "{{ watchtower_docker_config }}:/config.json:ro"
+        volumes: "{{ 
+                  ['/var/run/docker.sock:/var/run/docker.sock'] + 
+                  ([watchtower_docker_config ~ ':/config.json:ro'] if docker_config_stat.stat.exists else []) 
+                }}"
         env:
 #          DOCKER_API_VERSION: "{{ watchtower_docker_api_version }}"
           WATCHTOWER_CLEANUP: "{{ watchtower_cleanup }}"
