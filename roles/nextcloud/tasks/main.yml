@@ -3,47 +3,33 @@
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
-        path: "{{ item }}"
+        path: "{{ item.path }}"
         state: directory
-      with_items:
-        - "{{ nextcloud_data_directory }}/nextcloud"
-        - "{{ nextcloud_data_directory }}/mysql"
-        - "{{ nextcloud_data_directory }}/mysql/mysql" # added
-        - "{{ nextcloud_data_directory }}/nextcloud/before-starting" # added
-        - "{{ nextcloud_data_directory }}/nextcloud/pre-installation" # added
-        - "{{ nextcloud_data_directory }}/nextcloud/post-installation" # added
-        - "{{ nextcloud_data_directory }}/nextcloud/pre-upgrade" # added
-        - "{{ nextcloud_data_directory }}/nextcloud/post-upgrade" # added
-
-#    - name: Create {{ ansible_nas_app_name }} Directories
-#        ansible.builtin.file:
-#          path: "{{ item.path }}"
-#          state: directory
-#          owner: "{{ item.owner }}"
-#          group: "{{ item.group }}"
-#          mode: "755"
-#        loop:
-#          - path: "{{ invoiceninja_data_directory }}/mysql"
-#            owner: "{{ invoiceninja_db_user_id }}"
-#            group: "{{ invoiceninja_db_user_id }}"
-#          - path: "{{ invoiceninja_data_directory }}/mysql/mysql"
-#            owner: "{{ invoiceninja_web_user_id }}"
-#            group: "{{ invoiceninja_web_group_id }}"
-#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
-#            owner: "{{ invoiceninja_user_id }}"
-#            group: "{{ invoiceninja_user_id }}"
-#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
-#            owner: "{{ invoiceninja_user_id }}"
-#            group: "{{ invoiceninja_user_id }}"
-#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
-#            owner: "{{ invoiceninja_user_id }}"
-#            group: "{{ invoiceninja_user_id }}"
-#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
-#            owner: "{{ invoiceninja_user_id }}"
-#            group: "{{ invoiceninja_user_id }}"
-#          - path: "{{ invoiceninja_data_directory }}/nextcloud"
-#            owner: "{{ invoiceninja_user_id }}"
-#            group: "{{ invoiceninja_user_id }}"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "755"
+      loop:
+        - path: "{{ nextcloud_data_directory }}/db"
+          owner: 0
+          group: 0
+        - path: "{{ nextcloud_data_directory }}/nextcloud"
+          owner: 33
+          group: 33
+        - path: "{{ nextcloud_data_directory }}/nextcloud/before-starting"
+          owner: 33
+          group: 33
+        - path: "{{ nextcloud_data_directory }}/nextcloud/pre-installation"
+          owner: 33
+          group: 33
+        - path: "{{ nextcloud_data_directory }}/nextcloud/post-installation"
+          owner: 33
+          group: 33
+        - path: "{{ nextcloud_data_directory }}/nextcloud/pre-upgrade"
+          owner: 33
+          group: 33
+        - path: "{{ nextcloud_data_directory }}/nextcloud/post-upgrade"
+          owner: 33
+          group: 33
 
     - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
@@ -62,7 +48,7 @@
         networks_cli_compatible: "yes"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        command: "redis-server --requirepass topsecret"
+        command: "redis-server --requirepass {{ nextcloud_env_redis_host_password }}"
         labels:
           autoheal: "{{ nextcloud_redis_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ nextcloud_redis_watchtower_enable }}"
@@ -95,23 +81,33 @@
         network_mode: "{{ nextcloud_network_name }}"
         pull: true
         volumes:
-          - "{{ nextcloud_data_directory }}/mysql/mysql:/var/lib/mysql" # added
-#          - "{{ nextcloud_data_directory }}/mysql/my.cnf:/etc/my.cnf" # added
+          - "{{ nextcloud_data_directory }}/db:/var/lib/mysql"
         env:
-          MYSQL_DATABASE: "{{ nextcloud_sql_database }}"
-          MYSQL_USER: "{{ nextcloud_sql_user }}"
-          MYSQL_PASSWORD: "{{ nextcloud_sql_password }}"
-          MYSQL_ROOT_PASSWORD: "{{ nextcloud_sql_root_password }}"
+          MYSQL_DATABASE: "{{ nextcloud_db_database }}"
+          MYSQL_USER: "{{ nextcloud_db_user }}"
+          MYSQL_PASSWORD: "{{ nextcloud_db_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ nextcloud_db_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test:
+                - CMD
+                - /usr/local/bin/healthcheck.sh
+                - --su-mysql
+                - --connect
+                - --innodb_initialized
+              interval: "30s"
+              timeout: "10s"
+              retries: "3"
+              start_period: "30s"
         labels:
           autoheal: "{{ nextcloud_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enable }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MySQL"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ nextcloud_db_homepage_group }}"
           homepage.icon: "{{ nextcloud_db_homepage_icon }}"
           homepage.href: "{{ nextcloud_homepage_href }}"
-          homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_db_container_name }}"
           homepage.showStats: "{{ nextcloud_db_homepage_showstats }}"
@@ -121,10 +117,12 @@
           repliqate.backup_id: "{{ nextcloud_db_repliqate_backup_id }}"
           repliqate.retention: "{{ nextcloud_db_repliqate_retention }}"
           traefik.enable: "false"
-#          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.include: '^8\.4\.\d+$'
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/_/mysql"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
+        cpu_shares: "{{ nextcloud_db_cpu_shares }}"
+        memory: "{{ nextcloud_db_memory }}"
+        restart_policy: unless-stopped
         cpu_shares: "{{ nextcloud_db_cpu_shares }}"
         memory: "{{ nextcloud_db_memory }}"
         restart_policy: unless-stopped
@@ -156,21 +154,39 @@
           - "3478:3478" # TURN server for Talk
         env:
           MYSQL_HOST: "{{ nextcloud_db_container_name }}"
-          MYSQL_DATABASE: "{{ nextcloud_sql_database }}"
-          MYSQL_USER: "{{ nextcloud_sql_user }}"
-          MYSQL_PASSWORD: "{{ nextcloud_sql_password }}"
-          MYSQL_ROOT_PASSWORD: "{{ nextcloud_sql_root_password }}"
-          NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
-          REDIS_HOST: "{{ nextcloud_redis_container_name }}" # added
-          REDIS_PORT: "6379"               # added
-          REDIS_HOST_PASSWORD: "topsecret" # added
+          MYSQL_DATABASE: "{{ nextcloud_db_database }}"
+          MYSQL_USER: "{{ nextcloud_db_user }}"
+          MYSQL_PASSWORD: "{{ nextcloud_db_password }}"
+          REDIS_HOST: "{{ nextcloud_redis_container_name }}"
+          REDIS_PORT: "6379"
+          REDIS_HOST_PASSWORD: "{{ nextcloud_env_redis_host_password }}"
+          NEXTCLOUD_ADMIN_USER: "{{ ansible_nas_user }}"
+          NEXTCLOUD_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
+          NEXTCLOUD_DATA_DIR: "{{ nextcloud_env_nextcloud_data_dir }}"
+          NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_env_nextcloud_trusted_domains }}"
           NEXTCLOUD_INIT_HTACCESS: "{{ nextcloud_env_nextcloud_init_htaccess }}" # added
-          # ^^^ may need to add localhost
-          APACHE_DISABLE_REWRITE_IP: "1"   # added
-          TZ: "{{ ansible_nas_timezone }}" # added
+          TRUSTED_PROXIES: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+          APACHE_DISABLE_REWRITE_IP: "{{ nextcloud_env_apache_disable_rewrite_ip }}"
+          APACHE_BODY_LIMIT: "{{ nextcloud_env_body_limit }}"
+          OVERWRITEHOST: "{{ nextcloud_env_overwritehost }}"
+          OVERWRITEPROTOCOL: "{{ nextcloud_env_overwriteprotocol }}"
+          OVERWRITECLIURL: "{{ nextcloud_env_overwriteclirul }}"
+          OVERWRITEWEBROOT: "{{ nextcloud_env_overwritewebroot }}"
+          OVERWRITECONDADDR: "{{ nextcloud_env_overwritecondaddr }}"
+          PHP_MEMORY_LIMIT: "{{ nextcloud_env_php_memory_limit }}"
+          PHP_UPLOAD_LIMIT: "{{ nextcloud_env_php_upload_limit }}"
+          SMTP_HOST: "{{ nextcloud_env_smtp_host }}"
+          SMTP_SECURE: "{{ nextcloud_env_smtp_secure }}"
+          SMTP_PORT: "{{ nextcloud_env_smtp_port }}"
+          SMTP_AUTHTYPE: "{{ nextcloud_env_smtp_authtype }}"
+          SMTP_NAME: "{{ nextcloud_env_smtp_name }}"
+          SMTP_PASSWORD: "{{ nextcloud_env_smtp_password }}"
+          MAIL_FROM_ADDRESS: "{{ nextcloud_env_mail_from_address }}"
+          MAIL_DOMAIN: "{{ nextcloud_env_mail_domain }}"
+          TZ: "{{ ansible_nas_timezone }}"
         links:
-          - "{{ nextcloud_redis_container_name }}"
           - "{{ nextcloud_db_container_name }}"
+          - "{{ nextcloud_redis_container_name }}"
         labels:
           autoheal: "{{ nextcloud_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ nextcloud_watchtower_enable }}"
