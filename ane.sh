@@ -9,6 +9,14 @@
 : "${ANE_DISABLE_ALSO_REMOVES:=false}"
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
 
+: "${ANE_ENABLE_ALSO_STARTS:=false}"
+
+# Global exclusion list for app displays
+# Filter out non-containers
+ANE_EXCLUDES="#|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin"
+
+########## begin functions ##########
+
 function print_logo {
 echo "      _    _   _ _____"
 echo "     / \  | \ | | ____|"
@@ -29,7 +37,7 @@ function help {
     echo "      Check if your ANE files are up-to-date."
     echo "  --disable <app_name> <app_name> <app_name>"
     echo "      Disable app(s)."
-    echo "  --down <app_name> <app_name> <app_name>"
+    echo "  --down, --stop <app_name> <app_name> <app_name>"
     echo "      Disable and stop app(s)."
     echo "  --enable <app_name> <app_name> <app_name>"
     echo "      Enable app(s)."
@@ -53,9 +61,9 @@ function help {
     echo "      Run ANE full playbook."
     echo "  --settings, -s, --overrides"
     echo "      Edit ANE settings/overrides."
-    echo "  --stop"
+    echo "  --stopall"
     echo "      Stop all running containers."
-    echo "  --up  <app_name> <app_name> <app_name>; aliases: --app, --apps, --tag, --tags, -t,"
+    echo "  --up, --start  <app_name> <app_name> <app_name>; aliases: --app, --apps, --tag, --tags, -t,"
     echo "      Install or update apps by tag."
     echo "  --upgrade, --pull"
     echo "      Upgrade ANE files from repo"
@@ -63,8 +71,20 @@ function help {
     exit
 }
 
+# Check git commits ANE is behind function
+function check_behind {
+    git fetch --quiet
+    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
+    BEHIND=$(git rev-list --count HEAD..@{u})
+    echo "  ** Your ANE installation is $BEHIND git commits behind."
+    if [ $BEHIND -gt 0 ]; then
+       echo "  ** \"./ane.sh --upgrade\" to update"
+    fi
+    #echo
+}
+
 # ANE Pro Tips menu
-function protips {
+function display_protips {
     echo "Ansible-NAS-Enhanced (ANE) Pro Tips:"
     echo "  export ANE_EDITOR=\"editorname\""
     echo "    -- set a different default text editor for ane.sh; i.e. vi, vim, msedit"
@@ -82,16 +102,110 @@ function protips {
     echo "    -- install app when you enable it"
 }
 
-# Check git commits ANE is behind function
-function check_behind {
-    git fetch --quiet
-    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
-    BEHIND=$(git rev-list --count HEAD..@{u})
-    echo "  ** Your ANE installation is $BEHIND git commits behind."
-    if [ $BEHIND -gt 0 ]; then
-       echo "  ** \"./ane.sh --upgrade\" to update"
-    fi
-    #echo
+function display_devstuff {
+    echo "Ansible-NAS-Enhanced (ANE) Developer Stuff:"
+    echo "  --newapp"
+    echo "      Copies app template and autofills some variables."
+}
+
+function disable_app {
+    [[ "$1" == -* ]] && shift
+    FILE="inventories/ANE/group_vars/nas.yml"
+    for arg in "$@"; do
+        arg_clean="${arg//-/_}"
+        ENABLED_LINE="${arg_clean}_enabled: true"
+        DISABLED_LINE="${arg_clean}_enabled: false"
+        if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
+            sed -i "s/^$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
+            if [[ "$ANE_DISABLE_ALSO_STOPS" == "true" ]]; then
+                stop_app "$arg"
+            fi
+            if [[ "$ANE_DISABLE_ALSO_REMOVES" == "true" ]]; then
+                echo "  ** ${arg} disabled. Uninstalling..."
+                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
+            else
+                echo "  ** ${arg} disabled."
+            fi
+        elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
+            echo "  ** ${arg} is already disabled."
+        else
+            echo "  ** ${arg} does not exist in $FILE."
+        fi
+    done
+}
+
+function display_available_apps {
+    echo "  ** ANE available apps:"
+    echo "--------------------------------------------------------"
+    APP_LIST=$(grep 'role:' nas.yml | \
+        grep -v -E '#|ansible-nas-|WIP' | \
+        awk -F': ' '{print $2}' | \
+        sed 's/[#"].*//;s/ //g' | \
+        sort)
+    echo "$APP_LIST" | xargs printf "%-20s %-20s %-20s\n"
+    TOTAL=$(echo "$APP_LIST" | grep -c -v '^$')
+    echo "--------------------------------------------------------"
+    echo "  ** Total Apps Available: $TOTAL"
+}
+
+function display_disabled_apps {
+     echo "  ** ANE disabled apps:"
+     echo "--------------------------------------------------------"
+     
+     DISABLED_LIST=$(grep 'enabled: false' inventories/ANE/group_vars/nas.yml | \
+        grep -v -E "$ANE_EXCLUDES" | \
+        sed 's/_enabled: false//;s/ //g' | \
+        sort)
+     
+     if [[ -n "$DISABLED_LIST" ]]; then
+        echo "$DISABLED_LIST" | xargs printf "%-20s %-20s %-20s\n"
+        TOTAL=$(echo "$DISABLED_LIST" | grep -c -v '^$')
+     else
+        TOTAL=0
+     fi
+     echo "--------------------------------------------------------"
+     echo "  ** Total Apps Disabled: $TOTAL"
+}
+
+function display_enabled_apps {
+     echo "  ** ANE enabled apps:"
+     echo "--------------------------------------------------------"
+     EXCLUSIONS="#|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose"
+     ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | grep -v -E "$EXCLUSIONS" | sed 's/_enabled: true//;s/ //g' | sort)
+     if [[ -n "$ENABLED_LIST" ]]; then
+        echo "$ENABLED_LIST" | xargs printf "%-20s %-20s %-20s\n"
+        TOTAL=$(echo "$ENABLED_LIST" | grep -c -v '^$')
+     else
+        TOTAL=0
+     fi
+     echo "--------------------------------------------------------"
+     echo "  ** Total Apps Enabled: $TOTAL"
+}
+
+function display_status {
+    GREEN='\033[0;32m'
+    RED='\033[0;31m'
+    NC='\033[0m'
+
+    echo "  ** ANE Application Status:"
+    echo "--------------------------------------------------------"
+    printf "%-20s %-15s %-15s\n" "APP NAME" "CONFIGURED" "STATUS"
+    echo "--------------------------------------------------------"
+    
+    # Use the global ANE_EXCLUDES
+    ENABLED_APPS=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | \
+        grep -v -E "$ANE_EXCLUDES" | \
+        sed 's/_enabled: true//;s/ //g')
+
+    for app in $ENABLED_APPS; do
+        if docker ps --filter "name=^/${app}" --filter "status=running" --format '{{.Names}}' | grep -q . ; then
+            STATE="${GREEN}RUNNING${NC}"
+        else
+            STATE="${RED}STOPPED${NC}"
+        fi
+        printf "%-20s %-15s %-25b\n" "$app" "ENABLED" "$STATE"
+    done
+    echo "--------------------------------------------------------"
 }
 
 # prune Docker images and volumes
@@ -106,6 +220,21 @@ function prune {
 function upgrade {
     git pull
 }
+
+function stop_app {
+    [[ "$1" == -* ]] && shift
+    for arg in "$@"; do
+        TARGETS=$(docker ps --filter "name=^/${arg}" --filter "status=running" --format "{{.Names}}" | paste -sd ", " -)
+        if [[ -n "$TARGETS" ]]; then
+            echo "  ** Stopping: $TARGETS"
+            docker stop $(docker ps -q --filter "name=^/${arg}" --filter "status=running") > /dev/null
+        else
+            echo "  ** ${arg} is not currently running."
+        fi
+    done
+}
+
+########## end functions ##########
 
 # offer help when no switches provided
 if [[ -z "$1" ]]; then
@@ -142,14 +271,20 @@ fi
 
 # ANE Pro Tips menu
 if [[ "$1" = "--protips" || "$1" = "-protips" ]]; then
-    protips
+    display_protips
+    exit
+fi
+
+# ANE Pro Tips menu
+if [[ "$1" = "--devstuff" || "$1" = "-devstuff" ]]; then
+    display_devstuff
     exit
 fi
 
 if $ANE_ALWAYS_CHECK_BEHIND; then check_behind; fi
 
 # Install/update only specified ANE apps
-if [[ "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--up" || "$1" = "-up" || "$1" = "--tag" || "$1" = "--tags" || "$1" = "-t" ]]; then
+if [[ "$1" = "--up" || "$1" = "-up" || "$1" = "--start" || "$1" = "-start" || "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--tag" || "$1" = "--tags" || "$1" = "-t" ]]; then
      if [ "$2" = '' ]; then
         echo "  ** You need to specify at least one app name/tag."
         exit 1
@@ -165,18 +300,8 @@ fi
 
 # List ANE available apps (roles)
 if [[ "$1" = "--available" || "$1" = "-available" || "$1" = "--roles" || "$1" = "-roles" ]]; then
-     echo "  ** ANE available apps:"
-     echo "--------------------------------------------------------"
-     APP_LIST=$(grep 'role:' nas.yml | \
-        grep -v -E '#|ansible-nas-|WIP' | \
-        awk -F': ' '{print $2}' | \
-        sed 's/[#"].*//;s/ //g' | \
-        sort)
-     echo "$APP_LIST" | xargs printf "%-20s %-20s %-20s\n"
-     TOTAL=$(echo "$APP_LIST" | grep -c -v '^$')
-     echo "--------------------------------------------------------"
-     echo "  ** Total Apps Available: $TOTAL"
-     exit
+   display_available_apps
+   exit
 fi
 
 # Check git commits ANE is behind
@@ -188,83 +313,19 @@ fi
 
 # Disable ANE app
 if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
-    shift
-    FILE="inventories/ANE/group_vars/nas.yml"
-    for arg in "$@"; do
-        arg_clean="${arg//-/_}"
-        ENABLED_LINE="${arg_clean}_enabled: true"
-        DISABLED_LINE="${arg_clean}_enabled: false"
-        if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
-            sed -i "s/$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
-            if $ANE_DISABLE_ALSO_STOPS; then
-               docker stop "${arg}" > /dev/null 2>&1
-               if [ $? -eq 0 ]; then
-                  echo "  ** ${arg} stopped. ${arg} may have linked containers (i.e. DBs) still running."
-               else 
-                  echo "  ** ${arg} container not found or already stopped."
-               fi
-               docker stop "${arg}-db" > /dev/null 2>&1
-               if [ $? -eq 0 ]; then
-                  echo "  ** ${arg}-db stopped."
-               fi
-               docker stop "${arg}-redis" > /dev/null 2>&1
-               if [ $? -eq 0 ]; then
-                  echo "  ** ${arg}-redis stopped."
-               fi
-            fi
-            if $ANE_DISABLE_ALSO_REMOVES; then
-                echo "  ** ${arg} disabled. Unstalling..."
-                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
-            else
-                echo "  ** ${arg} disabled."
-            fi
-        elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
-            echo "  ** ${arg} is already disabled."
-        else
-            echo "  ** ${arg} does not exist in $FILE."
-            echo "  ** \"./ane.sh --enabled\" to view enabled apps."
-        fi
-    done
+    disable_app "$@"
     exit
 fi
 
 # Down (stop) ANE app
-if [[ "$1" = "--down" || "$1" = "-down" ]]; then
-    shift
-    for arg in "$@"; do
-        arg_clean="${arg//-/_}"
-        docker stop "${arg}" > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            echo "  ** ${arg} stopped. ${arg} may have linked containers (i.e. DBs) still running."
-        else 
-            echo "  ** ${arg} container not found or already stopped."
-        fi
-        docker stop "${arg}-db" > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            echo "  ** ${arg}-db stopped."
-        fi
-        docker stop "${arg}-redis" > /dev/null 2>&1
-        if [ $? -eq 0 ]; then
-            echo "  ** ${arg}-redis stopped."
-        fi
-    done
+if [[ "$1" = "--down" || "$1" = "-down" || "$1" = "-stop"|| "$1" = "-stop" ]]; then
+    stop_app "$@"
     exit
 fi
 
 # List ANE disabled apps
 if [[ "$1" = "--disabled" || "$1" = "-disabled" ]]; then
-     echo "  ** ANE disabled apps:"
-     echo "--------------------------------------------------------"
-     EXCLUSIONS="#|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose"
-     DISABLED_LIST=$(grep 'enabled: false' inventories/ANE/group_vars/nas.yml | grep -v -E "$EXCLUSIONS" | sed 's/_enabled: false//;s/ //g' | sort)
-     if [[ -n "$DISABLED_LIST" ]]; then
-        echo "$DISABLED_LIST" | xargs printf "%-20s %-20s %-20s\n"
-        TOTAL=$(echo "$DISABLED_LIST" | grep -c -v '^$')
-     else
-        TOTAL=0
-     fi
-     echo "--------------------------------------------------------"
-     echo "  ** Total Apps Disabled: $TOTAL"
+     display_disabled_apps
      exit
 fi
 
@@ -314,19 +375,8 @@ fi
 
 # List ANE enabled apps
 if [[ "$1" = "--enabled" || "$1" = "-enabled" || "$1" = "--installed" || "$1" = "-installed" ]]; then
-     echo "  ** ANE enabled apps:"
-     echo "--------------------------------------------------------"
-     EXCLUSIONS="#|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose"
-     ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | grep -v -E "$EXCLUSIONS" | sed 's/_enabled: true//;s/ //g' | sort)
-     if [[ -n "$ENABLED_LIST" ]]; then
-        echo "$ENABLED_LIST" | xargs printf "%-20s %-20s %-20s\n"
-        TOTAL=$(echo "$ENABLED_LIST" | grep -c -v '^$')
-     else
-        TOTAL=0
-     fi
-     echo "--------------------------------------------------------"
-     echo "  ** Total Apps Enabled: $TOTAL"
-     exit
+    display_enabled_apps
+    exit
 fi
 
 # git force pull
@@ -361,13 +411,19 @@ fi
 # Copy template for new app role development
 if [[ "$1" = "--newapp" || "$1" = "-newapp" ]]; then
     if [[ -z "$2" ]]; then echo "  ** ERROR: Specify app name."; exit 1; fi
+    if [[ ! -d "roles/template" ]]; then
+        echo "  ** ERROR: 'roles/template' directory not found. Cannot create new app."
+        exit 1
+    fi
     NEW_APP_CLEAN="${2//-/_}"
     TARGET="roles/$2"
-    if [[ -d "$TARGET" ]]; then echo "  ** ERROR: Exists."; exit 1; fi
+    if [[ -d "$TARGET" ]]; then echo "  ** ERROR: Role '$2' already exists."; exit 1; fi
     cp -r roles/template "$TARGET"
     find "$TARGET" -type f -exec sed -i "s/appname_/${NEW_APP_CLEAN}_/g" {} +
-    find "$TARGET" -name "appname_*" | while read file; do mv "$file" "${file//appname_/${NEW_APP_CLEAN}_}"; done
-    echo "  ** Role '$2' created."
+    find "$TARGET" -name "appname_*" | while read file; do 
+        mv "$file" "${file//appname_/${NEW_APP_CLEAN}_}"
+    done
+    echo "  ** Role '$2' created successfully."
     exit
 fi
 
@@ -403,9 +459,20 @@ if [[ "$1" = "--settings" || "$1" = "-settings" || "$1" = "-s" || "$1" = "--over
     exit
 fi
 
+# Edit ANE settings/variables
+if [[ "$1" = "--status" || "$1" = "-status" ]]; then
+    display_status
+    exit
+fi
+
 # Stop all Docker containers
-if [[ "$1" = "--stop" || "$1" = "-stop" ]]; then
-    docker stop $(docker ps -q)
+if [[ "$1" = "--stopall" || "$1" = "-stopall" ]]; then
+    RUNNING=$(docker ps -q)
+    if [[ -n "$RUNNING" ]]; then
+        docker stop $RUNNING
+    else
+        echo "  ** No containers are currently running."
+    fi
     exit
 fi
 
