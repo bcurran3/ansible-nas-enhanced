@@ -60,7 +60,7 @@ By default, applications can be found on the ports listed below.
 | Diskover         | 3005    | Bridge  | HTTP           |
 | Diskover ElasticS| 9200    | Bridge  | HTTP           |
 | Docker-Android   | 6080    | Bridge  | HTTP           |
-| DockFlare        | 5003    | Bridge  | HTTP           |
+| DockFlare        | 3070    | Bridge  | HTTP           |
 | Dockge           | 5001
 | Dockman          | 8866
 | Dockpeek         | 3420    | Bridge  | HTTP           |
@@ -217,6 +217,7 @@ By default, applications can be found on the ports listed below.
 | Paperless_ng     | 16922   | Bridge  | HTTP           |
 | PatchPanda       | 5093
 | Peppermint       | 3021
+| Peppermint       | 5003
 | phpBB            | 9003    | Bridge  | HTTP           |
 | Pi-hole          | 8888
 | Pi-hole          | 53
@@ -377,7 +378,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3069
+# next avail = 3071
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
