@@ -65,7 +65,7 @@ By default, applications can be found on the ports listed below.
 | Dockman          | 8866
 | Dockpeek         | 3420    | Bridge  | HTTP           |
 | Dokemon          | 9019    | Bridge  | HTTP           |
-| Doku             | 9091    | Bridge  | HTTP           |
+| Doku             | 3067    | Bridge  | HTTP           |
 | DokuWiki         | 8085    | Bridge  | HTTP           |
 | Double Commander | 3006    | Bridge  | HTTP           |
 | Dozzle           | 9999    | Bridge  | HTTP           |
@@ -80,7 +80,7 @@ By default, applications can be found on the ports listed below.
 | Emby             | 8920    | Bridge  | HTTPS          |
 | EspHome          | 6052    | Bridge  | HTTP           |
 | Fast Music Removr| 3045
-| Fasten           | 9091
+| Fasten           | 3068
 | File Browser     | 9013    | Bridge  | HTTP           |
 | FileBrowser Quan | 9014    | Bridge  | HTTP           |
 | FileShelter      | 5091    | Bridge  | HTTP           |
@@ -377,7 +377,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3067
+# next avail = 3069
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
