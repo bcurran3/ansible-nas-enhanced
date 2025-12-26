@@ -8,6 +8,13 @@
       with_items:
         - "{{ wud_data_directory }}"
 
+    - name: Install python3-passlib
+      apt:
+        name: "python3-passlib"
+        state: present
+      register: result
+      until: result is succeeded
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
