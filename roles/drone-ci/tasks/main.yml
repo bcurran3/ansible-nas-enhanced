@@ -3,12 +3,12 @@
   block:
     - name: Check for Gitea installation
       ansible.builtin.debug:
-        msg: "Drone-CI requires Gitea enabled and running for authentication, please set that up first."
+        msg: "Drone-CI requires Gitea enabled and running for authentication, please set that up first. Skipping..."
       when: gitea_enabled is true
 
     - name: Check for Gitea config
       ansible.builtin.debug:
-        msg: "Missing Gitea Oauth2 config! Read https://docs.drone.io/server/provider/gitea/ and set drone_ci_gitea_client_id and drone_ci_gitea_client_secret."
+        msg: "Missing Gitea Oauth2 config! Read https://docs.drone.io/server/provider/gitea/ and set drone_ci_gitea_client_id and drone_ci_gitea_client_secret. Skipping..."
       when: drone_ci_gitea_client_id == "notset"
 
     - name: Continue {{ ansible_nas_app_name }}

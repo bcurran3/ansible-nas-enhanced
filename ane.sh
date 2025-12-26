@@ -398,6 +398,7 @@ if [[ "$1" = "--up" || "$1" = "-up" || "$1" = "--start" || "$1" = "-start" || "$
         echo "  ** You need to specify at least one app name/tag."
         exit 1
      fi
+    [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
     appslist=""
     shift
     for arg in "$@"; do
