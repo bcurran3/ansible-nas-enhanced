@@ -13,7 +13,7 @@
 
 # Global exclusion list for app displays
 # Filter out non-containers
-ANE_EXCLUDES="#|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin"
+ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin"
 
 ########## begin functions ##########
 
@@ -38,7 +38,7 @@ function help {
     echo "  --disable <app_name> <app_name> <app_name>"
     echo "      Disable app(s)."
     echo "  --down, --stop <app_name> <app_name> <app_name>"
-    echo "      Disable and stop app(s)."
+    echo "      Stop app(s)."
     echo "  --enable <app_name> <app_name> <app_name>"
     echo "      Enable app(s)."
     echo "  --enabled, --installed"
@@ -104,45 +104,88 @@ function display_protips {
 
 function display_devstuff {
     echo "Ansible-NAS-Enhanced (ANE) Developer Stuff:"
+    echo "  --enableallapps"
+    echo "      Enable all apps."
+    echo "  --disableallapps"
+    echo "      Disable all apps."
     echo "  --newapp"
     echo "      Copies app template and autofills some variables."
+}
+
+function disable_all_apps {
+    FILE="inventories/ANE/group_vars/nas.yml"
+    echo -e "${RED}  ** WARNING: This will disable every application in your configuration.${NC}"
+    read -p "  ** Are you sure you want to proceed? (y/N): " confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        echo "  ** Aborted."
+        return 1
+    fi
+    ENABLED_APPS=$(grep 'enabled: true' "$FILE" | \
+        grep -v -E "$ANE_EXCLUDES" | \
+        sed 's/_enabled: true//;s/ //g')
+    if [[ -z "$ENABLED_APPS" ]]; then
+        echo "  ** No apps are currently enabled."
+        return 0
+    fi
+    TAGS_TO_STOP=""
+    for app in $ENABLED_APPS; do
+        arg_clean="${app//-/_}"
+        ENABLED_LINE="${arg_clean}_enabled: true"
+        DISABLED_LINE="${arg_clean}_enabled: false"
+        sed -i "s/^[[:space:]]*$ENABLED_LINE$/$DISABLED_LINE/" "$FILE"
+        TAGS_TO_STOP+="${app},"
+    done
+    CLEAN_TAGS=${TAGS_TO_STOP%,}
+    if [[ "$ANE_DISABLE_ALSO_STOPS" == "true" ]]; then
+        echo "  ** Stopping containers for disabled apps..."
+        IFS=',' read -r -a STOP_ARRAY <<< "$CLEAN_TAGS"
+        stop_app "${STOP_ARRAY[@]}"
+    fi
+    if [[ "$ANE_DISABLE_ALSO_REMOVES" == "true" ]]; then
+        echo "  ** Running playbook to uninstall apps..."
+        ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t "$CLEAN_TAGS"
+    else
+        echo "  ** All apps disabled in config. Containers may still be running unless ANE_DISABLE_ALSO_STOPS is true."
+    fi
 }
 
 function disable_app {
     [[ "$1" == -* ]] && shift
     FILE="inventories/ANE/group_vars/nas.yml"
+    TAGS_TO_REMOVE=""
     for arg in "$@"; do
+        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
         arg_clean="${arg//-/_}"
         ENABLED_LINE="${arg_clean}_enabled: true"
         DISABLED_LINE="${arg_clean}_enabled: false"
-        if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
-            sed -i "s/^$ENABLED_LINE/$DISABLED_LINE/" "$FILE"
+        if [ -f "$FILE" ] && grep -q "^$ENABLED_LINE" "$FILE"; then
+            sed -i "s/^$ENABLED_LINE$/$DISABLED_LINE/" "$FILE"
             if [[ "$ANE_DISABLE_ALSO_STOPS" == "true" ]]; then
                 stop_app "$arg"
             fi
-            if [[ "$ANE_DISABLE_ALSO_REMOVES" == "true" ]]; then
-                echo "  ** ${arg} disabled. Uninstalling..."
-                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
-            else
-                echo "  ** ${arg} disabled."
-            fi
-        elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
+            echo "  ** ${arg} disabled."
+            TAGS_TO_REMOVE+="${arg},"
+        elif [ -f "$FILE" ] && grep -q "^$DISABLED_LINE" "$FILE"; then
             echo "  ** ${arg} is already disabled."
         else
             echo "  ** ${arg} does not exist in $FILE."
         fi
     done
+    if [[ "$ANE_DISABLE_ALSO_REMOVES" == "true" && -n "$TAGS_TO_REMOVE" ]]; then
+        echo "  ** Uninstalling disabled apps: ${TAGS_TO_REMOVE%,}..."
+        ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t "${TAGS_TO_REMOVE%,}"
+    fi
 }
 
 function display_available_apps {
     echo "  ** ANE available apps:"
     echo "--------------------------------------------------------"
     APP_LIST=$(grep 'role:' nas.yml | \
-        grep -v -E '#|ansible-nas-|WIP' | \
+        grep -v -E "$ANE_EXCLUDES" | \
         awk -F': ' '{print $2}' | \
         sed 's/[#"].*//;s/ //g' | \
         sort)
-    echo "$APP_LIST" | xargs printf "%-20s %-20s %-20s\n"
+    echo "$APP_LIST" | xargs -r printf "%-20s %-20s %-20s\n"
     TOTAL=$(echo "$APP_LIST" | grep -c -v '^$')
     echo "--------------------------------------------------------"
     echo "  ** Total Apps Available: $TOTAL"
@@ -170,11 +213,13 @@ function display_disabled_apps {
 function display_enabled_apps {
      echo "  ** ANE enabled apps:"
      echo "--------------------------------------------------------"
-     EXCLUSIONS="#|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose"
-     ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | grep -v -E "$EXCLUSIONS" | sed 's/_enabled: true//;s/ //g' | sort)
+     ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | \
+        grep -v -E "$ANE_EXCLUDES" | \
+        sed 's/_enabled: true//;s/ //g' | \
+        sort)
      if [[ -n "$ENABLED_LIST" ]]; then
-        echo "$ENABLED_LIST" | xargs printf "%-20s %-20s %-20s\n"
-        TOTAL=$(echo "$ENABLED_LIST" | grep -c -v '^$')
+        echo "$ENABLED_LIST" | xargs -r printf "%-20s %-20s %-20s\n"
+        TOTAL=$(echo "$ENABLED_LIST" | wc -l)
      else
         TOTAL=0
      fi
@@ -191,12 +236,9 @@ function display_status {
     echo "--------------------------------------------------------"
     printf "%-20s %-15s %-15s\n" "APP NAME" "CONFIGURED" "STATUS"
     echo "--------------------------------------------------------"
-    
-    # Use the global ANE_EXCLUDES
     ENABLED_APPS=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | \
         grep -v -E "$ANE_EXCLUDES" | \
         sed 's/_enabled: true//;s/ //g')
-
     for app in $ENABLED_APPS; do
         if docker ps --filter "name=^/${app}" --filter "status=running" --format '{{.Names}}' | grep -q . ; then
             STATE="${GREEN}RUNNING${NC}"
@@ -206,6 +248,73 @@ function display_status {
         printf "%-20s %-15s %-25b\n" "$app" "ENABLED" "$STATE"
     done
     echo "--------------------------------------------------------"
+}
+
+function enable_all_apps {
+    FILE="inventories/ANE/group_vars/nas.yml"
+    APPSLIST="./nas.yml"
+    TAGS_TO_RUN=""
+    echo "  ** Preparing to enable all available ANE apps..."
+    ALL_APPS=$(grep 'role:' "$APPSLIST" | \
+        grep -v -E "$ANE_EXCLUDES" | \
+        awk -F': ' '{print $2}' | \
+        sed 's/[#"].*//;s/ //g')
+    for arg in $ALL_APPS; do
+        arg_clean="${arg//-/_}"
+        ENABLED_LINE="${arg_clean}_enabled: true"
+        DISABLED_LINE="${arg_clean}_enabled: false"
+        if grep -q "^[[:space:]]*$DISABLED_LINE" "$FILE"; then
+            sed -i "s/^[[:space:]]*$DISABLED_LINE$/$ENABLED_LINE/" "$FILE"
+            TAGS_TO_RUN+="${arg},"
+        elif ! grep -q "${arg_clean}_enabled" "$FILE"; then
+            echo -e "\n### ${arg}\n$ENABLED_LINE" >> "$FILE"
+            TAGS_TO_RUN+="${arg},"
+        fi
+    done
+    if [[ "$ANE_ENABLE_ALSO_STARTS" == "true" && -n "$TAGS_TO_RUN" ]]; then
+        echo "  ** Starting mass installation..."
+        ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t "${TAGS_TO_RUN%,}"
+    else
+        echo "  ** All apps enabled in $FILE. Run ANE full playbook to deploy."
+    fi
+}
+
+function enable_app {
+    [[ "$1" == -* ]] && shift
+    APPSLIST="./nas.yml"
+    FILE="inventories/ANE/group_vars/nas.yml"
+    TAGS_TO_RUN=""
+    for arg in "$@"; do
+        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+        arg_clean="${arg//-/_}"
+        ENABLED_LINE="${arg_clean}_enabled: true"
+        DISABLED_LINE="${arg_clean}_enabled: false"
+        if [ -f "$FILE" ] && grep -q "^$ENABLED_LINE" "$FILE"; then
+            echo "  ** ${arg} is already enabled."
+        elif [ -f "$FILE" ] && grep -q "^$DISABLED_LINE" "$FILE"; then
+            sed -i "s/^$DISABLED_LINE$/$ENABLED_LINE/" "$FILE"
+            echo "  ** ${arg} re-enabled."
+            TAGS_TO_RUN+="${arg},"
+        else
+            if [ -f "$APPSLIST" ] && grep -qE "role: +${arg}$" "$APPSLIST"; then
+                if ! grep -q "${arg_clean}_enabled" "$FILE"; then
+                    echo -e "\n### ${arg}\n$ENABLED_LINE" >> "$FILE"
+                    if grep -xq "traefik_enabled: true" "$FILE"; then
+                        echo "${arg_clean}_available_externally: true" >> "$FILE"
+                        echo "${arg_clean}_homepage_href: \"https://{{ ${arg_clean}_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
+                    fi
+                    echo "  ** ${arg} enabled (new entry)."
+                fi
+                TAGS_TO_RUN+="${arg},"
+            else
+                echo "  ** ${arg} not found in $APPSLIST."
+            fi
+        fi
+    done
+    if [[ "$ANE_ENABLE_ALSO_STARTS" == "true" ]] && [[ -n "${TAGS_TO_RUN%,}" ]]; then
+        echo "  ** Installing enabled apps: ${TAGS_TO_RUN%,}..."
+        ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t "${TAGS_TO_RUN%,}"
+    fi
 }
 
 # prune Docker images and volumes
@@ -311,13 +420,13 @@ if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-o
     exit
 fi
 
-# Disable ANE app
+# Disable ANE app(s)
 if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
     disable_app "$@"
     exit
 fi
 
-# Down (stop) ANE app
+# Down (stop) ANE app(s)
 if [[ "$1" = "--down" || "$1" = "-down" || "$1" = "-stop"|| "$1" = "-stop" ]]; then
     stop_app "$@"
     exit
@@ -329,53 +438,27 @@ if [[ "$1" = "--disabled" || "$1" = "-disabled" ]]; then
      exit
 fi
 
-# Enable ANE app
+# Enable ANE app(s)
 if [[ "$1" = "--enable" || "$1" = "-enable" ]]; then
-    shift
-    APPSLIST="./nas.yml"
-    FILE="inventories/ANE/group_vars/nas.yml"
-    for arg in "$@"; do
-        arg_clean="${arg//-/_}"
-        ENABLED_LINE="${arg_clean}_enabled: true"
-        DISABLED_LINE="${arg_clean}_enabled: false"
-        VALID_APP="role: ${arg}"
-        
-        if [ -f "$FILE" ] && grep -xq "$ENABLED_LINE" "$FILE"; then
-            echo "  ** ${arg} is already enabled."
-        elif [ -f "$FILE" ] && grep -xq "$DISABLED_LINE" "$FILE"; then
-            sed -i "s/$DISABLED_LINE/$ENABLED_LINE/" "$FILE"
-            if $ANE_ENABLE_ALSO_STARTS; then
-                echo "  ** ${arg} re-enabled. Installing..."
-                ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
-            else
-                echo "  ** ${arg} re-enabled. \"./ane.sh --app ${arg}\" to install."
-            fi
-        else
-            if [ -f "$APPSLIST" ] && grep -q "$VALID_APP" "$APPSLIST"; then
-                echo -e "\n### ${arg}" >> "$FILE"
-                echo "$ENABLED_LINE" >> "$FILE"
-                if [ -f "$FILE" ] && grep -xq "traefik_enabled: true" "$FILE"; then
-                    echo "${arg_clean}_available_externally: true" >> "$FILE"
-                    echo "${arg_clean}_homepage_href: \"https://{{ ${arg_clean}_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
-                fi
-                if $ANE_ENABLE_ALSO_STARTS; then
-                    echo "  ** ${arg} enabled. Installing..."
-                    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t ${arg}
-                else
-                    echo "  ** ${arg} enabled. \"./ane.sh --app ${arg}\" to install."
-                fi
-            else
-                echo "  ** ${arg} not found in $APPSLIST. ${arg} is not a valid app."
-                echo "  ** \"./ane.sh --available\" to view available apps."
-            fi
-        fi
-    done
+    enable_app "$@"
+    exit
+fi
+
+# Enable all ANE apps
+if [[ "$1" = "--enableallapps" || "$1" = "-enableallapps" ]]; then
+    enable_all_apps
     exit
 fi
 
 # List ANE enabled apps
 if [[ "$1" = "--enabled" || "$1" = "-enabled" || "$1" = "--installed" || "$1" = "-installed" ]]; then
     display_enabled_apps
+    exit
+fi
+
+# Disable all ANE apps
+if [[ "$1" = "--disableallapps" || "$1" = "-disableallapps" ]]; then
+    disable_all_apps
     exit
 fi
 
@@ -447,9 +530,8 @@ fi
 
 # Run ANE full playbook
 if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" || "$1" = "-update" || "$1" = "-u" ]]; then
-    if ($ANE_ALWAYS_UPGRADE); then upgrade; fi
-    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K "${@:2}"
-    if ($ANE_ALWAYS_PRUNE); then prune; fi
+    [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
+    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K "${@:2}" && { [[ "$ANE_ALWAYS_PRUNE" == "true" ]] && prune; }
     exit
 fi
 
