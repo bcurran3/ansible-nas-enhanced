@@ -30,6 +30,35 @@
           WUD_TRIGGER_WATCHTOWER_HTTP_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port_api }}/v1/update"
           WUD_TRIGGER_WATCHTOWER_HTTP_METHOD: "POST"
           WUD_TRIGGER_WATCHTOWER_HTTP_HEADERS: '{"Authorization":"Bearer {{ watchtower_api_token }}"}'
+#          WUD_REGISTRY_ACR_{REGISTRY_NAME}_CLIENTID	red_circle	Service Principal Client ID	See Service Principal Auth	
+#          WUD_REGISTRY_ACR_{REGISTRY_NAME}_CLIENTSECRET	red_circle	Service Principal Secret	See Service Principal Auth
+#          WUD_REGISTRY_CUSTOM_{REGISTRY_NAME}_URL	red_circle	Registry URL (e.g. http://localhost:5000)		
+#          WUD_REGISTRY_CUSTOM_{REGISTRY_NAME}_LOGIN	white_circle	Login (when htpasswd auth is enabled on the registry)	WUD_REGISTRY_CUSTOM_{REGISTRY_NAME}_PASSWORD must be defined	
+#          WUD_REGISTRY_CUSTOM_{REGISTRY_NAME}_PASSWORD	white_circle	Password (when htpasswd auth is enabled on the registry)	WUD_REGISTRY_CUSTOM_{REGISTRY_NAME}_LOGIN must be defined	
+#          WUD_REGISTRY_CUSTOM_{REGISTRY_NAME}_AUTH	white_circle	Htpasswd string (when htpasswd auth is enabled on the registry)
+#          WUD_REGISTRY_ECR_{REGISTRY_NAME}_REGION	red_circle	A valid AWS Region Code	AWS Region list	
+#          WUD_REGISTRY_ECR_{REGISTRY_NAME}_ACCESSKEYID	red_circle	A valid AWS Access Key Id	Standard AWS Credentials	
+#          WUD_REGISTRY_ECR_{REGISTRY_NAME}_SECRETACCESSKEY	red_circle	A valid AWS Secret Access Key	Standard AWS Credentials
+#          WUD_REGISTRY_FORGEJO_{REGISTRY_NAME}_URL	red_circle	Registry URL (e.g. https://forgejo.acme.com)		
+#          WUD_REGISTRY_FORGEJO_{REGISTRY_NAME}_LOGIN	red_circle	Forgejo username	WUD_REGISTRY_FORGEJO_{REGISTRY_NAME}_PASSWORD must be defined	
+#          WUD_REGISTRY_FORGEJO_{REGISTRY_NAME}_PASSWORD	red_circle	Forgejo password or personal access token	WUD_REGISTRY_FORGEJO_{REGISTRY_NAME}_LOGIN must be defined	
+#          WUD_REGISTRY_FORGEJO_{REGISTRY_NAME}_AUTH	white_circle	Htpasswd string (when htpasswd auth is enabled on the registry)
+#          WUD_REGISTRY_GCR_{REGISTRY_NAME}_CLIENTEMAIL	white_circle	Service Account Client Email (required for private images access)	See Service Account credentials	
+#          WUD_REGISTRY_GCR_{REGISTRY_NAME}_PRIVATEKEY	white_circle	Service Account Private Key (required for private images access)	See Service Account credentials
+#          WUD_REGISTRY_GHCR_{REGISTRY_NAME}_USERNAME	white_circle	Github username		
+#          WUD_REGISTRY_GHCR_{REGISTRY_NAME}_TOKEN	white_circle	Github token	Github password or Github Personal Token	
+#          WUD_REGISTRY_GITEA_{REGISTRY_NAME}_URL	red_circle	Registry URL (e.g. https://gitea.acme.com)		
+#          WUD_REGISTRY_GITEA_{REGISTRY_NAME}_LOGIN	red_circle	Gitea username	WUD_REGISTRY_GITEA_{REGISTRY_NAME}_PASSWORD must be defined	
+#          WUD_REGISTRY_GITEA_{REGISTRY_NAME}_PASSWORD	red_circle	Gitea password	WUD_REGISTRY_GITEA_{REGISTRY_NAME}_LOGIN must be defined	
+#          WUD_REGISTRY_GITEA_{REGISTRY_NAME}_AUTH	white_circle	Htpasswd string (when htpasswd auth is enabled on the registry)
+#          WUD_REGISTRY_GITLAB_{REGISTRY_NAME}_AUTHURL	red_circle	Gitlab Authentication base url		https://gitlab.com
+#          WUD_REGISTRY_GITLAB_{REGISTRY_NAME}_TOKEN	red_circle	Gitlab Personal Access Token		
+#          WUD_REGISTRY_GITLAB_{REGISTRY_NAME}_URL	red_circle	Gitlab Registry base url		https://registry.gitlab.com
+#          WUD_REGISTRY_LSCR_{REGISTRY_NAME}_USERNAME	red_circle	Github username		
+#          WUD_REGISTRY_LSCR_{REGISTRY_NAME}_TOKEN	red_circle	Github token	Github password or Github Personal Token	
+#          WUD_REGISTRY_QUAY_{REGISTRY_NAME}_NAMESPACE	white_circle	Quay namespace		
+#          WUD_REGISTRY_QUAY_{REGISTRY_NAME}_ACCOUNT	white_circle	Quay account		
+#          WUD_REGISTRY_QUAY_{REGISTRY_NAME}_TOKEN	white_circle	Quay token
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: 'curl --fail http://localhost:3000/health || exit 1'
@@ -71,8 +100,8 @@
           traefik.http.routers.wud.middlewares: "{{ wud_hostname }}@docker"
           traefik.http.middlewares.wud.IPAllowList.sourcerange: "{{ wud_traefik_whitelist }}"
           traefik.http.services.wud.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$$'
-          wud.link.template: "https://github.com/getwud/wud/releases/tag/$${major}.$${minor}.$${patch}"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.link.template: "https://github.com/getwud/wud/releases/tag/${major}.${minor}.${patch}"
         cpu_shares: "{{ wud_cpu_shares }}"
         memory: "{{ wud_memory }}"
         restart_policy: unless-stopped

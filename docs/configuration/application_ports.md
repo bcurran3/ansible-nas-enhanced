@@ -90,6 +90,9 @@ By default, applications can be found on the ports listed below.
 | Flexget          | 3539
 | Focalboard       | 3047    | Bridge  | HTTP           |
 | FreshRSS         | 8089    | Bridge  | HTTP           |
+| Frigate          | 8971    | Bridge  | HTTPS          |
+| Frigate          | 8554    | Bridge  | RTSP           |
+| Frigate          | 8555    | Bridge  | WebRTC         |
 | GameVault        | 5082    | Bridge  | HTTP           |
 | Gameyfin         | 8099
 | Gaseous Server   | 5198

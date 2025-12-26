@@ -1,5 +1,5 @@
 ---
-- name: Check if Watchtower config file exists
+- name: Check if Docker config.json file exists
   ansible.builtin.stat:
     path: "{{ watchtower_docker_config }}"
   register: docker_config_stat
@@ -14,26 +14,25 @@
         image: "{{ watchtower_image_name }}:{{ watchtower_image_version }}"
         pull: true
         ports:
-            - "{{ watchtower_port_http }}:8080"                             # added
+            - "{{ watchtower_port_api }}:8080"
         volumes: "{{ 
                   ['/var/run/docker.sock:/var/run/docker.sock'] + 
                   ([watchtower_docker_config ~ ':/config.json:ro'] if docker_config_stat.stat.exists else []) 
                 }}"
         env:
-#          DOCKER_API_VERSION: "{{ watchtower_docker_api_version }}"
+#         DOCKER_API_VERSION: "{{ watchtower_docker_api_version }}"
           WATCHTOWER_CLEANUP: "{{ watchtower_cleanup }}"
-          WATCHTOWER_LABEL_ENABLE: "true"
-          WATCHTOWER_LABEL_TAKE_PRECEDENCE: "true"
+          WATCHTOWER_LABEL_ENABLE: "{{ watchtower_label_enable }}"
+          WATCHTOWER_LABEL_TAKE_PRECEDENCE: "{{ watchtower_label_take_precedence }}"
           WATCHTOWER_REMOVE_VOLUMES: "{{ watchtower_remove_volumes }}"
           WATCHTOWER_DEBUG: "{{ watchtower_debug }}"
-          WATCHTOWER_HTTP_API_TOKEN: "{{ watchtower_api_token }}"           # added
-          WATCHTOWER_HTTP_API_METRICS: "true"              # added
-          WATCHTOWER_HTTP_API_PORT: "{{ watchtower_port_http }}"
-#         WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"       # added
+          WATCHTOWER_HTTP_API_TOKEN: "{{ watchtower_api_token }}"
+          WATCHTOWER_HTTP_API_METRICS: "{{ watchtower_http_api_metrics }}"
+          WATCHTOWER_HTTP_API_PORT: "{{ watchtower_port_api }}"
+#         WATCHTOWER_HTTP_API_PERIODIC_POLLS: "true"
           WATCHTOWER_INCLUDE_STOPPED: "{{ watchtower_include_stopped }}"
           WATCHTOWER_REVIVE_STOPPED: "{{ watchtower_revive_stopped }}"
 #         WATCHTOWER_POLL_INTERVAL: "{{ watchtower_poll_interval }}"
-          WATCHTOWER_enable: "{{ watchtower_enable }}"
           WATCHTOWER_NO_RESTART: "{{ watchtower_no_restart }}"
           WATCHTOWER_NO_PULL: "{{ watchtower_no_pull }}"
           WATCHTOWER_ROLLING_RESTART: "{{ watchtower_rolling_restart }}"
@@ -66,15 +65,13 @@
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ watchtower_homepage_group }}"
           homepage.icon: "{{ watchtower_homepage_icon }}"
-#         homepage.href: "{{ watchtower_homepage_href }}"
-#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port_http }}"
           homepage.description: "{{ 'A process for automating Docker container base image updates.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ watchtower_container_name }}"
           homepage.showStats: "{{ watchtower_homepage_showstats }}"
-#         homepage.widget.type: "watchtower"
-#         homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port_http }}"
-#         homepage.widget.key: "{{ watchtower_api_token }}"
+          homepage.widget.type: "watchtower"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port_api }}"
+          homepage.widget.key: "{{ watchtower_api_token }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
