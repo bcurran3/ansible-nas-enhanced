@@ -360,18 +360,14 @@ fi
 
 # Copy template for new app role development
 if [[ "$1" = "--newapp" || "$1" = "-newapp" ]]; then
-    if [[ -z "$2" ]]; then
-        echo "  ** ERROR: Please specify a name for the new app."
-        echo "  ** Usage: ./ane.sh --newapp <app_name>"
-        exit 1
-    fi
-    NEW_APP_PATH="roles/$2"
-    if [[ -d "$NEW_APP_PATH" ]]; then
-        echo "  ** ERROR: Role '$2' already exists at $NEW_APP_PATH"
-        exit 1
-    fi
-    cp -r roles/template "$NEW_APP_PATH"
-    echo "  ** Success: New app role created at $NEW_APP_PATH"
+    if [[ -z "$2" ]]; then echo "  ** ERROR: Specify app name."; exit 1; fi
+    NEW_APP_CLEAN="${2//-/_}"
+    TARGET="roles/$2"
+    if [[ -d "$TARGET" ]]; then echo "  ** ERROR: Exists."; exit 1; fi
+    cp -r roles/template "$TARGET"
+    find "$TARGET" -type f -exec sed -i "s/appname_/${NEW_APP_CLEAN}_/g" {} +
+    find "$TARGET" -name "appname_*" | while read file; do mv "$file" "${file//appname_/${NEW_APP_CLEAN}_}"; done
+    echo "  ** Role '$2' created."
     exit
 fi
 
