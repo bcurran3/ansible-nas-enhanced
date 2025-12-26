@@ -216,8 +216,8 @@ By default, applications can be found on the ports listed below.
 | ownCloud Server  | 3034
 | Paperless_ng     | 16922   | Bridge  | HTTP           |
 | PatchPanda       | 5093
-| Peppermint       | 3021
-| Peppermint       | 5003
+| Peppermint       | 3021   | Bridge   | HTTP           |
+| Peppermint       | 5003   | Bridge   |                |
 | phpBB            | 9003    | Bridge  | HTTP           |
 | Pi-hole          | 8888
 | Pi-hole          | 53

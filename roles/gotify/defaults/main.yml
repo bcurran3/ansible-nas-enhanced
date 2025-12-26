@@ -26,12 +26,12 @@ gotify_memory: "256M"
 
 # app
 # https://gotify.net/docs/config
-gotify_env_gotify_server_cors_alloworigins: "[.+.{{ ansible_nas_domain }}]" # [.+.example\.com, otherdomain\.com]
-gotify_env_gotify_server_cors_allowmethods: "[GET, POST]"
-gotify_env_gotify_server_cors_allowheaders: "" # [X-Gotify-Key, Authorization]
+gotify_env_gotify_server_cors_alloworigins: '["*"]' # "[.+.{{ ansible_nas_domain }},{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port_http }}]" # [.+.example\.com, otherdomain\.com]
+gotify_env_gotify_server_cors_allowmethods: "[GET, POST, OPTIONS, DELETE, PUT]"
+gotify_env_gotify_server_cors_allowheaders: "[X-Gotify-Key, Authorization, Content-Type]" # [X-Gotify-Key, Authorization]
 gotify_env_gotify_server_responseheaders: "" # {X-Custom-Header: "custom value", x-other: value}
-gotify_env_gotify_server_stream_alloworigins: "[.+.{{ ansible_nas_domain }}]" # [.+.example\.com, otherdomain\.com]
-gotify_env_gotify_server_trustedproxies: "[127.0.0.1,{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}]" # [127.0.0.1,192.168.178.2/24]
+gotify_env_gotify_server_stream_alloworigins: '["*"]' # '["localhost", ".+\\.{{ ansible_nas_domain | replace(".", "\\.") }}"]' # [.+.example\.com, otherdomain\.com]
+gotify_env_gotify_server_trustedproxies: "[127.0.0.1, 172.16.0.0/12, {{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ansible.utils.ipaddr('net') }}]" # [127.0.0.1,192.168.178.2/24]
 
 # autoheal
 gotify_autoheal: "false"
