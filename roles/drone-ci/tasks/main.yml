@@ -4,7 +4,7 @@
     - name: Check for Gitea installation
       ansible.builtin.debug:
         msg: "Drone-CI requires Gitea enabled and running for authentication, please set that up first."
-      when: gitea_enabled is drone_ci_runner
+      when: gitea_enabled is true
 
     - name: Check for Gitea config
       ansible.builtin.debug:
@@ -130,7 +130,7 @@
               SKIP_TLS_VERIFY=true
           notify: restart gitea
       when:
-        - gitea_enabled == drone_ci_runner
+        - gitea_enabled is true
         - drone_ci_gitea_client_id != "notset"
   when: drone_ci_enabled is true
 
