@@ -53,9 +53,9 @@
           traefik.http.routers.pornvault.middlewares: "{{ pornvault_hostname }}@docker"
           traefik.http.middlewares.pornvault.IPAllowList.sourcerange: "{{ pornvault_traefik_whitelist }}"
           traefik.http.services.pornvault.loadbalancer.server.port: "3000"
-          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/boi12321/porn-vault"
+          wud.watch.digest: "true"
+          wud.tag.include: ^alpine-edge$
+          wud.link.template: https://gitlab.com/porn-vault/porn-vault/-/commits/master
         cpu_shares: "{{ pornvault_cpu_shares }}"
         memory: "{{ pornvault_memory }}"
         restart_policy: unless-stopped
