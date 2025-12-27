@@ -64,8 +64,7 @@
           traefik.http.routers.guacamole.tls.certresolver: "letsencrypt"
           traefik.http.routers.guacamole.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.guacamole.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ guacamole_hostname }}"
-          traefik.http.routers.guacamole.middlewares: "{{ guacamole_hostname }}@docker"
+          traefik.http.routers.guacamole.middlewares: "guacamole@docker{{ ',tinyauth-auth@docker' if guacamole_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.guacamole.IPAllowList.sourcerange: "{{ guacamole_traefik_whitelist }}"
           traefik.http.services.guacamole.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

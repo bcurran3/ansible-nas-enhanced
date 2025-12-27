@@ -146,7 +146,7 @@
           traefik.http.routers.dockflare.tls.certresolver: "letsencrypt"
           traefik.http.routers.dockflare.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dockflare.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.dockflare.middlewares: "{{ dockflare_hostname }}@docker{{ ',tinyauth-auth@docker' if dockflare_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.dockflare.middlewares: "dockflare@docker{{ ',tinyauth-auth@docker' if dockflare_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dockflare.IPAllowList.sourcerange: "{{ dockflare_traefik_whitelist }}"
           traefik.http.services.dockflare.loadbalancer.server.port: "5000"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

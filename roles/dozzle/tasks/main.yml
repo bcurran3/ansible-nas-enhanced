@@ -42,7 +42,7 @@
           traefik.http.routers.dozzle.tls.certresolver: "letsencrypt"
           traefik.http.routers.dozzle.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dozzle.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.dozzle.middlewares: "{{ dozzle_hostname }}@docker{{ ',tinyauth-auth@docker' if dozzle_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.dozzle.middlewares: "dozzle@docker{{ ',tinyauth-auth@docker' if dozzle_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dozzle.IPAllowList.sourcerange: "{{ dozzle_traefik_whitelist }}"
           traefik.http.services.dozzle.loadbalancer.server.port: "8080"
           wud.tag.include: '^\\d+\\.\\d+\\.\\d+$'

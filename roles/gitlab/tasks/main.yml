@@ -75,8 +75,7 @@
           traefik.http.routers.gitlab.tls.certresolver: "letsencrypt"
           traefik.http.routers.gitlab.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gitlab.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ gitlab_hostname }}"
-          traefik.http.routers.gitlab.middlewares: "{{ gitlab_hostname }}@docker"
+          traefik.http.routers.gitlab.middlewares: "gitlab@docker{{ ',tinyauth-auth@docker' if gitlab_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.gitlab.IPAllowList.sourcerange: "{{ gitlab_traefik_whitelist }}"
           traefik.http.services.gitlab.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

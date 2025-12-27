@@ -68,8 +68,7 @@
           traefik.http.routers.duplicati.tls.certresolver: "letsencrypt"
           traefik.http.routers.duplicati.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.duplicati.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ duplicati_hostname }}"
-          traefik.http.routers.duplicati.middlewares: "{{ duplicati_hostname }}@docker"
+          traefik.http.routers.duplicati.middlewares: "duplicati@docker{{ ',tinyauth-auth@docker' if duplicati_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.duplicati.IPAllowList.sourcerange: "{{ duplicati_traefik_whitelist }}"
           traefik.http.services.duplicati.loadbalancer.server.port: "8200"
           wud.tag.include: '^version-\d+\.\d+\.\d+\.\d+$'

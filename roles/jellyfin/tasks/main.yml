@@ -82,7 +82,7 @@
           traefik.http.routers.jellyfin.tls.certresolver: "letsencrypt"
           traefik.http.routers.jellyfin.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.jellyfin.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.jellyfin.middlewares: "{{ jellyfin_hostname }}@docker{{ ',tinyauth-auth@docker' if jellyfin_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.jellyfin.middlewares: "jellyfin@docker{{ ',tinyauth-auth@docker' if jellyfin_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.jellyfin.IPAllowList.sourcerange: "{{ jellyfin_traefik_whitelist }}"
           traefik.http.services.jellyfin.loadbalancer.server.port: "8096"
           wud.tag.include: '^version-\d+\.\d+\.\d+$'

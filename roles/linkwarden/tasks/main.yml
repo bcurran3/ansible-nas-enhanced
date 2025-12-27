@@ -139,8 +139,7 @@
           traefik.http.routers.linkwarden.tls.certresolver: "letsencrypt"
           traefik.http.routers.linkwarden.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.linkwarden.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ linkwarden_hostname }}"
-          traefik.http.routers.linkwarden.middlewares: "{{ linkwarden_hostname }}@docker"
+          traefik.http.routers.linkwarden.middlewares: "linkwarden@docker{{ ',tinyauth-auth@docker' if linkwarden_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.linkwarden.IPAllowList.sourcerange: "{{ linkwarden_traefik_whitelist }}"
           traefik.http.services.linkwarden.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

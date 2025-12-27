@@ -52,7 +52,7 @@
           traefik.http.routers.glances.tls.certresolver: "letsencrypt"
           traefik.http.routers.glances.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.glances.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.glances.middlewares: "{{ glances_hostname }}@docker{{ ',tinyauth-auth@docker' if glances_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.glances.middlewares: "glances@docker{{ ',tinyauth-auth@docker' if glances_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.glances.IPAllowList.sourcerange: "{{ glances_traefik_whitelist }}"
           traefik.http.services.glances.loadbalancer.server.port: "61208"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

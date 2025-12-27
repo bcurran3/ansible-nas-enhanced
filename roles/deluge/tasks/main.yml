@@ -63,8 +63,7 @@
           traefik.http.routers.deluge.tls.certresolver: "letsencrypt"
           traefik.http.routers.deluge.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.deluge.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ deluge_hostname }}"
-          traefik.http.routers.deluge.middlewares: "{{ deluge_hostname }}@docker"
+          traefik.http.routers.deluge.middlewares: "deluge@docker{{ ',tinyauth-auth@docker' if deluge_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.deluge.IPAllowList.sourcerange: "{{ deluge_traefik_whitelist }}"
           traefik.http.services.deluge.loadbalancer.server.port: "8112"
           wud.tag.include: '^version-\d+\.\d+\.\d+$'

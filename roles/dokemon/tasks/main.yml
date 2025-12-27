@@ -49,8 +49,7 @@
           traefik.http.routers.dokemon.tls.certresolver: "letsencrypt"
           traefik.http.routers.dokemon.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dokemon.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ dokemon_hostname }}"
-          traefik.http.routers.dokemon.middlewares: "{{ dokemon_hostname }}@docker"
+          traefik.http.routers.dokemon.middlewares: "dokemon@docker{{ ',tinyauth-auth@docker' if dokemon_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dokemon.IPAllowList.sourcerange: "{{ dokemon_traefik_whitelist }}"
           traefik.http.services.dokemon.loadbalancer.server.port: "9090"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

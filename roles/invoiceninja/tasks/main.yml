@@ -210,7 +210,7 @@
           repliqate.backup_id: "{{ invoiceninja_web_repliqate_backup_id }}"
           repliqate.retention: "{{ invoiceninja_web_repliqate_retention }}"
           traefik.enable: "{{ invoiceninja_available_externally | string }}"
-          traefik.http.routers.invoiceninja.rule: "Host(`invoiceninja.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.invoiceninja.rule: "Host(`{{ invoiceninja_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.invoiceninja.tls.certresolver: "letsencrypt"
           traefik.http.routers.invoiceninja.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.invoiceninja.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"

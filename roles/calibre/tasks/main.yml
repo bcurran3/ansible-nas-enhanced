@@ -71,8 +71,7 @@
           traefik.http.routers.calibre.tls.certresolver: "letsencrypt"
           traefik.http.routers.calibre.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.calibre.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ calibre_hostname }}"
-          traefik.http.routers.calibre.middlewares: "{{ calibre_hostname }}@docker"
+          traefik.http.routers.calibre.middlewares: "calibre@docker{{ ',tinyauth-auth@docker' if calibre_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.calibre.IPAllowList.sourcerange: "{{ calibre_traefik_whitelist }}"
           traefik.http.services.calibre.loadbalancer.server.port: "{{ calibre_port_https }}"
           wud.tag.include: '^version-\d+\.\d+\.\d+$'

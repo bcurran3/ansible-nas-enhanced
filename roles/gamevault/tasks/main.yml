@@ -106,7 +106,7 @@
           traefik.http.routers.gamevault.tls.certresolver: "letsencrypt"
           traefik.http.routers.gamevault.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gamevault.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.gamevault.middlewares: "{{ gamevault_hostname }}@docker{{ ',tinyauth-auth@docker' if gamevault_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.gamevault.middlewares: "gamevault@docker{{ ',tinyauth-auth@docker' if gamevault_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.gamevault.IPAllowList.sourcerange: "{{ gamevault_traefik_whitelist }}"
           traefik.http.services.gamevault.loadbalancer.server.port: "8080"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

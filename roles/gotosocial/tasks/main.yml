@@ -58,8 +58,7 @@
           traefik.http.routers.gotosocial.tls.certresolver: "letsencrypt"
           traefik.http.routers.gotosocial.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gotosocial.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ gotosocial_hostname }}"
-          traefik.http.routers.gotosocial.middlewares: "{{ gotosocial_hostname }}@docker"
+          traefik.http.routers.gotosocial.middlewares: "gotosocial@docker{{ ',tinyauth-auth@docker' if gotosocial_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.gotosocial.IPAllowList.sourcerange: "{{ gotosocial_traefik_whitelist }}"
           traefik.http.services.gotosocial.loadbalancer.server.port: "8080"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

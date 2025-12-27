@@ -58,11 +58,11 @@
           repliqate.backup_id: "{{ arcane_repliqate_backup_id }}"
           repliqate.retention: "{{ arcane_repliqate_retention }}"
           traefik.enable: "{{ arcane_available_externally | string }}"
-          traefik.http.routers.arcane.rule: "Host(`arcane.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.arcane.rule: "Host(`{{ arcane_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.arcane.tls.certresolver: "letsencrypt"
           traefik.http.routers.arcane.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.arcane.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.arcane.middlewares: "{{ arcane_hostname }}@docker{{ ',tinyauth-auth@docker' if arcane_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.arcane.middlewares: "arcane@docker{{ ',tinyauth-auth@docker' if arcane_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.arcane.IPAllowList.sourcerange: "{{ arcane_traefik_whitelist }}"
           traefik.http.services.arcane.loadbalancer.server.port: "{{ arcane_port_http }}"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

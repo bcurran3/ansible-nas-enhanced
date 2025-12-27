@@ -57,11 +57,11 @@
           repliqate.backup_id: "{{ homepage_repliqate_backup_id }}"
           repliqate.retention: "{{ homepage_repliqate_retention }}"
           traefik.enable: "{{ homepage_available_externally | string }}"
-          traefik.http.routers.homepage.rule: "Host(`homepage.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.homepage.rule: "Host(`{{ homepage_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.homepage.tls.certresolver: "letsencrypt"
           traefik.http.routers.homepage.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.homepage.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.homepage.middlewares: "{{ homepage_hostname }}@docker{{ ',tinyauth-auth@docker' if homepage_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.homepage.middlewares: "homepage@docker{{ ',tinyauth-auth@docker' if homepage_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.homepage.IPAllowList.sourcerange: "{{ homepage_traefik_whitelist }}"
           traefik.http.services.homepage.loadbalancer.server.port: "3000"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

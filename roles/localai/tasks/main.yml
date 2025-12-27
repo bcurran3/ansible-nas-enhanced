@@ -58,7 +58,7 @@
           traefik.http.routers.localai.tls.certresolver: "letsencrypt"
           traefik.http.routers.localai.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.localai.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.localai.middlewares: "{{ localai_hostname }}@docker{{ ',tinyauth-auth@docker' if localai_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.localai.middlewares: "localai@docker{{ ',tinyauth-auth@docker' if localai_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.localai.IPAllowList.sourcerange: "{{ localai_traefik_whitelist }}"
           traefik.http.services.localai.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

@@ -120,8 +120,7 @@
           traefik.http.routers.firefly.tls.certresolver: "letsencrypt"
           traefik.http.routers.firefly.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.firefly.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ firefly_hostname }}"
-          traefik.http.routers.firefly.middlewares: "{{ firefly_hostname }}@docker"
+          traefik.http.routers.firefly.middlewares: "firefly@docker{{ ',tinyauth-auth@docker' if firefly_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.firefly.IPAllowList.sourcerange: "{{ firefly_traefik_whitelist }}"
           traefik.http.services.firefly.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

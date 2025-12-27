@@ -56,8 +56,7 @@
           traefik.http.routers.jackett.tls.certresolver: "letsencrypt"
           traefik.http.routers.jackett.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.jackett.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ jackett_hostname }}"
-          traefik.http.routers.jackett.middlewares: "{{ jackett_hostname }}@docker"
+          traefik.http.routers.jackett.middlewares: "jackett@docker{{ ',tinyauth-auth@docker' if jackett_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.jackett.IPAllowList.sourcerange: "{{ jackett_traefik_whitelist }}"
           traefik.http.services.jackett.loadbalancer.server.port: "9117"
           wud.tag.include: '^\d+\.\d+\.\d+$'

@@ -102,8 +102,7 @@
           traefik.http.routers.bitmagnet.tls.certresolver: "letsencrypt"
           traefik.http.routers.bitmagnet.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.bitmagnet.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ bitmagnet_hostname }}"
-          traefik.http.routers.bitmagnet.middlewares: "{{ bitmagnet_hostname }}@docker"
+          traefik.http.routers.bitmagnet.middlewares: "bitmagnet@docker{{ ',tinyauth-auth@docker' if bitmagnet_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.bitmagnet.IPAllowList.sourcerange: "{{ bitmagnet_traefik_whitelist }}"
           traefik.http.services.bitmagnet.loadbalancer.server.port: "3333"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

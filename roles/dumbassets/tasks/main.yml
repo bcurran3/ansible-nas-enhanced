@@ -57,8 +57,7 @@
           traefik.http.routers.dumbassets.tls.certresolver: "letsencrypt"
           traefik.http.routers.dumbassets.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dumbassets.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ dumbassets_hostname }}"
-          traefik.http.routers.dumbassets.middlewares: "{{ dumbassets_hostname }}@docker"
+          traefik.http.routers.dumbassets.middlewares: "dumbassets@docker{{ ',tinyauth-auth@docker' if dumbassets_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dumbassets.IPAllowList.sourcerange: "{{ dumbassets_traefik_whitelist }}"
           traefik.http.services.dumbassets.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

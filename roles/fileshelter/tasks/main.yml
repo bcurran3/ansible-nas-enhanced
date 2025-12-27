@@ -52,8 +52,7 @@
           traefik.http.routers.fileshelter.tls.certresolver: "letsencrypt"
           traefik.http.routers.fileshelter.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.fileshelter.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ fileshelter_hostname }}"
-          traefik.http.routers.fileshelter.middlewares: "{{ fileshelter_hostname }}@docker"
+          traefik.http.routers.fileshelter.middlewares: "fileshelter@docker{{ ',tinyauth-auth@docker' if fileshelter_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.fileshelter.IPAllowList.sourcerange: "{{ fileshelter_traefik_whitelist }}"
           traefik.http.services.fileshelter.loadbalancer.server.port: "5091"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

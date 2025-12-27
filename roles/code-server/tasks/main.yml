@@ -64,7 +64,7 @@
           traefik.http.routers.codeserver.tls.certresolver: "letsencrypt"
           traefik.http.routers.codeserver.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.codeserver.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.codeserver.middlewares: "{{ code_server_hostname }}@docker{{ ',tinyauth-auth@docker' if code_server_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.codeserver.middlewares: "codeserver@docker{{ ',tinyauth-auth@docker' if code_server_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.codeserver.IPAllowList.sourcerange: "{{ code_server_traefik_whitelist }}"
           traefik.http.services.codeserver.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

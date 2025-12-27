@@ -49,8 +49,7 @@
           traefik.http.routers.beszel.tls.certresolver: "letsencrypt"
           traefik.http.routers.beszel.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.beszel.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ beszel_hostname }}"
-          traefik.http.routers.beszel.middlewares: "{{ beszel_hostname }}@docker"
+          traefik.http.routers.beszel.middlewares: "beszel@docker{{ ',tinyauth-auth@docker' if beszel_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.beszel.IPAllowList.sourcerange: "{{ beszel_traefik_whitelist }}"
           traefik.http.services.beszel.loadbalancer.server.port: "8090"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

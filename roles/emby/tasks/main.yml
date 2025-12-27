@@ -72,8 +72,7 @@
           traefik.http.routers.emby.tls.certresolver: "letsencrypt"
           traefik.http.routers.emby.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.emby.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ emby_hostname }}"
-          traefik.http.routers.emby.middlewares: "{{ emby_hostname }}@docker"
+          traefik.http.routers.emby.middlewares: "emby@docker{{ ',tinyauth-auth@docker' if emby_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.emby.IPAllowList.sourcerange: "{{ emby_traefik_whitelist }}"
           traefik.http.services.emby.loadbalancer.server.port: "8096"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

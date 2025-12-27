@@ -76,8 +76,7 @@
           traefik.http.routers.frigate.tls.certresolver: "letsencrypt"
           traefik.http.routers.frigate.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.frigate.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ frigate_hostname }}"
-          traefik.http.routers.frigate.middlewares: "{{ frigate_hostname }}@docker"
+          traefik.http.routers.frigate.middlewares: "frigate@docker{{ ',tinyauth-auth@docker' if frigate_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.frigate.IPAllowList.sourcerange: "{{ frigate_traefik_whitelist }}"
           traefik.http.services.frigate.loadbalancer.server.port: "8971"
           wud.tag.include: ^\d+\.\d+\.\d+$

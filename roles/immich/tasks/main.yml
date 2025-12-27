@@ -214,8 +214,7 @@
           traefik.http.routers.immich.tls.certresolver: "letsencrypt"
           traefik.http.routers.immich.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.immich.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ immich_hostname }}"
-          traefik.http.routers.immich.middlewares: "{{ immich_hostname }}@docker"
+          traefik.http.routers.immich.middlewares: "immich@docker{{ ',tinyauth-auth@docker' if immich_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.immich.IPAllowList.sourcerange: "{{ immich_traefik_whitelist }}"
           traefik.http.services.immich.loadbalancer.server.port: "2283"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

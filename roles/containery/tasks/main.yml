@@ -51,8 +51,7 @@
           traefik.http.routers.containery.tls.certresolver: "letsencrypt"
           traefik.http.routers.containery.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.containery.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ containery_hostname }}"
-          traefik.http.routers.containery.middlewares: "{{ containery_hostname }}@docker"
+          traefik.http.routers.containery.middlewares: "containery@docker{{ ',tinyauth-auth@docker' if containery_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.containery.IPAllowList.sourcerange: "{{ containery_traefik_whitelist }}"
           traefik.http.services.containery.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

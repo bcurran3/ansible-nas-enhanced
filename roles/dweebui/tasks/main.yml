@@ -51,8 +51,7 @@
           traefik.http.routers.dweebui.tls.certresolver: "letsencrypt"
           traefik.http.routers.dweebui.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dweebui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ dweebui_hostname }}"
-          traefik.http.routers.dweebui.middlewares: "{{ dweebui_hostname }}@docker"
+          traefik.http.routers.dweebui.middlewares: "dweebui@docker{{ ',tinyauth-auth@docker' if dweebui_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dweebui.IPAllowList.sourcerange: "{{ dweebui_traefik_whitelist }}"
           traefik.http.services.dweebui.loadbalancer.server.port: "{{ dweebui_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

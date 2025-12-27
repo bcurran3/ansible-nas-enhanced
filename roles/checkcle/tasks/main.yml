@@ -52,8 +52,7 @@
           traefik.http.routers.checkcle.tls.certresolver: "letsencrypt"
           traefik.http.routers.checkcle.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.checkcle.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ checkcle_hostname }}"
-          traefik.http.routers.checkcle.middlewares: "{{ checkcle_hostname }}@docker"
+          traefik.http.routers.checkcle.middlewares: "checkcle@docker{{ ',tinyauth-auth@docker' if checkcle_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.checkcle.IPAllowList.sourcerange: "{{ checkcle_traefik_whitelist }}"
           traefik.http.services.checkcle.loadbalancer.server.port: "8090"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

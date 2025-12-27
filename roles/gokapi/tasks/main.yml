@@ -50,8 +50,7 @@
           traefik.http.routers.gokapi.tls.certresolver: "letsencrypt"
           traefik.http.routers.gokapi.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gokapi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ gokapi_hostname }}"
-          traefik.http.routers.gokapi.middlewares: "{{ gokapi_hostname }}@docker"
+          traefik.http.routers.gokapi.middlewares: "gokapi@docker{{ ',tinyauth-auth@docker' if gokapi_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.gokapi.IPAllowList.sourcerange: "{{ gokapi_traefik_whitelist }}"
           traefik.http.services.gokapi.loadbalancer.server.port: "53842"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

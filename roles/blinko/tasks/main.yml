@@ -111,8 +111,7 @@
           traefik.http.routers.blinko.tls.certresolver: "letsencrypt"
           traefik.http.routers.blinko.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.blinko.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ blinko_hostname }}"
-          traefik.http.routers.blinko.middlewares: "{{ blinko_hostname }}@docker"
+          traefik.http.routers.blinko.middlewares: "blinko@docker{{ ',tinyauth-auth@docker' if blinko_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.blinko.IPAllowList.sourcerange: "{{ blinko_traefik_whitelist }}"
           traefik.http.services.blinko.loadbalancer.server.port: "1111"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

@@ -107,7 +107,7 @@
           traefik.http.routers.adguardhome.tls.certresolver: "letsencrypt"
           traefik.http.routers.adguardhome.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.adguardhome.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.adguardhome.middlewares: "{{ adguardhome_hostname }}@docker{{ ',tinyauth-auth@docker' if adguardhome_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.adguardhome.middlewares: "adguardhome@docker{{ ',tinyauth-auth@docker' if adguardhome_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.adguardhome.IPAllowList.sourcerange: "{{ adguardhome_traefik_whitelist }}"
           traefik.http.services.adguardhome.loadbalancer.server.port: "80"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

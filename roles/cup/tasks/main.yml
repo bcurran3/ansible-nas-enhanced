@@ -63,8 +63,7 @@
           traefik.http.routers.cup.tls.certresolver: "letsencrypt"
           traefik.http.routers.cup.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.cup.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ cup_hostname }}"
-          traefik.http.routers.cup.middlewares: "{{ cup_hostname }}@docker"
+          traefik.http.routers.cup.middlewares: "cup@docker{{ ',tinyauth-auth@docker' if cup_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.cup.IPAllowList.sourcerange: "{{ cup_traefik_whitelist }}"
           traefik.http.services.cup.loadbalancer.server.port: "{{ cup_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

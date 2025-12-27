@@ -70,7 +70,6 @@
           traefik.http.routers.kasm.tls.certresolver: "letsencrypt"
           traefik.http.routers.kasm.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.kasm.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ kasm_hostname }}"
 #         traefik.http.routers.kasm.middlewares: "{{ kasm_hostname }}@docker"
           traefik.http.routers.kasm.middlewares: "kasm-headers"
           traefik.http.middlewares.kasm-headers.headers.customrequestheaders.X-Forwarded-Proto: "https"

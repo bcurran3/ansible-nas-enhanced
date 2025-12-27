@@ -50,8 +50,7 @@
           traefik.http.routers.fasten.tls.certresolver: "letsencrypt"
           traefik.http.routers.fasten.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.fasten.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ fasten_hostname }}"
-          traefik.http.routers.fasten.middlewares: "{{ fasten_hostname }}@docker"
+          traefik.http.routers.fasten.middlewares: "fasten@docker{{ ',tinyauth-auth@docker' if fasten_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.fasten.IPAllowList.sourcerange: "{{ fasten_traefik_whitelist }}"
           traefik.http.services.fasten.loadbalancer.server.port: "8080"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

@@ -57,7 +57,7 @@
           traefik.http.routers.dockman.tls.certresolver: "letsencrypt"
           traefik.http.routers.dockman.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dockman.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.dockman.middlewares: "{{ dockman_hostname }}@docker{{ ',tinyauth-auth@docker' if dockman_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.dockman.middlewares: "dockman@docker{{ ',tinyauth-auth@docker' if dockman_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dockman.IPAllowList.sourcerange: "{{ dockman_traefik_whitelist }}"
           traefik.http.services.dockman.loadbalancer.server.port: "{{ dockman_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

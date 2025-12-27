@@ -52,8 +52,7 @@
           traefik.http.routers.dockerandroid.tls.certresolver: "letsencrypt"
           traefik.http.routers.dockerandroid.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dockerandroid.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ dockerandroid_hostname }}"
-          traefik.http.routers.dockerandroid.middlewares: "{{ dockerandroid_hostname }}@docker"
+          traefik.http.routers.dockerandroid.middlewares: "dockerandroid@docker{{ ',tinyauth-auth@docker' if dockerandroid_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dockerandroid.IPAllowList.sourcerange: "{{ dockerandroid_traefik_whitelist }}"
           traefik.http.services.dockerandroid.loadbalancer.server.port: "6080"
           wud.tag.include: '^\d+\.\d+.*$'

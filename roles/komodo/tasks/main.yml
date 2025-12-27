@@ -182,8 +182,7 @@
           traefik.http.routers.komodo.tls.certresolver: "letsencrypt"
           traefik.http.routers.komodo.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.komodo.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ komodo_hostname }}"
-          traefik.http.routers.komodo.middlewares: "{{ komodo_hostname }}@docker"
+          traefik.http.routers.komodo.middlewares: "komodo@docker{{ ',tinyauth-auth@docker' if komodo_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.komodo.IPAllowList.sourcerange: "{{ komodo_traefik_whitelist }}"
           traefik.http.services.komodo.loadbalancer.server.port: "9120"
           wud.tag.include: '^\d+\.\d+\.\d+$'

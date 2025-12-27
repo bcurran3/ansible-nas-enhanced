@@ -132,8 +132,7 @@
           traefik.http.routers.koel.tls.certresolver: "letsencrypt"
           traefik.http.routers.koel.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.koel.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ koel_hostname }}"
-          traefik.http.routers.koel.middlewares: "{{ koel_hostname }}@docker"
+          traefik.http.routers.koel.middlewares: "koel@docker{{ ',tinyauth-auth@docker' if koel_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.koel.IPAllowList.sourcerange: "{{ koel_traefik_whitelist }}"
           traefik.http.services.koel.loadbalancer.server.port: "80"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

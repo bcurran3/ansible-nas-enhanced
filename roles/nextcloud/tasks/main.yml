@@ -82,7 +82,8 @@
         network_mode: "{{ nextcloud_network_name }}"
         pull: true
         volumes:
-          - "{{ nextcloud_data_directory }}/db:/var/lib/mysql"
+          - "{{ nextcloud_data_directory }}/db/my.cnf:/etc/my.cnf"
+          - "{{ nextcloud_data_directory }}/db/mysql:/var/lib/mysql"
         env:
           MYSQL_DATABASE: "{{ nextcloud_db_database }}"
           MYSQL_USER: "{{ nextcloud_db_user }}"

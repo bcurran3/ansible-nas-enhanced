@@ -56,9 +56,8 @@
           traefik.http.routers.filebrowser.tls.certresolver: "letsencrypt"
           traefik.http.routers.filebrowser.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.filebrowser.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ filebrowser_hostname }}"
-          traefik.http.routers.filebrowser.middlewares: "{{ filebrowser_hostname }}@docker"
-          traefik.http.middlewares.filebrowser.IPAllowList.sourcerange: "{{ filebrowser_traefik_whitelist }}"      
+          traefik.http.routers.filebrowser.middlewares: "filebrowser@docker{{ ',tinyauth-auth@docker' if filebrowser_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.filebrowser.IPAllowList.sourcerange: "{{ filebrowser_traefik_whitelist }}"
           traefik.http.services.filebrowser.loadbalancer.server.port: "80"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

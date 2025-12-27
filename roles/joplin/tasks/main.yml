@@ -104,7 +104,7 @@
           traefik.http.routers.joplin.tls.certresolver: "letsencrypt"
           traefik.http.routers.joplin.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.joplin.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.joplin.middlewares: "{{ joplin_hostname }}@docker{{ ',tinyauth-auth@docker' if joplin_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.joplin.middlewares: "joplin@docker{{ ',tinyauth-auth@docker' if joplin_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.joplin.IPAllowList.sourcerange: "{{ joplin_traefik_whitelist }}"
           traefik.http.services.joplin.loadbalancer.server.port: "22300"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

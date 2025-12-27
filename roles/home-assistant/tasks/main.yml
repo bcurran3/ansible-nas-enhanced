@@ -49,8 +49,7 @@
           traefik.http.routers.homeassistant.tls.certresolver: "letsencrypt"
           traefik.http.routers.homeassistant.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.homeassistant.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ homeassistant_hostname }}"
-          traefik.http.routers.homeassistant.middlewares: "{{ homeassistant_hostname }}@docker"
+          traefik.http.routers.homeassistant.middlewares: "homeassistant@docker{{ ',tinyauth-auth@docker' if homeassistant_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.homeassistant.IPAllowList.sourcerange: "{{ homeassistant_traefik_whitelist }}"
           traefik.http.services.homeassistant.loadbalancer.server.port: "8123"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

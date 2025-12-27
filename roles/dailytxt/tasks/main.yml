@@ -54,7 +54,7 @@
           traefik.http.routers.dailytxt.tls.certresolver: "letsencrypt"
           traefik.http.routers.dailytxt.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dailytxt.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.dailytxt.middlewares: "{{ dailytxt_hostname }}@docker{{ ',tinyauth-auth@docker' if dailytxt_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.dailytxt.middlewares: "dailytxt@docker{{ ',tinyauth-auth@docker' if dailytxt_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dailytxt.IPAllowList.sourcerange: "{{ dailytxt_traefik_whitelist }}"
           traefik.http.services.dailytxt.loadbalancer.server.port: "80"
           wud.watch.digest: "true"

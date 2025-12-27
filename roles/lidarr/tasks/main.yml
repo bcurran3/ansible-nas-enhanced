@@ -62,7 +62,7 @@
           traefik.http.routers.lidarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.lidarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.lidarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.lidarr.middlewares: "{{ lidarr_hostname }}@docker{{ ',tinyauth-auth@docker' if lidarr_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.lidarr.middlewares: "lidarr@docker{{ ',tinyauth-auth@docker' if lidarr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.lidarr.IPAllowList.sourcerange: "{{ lidarr_traefik_whitelist }}"
           traefik.http.services.lidarr.loadbalancer.server.port: "8686"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

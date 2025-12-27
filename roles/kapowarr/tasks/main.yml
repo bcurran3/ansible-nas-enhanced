@@ -50,8 +50,7 @@
           traefik.http.routers.kapowarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.kapowarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.kapowarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ kapowarr_hostname }}"
-          traefik.http.routers.kapowarr.middlewares: "{{ kapowarr_hostname }}@docker"
+          traefik.http.routers.kapowarr.middlewares: "kapowarr@docker{{ ',tinyauth-auth@docker' if kapowarr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.kapowarr.IPAllowList.sourcerange: "{{ kapowarr_traefik_whitelist }}"
           traefik.http.services.kapowarr.loadbalancer.server.port: "5656"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

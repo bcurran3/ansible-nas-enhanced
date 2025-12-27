@@ -107,7 +107,7 @@
           traefik.http.routers.gitea.tls.certresolver: "letsencrypt"
           traefik.http.routers.gitea.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gitea.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.gitea.middlewares: "{{ gitea_hostname }}@docker{{ ',tinyauth-auth@docker' if gitea_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.gitea.middlewares: "gitea@docker{{ ',tinyauth-auth@docker' if gitea_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.gitea.IPAllowList.sourcerange: "{{ gitea_traefik_whitelist }}"
           traefik.http.services.gitea.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

@@ -78,8 +78,7 @@
           traefik.http.routers.loki.tls.certresolver: "letsencrypt"
           traefik.http.routers.loki.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.loki.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ loki_hostname }}"
-          traefik.http.routers.loki.middlewares: "{{ loki_hostname }}@docker"
+          traefik.http.routers.loki.middlewares: "loki@docker{{ ',tinyauth-auth@docker' if loki_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.loki.IPAllowList.sourcerange: "{{ loki_traefik_whitelist }}"
           traefik.http.services.loki.loadbalancer.server.port: "3100"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

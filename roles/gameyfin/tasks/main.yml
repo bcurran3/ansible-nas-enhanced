@@ -60,8 +60,7 @@
           traefik.http.routers.gameyfin.tls.certresolver: "letsencrypt"
           traefik.http.routers.gameyfin.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gameyfin.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ gameyfin_hostname }}"
-          traefik.http.routers.gameyfin.middlewares: "{{ gameyfin_hostname }}@docker"
+          traefik.http.routers.gameyfin.middlewares: "gameyfin@docker{{ ',tinyauth-auth@docker' if gameyfin_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.gameyfin.IPAllowList.sourcerange: "{{ gameyfin_traefik_whitelist }}"
           traefik.http.services.gameyfin.loadbalancer.server.port: "8080"
           wud.tag.include: '^v\d+\.\d+\.\d+.*$'

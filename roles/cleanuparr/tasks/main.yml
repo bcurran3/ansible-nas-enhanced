@@ -50,8 +50,7 @@
           traefik.http.routers.cleanuparr.tls.certresolver: "letsencrypt"
           traefik.http.routers.cleanuparr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.cleanuparr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ cleanuparr_hostname }}"
-          traefik.http.routers.cleanuparr.middlewares: "{{ cleanuparr_hostname }}@docker"
+          traefik.http.routers.cleanuparr.middlewares: "cleanuparr@docker{{ ',tinyauth-auth@docker' if cleanuparr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.cleanuparr.IPAllowList.sourcerange: "{{ cleanuparr_traefik_whitelist }}"
           traefik.http.services.cleanuparr.loadbalancer.server.port: "11011"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

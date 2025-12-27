@@ -7,10 +7,10 @@
         state: directory
         # mode: 0755
       with_items:
-        - "{{ transmission_data_directory }}"
-        - "{{ transmission_data_directory }}/config"
-        - "{{ transmission_download_directory }}"
-        - "{{ transmission_watch_directory }}"
+        - "{{ transmission_openvpn_data_directory }}"
+        - "{{ transmission_openvpn_data_directory }}/config"
+        - "{{ transmission_openvpn_download_directory }}"
+        - "{{ transmission_openvpn_watch_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -19,9 +19,9 @@
         image: "{{ transmission_openvpn_image_name }}:{{ transmission_openvpn_image_version }}"
         pull: true
         volumes:
-          - "{{ transmission_data_directory }}//config:/config:rw"
-          - "{{ transmission_download_directory }}:/downloads:rw"
-          - "{{ transmission_watch_directory }}:/watch:rw"
+          - "{{ transmission_openvpn_data_directory }}//config:/config:rw"
+          - "{{ transmission_openvpn_download_directory }}:/downloads:rw"
+          - "{{ transmission_openvpn_watch_directory }}:/watch:rw"
           - "/etc/timezone:/etc/timezone:ro"
         ports:
           - "{{ transmission_openvpn_port_http }}:9091"

@@ -62,7 +62,7 @@
           traefik.http.routers.komga.tls.certresolver: "letsencrypt"
           traefik.http.routers.komga.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.komga.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.komga.middlewares: "{{ komga_hostname }}@docker{{ ',tinyauth-auth@docker' if komga_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.komga.middlewares: "komga@docker{{ ',tinyauth-auth@docker' if komga_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.komga.IPAllowList.sourcerange: "{{ komga_traefik_whitelist }}"
           traefik.http.services.komga.loadbalancer.server.port: "{{ komga_port_http }}"
           wud.tag.include: '^v\\d+\\.\\d+\\.\\d+.*$'

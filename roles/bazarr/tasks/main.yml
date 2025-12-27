@@ -62,8 +62,7 @@
           traefik.http.routers.bazarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.bazarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.bazarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ bazarr_hostname }}"
-          traefik.http.routers.bazarr.middlewares: "{{ bazarr_hostname }}@docker"
+          traefik.http.routers.bazarr.middlewares: "bazarr@docker{{ ',tinyauth-auth@docker' if bazarr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.bazarr.IPAllowList.sourcerange: "{{ bazarr_traefik_whitelist }}"
           traefik.http.services.bazarr.loadbalancer.server.port: "6767"
           wud.tag.include: '^version-\d+\.\d+\.\d+$'

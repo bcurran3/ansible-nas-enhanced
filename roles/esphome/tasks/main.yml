@@ -50,8 +50,7 @@
           traefik.http.routers.esphome.tls.certresolver: "letsencrypt"
           traefik.http.routers.esphome.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.esphome.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ esphome_hostname }}"
-          traefik.http.routers.esphome.middlewares: "{{ esphome_hostname }}@docker"
+          traefik.http.routers.esphome.middlewares: "esphome@docker{{ ',tinyauth-auth@docker' if esphome_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.esphome.IPAllowList.sourcerange: "{{ esphome_traefik_whitelist }}"
           traefik.http.services.esphome.loadbalancer.server.port: "80"
           wud.tag.include: '^\d{4}\.\d+\.\d+$'

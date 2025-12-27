@@ -62,8 +62,7 @@
           traefik.http.routers.glance.tls.certresolver: "letsencrypt"
           traefik.http.routers.glance.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.glance.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ glance_hostname }}"
-          traefik.http.routers.glance.middlewares: "{{ glance_hostname }}@docker"
+          traefik.http.routers.glance.middlewares: "glance@docker{{ ',tinyauth-auth@docker' if glance_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.glance.IPAllowList.sourcerange: "{{ glance_traefik_whitelist }}"
           traefik.http.services.glance.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

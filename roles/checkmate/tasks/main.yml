@@ -103,8 +103,7 @@
           traefik.http.routers.checkmate.tls.certresolver: "letsencrypt"
           traefik.http.routers.checkmate.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.checkmate.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ checkmate_hostname }}"
-          traefik.http.routers.checkmate.middlewares: "{{ checkmate_hostname }}@docker"
+          traefik.http.routers.checkmate.middlewares: "checkmate@docker{{ ',tinyauth-auth@docker' if checkmate_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.checkmate.IPAllowList.sourcerange: "{{ checkmate_traefik_whitelist }}"
           traefik.http.services.checkmate.loadbalancer.server.port: "52345"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

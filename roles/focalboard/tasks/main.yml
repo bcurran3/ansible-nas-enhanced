@@ -53,8 +53,7 @@
           traefik.http.routers.focalboard.tls.certresolver: "letsencrypt"
           traefik.http.routers.focalboard.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.focalboard.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ focalboard_hostname }}"
-          traefik.http.routers.focalboard.middlewares: "{{ focalboard_hostname }}@docker"
+          traefik.http.routers.focalboard.middlewares: "focalboard@docker{{ ',tinyauth-auth@docker' if focalboard_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.focalboard.IPAllowList.sourcerange: "{{ focalboard_traefik_whitelist }}"
           traefik.http.services.focalboard.loadbalancer.server.port: "8000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
