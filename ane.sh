@@ -317,6 +317,39 @@ function enable_app {
     fi
 }
 
+function create_new_app_placeholder {
+    if [[ -z "$2" ]]; then echo "  ** ERROR: Specify app name."; exit 1; fi
+    if [[ ! -d "roles/template" ]]; then
+        echo "  ** ERROR: 'roles/template' directory not found."
+        exit 1
+    fi
+    DOC_SOURCE="docs/applications/template.md"
+    DOC_TARGET="docs/applications/$2_placeholder.md"
+    NEW_APP_CLEAN="${2//-/_}"
+    TARGET="roles/$2"
+    if [[ ! -d "$TARGET" ]]; then
+        cp -r roles/template "$TARGET"
+        find "$TARGET" -type f -exec sed -i "s/appname_/${NEW_APP_CLEAN}_/g" {} +
+        find "$TARGET" -name "appname_*" | while read file; do 
+            mv "$file" "${file//appname_/${NEW_APP_CLEAN}_}"
+        done
+        echo "  ** $2 role created successfully."
+    else
+        echo "  ** $2 role already exists."
+    fi
+    if [[ -f "$DOC_SOURCE" ]]; then
+        if [[ ! -f "$DOC_TARGET" ]]; then
+            cp "$DOC_SOURCE" "$DOC_TARGET"
+            sed -i "s/appname/${2}/g" "$DOC_TARGET"
+            echo "  ** $2.md file created successfully."
+        else
+            echo "  ** $2.md file already exists."
+        fi
+    else
+        echo "  ** WARNING: Doc template $DOC_SOURCE not found."
+    fi
+}
+
 # prune Docker images and volumes
 function prune {
     echo "  ** Pruning images..."
@@ -385,7 +418,7 @@ if [[ "$1" = "--protips" || "$1" = "-protips" ]]; then
 fi
 
 # ANE Pro Tips menu
-if [[ "$1" = "--devstuff" || "$1" = "-devstuff" ]]; then
+if [[ "$1" = "--devstuff" || "$1" = "-devstuff" || "$1" = "--devops" || "$1" = "-devops" ]]; then
     display_devstuff
     exit
 fi
@@ -493,21 +526,8 @@ if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
 fi
 
 # Copy template for new app role development
-if [[ "$1" = "--newapp" || "$1" = "-newapp" ]]; then
-    if [[ -z "$2" ]]; then echo "  ** ERROR: Specify app name."; exit 1; fi
-    if [[ ! -d "roles/template" ]]; then
-        echo "  ** ERROR: 'roles/template' directory not found. Cannot create new app."
-        exit 1
-    fi
-    NEW_APP_CLEAN="${2//-/_}"
-    TARGET="roles/$2"
-    if [[ -d "$TARGET" ]]; then echo "  ** ERROR: Role '$2' already exists."; exit 1; fi
-    cp -r roles/template "$TARGET"
-    find "$TARGET" -type f -exec sed -i "s/appname_/${NEW_APP_CLEAN}_/g" {} +
-    find "$TARGET" -name "appname_*" | while read file; do 
-        mv "$file" "${file//appname_/${NEW_APP_CLEAN}_}"
-    done
-    echo "  ** Role '$2' created successfully."
+if [[ "$1" = "--newapp" || "$1" = "-newapp" || "$1" = "--createapp" || "$1" = "-createapp" ]]; then
+    create_new_app_placeholder "$@"
     exit
 fi
 
