@@ -80,11 +80,11 @@
           PHPBB_DATABASE_USER: "phpbb"
           PHPBB_DATABASE_PASSWORD: "topsecret"
           PHPBB_DATABASE_NAME: "phpbb_db"
-          PHPBB_DATABASE_HOST: "{{ phpbb_container_db_name }}"
+          PHPBB_DATABASE_HOST: "{{ phpbb_db_container_name }}"
           PHPBB_FORUM_SERVER_PROTOCOL: "http://"
           TZ: "{{ ansible_nas_timezone }}"
         links:
-          - "{{ phpbb_container_db_name }}"
+          - "{{ phpbb_db_container_name }}"
         labels:
           autoheal: "{{ phpbb_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ phpbb_watchtower_enable }}"
