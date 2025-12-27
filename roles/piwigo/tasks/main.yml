@@ -26,9 +26,9 @@
           - "{{ piwigo_data_directory }}/db:/var/lib/mysql:rw"
         env:
           MYSQL_DATABASE: "piwigo"
-          MYSQL_USER: "{{ piwigo_mysql_user }}"
-          MYSQL_PASSWORD: "{{ piwigo_mysql_password }}"
-          MYSQL_ROOT_PASSWORD: "{{ piwigo_mysql_root_password }}"
+          MYSQL_USER: "{{ piwigo_db_user }}"
+          MYSQL_PASSWORD: "{{ piwigo_db_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ piwigo_db_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         networks:
           - name: "{{ piwigo_network_name }}"
@@ -55,7 +55,7 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/mysql"
         cpu_shares: "{{ piwigo_db_cpu_shares }}"
-        memory: "{{ piwigo_mysql_memory }}"
+        memory: "{{ piwigo_db_memory }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
