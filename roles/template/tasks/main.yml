@@ -16,7 +16,7 @@
         image: "{{ appname_image_name }}:{{ appname_image_tag }}"
         pull: true
         volumes:
-          - "{{ appname_data_directory }}:/"
+          - "{{ appname_data_directory }}:/config"
         ports:
           - "{{ appname_port_http }}:80"
         env:
@@ -27,9 +27,9 @@
           PGID: "{{ appname_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ appname_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ appname_watchtower_enable }}"
-          dockflare.enable: "{{ appname_dockflare_tunnel }}"
+          autoheal: "{{ appname_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_watchtower_enable | string }}"
+          dockflare.enable: "{{ appname_dockflare_tunnel | string }}"
           dockflare.access.group: "{{ appname_dockflare_access_group }}"
           dockflare.hostname: "{{ appname_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ appname_port_http }}"
@@ -57,12 +57,15 @@
           traefik.http.routers.appname.middlewares: "{{ appname_hostname }}@docker{{ ',tinyauth-auth@docker' if appname_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ appname_traefik_whitelist }}"
           traefik.http.services.appname.loadbalancer.server.port: "80"
+### Docker hub example
           wud.tag.include: '^\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/devname/appname"
+### Github example
 #          wud.tag.include: '^\d+\.\d+\.\d+$'
 #          wud.tag.transform.type: "semver"
 #          wud.link.template: "https://github.com/dev/appname/pkgs/container/appname"
+### Linuxserver.io example
 #          wud.tag.include: '^\d+\.\d+\.\d+.*$'
 #          wud.tag.transform.type: "semver"
 #          wud.link.template: "https://lscr.io/linuxserver/appname"

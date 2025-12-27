@@ -60,7 +60,7 @@
           traefik.http.routers.traefik-router.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.traefik-router.service: "api@internal"
           traefik.http.services.traefik-router.loadbalancer.server.port: "8083"
-          traefik.http.routers.traefik-router.middlewares: "traefik-dash-redirect,traefik-whitelist"
+          traefik.http.routers.traefik-router.middlewares: "traefik-dash-redirect,traefik-whitelist,tinyauth-auth@docker"
           traefik.http.middlewares.traefik-dash-redirect.redirectregex.regex: "^https://{{ traefik_hostname | replace('.', '\\.') }}\\.{{ ansible_nas_domain | replace('.', '\\.') }}/?$"
           traefik.http.middlewares.traefik-dash-redirect.redirectregex.replacement: "https://{{ traefik_hostname }}.{{ ansible_nas_domain }}/dashboard/"
           traefik.http.middlewares.traefik-whitelist.ipallowlist.sourcerange: "{{ traefik_traefik_whitelist }}"

@@ -62,8 +62,7 @@
           traefik.http.routers.seedsync.tls.certresolver: "letsencrypt"
           traefik.http.routers.seedsync.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.seedsync.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ seedsync_hostname }}"
-          traefik.http.routers.seedsync.middlewares: "{{ seedsync_hostname }}@docker"
+          traefik.http.routers.seedsync.middlewares: "{{ seedsync_hostname }}@docker{{ ',tinyauth-auth@docker' if seedsync_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.seedsync.IPAllowList.sourcerange: "{{ seedsync_traefik_whitelist }}"
           traefik.http.services.seedsync.loadbalancer.server.port: "8800"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
