@@ -243,7 +243,7 @@ By default, applications can be found on the ports listed below.
 | Portainer        | 9000    | Bridge  | HTTP           |
 | Portainer Agent  | 9002
 | portracker       | 4999
-| ProGet           | 3334    | Bridge  | HTTP           |
+| ProGet           | 3071    | Bridge  | HTTP           |
 | ProjectSend      | 3036    | Bridge  | HTTP           |
 | Promtail         | 9080
 | Prowlarr         | 9696    | Bridge  | HTTP           |
@@ -378,7 +378,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3071
+# next avail = 3072
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
