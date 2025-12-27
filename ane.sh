@@ -228,24 +228,32 @@ function display_enabled_apps {
 }
 
 function display_status {
+    BLUE='\033[0;34m'
     GREEN='\033[0;32m'
     RED='\033[0;31m'
+    WHITE='\033[1;37m'
+    GRAY='\033[0;90m'
     NC='\033[0m'
 
     echo "  ** ANE Application Status:"
     echo "--------------------------------------------------------"
     printf "%-20s %-15s %-15s\n" "APP NAME" "CONFIGURED" "STATUS"
     echo "--------------------------------------------------------"
+    RUNNING_INFO=$(docker ps --format '{{.Names}} {{.Image}}')
     ENABLED_APPS=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | \
         grep -v -E "$ANE_EXCLUDES" | \
-        sed 's/_enabled: true//;s/ //g')
+        sed 's/_enabled: true//;s/ //g' | \
+        sort)
     for app in $ENABLED_APPS; do
-        if docker ps --filter "name=^/${app}" --filter "status=running" --format '{{.Names}}' | grep -q . ; then
+        app_hyphen="${app//_/-}"
+        if echo "$RUNNING_INFO" | grep -qiE "${app}|${app_hyphen}"; then
             STATE="${GREEN}RUNNING${NC}"
+            CONF_COLOR="${WHITE}"
         else
             STATE="${RED}STOPPED${NC}"
+            CONF_COLOR="${GRAY}"
         fi
-        printf "%-20s %-15s %-25b\n" "$app" "ENABLED" "$STATE"
+        printf "${BLUE}%-20s${NC} ${CONF_COLOR}%-15s${NC} %-25b\n" "$app_hyphen" "ENABLED" "$STATE"
     done
     echo "--------------------------------------------------------"
 }

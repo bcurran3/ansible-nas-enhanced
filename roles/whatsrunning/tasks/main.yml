@@ -38,8 +38,10 @@
           traefik.http.routers.whatsrunning.tls.certresolver: "letsencrypt"
           traefik.http.routers.whatsrunning.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.whatsrunning.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ whatsrunning_hostname }}"
-          traefik.http.routers.whatsrunning.middlewares: "{{ whatsrunning_hostname }}@docker"
+#         traefik.http.routers.frontend.middlewares: "{{ whatsrunning_hostname }}"
+#         traefik.http.routers.whatsrunning.middlewares: "{{ whatsrunning_hostname }}@docker"
+#         traefik.http.routers.whatsrunning.middlewares: "tinyauth-auth@docker"
+          traefik.http.routers.whatsrunning.middlewares: "{{ whatsrunning_hostname }}@docker{{ ',tinyauth-auth@docker' if whatsrunning_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.whatsrunning.IPAllowList.sourcerange: "{{ whatsrunning_traefik_whitelist }}"
           traefik.http.services.whatsrunning.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d{4}\.\d{2}\.\d+$'
