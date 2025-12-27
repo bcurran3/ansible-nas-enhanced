@@ -113,8 +113,7 @@
           traefik.http.routers.osticket.tls.certresolver: "letsencrypt"
           traefik.http.routers.osticket.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.osticket.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ osticket_hostname }}"
-          traefik.http.routers.osticket.middlewares: "{{ osticket_hostname }}@docker"
+          traefik.http.routers.osticket.middlewares: "osticket@docker{{ ',tinyauth-auth@docker' if osticket_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.osticket.IPAllowList.sourcerange: "{{ osticket_traefik_whitelist }}"
           traefik.http.services.osticket.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$'

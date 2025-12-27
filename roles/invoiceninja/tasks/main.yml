@@ -214,8 +214,7 @@
           traefik.http.routers.invoiceninja.tls.certresolver: "letsencrypt"
           traefik.http.routers.invoiceninja.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.invoiceninja.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ invoiceninja_hostname }}"
-          traefik.http.routers.invoiceninja.middlewares: "{{ invoiceninja_hostname }}@docker"
+          traefik.http.routers.invoiceninja.middlewares: "invoiceninja@docker{{ ',tinyauth-auth@docker' if invoiceninja_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.invoiceninja.IPAllowList.sourcerange: "{{ invoiceninja_traefik_whitelist }}"
           traefik.http.services.invoiceninja.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$'

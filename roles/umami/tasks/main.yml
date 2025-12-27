@@ -99,8 +99,7 @@
           traefik.http.routers.umami.tls.certresolver: "letsencrypt"
           traefik.http.routers.umami.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.umami.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ umami_hostname }}"
-          traefik.http.routers.umami.middlewares: "{{ umami_hostname }}@docker"
+          traefik.http.routers.umami.middlewares: "umami@docker{{ ',tinyauth-auth@docker' if umami_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.umami.IPAllowList.sourcerange: "{{ umami_traefik_whitelist }}"
           traefik.http.services.umami.loadbalancer.server.port: "3000"
           wud.tag.include: '^postgresql-v\d+\.\d+\.\d+$'

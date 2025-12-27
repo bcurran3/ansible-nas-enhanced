@@ -129,8 +129,7 @@
           traefik.http.routers.proget.tls.certresolver: "letsencrypt"
           traefik.http.routers.proget.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.proget.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ proget_hostname }}"
-          traefik.http.routers.proget.middlewares: "proget@docker"
+          traefik.http.routers.proget.middlewares: "proget@docker{{ ',tinyauth-auth@docker' if proget_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.proget.IPAllowList.sourcerange: "{{ proget_traefik_whitelist }}"
           traefik.http.services.proget.loadbalancer.server.port: "80"
           wud.tag.include: '^\d{4}\.\d+$'

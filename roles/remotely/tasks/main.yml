@@ -52,8 +52,7 @@
           traefik.http.routers.remotely.tls.certresolver: "letsencrypt"
           traefik.http.routers.remotely.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.remotely.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ remotely_hostname }}"
-          traefik.http.routers.remotely.middlewares: "{{ remotely_hostname }}@docker"
+          traefik.http.routers.remotely.middlewares: "remotely@docker{{ ',tinyauth-auth@docker' if remotely_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.remotely.IPAllowList.sourcerange: "{{ remotely_traefik_whitelist }}"
           traefik.http.services.remotely.loadbalancer.server.port: "5000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

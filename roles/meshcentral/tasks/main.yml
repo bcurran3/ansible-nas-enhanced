@@ -122,8 +122,7 @@
           traefik.http.routers.meshcentral.tls.certresolver: "letsencrypt"
           traefik.http.routers.meshcentral.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.meshcentral.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ meshcentral_hostname }}"
-          traefik.http.routers.meshcentral.middlewares: "{{ meshcentral_hostname }}@docker"
+          traefik.http.routers.meshcentral.middlewares: "meshcentral@docker{{ ',tinyauth-auth@docker' if meshcentral_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.meshcentral.IPAllowList.sourcerange: "{{ meshcentral_traefik_whitelist }}"
           traefik.http.services.meshcentral.loadbalancer.server.port: "4430"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

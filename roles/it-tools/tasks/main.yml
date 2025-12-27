@@ -34,8 +34,7 @@
           traefik.http.routers.ittools.tls.certresolver: "letsencrypt"
           traefik.http.routers.ittools.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ittools.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ ittools_hostname }}"
-          traefik.http.routers.ittools.middlewares: "{{ ittools_hostname }}@docker"
+          traefik.http.routers.ittools.middlewares: "ittools@docker{{ ',tinyauth-auth@docker' if ittools_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.ittools.IPAllowList.sourcerange: "{{ ittools_traefik_whitelist }}"
           traefik.http.services.ittools.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

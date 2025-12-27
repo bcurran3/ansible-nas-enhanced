@@ -123,8 +123,7 @@
           traefik.http.routers.ghost.tls.certresolver: "letsencrypt"
           traefik.http.routers.ghost.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ghost.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ ghost_hostname }}"
-          traefik.http.routers.ghost.middlewares: "{{ ghost_hostname }}@docker"
+          traefik.http.routers.ghost.middlewares: "ghost@docker{{ ',tinyauth-auth@docker' if ghost_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.ghost.IPAllowList.sourcerange: "{{ ghost_traefik_whitelist }}"
           traefik.http.services.ghost.loadbalancer.server.port: "2368"
           wud.tag.include: '^\d+\.\d+\.\d+$'
