@@ -53,8 +53,7 @@
           traefik.http.routers.ollama.tls.certresolver: "letsencrypt"
           traefik.http.routers.ollama.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ollama.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ ollama_hostname }}"
-          traefik.http.routers.ollama.middlewares: "{{ ollama_hostname }}@docker"
+          traefik.http.routers.ollama.middlewares: "{{ ollama_hostname }}@docker{{ ',tinyauth-auth@docker' if ollama_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.ollama.IPAllowList.sourcerange: "{{ ollama_traefik_whitelist }}"
           traefik.http.services.ollama.loadbalancer.server.port: "11434"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

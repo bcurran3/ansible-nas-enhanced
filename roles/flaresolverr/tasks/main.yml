@@ -49,8 +49,7 @@
           traefik.http.routers.flaresolverr.tls.certresolver: "letsencrypt"
           traefik.http.routers.flaresolverr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.flaresolverr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ flaresolverr_hostname }}"
-          traefik.http.routers.flaresolverr.middlewares: "{{ flaresolverr_hostname }}@docker"
+          traefik.http.routers.flaresolverr.middlewares: "{{ flaresolverr_hostname }}@docker{{ ',tinyauth-auth@docker' if flaresolverr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.flaresolverr.IPAllowList.sourcerange: "{{ flaresolverr_traefik_whitelist }}"
           traefik.http.services.flaresolverr.loadbalancer.server.port: "8191"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

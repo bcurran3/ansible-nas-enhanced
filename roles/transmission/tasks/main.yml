@@ -68,8 +68,7 @@
           traefik.http.routers.transmission.tls.certresolver: "letsencrypt"
           traefik.http.routers.transmission.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.transmission.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ transmission_hostname }}"
-          traefik.http.routers.transmission.middlewares: "{{ transmission_hostname }}@docker"
+          traefik.http.routers.transmission.middlewares: "{{ transmission_hostname }}@docker{{ ',tinyauth-auth@docker' if transmission_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.transmission.IPAllowList.sourcerange: "{{ transmission_traefik_whitelist }}"
           traefik.http.services.transmission.loadbalancer.server.port: "9091"
           wud.tag.include: '^version-\d+\.\d+\.\d+$'

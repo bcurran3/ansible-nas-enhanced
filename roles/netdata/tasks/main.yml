@@ -62,9 +62,9 @@
                     else (netdata_devices | default(omit))
                   }}
         labels:
-          autoheal: "{{ netdata_autoheal }}"
+          autoheal: "{{ netdata_autoheal | string }}"
           com.centurylinklabs.watchtower.enable: "{{ netdata_watchtower_enable }}"
-          dockflare.enable: "{{ netdata_dockflare_tunnel }}"
+          dockflare.enable: "{{ netdata_dockflare_tunnel | string }}"
           dockflare.access.group: "{{ netdata_dockflare_access_group }}"
           dockflare.hostname: "{{ netdata_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netdata_port_http }}"
@@ -85,8 +85,7 @@
           traefik.http.routers.netdata.tls.certresolver: "letsencrypt"
           traefik.http.routers.netdata.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.netdata.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ netdata_hostname }}"
-          traefik.http.routers.netdata.middlewares: "{{ netdata_hostname }}@docker"
+          traefik.http.routers.netdata.middlewares: "{{ netdata_hostname }}@docker{{ ',tinyauth-auth@docker' if netdata_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.netdata.IPAllowList.sourcerange: "{{ netdata_traefik_whitelist }}"
           traefik.http.services.netdata.loadbalancer.server.port: "19999"
           wud.tag.include: '^v\\d+\\.\\d+\\.\\d+$'

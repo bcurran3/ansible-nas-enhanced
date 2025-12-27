@@ -80,8 +80,7 @@
           traefik.http.routers.handbrake.tls.certresolver: "letsencrypt"
           traefik.http.routers.handbrake.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.handbrake.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ handbrake_hostname }}"
-          traefik.http.routers.handbrake.middlewares: "{{ handbrake_hostname }}@docker"
+          traefik.http.routers.handbrake.middlewares: "{{ handbrake_hostname }}@docker{{ ',tinyauth-auth@docker' if handbrake_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.handbrake.IPAllowList.sourcerange: "{{ handbrake_traefik_whitelist }}"
           traefik.http.services.handbrake.loadbalancer.server.port: "5800"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

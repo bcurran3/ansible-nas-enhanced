@@ -56,8 +56,7 @@
           traefik.http.routers.netbootxyz.tls.certresolver: "letsencrypt"
           traefik.http.routers.netbootxyz.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.netbootxyz.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ netbootxyz_hostname }}"
-          traefik.http.routers.netbootxyz.middlewares: "{{ netbootxyz_hostname }}@docker"
+          traefik.http.routers.netbootxyz.middlewares: "{{ netbootxyz_hostname }}@docker{{ ',tinyauth-auth@docker' if netbootxyz_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.netbootxyz.IPAllowList.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
           traefik.http.services.netbootxyz.loadbalancer.server.port: "{{ netbootxyz_port_http }}"
 # TDL add the 2nd site (assets) - need to rename frontend router

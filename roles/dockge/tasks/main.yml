@@ -53,8 +53,7 @@
           traefik.http.routers.dockge.tls.certresolver: "letsencrypt"
           traefik.http.routers.dockge.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dockge.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ dockge_hostname }}"
-          traefik.http.routers.dockge.middlewares: "{{ dockge_hostname }}@docker"
+          traefik.http.routers.dockge.middlewares: "{{ dockge_hostname }}@docker{{ ',tinyauth-auth@docker' if dockge_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dockge.IPAllowList.sourcerange: "{{ dockge_traefik_whitelist }}"
           traefik.http.services.dockge.loadbalancer.server.port: "5001"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

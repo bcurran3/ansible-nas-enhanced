@@ -31,7 +31,7 @@
           owner: 33
           group: 33
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ nextcloud_network_name }}"
 
@@ -214,8 +214,7 @@
           traefik.http.routers.nextcloud.tls.certresolver: "letsencrypt"
           traefik.http.routers.nextcloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.nextcloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ nextcloud_hostname }}"
-          traefik.http.routers.nextcloud.middlewares: "{{ nextcloud_hostname }}@docker"
+          traefik.http.routers.nextcloud.middlewares: "{{ nextcloud_hostname }}@docker{{ ',tinyauth-auth@docker' if nextcloud_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.nextcloud.IPAllowList.sourcerange: "{{ nextcloud_traefik_whitelist }}"
           traefik.http.services.nextcloud.loadbalancer.server.port: "80"
 # from https://docs.nextcloud.com/server/27/admin_manual/configuration_server/reverse_proxy_configuration.html#traefik-2

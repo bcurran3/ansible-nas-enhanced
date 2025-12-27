@@ -81,8 +81,7 @@
           traefik.http.routers.scrutiny.tls.certresolver: "letsencrypt"
           traefik.http.routers.scrutiny.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.scrutiny.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ scrutiny_hostname }}"
-          traefik.http.routers.scrutiny.middlewares: "{{ scrutiny_hostname }}@docker"
+          traefik.http.routers.scrutiny.middlewares: "{{ scrutiny_hostname }}@docker{{ ',tinyauth-auth@docker' if scrutiny_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.scrutiny.IPAllowList.sourcerange: "{{ scrutiny_traefik_whitelist }}"
           traefik.http.services.scrutiny.loadbalancer.server.port: "8080"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

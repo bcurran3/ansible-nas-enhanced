@@ -62,8 +62,7 @@
           traefik.http.routers.arcane.tls.certresolver: "letsencrypt"
           traefik.http.routers.arcane.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.arcane.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ arcane_hostname }}"
-          traefik.http.routers.arcane.middlewares: "{{ arcane_hostname }}@docker"
+          traefik.http.routers.arcane.middlewares: "{{ arcane_hostname }}@docker{{ ',tinyauth-auth@docker' if arcane_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.arcane.IPAllowList.sourcerange: "{{ arcane_traefik_whitelist }}"
           traefik.http.services.arcane.loadbalancer.server.port: "{{ arcane_port_http }}"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

@@ -73,8 +73,7 @@
           traefik.http.routers.qbittorrent.tls.certresolver: "letsencrypt"
           traefik.http.routers.qbittorrent.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.qbittorrent.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ qbittorrent_hostname }}"
-          traefik.http.routers.qbittorrent.middlewares: "{{ qbittorrent_hostname }}@docker"
+          traefik.http.routers.qbittorrent.middlewares: "{{ qbittorrent_hostname }}@docker{{ ',tinyauth-auth@docker' if qbittorrent_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.qbittorrent.IPAllowList.sourcerange: "{{ qbittorrent_traefik_whitelist }}"
           traefik.http.services.qbittorrent.loadbalancer.server.port: "{{ qbittorrent_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

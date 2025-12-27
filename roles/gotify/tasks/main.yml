@@ -59,8 +59,7 @@
           traefik.http.routers.gotify.tls.certresolver: "letsencrypt"
           traefik.http.routers.gotify.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.gotify.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ gotify_hostname }}"
-          traefik.http.routers.gotify.middlewares: "{{ gotify_hostname }}@docker"
+          traefik.http.routers.gotify.middlewares: "{{ gotify_hostname }}@docker{{ ',tinyauth-auth@docker' if gotify_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.gotify.IPAllowList.sourcerange: "{{ gotify_traefik_whitelist }}"
           traefik.http.services.gotify.loadbalancer.server.port: "{{ gotify_port_http }}"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

@@ -54,8 +54,7 @@
           traefik.http.routers.pulse.tls.certresolver: "letsencrypt"
           traefik.http.routers.pulse.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.pulse.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ pulse_hostname }}"
-          traefik.http.routers.pulse.middlewares: "{{ pulse_hostname }}@docker"
+          traefik.http.routers.pulse.middlewares: "{{ pulse_hostname }}@docker{{ ',tinyauth-auth@docker' if pulse_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.pulse.IPAllowList.sourcerange: "{{ pulse_traefik_whitelist }}"
           traefik.http.services.pulse.loadbalancer.server.port: "{{ pulse_port_http }}"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

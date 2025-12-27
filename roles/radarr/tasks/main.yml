@@ -62,8 +62,7 @@
           traefik.http.routers.radarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.radarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.radarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ radarr_hostname }}"
-          traefik.http.routers.radarr.middlewares: "{{ radarr_hostname }}@docker"
+          traefik.http.routers.radarr.middlewares: "{{ radarr_hostname }}@docker{{ ',tinyauth-auth@docker' if radarr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.radarr.IPAllowList.sourcerange: "{{ radarr_traefik_whitelist }}"
           traefik.http.services.radarr.loadbalancer.server.port: "7878"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

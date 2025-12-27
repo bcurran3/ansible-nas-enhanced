@@ -43,8 +43,7 @@
           traefik.http.routers.metube.tls.certresolver: "letsencrypt"
           traefik.http.routers.metube.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.metube.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ metube_hostname }}"
-          traefik.http.routers.metube.middlewares: "{{ metube_hostname }}@docker"
+          traefik.http.routers.metube.middlewares: "{{ metube_hostname }}@docker{{ ',tinyauth-auth@docker' if metube_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.metube.IPAllowList.sourcerange: "{{ metube_traefik_whitelist }}"
           traefik.http.services.metube.loadbalancer.server.port: "8081"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

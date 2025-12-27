@@ -60,8 +60,7 @@
           traefik.http.routers.tautulli.tls.certresolver: "letsencrypt"
           traefik.http.routers.tautulli.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.tautulli.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ tautulli_hostname }}"
-          traefik.http.routers.tautulli.middlewares: "{{ tautulli_hostname }}@docker"
+          traefik.http.routers.tautulli.middlewares: "{{ tautulli_hostname }}@docker{{ ',tinyauth-auth@docker' if tautulli_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.tautulli.IPAllowList.sourcerange: "{{ tautulli_traefik_whitelist }}"
           traefik.http.services.tautulli.loadbalancer.server.port: "8181"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

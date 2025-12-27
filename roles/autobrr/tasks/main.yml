@@ -50,8 +50,7 @@
           traefik.http.routers.autobrr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.autobrr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.services.autobrr.loadbalancer.server.port: "7474"
-          traefik.http.routers.frontend.middlewares: "{{ autobrr_hostname }}"
-          traefik.http.routers.autobrr.middlewares: "{{ autobrr_hostname }}@docker"
+          traefik.http.routers.autobrr.middlewares: "{{ autobrr_hostname }}@docker{{ ',tinyauth-auth@docker' if autobrr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.autobrr.IPAllowList.sourcerange: "{{ autobrr_traefik_whitelist }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

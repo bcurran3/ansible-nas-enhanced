@@ -53,8 +53,7 @@
           traefik.http.routers.banban.tls.certresolver: "letsencrypt"
           traefik.http.routers.banban.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.banban.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ banban_hostname }}"
-          traefik.http.routers.banban.middlewares: "{{ banban_hostname }}@docker"
+          traefik.http.routers.banban.middlewares: "{{ banban_hostname }}@docker{{ ',tinyauth-auth@docker' if banban_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.banban.IPAllowList.sourcerange: "{{ banban_traefik_whitelist }}"
           traefik.http.services.banban.loadbalancer.server.port: "{{ banban_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

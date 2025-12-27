@@ -106,8 +106,7 @@
           traefik.http.routers.plex.tls.certresolver: "letsencrypt"
           traefik.http.routers.plex.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.plex.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ plex_hostname }}"
-          traefik.http.routers.plex.middlewares: "{{ plex_hostname }}@docker"
+          traefik.http.routers.plex.middlewares: "{{ plex_hostname }}@docker{{ ',tinyauth-auth@docker' if plex_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.plex.IPAllowList.sourcerange: "{{ plex_traefik_whitelist }}"
           traefik.http.services.plex.loadbalancer.server.port: "32400"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

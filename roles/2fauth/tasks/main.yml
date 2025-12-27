@@ -158,9 +158,7 @@
           traefik.http.routers.twofauth.tls.certresolver: "letsencrypt"
           traefik.http.routers.twofauth.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.twofauth.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ twofauth_hostname }}"
-          traefik.http.routers.twofauth.middlewares: "{{ twofauth_hostname }}@docker"
-          traefik.http.middlewares.twofauth.IPAllowList.sourcerange: "{{ twofauth_traefik_whitelist }}"
+          traefik.http.routers.twofauth.middlewares: "{{ twofauth_hostname }}@docker{{ ',tinyauth-auth@docker' if twofauth_tinyauth_enabled | bool else '' }}"
           traefik.http.services.twofauth.loadbalancer.server.port: "8000"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

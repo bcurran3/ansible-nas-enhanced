@@ -53,8 +53,7 @@
           traefik.http.routers.wallabag.tls.certresolver: "letsencrypt"
           traefik.http.routers.wallabag.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.wallabag.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ wallabag_hostname }}"
-          traefik.http.routers.wallabag.middlewares: "{{ wallabag_hostname }}@docker"
+          traefik.http.routers.wallabag.middlewares: "{{ wallabag_hostname }}@docker{{ ',tinyauth-auth@docker' if wallabag_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.wallabag.IPAllowList.sourcerange: "{{ wallabag_traefik_whitelist }}"
           traefik.http.services.wallabag.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$'

@@ -52,8 +52,7 @@
           traefik.http.routers.searxng.tls.certresolver: "letsencrypt"
           traefik.http.routers.searxng.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.searxng.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ searxng_hostname }}"
-          traefik.http.routers.searxng.middlewares: "{{ searxng_hostname }}@docker"
+          traefik.http.routers.searxng.middlewares: "{{ searxng_hostname }}@docker{{ ',tinyauth-auth@docker' if searxng_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.searxng.IPAllowList.sourcerange: "{{ searxng_traefik_whitelist }}"
           traefik.http.services.searxng.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d{4}\.\d+\.\d+-.*$'
