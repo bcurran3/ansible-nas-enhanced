@@ -50,9 +50,8 @@
           traefik.http.routers.maintainerr.tls.certresolver: "letsencrypt"
           traefik.http.routers.maintainerr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.maintainerr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ maintainerr_hostname }}"
-          traefik.http.routers.maintainerr.middlewares: "{{ maintainerr_hostname }}@docker"
-          traefik.http.middlewares.maintainerr.IPAllowList.sourcerange: "{{ maintainerr_traefik_whitelist }}"      
+          traefik.http.routers.maintainerr.middlewares: "maintainerr@docker{{ ',tinyauth-auth@docker' if maintainerr_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.maintainerr.IPAllowList.sourcerange: "{{ maintainerr_traefik_whitelist }}"
           traefik.http.services.maintainerr.loadbalancer.server.port: "6246"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

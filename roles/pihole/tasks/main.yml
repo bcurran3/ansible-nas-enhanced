@@ -103,8 +103,7 @@
           traefik.http.routers.pihole.tls.certresolver: "letsencrypt"
           traefik.http.routers.pihole.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.pihole.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ pihole_hostname }}"
-          traefik.http.routers.pihole.middlewares: "{{ pihole_hostname }}@docker"
+          traefik.http.routers.pihole.middlewares: "pihole@docker{{ ',tinyauth-auth@docker' if pihole_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.pihole.IPAllowList.sourcerange: "{{ pihole_traefik_whitelist }}"
           traefik.http.services.pihole.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

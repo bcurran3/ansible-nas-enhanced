@@ -63,8 +63,7 @@
           traefik.http.routers.mylar.tls.certresolver: "letsencrypt"
           traefik.http.routers.mylar.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.mylar.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ mylar_hostname }}"
-          traefik.http.routers.mylar.middlewares: "{{ mylar_hostname }}@docker"
+          traefik.http.routers.mylar.middlewares: "mylar@docker{{ ',tinyauth-auth@docker' if mylar_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.mylar.IPAllowList.sourcerange: "{{ mylar_traefik_whitelist }}"
           traefik.http.services.mylar.loadbalancer.server.port: "8090"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

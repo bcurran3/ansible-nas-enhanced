@@ -41,8 +41,7 @@
           traefik.http.routers.medialytics.tls.certresolver: "letsencrypt"
           traefik.http.routers.medialytics.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.medialytics.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ medialytics_hostname }}"
-          traefik.http.routers.medialytics.middlewares: "{{ medialytics_hostname }}@docker"
+          traefik.http.routers.medialytics.middlewares: "medialytics@docker{{ ',tinyauth-auth@docker' if medialytics_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.medialytics.IPAllowList.sourcerange: "{{ medialytics_traefik_whitelist }}"
           traefik.http.services.medialytics.loadbalancer.server.port: "80"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

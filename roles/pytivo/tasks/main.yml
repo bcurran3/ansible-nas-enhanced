@@ -26,7 +26,7 @@
           - "{{ pytivo_music_directory }}:/music:ro"
           - "{{ pytivo_podcasts_directory }}:/podcasts:ro"
         ports:
-          - "9032:9032"
+          - "{{ pytivo_port_http }}:9032"
           - "2190:2190/udp"
         env:
           TZ: "{{ ansible_nas_timezone }}"
@@ -58,8 +58,7 @@
           traefik.http.routers.pytivo.tls.certresolver: "letsencrypt"
           traefik.http.routers.pytivo.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.pytivo.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ pytivo_hostname }}"
-          traefik.http.routers.pytivo.middlewares: "{{ pytivo_hostname }}@docker"
+          traefik.http.routers.pytivo.middlewares: "pytivo@docker{{ ',tinyauth-auth@docker' if pytivo_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.pytivo.IPAllowList.sourcerange: "{{ pytivo_traefik_whitelist }}"
           traefik.http.services.pytivo.loadbalancer.server.port: "9032"
           wud.watch.digest: "true"

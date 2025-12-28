@@ -52,8 +52,7 @@
           traefik.http.routers.portracker.tls.certresolver: "letsencrypt"
           traefik.http.routers.portracker.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.portracker.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ portracker_hostname }}"
-          traefik.http.routers.portracker.middlewares: "{{ portracker_hostname }}@docker"
+          traefik.http.routers.portracker.middlewares: "portracker@docker{{ ',tinyauth-auth@docker' if portracker_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.portracker.IPAllowList.sourcerange: "{{ portracker_traefik_whitelist }}"
           traefik.http.services.portracker.loadbalancer.server.port: "{{ portracker_port_http }}"
           wud.tag.include: '^\d+\.\d+.*$'

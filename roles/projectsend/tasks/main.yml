@@ -111,8 +111,7 @@
           traefik.http.routers.projectsend.tls.certresolver: "letsencrypt"
           traefik.http.routers.projectsend.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.projectsend.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ projectsend_hostname }}"
-          traefik.http.routers.projectsend.middlewares: "{{ projectsend_hostname }}@docker"
+          traefik.http.routers.projectsend.middlewares: "projectsend@docker{{ ',tinyauth-auth@docker' if projectsend_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.projectsend.IPAllowList.sourcerange: "{{ projectsend_traefik_whitelist }}"
           traefik.http.services.projectsend.loadbalancer.server.port: "80"
           wud.tag.include: '^r\d+.*$'

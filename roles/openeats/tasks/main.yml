@@ -209,8 +209,7 @@
           traefik.http.routers.openeats.tls.certresolver: "letsencrypt"
           traefik.http.routers.openeats.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.openeats.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ openeats_hostname }}"
-          traefik.http.routers.openeats.middlewares: "{{ openeats_hostname }}@docker"
+          traefik.http.routers.openeats.middlewares: "openeats@docker{{ ',tinyauth-auth@docker' if openeats_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.openeats.IPAllowList.sourcerange: "{{ openeats_traefik_whitelist }}"
           traefik.http.services.openeats.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$'

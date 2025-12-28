@@ -39,7 +39,6 @@
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
         }}"
-        # below needs OpenVINO toolkit or IPEX-LLM library
         devices: >-
                   {{
                     (open_webui_openedai_devices | default([])) + ['/dev/dri:/dev/dri']
@@ -68,12 +67,12 @@
           repliqate.backup_id: "{{ open_webui_openedai_repliqate_backup_id }}"
           repliqate.retention: "{{ open_webui_openedai_repliqate_retention }}"
           traefik.enable: "{{ open_webui_available_externally | string }}"
-          traefik.http.routers.openedai.rule: "Host(`openedai.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.openedai.tls.certresolver: "letsencrypt"
-          traefik.http.routers.openedai.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.openedai.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.open_webui.middlewares: "{{ open_webui_hostname }}@docker{{ ',tinyauth-auth@docker' if open_webui_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.openedai.IPAllowList.sourcerange: "{{ open_webui_traefik_whitelist }}"
+          traefik.http.routers.openwebui.rule: "Host(`{{ open_webui_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.openwebui.tls.certresolver: "letsencrypt"
+          traefik.http.routers.openwebui.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.openwebui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.openwebui.middlewares: "openwebui@docker{{ ',tinyauth-auth@docker' if open_webui_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.openwebui.IPAllowList.sourcerange: "{{ open_webui_traefik_whitelist }}"
           traefik.http.services.openedai.loadbalancer.server.port: "8000"
           wud.watch.digest: "true"
           wud.link.template: "https://github.com/matatonic/openedai-speech/pkgs/container/openedai-speech"

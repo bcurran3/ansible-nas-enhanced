@@ -54,8 +54,7 @@
           traefik.http.routers.plexrewind.tls.certresolver: "letsencrypt"
           traefik.http.routers.plexrewind.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.plexrewind.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ plexrewind_hostname }}"
-          traefik.http.routers.plexrewind.middlewares: "{{ plexrewind_hostname }}@docker"
+          traefik.http.routers.plexrewind.middlewares: "plexrewind@docker{{ ',tinyauth-auth@docker' if plexrewind_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.plexrewind.IPAllowList.sourcerange: "{{ plexrewind_traefik_whitelist }}"
           traefik.http.services.plexrewind.loadbalancer.server.port: "8383"
           wud.tag.include: '^\d+\.\d+\.\d+$'

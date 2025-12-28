@@ -52,8 +52,7 @@
           traefik.http.routers.pyload.tls.certresolver: "letsencrypt"
           traefik.http.routers.pyload.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.pyload.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ pyload_hostname }}"
-          traefik.http.routers.pyload.middlewares: "{{ pyload_hostname }}@docker"
+          traefik.http.routers.pyload.middlewares: "pyload@docker{{ ',tinyauth-auth@docker' if pyload_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.pyload.IPAllowList.sourcerange: "{{ pyload_traefik_whitelist }}"
           traefik.http.services.pyload.loadbalancer.server.port: "8000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

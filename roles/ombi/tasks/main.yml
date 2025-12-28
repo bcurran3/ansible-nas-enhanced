@@ -57,8 +57,7 @@
           traefik.http.routers.ombi.tls.certresolver: "letsencrypt"
           traefik.http.routers.ombi.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ombi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ ombi_hostname }}"
-          traefik.http.routers.ombi.middlewares: "{{ ombi_hostname }}@docker"
+          traefik.http.routers.ombi.middlewares: "ombi@docker{{ ',tinyauth-auth@docker' if ombi_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.ombi.IPAllowList.sourcerange: "{{ ombi_traefik_whitelist }}"
           traefik.http.services.ombi.loadbalancer.server.port: "3579"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

@@ -93,8 +93,7 @@
           traefik.http.routers.miniflux.tls.certresolver: "letsencrypt"
           traefik.http.routers.miniflux.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.miniflux.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ miniflux_hostname }}"
-          traefik.http.routers.miniflux.middlewares: "{{ miniflux_hostname }}@docker"
+          traefik.http.routers.miniflux.middlewares: "miniflux@docker{{ ',tinyauth-auth@docker' if miniflux_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.miniflux.IPAllowList.sourcerange: "{{ miniflux_traefik_whitelist }}"
           traefik.http.services.miniflux.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

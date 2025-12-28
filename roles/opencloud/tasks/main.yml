@@ -116,8 +116,7 @@
               traefik.http.routers.opencloud.tls.certresolver: "letsencrypt"
               traefik.http.routers.opencloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
               traefik.http.routers.opencloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-              traefik.http.routers.frontend.middlewares: "{{ opencloud_hostname }}"
-              traefik.http.routers.opencloud.middlewares: "{{ opencloud_hostname }}@docker"
+              traefik.http.routers.opencloud.middlewares: "opencloud@docker{{ ',tinyauth-auth@docker' if opencloud_tinyauth_enabled | bool else '' }}"
               traefik.http.middlewares.opencloud.IPAllowList.sourcerange: "{{ opencloud_traefik_whitelist }}"
               traefik.http.services.opencloud.loadbalancer.server.port: "9200"
               wud.tag.include: '^\d+\.\d+\.\d+.*$'

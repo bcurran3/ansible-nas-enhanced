@@ -49,8 +49,7 @@
           traefik.http.routers.mybibliotheca.tls.certresolver: "letsencrypt"
           traefik.http.routers.mybibliotheca.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.mybibliotheca.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ mybibliotheca_hostname }}"
-          traefik.http.routers.mybibliotheca.middlewares: "{{ mybibliotheca_hostname }}@docker"
+          traefik.http.routers.mybibliotheca.middlewares: "mybibliotheca@docker{{ ',tinyauth-auth@docker' if mybibliotheca_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.mybibliotheca.IPAllowList.sourcerange: "{{ mybibliotheca_traefik_whitelist }}"
           traefik.http.services.mybibliotheca.loadbalancer.server.port: "5054"
           wud.tag.include: '^\d+\.\d+\.\d+$'

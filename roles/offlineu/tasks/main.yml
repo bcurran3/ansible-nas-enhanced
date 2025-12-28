@@ -56,8 +56,7 @@
           traefik.http.routers.offlineu.tls.certresolver: "letsencrypt"
           traefik.http.routers.offlineu.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.offlineu.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ offlineu_hostname }}"
-          traefik.http.routers.offlineu.middlewares: "{{ offlineu_hostname }}@docker"
+          traefik.http.routers.offlineu.middlewares: "offlineu@docker{{ ',tinyauth-auth@docker' if offlineu_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.offlineu.IPAllowList.sourcerange: "{{ offlineu_traefik_whitelist }}"
           traefik.http.services.offlineu.loadbalancer.server.port: "5000"
           wud.tag.include: '^main$'

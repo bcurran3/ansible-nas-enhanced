@@ -61,8 +61,7 @@
           traefik.http.routers.pocketid.tls.certresolver: "letsencrypt"
           traefik.http.routers.pocketid.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.pocketid.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ pocketid_hostname }}"
-          traefik.http.routers.pocketid.middlewares: "{{ pocketid_hostname }}@docker"
+          traefik.http.routers.pocketid.middlewares: "pocketid@docker{{ ',tinyauth-auth@docker' if pocketid_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.pocketid.IPAllowList.sourcerange: "{{ pocketid_traefik_whitelist }}"
           traefik.http.services.pocketid.loadbalancer.server.port: "{{ pocketid_port_http }}"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

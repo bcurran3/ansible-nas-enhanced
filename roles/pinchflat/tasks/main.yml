@@ -51,8 +51,7 @@
           traefik.http.routers.pinchflat.tls.certresolver: "letsencrypt"
           traefik.http.routers.pinchflat.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.pinchflat.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ pinchflat_hostname }}"
-          traefik.http.routers.pinchflat.middlewares: "{{ pinchflat_hostname }}@docker"
+          traefik.http.routers.pinchflat.middlewares: "pinchflat@docker{{ ',tinyauth-auth@docker' if pinchflat_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.pinchflat.IPAllowList.sourcerange: "{{ pinchflat_traefik_whitelist }}"
           traefik.http.services.pinchflat.loadbalancer.server.port: "80"
           wud.tag.include: '^v\d+\.\d+\.\d+.*$'

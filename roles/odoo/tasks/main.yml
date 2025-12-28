@@ -97,8 +97,7 @@
           traefik.http.routers.odoo.tls.certresolver: "letsencrypt"
           traefik.http.routers.odoo.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.odoo.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ odoo_hostname }}"
-          traefik.http.routers.odoo.middlewares: "{{ odoo_hostname }}@docker"
+          traefik.http.routers.odoo.middlewares: "odoo@docker{{ ',tinyauth-auth@docker' if odoo_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.odoo.IPAllowList.sourcerange: "{{ odoo_traefik_whitelist }}"
           traefik.http.services.odoo.loadbalancer.server.port: "8069"
           wud.tag.include: '^\d+\.\d+.*$'

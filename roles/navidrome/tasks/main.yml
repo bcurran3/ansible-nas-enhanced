@@ -55,8 +55,7 @@
           traefik.http.routers.navidrome.tls.certresolver: "letsencrypt"
           traefik.http.routers.navidrome.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.navidrome.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ navidrome_hostname }}"
-          traefik.http.routers.navidrome.middlewares: "{{ navidrome_hostname }}@docker"
+          traefik.http.routers.navidrome.middlewares: "navidrome@docker{{ ',tinyauth-auth@docker' if navidrome_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.navidrome.IPAllowList.sourcerange: "{{ navidrome_traefik_whitelist }}"
           traefik.http.services.navidrome.loadbalancer.server.port: "4533"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

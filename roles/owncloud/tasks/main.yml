@@ -159,8 +159,7 @@
           traefik.http.routers.owncloud.tls.certresolver: "letsencrypt"
           traefik.http.routers.owncloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.owncloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ owncloud_hostname }}"
-          traefik.http.routers.owncloud.middlewares: "{{ owncloud_hostname }}@docker"
+          traefik.http.routers.owncloud.middlewares: "owncloud@docker{{ ',tinyauth-auth@docker' if owncloud_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.owncloud.IPAllowList.sourcerange: "{{ owncloud_traefik_whitelist }}"
           traefik.http.services.owncloud.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$'

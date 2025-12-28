@@ -96,8 +96,7 @@
           traefik.http.routers.patchpanda.tls.certresolver: "letsencrypt"
           traefik.http.routers.patchpanda.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.patchpanda.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ patchpanda_hostname }}"
-          traefik.http.routers.patchpanda.middlewares: "{{ patchpanda_hostname }}@docker"
+          traefik.http.routers.patchpanda.middlewares: "patchpanda@docker{{ ',tinyauth-auth@docker' if patchpanda_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.patchpanda.IPAllowList.sourcerange: "{{ patchpanda_traefik_whitelist }}"
           traefik.http.services.patchpanda.loadbalancer.server.port: "8080"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

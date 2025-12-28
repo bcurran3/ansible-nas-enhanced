@@ -68,8 +68,7 @@
           traefik.http.routers.netalertx.tls.certresolver: "letsencrypt"
           traefik.http.routers.netalertx.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.netalertx.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ netalertx_hostname }}"
-          traefik.http.routers.netalertx.middlewares: "{{ netalertx_hostname }}@docker"
+          traefik.http.routers.netalertx.middlewares: "netalertx@docker{{ ',tinyauth-auth@docker' if netalertx_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.netalertx.IPAllowList.sourcerange: "{{ netalertx_traefik_whitelist }}"
           traefik.http.services.netalertx.loadbalancer.server.port: "20211"
           wud.tag.include: '^v\\d+\\.\\d+\\.\\d+$'

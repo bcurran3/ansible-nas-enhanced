@@ -143,8 +143,7 @@
           traefik.http.routers.openemr.tls.certresolver: "letsencrypt"
           traefik.http.routers.openemr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.openemr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ openemr_hostname }}"
-          traefik.http.routers.openemr.middlewares: "{{ openemr_hostname }}@docker"
+          traefik.http.routers.openemr.middlewares: "openemr@docker{{ ',tinyauth-auth@docker' if openemr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.openemr.IPAllowList.sourcerange: "{{ openemr_traefik_whitelist }}"
           traefik.http.services.openemr.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
