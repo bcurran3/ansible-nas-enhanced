@@ -326,36 +326,49 @@ function enable_app {
 }
 
 function create_new_app_placeholder {
-    if [[ -z "$2" ]]; then echo "  ** ERROR: Specify app name."; exit 1; fi
+    if [[ -z "$2" ]]; then echo "  ** ERROR: Specify app name(s)."; exit 1; fi
     if [[ ! -d "roles/template" ]]; then
-        echo "  ** ERROR: 'roles/template' directory not found."
+        echo "  ** ERROR: roles/template directory not found."
         exit 1
     fi
     DOC_SOURCE="docs/applications/template.md"
-    DOC_TARGET="docs/applications/$2_placeholder.md"
-    NEW_APP_CLEAN="${2//-/_}"
-    TARGET="roles/$2"
-    if [[ ! -d "$TARGET" ]]; then
-        cp -r roles/template "$TARGET"
-        find "$TARGET" -type f -exec sed -i "s/appname_/${NEW_APP_CLEAN}_/g" {} +
-        find "$TARGET" -name "appname_*" | while read file; do 
-            mv "$file" "${file//appname_/${NEW_APP_CLEAN}_}"
-        done
-        echo "  ** $2 role created successfully."
-    else
-        echo "  ** $2 role already exists."
-    fi
-    if [[ -f "$DOC_SOURCE" ]]; then
-        if [[ ! -f "$DOC_TARGET" ]]; then
-            cp "$DOC_SOURCE" "$DOC_TARGET"
-            sed -i "s/appname/${2}/g" "$DOC_TARGET"
-            echo "  ** $2.md file created successfully."
+    shift 
+    for app in "$@"; do
+        NEW_APP_CLEAN="${app//-/_}"
+        FINAL_ROLE_DIR="roles/${app}"
+        WIP_ROLE_NAME="WIP_${app}"
+        WIP_ROLE_PATH="roles/${WIP_ROLE_NAME}"
+        DOC_FINAL_NAME="${app}.md"
+        DOC_WIP_NAME="WIP_${app}.md"
+        DOC_FINAL_PATH="docs/applications/${DOC_FINAL_NAME}"
+        DOC_WIP_PATH="docs/applications/${DOC_WIP_NAME}"
+        if [[ -d "$FINAL_ROLE_DIR" ]]; then
+            echo "  == ROLE: ${app} role already exists."
+        elif [[ -d "$WIP_ROLE_PATH" ]]; then
+            echo "  == ROLE: ${WIP_ROLE_NAME} already exists."
         else
-            echo "  ** $2.md file already exists."
+            cp -r roles/template "$WIP_ROLE_PATH"
+            find "$WIP_ROLE_PATH" -type f -exec sed -i "s/appname_/${NEW_APP_CLEAN}_/g" {} +
+            find "$WIP_ROLE_PATH" -name "appname_*" | while read -r file; do 
+                mv "$file" "${file//appname_/${NEW_APP_CLEAN}_}"
+            done
+            
+            echo "  ++ ROLE: ${WIP_ROLE_NAME} successfully created."
         fi
-    else
-        echo "  ** WARNING: Doc template $DOC_SOURCE not found."
-    fi
+        if [[ -f "$DOC_SOURCE" ]]; then
+            if [[ -f "$DOC_FINAL_PATH" ]]; then
+                echo "  == DOC : ${DOC_FINAL_NAME} already exists."
+            elif [[ -f "$DOC_WIP_PATH" ]]; then
+                echo "  == DOC : ${DOC_WIP_NAME} already exists."
+            else
+                cp "$DOC_SOURCE" "$DOC_WIP_PATH"
+                sed -i "s/appname/${app}/g" "$DOC_WIP_PATH"
+                echo "  ++ DOC : ${DOC_WIP_NAME} successfully created."
+            fi
+        else
+            echo "  ** DOC : template.md WARNING: template not found."
+        fi
+    done
 }
 
 # prune Docker images and volumes
@@ -534,7 +547,7 @@ if [[ "$1" = "--inventory" || "$1" = "-inventory" ]]; then
 fi
 
 # Copy template for new app role development
-if [[ "$1" = "--newapp" || "$1" = "-newapp" || "$1" = "--createapp" || "$1" = "-createapp" ]]; then
+if [[ "$1" = "--newapp" || "$1" = "-newapp" || "$1" = "--newapps" || "$1" = "-newapps" || "$1" = "--createapp" || "$1" = "-createapp" ]]; then
     create_new_app_placeholder "$@"
     exit
 fi
