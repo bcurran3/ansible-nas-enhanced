@@ -52,22 +52,28 @@
           repliqate.backup_id: "{{ netbootxyz_repliqate_backup_id }}"
           repliqate.retention: "{{ netbootxyz_repliqate_retention }}"
           traefik.enable: "{{ netbootxyz_available_externally | string }}"
+          # --- Router 1: Main Interface ---
           traefik.http.routers.netbootxyz.rule: "Host(`{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.netbootxyz.entrypoints: "websecure"
           traefik.http.routers.netbootxyz.tls.certresolver: "letsencrypt"
           traefik.http.routers.netbootxyz.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.netbootxyz.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.netbootxyz.middlewares: "{{ netbootxyz_hostname }}@docker{{ ',tinyauth-auth@docker' if netbootxyz_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.netbootxyz.IPAllowList.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
-          traefik.http.services.netbootxyz.loadbalancer.server.port: "{{ netbootxyz_port_http }}"
-# TDL add the 2nd site (assets) - need to create 2nd router
-#         traefik.http.routers.netbootxyz2.rule: "Host(`{{ netbootxyz_hostname2 }}.{{ ansible_nas_domain }}`)"
-#         traefik.http.routers.netbootxyz2.tls.certresolver: "letsencrypt"
-#         traefik.http.routers.netbootxyz2.tls.domains[0].main: "{{ ansible_nas_domain }}"
-#         traefik.http.routers.netbootxyz2.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-#         traefik.http.routers.frontend.middlewares: "{{ netbootxyz_hostname2 }}"
-#         traefik.http.routers.netbootxyz2.middlewares: "{{ netbootxyz_hostname2 }}@docker"
-#         traefik.http.middlewares.netbootxyz2.IPAllowList.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
-#         traefik.http.services.netbootxyz2.loadbalancer.server.port: "{{ netbootxyz_port_http2 }}"
+          traefik.http.routers.netbootxyz.middlewares: "netboot-whitelist,tinyauth-auth@docker"
+          traefik.http.routers.netbootxyz.service: "netboot-main-svc"
+
+          # --- Router 2: Assets Interface ---
+          traefik.http.routers.netbootxyz-assets.rule: "Host(`{{ netbootxyz_hostname2 }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.netbootxyz-assets.entrypoints: "websecure"
+          traefik.http.routers.netbootxyz-assets.tls.certresolver: "letsencrypt"
+          traefik.http.routers.netbootxyz-assets.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.netbootxyz-assets.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.netbootxyz-assets.middlewares: "netboot-whitelist,tinyauth-auth@docker"
+          traefik.http.routers.netbootxyz-assets.service: "netboot-assets-svc"
+          traefik.http.middlewares.netboot-whitelist.ipallowlist.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
+
+          # --- Service Definitions ---
+          traefik.http.services.netboot-main-svc.loadbalancer.server.port: "{{ netbootxyz_port_http }}"
+          traefik.http.services.netboot-assets-svc.loadbalancer.server.port: "{{ netbootxyz_port_http2 }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/netbootxyz/netbootxyz/pkgs/container/netbootxyz"
@@ -75,13 +81,15 @@
         memory: "{{ netbootxyz_memory }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: "Access {{ ansible_nas_app_name }} at"
       ansible.builtin.debug:
         msg: >-
-              {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netbootxyz_port_http | string)] +
-                (['https://' + netbootxyz_hostname + '.' + ansible_nas_domain] if (netbootxyz_available_externally is true or netbootxyz_dockflare_tunnel is true) else [])
-              }}
+          {{
+            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netbootxyz_port_http | string)] +
+            (['https://' + netbootxyz_hostname + '.' + ansible_nas_domain] if (netbootxyz_available_externally is true or netbootxyz_dockflare_tunnel is true) else []) +
+            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netbootxyz_port_http2 | string) + ' (assets)'] +
+            (['https://' + netbootxyz_hostname2 + '.' + ansible_nas_domain + '(assets)'] if (netbootxyz_available_externally is true or netbootxyz_dockflare_tunnel is true) else [])
+          }}
   when: netbootxyz_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
