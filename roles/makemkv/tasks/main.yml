@@ -9,11 +9,14 @@
         - "{{ makemkv_data_directory }}"
         - "{{ makemkv_data_directory }}/config"
         - "{{ makemkv_output_directory }}"
+        - "{{ makemkv_storage_directory }}"
 
-    - name: Check for optical drive device
-      ansible.builtin.stat:
-        path: "{{ makemkv_optical_drive }}"
-      register: optical_drive_stat
+    - name: Detect all optical and generic SCSI devices
+      set_fact:
+        makemkv_devices: "{{ ansible_facts.devices.keys() 
+          | select('match', '^(sr|sg)[0-9]') 
+          | map('regex_replace', '^(.*)$', '/dev/\\1:/dev/\\1') 
+          | list }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -22,9 +25,10 @@
         hostname: "{{ makemkv_container_name }}"
         image: "{{ makemkv_image_name }}:{{ makemkv_image_tag }}"
         pull: true
+        capabilities: "{{ ['SYS_RAWIO', 'SYS_ADMIN'] if makemkv_devices | length > 0 else [] }}"
+        devices: "{{ makemkv_devices | default([]) }}"
         volumes:
           - "{{ makemkv_data_directory }}/config:/config:rw"
-          - "{{ (makemkv_optical_drive + ':/dev/sr0:ro') if optical_drive_stat.stat.exists | default(false) else omit }}"
           - "{{ makemkv_storage_directory }}:/storage:ro"
           - "{{ makemkv_output_directory }}:/output:rw"
         ports:
