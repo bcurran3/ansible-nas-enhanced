@@ -13,6 +13,7 @@
         - "{{ stash_data_directory }}/data"
         - "{{ stash_data_directory }}/generated"
         - "{{ stash_data_directory }}/metadata"
+        - "{{ stash_porn_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -31,7 +32,7 @@
           - "{{ stash_data_directory }}/data:/data:rw"
           - "{{ stash_data_directory }}/generated:/generated:rw"
           - "{{ stash_data_directory }}/metadata:/metadata:rw"
-          - "{{ porn_root }}:/porn:ro"
+          - "{{ stash_porn_directory }}:/porn:ro"
         ports:
           - "{{ stash_port_http }}:9999"
         env:

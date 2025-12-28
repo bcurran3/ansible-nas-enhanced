@@ -12,6 +12,7 @@
         - "{{ gamevault_data_directory }}/files"
         - "{{ gamevault_data_directory }}/media"
         - "{{ gamevault_data_directory }}/plugins"
+        - "{{ gamevault_games_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -65,7 +66,7 @@
           - "{{ gamevault_data_directory }}/config:/config"
           - "{{ gamevault_data_directory }}/media:/media"
           - "{{ gamevault_data_directory }}/plugins:/plugins"
-          - "{{ games_root }}:/files"
+          - "{{ gamevault_games_directory }}:/files"
         ports:
           - "{{ gamevault_port_http }}:8080"
         env:

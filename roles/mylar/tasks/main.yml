@@ -7,7 +7,10 @@
         state: directory
         # mode: 0755
       with_items:
+        - "{{ mylar_data_directory }}"
         - "{{ mylar_data_directory }}/config"
+        - "{{ mylar_comics_directory }}"
+        - "{{ mylar_downloads_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -17,9 +20,9 @@
         image: "{{ mylar_image_name }}:{{ mylar_image_version }}"
         pull: true
         volumes:
+          - "{{ mylar_data_directory }}/config:/config:rw"
           - "{{ mylar_comics_directory }}:/comics:rw"
           - "{{ mylar_downloads_directory }}:/downloads:rw"
-          - "{{ mylar_data_directory }}/config:/config:rw"
         network_mode: "bridge"
         ports:
           - "{{ mylar_port_http }}:8090"

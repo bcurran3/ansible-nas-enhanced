@@ -30,9 +30,9 @@
 #         - "{{ code_server_data_directory }}/project:/home/coder/project"
           - "{{ code_server_data_directory }}/.config:/home/coder/.config"
           - "{{ code_server_data_directory }}/.local:/home/coder/.local"
-          - "/etc/timezone:/etc/timezone:ro"
           - "/home/{{ ansible_nas_user }}:/home/coder/{{ ansible_nas_user }}" # added
           - "{{ docker_home }}:/home/coder/dockerdata" # added
+          - "/etc/timezone:/etc/timezone:ro"
         network_mode: bridge
         env:
           DOCKER_USER: "{{ ansible_nas_user }}"

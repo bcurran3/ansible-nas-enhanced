@@ -8,6 +8,8 @@
       with_items:
         - "{{ pornvault_data_directory }}"
         - "{{ pornvault_data_directory }}/config"
+        - "{{ pornvault_porn_images_directory }}"
+        - "{{ pornvault_porn_videos_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -19,8 +21,8 @@
         volumes:
           - "/etc/localtime:/etc/localtime:ro"
           - "{{ pornvault_data_directory }}/config:/config:rw"
-          - "{{ porn_root }}:/videos:ro"
-          - "{{ porn_root }}/pix:/images:ro"
+          - "{{ pornvault_porn_images_directory }}:/images:ro"
+          - "{{ pornvault_porn_videos_directory }}:/videos:ro"
         ports:
           - "{{ pornvault_port_http }}:3000"
         labels:

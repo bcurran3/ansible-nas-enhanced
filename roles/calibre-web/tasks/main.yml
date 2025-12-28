@@ -8,6 +8,7 @@
       with_items:
         - "{{ calibre_web_data_directory }}/config"
         - "{{ calibre_web_data_directory }}/data"
+        - "{{ calibre_web_books_root }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,8 +19,8 @@
         pull: true
         volumes:
           - "{{ calibre_web_data_directory }}/config:/config"
-          - "{{ calibre_web_books_root }}:/books"
           - "{{ calibre_web_data_directory }}/data:/data"
+          - "{{ calibre_web_books_root }}:/books"
         env:
           DOCKER_MODS: "{{ calibre_web_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ calibre_web_env_docker_mods_install_packages }}"

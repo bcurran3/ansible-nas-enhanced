@@ -11,11 +11,11 @@
       with_items:
         - "{{ youtubedl_material_data_directory }}/appdata"
         - "{{ youtubedl_material_data_directory }}/db"
-        - "{{ youtubedl_material_dl_audio_directory }}"
-        - "{{ youtubedl_material_dl_video_directory }}"
-        - "{{ youtubedl_material_dl_subscriptions_directory }}"
-        - "{{ youtubedl_material_dl_channels_directory }}"
-        - "{{ youtubedl_material_dl_users_directory }}"
+        - "{{ youtubedl_material_download_audio_directory }}"
+        - "{{ youtubedl_material_download_video_directory }}"
+        - "{{ youtubedl_material_download_subscriptions_directory }}"
+        - "{{ youtubedl_material_download_channels_directory }}"
+        - "{{ youtubedl_material_download_users_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -62,11 +62,11 @@
         pull: true
         volumes:
           - "{{ youtubedl_material_data_directory }}/appdata:/app/appdata:rw"
-          - "{{ youtubedl_material_dl_audio_directory }}:/app/audio:rw"
-          - "{{ youtubedl_material_dl_video_directory }}:/app/video:rw"
-          - "{{ youtubedl_material_dl_subscriptions_directory }}:/app/subscriptions:rw"
-          - "{{ youtubedl_material_dl_channels_directory }}:/app/subscriptions/channels:rw"
-          - "{{ youtubedl_material_dl_users_directory }}:/app/users:rw"
+          - "{{ youtubedl_material_download_audio_directory }}:/app/audio:rw"
+          - "{{ youtubedl_material_download_video_directory }}:/app/video:rw"
+          - "{{ youtubedl_material_download_subscriptions_directory }}:/app/subscriptions:rw"
+          - "{{ youtubedl_material_download_channels_directory }}:/app/subscriptions/channels:rw"
+          - "{{ youtubedl_material_download_users_directory }}:/app/users:rw"
         network_mode: "bridge"
         ports:
           - "{{ youtubedl_material_port_http }}:17442"

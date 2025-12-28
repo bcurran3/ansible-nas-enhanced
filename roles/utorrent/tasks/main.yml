@@ -10,6 +10,7 @@
         - "{{ utorrent_data_directory }}/config"
         - "{{ utorrent_download_directory }}"
         - "{{ utorrent_download_directory_active }}"
+        - "{{ utorrent_torrents_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -21,7 +22,7 @@
         volumes:
           - "{{ utorrent_data_directory }}/config:/utorrent/settings:rw"
           - "{{ utorrent_download_directory }}:/data:rw"
-          - "{{ torrents_root }}:/utorrent/torrents:rw"
+          - "{{ utorrent_torrents_directory }}:/utorrent/torrents:rw"
         ports:
           - "{{ utorrent_port_http }}:8080"
           - "{{ utorrent_port_bt }}:6881"

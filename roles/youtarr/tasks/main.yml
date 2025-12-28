@@ -11,7 +11,7 @@
         - "{{ youtarr_data_directory }}/db"
         - "{{ youtarr_data_directory }}/images"
         - "{{ youtarr_data_directory }}/jobs"
-        - "{{ youtarr_dl_directory }}"
+        - "{{ youtarr_download_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -71,10 +71,10 @@
         image: "{{ youtarr_image_name }}:{{ youtarr_image_tag }}"
         pull: true
         volumes:
-          - "{{ youtarr_dl_directory }}:/usr/src/app/data"
           - "{{ youtarr_data_directory }}/images:/app/server/images"
           - "{{ youtarr_data_directory }}/config:/app/config"
           - "{{ youtarr_data_directory }}/jobs:/app/jobs"
+          - "{{ youtarr_download_directory }}:/usr/src/app/data"
         ports:
           - "{{ youtarr_port_http }}:3011"
         env:

@@ -8,6 +8,8 @@
       with_items:
         - "{{ stump_data_directory }}"
         - "{{ stump_data_directory }}/config"
+        - "{{ stump_books_directory }}"
+        - "{{ stump_comics_directory }}
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,8 +20,8 @@
         pull: true
         volumes:
           - "{{ stump_data_directory }}/config:/config"
-          - "{{ stump_comics_directory }}:/data/comics:ro"
           - "{{ stump_books_directory }}:/data/books:ro"
+          - "{{ stump_comics_directory }}:/data/comics:ro"
         ports:
           - "{{ stump_port_http }}:10801"
         env:

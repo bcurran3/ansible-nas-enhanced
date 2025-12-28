@@ -8,6 +8,7 @@
       with_items:
         - "{{ music_assistant_data_directory }}"
         - "{{ music_assistant_data_directory }}/data"
+        - "{{ music_assistant_music_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -20,7 +21,7 @@
         network_mode: host
         volumes:
           - "{{ music_assistant_data_directory }}/data:/data"
-          - "{{ music_root }}:/media:ro"
+          - "{{ music_assistant_music_directory }}:/media:ro"
 #        ports:
 #          - 8095:8095
         env:

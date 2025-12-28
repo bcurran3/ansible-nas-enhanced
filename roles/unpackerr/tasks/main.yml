@@ -9,6 +9,7 @@
         - "{{ unpackerr_data_directory }}"
         - "{{ unpackerr_data_directory }}/config"
         - "{{ unpackerr_data_directory }}/log"
+        - "{{ unpackerr_downloads_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -20,7 +21,7 @@
         volumes:
           - "{{ unpackerr_data_directory }}/config:/config"
           - "{{ unpackerr_data_directory }}/log:/log"
-          - "{{ downloads_root }}:/downloads"
+          - "{{ unpackerr_downloads_directory }}:/downloads"
         env:
           UN_LOG_FILE: "/log/unpackerr.log"
           UN_LIDARR_0_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lidarr_port_http }}"

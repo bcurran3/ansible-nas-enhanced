@@ -8,6 +8,8 @@
       with_items:
         - "{{ whisparr_data_directory }}"
         - "{{ whisparr_data_directory }}/config"
+        - "{{ whisperr_download_directory }}"
+        - "{{ whisparr_porn_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -20,8 +22,8 @@
           - "{{ whisparr_port_http }}:6969"
         volumes:
           - "{{ whisparr_data_directory }}/config:/config"
-          - "{{ whisparr_porn_directory }}:/porn"
           - "{{ whisparr_download_directory }}:/downloads"
+          - "{{ whisparr_porn_directory }}:/porn"
         network_mode: bridge
         env:
           PUID: "{{ whisparr_puid }}"

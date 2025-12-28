@@ -8,6 +8,7 @@
       with_items:
         - "{{ offlineu_data_directory }}"
         - "{{ offlineu_data_directory }}/data"
+        - "{{ offlineu_courses_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,7 +19,7 @@
         pull: true
         volumes:
           - "{{ offlineu_data_directory }}/data:/app/data"
-          - "{{ offlineu_courses }}:/app/courses"
+          - "{{ offlineu_courses_directory }}:/app/courses"
         ports:
           - "{{ offlineu_port_http }}:5000"
         env:

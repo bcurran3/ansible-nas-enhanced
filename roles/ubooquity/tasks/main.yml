@@ -7,6 +7,10 @@
         state: directory
       with_items:
         - "{{ ubooquity_data_directory }}"
+        - "{{ ubooquity_data_directory }}/config"
+        - "{{ ubooquity_data_directory }}/files"
+        - "{{ ubooquity_books_directory }}"
+        - "{{ ubooquity_comics_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,8 +22,8 @@
         volumes:
           - "{{ ubooquity_data_directory }}/config:/config:rw"
           - "{{ ubooquity_data_directory }}/files:/files:rw"
-          - "{{ books_root }}:/books"
-          - "{{ comics_root }}:/comics"
+          - "{{ ubooquity_books_directory }}:/books"
+          - "{{ ubooquity_comics_directory }}:/comics"
         env:
           DOCKER_MODS: "{{ ubooquity_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ ubooquity_env_docker_mods_install_packages }}"

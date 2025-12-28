@@ -8,6 +8,8 @@
       with_items:
         - "{{ bazarr_data_directory }}"
         - "{{ bazarr_data_directory }}/config"
+        - "{{ bazarr_movies_directory }}"
+        - "{{ bazarr_tv_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,8 +20,8 @@
         pull: true
         volumes:
           - "{{ bazarr_data_directory }}/config:/config:rw"
-          - "{{ bazarr_tv_directory }}:/tv:rw"
           - "{{ bazarr_movies_directory }}:/movies:rw"
+          - "{{ bazarr_tv_directory }}:/tv:rw"
         ports:
           - "{{ bazarr_port_http }}:6767"
         env:

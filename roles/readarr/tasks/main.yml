@@ -9,6 +9,8 @@
       with_items:
         - "{{ readarr_data_directory }}"
         - "{{ readarr_data_directory }}/config"
+        - "{{ readarr_books_directory }}"
+        - "{{ readarr_download_directory}}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -19,7 +21,7 @@
         pull: true
         volumes:
           - "{{ readarr_data_directory }}/config:/config:rw"
-          - "{{ books_root }}:/books:rw"
+          - "{{ readarr_books_directory }}:/books:rw"
           - "{{ readarr_download_directory }}:/downloads:rw"
         env:
           DOCKER_MODS: "{{ readarr_env_docker_mods }}"

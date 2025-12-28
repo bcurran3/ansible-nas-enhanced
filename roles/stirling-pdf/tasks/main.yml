@@ -7,8 +7,8 @@
         state: directory
       with_items:
         - "{{ stirling_pdf_data_directory }}"
-        - "{{ stirling_pdf_data_directory }}/extraConfigs"
-        - "{{ stirling_pdf_data_directory }}/trainingData"
+        - "{{ stirling_pdf_data_directory }}/configs"
+        - "{{ stirling_pdf_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,8 +18,8 @@
         image: "{{ stirling_pdf_image_name }}:{{ stirling_pdf_image_tag }}"
         pull: true
         volumes:
-          - "{{ stirling_pdf_data_directory }}/extraConfigs:/configs"
-          - "{{ stirling_pdf_data_directory }}/trainingData:/usr/share/tessdata"
+          - "{{ stirling_pdf_data_directory }}/configs:/configs"
+          - "{{ stirling_pdf_data_directory }}/data:/usr/share/tessdata"
         ports:
           - "{{ stirling_pdf_port_http }}:8080"
         env:
