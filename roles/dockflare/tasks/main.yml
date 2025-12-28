@@ -1,24 +1,23 @@
 ---
-# https://github.com/ChrispyBacon-dev/DockFlare/blob/stable/docker-compose.yml
-
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
-        path: "{{ item }}"
+        path: "{{ item.path }}"
         state: directory
-      with_items:
-        - "{{ dockflare_data_directory }}"
-        - "{{ dockflare_data_directory }}/redis"
-
-    - name: Create {{ ansible_nas_app_name }} Directories Part Deux
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        owner: "65532"
-        group: "65532"
-      with_items:
-        - "{{ dockflare_data_directory }}/data"
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "755"
+      loop:
+        - path: "{{ nextcloud_data_directory }}/"
+          owner: 0
+          group: 0
+        - path: "{{ nextcloud_data_directory }}/data"
+          owner: "{{ dockflare_user_id }}"
+          group: "{{ dockflare_group_id }}"
+        - path: "{{ nextcloud_data_directory }}/redis"
+          owner: 0
+          group: 0
 
     - name: Create {{ ansible_nas_app_name }} Docker Socket Proxy Container
       community.docker.docker_container:
@@ -110,6 +109,8 @@
         ports:
           - "{{ dockflare_port_http }}:5000"
         env:
+          DOCKFLARE_UID: "{{ dockflare_user_id }}"
+          DOCKFLARE_GID: "{{ dockflare_group_id }}"
           REDIS_URL: "redis://{{ dockflare_redis_container_name }}:6379/0"
           REDIS_DB_INDEX: "0"  # Optional: specify Redis database index (0-15) for isolation from other containers
           DOCKER_HOST: "tcp://{{ dockflare_proxy_container_name }}:2375"
