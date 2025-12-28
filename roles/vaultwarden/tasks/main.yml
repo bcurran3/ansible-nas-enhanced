@@ -128,9 +128,9 @@
               - "{{ vaultwarden_data_directory }}/data:/data"
               - "{{ vaultwarden_data_directory }}/backup:/backup"
             env:
-              DELETE_AFTER: "30"
-              UID: "0"
-              TIMESTAMP: "true"
+              DELETE_AFTER: "{{ vaultwarden_backup_env_delete_after }}"
+              UID: "{{ vaultwarden_backup_env_uid }}"
+              TIMESTAMP: "{{ vaultwarden_backup_env_timestamp }}"
               TZ: "{{ ansible_nas_timezone }}"
             links:
               - "{{ vaultwarden_container_name }}"
