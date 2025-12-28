@@ -1,0 +1,21 @@
+# docker-android
+
+Homepage: <https://docker-android.com/>
+Image: <https://link_to_docker_image_used.com>
+
+This is where you would have the developer's description of the application.
+
+## Usage
+
+Set `docker-android_enabled: true` in your `inventories/<your_inventory>/nas.yml` file.
+
+ane.sh --enable docker-android to enable the app
+ane.sh --up to install the app
+
+If you want to access docker-android externally, don't forget to set `docker-android_available_externally: true` in your `inventories/<your_inventory>/nas.yml` file.
+
+!---> mention dockflare here with cloduflare account and domain
+
+The default credentials are admin:password
+
+The docker-android web interface can be found at <http://ansible_nas_host_or_ip:port>.
