@@ -181,7 +181,7 @@ By default, applications can be found on the ports listed below.
 | Navidrome        | 4533    | Bridge  | HTTP           |
 | NetAlertX        | 20211
 | NetAlertX        | 20212
-| netbootxyz       | 3002    | Bridge  | HTTP           |
+| netbootxyz       | 3072    | Bridge  | HTTP           |
 | netbootxyz       | 5803    | Bridge  | HTTP           |
 | netbootxyz       | 69      | Bridge  | TFTP           |
 | Netdata          | 19999   | Bridge  | HTTP           |
@@ -378,7 +378,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3072
+# next avail = 3073
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
