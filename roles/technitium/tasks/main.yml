@@ -122,8 +122,7 @@
           traefik.http.routers.technitium.tls.certresolver: "letsencrypt"
           traefik.http.routers.technitium.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.technitium.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ technitium_hostname }}"
-          traefik.http.routers.technitium.middlewares: "{{ technitium_hostname }}@docker"
+          traefik.http.routers.technitium.middlewares: "technitium@docker{{ ',tinyauth-auth@docker' if technitium_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.technitium.IPAllowList.sourcerange: "{{ technitium_traefik_whitelist }}"
           traefik.http.services.technitium.loadbalancer.server.port: "{{ technitium_port_http }}"
           wud.tag.include: '^\d+\.\d+$'

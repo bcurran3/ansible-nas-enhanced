@@ -95,7 +95,7 @@
           repliqate.backup_id: "{{ umami_repliqate_backup_id }}"
           repliqate.retention: "{{ umami_repliqate_retention }}"
           traefik.enable: "{{ umami_available_externally | string }}"
-          traefik.http.routers.umami.rule: "Host(`umami.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.umami.rule: "Host(`{{ umami_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.umami.tls.certresolver: "letsencrypt"
           traefik.http.routers.umami.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.umami.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"

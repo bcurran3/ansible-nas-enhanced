@@ -52,8 +52,7 @@
           traefik.http.routers.watchstate.tls.certresolver: "letsencrypt"
           traefik.http.routers.watchstate.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.watchstate.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ watchstate_hostname }}"
-          traefik.http.routers.watchstate.middlewares: "{{ watchstate_hostname }}@docker"
+          traefik.http.routers.watchstate.middlewares: "watchstate@docker{{ ',tinyauth-auth@docker' if watchstate_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.watchstate.IPAllowList.sourcerange: "{{ watchstate_traefik_whitelist }}"
           traefik.http.services.watchstate.loadbalancer.server.port: "8080"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

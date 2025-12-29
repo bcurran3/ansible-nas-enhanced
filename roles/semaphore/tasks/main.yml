@@ -52,8 +52,7 @@
           traefik.http.routers.semaphore.tls.certresolver: "letsencrypt"
           traefik.http.routers.semaphore.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.semaphore.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ semaphore_hostname }}"
-          traefik.http.routers.semaphore.middlewares: "{{ semaphore_hostname }}@docker"
+          traefik.http.routers.semaphore.middlewares: "semaphore@docker{{ ',tinyauth-auth@docker' if semaphore_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.semaphore.IPAllowList.sourcerange: "{{ semaphore_traefik_whitelist }}"
           traefik.http.services.semaphore.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

@@ -89,8 +89,7 @@
           traefik.http.routers.titra.tls.certresolver: "letsencrypt"
           traefik.http.routers.titra.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.titra.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ titra_hostname }}"
-          traefik.http.routers.titra.middlewares: "{{ titra_hostname }}@docker"
+          traefik.http.routers.titra.middlewares: "titra@docker{{ ',tinyauth-auth@docker' if titra_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.titra.IPAllowList.sourcerange: "{{ titra_traefik_whitelist }}"
           traefik.http.services.titra.loadbalancer.server.port: "{{ titra_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'

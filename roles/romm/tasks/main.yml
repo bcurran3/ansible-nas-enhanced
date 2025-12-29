@@ -169,8 +169,7 @@
           traefik.http.routers.romm.tls.certresolver: "letsencrypt"
           traefik.http.routers.romm.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.romm.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ romm_hostname }}"
-          traefik.http.routers.romm.middlewares: "{{ romm_hostname }}@docker"
+          traefik.http.routers.romm.middlewares: "romm@docker{{ ',tinyauth-auth@docker' if romm_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.romm.IPAllowList.sourcerange: "{{ romm_traefik_whitelist }}"
           traefik.http.services.romm.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$'

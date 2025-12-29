@@ -55,8 +55,7 @@
           traefik.http.routers.stalwart.tls.certresolver: "letsencrypt"
           traefik.http.routers.stalwart.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.stalwart.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ stalwart_hostname }}"
-          traefik.http.routers.stalwart.middlewares: "{{ stalwart_hostname }}@docker"
+          traefik.http.routers.stalwart.middlewares: "stalwart@docker{{ ',tinyauth-auth@docker' if stalwart_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.stalwart.IPAllowList.sourcerange: "{{ stalwart_traefik_whitelist }}"
           traefik.http.services.stalwart.loadbalancer.server.port: "8080"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

@@ -53,8 +53,7 @@
           traefik.http.routers.trilium.tls.certresolver: "letsencrypt"
           traefik.http.routers.trilium.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.trilium.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ trilium_hostname }}"
-          traefik.http.routers.trilium.middlewares: "{{ trilium_hostname }}@docker"
+          traefik.http.routers.trilium.middlewares: "trilium@docker{{ ',tinyauth-auth@docker' if trilium_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.trilium.IPAllowList.sourcerange: "{{ trilium_traefik_whitelist }}"
           traefik.http.services.trilium.loadbalancer.server.port: "8080"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

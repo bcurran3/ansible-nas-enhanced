@@ -58,8 +58,7 @@
           traefik.http.routers.znc.tls.certresolver: "letsencrypt"
           traefik.http.routers.znc.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.znc.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ znc_hostname }}"
-          traefik.http.routers.znc.middlewares: "{{ znc_hostname }}@docker"
+          traefik.http.routers.znc.middlewares: "znc@docker{{ ',tinyauth-auth@docker' if znc_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.znc.IPAllowList.sourcerange: "{{ znc_traefik_whitelist }}"
           traefik.http.services.znc.loadbalancer.server.port: "6677"
           wud.tag.include: '^\d+\.\d+\.\d+$'

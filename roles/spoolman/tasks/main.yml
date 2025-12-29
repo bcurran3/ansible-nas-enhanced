@@ -49,8 +49,7 @@
           traefik.http.routers.spoolman.tls.certresolver: "letsencrypt"
           traefik.http.routers.spoolman.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.spoolman.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ spoolman_hostname }}"
-          traefik.http.routers.spoolman.middlewares: "{{ spoolman_hostname }}@docker"
+          traefik.http.routers.spoolman.middlewares: "spoolman@docker{{ ',tinyauth-auth@docker' if spoolman_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.spoolman.IPAllowList.sourcerange: "{{ spoolman_traefik_whitelist }}"
           traefik.http.services.spoolman.loadbalancer.server.port: "8000"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

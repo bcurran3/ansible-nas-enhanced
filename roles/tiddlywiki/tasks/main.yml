@@ -49,8 +49,7 @@
           traefik.http.routers.tiddlywiki.tls.certresolver: "letsencrypt"
           traefik.http.routers.tiddlywiki.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.tiddlywiki.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ tiddlywiki_hostname }}"
-          traefik.http.routers.tiddlywiki.middlewares: "{{ tiddlywiki_hostname }}@docker"
+          traefik.http.routers.tiddlywiki.middlewares: "tiddlywiki@docker{{ ',tinyauth-auth@docker' if tiddlywiki_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.tiddlywiki.IPAllowList.sourcerange: "{{ tiddlywiki_traefik_whitelist }}"
           traefik.http.services.tiddlywiki.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$'

@@ -118,7 +118,7 @@
           traefik.http.routers.youtarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.youtarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.youtarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.youtarr.middlewares: "{{ youtarr_hostname }}@docker{{ ',tinyauth-auth@docker' if youtarr_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.youtarr.middlewares: "youtarr@docker{{ ',tinyauth-auth@docker' if youtarr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.youtarr.IPAllowList.sourcerange: "{{ youtarr_traefik_whitelist }}"
           traefik.http.services.youtarr.loadbalancer.server.port: "3011"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

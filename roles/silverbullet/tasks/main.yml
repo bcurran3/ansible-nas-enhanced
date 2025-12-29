@@ -48,8 +48,7 @@
           traefik.http.routers.silverbullet.tls.certresolver: "letsencrypt"
           traefik.http.routers.silverbullet.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.silverbullet.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ silverbullet_hostname }}"
-          traefik.http.routers.silverbullet.middlewares: "{{ silverbullet_hostname }}@docker"
+          traefik.http.routers.silverbullet.middlewares: "silverbullet@docker{{ ',tinyauth-auth@docker' if silverbullet_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.silverbullet.IPAllowList.sourcerange: "{{ silverbullet_traefik_whitelist }}"
           traefik.http.services.silverbullet.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

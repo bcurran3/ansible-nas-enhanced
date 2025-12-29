@@ -55,8 +55,7 @@
           traefik.http.routers.whisparr.tls.certresolver: "letsencrypt"
           traefik.http.routers.whisparr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.whisparr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ whisparr_hostname }}"
-          traefik.http.routers.whisparr.middlewares: "{{ whisparr_hostname }}@docker"
+          traefik.http.routers.whisparr.middlewares: "whisparr@docker{{ ',tinyauth-auth@docker' if whisparr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.whisparr.IPAllowList.sourcerange: "{{ whisparr_traefik_whitelist }}"
           traefik.http.services.whisparr.loadbalancer.server.port: "6969"
           wud.tag.include: '^v\d+\.\d+\.\d+\.\d+$'

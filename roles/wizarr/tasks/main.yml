@@ -51,8 +51,7 @@
           traefik.http.routers.wizarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.wizarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.wizarr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ wizarr_hostname }}"
-          traefik.http.routers.wizarr.middlewares: "{{ wizarr_hostname }}@docker"
+          traefik.http.routers.wizarr.middlewares: "wizarr@docker{{ ',tinyauth-auth@docker' if wizarr_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.wizarr.IPAllowList.sourcerange: "{{ wizarr_traefik_whitelist }}"
           traefik.http.services.wizarr.loadbalancer.server.port: "5690"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

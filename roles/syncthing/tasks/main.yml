@@ -51,8 +51,7 @@
           traefik.http.routers.syncthing.tls.certresolver: "letsencrypt"
           traefik.http.routers.syncthing.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.syncthing.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ syncthing_hostname }}"
-          traefik.http.routers.syncthing.middlewares: "{{ syncthing_hostname }}@docker"
+          traefik.http.routers.syncthing.middlewares: "syncthing@docker{{ ',tinyauth-auth@docker' if syncthing_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.syncthing.IPAllowList.sourcerange: "{{ syncthing_traefik_whitelist }}"
           traefik.http.services.syncthing.loadbalancer.server.port: "8384"
           wud.tag.include: '^\d+\.\d+\.\d+$'

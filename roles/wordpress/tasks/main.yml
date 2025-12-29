@@ -96,8 +96,7 @@
           traefik.http.routers.wordpress.tls.certresolver: "letsencrypt"
           traefik.http.routers.wordpress.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.wordpress.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ wordpress_hostname }}"
-          traefik.http.routers.wordpress.middlewares: "{{ wordpress_hostname }}@docker"
+          traefik.http.routers.wordpress.middlewares: "wordpress@docker{{ ',tinyauth-auth@docker' if wordpress_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.wordpress.IPAllowList.sourcerange: "{{ wordpress_traefik_whitelist }}"
           traefik.http.services.wordpress.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+$'

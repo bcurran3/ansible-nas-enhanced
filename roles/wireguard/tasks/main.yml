@@ -61,8 +61,7 @@
           traefik.http.routers.wireguard.tls.certresolver: "letsencrypt"
           traefik.http.routers.wireguard.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.wireguard.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ wireguard_hostname }}"
-          traefik.http.routers.wireguard.middlewares: "{{ wireguard_hostname }}@docker"
+          traefik.http.routers.wireguard.middlewares: "wireguard@docker{{ ',tinyauth-auth@docker' if wireguard_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.wireguard.IPAllowList.sourcerange: "{{ wireguard_traefik_whitelist }}"
           traefik.http.services.wireguard.loadbalancer.server.port: "{{ wireguard_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'

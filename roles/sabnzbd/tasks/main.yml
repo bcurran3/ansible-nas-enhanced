@@ -58,8 +58,7 @@
           traefik.http.routers.sabnzbd.tls.certresolver: "letsencrypt"
           traefik.http.routers.sabnzbd.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.sabnzbd.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ sabnzbd_hostname }}"
-          traefik.http.routers.sabnzbd.middlewares: "{{ sabnzbd_hostname }}@docker"
+          traefik.http.routers.sabnzbd.middlewares: "sabnzbd@docker{{ ',tinyauth-auth@docker' if sabnzbd_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.sabnzbd.IPAllowList.sourcerange: "{{ sabnzbd_traefik_whitelist }}"
           traefik.http.services.sabnzbd.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

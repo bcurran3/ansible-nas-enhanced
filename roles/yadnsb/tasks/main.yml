@@ -42,8 +42,7 @@
           traefik.http.routers.yadnsb.tls.certresolver: "letsencrypt"
           traefik.http.routers.yadnsb.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.yadnsb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ yadnsb_hostname }}"
-          traefik.http.routers.yadnsb.middlewares: "{{ yadnsb_hostname }}@docker"
+          traefik.http.routers.yadnsb.middlewares: "yadnsb@docker{{ ',tinyauth-auth@docker' if yadnsb_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.yadnsb.IPAllowList.sourcerange: "{{ yadnsb_traefik_whitelist }}"
           traefik.http.services.yadnsb.loadbalancer.server.port: "3000"
           wud.tag.include: '^v\d+\.\d+\.\d+.*$'

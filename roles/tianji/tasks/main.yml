@@ -98,8 +98,7 @@
           traefik.http.routers.tianji.tls.certresolver: "letsencrypt"
           traefik.http.routers.tianji.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.tianji.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ tianji_hostname }}"
-          traefik.http.routers.tianji.middlewares: "{{ tianji_hostname }}@docker"
+          traefik.http.routers.tianji.middlewares: "tianji@docker{{ ',tinyauth-auth@docker' if tianji_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.tianji.IPAllowList.sourcerange: "{{ tianji_traefik_whitelist }}"
           traefik.http.services.tianji.loadbalancer.server.port: "12345"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

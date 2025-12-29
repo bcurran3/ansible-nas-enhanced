@@ -58,8 +58,7 @@
           traefik.http.routers.vfd.tls.certresolver: "letsencrypt"
           traefik.http.routers.vfd.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.vfd.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ vfd_hostname }}"
-          traefik.http.routers.vfd.middlewares: "{{ vfd_hostname }}@docker"
+          traefik.http.routers.vfd.middlewares: "vfd@docker{{ ',tinyauth-auth@docker' if vfd_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.vfd.IPAllowList.sourcerange: "{{ vfd_traefik_whitelist }}"
           traefik.http.services.vfd.loadbalancer.server.port: "{{ vfd_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'

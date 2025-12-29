@@ -60,8 +60,7 @@
           traefik.http.routers.utorrent.tls.certresolver: "letsencrypt"
           traefik.http.routers.utorrent.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.utorrent.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ utorrent_hostname }}"
-          traefik.http.routers.utorrent.middlewares: "{{ utorrent_hostname }}@docker"
+          traefik.http.routers.utorrent.middlewares: "utorrent@docker{{ ',tinyauth-auth@docker' if utorrent_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.utorrent.IPAllowList.sourcerange: "{{ utorrent_traefik_whitelist }}"
           traefik.http.services.utorrent.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$'

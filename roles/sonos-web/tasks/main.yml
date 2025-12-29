@@ -34,13 +34,12 @@
 # HOST MODE
 # TDL: possibly convert to bridged with sonos ports forwarded
 #          traefik.enable: "{{ sonos_web_available_externally | string }}"
-#          traefik.http.routers.sonos_web.rule: "Host(`sonos_web.{{ ansible_nas_domain }}`)"
-#          traefik.http.routers.sonos_web.tls.certresolver: "letsencrypt"
-#          traefik.http.routers.sonos_web.tls.domains[0].main: "{{ ansible_nas_domain }}"
-#          traefik.http.routers.sonos_web.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-#          traefik.http.routers.frontend.middlewares: "{{ sonos_web_hostname }}"
-#          traefik.http.routers.sonos_web.middlewares: "{{ sonos_web_hostname }}@docker"
-#          traefik.http.middlewares.sonos_web.IPAllowList.sourcerange: "{{ sonos_web_traefik_whitelist }}"
+#          traefik.http.routers.sonosweb.rule: "Host(`{{ sonos_web_hostname }}.{{ ansible_nas_domain }}`)"
+#          traefik.http.routers.sonosweb.tls.certresolver: "letsencrypt"
+#          traefik.http.routers.sonosweb.tls.domains[0].main: "{{ ansible_nas_domain }}"
+#          traefik.http.routers.sonosweb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+#          traefik.http.routers.sonosweb.middlewares: "sonosweb@docker{{ ',tinyauth-auth@docker' if sonos_web_tinyauth_enabled | bool else '' }}"
+#          traefik.http.middlewares.sonosweb.IPAllowList.sourcerange: "{{ sonos_web_traefik_whitelist }}"
 #          traefik.http.services.sonos_web.loadbalancer.server.port: "5050"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
