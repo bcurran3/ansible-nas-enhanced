@@ -115,6 +115,23 @@
 #            update_cache: yes
 # ^ close but errors updating cache
 
+
+
+
+# NEW UNTESTED GEMINI SUGGESTED WAY 12/28/25:
+# DO VM BACKUP BEFORE TESTING AS IT MIGHT CAUSE REPO ISSUES
+#    - name: Download NVIDIA Container Toolkit GPG key
+#      ansible.builtin.get_url:
+#        url: https://nvidia.github.io/libnvidia-container/gpgkey
+#        dest: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+#        mode: '0644'
+#
+#    - name: Add NVIDIA Container Toolkit repository
+#      ansible.builtin.apt_repository:
+#        repo: "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://nvidia.github.io/libnvidia-container/stable/deb/$(ARCH) /"
+#        filename: nvidia-container-toolkit
+#        state: present
+
 # my old, less Ansible-ly way:
         - name: Add NVIDIA Container Toolkit repository to APT sources
           ansible.builtin.shell: |
