@@ -1,0 +1,84 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ dockhand_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dockhand_container_name }}"
+        hostname: "{{ dockhand_container_name }}"
+        image: "{{ dockhand_image_name }}:{{ dockhand_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dockhand_data_directory }}:/app/data"
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+          - "{{ dockhand_port_http }}:3000"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ dockhand_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockhand_watchtower_enable | string }}"
+          dockflare.enable: "{{ dockhand_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ dockhand_dockflare_access_group }}"
+          dockflare.hostname: "{{ dockhand_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockhand_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ dockhand_homepage_group }}"
+          homepage.icon: "{{ dockhand_homepage_icon }}"
+          homepage.href: "{{ dockhand_homepage_href }}"
+          homepage.description: "{{ 'Docker management you will like' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dockhand_container_name }}"
+          homepage.showStats: "{{ dockhand_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockhand_port_http }}"
+          repliqate.enabled: "{{ dockhand_repliqate_enabled | string  }}"
+          repliqate.engine: "{{ dockhand_repliqate_engine }}"
+          repliqate.schedule: "{{ dockhand_repliqate_schedule }}"
+          repliqate.backup_id: "{{ dockhand_repliqate_backup_id }}"
+          repliqate.retention: "{{ dockhand_repliqate_retention }}"
+          traefik.enable: "{{ dockhand_available_externally | string }}"
+          traefik.http.routers.dockhand.rule: "Host(`{{ dockhand_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.dockhand.tls.certresolver: "letsencrypt"
+          traefik.http.routers.dockhand.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.dockhand.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.dockhand.middlewares: "dockhand@docker{{ ',tinyauth-auth@docker' if dockhand_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.dockhand.IPAllowList.sourcerange: "{{ dockhand_traefik_whitelist }}"
+          traefik.http.services.dockhand.loadbalancer.server.port: "3000"
+          wud.tag.include: ^v\d+\.\d+\.\d+$
+          wud.link.template: https://github.com/Finsys/dockhand/releases/tag/v${major}.${minor}.${patch}
+        cpu_shares: "{{ dockhand_cpu_shares }}"
+        memory: "{{ dockhand_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockhand_port_http | string)] +
+                (['https://' + dockhand_hostname + '.' + ansible_nas_domain] if (dockhand_available_externally is true or dockhand_dockflare_tunnel is true) else [])
+              }}
+  when: dockhand_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ dockhand_container_name }}"
+        state: absent
+  when: dockhand_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ dockhand_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - dockhand_enabled is false

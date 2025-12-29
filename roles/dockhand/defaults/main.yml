@@ -1,0 +1,48 @@
+---
+# ANE
+ansible_nas_app_name: "Dockhand"
+dockhand_enabled: false
+dockhand_available_externally: false
+dockhand_traefik_whitelist: "{{ lan }}"
+
+# directories
+dockhand_data_directory: "{{ docker_home }}/dockhand"
+
+# docker
+dockhand_container_name: "dockhand"
+dockhand_image_name: "fnsys/dockhand"
+dockhand_image_tag: "latest"
+
+# network
+dockhand_port_http: "3073"
+dockhand_hostname: "dockhand"
+
+# specs
+dockhand_cpu_shares: 1024
+dockhand_memory: "1G"
+
+# autoheal
+dockhand_autoheal: "false"
+
+# dockflare
+dockhand_dockflare_tunnel: "false"
+dockhand_dockflare_access_group: ""
+
+# homepage
+dockhand_homepage_group: "Apps"
+dockhand_homepage_icon: "https://dockhand.pro/images/logo-dark.webp"
+dockhand_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockhand_port_http }}"
+dockhand_homepage_showstats: "false"
+
+# repliqate
+dockhand_repliqate_enabled: "false"
+dockhand_repliqate_engine: "restic"
+dockhand_repliqate_schedule: "@daily 3am"
+dockhand_repliqate_backup_id: "{{ dockhand_container_name }}"
+dockhand_repliqate_retention: "30d"
+
+# tinyauth
+dockhand_tinyauth_enabled: "false"
+
+# watchtower
+dockhand_watchtower_enable: "false"
