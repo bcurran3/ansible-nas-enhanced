@@ -9,14 +9,14 @@
 : "${ANE_DISABLE_ALSO_REMOVES:=false}"
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
 
-: "${ANE_ENABLE_ALSO_STARTS:=false}"
-
-# Global exclusion list for app displays
 # Filter out non-containers
 ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin"
 
+#####################################
 ########## begin functions ##########
+#####################################
 
+# display ANE logo
 function print_logo {
 echo "      _    _   _ _____"
 echo "     / \  | \ | | ____|"
@@ -55,11 +55,13 @@ function help {
     echo "      Display ANE \"Pro Tips\""
     echo "  --prune"
     echo "      Prune unused Docker images and volumes."
+    echo "  --remove <app_name> <app_name> <app_name>"
+    echo "      Stop, disable, and remove ANE apps."
     echo "  --requirements"
     echo "      Install or re-install ANE requirements."
     echo "  --run, --update"
     echo "      Run ANE full playbook."
-    echo "  --settings, -s, --overrides"
+    echo "  --settings, --overrides"
     echo "      Edit ANE settings/overrides."
     echo "  --stopall"
     echo "      Stop all running containers."
@@ -71,7 +73,7 @@ function help {
     exit
 }
 
-# Check git commits ANE is behind function
+# Check # git commits ANE is behind
 function check_behind {
     git fetch --quiet
     if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
@@ -80,7 +82,6 @@ function check_behind {
     if [ $BEHIND -gt 0 ]; then
        echo "  ** \"./ane.sh --upgrade\" to update"
     fi
-    #echo
 }
 
 # ANE Pro Tips menu
@@ -102,13 +103,14 @@ function display_protips {
     echo "    -- install app when you enable it"
 }
 
+# ANE Developer Stuff menu
 function display_devstuff {
     echo "Ansible-NAS-Enhanced (ANE) Developer Stuff:"
     echo "  --enableallapps"
     echo "      Enable all apps."
     echo "  --disableallapps"
     echo "      Disable all apps."
-    echo "  --newapp"
+    echo "  --newapp appname"
     echo "      Copies app template and autofills some variables."
 }
 
@@ -168,7 +170,7 @@ function disable_app {
         elif [ -f "$FILE" ] && grep -q "^$DISABLED_LINE" "$FILE"; then
             echo "  ** ${arg} is already disabled."
         else
-            echo "  ** ${arg} does not exist in $FILE."
+            echo "  ** ${arg} does not exist in your settings/overrides file."
         fi
     done
     if [[ "$ANE_DISABLE_ALSO_REMOVES" == "true" && -n "$TAGS_TO_REMOVE" ]]; then
@@ -235,7 +237,7 @@ function display_status {
     GRAY='\033[0;90m'
     NC='\033[0m'
 
-    echo "  ** ANE Application Status:"
+    echo "  ** ANE Applications Status:"
     echo "--------------------------------------------------------"
     printf "%-20s %-15s %-15s\n" "APP NAME" "CONFIGURED" "STATUS"
     echo "--------------------------------------------------------"
@@ -315,7 +317,7 @@ function enable_app {
                 fi
                 TAGS_TO_RUN+="${arg},"
             else
-                echo "  ** ${arg} not found in $APPSLIST."
+                echo "  ** ${arg} role not found in nas.yml."
             fi
         fi
     done
@@ -384,6 +386,16 @@ function upgrade {
     git pull
 }
 
+function run_playbook {
+#    validate_app
+    appslist=""
+    shift
+    for arg in "$@"; do
+        appslist+=" -t $arg"
+    done
+    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $appslist
+}
+
 function stop_app {
     [[ "$1" == -* ]] && shift
     for arg in "$@"; do
@@ -397,7 +409,9 @@ function stop_app {
     done
 }
 
+###################################
 ########## end functions ##########
+###################################
 
 # offer help when no switches provided
 if [[ -z "$1" ]]; then
@@ -418,17 +432,15 @@ fi
 
 # ANE help
 if [[ "$1" = "--help" || "$1" = "-help" || "$1" = "--?" || "$1" = "-?" ]]; then
-    app_readme="./docs/applications/$2.md"
-    if [[ -n "$2" ]] && [[ -f "$app_readme" ]]; then
-        cat "$app_readme"
+    if [[ -n "./docs/applications/$2.md" ]] && [[ -f "./docs/applications/$2.md" ]]; then
+        cat "./docs/applications/$2.md"
         exit
     fi
     if [[ -n "$2" ]]; then
-        echo "  ** ERROR: $2.md not found."
+        echo "  ** $2.md not found."
         echo "  ** "./ane.sh --available" to view available apps."
         exit 1
     fi
-
     help
 fi
 
@@ -438,13 +450,13 @@ if [[ "$1" = "--protips" || "$1" = "-protips" ]]; then
     exit
 fi
 
-# ANE Pro Tips menu
+# ANE Dev Stuff menu
 if [[ "$1" = "--devstuff" || "$1" = "-devstuff" || "$1" = "--devops" || "$1" = "-devops" ]]; then
     display_devstuff
     exit
 fi
 
-if $ANE_ALWAYS_CHECK_BEHIND; then check_behind; fi
+if [[ "$ANE_ALWAYS_CHECK_BEHIND" == "true" ]]; then check_behind; fi
 
 # Install/update only specified ANE apps
 if [[ "$1" = "--up" || "$1" = "-up" || "$1" = "--start" || "$1" = "-start" || "$1" = "--app" || "$1" = "--apps" || "$1" = "-a" || "$1" = "--tag" || "$1" = "--tags" || "$1" = "-t" ]]; then
@@ -453,13 +465,8 @@ if [[ "$1" = "--up" || "$1" = "-up" || "$1" = "--start" || "$1" = "-start" || "$
         exit 1
      fi
     [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
-    appslist=""
-    shift
-    for arg in "$@"; do
-        appslist+=" -t $arg"
-    done
-   ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $appslist
-   exit
+    enable_app "$@"
+    run_playbook "$@"
 fi
 
 # List ANE available apps (roles)
@@ -470,7 +477,7 @@ fi
 
 # Check git commits ANE is behind
 if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" ]]; then
-    if $ANE_ALWAYS_CHECK_BEHIND; then exit; fi
+    if [[ "$ANE_ALWAYS_CHECK_BEHIND" == "true" ]]; then exit; fi
     check_behind
     exit
 fi
@@ -482,7 +489,7 @@ if [[ "$1" = "--disable" || "$1" = "-disable" ]]; then
 fi
 
 # Down (stop) ANE app(s)
-if [[ "$1" = "--down" || "$1" = "-down" || "$1" = "-stop"|| "$1" = "-stop" ]]; then
+if [[ "$1" = "--down" || "$1" = "-down" || "$1" = "--stop"|| "$1" = "-stop" ]]; then
     stop_app "$@"
     exit
 fi
@@ -564,6 +571,14 @@ if [[ "$1" = "--prune" || "$1" = "-prune" ]]; then
     exit
 fi
 
+# Remove ANE app
+if [[ "$1" = "--remove" || "$1" = "-remove" ]]; then
+    stop_app "$@"
+    disable_app "$@"
+    run_playbook "$@"
+    exit
+fi
+
 # Install ANE requirements
 if [[ "$1" = "--requirements" || "$1" = "-requirements" ]]; then
     ansible-galaxy install -r requirements.yml --force
@@ -577,13 +592,13 @@ if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" || "$1" = "-update" || 
     exit
 fi
 
-# Edit ANE settings/variables
+# Edit ANE settings/overrides/variables
 if [[ "$1" = "--settings" || "$1" = "-settings" || "$1" = "-s" || "$1" = "--overrides" || "$1" = "-overrides" || "$1" = "--vars" || "$1" = "-vars" || "$1" = "-v" ]]; then
     $ANE_EDITOR inventories/ANE/group_vars/nas.yml
     exit
 fi
 
-# Edit ANE settings/variables
+# Display ANE Applications Status
 if [[ "$1" = "--status" || "$1" = "-status" ]]; then
     display_status
     exit
