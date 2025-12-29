@@ -102,8 +102,7 @@
           traefik.http.routers.ocis.tls.certresolver: "letsencrypt"
           traefik.http.routers.ocis.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ocis.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ ocis_hostname }}"
-          traefik.http.routers.ocis.middlewares: "{{ ocis_hostname }}@docker"
+          traefik.http.routers.ocis.middlewares: "ocis@docker{{ ',tinyauth-auth@docker' if ocis_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.ocis.IPAllowList.sourcerange: "{{ ocis_traefik_whitelist }}"
           traefik.http.services.ocis.loadbalancer.server.port: "9200"
           wud.tag.include: '^\d+\.\d+\.\d+$'

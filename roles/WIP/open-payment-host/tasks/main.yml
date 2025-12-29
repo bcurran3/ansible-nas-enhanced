@@ -55,8 +55,7 @@
           traefik.http.routers.openpaymenthost.tls.certresolver: "letsencrypt"
           traefik.http.routers.openpaymenthost.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.openpaymenthost.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ openpaymenthost_hostname }}"
-          traefik.http.routers.openpaymenthost.middlewares: "{{ openpaymenthost_hostname }}@docker"
+          traefik.http.routers.openpaymenthost.middlewares: "openpaymenthost@docker{{ ',tinyauth-auth@docker' if openpaymenthost_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.openpaymenthost.IPAllowList.sourcerange: "{{ openpaymenthost_traefik_whitelist }}"
           traefik.http.services.openpaymenthost.loadbalancer.server.port: "80"
           wud.tag.include: '/^\\d+\\.\\d+\\.\\d+$/'

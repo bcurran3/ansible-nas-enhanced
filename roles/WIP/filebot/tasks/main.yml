@@ -65,10 +65,11 @@
           homepage.container: "{{ filebot_container_name }}"
           homepage.showStats: "{{ filebot_homepage_showstats }}"
           traefik.enable: "{{ filebot_available_externally | string }}"
-          traefik.http.routers.filebot.rule: "Host(`filebot.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.filebot.rule: "Host(`{{ filebot_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.filebot.tls.certresolver: "letsencrypt"
           traefik.http.routers.filebot.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.filebot.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.filebot.middlewares: "filebot@docker{{ ',tinyauth-auth@docker' if filebot_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.filebot.IPAllowList.sourcerange: "{{ filebot_traefik_whitelist }}"
           traefik.http.services.filebot.loadbalancer.server.port: "5452"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'

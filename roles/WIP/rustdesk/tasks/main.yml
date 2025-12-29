@@ -124,8 +124,7 @@
           traefik.http.routers.rustdesk.tls.certresolver: "letsencrypt"
           traefik.http.routers.rustdesk.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.rustdesk.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ rustdesk_hostname }}"
-          traefik.http.routers.rustdesk.middlewares: "{{ rustdesk_hostname }}@docker"
+          traefik.http.routers.rustdesk.middlewares: "rustdesk@docker{{ ',tinyauth-auth@docker' if rustdesk_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.rustdesk.IPAllowList.sourcerange: "{{ rustdesk_traefik_whitelist }}"
           traefik.http.services.rustdesk.loadbalancer.server.port: "5000"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'

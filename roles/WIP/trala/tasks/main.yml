@@ -54,8 +54,7 @@
           traefik.http.routers.trala.tls.certresolver: "letsencrypt"
           traefik.http.routers.trala.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.trala.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ trala_hostname }}"
-          traefik.http.routers.trala.middlewares: "{{ trala_hostname }}@docker"
+          traefik.http.routers.trala.middlewares: "trala@docker{{ ',tinyauth-auth@docker' if trala_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.trala.IPAllowList.sourcerange: "{{ trala_traefik_whitelist }}"
           traefik.http.services.trala.loadbalancer.server.port: "8080"
           wud.tag.include: '^v\d+\.\d+\.\d+$'

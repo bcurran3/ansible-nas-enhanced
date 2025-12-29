@@ -103,8 +103,7 @@
           traefik.http.routers.ssm.tls.certresolver: "letsencrypt"
           traefik.http.routers.ssm.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ssm.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.frontend.middlewares: "{{ ssm_hostname }}"
-          traefik.http.routers.ssm.middlewares: "{{ ssm_hostname }}@docker"
+          traefik.http.routers.ssm.middlewares: "ssm@docker{{ ',tinyauth-auth@docker' if ssm_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.ssm.IPAllowList.sourcerange: "{{ ssm_traefik_whitelist }}"
           traefik.http.services.ssm.loadbalancer.server.port: "8000"
           wud.tag.include: '^v\d+\.\d+\.\d+$'
