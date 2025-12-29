@@ -61,8 +61,9 @@ By default, applications can be found on the ports listed below.
 | Diskover ElasticS| 9200    | Bridge  | HTTP           |
 | Docker-Android   | 6080    | Bridge  | HTTP           |
 | DockFlare        | 3070    | Bridge  | HTTP           |
-| Dockge           | 5001
-| Dockman          | 8866
+| Dockge           | 5001    | Bridge  | HTTP           |
+| Dockhand         | 3073    | Bridge  | HTTP           |
+| Dockman          | 8866    | Bridge  | HTTP           |
 | Dockpeek         | 3420    | Bridge  | HTTP           |
 | Dokemon          | 9019    | Bridge  | HTTP           |
 | Doku             | 3067    | Bridge  | HTTP           |
@@ -378,7 +379,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3073
+# next avail = 3074
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
