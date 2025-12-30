@@ -467,6 +467,7 @@ if [[ "$1" = "--up" || "$1" = "-up" || "$1" = "--start" || "$1" = "-start" || "$
     [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
     enable_app "$@"
     run_playbook "$@"
+    exit
 fi
 
 # List ANE available apps (roles)
