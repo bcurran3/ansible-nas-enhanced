@@ -1,0 +1,53 @@
+---
+# ANE
+ansible_nas_app_name: "Mailrise"
+mailrise_enabled: false
+mailrise_available_externally: false
+mailrise_traefik_whitelist: "{{ lan }}"
+
+mailrise_data_directory: "{{ docker_home }}/mailrise"
+
+# docker
+mailrise_container_name: "mailrise"
+mailrise_image_name: "ghcr.io/yoryan/mailrise"
+mailrise_image_tag: "latest"
+
+# network
+mailrise_hostname: "mailrise"
+mailrise_port_http: "8025"
+
+# specs
+mailrise_cpu_shares: 1024
+mailrise_memory: "512MB"
+
+# app
+mailrise_smtp_username: "{{ ansible_nas_user }}"
+mailrise_smtp_password: "{{ ansible_nas_app_admin_password }}"
+mailrise_gotify_app_token: "_change_me_"
+mailrise_ntfy_topic: "Mailrise"
+
+# https://github.com/caronc/apprise/wiki
+mailrise_targets:
+  - email: "gotify@{{ mailrise_hostname }}.{{ ansible_nas_domain }}"
+    urls:
+      - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port_http }}/{{ mailrise_gotify_app_token }}"
+#  - email: "ntfy@{{ mailrise_hostname }}.{{ ansible_nas_domain }}"
+#    urls:
+#      - "ntfy://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}/{{ mailrise_ntfy_topic }}"
+  - email: "*@*" # Catch-All
+    urls:
+      - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port_http }}/{{ mailrise_gotify_app_token }}"
+
+# autoheal
+mailrise_autoheal: "false"
+
+# homepage
+mailrise_homepage_group: "Misc"
+mailrise_homepage_icon: "https://raw.githubusercontent.com/YoRyan/mailrise/refs/heads/main/src/mailrise/asset/mailrise-info-256x256.png"
+mailrise_homepage_showstats: "false"
+
+# tinyauth
+mailrise_tinyauth_enabled: false
+
+# watchtower
+mailrise_watchtower_enable: false
