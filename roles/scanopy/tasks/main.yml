@@ -24,15 +24,15 @@
           - "{{ scanopy_data_directory }}/config:/root/.config/daemon"
           - /var/run/docker.sock:/var/run/docker.sock:ro
 #        ports:
-#          - "{{ scanopy_daemon_port_http }}:{{ scanopy_daemon_port_http }}"
+#          - 60073:60073
         env:
           SCANOPY_SERVER_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
           SCANOPY_PORT: "{{ scanopy_daemon_port_http }}"
-          SCANOPY_BIND_ADDRESS: "0.0.0.0"
-          SCANOPY_NAME: "scanopy-daemon"
-          SCANOPY_HEARTBEAT_INTERVAL: "30"
-          SCANOPY_MODE: "Push"
-#         SCANOPY_INTEGRATED_DAEMON_URL: "172.17.0.1"
+          SCANOPY_BIND_ADDRESS: "{{ scanopy_daemon_env_scanopy_bind_address }}"
+          SCANOPY_NAME: "{{ scanopy_daemon_env_scanopy_name }}"
+          SCANOPY_HEARTBEAT_INTERVAL: "{{ scanopy_daemon_env_scanopy_heartbeat_interval }}"
+          SCANOPY_MODE: "{{ scanopy_daemon_env_scanopy_mode }}"
+          SCANOPY_INTEGRATED_DAEMON_URL: "{{ scanopy_daemon_env_scanopy_integrated_daemon_url }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD-SHELL", "curl -f http://localhost:{{ scanopy_daemon_port_http }}/api/health || exit 1"]
@@ -75,9 +75,9 @@
         volumes:
           - "{{ scanopy_data_directory }}/db:/var/lib/postgresql/data"
         env:
-          POSTGRES_DB: "scanopy"
-          POSTGRES_USER: "postgres"
-          POSTGRES_PASSWORD: "topsecret"
+          POSTGRES_DB: "{{ scanopy_env_postgres_db }}"
+          POSTGRES_USER: "{{ scanopy_env_postgres_user }}"
+          POSTGRES_PASSWORD: "{{ scanopy_env_postgres_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD-SHELL", "pg_isready -U postgres"]
@@ -121,7 +121,7 @@
         ports:
           - "{{ scanopy_port_http }}:60072"
         env:
-          SCANOPY_DATABASE_URL: "postgresql://postgres:topsecret@{{ scanopy_db_container_name }}:5432/scanopy"
+          SCANOPY_DATABASE_URL: "postgresql://{{ scanopy_env_postgres_user }}:{{ scanopy_env_postgres_password }}@{{ scanopy_db_container_name }}:5432/scanopy"
           SCANOPY_WEB_EXTERNAL_PATH: "/app/static"
           SCANOPY_PUBLIC_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
           SCANOPY_INTEGRATED_DAEMON_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_daemon_port_http }}"
