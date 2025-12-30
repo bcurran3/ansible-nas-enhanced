@@ -1,0 +1,191 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ scanopy_data_directory }}"
+        - "{{ scanopy_data_directory }}/config"
+        - "{{ scanopy_data_directory }}/data"
+        - "{{ scanopy_data_directory }}/db"
+
+    - name: Create {{ ansible_nas_app_name }} daemon Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ scanopy_daemon_container_name }}"
+        hostname: "{{ scanopy_daemon_container_name }}"
+        image: "{{ scanopy_daemon_image_name }}:{{ scanopy_daemon_image_tag }}"
+        pull: true
+        network_mode: host
+        privileged: true
+        volumes:
+          - "{{ scanopy_data_directory }}/config:/root/.config/daemon"
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+#        ports:
+#          - "{{ scanopy_daemon_port_http }}:{{ scanopy_daemon_port_http }}"
+        env:
+          SCANOPY_SERVER_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+          SCANOPY_PORT: "{{ scanopy_daemon_port_http }}"
+          SCANOPY_BIND_ADDRESS: "0.0.0.0"
+          SCANOPY_NAME: "scanopy-daemon"
+          SCANOPY_HEARTBEAT_INTERVAL: "30"
+          SCANOPY_MODE: "Push"
+#         SCANOPY_INTEGRATED_DAEMON_URL: "172.17.0.1"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "curl -f http://localhost:{{ scanopy_daemon_port_http }}/api/health || exit 1"]
+          interval: "5s"
+          timeout: "3s"
+          retries: 15
+        labels:
+          autoheal: "{{ scanopy_daemon_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ scanopy_daemon_watchtower_enable | string }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} daemon"
+          homepage.group: "{{ scanopy_daemon_homepage_group }}"
+          homepage.icon: "{{ scanopy_daemon_homepage_icon }}"
+          homepage.href: "{{ scanopy_daemon_homepage_href }}"
+          homepage.description: "{{ 'scanopy daemon description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ scanopy_daemon_container_name }}"
+          homepage.showStats: "{{ scanopy_daemon_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_daemon_port_http }}"
+          repliqate.enabled: "{{ scanopy_daemon_repliqate_enabled }}"
+          repliqate.engine: "{{ scanopy_daemon_repliqate_engine }}"
+          repliqate.schedule: "{{ scanopy_daemon_repliqate_schedule }}"
+          repliqate.backup_id: "{{ scanopy_daemon_repliqate_backup_id }}"
+          repliqate.retention: "{{ scanopy_daemon_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/dev/scanopy/pkgs/container/scanopy"
+        cpu_shares: "{{ scanopy_daemon_cpu_shares }}"
+        memory: "{{ scanopy_daemon_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ scanopy_db_container_name }}"
+        hostname: "{{ scanopy_db_container_name }}"
+        image: "{{ scanopy_db_image_name }}:{{ scanopy_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ scanopy_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_DB: "scanopy"
+          POSTGRES_USER: "postgres"
+          POSTGRES_PASSWORD: "topsecret"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U postgres"]
+          interval: "10s"
+          timeout: "5s"
+          retries: 5
+        labels:
+          autoheal: "{{ scanopy_db_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ scanopy_db_watchtower_enable }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ scanopy_db_homepage_group }}"
+          homepage.icon: "{{ scanopy_db_homepage_icon }}"
+          homepage.href: "{{ scanopy_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ scanopy_db_container_name }}"
+          homepage.showStats: "{{ scanopy_db_homepage_showstats }}"
+          repliqate.enabled: "{{ scanopy_db_repliqate_enabled }}"
+          repliqate.engine: "{{ scanopy_db_repliqate_engine }}"
+          repliqate.schedule: "{{ scanopy_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ scanopy_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ scanopy_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
+        cpu_shares: "{{ scanopy_db_cpu_shares }}"
+        memory: "{{ scanopy_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ scanopy_container_name }}"
+        hostname: "{{ scanopy_container_name }}"
+        image: "{{ scanopy_image_name }}:{{ scanopy_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ scanopy_data_directory }}/data:/data"
+        ports:
+          - "{{ scanopy_port_http }}:60072"
+        env:
+          SCANOPY_DATABASE_URL: "postgresql://postgres:topsecret@{{ scanopy_db_container_name }}:5432/scanopy"
+          SCANOPY_WEB_EXTERNAL_PATH: "/app/static"
+          SCANOPY_PUBLIC_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+          SCANOPY_INTEGRATED_DAEMON_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_daemon_port_http }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ scanopy_db_container_name }}"
+        labels:
+          autoheal: "{{ scanopy_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ scanopy_watchtower_enable | string }}"
+          dockflare.enable: "{{ scanopy_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ scanopy_dockflare_access_group }}"
+          dockflare.hostname: "{{ scanopy_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ scanopy_homepage_group }}"
+          homepage.icon: "{{ scanopy_homepage_icon }}"
+          homepage.href: "{{ scanopy_homepage_href }}"
+          homepage.description: "{{ 'scanopy description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ scanopy_container_name }}"
+          homepage.showStats: "{{ scanopy_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+          repliqate.enabled: "{{ scanopy_repliqate_enabled }} | string"
+          repliqate.engine: "{{ scanopy_repliqate_engine }}"
+          repliqate.schedule: "{{ scanopy_repliqate_schedule }}"
+          repliqate.backup_id: "{{ scanopy_repliqate_backup_id }}"
+          repliqate.retention: "{{ scanopy_repliqate_retention }}"
+          traefik.enable: "{{ scanopy_available_externally | string }}"
+          traefik.http.routers.scanopy.rule: "Host(`{{ scanopy_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.scanopy.tls.certresolver: "letsencrypt"
+          traefik.http.routers.scanopy.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.scanopy.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.scanopy.middlewares: "scanopy@docker{{ ',tinyauth-auth@docker' if scanopy_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.scanopy.IPAllowList.sourcerange: "{{ scanopy_traefik_whitelist }}"
+          traefik.http.services.scanopy.loadbalancer.server.port: "60072"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/dev/scanopy/pkgs/container/scanopy"
+        cpu_shares: "{{ scanopy_cpu_shares }}"
+        memory: "{{ scanopy_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (scanopy_port_http | string)] +
+                (['https://' + scanopy_hostname + '.' + ansible_nas_domain] if (scanopy_available_externally is true or scanopy_dockflare_tunnel is true) else [])
+              }}
+  when: scanopy_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ scanopy_container_name }}"
+        state: absent
+  when: scanopy_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ scanopy_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - scanopy_enabled is false

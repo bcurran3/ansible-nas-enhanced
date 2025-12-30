@@ -1,0 +1,85 @@
+---
+# ANE
+ansible_nas_app_name: "Scanopy"
+scanopy_enabled: false
+scanopy_available_externally: false
+scanopy_traefik_whitelist: "{{ lan }}"
+
+# directories
+scanopy_data_directory: "{{ docker_home }}/scanopy"
+
+# docker
+scanopy_container_name: "scanopy"
+scanopy_image_name: "ghcr.io/scanopy/scanopy/server"
+scanopy_image_tag: "latest"
+scanopy_db_container_name: "scanopy-db"
+scanopy_db_image_name: "postgres"
+scanopy_db_image_tag: "17-alpine"
+scanopy_daemon_container_name: "scanopy-daemon"
+scanopy_daemon_image_name: "ghcr.io/scanopy/scanopy/daemon"
+scanopy_daemon_image_tag: "latest"
+
+# uid / gid
+scanopy_user_id: "0"
+scanopy_group_id: "0"
+
+# network
+scanopy_port_http: "60072"
+scanopy_hostname: "scanopy"
+scanopy_daemon_port_http: "60073"
+
+# specs
+scanopy_cpu_shares: 1024
+scanopy_memory: "1G"
+scanopy_db_cpu_shares: 1024
+scanopy_db_memory: "1G"
+scanopy_daemon_cpu_shares: 1024
+scanopy_daemon_memory: "1G"
+
+# autoheal
+scanopy_autoheal: "false"
+scanopy_db_autoheal: "false"
+scanopy_daemon_autoheal: "false"
+
+# dockflare
+scanopy_dockflare_tunnel: false
+scanopy_dockflare_access_group: ""
+
+# homepage
+scanopy_homepage_group: "Apps"
+scanopy_homepage_icon: "scanopy.png"
+scanopy_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+scanopy_homepage_showstats: "false"
+scanopy_db_homepage_group: "DBs"
+scanopy_db_homepage_icon: "postgres.png"
+scanopy_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+scanopy_db_homepage_showstats: "false"
+scanopy_daemon_homepage_group: "Misc"
+scanopy_daemon_homepage_icon: "scanopy.png"
+scanopy_daemon_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+scanopy_daemon_homepage_showstats: "false"
+
+# repliqate
+scanopy_repliqate_enabled: false
+scanopy_repliqate_engine: "restic"
+scanopy_repliqate_schedule: "@daily 3am"
+scanopy_repliqate_backup_id: "{{ scanopy_container_name }}"
+scanopy_repliqate_retention: "30d"
+scanopy_db_repliqate_enabled: "false"
+scanopy_db_repliqate_engine: "restic"
+scanopy_db_repliqate_schedule: "@daily 3am"
+scanopy_db_repliqate_backup_id: "{{ scanopy_db_container_name }}"
+scanopy_db_repliqate_retention: "30d"
+scanopy_daemon_repliqate_enabled: "false"
+scanopy_daemon_repliqate_engine: "restic"
+scanopy_daemon_repliqate_schedule: "@daily 3am"
+scanopy_daemon_repliqate_backup_id: "{{ scanopy_db_container_name }}"
+scanopy_daemon_repliqate_retention: "30d"
+
+# tinyauth
+scanopy_tinyauth_enabled: false
+
+# watchtower
+scanopy_watchtower_enable: false
+scanopy_db_watchtower_enable: "false"
+scanopy_daemon_watchtower_enable: "false"
