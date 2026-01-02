@@ -1,0 +1,100 @@
+---
+# ANE
+ansible_nas_app_name: "Netbox"
+netbox_enabled: false
+netbox_available_externally: false
+netbox_traefik_whitelist: "{{ lan }}"
+
+# directories
+netbox_data_directory: "{{ docker_home }}/netbox"
+
+# docker
+netbox_container_name: "netbox"
+netbox_image_name: "lscr.io/linuxserver/netbox"
+netbox_image_tag: "latest"
+netbox_db_container_name: "netbox-db"
+netbox_db_image_name: "postgres"
+netbox_db_image_tag: "16-alpine"
+netbox_redis_container_name: "netbox-redis"
+netbox_redis_image_name: "redis"
+netbox_redis_image_tag: "latest"
+
+# uid / gid
+netbox_user_id: "1000"
+netbox_group_id: "1000"
+
+# network
+netbox_port_http: "3074"
+netbox_hostname: "netbox"
+
+# specs
+netbox_cpu_shares: 1024
+netbox_memory: "1G"
+netbox_db_cpu_shares: 1024
+netbox_db_memory: "1G"
+netbox_redis_cpu_shares: 1024
+netbox_redis_memory: "1G"
+
+# app
+netbox_env_superuser_email: "{{ ansible_nas_email }}"
+netbox_env_superuser_password: "{{ ansible_nas_app_admin_password }}"
+netbox_env_allowed_host: "*" # "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }} {{ netbox_hostname }}.{{ ansible_nas_domain }}"
+netbox_env_db_name: "netbox_db"
+netbox_env_db_user: "netbox"
+netbox_env_db_password: "topsecret"
+netbox_env_redis_password: "topsecret"
+netbox_env_redis_db_task: "0"
+netbox_env_redis_db_cache: "1"
+
+# autoheal
+netbox_autoheal: "false"
+netbox_db_autoheal: "false"
+netbox_redis_autoheal: "false"
+
+# dockflare
+netbox_dockflare_tunnel: false
+netbox_dockflare_access_group: ""
+
+# homepage
+netbox_homepage_group: "Apps"
+netbox_homepage_icon: "netbox.png"
+netbox_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbox_port_http }}"
+netbox_homepage_showstats: "false"
+netbox_db_homepage_group: "DBs"
+netbox_db_homepage_icon: "postgres.png"
+netbox_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbox_port_http }}"
+netbox_db_homepage_showstats: "false"
+netbox_redis_homepage_group: "DBs"
+netbox_redis_homepage_icon: "redis.png"
+netbox_redis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbox_port_http }}"
+netbox_redis_homepage_showstats: "false"
+
+# linuxserver.io docker mods for linuxserver.io images
+netbox_env_docker_mods: ""
+netbox_env_docker_mods_install_packages: ""
+netbox_env_docker_mods_install_pip_packages: ""
+
+# repliqate
+netbox_repliqate_enabled: false
+netbox_repliqate_engine: "restic"
+netbox_repliqate_schedule: "@daily 3am"
+netbox_repliqate_backup_id: "{{ netbox_container_name }}"
+netbox_repliqate_retention: "30d"
+netbox_db_repliqate_enabled: "false"
+netbox_db_repliqate_engine: "restic"
+netbox_db_repliqate_schedule: "@daily 3am"
+netbox_db_repliqate_backup_id: "{{ netbox_db_container_name }}"
+netbox_db_repliqate_retention: "30d"
+netbox_redis_repliqate_enabled: "false"
+netbox_redis_repliqate_engine: "restic"
+netbox_redis_repliqate_schedule: "@daily 3am"
+netbox_redis_repliqate_backup_id: "{{ netbox_redis_container_name }}"
+netbox_redis_repliqate_retention: "30d"
+
+# tinyauth
+netbox_tinyauth_enabled: false
+
+# watchtower
+netbox_watchtower_enable: false
+netbox_db_watchtower_enable: "false"
+netbox_redis_watchtower_enable: "false"
