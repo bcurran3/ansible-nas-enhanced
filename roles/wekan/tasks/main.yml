@@ -136,6 +136,14 @@
         state: absent
   when: wekan_enabled is false
 
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ wekan_db_container_name }}"
+        state: absent
+  when: wekan_enabled is false
+
 - name: Data Archive {{ ansible_nas_app_name }}
   include_role:
     name: ansible-nas-archive
