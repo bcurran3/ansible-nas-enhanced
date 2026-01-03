@@ -65,12 +65,18 @@
           repliqate.retention: "{{ netalertx_repliqate_retention }}"
           traefik.enable: "{{ netalertx_available_externally | string }}"
           traefik.http.routers.netalertx.rule: "Host(`{{ netalertx_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.netalertx.entrypoints: "websecure"
           traefik.http.routers.netalertx.tls.certresolver: "letsencrypt"
           traefik.http.routers.netalertx.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.netalertx.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.netalertx.middlewares: "netalertx@docker{{ ',tinyauth-auth@docker' if netalertx_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.netalertx.IPAllowList.sourcerange: "{{ netalertx_traefik_whitelist }}"
-          traefik.http.services.netalertx.loadbalancer.server.port: "20211"
+          
+          # Middlewares
+          traefik.http.routers.netalertx.middlewares: "netalertx-whitelist{{ ',tinyauth-auth@docker' if netalertx_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.netalertx-whitelist.ipallowlist.sourcerange: "{{ netalertx_traefik_whitelist }}"
+
+          # THE FIX: Point to the Docker Bridge Gateway (usually 172.17.0.1)
+          # We use the URL here, but we MUST ensure no other 'port' labels exist for this service.
+          traefik.http.services.netalertx.loadbalancer.server.url: "http://172.17.0.1:{{ netalertx_port_http }}"
           wud.tag.include: '^v\\d+\\.\\d+\\.\\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/jokob-sk/NetAlertX/pkgs/container/netalertx"
@@ -93,10 +99,10 @@
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
-              {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netalertx_port_http | string)] +
-                (['https://' + netalertx_hostname + '.' + ansible_nas_domain] if (netalertx_available_externally is true or netalertx_dockflare_tunnel is true) else [])
-              }}
+          {{
+            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netalertx_port_http | string)] +
+            (['https://' + netalertx_hostname + '.' + ansible_nas_domain] if (netalertx_available_externally is true or netalertx_dockflare_tunnel is true) else [])
+          }}
   when: netalertx_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

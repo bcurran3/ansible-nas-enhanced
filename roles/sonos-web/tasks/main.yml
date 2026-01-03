@@ -9,7 +9,7 @@
         image: "{{ sonos_web_image_name }}:{{ sonos_web_image_tag }}"
         pull: true
 #        ports:
-#          - "{{ sonos_web_port_http }}:5050"
+#          - "5050:5050"
         network_mode: host
         # ^ figure out the ports Sonos' use and make bridged
         env:
@@ -31,16 +31,15 @@
           homepage.container: "{{ sonos_web_container_name }}"
           homepage.showStats: "{{ sonos_web_homepage_showstats }}"
           repliqate.enabled: "false"
-# HOST MODE
-# TDL: possibly convert to bridged with sonos ports forwarded
-#          traefik.enable: "{{ sonos_web_available_externally | string }}"
-#          traefik.http.routers.sonosweb.rule: "Host(`{{ sonos_web_hostname }}.{{ ansible_nas_domain }}`)"
-#          traefik.http.routers.sonosweb.tls.certresolver: "letsencrypt"
-#          traefik.http.routers.sonosweb.tls.domains[0].main: "{{ ansible_nas_domain }}"
-#          traefik.http.routers.sonosweb.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-#          traefik.http.routers.sonosweb.middlewares: "sonosweb@docker{{ ',tinyauth-auth@docker' if sonos_web_tinyauth_enabled | bool else '' }}"
-#          traefik.http.middlewares.sonosweb.IPAllowList.sourcerange: "{{ sonos_web_traefik_whitelist }}"
-#          traefik.http.services.sonos_web.loadbalancer.server.port: "5050"
+          traefik.enable: "{{ sonos_web_available_externally | string }}"
+          traefik.http.routers.sonos-web.rule: "Host(`{{ sonos_web_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.sonos-web.entrypoints: "websecure"
+          traefik.http.routers.sonos-web.tls.certresolver: "letsencrypt"
+          traefik.http.routers.sonos-web.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.sonos-web.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.sonos-web.middlewares: "sonos-whitelist{{ ',tinyauth-auth@docker' if sonos_web_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.sonos-whitelist.ipallowlist.sourcerange: "{{ sonos_web_traefik_whitelist }}"
+          traefik.http.services.sonos-web-svc.loadbalancer.server.url: "http://172.17.0.1:{{ sonos_web_port_http }}"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/sonosweb/sonos-web"
@@ -51,10 +50,10 @@
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
-              {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (sonos_web_port_http | string)] +
-                (['https://' + sonos_web_hostname + '.' + ansible_nas_domain] if (sonos_web_available_externally is true or sonos_web_dockflare_tunnel is true) else [])
-              }}
+          {{
+            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (sonos_web_port_http | string)] +
+            (['https://' + sonos_web_hostname + '.' + ansible_nas_domain] if (sonos_web_available_externally is true or sonos_web_dockflare_tunnel is true) else [])
+          }}
   when: sonos_web_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
