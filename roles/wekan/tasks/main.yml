@@ -1,0 +1,146 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "755"
+      loop:
+        - path: "{{ wekan_data_directory }}/"
+          owner: ansible-nas
+          group: ansible-nas
+        - path: "{{ wekan_data_directory }}/data"
+          owner: 999
+          group: 999
+        - path: "{{ wekan_data_directory }}/db"
+          owner: ansible-nas
+          group: ansible-nas
+        - path: "{{ wekan_data_directory }}/dump"
+          owner: ansible-nas
+          group: ansible-nas
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wekan_db_container_name }}"
+        hostname: "{{ wekan_db_container_name }}"
+        image: "{{ wekan_db_image_name }}:{{ wekan_db_image_tag }}"
+        pull: true
+        command: "mongod --logpath /dev/null --oplogSize 128 --quiet"
+        volumes:
+          - "{{ wekan_data_directory }}/db:/data/db"
+          - "{{ wekan_data_directory }}/dump:/dump"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wekan_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.group: "{{ wekan_db_homepage_group }}"
+          homepage.icon: "{{ wekan_db_homepage_icon }}"
+          homepage.href: "{{ wekan_homepage_href }}"
+          homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wekan_db_container_name }}"
+          homepage.showStats: "{{ wekan_db_homepage_showstats }}"
+          repliqate.enabled: "{{ wekan_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ wekan_db_repliqate_engine }}"
+          repliqate.schedule: "{{ wekan_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wekan_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ wekan_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mongo"
+        cpu_shares: "{{ wekan_db_cpu_shares }}"
+        memory: "{{ wekan_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wekan_container_name }}"
+        hostname: "{{ wekan_container_name }}"
+        image: "{{ wekan_image_name }}:{{ wekan_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ wekan_data_directory }}/data:/data"
+          - /etc/localtime:/etc/localtime:ro
+        ports:
+          - "{{ wekan_port_http }}:8080"
+        env:
+          BIGEVENTS_PATTERN: "{{ wekan_env_bigevents_pattern }}"
+          BROWSER_POLICY_ENABLED: "{{ wekan_env_browser_policy_enabled }}"
+          RICHER_CARD_COMMENT_EDITOR: "{{ wekan_env_richer_card_comment_editor }}"
+          CARD_OPENED_WEBHOOK_ENABLED: "{{ wekan_env_card_opened_webhook_enabled }}"
+          MONGO_URL: "mongodb://{{ wekan_db_container_name }}:27017/wekan"
+          ROOT_URL: "{{ wekan_env_root_url }}"
+          WITH_API: "{{ wekan_env_with_api }}"
+          WRITABLE_PATH: "{{ wekan_env_writable_path }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ wekan_db_container_name }}"
+        labels:
+          autoheal: "{{ wekan_autoheal | string }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_watchtower_enable | string }}"
+          dockflare.enable: "{{ wekan_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ wekan_dockflare_access_group }}"
+          dockflare.hostname: "{{ wekan_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ wekan_homepage_group }}"
+          homepage.icon: "{{ wekan_homepage_icon }}"
+          homepage.href: "{{ wekan_homepage_href }}"
+          homepage.description: "{{ 'Open Source kanban' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wekan_container_name }}"
+          homepage.showStats: "{{ wekan_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+          repliqate.enabled: "{{ wekan_repliqate_enabled }} | string"
+          repliqate.engine: "{{ wekan_repliqate_engine }}"
+          repliqate.schedule: "{{ wekan_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wekan_repliqate_backup_id }}"
+          repliqate.retention: "{{ wekan_repliqate_retention }}"
+          traefik.enable: "{{ wekan_available_externally | string }}"
+          traefik.http.routers.wekan.rule: "Host(`{{ wekan_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.wekan.tls.certresolver: "letsencrypt"
+          traefik.http.routers.wekan.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.wekan.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.wekan.middlewares: "wekan@docker{{ ',tinyauth-auth@docker' if wekan_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.wekan.IPAllowList.sourcerange: "{{ wekan_traefik_whitelist }}"
+          traefik.http.services.wekan.loadbalancer.server.port: "8080"
+          wud.tag.include: '^v\d+\.\d+$'
+          wud.link.template: "https://github.com/wekan/wekan/releases/tag/v${major}.${minor}"
+        cpu_shares: "{{ wekan_cpu_shares }}"
+        memory: "{{ wekan_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wekan_port_http | string)] +
+                (['https://' + wekan_hostname + '.' + ansible_nas_domain] if (wekan_available_externally is true or wekan_dockflare_tunnel is true) else [])
+              }}
+  when: wekan_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ wekan_container_name }}"
+        state: absent
+  when: wekan_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ wekan_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - wekan_enabled is false

@@ -26,6 +26,8 @@ By default, applications can be found on the ports listed below.
 | bitmagnet        | 3334
 | Blinko           | 1111
 | Booksonic Air    | 4041    | Bridge  | HTTP           |
+| Blinko           | 3075    | Bridge  | HTTP           |
+| ByteStash        | 3076    | Bridge  | HTTP           |
 | Calibre          | 8093
 | Calibre          | 8094
 | Calibre          | 3060
@@ -364,7 +366,8 @@ By default, applications can be found on the ports listed below.
 | WatchYourLAN     | 8840    | Bridge  | HTTP           |
 | Webmin           | 10000   | Host    | HTTP           |
 | Webtop           | 3058    | Bridge  | HTTP           |
-| Webtop           | 3059    | Bridge  | HTTPS           |
+| Webtop           | 3059    | Bridge  | HTTPS          |
+| Wekan            | 3077    | Bridge  | HTTP           |
 | What's Running   | 3411    | Bridge  | HTTP           |
 | Whisparr         | 6969    | Bridge  | HTTP           |
 | Windows          | 8006
@@ -384,7 +387,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3075
+# next avail = 3078
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002

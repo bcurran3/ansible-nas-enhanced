@@ -1,0 +1,78 @@
+---
+# ANE
+ansible_nas_app_name: "WeKan"
+wekan_enabled: false
+wekan_available_externally: false
+wekan_traefik_whitelist: "{{ lan }}"
+
+# directories
+wekan_data_directory: "{{ docker_home }}/wekan"
+
+# docker
+wekan_container_name: "wekan"
+wekan_image_name: "ghcr.io/wekan/wekan"
+wekan_image_tag: "latest"
+wekan_db_container_name: "wekan-db"
+wekan_db_image_name: "mongo"
+wekan_db_image_tag: "7"
+
+# uid / gid
+wekan_user_id: "0"
+wekan_group_id: "0"
+
+# network
+wekan_port_http: "3077"
+wekan_hostname: "wekan"
+
+# specs
+wekan_cpu_shares: 1024
+wekan_memory: "1G"
+wekan_db_cpu_shares: 1024
+wekan_db_memory: "1G"
+
+# app
+# https://github.com/wekan/wekan/blob/main/docker-compose.yml
+wekan_env_bigevents_pattern: "NONE"
+wekan_env_browser_policy_enabled: "true"
+wekan_env_card_opened_webhook_enabled: "false" 
+wekan_env_richer_card_comment_editor: "false"
+wekan_env_root_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_env_with_api: "true"
+wekan_env_writable_path: "/data"
+
+# autoheal
+wekan_autoheal: "false"
+wekan_db_autoheal: "false"
+
+# dockflare
+wekan_dockflare_tunnel: false
+wekan_dockflare_access_group: ""
+
+# homepage
+wekan_homepage_group: "Apps"
+wekan_homepage_icon: "wekan.png"
+wekan_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_homepage_showstats: "false"
+wekan_db_homepage_group: "DBs"
+wekan_db_homepage_icon: "mongodb.png"
+wekan_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_db_homepage_showstats: "false"
+
+# repliqate
+wekan_repliqate_enabled: false
+wekan_repliqate_engine: "restic"
+wekan_repliqate_schedule: "@daily 3am"
+wekan_repliqate_backup_id: "{{ wekan_container_name }}"
+wekan_repliqate_retention: "30d"
+wekan_db_repliqate_enabled: "false"
+wekan_db_repliqate_engine: "restic"
+wekan_db_repliqate_schedule: "@daily 3am"
+wekan_db_repliqate_backup_id: "{{ wekan_db_container_name }}"
+wekan_db_repliqate_retention: "30d"
+
+# tinyauth
+wekan_tinyauth_enabled: false
+
+# watchtower
+wekan_watchtower_enable: false
+wekan_db_watchtower_enable: "false"
