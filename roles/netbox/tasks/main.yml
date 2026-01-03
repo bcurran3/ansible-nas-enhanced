@@ -95,9 +95,8 @@
         ports:
           - "{{ netbox_port_http }}:8000"
         env:
-          SUPERUSER_EMAIL: "{{ netbox_env_superuser_email }}"
-          SUPERUSER_PASSWORD: "{{ netbox_env_superuser_password }}"
           ALLOWED_HOST: "{{ netbox_env_allowed_host }}"
+          CSRF_TRUSTED_ORIGINS: "{{ netbox_env_csrf_trusted_origins }}"
           DB_NAME: "{{ netbox_env_db_name }}"
           DB_USER: "{{ netbox_env_db_user }}"
           DB_PASSWORD: "{{ netbox_env_db_password }}"
@@ -108,6 +107,8 @@
           REDIS_PASSWORD: "{{ netbox_env_redis_password }}"
           REDIS_DB_TASK: "{{ netbox_env_redis_db_task}}"
           REDIS_DB_CACHE: "{{ netbox_env_redis_db_cache }}"
+          SUPERUSER_EMAIL: "{{ netbox_env_superuser_email }}"
+          SUPERUSER_PASSWORD: "{{ netbox_env_superuser_password }}"
 #          BASE_PATH:  #optional
 #          REMOTE_AUTH_ENABLED:  #optional
 #          REMOTE_AUTH_BACKEND:  #optional
