@@ -8,61 +8,12 @@
       with_items:
         - "{{ immich_data_directory }}"
         - "{{ immich_data_directory }}/cache"
+        - "{{ immich_data_directory }}/db"
         - "{{ immich_upload_directory }}"
 
     - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ immich_network_name }}"
-
-    - name: Create {{ ansible_nas_app_name }} Machine Learning Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ immich_ml_container_name }}"
-        hostname: "{{ immich_ml_container_name }}"
-        image: "{{ immich_ml_image }}:{{ immich_ml_tag }}"
-        pull: true
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
-        device_requests: "{{
-          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
-          if nvidia_runtime_enabled | bool else omit
-        }}"
-        devices: >-
-                  {{
-                    (immich_devices | default([])) + ['/dev/dri:/dev/dri']
-                    if intel_igpu_enabled | default(false) | bool
-                    else (immich_devices | default(omit))
-                  }}
-        volumes:
-          - "{{ immich_data_directory }}/cache:/cache"
-        networks:
-          - name: "{{ immich_network_name }}"
-        network_mode: "bridge"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-        labels:
-          autoheal: "{{ immich_ml_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "true"
-          dockflare.enable: "false"
-          homepage.group: "{{ immich_ml_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }} Machine Learning"
-          homepage.icon: "{{ immich_ml_homepage_icon }}"
-          homepage.href: "{{ immich_homepage_href }}"
-          homepage.description: "{{'Immich Machine Learning' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ immich_ml_container_name }}"
-          homepage.showStats: "false"
-          repliqate.enabled: "{{ immich_ml_repliqate_enabled }}"
-          repliqate.engine: "{{ immich_ml_repliqate_engine }}"
-          repliqate.schedule: "{{ immich_ml_repliqate_schedule }}"
-          repliqate.backup_id: "{{ immich_ml_repliqate_backup_id }}"
-          repliqate.retention: "{{ immich_ml_repliqate_retention }}"
-          traefik.enable: "false"
-          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/immich-app/immich/releases"
-        cpu_shares: "{{ immich_ml_cpu_shares }}"
-        memory: "{{ immich_ml_memory }}"
-        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -72,7 +23,7 @@
         image: "{{ immich_db_image }}:{{ immich_db_tag }}"
         pull: true
         volumes:
-          - "{{ immich_data_directory }}/database:/var/lib/postgresql/data"
+          - "{{ immich_data_directory }}/db:/var/lib/postgresql/data"
         networks:
           - name: "{{ immich_network_name }}"
         network_mode: "bridge"
@@ -87,11 +38,11 @@
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD-SHELL", "pg_isready -d {{ immich_db_name }} -U {{ immich_db_username }}"]
-          interval: 5m
-          start_interval: 30s
-          start_period: 5m
+          interval: "5m"
+          start_interval: "30s"
+          start_period: "5m"
           retries: 5
-          timeout: 5s
+          timeout: "5s"
         labels:
           autoheal: "{{ immich_db_autoheal }}"
           com.centurylinklabs.watchtower.enable: "true"
@@ -116,7 +67,7 @@
         cpu_shares: "{{ immich_db_cpu_shares }}"
         memory: "{{ immich_db_memory }}"
         restart_policy: always
-        shm_size: 128MB
+        shm_size: "{{ immich_db_shm_size }}"
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
@@ -147,12 +98,65 @@
           homepage.showStats: "{{ immich_redis_homepage_showstats }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
-          wud.tag.include: '^6\.2\.\d+-alpine$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/_/redis"
+          wud.tag.include: ^\d+\.\d+\.\d+$
+          wud.link.template: https://github.com/valkey-io/valkey/releases/tag/${major}.${minor}.${patch}
         cpu_shares: "{{ immich_redis_cpu_shares }}"
         memory: "{{ immich_redis_memory }}"
         restart_policy: always
+
+    - name: Create {{ ansible_nas_app_name }} Machine Learning Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ immich_ml_container_name }}"
+        hostname: "{{ immich_ml_container_name }}"
+        image: "{{ immich_ml_image }}:{{ immich_ml_tag }}"
+        pull: true
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | bool else omit
+        }}"
+        devices: >-
+                  {{
+                    (immich_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (immich_devices | default(omit))
+                  }}
+        volumes:
+          - "{{ immich_data_directory }}/cache:/cache"
+        networks:
+          - name: "{{ immich_network_name }}"
+        network_mode: "bridge"
+        env:
+#          ACCELERATION: "cpu"
+          TZ: "{{ ansible_nas_timezone }}"
+#        healthcheck:
+#          disable: "false"
+        labels:
+          autoheal: "{{ immich_ml_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "true"
+          dockflare.enable: "false"
+          homepage.group: "{{ immich_ml_homepage_group }}"
+          homepage.name: "{{ ansible_nas_app_name }} Machine Learning"
+          homepage.icon: "{{ immich_ml_homepage_icon }}"
+          homepage.href: "{{ immich_homepage_href }}"
+          homepage.description: "{{'Immich Machine Learning' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ immich_ml_container_name }}"
+          homepage.showStats: "false"
+          repliqate.enabled: "{{ immich_ml_repliqate_enabled }}"
+          repliqate.engine: "{{ immich_ml_repliqate_engine }}"
+          repliqate.schedule: "{{ immich_ml_repliqate_schedule }}"
+          repliqate.backup_id: "{{ immich_ml_repliqate_backup_id }}"
+          repliqate.retention: "{{ immich_ml_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/immich-app/immich/releases"
+        cpu_shares: "{{ immich_ml_cpu_shares }}"
+        memory: "{{ immich_ml_memory }}"
+        memory_swap: -1
+        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Server Container
       community.docker.docker_container:
@@ -162,7 +166,7 @@
         image: "{{ immich_server_image }}:{{ immich_server_tag }}"
         pull: true
         volumes:
-          - "{{ immich_upload_directory }}:/data" #v1.137.0
+          - "{{ immich_upload_directory }}:/data"
           - "/etc/localtime:/etc/localtime:ro"
         networks:
           - name: "{{ immich_network_name }}"
@@ -181,9 +185,10 @@
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ immich_db_container_name }}"
+          - "{{ immich_ml_container_name }}"
           - "{{ immich_redis_container_name }}"
-#       healthcheck:
-#         disable: "false"
+#        healthcheck:
+#          disable: "false"
         labels:
           autoheal: "{{ immich_autoheal }}"
           com.centurylinklabs.watchtower.enable: "true"
@@ -222,6 +227,7 @@
           wud.link.template: "https://github.com/immich-app/immich/releases"
         cpu_shares: "{{ immich_server_cpu_shares }}"
         memory: "{{ immich_server_memory }}"
+        memory_swap: -1
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

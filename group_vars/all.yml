@@ -158,7 +158,7 @@ recordings_share_enabled: false
 roms_share_enabled: false
 torrents_share_enabled: false
 tv_share_enabled: false
-media_root_share_enabled: false # share everything from one place instead of individually
+samba_shares_root_enabled: false # share everything from one place instead of individually
 
 ###
 ### Samba
@@ -384,7 +384,7 @@ ANE_samba_shares:
     write_list: "{{ ansible_nas_user }}"
     browseable: yes
     path: "{{ samba_shares_root }}"
-    enabled: "{{ media_root_share_enabled }}"
+    enabled: "{{ samba_shares_root_enabled }}"
 
 # more more details on Samba variables at:
 # https://github.com/vladgh/ansible-collection-vladgh-samba
@@ -463,7 +463,7 @@ ANE_nfs_exports_list:
   - export: "{{ tv_root }} *({{ nfs_shares_access }},sync,no_root_squash)"
     enabled: "{{ tv_share_enabled }}"
   - export: "{{ samba_shares_root }} *({{ nfs_shares_access }},sync,no_root_squash)"
-    enabled: "{{ media_root_share_enabled }}"
+    enabled: "{{ samba_shares_root_enabled }}"
 
 # What version of python ansible should use on target system (path to specific binary)
 ansible_python_interpreter: /usr/bin/python3

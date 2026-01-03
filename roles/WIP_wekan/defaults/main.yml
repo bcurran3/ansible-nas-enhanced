@@ -1,0 +1,260 @@
+---
+# ANE
+ansible_nas_app_name: "appname"
+wekan_enabled: false
+wekan_available_externally: false
+wekan_traefik_whitelist: "{{ lan }}"
+
+# directories
+wekan_data_directory: "{{ docker_home }}/appname"
+
+# docker
+wekan_container_name: "appname"
+wekan_image_name: "appdev/appname" # use ghcr.io or lscr.io when available
+wekan_image_tag: "latest"
+
+# uid / gid
+wekan_user_id: "0"
+wekan_group_id: "0"
+
+# network
+wekan_port_http: "8989"
+wekan_hostname: "appname"
+
+# specs
+wekan_cpu_shares: 1024
+wekan_memory: "1G"
+
+# autoheal
+wekan_autoheal: "false"
+
+# dockflare
+wekan_dockflare_tunnel: false
+wekan_dockflare_access_group: ""
+
+# homepage
+wekan_homepage_group: "Apps"
+wekan_homepage_icon: "appname.png"
+wekan_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_homepage_showstats: "false"
+
+# linuxserver.io docker mods for linuxserver.io images
+#wekan_env_docker_mods: ""
+#wekan_env_docker_mods_install_packages: ""
+#wekan_env_docker_mods_install_pip_packages: ""
+
+# repliqate
+wekan_repliqate_enabled: false
+wekan_repliqate_engine: "restic"
+wekan_repliqate_schedule: "@daily 3am"
+wekan_repliqate_backup_id: "{{ wekan_container_name }}"
+wekan_repliqate_retention: "30d"
+
+# tinyauth
+wekan_tinyauth_enabled: false
+
+# watchtower
+wekan_watchtower_enable: false
+
+
+##############################################################################
+### EXAMPLES OF COMMON DATABASE SETUPS BELOW
+### DELETE ALL OR PARTS BELOW AS NOT NEEDED
+### PLEASE STICK TO THIS FORMAT
+### NOTE: ../molecule files are not templated for DBs and
+###       need to be updated as well when using DBs.
+###       Look at the Nextcloud role for a good example.
+##############################################################################
+
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###   __  __            _       ____  ____    ###
+###  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   ###
+###  | |\/| |/ _` | '__| |/ _` | | | |  _ \   ###
+###  | |  | | (_| | |  | | (_| | |_| | |_) |  ###
+###  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   ###
+#################################################
+
+# docker
+wekan_db_container_name: "appname-db"
+wekan_db_image_name: "mariadb"
+wekan_db_image_tag: "latest"
+
+# specs
+wekan_db_cpu_shares: 1024
+wekan_db_memory: "1G"
+
+# autoheal
+wekan_db_autoheal: "false"
+
+# homepage
+wekan_db_homepage_group: "DBs"
+wekan_db_homepage_icon: "mariadb.png"
+wekan_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_db_homepage_showstats: "false"
+
+# repliqate
+wekan_db_repliqate_enabled: false
+wekan_db_repliqate_engine: "restic"
+wekan_db_repliqate_schedule: "@daily 3am"
+wekan_db_repliqate_backup_id: "{{ wekan_db_container_name }}"
+wekan_db_repliqate_retention: "30d"
+
+# watchtower
+wekan_db_watchtower_enable: false
+
+
+######################################################
+###  OPTIONAL - remove if not needed               ###
+###   __  __                         ____  ____    ###
+###  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   ###
+###  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   ###
+###  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  ###
+###  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   ###
+###                      |___/                     ###
+######################################################
+
+# docker
+wekan_db_container_name: "appname-db"
+wekan_db_image_name: "mongo"
+wekan_db_image_tag: "latest"
+
+# specs
+wekan_db_cpu_shares: 1024
+wekan_db_memory: "1G"
+
+# autoheal
+wekan_db_autoheal: "false"
+
+# homepage
+wekan_db_homepage_group: "DBs"
+wekan_db_homepage_icon: "mongodb.png"
+wekan_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_db_homepage_showstats: "false"
+
+# repliqate
+wekan_db_repliqate_enabled: "false"
+wekan_db_repliqate_engine: "restic"
+wekan_db_repliqate_schedule: "@daily 3am"
+wekan_db_repliqate_backup_id: "{{ wekan_db_container_name }}"
+wekan_db_repliqate_retention: "30d"
+
+# watchtower
+wekan_db_watchtower_enable: "false"
+
+
+##########################################
+###  OPTIONAL - remove if not needed   ###
+###   __  __       ____   ___  _       ###
+###  |  \/  |_   _/ ___| / _ \| |      ###
+###  | |\/| | | | \___ \| | | | |      ###
+###  | |  | | |_| |___) | |_| | |___   ###
+###  |_|  |_|\__, |____/ \__\_\_____|  ###
+###          |___/                     ###
+##########################################
+
+# docker
+wekan_db_container_name: "appname-db"
+wekan_db_image_name: "mysql"
+wekan_db_image_tag: "8.4"
+
+# specs
+wekan_db_cpu_shares: 1024
+wekan_db_memory: "1G"
+
+# autoheal
+wekan_db_autoheal: "false"
+
+# homepage
+wekan_db_homepage_group: "DBs"
+wekan_db_homepage_icon: "mysql.png"
+wekan_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_db_homepage_showstats: "false"
+
+# repliqate
+wekan_db_repliqate_enabled: "false"
+wekan_db_repliqate_engine: "restic"
+wekan_db_repliqate_schedule: "@daily 3am"
+wekan_db_repliqate_backup_id: "{{ wekan_db_container_name }}"
+wekan_db_repliqate_retention: "30d"
+
+# watchtower
+wekan_db_watchtower_enable: "false"
+
+
+##############################################################
+###  OPTIONAL - remove if not needed                       ###
+###   ____           _                 ____   ___  _       ###
+###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
+###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
+###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
+###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
+###                     |___/                              ###
+##############################################################
+
+# docker
+wekan_db_container_name: "appname-db"
+wekan_db_image_name: "postgres"
+wekan_db_image_tag: "16-alpine"
+
+# specs
+wekan_db_cpu_shares: 1024
+wekan_db_memory: "1G"
+
+# autoheal
+wekan_db_autoheal: "false"
+
+# homepage
+wekan_db_homepage_group: "DBs"
+wekan_db_homepage_icon: "postgres.png"
+wekan_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_db_homepage_showstats: "false"
+
+# repliqate
+wekan_db_repliqate_enabled: "false"
+wekan_db_repliqate_engine: "restic"
+wekan_db_repliqate_schedule: "@daily 3am"
+wekan_db_repliqate_backup_id: "{{ wekan_db_container_name }}"
+wekan_db_repliqate_retention: "30d"
+
+# watchtower
+wekan_db_watchtower_enable: "false"
+
+
+#########################################
+###  OPTIONAL - remove if not needed  ###
+###       ____          _ _           ###
+###      |  _ \ ___  __| (_)___       ###
+###      | |_) / _ \/ _` | / __|      ###
+###      |  _ <  __/ (_| | \__ \      ###
+###      |_| \_\___|\__,_|_|___/      ###
+#########################################
+
+# docker
+wekan_redis_container_name: "appname-redis"
+wekan_redis_image_name: "redis"
+wekan_redis_image_tag: "latest"
+
+# specs
+wekan_redis_cpu_shares: 1024
+wekan_redis_memory: "1G"
+
+# autoheal
+wekan_redis_autoheal: "false"
+
+# homepage
+wekan_redis_homepage_group: "DBs"
+wekan_redis_homepage_icon: "redis.png"
+wekan_redis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+wekan_redis_homepage_showstats: "false"
+
+# repliqate
+wekan_redis_repliqate_enabled: "false"
+wekan_redis_repliqate_engine: "restic"
+wekan_redis_repliqate_schedule: "@daily 3am"
+wekan_redis_repliqate_backup_id: "{{ wekan_redis_container_name }}"
+wekan_redis_repliqate_retention: "30d"
+
+# watchtower
+wekan_redis_watchtower_enable: "false"

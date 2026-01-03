@@ -159,6 +159,8 @@ By default, applications can be found on the ports listed below.
 | Loki             | 3100
 | Luanti           | 30000
 | magnetico        | 9017    | Bridge  | HTTP           |
+| Mailrise         | 8025    | Host    | HTTP           |
+| Mailrise         | 465     | Host    | SMTP           |
 | Maintainerr      | 6246
 | MakeMKV          | 5804    | Bridge  | HTTP           |
 | Mealie           | 9925    | Host    | HTTP           |
@@ -185,6 +187,7 @@ By default, applications can be found on the ports listed below.
 | netbootxyz       | 3072    | Bridge  | HTTP           |
 | netbootxyz       | 5803    | Bridge  | HTTP           |
 | netbootxyz       | 69      | Bridge  | TFTP           |
+| Netbox           | 3074    | Bridge  | HTTP           |
 | Netdata          | 19999   | Bridge  | HTTP           |
 | Nextcloud        | 8080    | Bridge  | HTTP           |
 | Node-RED         | 1880
@@ -270,6 +273,8 @@ By default, applications can be found on the ports listed below.
 | ddns-route53     | n/a (????)
 | RSS-Bridge       | 8091    | Bridge  | HTTP           |
 | Sabnzbd          | 18080   | Bridge  | HTTP           |
+| Scanopy          | 60072   | Bridge  | HTTP           |
+| Scanopy daemon   | 60073   | Host    | HTTP           |
 | Scrutiny         | 9010    | Bridge  | HTTP           |
 | SearXNG          | 3008    | Bridge  | HTTP           |
 | SeedSync         | 8800
@@ -379,7 +384,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3074
+# next avail = 3075
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002

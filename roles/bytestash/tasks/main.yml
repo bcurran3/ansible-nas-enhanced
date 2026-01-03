@@ -1,0 +1,98 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ bytestash_data_directory }}"
+        - "{{ bytestash_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ bytestash_container_name }}"
+        hostname: "{{ bytestash_container_name }}"
+        image: "{{ bytestash_image_name }}:{{ bytestash_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ bytestash_data_directory }}/data:/data/snippets"
+        ports:
+          - "{{ bytestash_port_http }}:5000"
+        env:
+          ALLOWED_HOSTS: "{{ bytestash_env_allowed_hosts }}"
+          BASE_PATH: "{{ bytestash_env_base_path }}"
+          JWT_SECRET: "{{ bytestash_env_jwt_secret }}"
+          TOKEN_EXPIRY: "{{ bytestash_env_token_expiry }}"
+          ALLOW_NEW_ACCOUNTS: "{{ bytestash_env_allow_new_accounts }}"
+          DEBUG: "{{ bytestash_env_debug }}"
+          DISABLE_ACCOUNTS: "{{ bytestash_env_disable_accounts }}"
+          DISABLE_INTERNAL_ACCOUNTS: "{{ bytestash_env_disable_internal_accounts }}"
+          OIDC_ENABLED: "{{ bytestash_env_oidc_enabled }}"
+          OIDC_DISPLAY_NAME: "{{ bytestash_env_oidc_display_name }}"
+          OIDC_ISSUER_URL: "{{ bytestash_env_oidc_issuer_url }}"
+          OIDC_CLIENT_ID: "{{ bytestash_env_oidc_client_id }}"
+          OIDC_CLIENT_SECRET: "{{ bytestash_env_oidc_client_secret }}"
+          OIDC_SCOPES: "{{ bytestash_env_oidc_scopes }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ bytestash_autoheal | string }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ bytestash_watchtower_enable | string }}"
+          dockflare.enable: "{{ bytestash_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ bytestash_dockflare_access_group }}"
+          dockflare.hostname: "{{ bytestash_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bytestash_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ bytestash_homepage_group }}"
+          homepage.icon: "{{ bytestash_homepage_icon }}"
+          homepage.href: "{{ bytestash_homepage_href }}"
+          homepage.description: "{{ 'code snippet storage solution' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ bytestash_container_name }}"
+          homepage.showStats: "{{ bytestash_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bytestash_port_http }}"
+          repliqate.enabled: "{{ bytestash_repliqate_enabled }} | string"
+          repliqate.engine: "{{ bytestash_repliqate_engine }}"
+          repliqate.schedule: "{{ bytestash_repliqate_schedule }}"
+          repliqate.backup_id: "{{ bytestash_repliqate_backup_id }}"
+          repliqate.retention: "{{ bytestash_repliqate_retention }}"
+          traefik.enable: "{{ bytestash_available_externally | string }}"
+          traefik.http.routers.bytestash.rule: "Host(`{{ bytestash_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.bytestash.tls.certresolver: "letsencrypt"
+          traefik.http.routers.bytestash.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.bytestash.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.bytestash.middlewares: "bytestash@docker{{ ',tinyauth-auth@docker' if bytestash_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.bytestash.IPAllowList.sourcerange: "{{ bytestash_traefik_whitelist }}"
+          traefik.http.services.bytestash.loadbalancer.server.port: "5000"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.link.template: "https://github.com/jordan-dalby/ByteStash/releases/tag/v${major}.${minor}.${patch}"
+        cpu_shares: "{{ bytestash_cpu_shares }}"
+        memory: "{{ bytestash_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (bytestash_port_http | string)] +
+                (['https://' + bytestash_hostname + '.' + ansible_nas_domain] if (bytestash_available_externally is true or bytestash_dockflare_tunnel is true) else [])
+              }}
+  when: bytestash_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ bytestash_container_name }}"
+        state: absent
+  when: bytestash_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ bytestash_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - bytestash_enabled is false

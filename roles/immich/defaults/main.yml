@@ -19,40 +19,44 @@ immich_user_id: "1000"
 immich_group_id: "1000"
 
 # docker
-immich_server_container_name: "immich-server"
+immich_server_container_name: "immich"
 immich_server_image: "ghcr.io/immich-app/immich-server"
 immich_server_tag: "release"
 immich_db_container_name: "immich-db"
 immich_db_image: "ghcr.io/immich-app/postgres"
-immich_db_tag: "14-vectorchord0.3.0-pgvectors0.2.0"
+immich_db_tag: "14-vectorchord0.4.3-pgvectors0.2.0"
 # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
 # Example tag: ${IMMICH_VERSION:-release}-cuda
 immich_ml_container_name: "immich-machine-learning"
 immich_ml_image: "ghcr.io/immich-app/immich-machine-learning"
 immich_ml_tag: "release"
 immich_redis_container_name: "immich-redis"
-immich_redis_image: "redis"
-immich_redis_tag: "6.2-alpine"
+#immich_redis_image: "redis"
+#immich_redis_tag: "6.2-alpine"
+immich_redis_image: "valkey/valkey"
+immich_redis_tag: "9"
 
 # specs
 immich_server_cpu_shares: 1024
-immich_server_memory: "1G"
+immich_server_memory: "2G"
 immich_db_cpu_shares: 1024
-immich_db_memory: "2G"
+immich_db_memory: "1G"
+immich_db_shm_size: "128MB"
 immich_ml_cpu_shares: 1024
-immich_ml_memory: "1G"
+immich_ml_memory: "3G"
 immich_redis_cpu_shares: 1024
 immich_redis_memory: "1G"
 
 # database
-immich_db_password: "postgres" # $(pwgen -s 40 1)
-immich_db_username: "postgres"
+immich_db_password: "topsecret" # $(pwgen -s 40 1)
+immich_db_username: "immich"
 immich_db_name: "immich_db"
 immich_db_port: 5432
 immich_db_storage_type: "SSD" # or "HDD"
 
 # immich
-immich_jwt_secret: "verylongandsecrettext"
+immich_ml_acceleration: "cpu" # or "gpu"
+immich_jwt_secret: "IBRlN80AZ9z496KlhUwHrTWh0E83cEZfdKAcpt5tEze" # https://jwtsecretkeygenerator.com/
 immich_enable_mapbox: "false"
 immich_mapbox_key: ""
 immich_public_login_page_message: "Welcome to Immich!"

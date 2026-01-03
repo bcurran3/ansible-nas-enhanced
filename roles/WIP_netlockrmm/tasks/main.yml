@@ -1,0 +1,388 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ netlockrmm_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_container_name }}"
+        hostname: "{{ netlockrmm_container_name }}"
+        image: "{{ netlockrmm_image_name }}:{{ netlockrmm_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ netlockrmm_data_directory }}:/config"
+        ports:
+          - "{{ netlockrmm_port_http }}:80"
+        env:
+#         DOCKER_MODS: "{{ netlockrmm_env_docker_mods }}" # linuxserver.io images
+#         INSTALL_PACKAGES: "{{ netlockrmm_env_docker_mods_install_packages }}"
+#         INSTALL_PIP_PACKAGES: "{{ netlockrmm_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ netlockrmm_user_id }}"
+          PGID: "{{ netlockrmm_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ netlockrmm_autoheal | string }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_watchtower_enable | string }}"
+          dockflare.enable: "{{ netlockrmm_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ netlockrmm_dockflare_access_group }}"
+          dockflare.hostname: "{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+#         dockflare.access.policy: "authenticate"
+#         dockflare.access.allowed_idps: "YOUR_IDP_UUID_HERE"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ netlockrmm_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'appname description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_container_name }}"
+          homepage.showStats: "{{ netlockrmm_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+          repliqate.enabled: "{{ netlockrmm_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_repliqate_retention }}"
+          traefik.enable: "{{ netlockrmm_available_externally | string }}"
+          traefik.http.routers.appname.rule: "Host(`{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.appname.tls.certresolver: "letsencrypt"
+          traefik.http.routers.appname.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.appname.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.appname.middlewares: "appname@docker{{ ',tinyauth-auth@docker' if netlockrmm_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ netlockrmm_traefik_whitelist }}"
+          traefik.http.services.appname.loadbalancer.server.port: "80"
+### Docker hub example
+          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/devname/appname"
+### Github example
+#          wud.tag.include: '^\d+\.\d+\.\d+$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://github.com/dev/appname/pkgs/container/appname"
+### Linuxserver.io example
+#          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://lscr.io/linuxserver/appname"
+        cpu_shares: "{{ netlockrmm_cpu_shares }}"
+        memory: "{{ netlockrmm_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netlockrmm_port_http | string)] +
+                (['https://' + netlockrmm_hostname + '.' + ansible_nas_domain] if (netlockrmm_available_externally is true or netlockrmm_dockflare_tunnel is true) else [])
+              }}
+  when: netlockrmm_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ netlockrmm_container_name }}"
+        state: absent
+  when: netlockrmm_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ netlockrmm_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - netlockrmm_enabled is false
+
+
+
+##############################################################################
+### EXAMPLES OF COMMON DATABASE SETUPS BELOW
+### DELETE ALL OR PARTS BELOW AS NOT NEEDED
+### PLEASE STICK TO THIS FORMAT
+### NOTE: ../molecule files are not templated for DBs and
+###       need to be updated as well when using DBs.
+###       Look at the Nextcloud role for a good example.
+##############################################################################
+
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###   __  __            _       ____  ____    ###
+###  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   ###
+###  | |\/| |/ _` | '__| |/ _` | | | |  _ \   ###
+###  | |  | | (_| | |  | | (_| | |_| | |_) |  ###
+###  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   ###
+#################################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_db_container_name }}"
+        hostname: "{{ netlockrmm_db_container_name }}"
+        image: "{{ netlockrmm_db_image_name }}:{{ netlockrmm_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ netlockrmm_network_name }}"     # optional
+        network_mode: "{{ netlockrmm_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ netlockrmm_data_directory }}/db:/var/lib/mysql"
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          MYSQL_ROOT_PASSWORD: "topsecretroot"
+          MYSQL_DATABASE: "appname"
+          MYSQL_USER: "appname"
+          MYSQL_PASSWORD: "{{ netlockrmm_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test:
+                - CMD
+                - /usr/local/bin/healthcheck.sh
+                - --su-mysql
+                - --connect
+                - --innodb_initialized
+              interval: "30s"
+              timeout: "10s"
+              retries: "3"
+              start_period: "30s"
+        labels:
+          autoheal: "{{ netlockrmm_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ netlockrmm_db_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_db_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_db_container_name }}"
+          homepage.showStats: "{{ netlockrmm_db_homepage_showstats }}"
+          repliqate.enabled: "{{ netlockrmm_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_db_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
+        cpu_shares: "{{ netlockrmm_db_cpu_shares }}"
+        memory: "{{ netlockrmm_db_memory }}"
+        restart_policy: unless-stopped
+
+
+######################################################
+###  OPTIONAL - remove if not needed               ###
+###   __  __                         ____  ____    ###
+###  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   ###
+###  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   ###
+###  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  ###
+###  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   ###
+###                      |___/                     ###
+######################################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_db_container_name }}"
+        hostname: "{{ netlockrmm_db_container_name }}"
+        image: "{{ netlockrmm_db_image_name }}:{{ netlockrmm_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ netlockrmm_network_name }}"     # optional
+        network_mode: "{{ netlockrmm_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ netlockrmm_data_directory }}/db:/data/db"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ netlockrmm_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.group: "{{ netlockrmm_db_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_db_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_db_container_name }}"
+          homepage.showStats: "{{ netlockrmm_db_homepage_showstats }}"
+          repliqate.enabled: "{{ netlockrmm_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_db_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mongo"
+        cpu_shares: "{{ netlockrmm_db_cpu_shares }}"
+        memory: "{{ netlockrmm_db_memory }}"
+        restart_policy: unless-stopped
+
+
+##########################################
+###  OPTIONAL - remove if not needed   ###
+###   __  __       ____   ___  _       ###
+###  |  \/  |_   _/ ___| / _ \| |      ###
+###  | |\/| | | | \___ \| | | | |      ###
+###  | |  | | |_| |___) | |_| | |___   ###
+###  |_|  |_|\__, |____/ \__\_\_____|  ###
+###          |___/                     ###
+##########################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_db_container_name }}"
+        hostname: "{{ netlockrmm_db_container_name }}"
+        image: "{{ netlockrmm_db_image_name }}:{{ netlockrmm_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ netlockrmm_network_name }}"     # optional
+        network_mode: "{{ netlockrmm_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ netlockrmm_data_directory }}/mysql/mysql:/var/lib/mysql"
+          - "{{ netlockrmm_data_directory }}/mysql/my.cnf:/etc/my.cnf"
+        env:
+          MYSQL_DATABASE: "appname"
+          MYSQL_USER: "{{ netlockrmm_sql_user }}"
+          MYSQL_PASSWORD: "{{ netlockrmm_sql_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ netlockrmm_sql_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ netlockrmm_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MySQL"
+          homepage.group: "{{ netlockrmm_db_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_db_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_db_container_name }}"
+          homepage.showStats: "{{ netlockrmm_db_homepage_showstats }}"
+          repliqate.enabled: "{{ netlockrmm_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_db_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mysql"
+        cpu_shares: "{{ netlockrmm_db_cpu_shares }}"
+        memory: "{{ netlockrmm_db_memory }}"
+        restart_policy: unless-stopped
+
+
+##############################################################
+###  OPTIONAL - remove if not needed                       ###
+###   ____           _                 ____   ___  _       ###
+###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
+###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
+###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
+###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
+###                     |___/                              ###
+##############################################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_db_container_name }}"
+        hostname: "{{ netlockrmm_db_container_name }}"
+        image: "{{ netlockrmm_db_image_name }}:{{ netlockrmm_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ netlockrmm_network_name }}"     # optional
+        network_mode: "{{ netlockrmm_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ netlockrmm_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "appname"
+          POSTGRES_PASSWORD: "appname"
+          POSTGRES_DB: "appname"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ netlockrmm_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ netlockrmm_db_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_db_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_db_container_name }}"
+          homepage.showStats: "{{ netlockrmm_db_homepage_showstats }}"
+          repliqate.enabled: "{{ netlockrmm_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_db_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
+        cpu_shares: "{{ netlockrmm_db_cpu_shares }}"
+        memory: "{{ netlockrmm_db_memory }}"
+        restart_policy: unless-stopped
+
+
+#########################################
+###  OPTIONAL - remove if not needed  ###
+###       ____          _ _           ###
+###      |  _ \ ___  __| (_)___       ###
+###      | |_) / _ \/ _` | / __|      ###
+###      |  _ <  __/ (_| | \__ \      ###
+###      |_| \_\___|\__,_|_|___/      ###
+#########################################
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_redis_container_name }}"
+        hostname: "{{ netlockrmm_redis_container_name }}"
+        image: "{{ netlockrmm_redis_image_name }}:{{ netlockrmm_redis_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ netlockrmm_network_name }}"     # optional
+        network_mode: "{{ netlockrmm_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        command: "redis-server --requirepass topsecret"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ netlockrmm_redis_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_redis_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ netlockrmm_redis_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_redis_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_redis_container_name }}"
+          homepage.showStats: "{{ netlockrmm_redis_homepage_showstats }}"
+          repliqate.enabled: "{{ netlockrmm_redis_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_redis_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
+        cpu_shares: "{{ netlockrmm_redis_cpu_shares }}"
+        memory: "{{ netlockrmm_redis_memory }}"
+        restart_policy: unless-stopped

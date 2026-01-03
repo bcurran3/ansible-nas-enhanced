@@ -1,0 +1,68 @@
+---
+# ANE
+ansible_nas_app_name: "ByteStash"
+bytestash_enabled: false
+bytestash_available_externally: false
+bytestash_traefik_whitelist: "{{ lan }}"
+
+# directories
+bytestash_data_directory: "{{ docker_home }}/bytestash"
+
+# docker
+bytestash_container_name: "bytestash"
+bytestash_image_name: "ghcr.io/jordan-dalby/bytestash"
+bytestash_image_tag: "latest"
+
+# uid / gid
+bytestash_user_id: "0"
+bytestash_group_id: "0"
+
+# network
+bytestash_port_http: "3075"
+bytestash_hostname: "bytestash"
+
+# specs
+bytestash_cpu_shares: 1024
+bytestash_memory: "1G"
+
+# app
+bytestash_env_allowed_hosts: '*'
+bytestash_env_base_path: ""
+bytestash_env_jwt_secret: "wXq5dfP3DzjZw78rICtXrWS54eBjAuoBXEPfGolhrbH" # https://jwtsecretkeygenerator.com/
+bytestash_env_token_expiry: "24h"
+bytestash_env_allow_new_accounts: "true"
+bytestash_env_debug: "false"
+bytestash_env_disable_accounts: "false"
+bytestash_env_disable_internal_accounts: "false"
+bytestash_env_oidc_enabled: "false" # See https://github.com/jordan-dalby/ByteStash/wiki/Single-Sign%E2%80%90on-Setup for more info
+bytestash_env_oidc_display_name: ""
+bytestash_env_oidc_issuer_url: ""
+bytestash_env_oidc_client_id: ""
+bytestash_env_oidc_client_secret: ""
+bytestash_env_oidc_scopes: ""
+
+# autoheal
+bytestash_autoheal: "false"
+
+# dockflare
+bytestash_dockflare_tunnel: false
+bytestash_dockflare_access_group: ""
+
+# homepage
+bytestash_homepage_group: "Apps"
+bytestash_homepage_icon: "bytestash.png"
+bytestash_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bytestash_port_http }}"
+bytestash_homepage_showstats: "false"
+
+# repliqate
+bytestash_repliqate_enabled: false
+bytestash_repliqate_engine: "restic"
+bytestash_repliqate_schedule: "@daily 3am"
+bytestash_repliqate_backup_id: "{{ bytestash_container_name }}"
+bytestash_repliqate_retention: "30d"
+
+# tinyauth
+bytestash_tinyauth_enabled: false
+
+# watchtower
+bytestash_watchtower_enable: false

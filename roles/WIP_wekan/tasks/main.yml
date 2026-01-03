@@ -1,0 +1,388 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ wekan_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wekan_container_name }}"
+        hostname: "{{ wekan_container_name }}"
+        image: "{{ wekan_image_name }}:{{ wekan_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ wekan_data_directory }}:/config"
+        ports:
+          - "{{ wekan_port_http }}:80"
+        env:
+#         DOCKER_MODS: "{{ wekan_env_docker_mods }}" # linuxserver.io images
+#         INSTALL_PACKAGES: "{{ wekan_env_docker_mods_install_packages }}"
+#         INSTALL_PIP_PACKAGES: "{{ wekan_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ wekan_user_id }}"
+          PGID: "{{ wekan_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wekan_autoheal | string }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_watchtower_enable | string }}"
+          dockflare.enable: "{{ wekan_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ wekan_dockflare_access_group }}"
+          dockflare.hostname: "{{ wekan_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+#         dockflare.access.policy: "authenticate"
+#         dockflare.access.allowed_idps: "YOUR_IDP_UUID_HERE"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ wekan_homepage_group }}"
+          homepage.icon: "{{ wekan_homepage_icon }}"
+          homepage.href: "{{ wekan_homepage_href }}"
+          homepage.description: "{{ 'appname description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wekan_container_name }}"
+          homepage.showStats: "{{ wekan_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+          repliqate.enabled: "{{ wekan_repliqate_enabled }} | string"
+          repliqate.engine: "{{ wekan_repliqate_engine }}"
+          repliqate.schedule: "{{ wekan_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wekan_repliqate_backup_id }}"
+          repliqate.retention: "{{ wekan_repliqate_retention }}"
+          traefik.enable: "{{ wekan_available_externally | string }}"
+          traefik.http.routers.appname.rule: "Host(`{{ wekan_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.appname.tls.certresolver: "letsencrypt"
+          traefik.http.routers.appname.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.appname.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.appname.middlewares: "appname@docker{{ ',tinyauth-auth@docker' if wekan_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ wekan_traefik_whitelist }}"
+          traefik.http.services.appname.loadbalancer.server.port: "80"
+### Docker hub example
+          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/devname/appname"
+### Github example
+#          wud.tag.include: '^\d+\.\d+\.\d+$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://github.com/dev/appname/pkgs/container/appname"
+### Linuxserver.io example
+#          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://lscr.io/linuxserver/appname"
+        cpu_shares: "{{ wekan_cpu_shares }}"
+        memory: "{{ wekan_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wekan_port_http | string)] +
+                (['https://' + wekan_hostname + '.' + ansible_nas_domain] if (wekan_available_externally is true or wekan_dockflare_tunnel is true) else [])
+              }}
+  when: wekan_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ wekan_container_name }}"
+        state: absent
+  when: wekan_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ wekan_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - wekan_enabled is false
+
+
+
+##############################################################################
+### EXAMPLES OF COMMON DATABASE SETUPS BELOW
+### DELETE ALL OR PARTS BELOW AS NOT NEEDED
+### PLEASE STICK TO THIS FORMAT
+### NOTE: ../molecule files are not templated for DBs and
+###       need to be updated as well when using DBs.
+###       Look at the Nextcloud role for a good example.
+##############################################################################
+
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###   __  __            _       ____  ____    ###
+###  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   ###
+###  | |\/| |/ _` | '__| |/ _` | | | |  _ \   ###
+###  | |  | | (_| | |  | | (_| | |_| | |_) |  ###
+###  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   ###
+#################################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wekan_db_container_name }}"
+        hostname: "{{ wekan_db_container_name }}"
+        image: "{{ wekan_db_image_name }}:{{ wekan_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ wekan_network_name }}"     # optional
+        network_mode: "{{ wekan_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ wekan_data_directory }}/db:/var/lib/mysql"
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          MYSQL_ROOT_PASSWORD: "topsecretroot"
+          MYSQL_DATABASE: "appname"
+          MYSQL_USER: "appname"
+          MYSQL_PASSWORD: "{{ wekan_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test:
+                - CMD
+                - /usr/local/bin/healthcheck.sh
+                - --su-mysql
+                - --connect
+                - --innodb_initialized
+              interval: "30s"
+              timeout: "10s"
+              retries: "3"
+              start_period: "30s"
+        labels:
+          autoheal: "{{ wekan_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ wekan_db_homepage_group }}"
+          homepage.icon: "{{ wekan_db_homepage_icon }}"
+          homepage.href: "{{ wekan_homepage_href }}"
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wekan_db_container_name }}"
+          homepage.showStats: "{{ wekan_db_homepage_showstats }}"
+          repliqate.enabled: "{{ wekan_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ wekan_db_repliqate_engine }}"
+          repliqate.schedule: "{{ wekan_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wekan_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ wekan_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
+        cpu_shares: "{{ wekan_db_cpu_shares }}"
+        memory: "{{ wekan_db_memory }}"
+        restart_policy: unless-stopped
+
+
+######################################################
+###  OPTIONAL - remove if not needed               ###
+###   __  __                         ____  ____    ###
+###  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   ###
+###  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   ###
+###  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  ###
+###  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   ###
+###                      |___/                     ###
+######################################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wekan_db_container_name }}"
+        hostname: "{{ wekan_db_container_name }}"
+        image: "{{ wekan_db_image_name }}:{{ wekan_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ wekan_network_name }}"     # optional
+        network_mode: "{{ wekan_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ wekan_data_directory }}/db:/data/db"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wekan_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.group: "{{ wekan_db_homepage_group }}"
+          homepage.icon: "{{ wekan_db_homepage_icon }}"
+          homepage.href: "{{ wekan_homepage_href }}"
+          homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wekan_db_container_name }}"
+          homepage.showStats: "{{ wekan_db_homepage_showstats }}"
+          repliqate.enabled: "{{ wekan_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ wekan_db_repliqate_engine }}"
+          repliqate.schedule: "{{ wekan_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wekan_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ wekan_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mongo"
+        cpu_shares: "{{ wekan_db_cpu_shares }}"
+        memory: "{{ wekan_db_memory }}"
+        restart_policy: unless-stopped
+
+
+##########################################
+###  OPTIONAL - remove if not needed   ###
+###   __  __       ____   ___  _       ###
+###  |  \/  |_   _/ ___| / _ \| |      ###
+###  | |\/| | | | \___ \| | | | |      ###
+###  | |  | | |_| |___) | |_| | |___   ###
+###  |_|  |_|\__, |____/ \__\_\_____|  ###
+###          |___/                     ###
+##########################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wekan_db_container_name }}"
+        hostname: "{{ wekan_db_container_name }}"
+        image: "{{ wekan_db_image_name }}:{{ wekan_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ wekan_network_name }}"     # optional
+        network_mode: "{{ wekan_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ wekan_data_directory }}/mysql/mysql:/var/lib/mysql"
+          - "{{ wekan_data_directory }}/mysql/my.cnf:/etc/my.cnf"
+        env:
+          MYSQL_DATABASE: "appname"
+          MYSQL_USER: "{{ wekan_sql_user }}"
+          MYSQL_PASSWORD: "{{ wekan_sql_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ wekan_sql_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wekan_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MySQL"
+          homepage.group: "{{ wekan_db_homepage_group }}"
+          homepage.icon: "{{ wekan_db_homepage_icon }}"
+          homepage.href: "{{ wekan_homepage_href }}"
+          homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wekan_db_container_name }}"
+          homepage.showStats: "{{ wekan_db_homepage_showstats }}"
+          repliqate.enabled: "{{ wekan_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ wekan_db_repliqate_engine }}"
+          repliqate.schedule: "{{ wekan_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wekan_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ wekan_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mysql"
+        cpu_shares: "{{ wekan_db_cpu_shares }}"
+        memory: "{{ wekan_db_memory }}"
+        restart_policy: unless-stopped
+
+
+##############################################################
+###  OPTIONAL - remove if not needed                       ###
+###   ____           _                 ____   ___  _       ###
+###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
+###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
+###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
+###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
+###                     |___/                              ###
+##############################################################
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wekan_db_container_name }}"
+        hostname: "{{ wekan_db_container_name }}"
+        image: "{{ wekan_db_image_name }}:{{ wekan_db_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ wekan_network_name }}"     # optional
+        network_mode: "{{ wekan_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        volumes:
+          - "{{ wekan_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "appname"
+          POSTGRES_PASSWORD: "appname"
+          POSTGRES_DB: "appname"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wekan_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ wekan_db_homepage_group }}"
+          homepage.icon: "{{ wekan_db_homepage_icon }}"
+          homepage.href: "{{ wekan_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wekan_db_container_name }}"
+          homepage.showStats: "{{ wekan_db_homepage_showstats }}"
+          repliqate.enabled: "{{ wekan_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ wekan_db_repliqate_engine }}"
+          repliqate.schedule: "{{ wekan_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wekan_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ wekan_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
+        cpu_shares: "{{ wekan_db_cpu_shares }}"
+        memory: "{{ wekan_db_memory }}"
+        restart_policy: unless-stopped
+
+
+#########################################
+###  OPTIONAL - remove if not needed  ###
+###       ____          _ _           ###
+###      |  _ \ ___  __| (_)___       ###
+###      | |_) / _ \/ _` | / __|      ###
+###      |  _ <  __/ (_| | \__ \      ###
+###      |_| \_\___|\__,_|_|___/      ###
+#########################################
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ wekan_redis_container_name }}"
+        hostname: "{{ wekan_redis_container_name }}"
+        image: "{{ wekan_redis_image_name }}:{{ wekan_redis_image_tag }}"
+        pull: true
+        networks:                                  # optional
+          - name: "{{ wekan_network_name }}"     # optional
+        network_mode: "{{ wekan_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+        command: "redis-server --requirepass topsecret"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ wekan_redis_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_redis_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ wekan_redis_homepage_group }}"
+          homepage.icon: "{{ wekan_redis_homepage_icon }}"
+          homepage.href: "{{ wekan_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ wekan_redis_container_name }}"
+          homepage.showStats: "{{ wekan_redis_homepage_showstats }}"
+          repliqate.enabled: "{{ wekan_redis_repliqate_enabled }} | string"
+          repliqate.engine: "{{ wekan_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ wekan_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ wekan_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ wekan_redis_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
+        cpu_shares: "{{ wekan_redis_cpu_shares }}"
+        memory: "{{ wekan_redis_memory }}"
+        restart_policy: unless-stopped
