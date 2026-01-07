@@ -1,0 +1,78 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ komodo_periphery_data_directory }}"
+        - "{{ komodo_periphery_data_directory }}/periphery"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ komodo_periphery_container_name }}"
+        hostname: "{{ komodo_periphery_container_name }}"
+        image: "{{ komodo_periphery_image_name }}:{{ komodo_periphery_image_tag }}"
+        pull: true
+        ports:
+          - 8120:8120
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+          - "/proc:/proc"
+          - "{{ komodo_periphery_data_directory }}/periphery:{{ komodo_periphery_data_directory }}/periphery"
+        env:
+          PERIPHERY_ROOT_DIRECTORY: "{{ komodo_periphery_env_periphery_root_directory }}"
+          PERIPHERY_PASSKEYS: "{{ komodo_periphery_env_periphery_passkeys }}"
+          PERIPHERY_DISABLE_TERMINALS: "{{ komodo_periphery_env_periphery_disable_terminals }}"
+          PERIPHERY_SSL_ENABLED: "{{ komodo_periphery_env_periphery_ssl_enabled }}"
+          PERIPHERY_INCLUDE_DISK_MOUNTS: "{{ komodo_periphery_env_periphery_include_disk_mounts }}"
+          PERIPHERY_EXCLUDE_DISK_MOUNTS: "{{ komodo_periphery_env_periphery_exclude_disk_mounts }}"
+          PERIPHERY_LOGGING_PRETTY: "{{ komodo_periphery_env_periphery_logging_pretty }}"
+          PERIPHERY_PRETTY_STARTUP_CONFIG: "{{ komodo_periphery_env_periphery_pretty_startup_config }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ komodo_periphery_autoheal | string  }}"
+          com.centurylinklabs.watchtower.enable: "{{ komodo_periphery_watchtower_enable | string  }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Periphery"
+          homepage.group: "{{ komodo_periphery_homepage_group }}"
+          homepage.icon: "{{ komodo_periphery_homepage_icon }}"
+          homepage.href: "{{ komodo_periphery_homepage_href }}"
+          homepage.description: "{{ 'komodo description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ komodo_periphery_container_name }}"
+          homepage.showStats: "{{ komodo_periphery_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+          komodo.skip:
+          repliqate.enabled: "{{ komodo_periphery_repliqate_enabled | string  }}"
+          repliqate.engine: "{{ komodo_periphery_repliqate_engine }}"
+          repliqate.schedule: "{{ komodo_periphery_repliqate_schedule }}"
+          repliqate.backup_id: "{{ komodo_periphery_repliqate_backup_id }}"
+          repliqate.retention: "{{ komodo_periphery_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/moghtech/komodo/pkgs/container/komodo-periphery"
+        cpu_shares: "{{ komodo_periphery_cpu_shares }}"
+        memory: "{{ komodo_periphery_memory }}"
+        restart_policy: unless-stopped
+  when: komodo_periphery_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ komodo_periphery_container_name }}"
+        state: absent
+  when: komodo_periphery_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ komodo_periphery_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - komodo_periphery_enabled is false

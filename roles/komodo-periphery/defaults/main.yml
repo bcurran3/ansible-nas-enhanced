@@ -1,0 +1,58 @@
+---
+# ANE
+ansible_nas_app_name: "Komodo Periphery"
+komodo_periphery_enabled: false
+komodo_periphery_available_externally: false
+komodo_periphery_traefik_whitelist: "{{ lan }}"
+
+# directories
+komodo_periphery_data_directory: "{{ docker_home }}/komodo-periphery"
+
+# docker
+komodo_periphery_container_name: "komodo-periphery"
+komodo_periphery_image_name: "ghcr.io/moghtech/komodo-periphery"
+komodo_periphery_image_tag: "latest"
+
+# network
+komodo_periphery_port_http: "8120"
+komodo_periphery_hostname: "komodo-periphery"
+
+# specs
+komodo_periphery_cpu_shares: 1024
+komodo_periphery_memory: "1G"
+
+# app
+komodo_periphery_env_periphery_root_directory: "/etc/komodo" ## Specify the root directory used by Periphery agent.
+komodo_periphery_env_periphery_passkeys: "OdgswggH6J5mF0kOXfh18KL1QSGKB06t" ## Periphery passkeys must include KOMODO_PASSKEY to authenticate.
+komodo_periphery_env_periphery_disable_terminals: "false" ## Specify whether to disable the terminals feature and disallow remote shell access (inside the Periphery container).
+komodo_periphery_env_periphery_ssl_enabled: "true" ## Enable SSL using self signed certificates. Connect to Periphery at https://address:8120.
+komodo_periphery_env_periphery_include_disk_mounts: "/etc/hostname" ## If the disk size is overreporting, can use one of these to whitelist / blacklist the disks to filter them, whichever is easier. Accepts comma separated list of paths. Usually whitelisting just /etc/hostname gives correct size.
+komodo_periphery_env_periphery_exclude_disk_mounts: "/snap,/etc/repos"
+komodo_periphery_env_periphery_logging_pretty: "false" ## Prettier logging with empty lines between logs
+komodo_periphery_env_periphery_pretty_startup_config: "false" ## More human readable logging of startup config (multi-line)
+
+# autoheal
+komodo_periphery_autoheal: "false"
+
+# dockflare
+komodo_periphery_dockflare_tunnel: "false"
+komodo_periphery_dockflare_access_group: ""
+
+# homepage
+komodo_periphery_homepage_group: "DBs"
+komodo_periphery_homepage_icon: "mongodb.png"
+komodo_periphery_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+komodo_periphery_homepage_showstats: "false"
+
+# repliqate
+komodo_periphery_repliqate_enabled: "false"
+komodo_periphery_repliqate_engine: "restic"
+komodo_periphery_repliqate_schedule: "@daily 3am"
+komodo_periphery_repliqate_backup_id: "{{ komodo_periphery_container_name }}"
+komodo_periphery_repliqate_retention: "30d"
+
+# tinyauth
+komodo_periphery_tinyauth_enabled: false
+
+# watchtower
+komodo_periphery_watchtower_enable: "false"
