@@ -1,0 +1,87 @@
+---
+# ANE
+ansible_nas_app_name: "NetLock RMM"
+netlockrmm_enabled: false
+netlockrmm_available_externally: false
+netlockrmm_traefik_whitelist: "{{ lan }}"
+
+# directories
+netlockrmm_data_directory: "{{ docker_home }}/netlockrmm"
+netlockrmm_certs_directory: "{{ acmenator_traefik_directory }}"
+
+# docker
+netlockrmm_container_name: "netlockrmm"
+netlockrmm_image_name: "nicomak101/netlock-rmm-server"
+netlockrmm_image_tag: "latest"
+netlockrmm_db_container_name: "netlockrmm-db"
+netlockrmm_db_image_name: "mysql"
+netlockrmm_db_image_tag: "8.0"
+netlockrmm_web_container_name: "netlockrmm-web"
+netlockrmm_web_image_name: "nicomak101/netlock-rmm-web-console"
+netlockrmm_web_image_tag: "latest"
+
+# network
+netlockrmm_port_http: "3078"
+#netlockrmm_port_https: "7443"
+netlockrmm_hostname: "netlockrmm"
+
+# specs
+netlockrmm_cpu_shares: 1024
+netlockrmm_memory: "1G"
+netlockrmm_db_cpu_shares: 1024
+netlockrmm_db_memory: "1G"
+netlockrmm_web_cpu_shares: 1024
+netlockrmm_web_memory: "1G"
+
+# app
+netlockrmm_db_msql_database: "netlockrmm_db"
+netlockrmm_db_mysql_user: "root"
+netlockrmm_db_mysql_root_password: "topsecret"
+
+# autoheal
+netlockrmm_autoheal: "false"
+netlockrmm_db_autoheal: "false"
+netlockrmm_web_autoheal: "false"
+
+# dockflare
+netlockrmm_dockflare_tunnel: false
+netlockrmm_dockflare_access_group: ""
+
+# homepage
+netlockrmm_homepage_group: "Apps"
+netlockrmm_homepage_icon: "netlockrmm.png"
+netlockrmm_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+netlockrmm_homepage_showstats: "false"
+netlockrmm_db_homepage_group: "DBs"
+netlockrmm_db_homepage_icon: "mysql.png"
+netlockrmm_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+netlockrmm_db_homepage_showstats: "false"
+netlockrmm_web_homepage_group: "Apps"
+netlockrmm_web_homepage_icon: "netlockrmm.png"
+netlockrmm_web_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+netlockrmm_web_homepage_showstats: "false"
+
+# repliqate
+netlockrmm_repliqate_enabled: false
+netlockrmm_repliqate_engine: "restic"
+netlockrmm_repliqate_schedule: "@daily 3am"
+netlockrmm_repliqate_backup_id: "{{ netlockrmm_container_name }}"
+netlockrmm_repliqate_retention: "30d"
+netlockrmm_db_repliqate_enabled: "false"
+netlockrmm_db_repliqate_engine: "restic"
+netlockrmm_db_repliqate_schedule: "@daily 3am"
+netlockrmm_db_repliqate_backup_id: "{{ netlockrmm_db_container_name }}"
+netlockrmm_db_repliqate_retention: "30d"
+netlockrmm_web_repliqate_enabled: false
+netlockrmm_web_repliqate_engine: "restic"
+netlockrmm_web_repliqate_schedule: "@daily 3am"
+netlockrmm_web_repliqate_backup_id: "{{ netlockrmm_container_name }}"
+netlockrmm_web_repliqate_retention: "30d"
+
+# tinyauth
+netlockrmm_tinyauth_enabled: false
+
+# watchtower
+netlockrmm_watchtower_enable: false
+netlockrmm_db_watchtower_enable: "false"
+netlockrmm_web_watchtower_enable: false

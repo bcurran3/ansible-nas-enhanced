@@ -1,0 +1,213 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ netlockrmm_data_directory }}"
+        - "{{ netlockrmm_data_directory }}/db"
+        - "{{ netlockrmm_data_directory }}/files"
+        - "{{ netlockrmm_data_directory }}/internal"
+        - "{{ netlockrmm_data_directory }}/logs"
+
+    - name: Copy {{ ansible_nas_app_name }} Template appsettings.json
+      ansible.builtin.template:
+        src: appsettings.json
+        dest: "{{ netlockrmm_data_directory }}/appsettings.json"
+      register: template_config
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_db_container_name }}"
+        hostname: "{{ netlockrmm_db_container_name }}"
+        image: "{{ netlockrmm_db_image_name }}:{{ netlockrmm_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ netlockrmm_data_directory }}/db:/var/lib/mysql"
+          - /etc/localtime:/etc/localtime:ro
+        env:
+          MYSQL_ROOT_PASSWORD: "{{ netlockrmm_db_mysql_root_password }}"
+          MYSQL_DATABASE: "{{ netlockrmm_db_msql_database }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ netlockrmm_db_autoheal }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_db_watchtower_enable }} | string"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MySQL"
+          homepage.group: "{{ netlockrmm_db_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_db_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_db_container_name }}"
+          homepage.showStats: "{{ netlockrmm_db_homepage_showstats }}"
+          repliqate.enabled: "{{ netlockrmm_db_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_db_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mysql"
+        cpu_shares: "{{ netlockrmm_db_cpu_shares }}"
+        memory: "{{ netlockrmm_db_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Web UI Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_container_name }}"
+        hostname: "{{ netlockrmm_container_name }}"
+        image: "{{ netlockrmm_image_name }}:{{ netlockrmm_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ netlockrmm_data_directory }}/appsettings.json:/app/appsettings.json"
+          - "{{ netlockrmm_data_directory }}//internal:/app/internal"
+          - "{{ netlockrmm_data_directory }}/logs:/var/0x101 Cyber Security/NetLock RMM/Web Console/"
+          - "{{ netlockrmm_certs_directory }}:/app/certificates"
+          - /etc/localtime:/etc/localtime:ro
+        ports:
+          - "{{ netlockrmm_port_http }}:80"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ netlockrmm_db_container_name }}"
+        labels:
+          autoheal: "{{ netlockrmm_autoheal | string }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_watchtower_enable | string }}"
+          dockflare.enable: "{{ netlockrmm_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ netlockrmm_dockflare_access_group }}"
+          dockflare.hostname: "{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ netlockrmm_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'netlockrmm description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_container_name }}"
+          homepage.showStats: "{{ netlockrmm_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+          repliqate.enabled: "{{ netlockrmm_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_repliqate_retention }}"
+          traefik.enable: "{{ netlockrmm_available_externally | string }}"
+          traefik.http.routers.netlockrmm.rule: "Host(`{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.netlockrmm.tls.certresolver: "letsencrypt"
+          traefik.http.routers.netlockrmm.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.netlockrmm.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.netlockrmm.middlewares: "netlockrmm@docker{{ ',tinyauth-auth@docker' if netlockrmm_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.netlockrmm.IPAllowList.sourcerange: "{{ netlockrmm_traefik_whitelist }}"
+          traefik.http.services.netlockrmm.loadbalancer.server.port: "80"
+### Docker hub example
+          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/devname/netlockrmm"
+### Github example
+#          wud.tag.include: '^\d+\.\d+\.\d+$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://github.com/dev/netlockrmm/pkgs/container/netlockrmm"
+### Linuxserver.io example
+#          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://lscr.io/linuxserver/netlockrmm"
+        cpu_shares: "{{ netlockrmm_cpu_shares }}"
+        memory: "{{ netlockrmm_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Server Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ netlockrmm_container_name }}"
+        hostname: "{{ netlockrmm_container_name }}"
+        image: "{{ netlockrmm_image_name }}:{{ netlockrmm_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ netlockrmm_data_directory }}/appsettings.json:/app/appsettings.json"
+          - "{{ netlockrmm_data_directory }}/internal:/app/internal"
+          - "{{ netlockrmm_data_directory }}/files:/app/www/private/files"
+          - "{{ netlockrmm_data_directory }}/logs:/var/0x101 Cyber Security/NetLock RMM/Server/"
+          - "{{ netlockrmm_certs_directory }}:/app/certificates"
+          - /etc/localtime:/etc/localtime:ro
+        ports:
+          - "{{ netlockrmm_port_http }}:7080"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ netlockrmm_db_container_name }}"
+        labels:
+          autoheal: "{{ netlockrmm_autoheal | string }} | string"
+          com.centurylinklabs.watchtower.enable: "{{ netlockrmm_watchtower_enable | string }}"
+          dockflare.enable: "{{ netlockrmm_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ netlockrmm_dockflare_access_group }}"
+          dockflare.hostname: "{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ netlockrmm_homepage_group }}"
+          homepage.icon: "{{ netlockrmm_homepage_icon }}"
+          homepage.href: "{{ netlockrmm_homepage_href }}"
+          homepage.description: "{{ 'netlockrmm description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ netlockrmm_container_name }}"
+          homepage.showStats: "{{ netlockrmm_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+          repliqate.enabled: "{{ netlockrmm_repliqate_enabled }} | string"
+          repliqate.engine: "{{ netlockrmm_repliqate_engine }}"
+          repliqate.schedule: "{{ netlockrmm_repliqate_schedule }}"
+          repliqate.backup_id: "{{ netlockrmm_repliqate_backup_id }}"
+          repliqate.retention: "{{ netlockrmm_repliqate_retention }}"
+          traefik.enable: "{{ netlockrmm_available_externally | string }}"
+          traefik.http.routers.netlockrmmserver.rule: "Host(`{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.netlockrmmserver.tls.certresolver: "letsencrypt"
+          traefik.http.routers.netlockrmmserver.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.netlockrmmserver.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.netlockrmmserver.middlewares: "netlockrmmserver@docker{{ ',tinyauth-auth@docker' if netlockrmm_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.netlockrmm.IPAllowList.sourcerange: "{{ netlockrmm_traefik_whitelist }}"
+          traefik.http.services.netlockrmmserver.loadbalancer.server.port: "7080"
+### Docker hub example
+          wud.tag.include: '^\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/r/devname/netlockrmm"
+### Github example
+#          wud.tag.include: '^\d+\.\d+\.\d+$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://github.com/dev/netlockrmm/pkgs/container/netlockrmm"
+### Linuxserver.io example
+#          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+#          wud.tag.transform.type: "semver"
+#          wud.link.template: "https://lscr.io/linuxserver/netlockrmm"
+        cpu_shares: "{{ netlockrmm_cpu_shares }}"
+        memory: "{{ netlockrmm_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netlockrmm_port_http | string)] +
+                (['https://' + netlockrmm_hostname + '.' + ansible_nas_domain] if (netlockrmm_available_externally is true or netlockrmm_dockflare_tunnel is true) else [])
+              }}
+  when: netlockrmm_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ netlockrmm_container_name }}"
+        state: absent
+  when: netlockrmm_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ netlockrmm_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - netlockrmm_enabled is false
