@@ -27,7 +27,7 @@
           PGID: "{{ appname_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ appname_autoheal | string }} | string"
+          autoheal: "{{ appname_autoheal | string }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_watchtower_enable | string }}"
           dockflare.enable: "{{ appname_dockflare_tunnel | string }}"
           dockflare.access.group: "{{ appname_dockflare_access_group }}"
@@ -44,7 +44,7 @@
           homepage.container: "{{ appname_container_name }}"
           homepage.showStats: "{{ appname_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ appname_port_http }}"
-          repliqate.enabled: "{{ appname_repliqate_enabled }} | string"
+          repliqate.enabled: "{{ appname_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_repliqate_engine }}"
           repliqate.schedule: "{{ appname_repliqate_schedule }}"
           repliqate.backup_id: "{{ appname_repliqate_backup_id }}"
@@ -100,6 +100,11 @@
     - appname_enabled is false
 
 
+## if setting up networks, add this to all containers:
+        networks:                                  # optional
+          - name: "{{ appname_network_name }}"     # optional
+        network_mode: "{{ appname_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
 
 ##############################################################################
 ### EXAMPLES OF COMMON DATABASE SETUPS BELOW
@@ -127,10 +132,6 @@
         hostname: "{{ appname_db_container_name }}"
         image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
         pull: true
-        networks:                                  # optional
-          - name: "{{ appname_network_name }}"     # optional
-        network_mode: "{{ appname_network_name }}" # optional
-        networks_cli_compatible: "yes"             # optional
         volumes:
           - "{{ appname_data_directory }}/db:/var/lib/mysql"
         env:
@@ -153,8 +154,8 @@
               retries: "3"
               start_period: "30s"
         labels:
-          autoheal: "{{ appname_db_autoheal }} | string"
-          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable }} | string"
+          autoheal: "{{ appname_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable | string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ appname_db_homepage_group }}"
@@ -164,7 +165,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showstats }}"
-          repliqate.enabled: "{{ appname_db_repliqate_enabled }} | string"
+          repliqate.enabled: "{{ appname_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_db_repliqate_engine }}"
           repliqate.schedule: "{{ appname_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ appname_db_repliqate_backup_id }}"
@@ -195,17 +196,13 @@
         hostname: "{{ appname_db_container_name }}"
         image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
         pull: true
-        networks:                                  # optional
-          - name: "{{ appname_network_name }}"     # optional
-        network_mode: "{{ appname_network_name }}" # optional
-        networks_cli_compatible: "yes"             # optional
         volumes:
           - "{{ appname_data_directory }}/db:/data/db"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ appname_db_autoheal }} | string"
-          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable }} | string"
+          autoheal: "{{ appname_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable | string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ appname_db_homepage_group }}"
@@ -215,7 +212,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showstats }}"
-          repliqate.enabled: "{{ appname_db_repliqate_enabled }} | string"
+          repliqate.enabled: "{{ appname_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_db_repliqate_engine }}"
           repliqate.schedule: "{{ appname_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ appname_db_repliqate_backup_id }}"
@@ -246,10 +243,6 @@
         hostname: "{{ appname_db_container_name }}"
         image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
         pull: true
-        networks:                                  # optional
-          - name: "{{ appname_network_name }}"     # optional
-        network_mode: "{{ appname_network_name }}" # optional
-        networks_cli_compatible: "yes"             # optional
         volumes:
           - "{{ appname_data_directory }}/mysql/mysql:/var/lib/mysql"
           - "{{ appname_data_directory }}/mysql/my.cnf:/etc/my.cnf"
@@ -260,8 +253,8 @@
           MYSQL_ROOT_PASSWORD: "{{ appname_sql_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ appname_db_autoheal }} | string"
-          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable }} | string"
+          autoheal: "{{ appname_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable | string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ appname_db_homepage_group }}"
@@ -271,7 +264,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showstats }}"
-          repliqate.enabled: "{{ appname_db_repliqate_enabled }} | string"
+          repliqate.enabled: "{{ appname_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_db_repliqate_engine }}"
           repliqate.schedule: "{{ appname_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ appname_db_repliqate_backup_id }}"
@@ -302,10 +295,6 @@
         hostname: "{{ appname_db_container_name }}"
         image: "{{ appname_db_image_name }}:{{ appname_db_image_tag }}"
         pull: true
-        networks:                                  # optional
-          - name: "{{ appname_network_name }}"     # optional
-        network_mode: "{{ appname_network_name }}" # optional
-        networks_cli_compatible: "yes"             # optional
         volumes:
           - "{{ appname_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -314,8 +303,8 @@
           POSTGRES_DB: "appname"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ appname_db_autoheal }} | string"
-          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable }} | string"
+          autoheal: "{{ appname_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable | string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ appname_db_homepage_group }}"
@@ -325,7 +314,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
           homepage.showStats: "{{ appname_db_homepage_showstats }}"
-          repliqate.enabled: "{{ appname_db_repliqate_enabled }} | string"
+          repliqate.enabled: "{{ appname_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_db_repliqate_engine }}"
           repliqate.schedule: "{{ appname_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ appname_db_repliqate_backup_id }}"
@@ -355,16 +344,12 @@
         hostname: "{{ appname_redis_container_name }}"
         image: "{{ appname_redis_image_name }}:{{ appname_redis_image_tag }}"
         pull: true
-        networks:                                  # optional
-          - name: "{{ appname_network_name }}"     # optional
-        network_mode: "{{ appname_network_name }}" # optional
-        networks_cli_compatible: "yes"             # optional
         command: "redis-server --requirepass topsecret"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ appname_redis_autoheal }} | string"
-          com.centurylinklabs.watchtower.enable: "{{ appname_redis_watchtower_enable }} | string"
+          autoheal: "{{ appname_redis_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_redis_watchtower_enable | string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ appname_redis_homepage_group }}"
@@ -374,7 +359,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ appname_redis_container_name }}"
           homepage.showStats: "{{ appname_redis_homepage_showstats }}"
-          repliqate.enabled: "{{ appname_redis_repliqate_enabled }} | string"
+          repliqate.enabled: "{{ appname_redis_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_redis_repliqate_engine }}"
           repliqate.schedule: "{{ appname_redis_repliqate_schedule }}"
           repliqate.backup_id: "{{ appname_redis_repliqate_backup_id }}"
