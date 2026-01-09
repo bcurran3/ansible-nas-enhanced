@@ -1,0 +1,88 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: 1000
+        group: 1000
+      with_items:
+        - "{{ journiv_data_directory }}"
+        - "{{ journiv_data_directory }}/data"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ journiv_container_name }}"
+        hostname: "{{ journiv_container_name }}"
+        image: "{{ journiv_image_name }}:{{ journiv_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ journiv_data_directory }}/data:/data"
+        ports:
+          - "{{ journiv_port_http }}:8000"
+        env:
+          SECRET_KEY: "{{ journiv_env_secret_key }}"
+          DOMAIN_NAME: "{{ journiv_env_domain_name }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ journiv_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ journiv_watchtower_enable | string }}"
+          dockflare.enable: "{{ journiv_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ journiv_dockflare_access_group }}"
+          dockflare.hostname: "{{ journiv_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ journiv_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ journiv_homepage_group }}"
+          homepage.icon: "{{ journiv_homepage_icon }}"
+          homepage.href: "{{ journiv_homepage_href }}"
+          homepage.description: "{{ 'Self hosted private journaling app' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ journiv_container_name }}"
+          homepage.showStats: "{{ journiv_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ journiv_port_http }}"
+          repliqate.enabled: "{{ journiv_repliqate_enabled | string }}"
+          repliqate.engine: "{{ journiv_repliqate_engine }}"
+          repliqate.schedule: "{{ journiv_repliqate_schedule }}"
+          repliqate.backup_id: "{{ journiv_repliqate_backup_id }}"
+          repliqate.retention: "{{ journiv_repliqate_retention }}"
+          traefik.enable: "{{ journiv_available_externally | string }}"
+          traefik.http.routers.journiv.rule: "Host(`{{ journiv_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.journiv.tls.certresolver: "letsencrypt"
+          traefik.http.routers.journiv.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.journiv.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.journiv.middlewares: "journiv@docker{{ ',tinyauth-auth@docker' if journiv_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.journiv.IPAllowList.sourcerange: "{{ journiv_traefik_whitelist }}"
+          traefik.http.services.journiv.loadbalancer.server.port: "8000"
+          wud.tag.include: '^v\d+\.\d+\.\d+(-.*)?$'
+          wud.link.template: "https://github.com/journiv/journiv-app/releases/tag/${tag}"
+        cpu_shares: "{{ journiv_cpu_shares }}"
+        memory: "{{ journiv_memory }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (journiv_port_http | string)] +
+                (['https://' + journiv_hostname + '.' + ansible_nas_domain] if (journiv_available_externally is true or journiv_dockflare_tunnel is true) else [])
+              }}
+  when: journiv_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ journiv_container_name }}"
+        state: absent
+  when: journiv_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ journiv_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - journiv_enabled is false

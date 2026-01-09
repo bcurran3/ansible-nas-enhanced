@@ -142,6 +142,7 @@ By default, applications can be found on the ports listed below.
 | Jellyfin         | 8896    | Bridge  | HTTP           |
 | Joomla           | 8181    | Bridge  | HTTP           |
 | Joplin           | 22300   | Bridge  | HTTP           |
+| Journiv          | 3079    | Bridge  | HTTP           |
 | Kapowarr         | 5656    | Bridge  | HTTP           |
 | Karaoke-Forever  | 9018    | Bridge  | HTTP           |
 | Kasm             | 3025
@@ -151,6 +152,7 @@ By default, applications can be found on the ports listed below.
 | Koillection      | 3030    | Bridge  | HTTP           |
 | Komga            | 8088    | Bridge  | HTTPS          |
 | Komodo           | 9120    | Bridge  | HTTP           |
+| Komodo Periphery | 8120    | Bridge  | HTTP           |
 | Krusader         | 6080    | Bridge  | HTTP           |
 | Krusader         | 5901    | Bridge  | VNC            |
 | LANCommander     | 1337    | Bridge  | HTTP           |
@@ -191,6 +193,7 @@ By default, applications can be found on the ports listed below.
 | netbootxyz       | 69      | Bridge  | TFTP           |
 | Netbox           | 3074    | Bridge  | HTTP           |
 | Netdata          | 19999   | Bridge  | HTTP           |
+| Netlock RMM      | 3078    | Bridge  | HTTP           |
 | Nextcloud        | 8080    | Bridge  | HTTP           |
 | Node-RED         | 1880
 | Nomad            | 4646
@@ -374,8 +377,9 @@ By default, applications can be found on the ports listed below.
 | Windows          | 3388 RDP
 | WireGuard        | 51820
 | WireGuard        | 51821
-| Wireshark        | 3001    | Host    | HTTP           |
-| Wireshark        | 3060    | Host    | HTTPS           |
+| Wireshark        | 3000    | Host    | HTTP           |
+| Wireshark        | 3001    | Host    | HTTPS          |
+| Wireshark        | 8082    | Host    | WebSocket      |
 | Wizarr           | 5690    | Bridge  | HTTP           |
 | Woodpecker CI    | 8000
 | Woodpecker CI    | 9000
@@ -387,7 +391,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3078
+# next avail = 3080
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
