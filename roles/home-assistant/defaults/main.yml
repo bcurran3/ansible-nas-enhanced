@@ -1,49 +1,49 @@
 ---
 # ANE
 ansible_nas_app_name: "Home Assistant"
-homeassistant_enabled: false
-homeassistant_available_externally: false
-homeassistant_traefik_whitelist: "{{ lan }}"
+home_assistant_enabled: false
+home_assistant_available_externally: false
+home_assistant_traefik_whitelist: "{{ lan }}"
 
 # directories
-homeassistant_data_directory: "{{ docker_home }}/home-assistant"
+home_assistant_data_directory: "{{ docker_home }}/home-assistant"
 
 # network
-homeassistant_port_http: "8123"
-homeassistant_hostname: "homeassistant"
+home_assistant_port_http: "8123"
+home_assistant_hostname: "homeassistant"
 
 # docker
-homeassistant_container_name: "home-assistant"
-homeassistant_image_name: "homeassistant/home-assistant"
-homeassistant_image_version: latest
-homeassistant_cpu_shares: 1024
+home_assistant_container_name: "home-assistant"
+home_assistant_image_name: "homeassistant/home-assistant"
+home_assistant_image_version: latest
+home_assistant_cpu_shares: 1024
 
 # specs
-homeassistant_memory: "1G"
+home_assistant_memory: "1G"
 
 # autoheal
-homeassistant_autoheal: "false"
+home_assistant_autoheal: "false"
 
 # dockflare
-homeassistant_dockflare_tunnel: "false"
-homeassistant_dockflare_access_group: ""
+home_assistant_dockflare_tunnel: "false"
+home_assistant_dockflare_access_group: ""
 
 # homepage
-homeassistant_homepage_group: "Apps"
-homeassistant_homepage_icon: "home-assistant.png"
-homeassistant_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homeassistant_port_http }}"
-homeassistant_homepage_showstats: "false"
-homeassistant_widget_key: "your_key_here"
+home_assistant_homepage_group: "Apps"
+home_assistant_homepage_icon: "home-assistant.png"
+home_assistant_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ home_assistant_port_http }}"
+home_assistant_homepage_showstats: "false"
+home_assistant_widget_key: "your_key_here"
 
 # repliqate
-homeassistant_repliqate_enabled: "false"
-homeassistant_repliqate_engine: "restic"
-homeassistant_repliqate_schedule: "@daily 3am"
-homeassistant_repliqate_backup_id: "{{ homeassistant_container_name }}"
-homeassistant_repliqate_retention: "30d"
+home_assistant_repliqate_enabled: "false"
+home_assistant_repliqate_engine: "restic"
+home_assistant_repliqate_schedule: "@daily 3am"
+home_assistant_repliqate_backup_id: "{{ home_assistant_container_name }}"
+home_assistant_repliqate_retention: "30d"
 
 # tinyauth
-homeassistant_tinyauth_enabled: false
+home_assistant_tinyauth_enabled: false
 
 # watchtower
-homeassistant_watchtower_enable: "false"
+home_assistant_watchtower_enable: "false"

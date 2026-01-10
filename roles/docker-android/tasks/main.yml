@@ -6,84 +6,84 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ dockerandroid_data_directory }}"
-        - "{{ dockerandroid_data_directory }}/data"
+        - "{{ docker_android_data_directory }}"
+        - "{{ docker_android_data_directory }}/data"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ dockerandroid_container_name }}"
-        hostname: "{{ dockerandroid_container_name }}"
-        image: "{{ dockerandroid_image_name }}:{{ dockerandroid_image_tag }}"
+        name: "{{ docker_android_container_name }}"
+        hostname: "{{ docker_android_container_name }}"
+        image: "{{ docker_android_image_name }}:{{ docker_android_image_tag }}"
         pull: true
 #        volumes:
-#          - "{{ dockerandroid_data_directory }}/data:/home/androidusr"
+#          - "{{ docker_android_data_directory }}/data:/home/androidusr"
         ports:
-          - "{{ dockerandroid_port_http }}:6080"
+          - "{{ docker_android_port_http }}:6080"
         env:
-          EMULATOR_DEVICE: "{{ dockerandroid_env_emulator_device }}"
+          EMULATOR_DEVICE: "{{ docker_android_env_emulator_device }}"
           WEB_VNC: "true"
           TZ: "{{ ansible_nas_timezone }}"
         devices:
           - "/dev/kvm"
         labels:
-          autoheal: "{{ dockerandroid_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ dockerandroid_watchtower_enable }}"
-          dockflare.enable: "{{ dockerandroid_dockflare_tunnel }}"
-          dockflare.access.group: "{{ dockerandroid_dockflare_access_group }}"
-          dockflare.hostname: "{{ dockerandroid_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockerandroid_port_http }}"
+          autoheal: "{{ docker_android_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ docker_android_watchtower_enable }}"
+          dockflare.enable: "{{ docker_android_dockflare_tunnel }}"
+          dockflare.access.group: "{{ docker_android_dockflare_access_group }}"
+          dockflare.hostname: "{{ docker_android_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ docker_android_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ dockerandroid_homepage_group }}"
-          homepage.icon: "{{ dockerandroid_homepage_icon }}"
-          homepage.href: "{{ dockerandroid_homepage_href }}"
+          homepage.group: "{{ docker_android_homepage_group }}"
+          homepage.icon: "{{ docker_android_homepage_icon }}"
+          homepage.href: "{{ docker_android_homepage_href }}"
           homepage.description: "{{ 'Android in docker solution with noVNC supported and video recording' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ dockerandroid_container_name }}"
-          homepage.showStats: "{{ dockerandroid_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockerandroid_port_http }}"
-          repliqate.enabled: "{{ dockerandroid_repliqate_enabled }}"
-          repliqate.engine: "{{ dockerandroid_repliqate_engine }}"
-          repliqate.schedule: "{{ dockerandroid_repliqate_schedule }}"
-          repliqate.backup_id: "{{ dockerandroid_repliqate_backup_id }}"
-          repliqate.retention: "{{ dockerandroid_repliqate_retention }}"
-          traefik.enable: "{{ dockerandroid_available_externally | string }}"
-          traefik.http.routers.dockerandroid.rule: "Host(`{{ dockerandroid_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.dockerandroid.tls.certresolver: "letsencrypt"
+          homepage.container: "{{ docker_android_container_name }}"
+          homepage.showStats: "{{ docker_android_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ docker_android_port_http }}"
+          repliqate.enabled: "{{ docker_android_repliqate_enabled }}"
+          repliqate.engine: "{{ docker_android_repliqate_engine }}"
+          repliqate.schedule: "{{ docker_android_repliqate_schedule }}"
+          repliqate.backup_id: "{{ docker_android_repliqate_backup_id }}"
+          repliqate.retention: "{{ docker_android_repliqate_retention }}"
+          traefik.enable: "{{ docker_android_available_externally | string }}"
+          traefik.http.routers.dockerandroid.rule: "Host(`{{ docker_android_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.docke_android.tls.certresolver: "letsencrypt"
           traefik.http.routers.dockerandroid.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.dockerandroid.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.dockerandroid.middlewares: "dockerandroid@docker{{ ',tinyauth-auth@docker' if dockerandroid_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.dockerandroid.IPAllowList.sourcerange: "{{ dockerandroid_traefik_whitelist }}"
+          traefik.http.routers.dockerandroid.middlewares: "dockerandroid@docker{{ ',tinyauth-auth@docker' if docker_android_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.dockerandroid.IPAllowList.sourcerange: "{{ docker_android_traefik_whitelist }}"
           traefik.http.services.dockerandroid.loadbalancer.server.port: "6080"
           wud.tag.include: '^\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/budtmo/docker-android"
-        cpu_shares: "{{ dockerandroid_cpu_shares }}"
-        memory: "{{ dockerandroid_memory }}"
+        cpu_shares: "{{ docker_android_cpu_shares }}"
+        memory: "{{ docker_android_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockerandroid_port_http | string)] +
-                (['https://' + dockerandroid_hostname + '.' + ansible_nas_domain] if (dockerandroid_available_externally is true or dockerandroid_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (docker_android_port_http | string)] +
+                (['https://' + docker_android_hostname + '.' + ansible_nas_domain] if (docker_android_available_externally is true or docker_android_dockflare_tunnel is true) else [])
               }}
-  when: dockerandroid_enabled is true
+  when: docker_android_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ dockerandroid_container_name }}"
+        name: "{{ docker_android_container_name }}"
         state: absent
-  when: dockerandroid_enabled is false
+  when: docker_android_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   include_role:
     name: ansible-nas-archive
   vars:
-    target_data_dir: "{{ dockerandroid_data_directory }}"
+    target_data_dir: "{{ docker_android_data_directory }}"
   when:
     - archive_app_data_enabled is true
-    - dockerandroid_enabled is false
+    - docker_android_enabled is false

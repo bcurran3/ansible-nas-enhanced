@@ -6,81 +6,121 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ homeassistant_data_directory }}/config"
+        - "{{ home_assistant_data_directory }}/config"
+
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ home_assistant_data_directory }}/config"
+
+    - name: Pre-seed Clean Configuration
+      ansible.builtin.copy:
+        dest: "{{ home_assistant_data_directory }}/config/configuration.yaml"
+        content: |
+          default_config:
+
+          frontend:
+            themes: !include_dir_merge_named themes
+
+          automation: !include automations.yaml
+          script: !include scripts.yaml
+          scene: !include scenes.yaml
+
+          http:
+            use_x_forwarded_for: true
+            trusted_proxies:
+              - 172.17.0.0/16
+              - 127.0.0.1
+
+    - name: Create empty helper files
+      ansible.builtin.file:
+        path: "{{ home_assistant_data_directory }}/config/{{ item }}"
+        state: touch
+      with_items: [automations.yaml, scripts.yaml, scenes.yaml]
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ homeassistant_container_name }}"
-        hostname: "{{ homeassistant_container_name }}"
-        image: "{{ homeassistant_image_name }}:{{ homeassistant_image_version }}"
+        name: "{{ home_assistant_container_name }}"
+        hostname: "{{ home_assistant_container_name }}"
+        image: "{{ home_assistant_image_name }}:{{ home_assistant_image_version }}"
         pull: true
         volumes:
-          - "{{ homeassistant_data_directory }}/config:/config:rw"
+          - "{{ home_assistant_data_directory }}/config:/config:rw"
         network_mode: host
+        capabilities:
+          - NET_ADMIN
+          - NET_RAW
+#        ports:
+#          - 8123:8123
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ homeassistant_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ homeassistant_watchtower_enable }}"
-          dockflare.enable: "{{ homeassistant_dockflare_tunnel }}"
-          dockflare.access.group: "{{ homeassistant_dockflare_access_group }}"
-          dockflare.hostname: "{{ homeassistant_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homeassistant_port_http }}"
+          autoheal: "{{ home_assistant_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ home_assistant_watchtower_enable }}"
+          dockflare.enable: "{{ home_assistant_dockflare_tunnel }}"
+          dockflare.access.group: "{{ home_assistant_dockflare_access_group }}"
+          dockflare.hostname: "{{ home_assistant_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ home_assistant_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ homeassistant_homepage_group }}"
-          homepage.icon: "{{ homeassistant_homepage_icon }}"
-          homepage.href: "{{ homeassistant_homepage_href }}"
-          homepage.description: "{{ 'homeassistant description' if homepage_show_description else omit }}"
+          homepage.group: "{{ home_assistant_homepage_group }}"
+          homepage.icon: "{{ home_assistant_homepage_icon }}"
+          homepage.href: "{{ home_assistant_homepage_href }}"
+          homepage.description: "{{ 'home_assistant description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ homeassistant_container_name }}"
-          homepage.showStats: "{{ homeassistant_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homeassistant_port_http }}"
+          homepage.container: "{{ home_assistant_container_name }}"
+          homepage.showStats: "{{ home_assistant_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ home_assistant_port_http }}"
           homepage.widget.type: "homeassistant"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
-          homepage.widget.key: "{{ homeassistant_widget_key }}"
-          repliqate.enabled: "{{ homeassistant_repliqate_enabled }}"
-          repliqate.engine: "{{ homeassistant_repliqate_engine }}"
-          repliqate.schedule: "{{ homeassistant_repliqate_schedule }}"
-          repliqate.backup_id: "{{ homeassistant_repliqate_backup_id }}"
-          repliqate.retention: "{{ homeassistant_repliqate_retention }}"
-          traefik.enable: "{{ homeassistant_available_externally | string }}"
-          traefik.http.routers.homeassistant.rule: "Host(`{{ homeassistant_hostname }}.{{ ansible_nas_domain }}`)"
+          homepage.widget.key: "{{ home_assistant_widget_key }}"
+          repliqate.enabled: "{{ home_assistant_repliqate_enabled }}"
+          repliqate.engine: "{{ home_assistant_repliqate_engine }}"
+          repliqate.schedule: "{{ home_assistant_repliqate_schedule }}"
+          repliqate.backup_id: "{{ home_assistant_repliqate_backup_id }}"
+          repliqate.retention: "{{ home_assistant_repliqate_retention }}"
+          traefik.enable: "{{ home_assistant_available_externally | string }}"
+          traefik.http.routers.homeassistant.rule: "Host(`{{ home_assistant_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.homeassistant.entrypoints: "websecure"
           traefik.http.routers.homeassistant.tls.certresolver: "letsencrypt"
           traefik.http.routers.homeassistant.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.homeassistant.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.homeassistant.middlewares: "homeassistant@docker{{ ',tinyauth-auth@docker' if homeassistant_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.homeassistant.IPAllowList.sourcerange: "{{ homeassistant_traefik_whitelist }}"
-          traefik.http.services.homeassistant.loadbalancer.server.port: "8123"
+          traefik.http.routers.homeassistant.middlewares: "homeassistant-whitelist{{ ',tinyauth-auth@docker' if home_assistant_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.homeassistant-whitelist.ipallowlist.sourcerange: "{{ home_assistant_traefik_whitelist }}"
+          traefik.http.services.homeassistant-svc.loadbalancer.server.url: "http://172.17.0.1:8123"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/homeassistant/home-assistant"
-        cpu_shares: "{{ homeassistant_cpu_shares }}"
-        memory: "{{ homeassistant_memory }}"
+        cpu_shares: "{{ home_assistant_cpu_shares }}"
+        memory: "{{ home_assistant_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (homeassistant_port_http | string)] +
-                (['https://' + homeassistant_hostname + '.' + ansible_nas_domain] if (homeassistant_available_externally is true or homeassistant_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (home_assistant_port_http | string)] +
+                (['https://' + home_assistant_hostname + '.' + ansible_nas_domain] if (home_assistant_available_externally is true or home_assistant_dockflare_tunnel is true) else [])
               }}
-  when: homeassistant_enabled is true
+  when: home_assistant_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ homeassistant_container_name }}"
+        name: "{{ home_assistant_container_name }}"
         state: absent
-  when: homeassistant_enabled is false
+  when: home_assistant_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   include_role:
     name: ansible-nas-archive
   vars:
-    target_data_dir: "{{ homeassistant_data_directory }}"
+    target_data_dir: "{{ home_assistant_data_directory }}"
   when:
     - archive_app_data_enabled is true
-    - homeassistant_enabled is false
+    - home_assistant_enabled is false

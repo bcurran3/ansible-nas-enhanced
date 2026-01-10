@@ -1,51 +1,51 @@
 ---
 # ANE
 ansible_nas_app_name: "Docker-Android"
-dockerandroid_enabled: false
-dockerandroid_available_externally: false
-dockerandroid_traefik_whitelist: "{{ lan }}"
+docker_android_enabled: false
+docker_android_available_externally: false
+docker_android_traefik_whitelist: "{{ lan }}"
 
 # directories
-dockerandroid_data_directory: "{{ docker_home }}/dockerandroid"
+docker_android_data_directory: "{{ docker_home }}/docker-android"
 
 # docker
-dockerandroid_container_name: "dockerandroid"
-dockerandroid_image_name: "budtmo/docker-android"
-dockerandroid_image_tag: "emulator_14.0" # https://github.com/budtmo/docker-android
+docker_android_container_name: "docker-android"
+docker_android_image_name: "budtmo/docker-android"
+docker_android_image_tag: "emulator_14.0" # https://github.com/budtmo/docker-android
 
 # network
-dockerandroid_port_http: "6080"
-dockerandroid_hostname: "dockerandroid"
+docker_android_port_http: "6080"
+docker_android_hostname: "dockerandroid"
 
 # specs
-dockerandroid_cpu_shares: 1024
-dockerandroid_memory: "8G"
+docker_android_cpu_shares: 1024
+docker_android_memory: "8G"
 
 # app
-dockerandroid_env_emulator_device: "Samsung Galaxy S10" # https://github.com/budtmo/docker-android
+docker_android_env_emulator_device: "Samsung Galaxy S10" # https://github.com/budtmo/docker-android
 
 # autoheal
-dockerandroid_autoheal: "false"
+docker_android_autoheal: "false"
 
 # dockflare
-dockerandroid_dockflare_tunnel: "false"
-dockerandroid_dockflare_access_group: ""
+docker_android_dockflare_tunnel: "false"
+docker_android_dockflare_access_group: ""
 
 # homepage
-dockerandroid_homepage_group: "Apps"
-dockerandroid_homepage_icon: "android.png"
-dockerandroid_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockerandroid_port_http }}"
-dockerandroid_homepage_showstats: "false"
+docker_android_homepage_group: "Apps"
+docker_android_homepage_icon: "android.png"
+docker_android_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ docker_android_port_http }}"
+docker_android_homepage_showstats: "false"
 
 # repliqate
-dockerandroid_repliqate_enabled: "false"
-dockerandroid_repliqate_engine: "restic"
-dockerandroid_repliqate_schedule: "@daily 3am"
-dockerandroid_repliqate_backup_id: "{{ dockerandroid_container_name }}"
-dockerandroid_repliqate_retention: "30d"
+docker_android_repliqate_enabled: "false"
+docker_android_repliqate_engine: "restic"
+docker_android_repliqate_schedule: "@daily 3am"
+docker_android_repliqate_backup_id: "{{ docker_android_container_name }}"
+docker_android_repliqate_retention: "30d"
 
 # tinyauth
-dockerandroid_tinyauth_enabled: false
+docker_android_tinyauth_enabled: false
 
 # watchtower
-dockerandroid_watchtower_enable: "false"
+docker_android_watchtower_enable: "false"

@@ -4,59 +4,59 @@
     - name: Create Fast {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ fastmusicremover_container_name }}"
-        hostname: "{{ fastmusicremover_container_name }}"
-        image: "{{ fastmusicremover_image_name }}:{{ fastmusicremover_image_tag }}"
+        name: "{{ fast_music_remover_container_name }}"
+        hostname: "{{ fast_music_remover_container_name }}"
+        image: "{{ fast_music_remover_image_name }}:{{ fast_music_remover_image_tag }}"
         pull: true
         ports:
-          - "{{ fastmusicremover_port_http }}:8080"
+          - "{{ fast_music_remover_port_http }}:8080"
         network_mode: "bridge"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ fastmusicremover_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ fastmusicremover_watchtower_enable }}"
-          dockflare.enable: "{{ fastmusicremover_dockflare_tunnel }}"
-          dockflare.access.group: "{{ fastmusicremover_dockflare_access_group }}"
-          dockflare.hostname: "{{ fastmusicremover_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fastmusicremover_port_http }}"
+          autoheal: "{{ fast_music_remover_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ fast_music_remover_watchtower_enable }}"
+          dockflare.enable: "{{ fast_music_remover_dockflare_tunnel }}"
+          dockflare.access.group: "{{ fast_music_remover_dockflare_access_group }}"
+          dockflare.hostname: "{{ fast_music_remover_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fast_music_remover_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ fastmusicremover_homepage_group }}"
-          homepage.href: "{{ fastmusicremover_homepage_href }}"
-          homepage.icon: "{{ fastmusicremover_homepage_icon }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fastmusicremover_port_http }}"
+          homepage.group: "{{ fast_music_remover_homepage_group }}"
+          homepage.href: "{{ fast_music_remover_homepage_href }}"
+          homepage.icon: "{{ fast_music_remover_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fast_music_remover_port_http }}"
           homepage.description: "{{ 'lightweight music and noise remover for YouTube and other internet media, using DeepFilterNet for audio enhancement' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "fastmusicremover"
-          homepage.showStats: "{{ fastmusicremover_homepage_showstats }}"
+          homepage.container: "fast_music_remover"
+          homepage.showStats: "{{ fast_music_remover_homepage_showstats }}"
           repliqate.enabled: "false"
-          traefik.enable: "{{ fastmusicremover_available_externally | string }}"
-          traefik.http.routers.fastmusicremover.rule: "Host(`{{ fastmusicremover_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.enable: "{{ fast_music_remover_available_externally | string }}"
+          traefik.http.routers.fastmusicremover.rule: "Host(`{{ fast_music_remover_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.fastmusicremover.tls.certresolver: "letsencrypt"
           traefik.http.routers.fastmusicremover.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.fastmusicremover.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.fastmusicremover.middlewares: "fastmusicremover@docker{{ ',tinyauth-auth@docker' if fastmusicremover_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.fastmusicremover.IPAllowList.sourcerange: "{{ fastmusicremover_traefik_whitelist }}"
+          traefik.http.routers.fastmusicremover.middlewares: "fastmusicremover@docker{{ ',tinyauth-auth@docker' if fast_music_remover_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.fastmusicremover.IPAllowList.sourcerange: "{{ fast_music_remover_traefik_whitelist }}"
           traefik.http.services.fastmusicremover.loadbalancer.server.port: "8080"
           wud.watch.digest: "true"
           wud.link.template: "https://github.com/omeryusufyagci/fast-music-remover"
-        cpu_shares: "{{ fastmusicremover_cpu_shares }}"
-        memory: "{{ fastmusicremover_memory }}"
+        cpu_shares: "{{ fast_music_remover_cpu_shares }}"
+        memory: "{{ fast_music_remover_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (fastmusicremover_port_http | string)] +
-                (['https://' + fastmusicremover_hostname + '.' + ansible_nas_domain] if (fastmusicremover_available_externally is true or fastmusicremover_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (fast_music_remover_port_http | string)] +
+                (['https://' + fast_music_remover_hostname + '.' + ansible_nas_domain] if (fast_music_remover_available_externally is true or fast_music_remover_dockflare_tunnel is true) else [])
               }}
-  when: fastmusicremover_enabled is true
+  when: fast_music_remover_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ fastmusicremover_container_name }}"
+        name: "{{ fast_music_remover_container_name }}"
         state: absent
-  when: fastmusicremover_enabled is false
+  when: fast_music_remover_enabled is false

@@ -4,58 +4,58 @@
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
-        name: "{{ ittools_container_name }}"
-        hostname: "{{ ittools_container_name }}"
-        image: "{{ ittools_image_name }}:{{ ittools_image_tag }}"
+        name: "{{ it_tools_container_name }}"
+        hostname: "{{ it_tools_container_name }}"
+        image: "{{ it_tools_image_name }}:{{ it_tools_image_tag }}"
         pull: true
         ports:
-          - "{{ ittools_port_http }}:80"
+          - "{{ it_tools_port_http }}:80"
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ ittools_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ ittools_watchtower_enable }}"
-          dockflare.enable: "{{ ittools_dockflare_tunnel }}"
-          dockflare.access.group: "{{ ittools_dockflare_access_group }}"
-          dockflare.hostname: "{{ ittools_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ittools_port_http }}"
+          autoheal: "{{ it_tools_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ it_tools_watchtower_enable }}"
+          dockflare.enable: "{{ it_tools_dockflare_tunnel }}"
+          dockflare.access.group: "{{ it_tools_dockflare_access_group }}"
+          dockflare.hostname: "{{ it_tools_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ it_tools_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
-          homepage.group: "{{ ittools_homepage_group }}"
-          homepage.icon: "{{ ittools_homepage_icon }}"
-          homepage.href: "{{ ittools_homepage_href }}"
+          homepage.group: "{{ it_tools_homepage_group }}"
+          homepage.icon: "{{ it_tools_homepage_icon }}"
+          homepage.href: "{{ it_tools_homepage_href }}"
           homepage.description: "{{ 'Collection of handy online tools for developers, with great UX.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
-          homepage.container: "{{ ittools_container_name }}"
-          homepage.showStats: "{{ ittools_homepage_showstats }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ittools_port_http }}"
-          traefik.enable: "{{ ittools_available_externally | string }}"
-          traefik.http.routers.ittools.rule: "Host(`{{ ittools_hostname }}.{{ ansible_nas_domain }}`)"
+          homepage.container: "{{ it_tools_container_name }}"
+          homepage.showStats: "{{ it_tools_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ it_tools_port_http }}"
+          traefik.enable: "{{ it_tools_available_externally | string }}"
+          traefik.http.routers.ittools.rule: "Host(`{{ it_tools_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ittools.tls.certresolver: "letsencrypt"
           traefik.http.routers.ittools.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.ittools.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.ittools.middlewares: "ittools@docker{{ ',tinyauth-auth@docker' if ittools_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.ittools.IPAllowList.sourcerange: "{{ ittools_traefik_whitelist }}"
+          traefik.http.routers.ittools.middlewares: "ittools@docker{{ ',tinyauth-auth@docker' if it_tools_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.ittools.IPAllowList.sourcerange: "{{ it_tools_traefik_whitelist }}"
           traefik.http.services.ittools.loadbalancer.server.port: "80"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/corentinth/it-tools"
-        cpu_shares: "{{ ittools_cpu_shares }}"
-        memory: "{{ ittools_memory }}"
+        cpu_shares: "{{ it_tools_cpu_shares }}"
+        memory: "{{ it_tools_memory }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ittools_port_http | string)] +
-                (['https://' + ittools_hostname + '.' + ansible_nas_domain] if (ittools_available_externally is true or ittools_dockflare_tunnel is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (it_tools_port_http | string)] +
+                (['https://' + it_tools_hostname + '.' + ansible_nas_domain] if (it_tools_available_externally is true or it_tools_dockflare_tunnel is true) else [])
               }}
-  when: ittools_enabled is true
+  when: it_tools_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:
     - name: Stop {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
-        name: "{{ ittools_container_name }}"
+        name: "{{ it_tools_container_name }}"
         state: absent
-  when: ittools_enabled is false
+  when: it_tools_enabled is false

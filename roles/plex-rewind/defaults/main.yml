@@ -1,56 +1,56 @@
 ---
 # ANE
 ansible_nas_app_name: "Plex Rewind"
-plexrewind_enabled: false
-plexrewind_available_externally: false
-plexrewind_traefik_whitelist: "{{ lan }}"
-plexrewind_data_directory: "{{ docker_home }}/plex-rewind"
+plex_rewind_enabled: false
+plex_rewind_available_externally: false
+plex_rewind_traefik_whitelist: "{{ lan }}"
+plex_rewind_data_directory: "{{ docker_home }}/plex-rewind"
 
 # app
 # (required) used to encrypt auth JWT token, generate one with `openssl rand -base64 32`
-plexrewind_nextauth_secret: "m07Gw05Gfdb0qeXOPuEGqMaVKIxLTwuXpwE7T14WSNk="
+plex_rewind_nextauth_secret: "m07Gw05Gfdb0qeXOPuEGqMaVKIxLTwuXpwE7T14WSNk="
 # change to your domain if you are exposing the app to the internet
-plexrewind_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plexrewind_port_http }}"
+plex_rewind_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
 # change to your domain if you are exposing the app to the internet
-plexrewind_next_public_site_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plexrewind_port_http }}"
+plex_rewind_next_public_site_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
 # starting date for "all time" option (YYYY-MM-DD)
-plexrewind_next_public_statistics_start_date: "2018-01-01"
+plex_rewind_next_public_statistics_start_date: "2018-01-01"
 
 # network
-plexrewind_hostname: "plexrewind"
-plexrewind_port_http: "8383"
+plex_rewind_hostname: "plexrewind"
+plex_rewind_port_http: "8383"
 
 # docker
-plexrewind_container_name: "plex-rewind"
-plexrewind_image_name: "ghcr.io/raunot/plex-rewind"
-plexrewind_image_tag: "latest"
+plex_rewind_container_name: "plex-rewind"
+plex_rewind_image_name: "ghcr.io/raunot/plex-rewind"
+plex_rewind_image_tag: "latest"
 
 # specs
-plexrewind_cpu_shares: 1024
-plexrewind_memory: "512M"
+plex_rewind_cpu_shares: 1024
+plex_rewind_memory: "512M"
 
 # autoheal
-plexrewind_autoheal: "false"
+plex_rewind_autoheal: "false"
 
 # dockflare
-plexrewind_dockflare_tunnel: "false"
-plexrewind_dockflare_access_group: ""
+plex_rewind_dockflare_tunnel: "false"
+plex_rewind_dockflare_access_group: ""
 
 # homepage
-plexrewind_homepage_group: "Apps"
-plexrewind_homepage_icon: "plexrewind.png"
-plexrewind_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plexrewind_port_http }}"
-plexrewind_homepage_showstats: "false"
+plex_rewind_homepage_group: "Apps"
+plex_rewind_homepage_icon: "plexrewind.png"
+plex_rewind_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
+plex_rewind_homepage_showstats: "false"
 
 # repliqate
-plexrewind_repliqate_enabled: "false"
-plexrewind_repliqate_engine: "restic"
-plexrewind_repliqate_schedule: "@daily 3am"
-plexrewind_repliqate_backup_id: "{{ plexrewind_container_name }}"
-plexrewind_repliqate_retention: "30d"
+plex_rewind_repliqate_enabled: "false"
+plex_rewind_repliqate_engine: "restic"
+plex_rewind_repliqate_schedule: "@daily 3am"
+plex_rewind_repliqate_backup_id: "{{ plex_rewind_container_name }}"
+plex_rewind_repliqate_retention: "30d"
 
 # tinyauth
-plexrewind_tinyauth_enabled: false
+plex_rewind_tinyauth_enabled: false
 
 # watchtower
-plexrewind_watchtower_enable: "false"
+plex_rewind_watchtower_enable: "false"
