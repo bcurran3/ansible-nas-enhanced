@@ -3,3 +3,12 @@
 - ansible.builtin.import_tasks: telegraf.yml
 - ansible.builtin.import_tasks: exporters.yml
 - ansible.builtin.import_tasks: grafana.yml
+
+- name: Data Archive Stats Stack
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ docker_home }}/stats"
+  when:
+    - archive_app_data_enabled is true
+    - stats_enabled is false

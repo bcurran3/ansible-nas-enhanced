@@ -76,12 +76,3 @@
         name: "{{ stats_telegraf_container_name }}"
         state: absent
   when: stats_enabled is false
-
-- name: Data Archive Telegraf
-  include_role:
-    name: ansible-nas-archive
-  vars:
-    target_data_dir: "{{ stats_telegraf_data_directory }}"
-  when:
-    - archive_app_data_enabled is true
-    - stats_enabled is false

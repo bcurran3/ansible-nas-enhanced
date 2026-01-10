@@ -93,12 +93,3 @@
         name: "{{ stats_grafana_container_name }}"
         state: absent
   when: stats_enabled is false
-
-- name: Data Archive Grafana
-  include_role:
-    name: ansible-nas-archive
-  vars:
-    target_data_dir: "{{ stats_grafana_data_directory }}"
-  when:
-    - archive_app_data_enabled is true
-    - stats_enabled is false

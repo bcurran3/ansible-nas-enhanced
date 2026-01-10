@@ -89,12 +89,3 @@
         name: "{{ stats_prometheus_container_name }}"
         state: absent
   when: stats_enabled is false
-
-- name: Data Archive Prometheus
-  include_role:
-    name: ansible-nas-archive
-  vars:
-    target_data_dir: "{{ stats_prometheus_data_directory }}"
-  when:
-    - archive_app_data_enabled is true
-    - stats_enabled is false
