@@ -318,6 +318,7 @@ function enable_app {
                 TAGS_TO_RUN+="${arg},"
             else
                 echo "  ** ${arg} role not found in nas.yml."
+                echo "  ** ./ane.sh --available to list available apps."
             fi
         fi
     done
@@ -492,6 +493,7 @@ fi
 # Down (stop) ANE app(s)
 if [[ "$1" = "--down" || "$1" = "-down" || "$1" = "--stop"|| "$1" = "-stop" ]]; then
     stop_app "$@"
+    disable_app "$@"
     exit
 fi
 
