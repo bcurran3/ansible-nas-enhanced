@@ -210,6 +210,8 @@ By default, applications can be found on the ports listed below.
 | ONLYOFFICE Docs  | 9015    | Bridge  | HTTP           |
 | ONLYOFFICE Docs  | 5222    | Bridge  | XMPP           |
 | Ombi             | 3579    | Bridge  | HTTP           |
+| Open Notebook    | 8502    | Bridge  | HTTP           |
+| Open Notebook    | 5056    | Bridge  | API            |
 | Open WebUI       | 11435
 | Open WebUI       | 11436
 | OpenCloud        | 9201

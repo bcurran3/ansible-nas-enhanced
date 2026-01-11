@@ -1,0 +1,163 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "755"
+      loop:
+        - path: "{{ open_notebook_data_directory }}"
+          owner: 0
+          group: 0
+        - path: "{{ open_notebook_data_directory }}/data"
+          owner: 0
+          group: 0
+        - path: "{{ open_notebook_data_directory }}/db"
+          owner: 65532
+          group: 65532
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ open_notebook_db_container_name }}"
+        hostname: "{{ open_notebook_db_container_name }}"
+        image: "{{ open_notebook_db_image_name }}:{{ open_notebook_db_image_tag }}"
+        pull: true
+        command: "start --user {{ open_notebook_env_surreal_user }} --pass {{ open_notebook_env_surreal_password }} --bind 0.0.0.0:8000 rocksdb:/mydata/{{ open_notebook_env_surreal_database }}.db"
+#       ports:
+#         - "8000:8000"
+        volumes:
+          - "{{ open_notebook_data_directory }}/db:/mydata"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ open_notebook_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ open_notebook_db_watchtower_enable | string }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} SurrealDB"
+          homepage.group: "{{ open_notebook_db_homepage_group }}"
+          homepage.icon: "{{ open_notebook_db_homepage_icon }}"
+          homepage.href: "{{ open_notebook_homepage_href }}"
+          homepage.description: "{{ 'A scalable, distributed, collaborative, document-graph database, for the realtime web' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ open_notebook_db_container_name }}"
+          homepage.showStats: "{{ open_notebook_db_homepage_showstats }}"
+          repliqate.enabled: "{{ open_notebook_db_repliqate_enabled | string }}"
+          repliqate.engine: "{{ open_notebook_db_repliqate_engine }}"
+          repliqate.schedule: "{{ open_notebook_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ open_notebook_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ open_notebook_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.link.template: "https://github.com/surrealdb/surrealdb/releases/tag/v${major}.${minor}.${patch}"
+        cpu_shares: "{{ open_notebook_db_cpu_shares }}"
+        memory: "{{ open_notebook_db_memory }}"
+        memory_swap: "{{ open_notebook_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ open_notebook_container_name }}"
+        hostname: "{{ open_notebook_container_name }}"
+        image: "{{ open_notebook_image_name }}:{{ open_notebook_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ open_notebook_data_directory }}/data:/app/data"
+        ports:
+          - "{{ open_notebook_port_http }}:8502"
+          - "{{ open_notebook_port_api }}:5055"
+        env:
+          API_CLIENT_TIMEOUT: "{{ open_notebook_env_api_client_timeout }}"
+          API_URL: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ open_notebook_port_api }}"
+          INTERNAL_API_URL: "http://localhost:5055"
+          SURREAL_URL: "{{ open_notebook_env_surreal_url }}"
+          SURREAL_USER: "{{ open_notebook_env_surreal_user }}"
+          SURREAL_PASSWORD: "{{ open_notebook_env_surreal_password }}"
+          SURREAL_NAMESPACE: "{{ open_notebook_env_surreal_namespace }}"
+          SURREAL_DATABASE: "{{ open_notebook_env_surreal_database }}"
+          ESPERANTO_LLM_TIMEOUT: "{{ open_notebook_env_esperanto_llm_timeout }}"
+          ESPERANTO_SSL_VERIFY: "{{ open_notebook_env_esperanto_ssl_verify }}"
+          TTS_BATCH_SIZE: "{{ open_notebook_env_tts_batch_size }}"
+          OPEN_NOTEBOOK_PASSWORD: "{{ open_notebook_env_open_notebook_password }}"
+          OLLAMA_API_BASE: "{{ open_notebook_env_ollama_api_base }}"
+          # OPENAI_API_KEY: "{{ open_notebook_env_openai_api_key }}"
+          # ANTHROPIC_API_KEY: "{{ open_notebook_env_anthropic_api_key }}"
+          # DEEPSEEK_API_KEY: "{{ open_notebook_env_deepseek_api_key }}"
+          # GOOGLE_API_KEY: "{{ open_notebook_env_google_api_key }}"
+          # GROQ_API_KEY: "{{ open_notebook_env_groq_api_key }}"
+          # MISTRAL_API_KEY: "{{ open_notebook_env_mistral_api_key }}"
+          # OPENAI_API_KEY: "{{ open_notebook_env_open_api_key }}"
+          OPENAI_COMPATIBLE_BASE_URL: "{{ open_notebook_env_openai_compatible_base_url }}"
+          OPENAI_COMPATIBLE_API_KEY: "{{ open_notebook_env_openai_compatible_api_key }}"
+          # OPENROUTER_API_KEY: "{{ open_notebook_env_openrouter_api_key }}"
+          # OPENROUTER_BASE_URL: "{{ open_notebook_env_openrouter_base_url }}"
+          # VOYAGE_API_KEY: "{{ open_notebook_env_voyage_api_key }}"
+          # XAI_API_KEY: "{{ open_notebook_env_xai_api_key }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ open_notebook_db_container_name }}"
+        labels:
+          autoheal: "{{ open_notebook_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ open_notebook_watchtower_enable | string }}"
+          dockflare.enable: "{{ open_notebook_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ open_notebook_dockflare_access_group }}"
+          dockflare.hostname: "{{ open_notebook_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ open_notebook_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ open_notebook_homepage_group }}"
+          homepage.icon: "{{ open_notebook_homepage_icon }}"
+          homepage.href: "{{ open_notebook_homepage_href }}"
+          homepage.description: "{{ 'A private, multi-model, 100% local, full-featured alternative to Notebook LM' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ open_notebook_container_name }}"
+          homepage.showStats: "{{ open_notebook_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ open_notebook_port_http }}"
+          repliqate.enabled: "{{ open_notebook_repliqate_enabled | string }}"
+          repliqate.engine: "{{ open_notebook_repliqate_engine }}"
+          repliqate.schedule: "{{ open_notebook_repliqate_schedule }}"
+          repliqate.backup_id: "{{ open_notebook_repliqate_backup_id }}"
+          repliqate.retention: "{{ open_notebook_repliqate_retention }}"
+          traefik.enable: "{{ open_notebook_available_externally | string }}"
+          traefik.http.routers.opennotebook.rule: "Host(`{{ open_notebook_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.opennotebook.tls.certresolver: "letsencrypt"
+          traefik.http.routers.opennotebook.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.opennotebook.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.opennotebook.middlewares: "opennotebook@docker{{ ',tinyauth-auth@docker' if open_notebook_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.opennotebook.IPAllowList.sourcerange: "{{ open_notebook_traefik_whitelist }}"
+          traefik.http.services.opennotebook.loadbalancer.server.port: "8502"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.link.template: "https://github.com/lfnovo/open-notebook/releases/tag/v${major}.${minor}.${patch}"
+        cpu_shares: "{{ open_notebook_cpu_shares }}"
+        memory: "{{ open_notebook_memory }}"
+        memory_swap: "{{ open_notebook_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (open_notebook_port_http | string)] +
+                (['https://' + open_notebook_hostname + '.' + ansible_nas_domain] if (open_notebook_available_externally is true or open_notebook_dockflare_tunnel is true) else [])
+              }}
+  when: open_notebook_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ open_notebook_container_name }}"
+        state: absent
+  when: open_notebook_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ open_notebook_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - open_notebook_enabled is false

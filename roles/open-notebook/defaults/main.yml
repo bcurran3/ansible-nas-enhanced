@@ -1,0 +1,96 @@
+---
+# ANE
+ansible_nas_app_name: "Open Notebook"
+open_notebook_enabled: false
+open_notebook_available_externally: false
+open_notebook_traefik_whitelist: "{{ lan }}"
+
+# directories
+open_notebook_data_directory: "{{ docker_home }}/open-notebook"
+
+# docker
+open_notebook_container_name: "open-notebook"
+open_notebook_image_name: "ghcr.io/lfnovo/open-notebook"
+open_notebook_image_tag: "v1-latest"
+open_notebook_db_container_name: "open-notebook-db"
+open_notebook_db_image_name: "surrealdb/surrealdb"
+open_notebook_db_image_tag: "v2"
+
+# network
+open_notebook_port_http: "8502"
+open_notebook_port_api: "5056"
+open_notebook_hostname: "opennotebook"
+
+# specs
+open_notebook_cpu_shares: 1024
+open_notebook_memory: "1G"
+open_notebook_memory_swap: -1
+open_notebook_db_cpu_shares: 1024
+open_notebook_db_memory: "1G"
+open_notebook_db_memory_swap: "{{ open_notebook_db_memory }}"
+
+# app
+# https://github.com/lfnovo/open-notebook/blob/main/.env.example
+open_notebook_env_surreal_url: "ws://{{ open_notebook_db_container_name }}:8000/rpc"
+open_notebook_env_surreal_user: "root"
+open_notebook_env_surreal_password: "topsecret"
+open_notebook_env_surreal_namespace: "opennotebook"
+open_notebook_env_surreal_database: "opennotebook"
+open_notebook_env_api_client_timeout: "300"
+open_notebook_env_esperanto_llm_timeout: "60"
+open_notebook_env_esperanto_ssl_verify: "false"
+open_notebook_env_tts_batch_size: "2"
+open_notebook_env_open_notebook_password: "{{ ansible_nas_app_admin_password }}"
+open_notebook_env_openai_api_key: ""
+open_notebook_env_anthropic_api_key: ""
+open_notebook_env_google_api_key: ""
+open_notebook_env_mistral_api_key: ""
+open_notebook_env_deepseek_api_key: ""
+open_notebook_env_groq_api_key: ""
+open_notebook_env_ollama_api_base: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_port_http }}"
+open_notebook_env_open_api_key: ""
+open_notebook_env_openai_compatible_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ localai_port_http }}"
+open_notebook_env_openai_compatible_api_key: ""
+open_notebook_env_openrouter_api_key: ""
+open_notebook_env_openrouter_base_url: "https://openrouter.ai/api/v1"
+open_notebook_env_voyage_api_key: ""
+open_notebook_env_xai_api_key: ""
+
+# autoheal
+open_notebook_autoheal: "false"
+open_notebook_db_autoheal: "false"
+
+# dockflare
+open_notebook_dockflare_tunnel: false
+open_notebook_dockflare_access_group: ""
+
+# homepage
+open_notebook_homepage_group: "Apps"
+#open_notebook_homepage_icon: "open-notebook.png"
+open_notebook_homepage_icon: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ open_notebook_port_http }}/logo.svg"
+open_notebook_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ open_notebook_port_http }}"
+open_notebook_homepage_showstats: "false"
+open_notebook_db_homepage_group: "DBs"
+#open_notebook_db_homepage_icon: "surrealdb.png"
+open_notebook_db_homepage_icon: "https://raw.githubusercontent.com/surrealdb/surrealdb/refs/heads/main/img/icon.png"
+open_notebook_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ open_notebook_port_http }}"
+open_notebook_db_homepage_showstats: "false"
+
+# repliqate
+open_notebook_repliqate_enabled: false
+open_notebook_repliqate_engine: "restic"
+open_notebook_repliqate_schedule: "@daily 3am"
+open_notebook_repliqate_backup_id: "{{ open_notebook_container_name }}"
+open_notebook_repliqate_retention: "30d"
+open_notebook_db_repliqate_enabled: false
+open_notebook_db_repliqate_engine: "restic"
+open_notebook_db_repliqate_schedule: "@daily 3am"
+open_notebook_db_repliqate_backup_id: "{{ open_notebook_db_container_name }}"
+open_notebook_db_repliqate_retention: "30d"
+
+# tinyauth
+open_notebook_tinyauth_enabled: false
+
+# watchtower
+open_notebook_watchtower_enable: false
+open_notebook_db_watchtower_enable: false
