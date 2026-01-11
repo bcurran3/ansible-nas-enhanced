@@ -1,0 +1,49 @@
+---
+# ANE
+ansible_nas_app_name: "qui"
+qui_enabled: false
+qui_available_externally: false
+qui_traefik_whitelist: "{{ lan }}"
+
+# directories
+qui_data_directory: "{{ docker_home }}/qui"
+
+# docker
+qui_container_name: "qui"
+qui_image_name: "ghcr.io/autobrr/qui"
+qui_image_tag: "latest"
+
+# network
+qui_port_http: "7476"
+qui_hostname: "qui"
+
+# specs
+qui_cpu_shares: 1024
+qui_memory: "1G"
+qui_memory_swap: -1
+
+# autoheal
+qui_autoheal: "false"
+
+# dockflare
+qui_dockflare_tunnel: false
+qui_dockflare_access_group: ""
+
+# homepage
+qui_homepage_group: "Apps"
+qui_homepage_icon: "sh-qui.png"
+qui_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qui_port_http }}"
+qui_homepage_showstats: "false"
+
+# repliqate
+qui_repliqate_enabled: false
+qui_repliqate_engine: "restic"
+qui_repliqate_schedule: "@daily 3am"
+qui_repliqate_backup_id: "{{ qui_container_name }}"
+qui_repliqate_retention: "30d"
+
+# tinyauth
+qui_tinyauth_enabled: false
+
+# watchtower
+qui_watchtower_enable: false

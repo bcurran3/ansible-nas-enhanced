@@ -1,0 +1,85 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ qui_data_directory }}"
+        - "{{ qui_data_directory }}/config"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ qui_container_name }}"
+        hostname: "{{ qui_container_name }}"
+        image: "{{ qui_image_name }}:{{ qui_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ qui_data_directory }}/config:/config"
+        ports:
+          - "{{ qui_port_http }}:7476"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ qui_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ qui_watchtower_enable | string }}"
+          dockflare.enable: "{{ qui_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ qui_dockflare_access_group }}"
+          dockflare.hostname: "{{ qui_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qui_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ qui_homepage_group }}"
+          homepage.icon: "{{ qui_homepage_icon }}"
+          homepage.href: "{{ qui_homepage_href }}"
+          homepage.description: "{{ 'Modern web interface for qBittorrent' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ qui_container_name }}"
+          homepage.showStats: "{{ qui_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qui_port_http }}"
+          repliqate.enabled: "{{ qui_repliqate_enabled | string }}"
+          repliqate.engine: "{{ qui_repliqate_engine }}"
+          repliqate.schedule: "{{ qui_repliqate_schedule }}"
+          repliqate.backup_id: "{{ qui_repliqate_backup_id }}"
+          repliqate.retention: "{{ qui_repliqate_retention }}"
+          traefik.enable: "{{ qui_available_externally | string }}"
+          traefik.http.routers.qui.rule: "Host(`{{ qui_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.qui.tls.certresolver: "letsencrypt"
+          traefik.http.routers.qui.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.qui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.qui.middlewares: "qui@docker{{ ',tinyauth-auth@docker' if qui_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.qui.IPAllowList.sourcerange: "{{ qui_traefik_whitelist }}"
+          traefik.http.services.qui.loadbalancer.server.port: "7476"
+          wud.tag.include: '^v\d+\.\d+\.\d+$'
+          wud.link.template: "https://github.com/autobrr/qui/releases/tag/v${major}.${minor}.${patch}"
+        cpu_shares: "{{ qui_cpu_shares }}"
+        memory: "{{ qui_memory }}"
+        memory_swap: "{{ qui_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (qui_port_http | string)] +
+                (['https://' + qui_hostname + '.' + ansible_nas_domain] if (qui_available_externally is true or qui_dockflare_tunnel is true) else [])
+              }}
+  when: qui_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ qui_container_name }}"
+        state: absent
+  when: qui_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ qui_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - qui_enabled is false
