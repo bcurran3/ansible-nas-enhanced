@@ -1,0 +1,49 @@
+---
+# ANE
+ansible_nas_app_name: "NocoDB"
+nocodb_enabled: false
+nocodb_available_externally: false
+nocodb_traefik_whitelist: "{{ lan }}"
+
+# directories
+nocodb_data_directory: "{{ docker_home }}/nocodb"
+
+# docker
+nocodb_container_name: "nocodb"
+nocodb_image_name: "nocodb/nocodb"
+nocodb_image_tag: "latest"
+
+# network
+nocodb_port_http: "3080"
+nocodb_hostname: "nocodb"
+
+# specs
+nocodb_cpu_shares: 1024
+nocodb_memory: "1G"
+nocodb_memory_swap: -1
+
+# autoheal
+nocodb_autoheal: "false"
+
+# dockflare
+nocodb_dockflare_tunnel: false
+nocodb_dockflare_access_group: ""
+
+# homepage
+nocodb_homepage_group: "Apps"
+nocodb_homepage_icon: "sh-nocodb.png"
+nocodb_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nocodb_port_http }}"
+nocodb_homepage_showstats: "false"
+
+# repliqate
+nocodb_repliqate_enabled: false
+nocodb_repliqate_engine: "restic"
+nocodb_repliqate_schedule: "@daily 3am"
+nocodb_repliqate_backup_id: "{{ nocodb_container_name }}"
+nocodb_repliqate_retention: "30d"
+
+# tinyauth
+nocodb_tinyauth_enabled: false
+
+# watchtower
+nocodb_watchtower_enable: false

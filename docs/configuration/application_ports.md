@@ -195,7 +195,8 @@ By default, applications can be found on the ports listed below.
 | Netdata          | 19999   | Bridge  | HTTP           |
 | Netlock RMM      | 3078    | Bridge  | HTTP           |
 | Nextcloud        | 8080    | Bridge  | HTTP           |
-| Node-RED         | 1880
+| nocodb           | 3080    | Bridge  | HTTP           |
+| Node-RED         | 1880    | Bridge  | HTTP           |
 | Nomad            | 4646
 | Nomad            | 4647
 | Nomad            | 4648
@@ -265,6 +266,7 @@ By default, applications can be found on the ports listed below.
 | qBittorrent      | 6882    | Bridge  | bt             |
 | QDirStat         | 5800    | Bridge  | HTTP           |
 | QDirStat         | 5903    | Bridge  | VNC            |
+| qui              | 7476    | Bridge  | HTTP           |
 | Radarr           | 7878    | Bridge  | HTTP           |
 | Readarr          | 8787    | Bridge  | HTTP           |
 | Recyclarr        | n/a
@@ -391,7 +393,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3080
+# next avail = 3081
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
