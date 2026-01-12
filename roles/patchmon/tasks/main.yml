@@ -1,0 +1,273 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "755"
+      loop:
+        - path: "{{ patchmon_data_directory }}"
+          owner: 0
+          group: 0
+        - path: "{{ patchmon_data_directory }}/agents"
+          owner: 1000
+          group: 1000
+#        - path: "{{ patchmon_data_directory }}/assets"
+#          owner: 1000
+#          group: 1000
+        - path: "{{ patchmon_data_directory }}/db"
+          owner: 70
+          group: 70
+        - path: "{{ patchmon_data_directory }}/redis"
+          owner: 999
+          group: 999
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ patchmon_db_container_name }}"
+        hostname: "{{ patchmon_db_container_name }}"
+        image: "{{ patchmon_db_image_name }}:{{ patchmon_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ patchmon_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "{{ patchmon_db_env_postgres_user }}"
+          POSTGRES_PASSWORD: "{{ patchmon_db_env_postgres_password }}"
+          POSTGRES_DB: "{{ patchmon_db_env_postgres_db }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U {{ patchmon_db_env_postgres_user }} -d {{ patchmon_db_env_postgres_db }}"]
+          interval: "3s"
+          timeout: "5s"
+          retries: 7
+        labels:
+          autoheal: "{{ patchmon_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchmon_db_watchtower_enable | string }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ patchmon_db_homepage_group }}"
+          homepage.icon: "{{ patchmon_db_homepage_icon }}"
+          homepage.href: "{{ patchmon_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ patchmon_db_container_name }}"
+          homepage.showStats: "{{ patchmon_db_homepage_showstats }}"
+          repliqate.enabled: "{{ patchmon_db_repliqate_enabled | string }}"
+          repliqate.engine: "{{ patchmon_db_repliqate_engine }}"
+          repliqate.schedule: "{{ patchmon_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ patchmon_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ patchmon_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
+        cpu_shares: "{{ patchmon_db_cpu_shares }}"
+        memory: "{{ patchmon_db_memory }}"
+        memory_swap: "{{ patchmon_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ patchmon_redis_container_name }}"
+        hostname: "{{ patchmon_redis_container_name }}"
+        image: "{{ patchmon_redis_image_name }}:{{ patchmon_redis_image_tag }}"
+        pull: true
+        command: "redis-server --requirepass {{ patchmon_env_redis_password }}"
+        volumes:
+          - "{{ patchmon_data_directory }}/redis:/data"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "{{ patchmon_env_redis_password }}", "ping"]
+          interval: "3s"
+          timeout: "5s"
+          retries: 7
+        labels:
+          autoheal: "{{ patchmon_redis_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchmon_redis_watchtower_enable | string }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ patchmon_redis_homepage_group }}"
+          homepage.icon: "{{ patchmon_redis_homepage_icon }}"
+          homepage.href: "{{ patchmon_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ patchmon_redis_container_name }}"
+          homepage.showStats: "{{ patchmon_redis_homepage_showstats }}"
+          repliqate.enabled: "{{ patchmon_redis_repliqate_enabled | string }}"
+          repliqate.engine: "{{ patchmon_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ patchmon_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ patchmon_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ patchmon_redis_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
+        cpu_shares: "{{ patchmon_redis_cpu_shares }}"
+        memory: "{{ patchmon_redis_memory }}"
+        memory_swap: "{{ patchmon_redis_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ patchmon_container_name }}"
+        hostname: "{{ patchmon_container_name }}"
+        image: "{{ patchmon_image_name }}:{{ patchmon_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ patchmon_data_directory }}/agents:/app/agents"
+#          - "{{ patchmon_data_directory }}/assets:{{ patchmon_env_assets_dir }}"
+        ports:
+          - "{{ patchmon_port_http_backend }}:3001"
+        env:
+          LOG_LEVEL: "{{ patchmon_env_log_level }}"
+          DATABASE_URL: "{{ patchmon_env_database_url }}"
+          JWT_SECRET: "{{ patchmon_env_jwt_secret }}"
+          SERVER_PROTOCOL: "{{ patchmon_env_server_protocol }}"
+          SERVER_HOST: "{{ patchmon_env_server_host }}"
+          SERVER_PORT: "{{ patchmon_env_server_port }}"
+          CORS_ORIGIN: "{{ patchmon_env_cors_origin }}"
+          DB_CONNECTION_LIMIT: "{{ patchmon_env_db_connection_limit }}"
+          DB_POOL_TIMEOUT: "{{ patchmon_env_db_pool_timeout }}"
+          DB_CONNECT_TIMEOUT: "{{ patchmon_env_db_connect_timeout }}"
+          DB_IDLE_TIMEOUT: "{{ patchmon_env_db_idle_timeout }}"
+          DB_MAX_LIFETIME: "{{ patchmon_env_db_max_lifetime }}"
+          RATE_LIMIT_WINDOW_MS: "{{ patchmon_env_rate_limit_window_ms }}"
+          RATE_LIMIT_MAX: "{{ patchmon_env_rate_limit_max }}"
+          AUTH_RATE_LIMIT_WINDOW_MS: "{{ patchmon_env_auth_rate_limit_window_ms }}"
+          AUTH_RATE_LIMIT_MAX: "{{ patchmon_env_auth_rate_limit_max }}"
+          AGENT_RATE_LIMIT_WINDOW_MS: "{{ patchmon_env_agent_rate_limit_window_ms }}"
+          AGENT_RATE_LIMIT_MAX: "{{ patchmon_env_agent_rate_limit_max }}"
+          REDIS_HOST: "{{ patchmon_env_redis_host }}"
+          REDIS_PORT: "{{ patchmon_env_redis_port }}"
+          REDIS_PASSWORD: "{{ patchmon_env_redis_password }}"
+          REDIS_DB: "{{ patchmon_env_redis_db }}"
+          ASSETS_DIR: "{{ patchmon_env_assets_dir }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ patchmon_db_container_name }}"
+          - "{{ patchmon_redis_container_name }}"
+        labels:
+          autoheal: "{{ patchmon_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchmon_watchtower_enable | string }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ patchmon_homepage_group }}"
+          homepage.icon: "{{ patchmon_homepage_icon }}"
+          homepage.href: "{{ patchmon_homepage_href }}"
+          homepage.description: "{{ 'Linux Patch Monitoring Automation Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ patchmon_container_name }}"
+          homepage.showStats: "{{ patchmon_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
+          repliqate.enabled: "{{ patchmon_repliqate_enabled | string }}"
+          repliqate.engine: "{{ patchmon_repliqate_engine }}"
+          repliqate.schedule: "{{ patchmon_repliqate_schedule }}"
+          repliqate.backup_id: "{{ patchmon_repliqate_backup_id }}"
+          repliqate.retention: "{{ patchmon_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.link.template: "https://github.com/PatchMon/PatchMon/releases/tag/v${major}.${minor}.${patch}"
+        cpu_shares: "{{ patchmon_cpu_shares }}"
+        memory: "{{ patchmon_memory }}"
+        memory_swap: "{{ patchmon_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Web UI Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ patchmon_web_container_name }}"
+        hostname: "{{ patchmon_web_container_name }}"
+        image: "{{ patchmon_web_image_name }}:{{ patchmon_web_image_tag }}"
+        pull: true
+#        volumes:
+#          - "{{ patchmon_data_directory }}/assets:/usr/share/nginx/html/assets"
+        ports:
+          - "{{ patchmon_port_http }}:3000"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ patchmon_container_name }}:backend"
+          - "{{ patchmon_redis_container_name }}:redis"
+        labels:
+          autoheal: "{{ patchmon_web_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchmon_web_watchtower_enable | string }}"
+          dockflare.enable: "{{ patchmon_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ patchmon_dockflare_access_group }}"
+          dockflare.hostname: "{{ patchmon_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }} Web UI"
+          homepage.group: "{{ patchmon_web_homepage_group }}"
+          homepage.icon: "{{ patchmon_web_homepage_icon }}"
+          homepage.href: "{{ patchmon_web_homepage_href }}"
+          homepage.description: "{{ 'Linux Patch Monitoring Automation Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ patchmon_web_container_name }}"
+          homepage.showStats: "{{ patchmon_web_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
+          repliqate.enabled: "{{ patchmon_web_repliqate_enabled | string }}"
+          repliqate.engine: "{{ patchmon_web_repliqate_engine }}"
+          repliqate.schedule: "{{ patchmon_web_repliqate_schedule }}"
+          repliqate.backup_id: "{{ patchmon_web_repliqate_backup_id }}"
+          repliqate.retention: "{{ patchmon_web_repliqate_retention }}"
+          traefik.enable: "{{ patchmon_available_externally | string }}"
+          traefik.http.routers.patchmon.rule: "Host(`{{ patchmon_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.patchmon.tls.certresolver: "letsencrypt"
+          traefik.http.routers.patchmon.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.patchmon.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.patchmon.middlewares: "patchmon@docker{{ ',tinyauth-auth@docker' if patchmon_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.patchmon.IPAllowList.sourcerange: "{{ patchmon_traefik_whitelist }}"
+          traefik.http.services.patchmon.loadbalancer.server.port: "3000"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.link.template: "https://github.com/PatchMon/PatchMon/releases/tag/v${major}.${minor}.${patch}"
+        cpu_shares: "{{ patchmon_web_cpu_shares }}"
+        memory: "{{ patchmon_web_memory }}"
+        memory_swap: "{{ patchmon_web_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (patchmon_port_http | string)] +
+                (['https://' + patchmon_hostname + '.' + ansible_nas_domain] if (patchmon_available_externally is true or patchmon_dockflare_tunnel is true) else [])
+              }}
+  when: patchmon_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Web UI Container
+      community.docker.docker_container:
+        name: "{{ patchmon_web_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ patchmon_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ patchmon_db_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        name: "{{ patchmon_redis_container_name }}"
+        state: absent
+  when: patchmon_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ patchmon_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - patchmon_enabled is false

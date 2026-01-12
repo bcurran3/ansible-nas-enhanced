@@ -1,0 +1,129 @@
+---
+# ANE
+ansible_nas_app_name: "PatchMon"
+patchmon_enabled: false
+patchmon_available_externally: false
+patchmon_traefik_whitelist: "{{ lan }}"
+
+# directories
+patchmon_data_directory: "{{ docker_home }}/patchmon"
+
+# docker
+patchmon_container_name: "patchmon"
+patchmon_image_name: "ghcr.io/patchmon/patchmon-backend"
+patchmon_image_tag: "latest"
+patchmon_db_container_name: "patchmon-db"
+patchmon_db_image_name: "postgres"
+patchmon_db_image_tag: "17-alpine"
+patchmon_redis_container_name: "patchmon-redis"
+patchmon_redis_image_name: "redis"
+patchmon_redis_image_tag: "7-alpine"
+patchmon_web_container_name: "patchmon-web"
+patchmon_web_image_name: "ghcr.io/patchmon/patchmon-frontend"
+patchmon_web_image_tag: "latest"
+
+# network
+patchmon_port_http: "3081"
+patchmon_port_http_backend: "3082"
+patchmon_hostname: "patchmon"
+
+# specs
+patchmon_cpu_shares: 1024
+patchmon_memory: "1G"
+patchmon_memory_swap: -1
+patchmon_db_cpu_shares: 1024
+patchmon_db_memory: "1G"
+patchmon_db_memory_swap: "{{ patchmon_db_memory }}"
+patchmon_redis_cpu_shares: 1024
+patchmon_redis_memory: "1G"
+patchmon_redis_memory_swap: "{{ patchmon_db_memory }}"
+patchmon_web_cpu_shares: 1024
+patchmon_web_memory: "1G"
+patchmon_web_memory_swap: -1
+
+# app
+patchmon_env_log_level: "info"
+patchmon_env_database_url: "postgresql://{{ patchmon_db_env_postgres_user }}:{{ patchmon_db_env_postgres_password }}@{{ patchmon_db_container_name }}:5432/{{ patchmon_db_env_postgres_db }}"
+patchmon_env_jwt_secret: "CQZSW8r2qsx6QcOx01DdOaTpwgVBJ4Dnym9LJXabRMY"
+patchmon_env_server_protocol: "http"
+patchmon_env_server_host: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+patchmon_env_server_port: "{{ patchmon_port_http_backend }}"
+patchmon_env_cors_origin: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
+patchmon_env_db_connection_limit: "30"
+patchmon_env_db_pool_timeout: "20"
+patchmon_env_db_connect_timeout: "10"
+patchmon_env_db_idle_timeout: "300"
+patchmon_env_db_max_lifetime: "1800"
+patchmon_env_rate_limit_window_ms: "900000"
+patchmon_env_rate_limit_max: "5000"
+patchmon_env_auth_rate_limit_window_ms: "600000"
+patchmon_env_auth_rate_limit_max: "500"
+patchmon_env_agent_rate_limit_window_ms: "60000"
+patchmon_env_agent_rate_limit_max: "1000"
+patchmon_env_redis_host: "{{ patchmon_redis_container_name }}"
+patchmon_env_redis_port: "6379"
+patchmon_env_redis_password: "topsecret"
+patchmon_env_redis_db: "0"
+patchmon_env_assets_dir: "/app/assets"
+patchmon_db_env_postgres_user: "patchmon"
+patchmon_db_env_postgres_password: "topsecret"
+patchmon_db_env_postgres_db: "patchmon_db"
+
+# autoheal
+patchmon_autoheal: "false"
+patchmon_db_autoheal: "false"
+patchmon_redis_autoheal: "false"
+patchmon_web_autoheal: "false"
+
+# dockflare
+patchmon_dockflare_tunnel: false
+patchmon_dockflare_access_group: ""
+
+# homepage
+patchmon_homepage_group: "Misc"
+patchmon_homepage_icon: "sh-patchmon.png"
+patchmon_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
+patchmon_homepage_showstats: "false"
+patchmon_db_homepage_group: "DBs"
+patchmon_db_homepage_icon: "postgres.png"
+patchmon_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
+patchmon_db_homepage_showstats: "false"
+patchmon_redis_homepage_group: "DBs"
+patchmon_redis_homepage_icon: "redis.png"
+patchmon_redis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
+patchmon_redis_homepage_showstats: "false"
+patchmon_web_homepage_group: "Apps"
+patchmon_web_homepage_icon: "sh-patchmon.png"
+patchmon_web_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
+patchmon_web_homepage_showstats: "false"
+
+# repliqate
+patchmon_repliqate_enabled: false
+patchmon_repliqate_engine: "restic"
+patchmon_repliqate_schedule: "@daily 3am"
+patchmon_repliqate_backup_id: "{{ patchmon_container_name }}"
+patchmon_repliqate_retention: "30d"
+patchmon_db_repliqate_enabled: "false"
+patchmon_db_repliqate_engine: "restic"
+patchmon_db_repliqate_schedule: "@daily 3am"
+patchmon_db_repliqate_backup_id: "{{ patchmon_db_container_name }}"
+patchmon_db_repliqate_retention: "30d"
+patchmon_redis_repliqate_enabled: "false"
+patchmon_redis_repliqate_engine: "restic"
+patchmon_redis_repliqate_schedule: "@daily 3am"
+patchmon_redis_repliqate_backup_id: "{{ patchmon_redis_container_name }}"
+patchmon_redis_repliqate_retention: "30d"
+patchmon_web_repliqate_enabled: false
+patchmon_web_repliqate_engine: "restic"
+patchmon_web_repliqate_schedule: "@daily 3am"
+patchmon_web_repliqate_backup_id: "{{ patchmon_container_name }}"
+patchmon_web_repliqate_retention: "30d"
+
+# tinyauth
+patchmon_tinyauth_enabled: false
+
+# watchtower
+patchmon_watchtower_enable: false
+patchmon_db_watchtower_enable: "false"
+patchmon_redis_watchtower_enable: "false"
+patchmon_web_watchtower_enable: false

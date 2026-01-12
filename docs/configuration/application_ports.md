@@ -227,9 +227,11 @@ By default, applications can be found on the ports listed below.
 | Overseerr        | 5055    | Bridge  | HTTP           |
 | ownCloud Server  | 3034
 | Paperless_ng     | 16922   | Bridge  | HTTP           |
-| PatchPanda       | 5093
-| Peppermint       | 3021   | Bridge   | HTTP           |
-| Peppermint       | 5003   | Bridge   |                |
+| PatchPanda       | 5093    | Bridge  | HTTP           |
+| PatchMon         | 3081    | Bridge  | HTTP           |
+| PatchMon         | 3082    | Bridge  | HTTP           |
+| Peppermint       | 3021    | Bridge  | HTTP           |
+| Peppermint       | 5003    | Bridge  |                |
 | phpBB            | 9003    | Bridge  | HTTP           |
 | Pi-hole          | 8888
 | Pi-hole          | 53
@@ -395,7 +397,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3081
+# next avail = 3083
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
