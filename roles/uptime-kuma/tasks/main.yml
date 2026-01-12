@@ -48,18 +48,19 @@
           repliqate.backup_id: "{{ uptime_kuma_repliqate_backup_id }}"
           repliqate.retention: "{{ uptime_kuma_repliqate_retention }}"
           traefik.enable: "{{ uptime_kuma_available_externally | string }}"
-          traefik.http.routers.uptime_kuma.rule: "Host(`uptime_kuma.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.uptime_kuma.tls.certresolver: "letsencrypt"
-          traefik.http.routers.uptime_kuma.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.uptime_kuma.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.uptime_kuma.middlewares: "{{ uptime_kuma_hostname }}@docker{{ ',tinyauth-auth@docker' if uptime_kuma_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.uptime_kuma.IPAllowList.sourcerange: "{{ uptime_kuma_traefik_whitelist }}"
-          traefik.http.services.uptime_kuma.loadbalancer.server.port: "3001"
+          traefik.http.routers.uptimekuma.rule: "Host(`{{ uptime_kuma_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.uptimekuma.tls.certresolver: "letsencrypt"
+          traefik.http.routers.uptimekuma.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.uptimekuma.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.uptimekuma.middlewares: "uptimekuma@docker{{ ',tinyauth-auth@docker' if uptime_kuma_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.uptimekuma.IPAllowList.sourcerange: "{{ uptime_kuma_traefik_whitelist }}"
+          traefik.http.services.uptimekuma.loadbalancer.server.port: "3001"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/louislam/uptime-kuma/pkgs/container/uptime-kuma"
         cpu_shares: "{{ uptime_kuma_cpu_shares }}"
         memory: "{{ uptime_kuma_memory }}"
+        memory_swap: "{{ uptime_kuma_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
