@@ -20,10 +20,10 @@
         volumes:
           - "{{ firefly_data_directory }}/mariadb:/var/lib/mysql:rw"
         env:
-          MYSQL_DATABASE: "firefly"
-          MYSQL_USER: "firefly"
-          MYSQL_PASSWORD: "firefly"
-          MYSQL_ROOT_PASSWORD: "firefly"
+          MYSQL_DATABASE: "{{ firefly_env_db_database }}"
+          MYSQL_USER: "{{ firefly_env_db_username }}"
+          MYSQL_PASSWORD: "{{ firefly_env_db_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ firefly_db_env_mysql_root_password }}"
         healthcheck:
               test:
                 - CMD
@@ -59,6 +59,7 @@
           wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ firefly_db_cpu_shares }}"
         memory: "{{ firefly_db_memory }}"
+        memory_swap: "{{ firefly_db_memory_swap }}"
         restart_policy: unless-stopped
       register: firefly_db_status
 
@@ -71,7 +72,7 @@
       community.docker.docker_container:
         name: "{{ firefly_container_name }}"
         hostname: "{{ firefly_container_name }}"
-        image: fireflyiii/core:latest
+        image: "{{ firefly_image_name }}:{{ firefly_image_tag }}"
         pull: true
         volumes:
           - "{{ firefly_data_directory }}/export:/var/www/firefly-iii/storage/export:rw"
@@ -81,18 +82,15 @@
         ports:
           - "{{ firefly_port_http }}:8080"
         env:
-          APP_URL: "https://{{ firefly_hostname }}.{{ ansible_nas_domain }}"
-          APP_ENV: "local"
-          APP_KEY: "S0m3R@nd0mString0f32Ch@rsEx@ct1y"
-          DB_CONNECTION: "mysql"
+          APP_ENV: "{{ firefly_env_app_env }}"
+          APP_KEY: "{{ firefly_env_app_key }}"
+          APP_URL: "{{ firefly_env_app_url }}"
+          DB_CONNECTION: "{{ firefly_env_db_connection }}"
           DB_HOST: "{{ firefly_db_container_name }}"
-          DB_DATABASE: "firefly"
-          DB_USERNAME: "firefly"
-          DB_PASSWORD: "firefly"
-          DOCKER_MODS: "{{ firefly_env_docker_mods }}"
-          INSTALL_PACKAGES: "{{ firefly_env_docker_mods_install_packages }}"
-          INSTALL_PIP_PACKAGES: "{{ firefly_env_docker_mods_install_pip_packages}}"
-          TRUSTED_PROXIES: "**"
+          DB_DATABASE: "{{ firefly_env_db_database }}"
+          DB_USERNAME: "{{ firefly_env_db_username }}"
+          DB_PASSWORD: "{{ firefly_env_db_password }}"
+          TRUSTED_PROXIES: "*"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ firefly_autoheal }}"
@@ -128,6 +126,7 @@
           wud.link.template: "https://hub.docker.com/r/fireflyiii/core"
         cpu_shares: "{{ firefly_cpu_shares }}"
         memory: "{{ firefly_memory }}"
+        memory_swap: "{{ firefly_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
