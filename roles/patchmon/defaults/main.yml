@@ -4,6 +4,7 @@ ansible_nas_app_name: "PatchMon"
 patchmon_enabled: false
 patchmon_available_externally: false
 patchmon_traefik_whitelist: "{{ lan }}"
+patchmon_api_traefik_whitelist: "{{ lan }}"
 
 # directories
 patchmon_data_directory: "{{ docker_home }}/patchmon"
@@ -23,9 +24,10 @@ patchmon_web_image_name: "ghcr.io/patchmon/patchmon-frontend"
 patchmon_web_image_tag: "latest"
 
 # network
-patchmon_port_http: "3081"
-patchmon_port_http_backend: "3082"
 patchmon_hostname: "patchmon"
+patchmon_api_hostname: "patchmonapi"
+patchmon_port_http: "3081"
+patchmon_api_port_http: "3082"
 
 # specs
 patchmon_cpu_shares: 1024
@@ -47,7 +49,7 @@ patchmon_env_database_url: "postgresql://{{ patchmon_db_env_postgres_user }}:{{ 
 patchmon_env_jwt_secret: "CQZSW8r2qsx6QcOx01DdOaTpwgVBJ4Dnym9LJXabRMY"
 patchmon_env_server_protocol: "http"
 patchmon_env_server_host: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
-patchmon_env_server_port: "{{ patchmon_port_http_backend }}"
+patchmon_env_server_port: "{{ patchmon_api_port_http }}"
 patchmon_env_cors_origin: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchmon_port_http }}"
 patchmon_env_db_connection_limit: "30"
 patchmon_env_db_pool_timeout: "20"

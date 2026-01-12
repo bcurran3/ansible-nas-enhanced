@@ -15,9 +15,10 @@
         - path: "{{ patchmon_data_directory }}/agents"
           owner: 1000
           group: 1000
+# use and permissions of /assets needs to be implemented better
 #        - path: "{{ patchmon_data_directory }}/assets"
 #          owner: 1000
-#          group: 1000
+#          group: 101
         - path: "{{ patchmon_data_directory }}/db"
           owner: 70
           group: 70
@@ -122,9 +123,9 @@
         pull: true
         volumes:
           - "{{ patchmon_data_directory }}/agents:/app/agents"
-#          - "{{ patchmon_data_directory }}/assets:{{ patchmon_env_assets_dir }}"
+#          - "{{ patchmon_data_directory }}/assets:{{ patchmon_env_assets_dir }}/custom"
         ports:
-          - "{{ patchmon_port_http_backend }}:3001"
+          - "{{ patchmon_api_port_http }}:3001"
         env:
           LOG_LEVEL: "{{ patchmon_env_log_level }}"
           DATABASE_URL: "{{ patchmon_env_database_url }}"
@@ -171,7 +172,14 @@
           repliqate.schedule: "{{ patchmon_repliqate_schedule }}"
           repliqate.backup_id: "{{ patchmon_repliqate_backup_id }}"
           repliqate.retention: "{{ patchmon_repliqate_retention }}"
-          traefik.enable: "false"
+          traefik.enable: "{{ patchmon_available_externally | string }}"
+          traefik.http.routers.patchmonapi.rule: "Host(`{{ patchmon_api_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.patchmonapi.tls.certresolver: "letsencrypt"
+          traefik.http.routers.patchmonapi.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.patchmonapi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.patchmonapi.middlewares: "patchmonapi@docker"
+          traefik.http.middlewares.patchmonapi.IPAllowList.sourcerange: "{{ patchmon_api_traefik_whitelist }}"
+          traefik.http.services.patchmonapi.loadbalancer.server.port: "3000"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.link.template: "https://github.com/PatchMon/PatchMon/releases/tag/v${major}.${minor}.${patch}"
         cpu_shares: "{{ patchmon_cpu_shares }}"
@@ -187,7 +195,7 @@
         image: "{{ patchmon_web_image_name }}:{{ patchmon_web_image_tag }}"
         pull: true
 #        volumes:
-#          - "{{ patchmon_data_directory }}/assets:/usr/share/nginx/html/assets"
+#          - "{{ patchmon_data_directory }}/assets:/usr/share/nginx/html/assets/custom"
         ports:
           - "{{ patchmon_port_http }}:3000"
         env:
