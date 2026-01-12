@@ -58,6 +58,7 @@
           wud.link.template: "https://github.com/tecnativa/docker-socket-proxy/pkgs/container/docker-socket-proxy"
         cpu_shares: "{{ dockflare_proxy_cpu_shares }}"
         memory: "{{ dockflare_proxy_memory }}"
+        memory_swap: "{{ dockflare_proxy_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
@@ -69,7 +70,7 @@
         pull: true
         volumes:
           - "{{ dockflare_data_directory }}/redis:/data"
-        command: "redis-server --save --appendonly no"
+        command: ["redis-server", "--save", "", "--appendonly", "no"]
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
@@ -90,11 +91,12 @@
           repliqate.backup_id: "{{ dockflare_redis_repliqate_backup_id }}"
           repliqate.retention: "{{ dockflare_redis_repliqate_retention }}"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.include: "^v?\\d+-alpine$"
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ dockflare_redis_cpu_shares }}"
         memory: "{{ dockflare_redis_memory }}"
+        memory_swap: "{{ dockflare_redis_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -155,6 +157,7 @@
           wud.link.template: "https://hub.docker.com/r/alplat/dockflare"
         cpu_shares: "{{ dockflare_cpu_shares }}"
         memory: "{{ dockflare_memory }}"
+        memory_swap: "{{ dockflare_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
