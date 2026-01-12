@@ -29,13 +29,22 @@ firefly_db_image_name: "mariadb"
 firefly_db_image_tag: "lts"
 
 # app
-firefly_env_app_env: "local"
+firefly_env_app_env: "production"
 firefly_env_app_key: "lm6sZhprxGgpc97sp09ph3ZElRUVGTT3"
 firefly_env_app_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
 firefly_env_db_connection: "mysql"
 firefly_env_db_database: "firefly_db"
 firefly_env_db_username: "firefly"
 firefly_env_db_password:  "topsecret"
+firefly_env_db_port: "3306"
+firefly_env_mail_mail: "log" # smtp, sendmail, mailgun, sparkpost, mailersend
+firefly_env_mail_host: "" # smtp.mailtrap.io
+firefly_env_mail_port: "" # 2525
+firefly_env_mail_from: "" # changeme@example.com
+firefly_env_mail_username: ""
+firefly_env_mail_password: ""
+firefly_env_mail_encryption: ""
+firefly_env_site_owner: "" # you@example.com
 firefly_db_env_mysql_root_password: "firefly"
 
 # autoheal
