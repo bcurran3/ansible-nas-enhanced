@@ -53,6 +53,7 @@
           wud.link.template: "https://github.com/postgres/postgres/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ bitmagnet_db_cpu_shares }}"
         memory: "{{ bitmagnet_db_memory }}"
+        memory_swap: "{{ bitmagnet_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -110,6 +111,7 @@
           wud.link.template: "https://github.com/bitmagnet-io/bitmagnet/releases"
         cpu_shares: "{{ bitmagnet_cpu_shares }}"
         memory: "{{ bitmagnet_memory }}"
+        memory_swap: "{{ bitmagnet_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

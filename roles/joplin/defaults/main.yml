@@ -24,8 +24,10 @@ joplin_db_image_tag: "16-alpine"
 # specs
 joplin_cpu_shares: 1024
 joplin_memory: "1G"
+joplin_memory_swap: -1
 joplin_db_cpu_shares: 1024
 joplin_db_memory: "1G"
+joplin_db_memory_swap: "{{ joplin_db_memory }}"
 
 # app
 joplin_env_app_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joplin_port_http }}"
@@ -35,13 +37,13 @@ joplin_env_postgres_database: "joplin_db"
 joplin_env_postgres_user: "joplin"
 joplin_env_postgres_port: "5432"
 joplin_env_mailer_enabled: "0" # 1 to enable
-joplin_env_mailer_host: "smtp.{{ ansible_nas_domain }}"
-joplin_env_mailer_port: "587"
-joplin_env_mailer_security: "starttls"
-joplin_env_mailer_auth_user: "your_email_address@{{ ansible_nas_domain }}"
-joplin_env_mailer_auth_password: "yourpassword"
-joplin_env_mailer_noreply_name: "JoplinServer"
-joplin_env_mailer_noreply_email: "noreply@{{ ansible_nas_domain }}"
+joplin_env_mailer_host: "" # smtp.{{ ansible_nas_domain }}
+joplin_env_mailer_port: "" # 587
+joplin_env_mailer_security: "" # starttls
+joplin_env_mailer_auth_user: "" # your_email_address@{{ ansible_nas_domain }}
+joplin_env_mailer_auth_password: ""
+joplin_env_mailer_noreply_name: "" # JoplinServer
+joplin_env_mailer_noreply_email: "" # noreply@{{ ansible_nas_domain }}
 
 # autoheal
 joplin_autoheal: "false"
