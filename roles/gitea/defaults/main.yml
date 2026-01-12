@@ -15,18 +15,20 @@ gitea_port_http: "3065"
 gitea_port_ssh: "2221"
 
 # specs
+gitea_cpu_shares: 1024
 gitea_memory: "1G"
+gitea_memory_swap: -1
+gitea_db_cpu_shares: 1024
 gitea_db_memory: "1G"
+gitea_db_memory_swap: "{{ gitea_db_memory }}"
 
 # docker
 gitea_container_name: "gitea"
 gitea_image_name: "gitea/gitea"
 gitea_image_version: latest
-gitea_cpu_shares: 1024
 gitea_db_container_name: "gitea-db"
 gitea_db_image_name: "mysql"
 gitea_db_image_version: "9.3"
-gitea_db_cpu_shares: 1024
 
 # app
 gitea_uid: "1000"
@@ -46,6 +48,7 @@ gitea_homepage_group: "Apps"
 gitea_homepage_icon: "gitea.png"
 gitea_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"
 gitea_homepage_showstats: "false"
+gitea_homepage_widget_key: ""
 gitea_db_homepage_group: "DBs"
 gitea_db_homepage_icon: "mysql.png"
 gitea_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"

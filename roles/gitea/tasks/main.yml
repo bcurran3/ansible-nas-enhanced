@@ -50,6 +50,7 @@
           wud.link.template: "https://hub.docker.com/_/mysql"
         cpu_shares: "{{ gitea_db_cpu_shares }}"
         memory: "{{ gitea_db_memory }}"
+        memory_swap: "{{ gitea_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -97,6 +98,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ gitea_container_name }}"
           homepage.showStats: "{{ gitea_homepage_showstats }}"
+          homepage.widget.type: "gitea"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"
+          homepage.widget.key: "{{ gitea_homepage_widget_key }}"
           repliqate.enabled: "{{ gitea_repliqate_enabled }}"
           repliqate.engine: "{{ gitea_repliqate_engine }}"
           repliqate.schedule: "{{ gitea_repliqate_schedule }}"
@@ -115,6 +119,7 @@
           wud.link.template: "https://hub.docker.com/r/gitea/gitea"
         cpu_shares: "{{ gitea_cpu_shares }}"
         memory: "{{ gitea_memory }}"
+        memory_swap: "{{ gitea_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
