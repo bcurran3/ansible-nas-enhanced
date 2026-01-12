@@ -27,13 +27,34 @@
           PGID: "{{ dasharr_group_id }}"
           SESSION_SECRET: "{{ dasharr_env_session_secret }}"
           TRUST_PROXY: "{{ dasharr_env_trust_proxy }}"
+          JELLYFIN_URL: "{{ dasharr_env_jellyfin_url }}"
+          JELLYFIN_API_KEY: "{{ dasharr_env_jellyfin_api_key }}"
+          JELLYSEERR_URL: "{{ dasharr_env_jellyseerr_url }}"
+          JELLYSEERR_API_KEY: "{{ dasharr_env_jellyseerr_api_key }}"
+          OVERSEERR_URL: "{{ dasharr_env_overseerr_url }}"
+          OVERSEERR_API_KEY: "{{ dasharr_env_overseerr_api_key }}"
+          PLEX_URL: "{{ dasharr_env_plex_url }}"
+          PLEX_TOKEN: "{{ dasharr_env_plex_token }}"
+          PROWLARR_URL: "{{ dasharr_env_prowlarr_url }}"
+          PROWLARR_API_KEY: "{{ dasharr_env_prowlarr_api_key }}"
+          QBITTORRENT_URL: "{{ dasharr_env_qbittorrent_url }}"
+          QBITTORRENT_USERNAME: "{{ dasharr_env_qbittorrent_username }}"
+          QBITTORRENT_PASSWORD: "{{ dasharr_env_qbittorrent_password }}"
+          RADARR_URL: "{{ dasharr_env_radarr_url }}"
+          RADARR_API_KEY: "{{ dasharr_env_radarr_api_key }}"
+          SABNZBD_URL: "{{ dasharr_env_sabnzbd_url }}"
+          SABNZBD_API: "{{ dasharr_env_sabnzbd_api_key }}"
+          SONARR_URL: "{{ dasharr_env_sonarr_url }}"
+          SONARR_API_KEY: "{{ dasharr_env_sonarr_api_key }}"
+          TAUTULLI_URL: "{{ dasharr_env_tautulli_url }}"
+          TAUTULLI_API_KEY: "{{ dasharr_env_tautulli_api_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: ["CMD", "wget", "-q", "--spider", "http://localhost:{{ dasharr_port_http }}"]
-          interval: 30s
-          timeout: 10s
+          interval: "30s"
+          timeout: "10s"
           retries: 3
-          start_period: 40s
+          start_period: "40s"
         labels:
           autoheal: "{{ dasharr_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ dasharr_watchtower_enable }}"
