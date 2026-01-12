@@ -48,6 +48,8 @@
           homepage.server: "my-docker"
           homepage.container: "{{ apcupsd_container_name }}"
           homepage.showStats: "{{ apcupsd_homepage_showstats }}"
+          homepage.widget.type: "apcups"
+          homepage.widget.url: "tcp://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ apcupsd_port_http }}"
           traefik.enable: "false"
           repliqate.enabled: "{{ apcupsd_repliqate_enabled }}"
           repliqate.engine: "{{ apcupsd_repliqate_engine }}"
@@ -59,6 +61,7 @@
           wud.link.template: "https://hub.docker.com/r/gregewing/apcupsd"
         cpu_shares: "{{ apcupsd_cpu_shares }}"
         memory: "{{ apcupsd_memory }}"
+        memory_swap: "{{ apcupsd_memory_swap }}"
         restart_policy: unless-stopped
   when: apcupsd_enabled is true
 
