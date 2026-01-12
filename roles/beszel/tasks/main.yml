@@ -39,6 +39,12 @@
           homepage.server: "my-docker"
           homepage.container: "{{ beszel_container_name }}"
           homepage.showStats: "{{ beszel_homepage_showstats }}"
+          homepage.widget.type: "beszel"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ beszel_port_http }}"
+          homepage.widget.username: "{{ beszel_homepage_widget_username }}"
+          homepage.widget.password: "{{ beszel_homepage_widget_password }}"
+          homepage.widget.systemId: "{{ beszel_homepage_widget_systemid }}"
+          homepage.widget.version: "{{ beszel_homepage_widget_version }}"
           repliqate.enabled: "{{ beszel_repliqate_enabled }}"
           repliqate.engine: "{{ beszel_repliqate_engine }}"
           repliqate.schedule: "{{ beszel_repliqate_schedule }}"
@@ -57,6 +63,7 @@
           wud.link.template: "https://hub.docker.com/r/henrygd/beszel"
         cpu_shares: "{{ beszel_cpu_shares }}"
         memory: "{{ beszel_memory }}"
+        memory_swap: "{{ beszel_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
@@ -84,7 +91,3 @@
   when:
     - archive_app_data_enabled is true
     - beszel_enabled is false
-
-# might need to look at 
-# https://github.com/henrygd/beszel/blob/main/supplemental/docker/same-system/docker-compose.yml
-# for agent in same system

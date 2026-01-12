@@ -28,10 +28,13 @@ komodo_periphery_hostname: "komodo-periphery"
 # specs
 komodo_cpu_shares: 1024
 komodo_memory: "1G"
+komodo_memory_swap: -1
 komodo_db_cpu_shares: 1024
 komodo_db_memory: "1G"
+komodo_db_memory_swap: "{{ komodo_db_memory }}"
 komodo_periphery_cpu_shares: 1024
-komodo_periphery_memory: "1G"
+komodo_periphery_memory: "256M"
+komodo_periphery_memory_swap: -1
 
 # app
 komodo_env_komodo_database_username: "komodo"
@@ -99,6 +102,10 @@ komodo_homepage_group: "Apps"
 komodo_homepage_icon: "komodo.png"
 komodo_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
 komodo_homepage_showstats: "false"
+komodo_homepage_widget_key: ""
+komodo_homepage_widget_secret: ""
+komodo_homepage_widget_showsummary: "true"
+komodo_homepage_widget_showstacks: "true"
 komodo_db_homepage_group: "DBs"
 komodo_db_homepage_icon: "mongodb.png"
 komodo_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"

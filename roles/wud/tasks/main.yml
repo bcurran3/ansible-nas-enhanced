@@ -91,8 +91,8 @@
           homepage.showStats: "{{ wud_homepage_showstats }}"
           homepage.widget.type: "whatsupdocker"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
-          homepage.widget.username: "{{ wud_env_wud_auth_basic_admin_username }}"
-          homepage.widget.password: "{{ wud_env_wud_auth_basic_admin_hash }}"
+          homepage.widget.username: "{{ wud_homepage_widget_username }}"
+          homepage.widget.password: "{{ wud_homepage_widget_password }}"
           repliqate.enabled: "{{ wud_repliqate_enabled }}"
           repliqate.engine: "{{ wud_repliqate_engine }}"
           repliqate.schedule: "{{ wud_repliqate_schedule }}"
@@ -110,6 +110,7 @@
           wud.link.template: "https://github.com/getwud/wud/releases/tag/${major}.${minor}.${patch}"
         cpu_shares: "{{ wud_cpu_shares }}"
         memory: "{{ wud_memory }}"
+        memory_swap: "{{ wud_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

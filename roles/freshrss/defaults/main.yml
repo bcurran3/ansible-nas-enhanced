@@ -12,13 +12,17 @@ freshrss_data_directory: "{{ docker_home }}/freshrss"
 freshrss_container_name: "freshrss"
 freshrss_image_name: "freshrss/freshrss"
 freshrss_image_version: "latest"
-freshrss_cpu_shares: 1024
-freshrss_memory: "1G"
 freshrss_db_container_name: "freshrss-db"
 freshrss_db_image_name: "postgres"
 freshrss_db_image_version: "16-alpine"
+
+# specs
+freshrss_cpu_shares: 1024
+freshrss_memory: "1G"
+freshrss_memory_swap: -1
 freshrss_db_cpu_shares: 1024
 freshrss_db_memory: "1G"
+freshrss_db_memory_swap: "{{ freshrss_db_memory }}"
 
 # network
 freshrss_hostname: "freshrss"
@@ -37,8 +41,8 @@ freshrss_homepage_group: "Apps"
 freshrss_homepage_icon: "freshrss.png"
 freshrss_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port_http }}"
 freshrss_homepage_showstats: "false"
-freshrss_homepage_widget_username: "your username"
-freshrss_homepage_widget_password: "your password"
+freshrss_homepage_widget_username: ""
+freshrss_homepage_widget_password: ""
 freshrss_db_homepage_group: "DBs"
 freshrss_db_homepage_icon: "postgres.png"
 freshrss_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ freshrss_port_http }}"

@@ -44,6 +44,9 @@
           homepage.container: "{{ audiobookshelf_container_name }}"
           homepage.showStats: "{{ audiobookshelf_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ audiobookshelf_port_http }}"
+          homepage.widget.type: "audiobookshelf"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ audiobookshelf_port_http }}"
+          homepage.widget.key: "{{ audiobookshelf_homepage_widget_key }}"
           repliqate.enabled: "{{ audiobookshelf_repliqate_enabled }}"
           repliqate.engine: "{{ audiobookshelf_repliqate_engine }}"
           repliqate.schedule: "{{ audiobookshelf_repliqate_schedule }}"
@@ -62,6 +65,7 @@
           wud.link.template: "https://github.com/advplyr/audiobookshelf/releases"
         cpu_shares: "{{ audiobookshelf_cpu_shares }}"
         memory: "{{ audiobookshelf_memory }}"
+        memory_swap: "{{ audiobookshelf_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

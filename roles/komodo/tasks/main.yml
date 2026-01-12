@@ -51,6 +51,7 @@
           wud.link.template: "https://hub.docker.com/_/mongo"
         cpu_shares: "{{ komodo_db_cpu_shares }}"
         memory: "{{ komodo_db_memory }}"
+        memory_swap: "{{ komodo_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Periphery Container
@@ -101,6 +102,7 @@
           wud.link.template: "https://github.com/moghtech/komodo/pkgs/container/komodo-periphery"
         cpu_shares: "{{ komodo_periphery_cpu_shares }}"
         memory: "{{ komodo_periphery_memory }}"
+        memory_swap: "{{ komodo_periphery_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -173,6 +175,12 @@
           homepage.container: "{{ komodo_container_name }}"
           homepage.showStats: "{{ komodo_homepage_showstats }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+          homepage.widget.type: "komodo"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+          homepage.widget.key: "{{ komodo_homepage_widget_key }}"
+          homepage.widget.secret: "{{ komodo_homepage_widget_secret }}"
+          homepage.widget.showSummary: "{{ komodo_homepage_widget_showsummary }}"
+          homepage.widget.showStacks: "{{ komodo_homepage_widget_showstacks }}"
           komodo.skip:
           repliqate.enabled: "{{ komodo_repliqate_enabled }}"
           repliqate.engine: "{{ komodo_repliqate_engine }}"
@@ -192,6 +200,7 @@
           wud.link.template: "https://github.com/moghtech/komodo/pkgs/container/komodo-core"
         cpu_shares: "{{ komodo_cpu_shares }}"
         memory: "{{ komodo_memory }}"
+        memory_swap: "{{ komodo_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

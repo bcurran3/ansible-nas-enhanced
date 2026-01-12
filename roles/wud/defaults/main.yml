@@ -19,6 +19,7 @@ wud_image_tag: "latest"
 # specs
 wud_cpu_shares: 1024
 wud_memory: "256MB"
+wud_memory_swap: -1
 
 # app
 wud_admin_password:  "{{ ansible_nas_app_admin_password }}"
@@ -40,6 +41,8 @@ wud_homepage_group: "Apps"
 wud_homepage_icon: "whats-up-docker.png"
 wud_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
 wud_homepage_showstats: "false"
+wud_homepage_widget_username: "{{ wud_env_wud_auth_basic_admin_username }}"
+wud_homepage_widget_password:  "{{ wud_env_wud_auth_basic_admin_hash }}"
 
 # repliqate
 wud_repliqate_enabled: "false"
