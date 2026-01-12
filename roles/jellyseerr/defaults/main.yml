@@ -1,0 +1,50 @@
+---
+# ANE
+ansible_nas_app_name: "Jellyseerr"
+jellyseerr_enabled: false
+jellyseerr_available_externally: false
+jellyseerr_traefik_whitelist: "{{ lan }}"
+
+# directories
+jellyseerr_data_directory: "{{ docker_home }}/jellyseerr"
+
+# docker
+jellyseerr_container_name: "jellyseerr"
+jellyseerr_image_name: "ghcr.io/fallenbagel/jellyseerr"
+jellyseerr_image_tag: "latest"
+
+# network
+jellyseerr_port_http: "3083"
+jellyseerr_hostname: "jellyseerr"
+
+# specs
+jellyseerr_cpu_shares: 1024
+jellyseerr_memory: "1G"
+jellyseerr_memory_swap: -1
+
+# autoheal
+jellyseerr_autoheal: "false"
+
+# dockflare
+jellyseerr_dockflare_tunnel: false
+jellyseerr_dockflare_access_group: ""
+
+# homepage
+jellyseerr_homepage_group: "Media Management"
+jellyseerr_homepage_icon: "jellyseerr.png"
+jellyseerr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyseerr_port_http }}"
+jellyseerr_homepage_showstats: "false"
+jellyseerr_homepage_widget_key: ""
+
+# repliqate
+jellyseerr_repliqate_enabled: false
+jellyseerr_repliqate_engine: "restic"
+jellyseerr_repliqate_schedule: "@daily 3am"
+jellyseerr_repliqate_backup_id: "{{ jellyseerr_container_name }}"
+jellyseerr_repliqate_retention: "30d"
+
+# tinyauth
+jellyseerr_tinyauth_enabled: false
+
+# watchtower
+jellyseerr_watchtower_enable: false

@@ -140,6 +140,7 @@ By default, applications can be found on the ports listed below.
 | IT-Tools         | 8991    | Bridge  | HTTP           |
 | Jackett          | 9117    | Bridge  | HTTP           |
 | Jellyfin         | 8896    | Bridge  | HTTP           |
+| Jellyseerr       | 3083    | Bridge  | HTTP           |
 | Joomla           | 8181    | Bridge  | HTTP           |
 | Joplin           | 22300   | Bridge  | HTTP           |
 | Journiv          | 3079    | Bridge  | HTTP           |
@@ -397,7 +398,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3083
+# next avail = 3084
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002

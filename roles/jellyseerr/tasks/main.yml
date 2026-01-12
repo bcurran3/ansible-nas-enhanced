@@ -1,0 +1,97 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ jellyseerr_data_directory }}"
+        - "{{ jellyseerr_data_directory }}/config"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ jellyseerr_container_name }}"
+        hostname: "{{ jellyseerr_container_name }}"
+        image: "{{ jellyseerr_image_name }}:{{ jellyseerr_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ jellyseerr_data_directory }}/config:/app/config"
+        ports:
+          - "{{ jellyseerr_port_http }}:{{ jellyseerr_port_http }}"
+        env:
+          LOG_LEVEL: "debug"
+          PORT: "{{ jellyseerr_port_http }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test: ["wget --no-verbose --tries=1 --spider http://localhost:{{ jellyseerr_port_http }}/api/v1/status || exit 1"]
+              interval: "15s"
+              timeout: "3s"
+              retries: "3"
+              start_period: "20s"
+        labels:
+          autoheal: "{{ jellyseerr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ jellyseerr_watchtower_enable | string }}"
+          dockflare.enable: "{{ jellyseerr_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ jellyseerr_dockflare_access_group }}"
+          dockflare.hostname: "{{ jellyseerr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyseerr_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ jellyseerr_homepage_group }}"
+          homepage.icon: "{{ jellyseerr_homepage_icon }}"
+          homepage.href: "{{ jellyseerr_homepage_href }}"
+          homepage.description: "{{ 'a free and open source software application for managing requests for your media library' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ jellyseerr_container_name }}"
+          homepage.showStats: "{{ jellyseerr_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyseerr_port_http }}"
+          homepage.widget.type: "jellyseerr"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyseerr_port_http }}"
+          homepage.widget.key: "{{ jellyseerr_homepage_widget_key }}"
+          repliqate.enabled: "{{ jellyseerr_repliqate_enabled | string }}"
+          repliqate.engine: "{{ jellyseerr_repliqate_engine }}"
+          repliqate.schedule: "{{ jellyseerr_repliqate_schedule }}"
+          repliqate.backup_id: "{{ jellyseerr_repliqate_backup_id }}"
+          repliqate.retention: "{{ jellyseerr_repliqate_retention }}"
+          traefik.enable: "{{ jellyseerr_available_externally | string }}"
+          traefik.http.routers.jellyseerr.rule: "Host(`{{ jellyseerr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.jellyseerr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.jellyseerr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.jellyseerr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.jellyseerr.middlewares: "jellyseerr@docker{{ ',tinyauth-auth@docker' if jellyseerr_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.jellyseerr.IPAllowList.sourcerange: "{{ jellyseerr_traefik_whitelist }}"
+          traefik.http.services.jellyseerr.loadbalancer.server.port: "{{ jellyseerr_port_http }}"
+          wud.tag.include: "^v?\\d+\\.\\d+\\.\\d+.*$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/fallenbagel/jellyseerr/pkgs/container/jellyseerr"
+        cpu_shares: "{{ jellyseerr_cpu_shares }}"
+        memory: "{{ jellyseerr_memory }}"
+        memory_swap: "{{ jellyseerr_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (jellyseerr_port_http | string)] +
+                (['https://' + jellyseerr_hostname + '.' + ansible_nas_domain] if (jellyseerr_available_externally is true or jellyseerr_dockflare_tunnel is true) else [])
+              }}
+  when: jellyseerr_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ jellyseerr_container_name }}"
+        state: absent
+  when: jellyseerr_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ jellyseerr_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - jellyseerr_enabled is false
