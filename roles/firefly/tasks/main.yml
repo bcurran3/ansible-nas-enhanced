@@ -6,7 +6,7 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ firefly_data_directory }}/mariadb"
+        - "{{ firefly_data_directory }}/db"
         - "{{ firefly_data_directory }}/upload"
         - "{{ firefly_data_directory }}/export"
 
@@ -18,7 +18,7 @@
         image: "{{ firefly_db_image_name }}:{{ firefly_db_image_tag }}"
         pull: true
         volumes:
-          - "{{ firefly_data_directory }}/mariadb:/var/lib/mysql:rw"
+          - "{{ firefly_data_directory }}/db:/var/lib/mysql:rw"
         env:
           MYSQL_DATABASE: "{{ firefly_env_db_database }}"
           MYSQL_USER: "{{ firefly_env_db_username }}"
@@ -75,8 +75,8 @@
         image: "{{ firefly_image_name }}:{{ firefly_image_tag }}"
         pull: true
         volumes:
-          - "{{ firefly_data_directory }}/export:/var/www/firefly-iii/storage/export:rw"
-          - "{{ firefly_data_directory }}/upload:/var/www/firefly-iii/storage/upload:rw"
+          - "{{ firefly_data_directory }}/export:/var/www/html/storage/export"
+          - "{{ firefly_data_directory }}/upload:/var/www/html/storage/upload"
         links:
           - "{{ firefly_db_container_name }}"
         ports:
