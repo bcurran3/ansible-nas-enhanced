@@ -194,7 +194,9 @@ By default, applications can be found on the ports listed below.
 | netbootxyz       | 69      | Bridge  | TFTP           |
 | Netbox           | 3074    | Bridge  | HTTP           |
 | Netdata          | 19999   | Bridge  | HTTP           |
-| Netlock RMM      | 3078    | Bridge  | HTTP           |
+| Netlock RMM UI   | 3078    | Bridge  | HTTP           |
+| Netlock RMM Back | 7080    | Bridge  | HTTP           |
+| Netlock RMM Rely | 7081    | Bridge  | HTTP           |
 | Nextcloud        | 8080    | Bridge  | HTTP           |
 | nocodb           | 3080    | Bridge  | HTTP           |
 | Node-RED         | 1880    | Bridge  | HTTP           |

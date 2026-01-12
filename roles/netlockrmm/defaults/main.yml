@@ -15,28 +15,33 @@ netlockrmm_image_name: "nicomak101/netlock-rmm-server"
 netlockrmm_image_tag: "latest"
 netlockrmm_db_container_name: "netlockrmm-db"
 netlockrmm_db_image_name: "mysql"
-netlockrmm_db_image_tag: "8.0"
+netlockrmm_db_image_tag: "8"
 netlockrmm_web_container_name: "netlockrmm-web"
 netlockrmm_web_image_name: "nicomak101/netlock-rmm-web-console"
 netlockrmm_web_image_tag: "latest"
 
 # network
-netlockrmm_port_http: "3078"
-#netlockrmm_port_https: "7443"
 netlockrmm_hostname: "netlockrmm"
+netlockrmm_server_hostname: "netlockrmmserver"
+netlockrmm_port_http: "3078"
+netlockrmm_server_port_http: "7080"
 
 # specs
 netlockrmm_cpu_shares: 1024
 netlockrmm_memory: "1G"
+netlockrmm_memory_swap: -1
 netlockrmm_db_cpu_shares: 1024
 netlockrmm_db_memory: "1G"
+netlockrmm_db_memory_swap: "{{ netlockrmm_db_memory }}"
 netlockrmm_web_cpu_shares: 1024
 netlockrmm_web_memory: "1G"
+netlockrmm_web_memory_swap: -1
 
 # app
 netlockrmm_db_msql_database: "netlockrmm_db"
 netlockrmm_db_mysql_user: "root"
 netlockrmm_db_mysql_root_password: "topsecret"
+netlockrmm_api_key: ""
 
 # autoheal
 netlockrmm_autoheal: "false"
@@ -48,17 +53,17 @@ netlockrmm_dockflare_tunnel: false
 netlockrmm_dockflare_access_group: ""
 
 # homepage
-netlockrmm_homepage_group: "Apps"
-netlockrmm_homepage_icon: "netlockrmm.png"
-netlockrmm_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+netlockrmm_homepage_group: "Misc"
+netlockrmm_homepage_icon: "sh-netlock-rmm.png"
+netlockrmm_homepage_href: "https://{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}"
 netlockrmm_homepage_showstats: "false"
 netlockrmm_db_homepage_group: "DBs"
 netlockrmm_db_homepage_icon: "mysql.png"
-netlockrmm_db_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+netlockrmm_db_homepage_href: "https://{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}"
 netlockrmm_db_homepage_showstats: "false"
 netlockrmm_web_homepage_group: "Apps"
-netlockrmm_web_homepage_icon: "netlockrmm.png"
-netlockrmm_web_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
+netlockrmm_web_homepage_icon: "sh-netlock-rmm.png"
+netlockrmm_web_homepage_href: "https://{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}"
 netlockrmm_web_homepage_showstats: "false"
 
 # repliqate

@@ -11,8 +11,22 @@
         name: "{{ netlockrmm_container_name }}"
       register: result
 
-    - name: Check if {{ ansible_nas_app_name }} container is running
+    - name: Get {{ ansible_nas_app_name }} DB container state
+      community.docker.docker_container:
+        name: "{{ netlockrmm_db_container_name }}"
+      register: result_db
+
+    - name: Get {{ ansible_nas_app_name }} Web UI container state
+      community.docker.docker_container:
+        name: "{{ netlockrmm_web_container_name }}"
+      register: result_web
+
+    - name: Check if {{ ansible_nas_app_name }} containers are running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
           - result.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false
+          - result_web.container['State']['Status'] == "running"
+          - result_web.container['State']['Restarting'] == false
