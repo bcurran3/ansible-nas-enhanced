@@ -36,6 +36,35 @@
   register: result
   until: result is succeeded
 
+- name: Install avahi-daemon for GDM
+  ansible.builtin.apt:
+    name: "avahi-daemon"
+    state: present
+  register: result
+  until: result is succeeded
+
+- name: Configure avahi-daemon to allow other stacks
+  ansible.builtin.lineinfile:
+    path: /etc/avahi/avahi-daemon.conf
+    regexp: '^#?disallow-other-stacks='
+    line: 'disallow-other-stacks=no'
+    insertafter: '^\[server\]'
+  register: avahi_config_result
+
+#- name: Enable Avahi Reflector for Docker Bridge support
+#  ansible.builtin.lineinfile:
+#    path: /etc/avahi/avahi-daemon.conf
+#    regexp: '^#?enable-reflector='
+#    line: 'enable-reflector=yes'
+#    insertafter: '^\[server\]'
+#  register: avahi_reflector_result
+
+- name: Restart avahi-daemon
+  ansible.builtin.service:
+    name: avahi-daemon
+    state: restarted
+  when: avahi_config_result.changed
+
 - name: "Set hostname to {{ ansible_nas_hostname }}"
   ansible.builtin.hostname:
     name: "{{ ansible_nas_hostname }}"
