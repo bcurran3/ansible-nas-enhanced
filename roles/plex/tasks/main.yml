@@ -17,7 +17,7 @@
         hostname: "{{ plex_container_name }}"
         image: "{{ plex_image_name }}:{{ plex_image_version }}"
         pull: true
-        network_mode: "host"
+        network_mode: host
 #        ports:
 #          - "{{ plex_port_http }}:32400"
 #          - "32400:32400/udp"
@@ -109,7 +109,7 @@
           traefik.http.routers.plex.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.middlewares.plex-whitelist.ipallowlist.sourcerange: "{{ plex_traefik_whitelist }}"
           traefik.http.routers.plex.middlewares: "plex-whitelist@docker"
-          traefik.http.services.plex.loadbalancer.server.port: "32400"
+          traefik.http.services.plex.loadbalancer.server.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://lscr.io/linuxserver/plex"
