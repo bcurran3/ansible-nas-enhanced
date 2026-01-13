@@ -25,7 +25,9 @@
         security_opts: ["apparmor=unconfined"]
         volumes:
           - "{{ music_assistant_data_directory }}/data:/data"
-          - "{{ music_assistant_music_directory }}:/media:ro"
+          - "{{ music_assistant_audiobooks_directory }}:/media/audiobooks:ro"
+          - "{{ music_assistant_music_directory }}:/media/music:ro"
+          - "{{ music_assistant_podcasts_directory }}:/media/podcasts:ro"
 #        ports:
 #          - 8095:8095  # web interface
 #          - 8097:8097  # stream to players
