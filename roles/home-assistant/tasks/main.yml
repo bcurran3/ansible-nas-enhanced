@@ -33,8 +33,9 @@
           http:
             use_x_forwarded_for: true
             trusted_proxies:
-              - 172.17.0.0/16
+              - 172.16.0.0/12
               - 127.0.0.1
+              - {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}
 
     - name: Create empty helper files
       ansible.builtin.file:
@@ -91,7 +92,7 @@
           traefik.http.routers.homeassistant.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.homeassistant.middlewares: "homeassistant-whitelist{{ ',tinyauth-auth@docker' if home_assistant_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.homeassistant-whitelist.ipallowlist.sourcerange: "{{ home_assistant_traefik_whitelist }}"
-          traefik.http.services.homeassistant-svc.loadbalancer.server.url: "http://172.17.0.1:8123"
+          traefik.http.services.homeassistant-svc.loadbalancer.server.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/homeassistant/home-assistant"
