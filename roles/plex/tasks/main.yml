@@ -17,25 +17,20 @@
         hostname: "{{ plex_container_name }}"
         image: "{{ plex_image_name }}:{{ plex_image_version }}"
         pull: true
-        healthcheck:
-          test: curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity
-          interval: 1m00s
-          timeout: 15s
-          retries: 3
-          start_period: 1m00s
-        ports:
-          - "{{ plex_port_http }}:32400"
-          - "32400:32400/udp"
-          - "5353:5353/udp"     # older Bonjour/Avahi network discovery
-          - "8324:8324"         # controlling Plex for Roku via Plex Companion
-          - "32410:32410/udp"   # GDM network discovery
-          - "32412:32412/udp"   # GDM network discovery
-          - "32413:32413/udp"   # GDM network discovery
-          - "32414:32414/udp"   # GDM network discovery
-          - "32469:32469"       # access to the Plex DLNA Server
-          - "32469:32469/udp"   # access to the Plex DLNA Server
-          - "33400:33400"       # Plex Web Tools
-          - "1900:1900/udp"     # Plex DLNA Server
+        network_mode: "host"
+#        ports:
+#          - "{{ plex_port_http }}:32400"
+#          - "32400:32400/udp"
+#          - "5353:5353/udp"     # older Bonjour/Avahi network discovery
+#          - "8324:8324"         # controlling Plex for Roku via Plex Companion
+#          - "32410:32410/udp"   # GDM network discovery
+#          - "32412:32412/udp"   # GDM network discovery
+#          - "32413:32413/udp"   # GDM network discovery
+#          - "32414:32414/udp"   # GDM network discovery
+#          - "32469:32469"       # access to the Plex DLNA Server
+#          - "32469:32469/udp"   # access to the Plex DLNA Server
+#          - "33400:33400"       # Plex Web Tools
+#          - "1900:1900/udp"     # Plex DLNA Server
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
         device_requests: "{{
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
@@ -60,7 +55,6 @@
           - "{{ plex_porn_directory }}:/porn:{{ plex_porn_permissions }}"  # added
           - "{{ plex_tv_directory }}:/tv:{{ plex_tv_permissions }}"
           - "{{ acmenator_data_directory }}:/certs"
-        network_mode: "bridge"   # changed
         env:
           DOCKER_MODS: "{{ plex_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ plex_env_docker_mods_install_packages }}"
@@ -77,6 +71,12 @@
           GenerateBIFKeyframesOnly: "1"                       # added
           PLEX_DISABLE_SECURITY: "1"                          # added
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity
+          interval: 1m00s
+          timeout: 15s
+          retries: 3
+          start_period: 1m00s
         labels:
           autoheal: "{{ plex_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ plex_watchtower_enable }}"

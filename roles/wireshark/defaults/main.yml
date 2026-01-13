@@ -14,9 +14,9 @@ wireshark_group_id: "1000"
 
 # network
 wireshark_hostname: "wireshark"
-wireshark_port_http: "3001"
-# webhooks on 8082
-#wireshark_port_https: "3060"
+wireshark_port_http: "3000"
+wireshark_port_https: "3001"
+wireshark_port_kasmvnc: "8082"
 
 # docker
 wireshark_container_name: "wireshark"
@@ -26,6 +26,10 @@ wireshark_image_version: "latest"
 # specs
 wireshark_cpu_shares: 1024
 wireshark_memory: "512M"
+
+# app
+wireshark_env_custom_user: "{{ ansible_nas_user }}"
+wireshark_env_password: "{{ ansible_nas_app_admin_password }}"
 
 # autoheal
 wireshark_autoheal: "false"
@@ -50,7 +54,7 @@ wireshark_repliqate_backup_id: "{{ wireshark_container_name }}"
 wireshark_repliqate_retention: "30d"
 
 # tinyauth
-#wireshark_tinyauth_enabled: false
+wireshark_tinyauth_enabled: false
 
 # watchtower
 wireshark_watchtower_enable: "false"

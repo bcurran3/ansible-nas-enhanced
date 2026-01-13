@@ -5,6 +5,8 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+        owner: "{{ wireshark_user_id }}"
+        group: "{{ wireshark_group_id }}"
       with_items:
         - "{{ wireshark_data_directory }}"
         - "{{ wireshark_data_directory }}/config"
@@ -16,10 +18,35 @@
         hostname: "{{ wireshark_container_name }}"
         image: "{{ wireshark_image_name }}:{{ wireshark_image_version }}"
         pull: true
+        ports:
+#         - "{{ wireshark_port_http }}:3000"
+          - "{{ wireshark_port_https }}:3001"
+          - "{{ wireshark_port_kasmvnc }}:8082"
+        tmpfs:
+          - /tmp:exec,mode=1777
         volumes:
           - "{{ wireshark_data_directory }}/config:/config:rw"
-        network_mode: host
+        network_mode: bridge
+        devices: >-
+                  {{
+                    (wireshark_devices | default([])) + ['/dev/dri:/dev/dri']
+                    if intel_igpu_enabled | default(false) | bool
+                    else (wireshark_devices | default(omit))
+                  }}
         env:
+#          DISPLAY: ":99"
+#          LIBGL_ALWAYS_SOFTWARE: "1"
+#          GALLIUM_DRIVER: "llvmpipe"
+#          NVIDIA_VISIBLE_DEVICES: "none" 
+#          NVIDIA_DRIVER_CAPABILITIES: "none"
+#          OCL_ICD_VENDORS: "none"
+#          S6_READ_ONLY_ROOT: "1"
+#          MESA_LOADER_DRIVER_OVERRIDE: "kmsro"
+          HTTP_PORT: "{{ wireshark_port_http }}"
+          HTTPS_PORT: "{{ wireshark_port_https }}"
+          KASMVNC_PORT: "{{ wireshark_port_kasmvnc }}"
+          CUSTOM_USER: "{{ wireshark_env_custom_user }}"
+          PASSWORD: "{{ wireshark_env_password }}"
           DOCKER_MODS: "{{ wireshark_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ wireshark_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ wireshark_env_docker_mods_install_pip_packages}}"
@@ -28,6 +55,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         capabilities:
           - NET_ADMIN
+          - NET_RAW
         labels:
           autoheal: "{{ wireshark_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ wireshark_watchtower_enable }}"
@@ -46,20 +74,38 @@
           repliqate.schedule: "{{ wireshark_repliqate_schedule }}"
           repliqate.backup_id: "{{ wireshark_repliqate_backup_id }}"
           repliqate.retention: "{{ wireshark_repliqate_retention }}"
-          traefik.enable: "false"
+          traefik.enable: "{{ wireshark_available_externally | string }}"
+          traefik.http.routers.wireshark.rule: "Host(`{{ wireshark_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.wireshark.entrypoints: "websecure"
+          traefik.http.routers.wireshark.tls.certresolver: "letsencrypt"
+          traefik.http.routers.wireshark.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.wireshark.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          
+          # Middleware Chain (Adding TinyAuth since Wireshark is powerful/sensitive)
+          traefik.http.routers.wireshark.middlewares: "wireshark-whitelist{{ ',tinyauth-auth@docker' if wireshark_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.wireshark-whitelist.ipallowlist.sourcerange: "{{ wireshark_traefik_whitelist }}"
+
+          # THE HOST MODE FIX: Point to Gateway IP
+          traefik.http.services.wireshark-svc.loadbalancer.server.url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireshark_port_https }}"
+          
+          # Use the SSL-skip transport because Wireshark uses internal HTTPS
+          traefik.http.services.wireshark-svc.loadbalancer.serversTransport: "kasm-transport@file"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "lscr.io/linuxserver/wireshark"
         cpu_shares: "{{ wireshark_cpu_shares }}"
         memory: "{{ wireshark_memory }}"
+        privileged: true
+        shm_size: "1GB"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
-              {{
-                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wireshark_port_http | string)]
-              }}
+          {{
+            ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wireshark_port_https | string)] +
+            (['https://' + wireshark_hostname + '.' + ansible_nas_domain] if (wireshark_available_externally is true) else [])
+          }}
   when: wireshark_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

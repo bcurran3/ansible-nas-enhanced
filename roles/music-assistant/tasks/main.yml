@@ -19,12 +19,18 @@
         pull: true
         privileged: true
         network_mode: host
+        capabilities:
+          - SYS_ADMIN        # to mount SMB shares in container
+          - DAC_READ_SEARCH  # to mount SMB shares in container
+        security_opts: ["apparmor=unconfined"]
         volumes:
           - "{{ music_assistant_data_directory }}/data:/data"
           - "{{ music_assistant_music_directory }}:/media:ro"
 #        ports:
-#          - 8095:8095
+#          - 8095:8095  # web interface
+#          - 8097:8097  # stream to players
         env:
+          LOG_LEVEL: "info"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ music_assistant_autoheal }}"
@@ -44,13 +50,30 @@
           repliqate.schedule: "{{ music_assistant_repliqate_schedule }}"
           repliqate.backup_id: "{{ music_assistant_repliqate_backup_id }}"
           repliqate.retention: "{{ music_assistant_repliqate_retention }}"
-          traefik.enable: "false"
+          traefik.enable: "{{ music_assistant_available_externally | string }}"
+          traefik.http.routers.music-assistant.rule: "Host(`{{ music_assistant_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.music-assistant.entrypoints: "websecure"
+          traefik.http.routers.music-assistant.tls.certresolver: "letsencrypt"
+          traefik.http.routers.music-assistant.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.music-assistant.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.music-assistant.middlewares: "music-assistant-whitelist{{ ',tinyauth-auth@docker' if music_assistant_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.music-assistant-whitelist.ipallowlist.sourcerange: "{{ music_assistant_traefik_whitelist }}"
+          traefik.http.services.music-assistant-svc.loadbalancer.server.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ music_assistant_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/music-assistant/server/pkgs/container/server"
         cpu_shares: "{{ music_assistant_cpu_shares }}"
         memory: "{{ music_assistant_memory }}"
+        memory_swap: "{{ music_assistant_memory_swap }}"
         restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (music_assistant_port_http | string)] +
+                (['https://' + music_assistant_hostname + '.' + ansible_nas_domain] if (music_assistant_available_externally is true or music_assistant_dockflare_tunnel is true) else [])
+              }}
   when: music_assistant_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
