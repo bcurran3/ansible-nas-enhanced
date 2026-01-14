@@ -18,7 +18,7 @@
         hostname: "{{ kasm_container_name }}"
         image: "{{ kasm_image_name }}:{{ kasm_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ kasm_data_directory }}/opt:/opt"
           - "{{ kasm_data_directory }}/profiles:/profiles" #optional
@@ -42,8 +42,7 @@
           - "{{ kasm_port_https }}:{{ kasm_port_https }}" # user access
           - "{{ kasm_port_install_https }}:3000" # admin/installation
         privileged: true
-#       security_opts:
-#         - apparmor:rootlesskit #optional
+#       security_opts: ["apparmor=rootlesskit"] #optional
         labels:
           autoheal: "{{ kasm_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ kasm_watchtower_enable }}"
@@ -66,7 +65,6 @@
           repliqate.backup_id: "{{ kasm_repliqate_backup_id }}"
           repliqate.retention: "{{ kasm_repliqate_retention }}"
           traefik.enable: "{{ kasm_available_externally | string }}"
-          # --- Routers ---
           traefik.http.routers.kasm-main.rule: "Host(`{{ kasm_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.kasm-main.entrypoints: "websecure"
           traefik.http.routers.kasm-main.tls.certresolver: "letsencrypt"
@@ -74,7 +72,6 @@
           traefik.http.routers.kasm-main.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.kasm-main.middlewares: "kasm-whitelist,tinyauth-auth@docker,kasm-headers"
           traefik.http.routers.kasm-main.service: "kasm-main-svc"
-
           traefik.http.routers.kasm-admin.rule: "Host(`{{ kasm_hostname }}-admin.{{ ansible_nas_domain }}`)"
           traefik.http.routers.kasm-admin.entrypoints: "websecure"
           traefik.http.routers.kasm-admin.tls.certresolver: "letsencrypt"
@@ -82,17 +79,12 @@
           traefik.http.routers.kasm-admin.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.kasm-admin.middlewares: "kasm-whitelist,tinyauth-auth@docker,kasm-headers"
           traefik.http.routers.kasm-admin.service: "kasm-admin-svc"
-
-          # --- Services ---
           traefik.http.services.kasm-main-svc.loadbalancer.server.port: "{{ kasm_port_https }}"
           traefik.http.services.kasm-main-svc.loadbalancer.server.scheme: "https"
-          traefik.http.services.kasm-main-svc.loadbalancer.serversTransport: "kasm-transport@file"
-          
+          traefik.http.services.kasm-main-svc.loadbalancer.serversTransport: "ignore-cert@file"
           traefik.http.services.kasm-admin-svc.loadbalancer.server.port: "3000"
           traefik.http.services.kasm-admin-svc.loadbalancer.server.scheme: "https"
-          traefik.http.services.kasm-admin-svc.loadbalancer.serversTransport: "kasm-transport@file"
-
-          # --- Middlewares ---
+          traefik.http.services.kasm-admin-svc.loadbalancer.serversTransport: "ignore-cert@file"
           traefik.http.middlewares.kasm-whitelist.ipallowlist.sourcerange: "{{ kasm_traefik_whitelist }}"
           traefik.http.middlewares.kasm-headers.headers.customrequestheaders.X-Forwarded-Proto: "https"
           traefik.http.middlewares.kasm-headers.headers.accessControlAllowOriginList: "*"
