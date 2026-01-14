@@ -32,9 +32,11 @@ mailrise_targets:
   - email: "gotify@{{ mailrise_hostname }}.{{ ansible_nas_domain }}"
     urls:
       - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port_http }}/{{ mailrise_gotify_app_token }}"
-#  - email: "ntfy@{{ mailrise_hostname }}.{{ ansible_nas_domain }}"
-#    urls:
-#      - "ntfy://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}/{{ mailrise_ntfy_topic }}"
+
+  - email: "ntfy@{{ mailrise_hostname }}.{{ ansible_nas_domain }}"
+    urls:
+      - "ntfy://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}/{{ mailrise_ntfy_topic }}"
+
   - email: "*@*" # Catch-All
     urls:
       - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port_http }}/{{ mailrise_gotify_app_token }}"
