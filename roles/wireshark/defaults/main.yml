@@ -14,8 +14,8 @@ wireshark_group_id: "1000"
 
 # network
 wireshark_hostname: "wireshark"
-wireshark_port_http: "3000"
-wireshark_port_https: "3001"
+#wireshark_port_http: "3000"
+#wireshark_port_https: "3001"
 wireshark_port_kasmvnc: "8082"
 
 # docker
@@ -26,6 +26,7 @@ wireshark_image_version: "latest"
 # specs
 wireshark_cpu_shares: 1024
 wireshark_memory: "512M"
+wireshark_memory_swap: -1
 
 # app
 wireshark_env_custom_user: "{{ ansible_nas_user }}"
@@ -43,7 +44,7 @@ wireshark_env_docker_mods_install_pip_packages: ""
 wireshark_homepage_group: "Network"
 #wireshark_homepage_group: "Apps"
 wireshark_homepage_icon: "wireshark.png"
-wireshark_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireshark_port_http }}"
+wireshark_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:3001"
 wireshark_homepage_showstats: "false"
 
 # repliqate

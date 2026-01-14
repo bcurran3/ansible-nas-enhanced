@@ -18,15 +18,15 @@
         hostname: "{{ wireshark_container_name }}"
         image: "{{ wireshark_image_name }}:{{ wireshark_image_version }}"
         pull: true
-        ports:
+        network_mode: host
+#        ports:
 #         - "{{ wireshark_port_http }}:3000"
-          - "{{ wireshark_port_https }}:3001"
-          - "{{ wireshark_port_kasmvnc }}:8082"
+#          - "{{ wireshark_port_https }}:3001"
+#          - "{{ wireshark_port_kasmvnc }}:8082"
         tmpfs:
           - /tmp:exec,mode=1777
         volumes:
           - "{{ wireshark_data_directory }}/config:/config:rw"
-        network_mode: bridge
         devices: >-
                   {{
                     (wireshark_devices | default([])) + ['/dev/dri:/dev/dri']
@@ -42,8 +42,8 @@
 #          OCL_ICD_VENDORS: "none"
 #          S6_READ_ONLY_ROOT: "1"
 #          MESA_LOADER_DRIVER_OVERRIDE: "kmsro"
-          HTTP_PORT: "{{ wireshark_port_http }}"
-          HTTPS_PORT: "{{ wireshark_port_https }}"
+#          HTTP_PORT: "{{ wireshark_port_http }}"
+#          HTTPS_PORT: "{{ wireshark_port_https }}"
           KASMVNC_PORT: "{{ wireshark_port_kasmvnc }}"
           CUSTOM_USER: "{{ wireshark_env_custom_user }}"
           PASSWORD: "{{ wireshark_env_password }}"
@@ -68,7 +68,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ wireshark_container_name }}"
           homepage.showStats: "{{ wireshark_homepage_showstats }}"
-          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireshark_port_http }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:3001"
           repliqate.enabled: "{{ wireshark_repliqate_enabled }}"
           repliqate.engine: "{{ wireshark_repliqate_engine }}"
           repliqate.schedule: "{{ wireshark_repliqate_schedule }}"
@@ -80,21 +80,16 @@
           traefik.http.routers.wireshark.tls.certresolver: "letsencrypt"
           traefik.http.routers.wireshark.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.wireshark.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          
-          # Middleware Chain (Adding TinyAuth since Wireshark is powerful/sensitive)
           traefik.http.routers.wireshark.middlewares: "wireshark-whitelist{{ ',tinyauth-auth@docker' if wireshark_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.wireshark-whitelist.ipallowlist.sourcerange: "{{ wireshark_traefik_whitelist }}"
-
-          # THE HOST MODE FIX: Point to Gateway IP
-          traefik.http.services.wireshark-svc.loadbalancer.server.url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireshark_port_https }}"
-          
-          # Use the SSL-skip transport because Wireshark uses internal HTTPS
-          traefik.http.services.wireshark-svc.loadbalancer.serversTransport: "kasm-transport@file"
+          traefik.http.services.wireshark-svc.loadbalancer.server.url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:3001"
+          traefik.http.services.wireshark-svc.loadbalancer.serversTransport: "ignore-cert@file"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "lscr.io/linuxserver/wireshark"
         cpu_shares: "{{ wireshark_cpu_shares }}"
         memory: "{{ wireshark_memory }}"
+        memory_swap: "{{ wireshark_memory_swap }}"
         privileged: true
         shm_size: "1GB"
         restart_policy: unless-stopped
@@ -103,7 +98,7 @@
       ansible.builtin.debug:
         msg: >-
           {{
-            ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wireshark_port_https | string)] +
+            ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + '3001'] +
             (['https://' + wireshark_hostname + '.' + ansible_nas_domain] if (wireshark_available_externally is true) else [])
           }}
   when: wireshark_enabled is true
