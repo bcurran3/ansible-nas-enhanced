@@ -1,0 +1,39 @@
+---
+# ANE
+ansible_nas_app_name: "Rackula"
+rackula_enabled: false
+rackula_available_externally: false
+rackula_traefik_whitelist: "{{ lan }}"
+
+# docker
+rackula_container_name: "rackula"
+rackula_image_name: "ghcr.io/rackulalives/rackula"
+rackula_image_tag: "latest"
+
+# network
+rackula_hostname: "rackula"
+rackula_port_http: "3084"
+
+# specs
+rackula_cpu_shares: 1024
+rackula_memory: "1G"
+rackula_memory_swap: -1
+
+# autoheal
+rackula_autoheal: "false"
+
+# dockflare
+rackula_dockflare_tunnel: false
+rackula_dockflare_access_group: ""
+
+# homepage
+rackula_homepage_group: "Apps"
+rackula_homepage_icon: "rackula.png"
+rackula_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rackula_port_http }}"
+rackula_homepage_showstats: "false"
+
+# tinyauth
+rackula_tinyauth_enabled: false
+
+# watchtower
+rackula_watchtower_enable: false

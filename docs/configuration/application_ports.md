@@ -179,8 +179,9 @@ By default, applications can be found on the ports listed below.
 | Miniflux         | 8070    | Bridge  | HTTP           |
 | Mosquitto        | 1883    | Bridge  | Websocket      |
 | Mosquitto        | 9001    | Bridge  | HTTP           |
-| Mumble           | 64738 tcp + udp
-| Music Assistant  | 8095    | Host
+| Mumble           | 64738   | Bridge  | TCP+UDP        |
+| Music Assistant  | 8095    | Host    | HTTP           |
+| Music Assistant  | 8097    | Host    | TCP            |
 | MyBibliotheca    | 5054    | Bridge  | HTTP           |
 | Mylar            | 8585    | Bridge  | HTTP           |
 | MyMediaForAlexa  | 52050   | Bridge  | TCP            |
@@ -274,6 +275,7 @@ By default, applications can be found on the ports listed below.
 | QDirStat         | 5800    | Bridge  | HTTP           |
 | QDirStat         | 5903    | Bridge  | VNC            |
 | qui              | 7476    | Bridge  | HTTP           |
+| Rackula          | 3084    | Bridge  | HTTP           |
 | Radarr           | 7878    | Bridge  | HTTP           |
 | Readarr          | 8787    | Bridge  | HTTP           |
 | Recyclarr        | n/a
@@ -400,7 +402,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3084
+# next avail = 3085
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002

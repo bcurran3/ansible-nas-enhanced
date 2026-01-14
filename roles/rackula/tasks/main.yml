@@ -1,0 +1,64 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ rackula_container_name }}"
+        hostname: "{{ rackula_container_name }}"
+        image: "{{ rackula_image_name }}:{{ rackula_image_tag }}"
+        pull: true
+        network_mode: bridge
+        ports:
+          - "{{ rackula_port_http }}:80"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ rackula_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ rackula_watchtower_enable | string }}"
+          dockflare.enable: "{{ rackula_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ rackula_dockflare_access_group }}"
+          dockflare.hostname: "{{ rackula_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rackula_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ rackula_homepage_group }}"
+          homepage.icon: "{{ rackula_homepage_icon }}"
+          homepage.href: "{{ rackula_homepage_href }}"
+          homepage.description: "{{ 'Drag and drop rack visualizer' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ rackula_container_name }}"
+          homepage.showStats: "{{ rackula_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rackula_port_http }}"
+          repliqate.enabled: "false"
+          traefik.enable: "{{ rackula_available_externally | string }}"
+          traefik.http.routers.rackula.rule: "Host(`{{ rackula_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.rackula.tls.certresolver: "letsencrypt"
+          traefik.http.routers.rackula.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.rackula.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.rackula.middlewares: "rackula@docker{{ ',tinyauth-auth@docker' if rackula_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.rackula.IPAllowList.sourcerange: "{{ rackula_traefik_whitelist }}"
+          traefik.http.services.rackula.loadbalancer.server.port: "80"
+          wud.tag.include: "^latest$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/RackulaLives/Rackula/releases"
+        cpu_shares: "{{ rackula_cpu_shares }}"
+        memory: "{{ rackula_memory }}"
+        memory_swap: "{{ rackula_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (rackula_port_http | string)] +
+                (['https://' + rackula_hostname + '.' + ansible_nas_domain] if (rackula_available_externally is true or rackula_dockflare_tunnel is true) else [])
+              }}
+  when: rackula_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ rackula_container_name }}"
+        state: absent
+  when: rackula_enabled is false
