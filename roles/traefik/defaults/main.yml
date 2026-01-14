@@ -25,6 +25,11 @@ traefik_image_name: "traefik"
 traefik_image_version: "latest"
 traefik_log_level: "INFO"
 
+# specs
+traefik_cpu_shares: 1024
+traefik_memory: "512M"
+traefik_memory_swap: -1
+
 # find the relevant name and environment variables for your DNS provider at https://go-acme.github.io/lego/dns/.
 # More info at https://doc.traefik.io/traefik/https/acme/
 traefik_dns_provider: cloudflare
@@ -38,9 +43,21 @@ traefik_environment_variables:
 # traefik_acme_server: "https://acme-staging-v02.api.letsencrypt.org/directory" # staging
 traefik_acme_server: "https://acme-v02.api.letsencrypt.org/directory" # production
 
-# specs
-traefik_cpu_shares: 1024
-traefik_memory: "512M"
+# List of external devices on your network to proxy
+# remove transport for http urls but use for https urls
+# whitelist true to use your lan whitelist, false to allow from 0.0.0.0
+traefik_external_hosts:
+  - name: "router"
+    subdomain: "router"
+    target: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['gateway'] }}"
+    transport: "ignore-cert@file"
+    whitelist: true
+
+#  - name: "ProxmoxVE"
+#    subdomain: "pve"
+#    target: "https://192.168.1.10:8006"
+#    transport: "ignore-cert@file"
+#    whitelist: true
 
 # app
 traefik_sendanonymoussage: "false"

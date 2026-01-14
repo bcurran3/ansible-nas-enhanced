@@ -1,0 +1,42 @@
+http:
+  serversTransports:
+    ignore-cert:
+      insecureSkipVerify: true
+
+  middlewares:
+    external-whitelist:
+      ipAllowList:
+        sourceRange:
+{% for cidr in traefik_traefik_whitelist.split(',') %}
+          - "{{ cidr | trim }}"
+{% endfor %}
+
+  routers:
+{% for host in traefik_external_hosts %}
+    {{ host.name }}:
+      rule: "Host(`{{ host.subdomain }}.{{ ansible_nas_domain }}`)"
+      entryPoints:
+        - "websecure"
+      service: "{{ host.name }}-svc"
+      tls:
+        certResolver: "letsencrypt"
+        domains:
+          - main: "{{ ansible_nas_domain }}"
+            sans: ["*.{{ ansible_nas_domain }}"]
+{% if host.whitelist | default(false) %}
+      middlewares:
+        - "external-whitelist"
+{% endif %}
+{% endfor %}
+
+  services:
+{% for host in traefik_external_hosts %}
+    {{ host.name }}-svc:
+      loadBalancer:
+        servers:
+          - url: "{{ host.target }}"
+        passHostHeader: true
+{% if host.transport is defined %}
+        serversTransport: "{{ host.transport }}"
+{% endif %}
+{% endfor %}
