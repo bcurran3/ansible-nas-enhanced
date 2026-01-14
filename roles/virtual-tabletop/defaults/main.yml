@@ -1,0 +1,54 @@
+---
+# ANE
+ansible_nas_app_name: "Virtual Tabletop"
+virtual_tabletop_enabled: false
+virtual_tabletop_available_externally: false
+virtual_tabletop_traefik_whitelist: "{{ lan }}"
+
+# directories
+virtual_tabletop_data_directory: "{{ docker_home }}/virtual-tabletop"
+
+# docker
+virtual_tabletop_container_name: "virtual-tabletop"
+virtual_tabletop_image_name: "arnoldsmith86/virtualtabletop"
+virtual_tabletop_image_tag: "latest"
+
+# network
+virtual_tabletop_port_http: "8272"
+virtual_tabletop_hostname: "virtualtabletop"
+
+# specs
+virtual_tabletop_cpu_shares: 1024
+virtual_tabletop_memory: "1G"
+virtual_tabletop_memory_swap: -1
+
+# app
+virtual_tabletop_env_adminurl: "/admin"
+virtual_tabletop_env_allowpubliclibraryedits: "false"
+virtual_tabletop_env_customtab: "Virtual Tabletop ({{ ansible_nas_hostname }})"
+#virtual_tabletop_env_externalurl: "https://{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}"
+virtual_tabletop_env_externalurl: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtual_tabletop_port_http }}"
+virtual_tabletop_env_forcetracing: "false"
+virtual_tabletop_env_minifyjavascript: "false"
+virtual_tabletop_env_servername: "{{ ansible_nas_hostname }}"
+virtual_tabletop_env_simulateserverlag: "0"
+virtual_tabletop_env_urlprefix: ""
+
+# autoheal
+virtual_tabletop_autoheal: "false"
+
+# dockflare
+virtual_tabletop_dockflare_tunnel: "false"
+virtual_tabletop_dockflare_access_group: ""
+
+# homepage
+virtual_tabletop_homepage_group: "Apps"
+virtual_tabletop_homepage_icon: "https://raw.githubusercontent.com/ArnoldSmith86/virtualtabletop/refs/heads/main/assets/branding/android-192.png"
+virtual_tabletop_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtual_tabletop_port_http }}"
+virtual_tabletop_homepage_showstats: "false"
+
+# tinyauth
+virtual_tabletop_tinyauth_enabled: false
+
+# watchtower
+virtual_tabletop_watchtower_enable: "false"

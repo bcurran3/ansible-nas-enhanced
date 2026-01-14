@@ -1,0 +1,91 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+#    - name: Create {{ ansible_nas_app_name }} Directories
+#      ansible.builtin.file:
+#        path: "{{ item }}"
+#        state: directory
+#      with_items:
+#        - "{{ virtual_tabletop_data_directory }}"
+#        - "{{ virtual_tabletop_data_directory }}/games"
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ virtual_tabletop_container_name }}"
+        hostname: "{{ virtual_tabletop_hostname }}"
+        image: "{{ virtual_tabletop_image_name }}:{{ virtual_tabletop_image_tag }}"
+        pull: true
+#        volumes:
+#          - "{{ virtual_tabletop_data_directory }}/games:/app/library/games"
+        ports:
+          - "{{ virtual_tabletop_port_http }}:{{ virtual_tabletop_port_http }}"
+        env:
+          ADMINURL: "{{ virtual_tabletop_env_adminurl }}"
+          ALLOWPUBLICLIBRARYEDITS: "{{ virtual_tabletop_env_allowpubliclibraryedits }}"
+          CUSTOMTAB: "{{ virtual_tabletop_env_customtab }}"
+          EXTERNALURL: "{{ virtual_tabletop_env_externalurl }}"
+          FORCETRACING: "{{ virtual_tabletop_env_forcetracing }}"
+          MINIFYJAVASCRIPT: "{{ virtual_tabletop_env_minifyjavascript }}"
+          PORT: "{{ virtual_tabletop_port_http }}"
+          SERVERNAME: "{{ virtual_tabletop_env_servername }}"
+          SIMULATESERVERLAG: "{{ virtual_tabletop_env_simulateserverlag }}"
+          URLPREFIX: "{{ virtual_tabletop_env_urlprefix }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ virtual_tabletop_autoheal }}"
+          com.centurylinklabs.watchtower.enable: "{{ virtual_tabletop_watchtower_enable }}"
+          dockflare.enable: "{{ virtual_tabletop_dockflare_tunnel }}"
+          dockflare.access.group: "{{ virtual_tabletop_dockflare_access_group }}"
+          dockflare.hostname: "{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtual_tabletop_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ virtual_tabletop_homepage_group }}"
+          homepage.icon: "{{ virtual_tabletop_homepage_icon }}"
+          homepage.href: "{{ virtual_tabletop_homepage_href }}"
+          homepage.description: "{{ 'a virtual surface in the browser on which you can play board, dice and card games' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ virtual_tabletop_container_name }}"
+          homepage.showStats: "{{ virtual_tabletop_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtual_tabletop_port_http }}"
+          repliqate.enabled: "false"
+          traefik.enable: "{{ virtual_tabletop_available_externally | string }}"
+          traefik.http.routers.virtualtabletop.rule: "Host(`{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.virtualtabletop.tls.certresolver: "letsencrypt"
+          traefik.http.routers.virtualtabletop.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.virtualtabletop.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.virtualtabletop.middlewares: "{{ virtual_tabletop_hostname }}@docker{{ ',tinyauth-auth@docker' if virtual_tabletop_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.virtualtabletop.IPAllowList.sourcerange: "{{ virtual_tabletop_traefik_whitelist }}"
+          traefik.http.services.virtualtabletop.loadbalancer.server.port: "{{ virtual_tabletop_port_http }}"
+          wud.watch.digest: "true"
+          wud.link.template: "https://hub.docker.com/r/arnoldsmith86/virtualtabletop"
+        cpu_shares: "{{ virtual_tabletop_cpu_shares }}"
+        memory: "{{ virtual_tabletop_memory }}"
+        memory_swap: "{{ virtual_tabletop_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (virtual_tabletop_port_http | string)] +
+                (['https://' + virtual_tabletop_hostname + '.' + ansible_nas_domain] if (virtual_tabletop_available_externally is true or virtual_tabletop_dockflare_tunnel is true) else [])
+              }}
+  when: virtual_tabletop_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ virtual_tabletop_container_name }}"
+        state: absent
+  when: virtual_tabletop_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ virtual_tabletop_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - virtual_tabletop_enabled is false
