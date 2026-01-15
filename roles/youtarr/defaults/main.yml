@@ -24,14 +24,20 @@ youtarr_port_http: "3087"
 # specs
 youtarr_cpu_shares: 1024
 youtarr_memory: "1G"
+youtarr_memory_swap: -1
 youtarr_db_cpu_shares: 1024
 youtarr_db_memory: "1G"
+youtarr_db_memory_swap: "{{ youtarr_db_memory }}"
 
 # app
 youtarr_env_auth_enabled: "true"
 youtarr_env_auth_preset_username: "admin"
 youtarr_env_auth_preset_password: "{{ ansible_nas_app_admin_password }}"
 youtarr_env_plex_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:32400"
+youtarr_env_db_user: "root"
+youtarr_env_db_password: "topsecret"
+youtarr_env_db_name: "youtarr_db"
+youtarr_env_in_docker_container: '1'
 
 # autoheal
 youtarr_autoheal: "false"
@@ -42,7 +48,7 @@ youtarr_dockflare_tunnel: "false"
 youtarr_dockflare_access_group: ""
 
 # homepage
-youtarr_homepage_group: "Apps"
+youtarr_homepage_group: "Download Tools"
 youtarr_homepage_icon: "sh-youtarr.png"
 youtarr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port_http }}"
 youtarr_homepage_showstats: "false"

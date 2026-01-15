@@ -26,14 +26,14 @@
           - "{{ youtarr_data_directory }}/migrations:/docker-entrypoint-initdb.d"
           - "{{ youtarr_data_directory }}/config/mariadb.cnf:/etc/mysql/conf.d/charset.cnf:ro"
         env:
-          MYSQL_ROOT_PASSWORD: "123qweasd"
-          MYSQL_DATABASE: "youtarr"
+          MYSQL_ROOT_PASSWORD: "{{ youtarr_env_db_password }}"
+          MYSQL_DATABASE: "{{ youtarr_env_db_name }}"
           MYSQL_TCP_PORT: "3321"
           MYSQL_CHARSET: "utf8mb4"
           MYSQL_COLLATION: "utf8mb4_unicode_ci"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "3321", "-p123qweasd"]
+          test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-P", "3321", "-p{{ youtarr_env_db_password }}"]
           interval: 10s
           timeout: 5s
           retries: 5
@@ -61,6 +61,7 @@
           wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ youtarr_db_cpu_shares }}"
         memory: "{{ youtarr_db_memory }}"
+        memory_swap: "{{ youtarr_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -83,13 +84,19 @@
           AUTH_PRESET_PASSWORD: "{{ youtarr_env_auth_preset_password }}"
           DB_HOST: "{{ youtarr_db_container_name }}"
           DB_PORT: "3321"
-          DB_USER: "root"
-          DB_PASSWORD: "123qweasd"
-          DB_NAME: "youtarr"
-          IN_DOCKER_CONTAINER: "1"
+          DB_USER: "{{ youtarr_env_db_user }}"
+          DB_PASSWORD: "{{ youtarr_env_db_password }}"
+          DB_NAME: "{{ youtarr_env_db_name }}"
+          IN_DOCKER_CONTAINER: "{{ youtarr_env_in_docker_container }}"
           PLEX_URL: "{{ youtarr_env_plex_url }}"
           YOUTUBE_OUTPUT_DIR: "/usr/src/app/data"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--output", "/dev/null", "http://localhost:3011/api/health"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+          start_period: 40s
         links:
           - "{{ youtarr_db_container_name }}"
         labels:
@@ -126,6 +133,7 @@
           wud.link.template: "https://hub.docker.com/r/dialmaster/youtarr"
         cpu_shares: "{{ youtarr_cpu_shares }}"
         memory: "{{ youtarr_memory }}"
+        memory_swap: "{{ youtarr_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
