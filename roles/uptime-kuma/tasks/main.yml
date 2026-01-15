@@ -55,9 +55,9 @@
           traefik.http.routers.uptimekuma.middlewares: "uptimekuma@docker{{ ',tinyauth-auth@docker' if uptime_kuma_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.uptimekuma.IPAllowList.sourcerange: "{{ uptime_kuma_traefik_whitelist }}"
           traefik.http.services.uptimekuma.loadbalancer.server.port: "3001"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.include: "^\\d+$"
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/louislam/uptime-kuma/pkgs/container/uptime-kuma"
+          wud.link.template: "https://github.com/louislam/uptime-kuma/releases"
         cpu_shares: "{{ uptime_kuma_cpu_shares }}"
         memory: "{{ uptime_kuma_memory }}"
         memory_swap: "{{ uptime_kuma_memory_swap }}"

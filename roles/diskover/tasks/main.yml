@@ -33,7 +33,7 @@
         networks:
           - name: "{{ diskover_network_name }}"
         networks_cli_compatible: "yes"
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ diskover_data_directory }}/elasticsearch/data:/usr/share/elasticsearch/data:rw"
           - "/etc/timezone:/etc/timezone:ro"
@@ -81,6 +81,7 @@
           wud.link.template: "https://gallery.ecr.aws/elastic/elasticsearch"
         cpu_shares: "{{ diskover_elasticsearch_cpu_shares }}"
         memory: "{{ diskover_elasticsearch_memory }}"
+        memory_swap: "{{ diskover_elasticsearch_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} Elasticsearch at
@@ -91,7 +92,7 @@
                 (['https://' + diskover_elasticsearch_hostname + '.' + ansible_nas_domain] if (diskover_available_externally is true or diskover_dockflare_tunnel is true) else [])
               }}
 
-    - name: Create {{ ansible_nas_app_name }} Elasticsearch-helper Container
+    - name: Create {{ ansible_nas_app_name }} Elasticsearch helper Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_elasticsearch_helper_container_name }}"
@@ -102,7 +103,7 @@
         networks:
           - name: "{{ diskover_network_name }}"
         networks_cli_compatible: "yes"
-        network_mode: "bridge"
+        network_mode: bridge
         command: sh -c "sysctl -w vm.max_map_count=262144"
         privileged: true
         labels:
@@ -124,7 +125,7 @@
         networks:
           - name: "{{ diskover_network_name }}"
         networks_cli_compatible: "yes"
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ samba_shares_root }}:/data:ro"
           - "{{ diskover_data_directory }}/config:/config"
@@ -175,6 +176,7 @@
           wud.link.template: "https://lscr.io/linuxserver/diskover"
         cpu_shares: "{{ diskover_cpu_shares }}"
         memory: "{{ diskover_memory }}"
+        memory_swap: "{{ diskover_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

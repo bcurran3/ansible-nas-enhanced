@@ -22,7 +22,7 @@
           - "{{ kavita_data_directory }}/config:/kavita/config"
           - "{{ kavita_books_directory }}:/books:ro"
           - "{{ kavita_comics_directory }}:/comics:ro"
-        network_mode: "bridge"
+        network_mode: bridge
         ports:
           - "{{ kavita_port_http }}:5000"
         env:
@@ -66,6 +66,7 @@
           wud.link.template: "https://hub.docker.com/r/jvmilazz0/kavita"
         cpu_shares: "{{ kavita_cpu_shares }}"
         memory: "{{ kavita_memory }}"
+        memory_swap: "{{ kavita_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

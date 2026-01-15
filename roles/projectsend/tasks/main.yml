@@ -18,7 +18,7 @@
         hostname: "{{ projectsend_db_container_name }}"
         image: "{{ projectsend_db_image_name }}:{{ projectsend_db_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ projectsend_data_directory }}/db:/config/databases"
         env:
@@ -68,7 +68,7 @@
         name: "{{ projectsend_container_name }}"
         hostname: "{{ projectsend_container_name }}"
         image: "{{ projectsend_image_name }}:{{ projectsend_image_tag }}"
-        network_mode: "bridge"
+        network_mode: bridge
         pull: true
         volumes:
           - "{{ projectsend_data_directory }}/config:/config"

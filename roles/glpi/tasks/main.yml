@@ -59,6 +59,7 @@
           wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ glpi_db_cpu_shares }}"
         memory: "{{ glpi_db_memory }}"
+        memory_swap: "{{ glpi_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -113,6 +114,7 @@
           wud.link.template: "https://hub.docker.com/r/diouxx/glpi"
         cpu_shares: "{{ glpi_cpu_shares }}"
         memory: "{{ glpi_memory }}"
+        memory_swap: "{{ glpi_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

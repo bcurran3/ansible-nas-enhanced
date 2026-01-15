@@ -78,6 +78,7 @@
           wud.link.template: "https://github.com/matatonic/openedai-speech/pkgs/container/openedai-speech"
         cpu_shares: "{{ open_webui_openedai_cpu_shares }}"
         memory: "{{ open_webui_openedai_memory }}"
+        memory_swap: "{{ open_webui_openedai_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -146,6 +147,7 @@
           wud.link.template: "https://github.com/open-webui/open-webui/pkgs/container/open-webui"
         cpu_shares: "{{ open_webui_cpu_shares }}"
         memory: "{{ open_webui_memory }}"
+        memory_swap: "{{ open_webui_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

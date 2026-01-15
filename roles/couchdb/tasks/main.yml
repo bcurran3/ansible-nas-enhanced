@@ -57,8 +57,9 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/couchdb"
         cpu_shares: "{{ couchdb_cpu_shares }}"
-        restart_policy: unless-stopped
         memory: "{{ couchdb_memory }}"
+        memory_swap: "{{ couchdb_memory_swap }}"
+        restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:

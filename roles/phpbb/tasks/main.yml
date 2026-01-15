@@ -23,7 +23,7 @@
         hostname: "{{ phpbb_db_container_name }}"
         image: "{{ phpbb_db_image_name }}:{{ phpbb_db_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         networks:
           - name: "{{ phpbb_network_name }}"
         networks_cli_compatible: "yes"
@@ -70,7 +70,7 @@
         networks:
           - name: "{{ phpbb_network_name }}"
         networks_cli_compatible: "yes"
-        network_mode: "bridge"
+        network_mode: bridge
         ports:
           - "{{ phpbb_port_http }}:8080"
         volumes:

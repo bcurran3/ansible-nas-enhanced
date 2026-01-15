@@ -87,6 +87,7 @@
           wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ invoiceninja_db_cpu_shares }}"
         memory: "{{ invoiceninja_db_memory }}"
+        memory_swap: "{{ invoiceninja_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} App Container
@@ -165,6 +166,7 @@
           wud.link.template: https://github.com/invoiceninja/invoiceninja/releases/tag/v${major}.${minor}.${patch}
         cpu_shares: "{{ invoiceninja_app_cpu_shares }}"
         memory: "{{ invoiceninja_app_memory }}"
+        memory_swap: "{{ invoiceninja_app_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Web UI Container
@@ -222,6 +224,7 @@
           wud.link.template: "https://hub.docker.com/_/nginx"
         cpu_shares: "{{ invoiceninja_web_cpu_shares }}"
         memory: "{{ invoiceninja_web_memory }}"
+        memory_swap: "{{ invoiceninja_web_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

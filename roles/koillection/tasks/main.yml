@@ -46,6 +46,7 @@
           wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ koillection_db_cpu_shares }}"
         memory: "{{ koillection_db_memory }}"
+        memory_swap: "{{ koillection_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -111,6 +112,7 @@
           wud.link.template: "https://hub.docker.com/r/koillection/koillection"
         cpu_shares: "{{ koillection_cpu_shares }}"
         memory: "{{ koillection_memory }}"
+        memory_swap: "{{ koillection_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

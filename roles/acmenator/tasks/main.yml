@@ -15,7 +15,7 @@
         hostname: "{{ acmenator_container_name }}"
         image: "{{ acmenator_image_name }}:{{ acmenator_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ traefik_data_directory }}/letsencrypt/acme.json:/traefik.json:ro"
           - "{{ acmenator_data_directory }}:/target"
@@ -44,6 +44,7 @@
           wud.link.template: "https://hub.docker.com/r/ummecasino/acmenator"
         cpu_shares: "{{ acmenator_cpu_shares }}"
         memory: "{{ acmenator_memory }}"
+        memory_swap: "{{ acmenator_memory_swap }}"
         restart_policy: unless-stopped
   when: acmenator_enabled is true
 

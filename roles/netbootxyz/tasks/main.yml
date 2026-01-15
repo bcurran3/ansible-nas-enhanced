@@ -52,7 +52,6 @@
           repliqate.backup_id: "{{ netbootxyz_repliqate_backup_id }}"
           repliqate.retention: "{{ netbootxyz_repliqate_retention }}"
           traefik.enable: "{{ netbootxyz_available_externally | string }}"
-          # --- Router 1: Main Interface ---
           traefik.http.routers.netbootxyz.rule: "Host(`{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.netbootxyz.entrypoints: "websecure"
           traefik.http.routers.netbootxyz.tls.certresolver: "letsencrypt"
@@ -60,8 +59,6 @@
           traefik.http.routers.netbootxyz.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.netbootxyz.middlewares: "netboot-whitelist,tinyauth-auth@docker"
           traefik.http.routers.netbootxyz.service: "netboot-main-svc"
-
-          # --- Router 2: Assets Interface ---
           traefik.http.routers.netbootxyz-assets.rule: "Host(`{{ netbootxyz_hostname2 }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.netbootxyz-assets.entrypoints: "websecure"
           traefik.http.routers.netbootxyz-assets.tls.certresolver: "letsencrypt"
@@ -70,8 +67,6 @@
           traefik.http.routers.netbootxyz-assets.middlewares: "netboot-whitelist,tinyauth-auth@docker"
           traefik.http.routers.netbootxyz-assets.service: "netboot-assets-svc"
           traefik.http.middlewares.netboot-whitelist.ipallowlist.sourcerange: "{{ netbootxyz_traefik_whitelist }}"
-
-          # --- Service Definitions ---
           traefik.http.services.netboot-main-svc.loadbalancer.server.port: "{{ netbootxyz_port_http }}"
           traefik.http.services.netboot-assets-svc.loadbalancer.server.port: "{{ netbootxyz_port_http2 }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'
@@ -79,6 +74,7 @@
           wud.link.template: "https://github.com/netbootxyz/netbootxyz/pkgs/container/netbootxyz"
         cpu_shares: "{{ netbootxyz_cpu_shares }}"
         memory: "{{ netbootxyz_memory }}"
+        memory_swap: "{{ netbootxyz_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: "Access {{ ansible_nas_app_name }} at"

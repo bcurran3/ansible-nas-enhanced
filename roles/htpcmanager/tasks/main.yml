@@ -17,7 +17,7 @@
         hostname: "{{ htpcmanager_container_name }}"
         image: "{{ htpcmanager_image_name }}:{{ htpcmanager_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         ports:
           - "{{ htpcmanager_port_http }}:8085"
         volumes:
@@ -62,6 +62,7 @@
           wud.link.template: "https://lscr.io/linuxserver/htpcmanager"
         cpu_shares: "{{ htpcmanager_cpu_shares }}"
         memory: "{{ htpcmanager_memory }}"
+        memory_swap: "{{ htpcmanager_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

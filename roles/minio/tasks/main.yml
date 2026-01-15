@@ -36,7 +36,7 @@
           homepage.group: "{{ minio_homepage_group }}"
           homepage.icon: "{{ minio_homepage_icon }}"
 #          homepage.href: "{{ minio_homepage_href }}"
-          homepage.description: "{{ 'minio description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'high-performance S3 compatible object store' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ minio_container_name }}"
           homepage.showStats: "{{ minio_homepage_showstats }}"
@@ -59,6 +59,7 @@
           wud.link.template: "https://hub.docker.com/r/minio/minio"
         cpu_shares: "{{ minio_cpu_shares }}"
         memory: "{{ minio_memory }}"
+        memory_swap: "{{ minio_memory_swap }}"
         restart_policy: unless-stopped
 
 #    - name: Access {{ ansible_nas_app_name }} at

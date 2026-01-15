@@ -17,13 +17,17 @@ gamevault_port_http: "5082"
 gamevault_container_name: "gamevault"
 gamevault_image_name: "ghcr.io/phalcode/gamevault-backend"
 gamevault_image_tag: "latest"
-gamevault_cpu_shares: 1024
-gamevault_memory: "2g"
 gamevault_db_container_name: "gamevault-db"
 gamevault_db_image_name: "postgres"
 gamevault_db_image_tag: "16-alpine"
+
+# specs
+gamevault_cpu_shares: 1024
+gamevault_memory: "2g"
+gamevault_memory_swap: -1
 gamevault_db_cpu_shares: 1024
 gamevault_db_memory: "1G"
+gamevault_db_memory_swap: "{{ gamevault_db_memory }}"
 
 # app
 gamevault_puid: "0"

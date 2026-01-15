@@ -51,6 +51,7 @@
           wud.link.template: "https://hub.docker.com/_/mongo"
         cpu_shares: "{{ youtubedl_material_db_cpu_shares }}"
         memory: "{{ youtubedl_material_db_memory }}"
+        memory_swap: "{{ youtubedl_material_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -67,7 +68,7 @@
           - "{{ youtubedl_material_download_subscriptions_directory }}:/app/subscriptions:rw"
           - "{{ youtubedl_material_download_channels_directory }}:/app/subscriptions/channels:rw"
           - "{{ youtubedl_material_download_users_directory }}:/app/users:rw"
-        network_mode: "bridge"
+        network_mode: bridge
         ports:
           - "{{ youtubedl_material_port_http }}:17442"
         env:
@@ -115,6 +116,7 @@
           wud.link.template: "https://hub.docker.com/r/tzahi12345/youtubedl-material"
         cpu_shares: "{{ youtubedl_material_cpu_shares }}"
         memory: "{{ youtubedl_material_memory }}"
+        memory_swap: "{{ youtubedl_material_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

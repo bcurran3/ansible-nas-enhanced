@@ -25,7 +25,7 @@
         networks:
           - name: "{{ mastodon_network_name }}"
         networks_cli_compatible: "yes"
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ mastodon_data_directory }}/data:/data"
         env:
@@ -55,7 +55,7 @@
         networks:
           - name: "{{ mastodon_network_name }}"
         networks_cli_compatible: "yes"
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ mastodon_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -91,7 +91,7 @@
         networks:
           - name: "{{ mastodon_network_name }}"
         networks_cli_compatible: "yes"
-        network_mode: "bridge"
+        network_mode: bridge
         command: "bundle exec puma -C config/puma.rb"
         env:
           DOCKER_MODS: "{{ mastodon_env_docker_mods }}"

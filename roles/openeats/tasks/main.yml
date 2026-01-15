@@ -15,7 +15,7 @@
         hostname: "{{ openeats_db_container_name }}"
         image: "{{ openeats_db_image_name }}:{{ openeats_db_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ openeats_data_directory }}/db:/var/lib/mysql"
         env:
@@ -67,7 +67,7 @@
         hostname: "{{ openeats_api_container_name }}"
         image: "{{ openeats_api_image_name }}:{{ openeats_api_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         command: "/startup/prod-entrypoint.sh"
         volumes:
         - "site-media:/code/site-media"
@@ -124,7 +124,7 @@
         hostname: "{{ openeats_web_container_name }}"
         image: "{{ openeats_web_image_name }}:{{ openeats_web_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
 #       command: "yarn start"
         command: sh -c "yarn build && tail -f /dev/null"
         links:
@@ -169,7 +169,7 @@
         hostname: "{{ openeats_nginx_container_name }}"
         image: "{{ openeats_nginx_image_name }}:{{ openeats_nginx_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         command: "./start.sh"
         volumes:
         - "site-media:/var/www/html/openeats-static/site-media"

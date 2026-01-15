@@ -51,6 +51,7 @@
           wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ miniflux_db_cpu_shares }}"
         memory: "{{ miniflux_db_memory }}"
+        memory_swap: "{{ miniflux_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -104,6 +105,7 @@
           wud.link.template: "https://hub.docker.com/r/miniflux/miniflux"
         cpu_shares: "{{ miniflux_cpu_shares }}"
         memory: "{{ miniflux_memory }}"
+        memory_swap: "{{ miniflux_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

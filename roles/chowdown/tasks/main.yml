@@ -16,15 +16,13 @@
         hostname: "{{ chowdown_container_name }}"
         image: "{{ chowdown_image_name }}:{{ chowdown_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ chowdown_data_directory }}/config:/config:rw"
         ports:
           - "{{ chowdown_port_http }}:4000"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-#         PUID: "{{ chowdown_user_id }}"
-#         PGID: "{{ chowdown_group_id }}"
         labels:
           autoheal: "{{ chowdown_autoheal }}"
           com.centurylinklabs.watchtower.enable: "{{ chowdown_watchtower_enable }}"
@@ -58,6 +56,7 @@
           wud.link.template: "https://hub.docker.com/r/gregyankovoy/chowdown"
         cpu_shares: "{{ chowdown_cpu_shares }}"
         memory: "{{ chowdown_memory }}"
+        memory_swap: "{{ chowdown_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

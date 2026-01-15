@@ -18,7 +18,7 @@
         hostname: "{{ idrac6_container_name }}"
         image: "{{ idrac6_image_name }}:{{ idrac6_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         ports:
           - "{{ idrac6_port_http }}:5800"
           - "{{ idrac6_port_vnc }}:5900"
@@ -65,6 +65,7 @@
           wud.link.template: "https://hub.docker.com/r/domistyle/idrac6"
         cpu_shares: "{{ idrac6_cpu_shares }}"
         memory: "{{ idrac6_memory }}"
+        memory_swap: "{{ idrac6_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

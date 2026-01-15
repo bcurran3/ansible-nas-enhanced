@@ -57,6 +57,7 @@
           wud.link.template: "https://github.com/steveiliop/tinyauth/pkgs/container/tinyauth"
         cpu_shares: "{{ tinyauth_cpu_shares }}"
         memory: "{{ tinyauth_memory }}"
+        memory_swap: "{{ tinyauth_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
@@ -75,6 +76,3 @@
         name: "{{ tinyauth_container_name }}"
         state: absent
   when: tinyauth_enabled is false
-
-# add this to apps to auth through tiny-auth:
-# traefik.http.routers.<app_name>.middlewares: "tinyauth-auth@docker"

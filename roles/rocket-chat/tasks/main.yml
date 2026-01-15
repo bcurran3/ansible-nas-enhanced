@@ -51,7 +51,7 @@
             hostname: "{{ rocket_chat_db_container_name }}"
             image: "{{ rocket_chat_db_image_name }}:{{ rocket_chat_db_image_tag }}"
             pull: true
-            network_mode: "bridge"
+            network_mode: bridge
             env:
               MONGODB_REPLICA_SET_MODE: "primary"
               MONGODB_REPLICA_SET_NAME: "rs0"
@@ -102,7 +102,7 @@
             hostname: "{{ rocket_chat_container_name }}"
             image: "{{ rocket_chat_image_name }}:{{ rocket_chat_image_tag }}"
             pull: true
-            network_mode: "bridge"
+            network_mode: bridge
             ports:
               - "{{ rocket_chat_port_http }}:{{ rocket_chat_port_http }}"
             env:

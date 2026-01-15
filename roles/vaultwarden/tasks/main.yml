@@ -100,6 +100,7 @@
               wud.link.template: "https://github.com/dani-garcia/vaultwarden/pkgs/container/vaultwarden"
             cpu_shares: "{{ vaultwarden_cpu_shares }}"
             memory: "{{ vaultwarden_memory }}"
+            memory_swap: "{{ vaultwarden_memory_swap }}"
             restart_policy: unless-stopped
 
         - name: Access {{ ansible_nas_app_name }} at
@@ -150,6 +151,7 @@
               wud.link.template: "https://hub.docker.com/r/bruceforce/vaultwarden-backup"
             cpu_shares: "{{ vaultwarden_backup_cpu_shares }}"
             memory: "{{ vaultwarden_backup_memory }}"
+            memory_swap: "{{ vaultwarden_backup_memory_swap }}"
             restart_policy: unless-stopped
       when:
         - dns_exists

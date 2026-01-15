@@ -17,7 +17,7 @@
         hostname: "{{ checkmk_container_name }}"
         image: "{{ checkmk_image_name }}:{{ checkmk_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           -  "{{ checkmk_data_directory }}/omd/sites:/omd/sites"
           - "/etc/localtime:/etc/localtime:ro"
@@ -64,6 +64,7 @@
           wud.tag.include: '^master-daily$"'
         cpu_shares: "{{ checkmk_cpu_shares }}"
         memory: "{{ checkmk_memory }}"
+        memory_swap: "{{ checkmk_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

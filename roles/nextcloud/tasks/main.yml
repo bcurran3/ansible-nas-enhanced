@@ -68,6 +68,7 @@
           wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ nextcloud_redis_cpu_shares }}"
         memory: "{{ nextcloud_redis_memory }}"
+        memory_swap: "{{ nextcloud_redis_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
@@ -76,7 +77,7 @@
         name: "{{ nextcloud_db_container_name }}"
         hostname: "{{ nextcloud_db_container_name }}"
         image: "{{ nextcloud_db_image_name }}:{{ nextcloud_db_image_version }}"
-        command: "--transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW"
+        command: "--transaction-isolation=READ-COMMITTED --log-bin=binlog --log_error_suppression_list='MY-010068,MY-013360'"
         networks:
           - name: "{{ nextcloud_network_name }}"
         network_mode: "{{ nextcloud_network_name }}"
@@ -124,6 +125,7 @@
           wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ nextcloud_db_cpu_shares }}"
         memory: "{{ nextcloud_db_memory }}"
+        memory_swap: "{{ nextcloud_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -229,6 +231,7 @@
           wud.link.template: "https://hub.docker.com/_/nextcloud"
         cpu_shares: "{{ nextcloud_cpu_shares }}"
         memory: "{{ nextcloud_memory }}"
+        memory_swap: "{{ nextcloud_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

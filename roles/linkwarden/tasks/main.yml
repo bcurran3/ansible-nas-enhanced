@@ -49,6 +49,7 @@
           wud.link.template: "https://hub.docker.com/r/getmeili/meilisearch"
         cpu_shares: "{{ linkwarden_search_cpu_shares }}"
         memory: "{{ linkwarden_search_memory }}"
+        memory_swap: "{{ linkwarden_search_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
@@ -88,6 +89,7 @@
           wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ linkwarden_db_cpu_shares }}"
         memory: "{{ linkwarden_db_memory }}"
+        memory_swap: "{{ linkwarden_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -150,6 +152,7 @@
           wud.link.template: "https://github.com/linkwarden/linkwarden/releases"
         cpu_shares: "{{ linkwarden_cpu_shares }}"
         memory: "{{ linkwarden_memory }}"
+        memory_swap: "{{ linkwarden_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

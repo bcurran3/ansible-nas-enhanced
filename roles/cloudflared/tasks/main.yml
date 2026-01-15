@@ -8,7 +8,7 @@
         hostname: "{{ cloudflared_container_name }}"
         image: "{{ cloudflared_image_name }}:{{ cloudflared_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         command: "tunnel --no-autoupdate run --token {{ cloudflared_token }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"

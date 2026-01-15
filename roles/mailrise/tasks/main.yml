@@ -21,6 +21,7 @@
         hostname: "{{ mailrise_container_name }}"
         image: "{{ mailrise_image_name }}:{{ mailrise_image_tag }}"
         pull: true
+        network_mode: bridge
         ports:
           - "{{ mailrise_port_http }}:8025"
         volumes:

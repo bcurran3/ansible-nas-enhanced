@@ -19,7 +19,7 @@
         pull: true
         volumes:
           - "{{ homebridge_data_directory }}/config:/homebridge"
-        network_mode: "host"
+        network_mode: host
         env:
           TZ: "{{ ansible_nas_timezone }}"
           PGID: "{{ homebridge_group_id }}"
@@ -63,8 +63,9 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/oznu/homebridge"
         cpu_shares: "{{ homebridge_cpu_shares }}"
-        restart_policy: unless-stopped
         memory: "{{ homebridge_memory }}"
+        memory_swap: "{{ homebridge_memory_swap }}"
+        restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:

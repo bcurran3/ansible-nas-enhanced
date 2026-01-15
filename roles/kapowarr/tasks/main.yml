@@ -21,7 +21,7 @@
           - "{{ kapowarr_comics_directory }}:/comics:rw"
           - "{{ kapowarr_downloads_directory }}:/downloads:rw"
           - "{{ kapowarr_data_directory }}/config:/app/db:rw"
-        network_mode: "bridge"
+        network_mode: bridge
         ports:
           - "{{ kapowarr_port_http }}:5656"
         env:
@@ -60,6 +60,7 @@
           wud.link.template: "https://hub.docker.com/r/mrcas/kapowarr"
         cpu_shares: "{{ kapowarr_cpu_shares }}"
         memory: "{{ kapowarr_memory }}"
+        memory_swap: "{{ kapowarr_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

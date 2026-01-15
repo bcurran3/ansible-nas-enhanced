@@ -44,6 +44,7 @@
           wud.link.template: "https://hub.docker.com/r/dgtlmoon/sockpuppetbrowser"
         cpu_shares: "{{ change_detection_sockpuppet_cpu_shares }}"
         memory: "{{ change_detection_sockpuppet_memory }}"
+        memory_swap: "{{ change_detection_sockpuppet_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -102,6 +103,7 @@
           wud.link.template: "https://github.com/dgtlmoon/changedetection.io/pkgs/container/changedetection.io"
         cpu_shares: "{{ change_detection_cpu_shares }}"
         memory: "{{ change_detection_memory }}"
+        memory_swap: "{{ change_detection_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

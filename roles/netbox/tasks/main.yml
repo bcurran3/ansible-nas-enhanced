@@ -16,6 +16,7 @@
         hostname: "{{ netbox_db_container_name }}"
         image: "{{ netbox_db_image_name }}:{{ netbox_db_image_tag }}"
         pull: true
+        network_mode: bridge
         volumes:
           - "{{ netbox_data_directory }}/db:/var/lib/postgresql/data"
         env:
@@ -46,6 +47,7 @@
           wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ netbox_db_cpu_shares }}"
         memory: "{{ netbox_db_memory }}"
+        memory_swap: "{{ netbox_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
@@ -55,6 +57,7 @@
         hostname: "{{ netbox_redis_container_name }}"
         image: "{{ netbox_redis_image_name }}:{{ netbox_redis_image_tag }}"
         pull: true
+        network_mode: bridge
         command: "redis-server --requirepass {{ netbox_env_redis_password }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
@@ -81,6 +84,7 @@
           wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ netbox_redis_cpu_shares }}"
         memory: "{{ netbox_redis_memory }}"
+        memory_swap: "{{ netbox_redis_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -90,6 +94,7 @@
         hostname: "{{ netbox_container_name }}"
         image: "{{ netbox_image_name }}:{{ netbox_image_tag }}"
         pull: true
+        network_mode: bridge
         volumes:
           - "{{ netbox_data_directory }}/config:/config"
         ports:
@@ -158,6 +163,7 @@
           wud.link.template: "https://github.com/netbox-community/netbox/releases/tag/v${major}.${minor}.${patch}"
         cpu_shares: "{{ netbox_cpu_shares }}"
         memory: "{{ netbox_memory }}"
+        memory_swap: "{{ netbox_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

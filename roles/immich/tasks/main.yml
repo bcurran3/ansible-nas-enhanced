@@ -26,7 +26,7 @@
           - "{{ immich_data_directory }}/db:/var/lib/postgresql/data"
         networks:
           - name: "{{ immich_network_name }}"
-        network_mode: "bridge"
+        network_mode: bridge
         networks_cli_compatible: "yes"
         env:
           DB_STORAGE_TYPE: "{{ immich_db_storage_type }}"
@@ -66,6 +66,7 @@
           wud.link.template: "https://github.com/immich-app/immich/releases"
         cpu_shares: "{{ immich_db_cpu_shares }}"
         memory: "{{ immich_db_memory }}"
+        memory_swap: "{{ immich_db_memory_swap }}"
         restart_policy: always
         shm_size: "{{ immich_db_shm_size }}"
 
@@ -78,7 +79,7 @@
         pull: true
         networks:
           - name: "{{ immich_network_name }}"
-        network_mode: "bridge"
+        network_mode: bridge
         networks_cli_compatible: "yes"
         env:
           TZ: "{{ ansible_nas_timezone }}"
@@ -98,10 +99,12 @@
           homepage.showStats: "{{ immich_redis_homepage_showstats }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
-          wud.tag.include: ^\d+\.\d+\.\d+$
-          wud.link.template: https://github.com/valkey-io/valkey/releases/tag/${major}.${minor}.${patch}
+          wud.tag.include: "^\\d+$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/valkey-io/valkey/releases"
         cpu_shares: "{{ immich_redis_cpu_shares }}"
         memory: "{{ immich_redis_memory }}"
+        memory_swap: "{{ immich_redis_memory_swap }}"
         restart_policy: always
 
     - name: Create {{ ansible_nas_app_name }} Machine Learning Container
@@ -126,7 +129,7 @@
           - "{{ immich_data_directory }}/cache:/cache"
         networks:
           - name: "{{ immich_network_name }}"
-        network_mode: "bridge"
+        network_mode: bridge
         env:
 #          ACCELERATION: "cpu"
           TZ: "{{ ansible_nas_timezone }}"
@@ -155,7 +158,7 @@
           wud.link.template: "https://github.com/immich-app/immich/releases"
         cpu_shares: "{{ immich_ml_cpu_shares }}"
         memory: "{{ immich_ml_memory }}"
-        memory_swap: -1
+        memory_swap: "{{ immich_ml_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Server Container
@@ -170,7 +173,7 @@
           - "/etc/localtime:/etc/localtime:ro"
         networks:
           - name: "{{ immich_network_name }}"
-        network_mode: "bridge"
+        network_mode: bridge
         networks_cli_compatible: "yes"
         ports:
           - "{{ immich_port_http }}:2283"
@@ -227,7 +230,7 @@
           wud.link.template: "https://github.com/immich-app/immich/releases"
         cpu_shares: "{{ immich_server_cpu_shares }}"
         memory: "{{ immich_server_memory }}"
-        memory_swap: -1
+        memory_swap: "{{ immich_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

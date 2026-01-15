@@ -18,7 +18,7 @@
         hostname: "{{ osticket_db_container_name }}"
         image: "{{ osticket_db_image_name }}:{{ osticket_db_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         volumes:
           - "{{ osticket_data_directory }}/db:/config"
         env:
@@ -71,7 +71,7 @@
         hostname: "{{ osticket_container_name }}"
         image: "{{ osticket_image_name }}:{{ osticket_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         ports:
           - "{{ osticket_port_http }}:80"
         env:

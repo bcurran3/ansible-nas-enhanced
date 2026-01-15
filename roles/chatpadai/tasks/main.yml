@@ -8,7 +8,7 @@
         hostname: "{{ chatpadai_container_name }}"
         image: "{{ chatpadai_image_name }}:{{ chatpadai_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
         ports:
@@ -42,6 +42,7 @@
           wud.link.template: "https://github.com/deiucanta/chatpad"
         cpu_shares: "{{ chatpadai_cpu_shares }}"
         memory: "{{ chatpadai_memory }}"
+        memory_swap: "{{ chatpadai_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

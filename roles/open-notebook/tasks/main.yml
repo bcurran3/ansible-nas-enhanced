@@ -51,8 +51,9 @@
           repliqate.backup_id: "{{ open_notebook_db_repliqate_backup_id }}"
           repliqate.retention: "{{ open_notebook_db_repliqate_retention }}"
           traefik.enable: "false"
-          wud.tag.include: '^v\d+\.\d+\.\d+$'
-          wud.link.template: "https://github.com/surrealdb/surrealdb/releases/tag/v${major}.${minor}.${patch}"
+          wud.tag.include: "^v\\d+$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/surrealdb/surrealdb/releases"
         cpu_shares: "{{ open_notebook_db_cpu_shares }}"
         memory: "{{ open_notebook_db_memory }}"
         memory_swap: "{{ open_notebook_db_memory_swap }}"
@@ -129,8 +130,9 @@
           traefik.http.routers.opennotebook.middlewares: "opennotebook@docker{{ ',tinyauth-auth@docker' if open_notebook_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.opennotebook.IPAllowList.sourcerange: "{{ open_notebook_traefik_whitelist }}"
           traefik.http.services.opennotebook.loadbalancer.server.port: "8502"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.link.template: "https://github.com/lfnovo/open-notebook/releases/tag/v${major}.${minor}.${patch}"
+          wud.tag.include: "^v\\d+-latest$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/lfnovo/open-notebook/releases"
         cpu_shares: "{{ open_notebook_cpu_shares }}"
         memory: "{{ open_notebook_memory }}"
         memory_swap: "{{ open_notebook_memory_swap }}"

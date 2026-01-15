@@ -74,6 +74,7 @@
               wud.link.template: "https://hub.docker.com/r/drone/drone"
             cpu_shares: "{{ drone_ci_cpu_shares }}"
             memory: "{{ drone_ci_memory }}"
+            memory_swap: "{{ drone_ci_memory_swap }}"
             restart_policy: unless-stopped
 
         - name: Access {{ ansible_nas_app_name }} at
@@ -88,7 +89,8 @@
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ drone_ci_runner_container_name }}"
-            image: drone/drone-runner-docker:1
+            hostname: "{{ drone_ci_runner_container_name }}"
+            image: "{{ drone_ci_runner_image_name }}:{{ drone_ci_runner_image_tag }}"
             pull: true
             volumes:
               - "/var/run/docker.sock:/var/run/docker.sock:rw"
@@ -117,7 +119,8 @@
               wud.tag.transform.type: "semver"
               wud.link.template: "https://hub.docker.com/r/drone/drone-runner-docker"
             cpu_shares: "{{ drone_ci_runner_cpu_shares }}"
-            memory: "{{ drone_ci_agent_memory }}"
+            memory: "{{ drone_ci_runner_memory }}"
+            memory_swap: "{{ drone_ci_runner_memory_swap }}"
             restart_policy: unless-stopped
 
         - name: Add webhook allowed hosts to Gitea

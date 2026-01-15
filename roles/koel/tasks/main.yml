@@ -72,6 +72,7 @@
           wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ koel_db_cpu_shares }}"
         memory: "{{ koel_db_memory }}"
+        memory_swap: "{{ koel_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -140,6 +141,7 @@
           wud.link.template: "https://hub.docker.com/r/phanan/koel"
         cpu_shares: "{{ koel_cpu_shares }}"
         memory: "{{ koel_memory }}"
+        memory_swap: "{{ koel_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

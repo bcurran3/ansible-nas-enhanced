@@ -39,13 +39,17 @@ immich_redis_tag: "9"
 # specs
 immich_server_cpu_shares: 1024
 immich_server_memory: "2G"
+immich_memory_swap: -1
 immich_db_cpu_shares: 1024
 immich_db_memory: "1G"
+immich_db_memory_swap: "{{ immich_db_memory }}"
 immich_db_shm_size: "128MB"
 immich_ml_cpu_shares: 1024
 immich_ml_memory: "3G"
+immich_ml_memory_swap: -1
 immich_redis_cpu_shares: 1024
 immich_redis_memory: "1G"
+immich_redis_memory_swap: "{{ immich_redis_memory }}"
 
 # database
 immich_db_password: "topsecret" # $(pwgen -s 40 1)
@@ -77,7 +81,7 @@ immich_homepage_group: "Apps"
 immich_homepage_icon: "immich.png"
 immich_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port_http }}"
 immich_homepage_showstats: "false"
-immich_homepage_widget_key: "your_admin_api_key"
+immich_homepage_widget_key: ""
 immich_db_homepage_group: "DBs"
 immich_db_homepage_icon: "postgres.png"
 immich_db_homepage_showstats: "false"

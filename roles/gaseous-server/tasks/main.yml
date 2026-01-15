@@ -21,7 +21,7 @@
         hostname: "{{ gaseous_server_db_container_name }}"
         image: "{{ gaseous_server_db_image_name }}:{{ gaseous_server_db_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         networks:
           - name: "{{ gaseous_server_network_name }}"
         networks_cli_compatible: "yes"
@@ -65,6 +65,7 @@
 #         wud.link.template: "https://github.com/MariaDB/mariadb-docker/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ gaseous_server_db_cpu_shares }}"
         memory: "{{ gaseous_server_db_memory }}"
+        memory_swap: "{{ gaseous_server_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -74,7 +75,7 @@
         hostname: "{{ gaseous_server_container_name }}"
         image: "{{ gaseous_server_image_name }}:{{ gaseous_server_image_tag }}"
         pull: true
-        network_mode: "bridge"
+        network_mode: bridge
         networks:
           - name: "{{ gaseous_server_network_name }}"
         networks_cli_compatible: "yes"
@@ -124,6 +125,7 @@
           wud.link.template: "https://github.com/gaseous-project/gaseous-server/pkgs/container/gaseousserver"
         cpu_shares: "{{ gaseous_server_cpu_shares }}"
         memory: "{{ gaseous_server_memory }}"
+        memory_swap: "{{ gaseous_server_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
