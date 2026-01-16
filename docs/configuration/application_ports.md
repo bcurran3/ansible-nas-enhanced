@@ -56,9 +56,9 @@ By default, applications can be found on the ports listed below.
 | DailyTxT         | 8766    | Bridge  | HTTP           |
 | Dasharr          | 3035
 | Dashy            | 9008    | Bridge  | HTTP           |
-| dash.            | 3022
+| dash.            | 3022    | Bridge  | HTTP           |
 | ddns-updater     | 8202
-| Deluge           | 8112
+| Deluge           | 8112    | Bridge  | HTTP           |
 | Diskover         | 3005    | Bridge  | HTTP           |
 | Diskover ElasticS| 9200    | Bridge  | HTTP           |
 | Docker-Android   | 6080    | Bridge  | HTTP           |
@@ -78,7 +78,7 @@ By default, applications can be found on the ports listed below.
 | DumbAssets       | 3057    | Bridge  | HTTP           |
 | Duplicacy        | 3875    | Bridge  | HTTP           |
 | Duplicati        | 8200    | Bridge  | HTTP           |
-| DweebUI          | 8004
+| DweebUI          | 8004    | Bridge  | HTTP           |
 | Emby             | 8096    | Bridge  | HTTP           |
 | Emby             | 8920    | Bridge  | HTTPS          |
 | EspHome          | 6052    | Bridge  | HTTP           |
@@ -255,7 +255,7 @@ By default, applications can be found on the ports listed below.
 | Plex             | 32469   | Bridge  | TCP/UDP        |
 | Plex             | 33400   | Bridge  | HTTP           |
 | Plex             | 1900    | Bridge  | UDP            |
-| Plex Rewind      | 8383
+| Plex Rewind      | 8383    | Bridge  | HTTP           |
 | Pocket ID        | 1411
 | Porn Vault       | 6996    | Bridge  | HTTP           |
 | Portainer        | 9000    | Bridge  | HTTP           |
@@ -293,7 +293,7 @@ By default, applications can be found on the ports listed below.
 | Scanopy daemon   | 60073   | Host    | HTTP           |
 | Scrutiny         | 9010    | Bridge  | HTTP           |
 | SearXNG          | 3008    | Bridge  | HTTP           |
-| SeedSync         | 8800
+| SeedSync         | 8800    | Bridge  | HTTP           |
 | Semaphore        | 3052
 | Shaarli          | 3056    | Bridge  | HTTP           |
 | Shoutcast Server | 8002
@@ -372,8 +372,9 @@ By default, applications can be found on the ports listed below.
 | VERT             | 3038    | Bridge  | HTTP           |
 | VERT             | 24153
 | VFD              | 4242    | Bridge  | HTTP           |
-| Virtual Desktop  | 3389 RDP
-| virtualtabletop  | 8272    | Bridge  | HTTP           |
+| Vikunja          | 3456    | Bridge  | HTTP           |
+| Virtual Desktop  | 3389    | Bridge  | RDP            |
+| Virtual Tabletop | 8272    | Bridge  | HTTP           |
 | Wallabag         | 7780    | Bridge  | HTTP           |
 | WatchState       | 8992
 | Watchtower       | 2347
@@ -385,7 +386,7 @@ By default, applications can be found on the ports listed below.
 | What's Running   | 3411    | Bridge  | HTTP           |
 | Whisparr         | 6969    | Bridge  | HTTP           |
 | Windows          | 8006
-| Windows          | 3388 RDP
+| Windows          | 3388    | Bridge  | RDP            |
 | WireGuard        | 51820
 | WireGuard        | 51821
 | Wireshark        | 3000    | Host    | HTTP           |

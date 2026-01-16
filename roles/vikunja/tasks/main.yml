@@ -1,0 +1,156 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: 1000
+        group: 1000
+      with_items:
+        - "{{ vikunja_data_directory }}"
+        - "{{ vikunja_data_directory }}/db"
+        - "{{ vikunja_data_directory }}/files"
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ vikunja_db_container_name }}"
+        hostname: "{{ vikunja_db_container_name }}"
+        image: "{{ vikunja_db_image_name }}:{{ vikunja_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ vikunja_data_directory }}/db:/var/lib/postgresql"
+        env:
+          POSTGRES_USER: "{{ vikunja_env_vikunja_database_user }}"
+          POSTGRES_PASSWORD: "{{ vikunja_env_vikunja_database_password }}"
+          POSTGRES_DB: "{{ vikunja_env_vikunja_database_database }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -h localhost -U {{ vikunja_env_vikunja_database_user }} -d {{ vikunja_env_vikunja_database_database }}"]
+          interval: 2s
+          start_period: 30s
+        labels:
+          autoheal: "{{ vikunja_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ vikunja_db_watchtower_enable | string }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ vikunja_db_homepage_group }}"
+          homepage.icon: "{{ vikunja_db_homepage_icon }}"
+          homepage.href: "{{ vikunja_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ vikunja_db_container_name }}"
+          homepage.showStats: "{{ vikunja_db_homepage_showstats }}"
+          repliqate.enabled: "{{ vikunja_db_repliqate_enabled | string }}"
+          repliqate.engine: "{{ vikunja_db_repliqate_engine }}"
+          repliqate.schedule: "{{ vikunja_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ vikunja_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ vikunja_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "^\\d+$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://www.postgresql.org/docs/release/"
+        cpu_shares: "{{ vikunja_db_cpu_shares }}"
+        memory: "{{ vikunja_db_memory }}"
+        memory_swap: "{{ vikunja_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ vikunja_container_name }}"
+        hostname: "{{ vikunja_container_name }}"
+        image: "{{ vikunja_image_name }}:{{ vikunja_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ vikunja_data_directory }}/files:/app/vikunja/files"
+        ports:
+          - "{{ vikunja_port_http }}:3456"
+        env:
+          VIKUNJA_DATABASE_HOST: "{{ vikunja_db_container_name }}"
+          VIKUNJA_DATABASE_PASSWORD: "{{ vikunja_env_vikunja_database_password }}"
+          VIKUNJA_DATABASE_TYPE: "postgres"
+          VIKUNJA_DATABASE_USER: "{{ vikunja_env_vikunja_database_user }}"
+          VIKUNJA_DATABASE_DATABASE: "{{ vikunja_env_vikunja_database_database }}"
+          VIKUNJA_CORS_ENABLE: "{{ vikunja_env_vikunja_cors_enable }}"
+          VIKUNJA_CORS_ORIGINS: "{{ vikunja_env_vikunja_cors_origins }}"
+          VIKUNJA_SERVICE_PUBLICURL: "{{ vikunja_env_vikunja_service_publicurl }}"
+#         VIKUNJA_SERVICE_INTERFACE: "{{ vikunja_port_http }}"
+          VIKUNJA_SERVICE_JWTSECRET: "{{ vikunja_env_vikunja_service_jwtsecret }}"
+          VIKUNJA_MAILER_HOST: "{{ vikunja_env_vikunja_mailer_host }}"
+          VIKUNJA_MAILER_PORT: "{{ vikunja_env_vikunja_mailer_port }}"
+          VIKUNJA_MAILER_AUTHTYPE: "{{ vikunja_env_vikunja_mailer_authtype }}"
+          VIKUNJA_MAILER_USERNAME: "{{ vikunja_env_vikunja_mailer_username }}"
+          VIKUNJA_MAILER_PASSWORD: "{{ vikunja_env_vikunja_mailer_password }}"
+          VIKUNJA_MAILER_SKIPTLSVERIFY: "{{ vikunja_env_vikunja_mailer_skiptlsverify }}"
+          VIKUNJA_MAILER_FROMEMAIL: "{{ vikunja_env_vikunja_mailer_fromemail }}"
+          VIKUNJA_MAILER_QUEUELENGTH: "{{ vikunja_env_vikunja_mailer_queuelength }}"
+          VIKUNJA_MAILER_QUEUETIMEOUT: "{{ vikunja_env_vikunja_mailer_queuetimeout }}"
+          VIKUNJA_MAILER_FORCESSL: "{{ vikunja_env_vikunja_mailer_forcessl }}"
+          VIKUNJA_SERVICE_TIMEZONE: "{{ ansible_nas_timezone }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ vikunja_db_container_name }}"
+        labels:
+          autoheal: "{{ vikunja_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ vikunja_watchtower_enable | string }}"
+          dockflare.enable: "{{ vikunja_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ vikunja_dockflare_access_group }}"
+          dockflare.hostname: "{{ vikunja_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vikunja_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ vikunja_homepage_group }}"
+          homepage.icon: "{{ vikunja_homepage_icon }}"
+          homepage.href: "{{ vikunja_homepage_href }}"
+          homepage.description: "{{ 'to-do app to organize your life' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ vikunja_container_name }}"
+          homepage.showStats: "{{ vikunja_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vikunja_port_http }}"
+          repliqate.enabled: "{{ vikunja_repliqate_enabled | string }}"
+          repliqate.engine: "{{ vikunja_repliqate_engine }}"
+          repliqate.schedule: "{{ vikunja_repliqate_schedule }}"
+          repliqate.backup_id: "{{ vikunja_repliqate_backup_id }}"
+          repliqate.retention: "{{ vikunja_repliqate_retention }}"
+          traefik.enable: "{{ vikunja_available_externally | string }}"
+          traefik.http.routers.vikunja.rule: "Host(`{{ vikunja_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.vikunja.tls.certresolver: "letsencrypt"
+          traefik.http.routers.vikunja.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.vikunja.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.vikunja.middlewares: "vikunja@docker{{ ',tinyauth-auth@docker' if vikunja_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.vikunja.IPAllowList.sourcerange: "{{ vikunja_traefik_whitelist }}"
+          traefik.http.services.vikunja.loadbalancer.server.port: "3456"
+          wud.tag.include: "^latest$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/go-vikunja/vikunja/releases"
+        cpu_shares: "{{ vikunja_cpu_shares }}"
+        memory: "{{ vikunja_memory }}"
+        memory_swap: "{{ vikunja_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (vikunja_port_http | string)] +
+                (['https://' + vikunja_hostname + '.' + ansible_nas_domain] if (vikunja_available_externally is true or vikunja_dockflare_tunnel is true) else [])
+              }}
+  when: vikunja_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ vikunja_container_name }}"
+        state: absent
+  when: vikunja_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ vikunja_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - vikunja_enabled is false
