@@ -64,9 +64,9 @@
 #        ports:
 #          - 8120:8120
         volumes:
+          - "{{ komodo_data_directory }}/periphery:{{ komodo_data_directory }}/periphery"
           - "/var/run/docker.sock:/var/run/docker.sock"
           - "/proc:/proc"
-          - "{{ komodo_data_directory }}/periphery:{{ komodo_data_directory }}/periphery"
         env:
           PERIPHERY_ROOT_DIRECTORY: "{{ komodo_periphery_env_periphery_root_directory }}"
           PERIPHERY_PASSKEYS: "{{ komodo_periphery_env_periphery_passkeys }}"
