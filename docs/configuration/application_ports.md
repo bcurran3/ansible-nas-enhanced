@@ -265,6 +265,8 @@ By default, applications can be found on the ports listed below.
 | ProjectSend      | 3036    | Bridge  | HTTP           |
 | Promtail         | 9080
 | Prowlarr         | 9696    | Bridge  | HTTP           |
+| Proxmox DC Mgr   | 3085    | Bridge  | HTTP           |
+| Proxmox DC Mgr   | 2222    | Bridge  | SSH            |
 | PruneMate        | 7676    | Bridge  | HTTP           |
 | Pulse            | 7655    | Bridge  | HTTP           |
 | pyload           | 8000    | Bridge  | HTTP           |
@@ -403,7 +405,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3085
+# next avail = 3086
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
