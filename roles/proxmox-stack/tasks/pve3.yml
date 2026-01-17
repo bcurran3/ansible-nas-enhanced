@@ -1,0 +1,89 @@
+---
+- name: Start {{ ansible_nas_app_name }} VE Node 3
+  block:
+    - name: Create {{ ansible_nas_app_name }} VE Node 3 Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ pve3_container_name }}"
+        hostname: "{{ pve3_container_name }}"
+        image: "{{ pve_image_name }}:{{ pve_image_tag }}"
+        pull: true
+        networks:
+          - name: "{{ pve_network_name }}"
+        network_mode: "{{ pve_network_name }}"
+        networks_cli_compatible: "yes"
+        volumes:
+          - "/usr/lib/modules:/usr/lib/modules:ro"
+          - "/sys/kernel/security:/sys/kernel/security"
+          - "{{ pve_data_directory }}/backup:/var/lib/vz/dump"
+          - "{{ pve_data_directory }}/iso:/var/lib/vz/template/iso"
+        ports:
+          - "{{ pve3_port_http }}:8006"
+          - "{{ pve3_port_ssh }}:22"
+          - "{{ pve3_port_spice }}:3128"
+        env:
+          PASSWORD: "{{ pve_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ pve_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enable | string }}"
+          dockflare.enable: "{{ pve_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ pve_dockflare_access_group }}"
+          dockflare.hostname: "{{ pve3_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve3_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }} VE Node 3"
+          homepage.group: "{{ pve3_homepage_group }}"
+          homepage.icon: "{{ pve3_homepage_icon }}"
+          homepage.href: "{{ pve3_homepage_href }}"
+          homepage.description: "{{ 'pve description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ pve3_container_name }}"
+          homepage.showStats: "{{ pve_homepage_showstats }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve3_port_http }}"
+          repliqate.enabled: "false"
+          traefik.enable: "{{ pve_available_externally | string }}"
+          traefik.http.routers.pve3.rule: "Host(`{{ pve3_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.pve3.tls.certresolver: "letsencrypt"
+          traefik.http.routers.pve3.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.pve3.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.pve3.middlewares: "pve3@docker{{ ',tinyauth-auth@docker' if pve_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.pve3.IPAllowList.sourcerange: "{{ pve_traefik_whitelist }}"
+          traefik.http.services.pve3.loadbalancer.server.scheme: "https"
+          traefik.http.services.pve3.loadbalancer.serverstransport: "insecureTransport@file"
+          traefik.http.services.pve3.loadbalancer.server.port: "8006"
+          wud.tag.include: "^latest$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/LongQT-sea/containerized-proxmox/releases"
+        capabilities:
+          - ALL
+        cgroupns_mode: private
+        cpu_shares: "{{ pve3_cpu_shares }}"
+        device_cgroup_rules:
+          - "a *:* rwm"
+        memory: "{{ pve3_memory }}"
+        memory_swap: "{{ pve3_memory_swap }}"
+        privileged: true
+        security_opts:
+          - seccomp=unconfined
+          - apparmor=unconfined
+        tty: true
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} VE Node 3 at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pve3_port_http | string)] +
+                (['https://' + pve3_hostname + '.' + ansible_nas_domain] if (pve_available_externally is true or pve_dockflare_tunnel is true) else [])
+              }}
+  when: 
+    - pve3_enabled is true
+    - proxmox_stack_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }} VE Node 3
+  block:
+    - name: Stop {{ ansible_nas_app_name }} VE Node 3 Container
+      community.docker.docker_container:
+        name: "{{ pve3_container_name }}"
+        state: absent
+  when: pve3_enabled is false or proxmox_stack_enabled is false

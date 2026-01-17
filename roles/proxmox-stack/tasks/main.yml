@@ -1,0 +1,21 @@
+---
+- ansible.builtin.import_tasks: pve1.yml
+- ansible.builtin.import_tasks: pve2.yml
+- ansible.builtin.import_tasks: pve3.yml
+- ansible.builtin.import_tasks: pdm.yml
+
+- name: Delete {{ ansible_nas_app_name }} Network
+  community.docker.docker_network:
+    name: "{{ pve_network_name }}"
+    state: absent
+  when:
+    - proxmox_stack_enabled is false
+
+- name: Data Archive Proxmox Stack
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ docker_home }}/proxmox"
+  when:
+    - archive_app_data_enabled is true
+    - proxmox_stack_enabled is false

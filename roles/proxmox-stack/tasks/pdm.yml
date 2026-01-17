@@ -1,0 +1,81 @@
+---
+- name: Start {{ ansible_nas_app_name }} DC Manager
+  block:
+    - name: Create {{ ansible_nas_app_name }} DC Manager Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ pdm_container_name }}"
+        hostname: "{{ pdm_container_name }}"
+        image: "{{ pdm_image_name }}:{{ pdm_image_tag }}"
+        pull: true
+        networks:
+          - name: "{{ pve_network_name }}"
+        network_mode: "{{ pve_network_name }}"
+        networks_cli_compatible: "yes"
+        capabilities:	['ALL']
+        cgroupns_mode: host
+        security_opts: 
+          - apparmor=unconfined
+          - seccomp=unconfined
+        volumes:
+          - "/sys/fs/cgroup:/sys/fs/cgroup"
+        ports:
+          - "{{ pdm_port_http }}:8443"
+          - "{{ pdm_port_ssh }}:22"
+        env:
+          PASSWORD: "{{ pve_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ pve_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enable | string }}"
+          dockflare.enable: "{{ pve_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ pve_dockflare_access_group }}"
+          dockflare.hostname: "{{ pdm_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.option.no-tls-verify: "true"
+          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pdm_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ pdm_homepage_group }}"
+          homepage.icon: "{{ pdm_homepage_icon }}"
+          homepage.href: "{{ pdm_homepage_href }}"
+          homepage.description: "{{ 'pdm description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ pdm_container_name }}"
+          homepage.showStats: "{{ pve_homepage_showstats }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pdm_port_http }}"
+          repliqate.enabled: "false"
+          traefik.enable: "{{ pve_available_externally | string }}"
+          traefik.http.routers.pdm.rule: "Host(`{{ pdm_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.pdm.tls.certresolver: "letsencrypt"
+          traefik.http.routers.pdm.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.pdm.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.pdm.middlewares: "pdm@docker{{ ',tinyauth-auth@docker' if pve_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.pdm.IPAllowList.sourcerange: "{{ pve_traefik_whitelist }}"
+          traefik.http.services.pdm.loadbalancer.server.scheme: "https"
+          traefik.http.services.pdm.loadbalancer.serverstransport: "insecureTransport@file"
+          traefik.http.services.pdm.loadbalancer.server.port: "8443"
+          wud.tag.include: "^latest$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/LongQT-Sea/Proxmox-Datacenter-Manager/releases"
+        cpu_shares: "{{ pdm_cpu_shares }}"
+        memory: "{{ pdm_memory }}"
+        memory_swap: "{{ pdm_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} DC Manager at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pdm_port_http | string)] +
+                (['https://' + pdm_hostname + '.' + ansible_nas_domain] if (pve_available_externally | bool or pve_dockflare_tunnel | bool) else [])
+              }}
+  when: 
+    - pdm_enabled is true
+    - proxmox_stack_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }} DC Manager
+  block:
+    - name: Stop {{ ansible_nas_app_name }} DC Manager Container
+      community.docker.docker_container:
+        name: "{{ pdm_container_name }}"
+        state: absent
+  when: pdm_enabled is false or proxmox_stack_enabled is false

@@ -1,0 +1,39 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 1
+      community.docker.docker_container:
+        name: "{{ pve1_container_name }}"
+        state: absent
+      register: result_pve1
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 2
+      community.docker.docker_container:
+        name: "{{ pve2_container_name }}"
+        state: absent
+      register: result_pve2
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 3
+      community.docker.docker_container:
+        name: "{{ pve3_container_name }}"
+        state: absent
+      register: result_pve3
+
+    - name: Try and stop and remove {{ ansible_nas_app_name }} DC Manager
+      community.docker.docker_container:
+        name: "{{ pdm_container_name }}"
+        state: absent
+      register: result_pdm
+
+    - name: Check if {{ ansible_nas_app_name }} is stopped
+      ansible.builtin.assert:
+        that:
+          - not result_pve1.changed
+          - not result_pve2.changed
+          - not result_pve3.changed
+          - not result_pdm.changed

@@ -1,0 +1,106 @@
+---
+- name: Start {{ ansible_nas_app_name }} VE Node 1
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ pve_data_directory }}"
+        - "{{ pve_data_directory }}/backup"
+        - "{{ pve_data_directory }}/iso"
+
+    - name: Create {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ pve_network_name }}"
+
+    - name: Create {{ ansible_nas_app_name }} VE Node 1 Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ pve1_container_name }}"
+        hostname: "{{ pve1_container_name }}"
+        image: "{{ pve_image_name }}:{{ pve_image_tag }}"
+        pull: true
+        networks:
+          - name: "{{ pve_network_name }}"
+        network_mode: "{{ pve_network_name }}"
+        networks_cli_compatible: "yes"
+        volumes:
+          - "/usr/lib/modules:/usr/lib/modules:ro"
+          - "/sys/kernel/security:/sys/kernel/security"
+          - "{{ pve_data_directory }}/backup:/var/lib/vz/dump"
+          - "{{ pve_data_directory }}/iso:/var/lib/vz/template/iso"
+        ports:
+          - "{{ pve1_port_http }}:8006"
+          - "{{ pve1_port_ssh }}:22"
+          - "{{ pve1_port_spice }}:3128"
+        env:
+          PASSWORD: "{{ pve_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ pve_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enable | string }}"
+          dockflare.enable: "{{ pve_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ pve_dockflare_access_group }}"
+          dockflare.hostname: "{{ pve1_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve1_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }} VE Node 1"
+          homepage.group: "{{ pve1_homepage_group }}"
+          homepage.icon: "{{ pve1_homepage_icon }}"
+          homepage.href: "{{ pve1_homepage_href }}"
+          homepage.description: "{{ 'pve description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ pve1_container_name }}"
+          homepage.showStats: "{{ pve_homepage_showstats }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve1_port_http }}"
+          repliqate.enabled: "{{ pve_repliqate_enabled | string }}"
+          repliqate.engine: "{{ pve_repliqate_engine }}"
+          repliqate.schedule: "{{ pve_repliqate_schedule }}"
+          repliqate.backup_id: "{{ pve_repliqate_backup_id }}"
+          repliqate.retention: "{{ pve_repliqate_retention }}"
+          traefik.enable: "{{ pve_available_externally | string }}"
+          traefik.http.routers.pve1.rule: "Host(`{{ pve1_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.pve1.tls.certresolver: "letsencrypt"
+          traefik.http.routers.pve1.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.pve1.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.pve1.middlewares: "pve1@docker{{ ',tinyauth-auth@docker' if pve_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.pve1.IPAllowList.sourcerange: "{{ pve_traefik_whitelist }}"
+          traefik.http.services.pve1.loadbalancer.server.scheme: "https"
+          traefik.http.services.pve1.loadbalancer.serverstransport: "insecureTransport@file"
+          traefik.http.services.pve1.loadbalancer.server.port: "8006"
+          wud.tag.include: "^latest$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/LongQT-sea/containerized-proxmox/releases"
+        capabilities:
+          - ALL
+        cgroupns_mode: private
+        cpu_shares: "{{ pve1_cpu_shares }}"
+        device_cgroup_rules:
+          - "a *:* rwm"
+        memory: "{{ pve1_memory }}"
+        memory_swap: "{{ pve1_memory_swap }}"
+        privileged: true
+        security_opts:
+          - seccomp=unconfined
+          - apparmor=unconfined
+        tty: true
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} VE Node 1 at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pve1_port_http | string)] +
+                (['https://' + pve1_hostname + '.' + ansible_nas_domain] if (pve_available_externally is true or pve_dockflare_tunnel is true) else [])
+              }}
+  when: 
+    - pve1_enabled is true
+    - proxmox_stack_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}  VE Node 1
+  block:
+    - name: Stop {{ ansible_nas_app_name }} VE Node 1 Container
+      community.docker.docker_container:
+        name: "{{ pve1_container_name }}"
+        state: absent
+  when: pve1_enabled is false or proxmox_stack_enabled is false
