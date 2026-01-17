@@ -61,8 +61,8 @@
         hostname: "{{ komodo_periphery_container_name }}"
         image: "{{ komodo_periphery_image_name }}:{{ komodo_periphery_image_tag }}"
         pull: true
-#        ports:
-#          - 8120:8120
+        ports:
+          - 8120:8120
         volumes:
           - "{{ komodo_data_directory }}/periphery:{{ komodo_data_directory }}/periphery"
           - "/var/run/docker.sock:/var/run/docker.sock"
@@ -89,7 +89,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ komodo_periphery_container_name }}"
           homepage.showStats: "{{ komodo_periphery_homepage_showstats }}"
-#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8120"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8120"
           komodo.skip:
           repliqate.enabled: "{{ komodo_periphery_repliqate_enabled }}"
           repliqate.engine: "{{ komodo_periphery_repliqate_engine }}"
