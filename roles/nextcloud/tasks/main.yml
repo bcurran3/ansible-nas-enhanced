@@ -51,7 +51,7 @@
         command: "redis-server --requirepass {{ nextcloud_env_redis_host_password }}"
         labels:
           autoheal: "{{ nextcloud_redis_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ nextcloud_redis_watchtower_enabled| string }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_redis_watchtower_enabled | string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ nextcloud_redis_homepage_group }}"
@@ -104,7 +104,7 @@
               start_period: "30s"
         labels:
           autoheal: "{{ nextcloud_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enabled| string }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enabled | string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ nextcloud_db_homepage_group }}"
@@ -190,7 +190,7 @@
           - "{{ nextcloud_redis_container_name }}"
         labels:
           autoheal: "{{ nextcloud_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ nextcloud_watchtower_enabled| string }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_watchtower_enabled | string }}"
           dockflare.enable: "{{ nextcloud_dockflare_enabled | string }}"
           dockflare.access.group: "{{ nextcloud_dockflare_access_group }}"
           dockflare.hostname: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"

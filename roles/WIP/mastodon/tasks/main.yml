@@ -35,7 +35,7 @@
         command: "redis-server --requirepass topsecret"
         labels:
           autoheal: "{{ mastodon_redis_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ mastodon_redis_watchtower_enabled| string }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_redis_watchtower_enabled | string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
           wud.tag.include: "^v?\\d+-alpine$"
@@ -69,7 +69,7 @@
           test: ['CMD', 'pg_isready', '-U', 'postgres']
         labels:
           autoheal: "{{ mastodon_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ mastodon_db_watchtower_enabled| string }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_db_watchtower_enabled | string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+.*$'
@@ -149,7 +149,7 @@
           - "{{ mastodon_db_container_name }}"
         labels:
           autoheal: "{{ mastodon_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ mastodon_watchtower_enabled| string }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_watchtower_enabled | string }}"
           dockflare.enable: "{{ mastodon_dockflare_enabled | string }}"
           dockflare.access.group: "{{ mastodon_dockflare_access_group }}"
           dockflare.hostname: "{{ mastodon_hostname }}.{{ ansible_nas_domain }}"
