@@ -1,0 +1,111 @@
+---
+# ANE
+ansible_nas_app_name: "Activepieces"
+activepieces_enabled: false
+activepieces_available_externally: false
+activepieces_traefik_whitelist: "{{ lan }}"
+
+# directories
+activepieces_data_directory: "{{ docker_home }}/activepieces"
+
+# docker
+activepieces_container_name: "activepieces"
+activepieces_image_name: "ghcr.io/activepieces/activepieces"
+activepieces_image_tag: "latest"
+activepieces_db_container_name: "activepieces-db"
+activepieces_db_image_name: "postgres"
+activepieces_db_image_tag: "17-alpine"
+activepieces_redis_container_name: "activepieces-redis"
+activepieces_redis_image_name: "redis"
+activepieces_redis_image_tag: "8-alpine"
+
+# network
+activepieces_hostname: "activepieces"
+activepieces_port_http: "3086"
+
+# specs
+activepieces_cpu_shares: 1024
+activepieces_memory: "4G"
+activepieces_memory_swap: -1
+activepieces_db_cpu_shares: 1024
+activepieces_db_memory: "1G"
+activepieces_db_memory_swap: "{{ activepieces_db_memory }}"
+activepieces_redis_cpu_shares: 1024
+activepieces_redis_memory: "1G"
+activepieces_redis_memory_swap: "{{ activepieces_db_memory }}"
+
+# app
+# https://www.activepieces.com/docs/install/configuration/environment-variables
+activepieces_env_ap_api_key: ""
+activepieces_env_ap_encryption_key: "DoqTS6HSphaC3Bh9o19qwuZvXEGFjX8K" # openssl rand -hex 16
+activepieces_env_ap_engine_executable_path: "dist/packages/engine/main.js"
+activepieces_env_ap_jwt_secret: "3vnPRtLDBHuVkVMwJa0xy47xiqkztm9npMnQdvK55S6" # openssl rand -hex 32
+activepieces_env_ap_environment: "prod"
+activepieces_env_ap_frontend_url: "https://{{ activepieces_hostname }}.{{ ansible_nas_domain }}"
+activepieces_env_ap_webhook_timeout_seconds: "30"
+activepieces_env_ap_trigger_default_poll_interval: "5"
+activepieces_env_ap_postgres_database: "activepieces_db"
+activepieces_env_ap_postgres_host: "{{ activepieces_db_container_name }}"
+activepieces_env_ap_postgres_port: "5432"
+activepieces_env_ap_postgres_username: "activepieces"
+activepieces_env_ap_postgres_password: "topsecret"
+activepieces_env_ap_execution_mode: "UNSANDBOXED"
+activepieces_env_ap_redis_host: "{{ activepieces_redis_container_name }}"
+activepieces_env_ap_redis_port: "6379"
+activepieces_env_ap_flow_timeout_seconds: "600"
+activepieces_env_ap_telemetry_enabled: "false"
+activepieces_env_ap_templates_source_url: "https://cloud.activepieces.com/api/v1/flow-templates"
+activepieces_env_ap_smtp_host: ""
+activepieces_env_ap_smtp_port: ""
+activepieces_env_ap_smtp_username: ""
+activepieces_env_ap_smtp_password: ""
+activepieces_env_ap_smtp_sender_email: ""
+activepieces_env_ap_smtp_sender_name: ""
+
+# autoheal
+activepieces_autoheal: false
+activepieces_db_autoheal: false
+activepieces_redis_autoheal: false
+
+# dockflare
+activepieces_dockflare_tunnel: false
+activepieces_dockflare_access_group: ""
+
+# homepage
+activepieces_homepage_group: "Apps"
+activepieces_homepage_icon: "activepieces.png"
+activepieces_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ activepieces_port_http }}"
+activepieces_homepage_showstats: "false"
+activepieces_db_homepage_group: "DBs"
+activepieces_db_homepage_icon: "postgres.png"
+activepieces_db_homepage_href: "{{ activepieces_homepage_href }}"
+activepieces_db_homepage_showstats: "false"
+activepieces_redis_homepage_group: "DBs"
+activepieces_redis_homepage_icon: "redis.png"
+activepieces_redis_homepage_href: "{{ activepieces_homepage_href }}"
+activepieces_redis_homepage_showstats: "false"
+
+# repliqate
+activepieces_repliqate_enabled: false
+activepieces_repliqate_engine: "restic"
+activepieces_repliqate_schedule: "@daily 3am"
+activepieces_repliqate_backup_id: "{{ activepieces_container_name }}"
+activepieces_repliqate_retention: "30d"
+activepieces_db_repliqate_enabled: "false"
+activepieces_db_repliqate_engine: "restic"
+activepieces_db_repliqate_schedule: "@daily 3am"
+activepieces_db_repliqate_backup_id: "{{ activepieces_db_container_name }}"
+activepieces_db_repliqate_retention: "30d"
+activepieces_redis_repliqate_enabled: "false"
+activepieces_redis_repliqate_engine: "restic"
+activepieces_redis_repliqate_schedule: "@daily 3am"
+activepieces_redis_repliqate_backup_id: "{{ activepieces_redis_container_name }}"
+activepieces_redis_repliqate_retention: "30d"
+
+# tinyauth
+activepieces_tinyauth_enabled: false
+
+# watchtower
+activepieces_watchtower_enable: false
+activepieces_db_watchtower_enable: false
+activepieces_redis_watchtower_enable: false

@@ -4,6 +4,7 @@ By default, applications can be found on the ports listed below.
 
 | Application      | Port    | Mode    | Notes          |
 |------------------|---------|---------|----------------|
+| Activepieces     | 3086    | Bridge  | HTTP           |
 | 2FAuth           | 8001    | Bridge  | HTTP           |
 | AdGuard Home     | 8844    | Bridge  |                |
 | AdGuard Home     | 53      | Bridge  |                |
@@ -415,7 +416,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3086-3089, then 3098+
+# next avail = 3087-3089, then 3098+
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002

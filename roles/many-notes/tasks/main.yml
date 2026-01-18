@@ -5,10 +5,10 @@
       community.docker.docker_volume:
         name: "{{ item }}"
       loop:
-        - database
-        - logs
-        - private
-        - typesense
+        - many_notes_database
+        - many_notes_logs
+        - many_notes_private
+        - many_notes_typesense
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -18,10 +18,10 @@
         image: "{{ many_notes_image_name }}:{{ many_notes_image_tag }}"
         pull: true
         volumes:
-          - database:/var/www/html/database/sqlite
-          - logs:/var/www/html/storage/logs
-          - private:/var/www/html/storage/app/private
-          - typesense:/var/www/html/typesense
+          - many_notes_database:/var/www/html/database/sqlite
+          - many_notes_logs:/var/www/html/storage/logs
+          - many_notes_private:/var/www/html/storage/app/private
+          - many_notes_typesense:/var/www/html/typesense
         ports:
           - "{{ many_notes_port_http }}:8080"
         env:
