@@ -39,9 +39,9 @@
           PLUGIN_DIR: "/usr/local/lib/crowdsec/plugins/"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ crowdsec_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ crowdsec_watchtower_enabled | string }}"
-          dockflare.enable: "{{ crowdsec_dockflare_enabled | string }}"
+          autoheal: "{{ crowdsec_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ crowdsec_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ crowdsec_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ crowdsec_dockflare_access_group }}"
           dockflare.hostname: "{{ crowdsec_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
@@ -53,17 +53,17 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ crowdsec_container_name }}"
-          homepage.showStats: "{{ crowdsec_homepage_showstats | string }}"
+          homepage.showStats: "{{ crowdsec_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "crowdsec"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ crowdsec_port_http }}"
           homepage.widget.username: "{{ crowdsec_homepage_widget_username }}"
           homepage.widget.password: "{{ crowdsec_homepage_widget_password }}"
-          repliqate.enabled: "{{ crowdsec_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ crowdsec_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ crowdsec_repliqate_engine }}"
           repliqate.schedule: "{{ crowdsec_repliqate_schedule }}"
           repliqate.backup_id: "{{ crowdsec_repliqate_backup_id }}"
           repliqate.retention: "{{ crowdsec_repliqate_retention }}"
-          traefik.enable: "{{ crowdsec_available_externally | string }}"
+          traefik.enable: "{{ crowdsec_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.crowdsec.rule: "Host(`{{ crowdsec_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.crowdsec.tls.certresolver: "letsencrypt"
           traefik.http.routers.crowdsec.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -83,7 +83,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (crowdsec_port_http | string)] +
-                (['https://' + crowdsec_hostname + '.' + ansible_nas_domain] if (crowdsec_available_externally is true or crowdsec_dockflare_enabled is true) else [])
+                (['https://' + crowdsec_hostname + '.' + ansible_nas_domain] if (crowdsec_traefik_enabled is true or crowdsec_dockflare_enabled is true) else [])
               }}
   when: crowdsec_enabled is true
 

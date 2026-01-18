@@ -24,9 +24,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ huntarr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ huntarr_watchtower_enabled | string }}"
-          dockflare.enable: "{{ huntarr_dockflare_enabled | string }}"
+          autoheal: "{{ huntarr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ huntarr_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ huntarr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ huntarr_dockflare_access_group }}"
           dockflare.hostname: "{{ huntarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ huntarr_port_http }}"
@@ -38,13 +38,13 @@
           homepage.description: "{{ 'A specialized utility that automates discovering missing and upgrading your media collection!' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ huntarr_container_name }}"
-          homepage.showStats: "{{ huntarr_homepage_showstats | string }}"
-          repliqate.enabled: "{{ huntarr_repliqate_enabled | string }}"
+          homepage.showStats: "{{ huntarr_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ huntarr_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ huntarr_repliqate_engine }}"
           repliqate.schedule: "{{ huntarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ huntarr_repliqate_backup_id }}"
           repliqate.retention: "{{ huntarr_repliqate_retention }}"
-          traefik.enable: "{{ huntarr_available_externally | string }}"
+          traefik.enable: "{{ huntarr_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.huntarr.rule: "Host(`{{ huntarr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.huntarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.huntarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -65,7 +65,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (huntarr_port_http | string)] +
-                (['https://' + huntarr_hostname + '.' + ansible_nas_domain] if (huntarr_available_externally is true or huntarr_dockflare_enabled is true) else [])
+                (['https://' + huntarr_hostname + '.' + ansible_nas_domain] if (huntarr_traefik_enabled is true or huntarr_dockflare_enabled is true) else [])
               }}
   when: huntarr_enabled is true
 

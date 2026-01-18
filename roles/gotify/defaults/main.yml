@@ -2,7 +2,7 @@
 # ANE
 ansible_nas_app_name: "Gotify"
 gotify_enabled: false
-gotify_available_externally: false
+gotify_traefik_enabled: false
 gotify_traefik_whitelist: "{{ lan }}"
 
 # data directory
@@ -35,7 +35,7 @@ gotify_env_gotify_server_stream_alloworigins: '["*"]' # '["localhost", ".+\\.{{ 
 gotify_env_gotify_server_trustedproxies: "[127.0.0.1, 172.16.0.0/12, {{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ansible.utils.ipaddr('net') }}]" # [127.0.0.1,192.168.178.2/24]
 
 # autoheal
-gotify_autoheal: false
+gotify_autoheal_enabled: false
 
 # dockflare
 gotify_dockflare_enabled: false

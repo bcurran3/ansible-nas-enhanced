@@ -38,8 +38,8 @@
               timeout: "10s"
               retries: "5"
         labels:
-          autoheal: "{{ projectsend_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ projectsend_db_watchtower_enabled | string }}"
+          autoheal: "{{ projectsend_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ projectsend_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ projectsend_db_homepage_group }}"
@@ -48,8 +48,8 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ projectsend_db_container_name }}"
-          homepage.showStats: "{{ projectsend_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ projectsend_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ projectsend_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ projectsend_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ projectsend_db_repliqate_engine }}"
           repliqate.schedule: "{{ projectsend_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ projectsend_db_repliqate_backup_id }}"
@@ -86,9 +86,9 @@
         links:
           - "{{ projectsend_db_container_name }}"
         labels:
-          autoheal: "{{ projectsend_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ projectsend_watchtower_enabled | string }}"
-          dockflare.enable: "{{ projectsend_dockflare_enabled | string }}"
+          autoheal: "{{ projectsend_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ projectsend_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ projectsend_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ projectsend_dockflare_access_group }}"
           dockflare.hostname: "{{ projectsend_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
@@ -100,13 +100,13 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ projectsend_container_name }}"
-          homepage.showStats: "{{ projectsend_homepage_showstats | string }}"
-          repliqate.enabled: "{{ projectsend_repliqate_enabled | string }}"
+          homepage.showStats: "{{ projectsend_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ projectsend_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ projectsend_repliqate_engine }}"
           repliqate.schedule: "{{ projectsend_repliqate_schedule }}"
           repliqate.backup_id: "{{ projectsend_repliqate_backup_id }}"
           repliqate.retention: "{{ projectsend_repliqate_retention }}"
-          traefik.enable: "{{ projectsend_available_externally | string }}"
+          traefik.enable: "{{ projectsend_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.projectsend.rule: "Host(`{{ projectsend_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.projectsend.tls.certresolver: "letsencrypt"
           traefik.http.routers.projectsend.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -126,7 +126,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (projectsend_port_http | string)] +
-                (['https://' + projectsend_hostname + '.' + ansible_nas_domain] if (projectsend_available_externally is true or projectsend_dockflare_enabled is true) else [])
+                (['https://' + projectsend_hostname + '.' + ansible_nas_domain] if (projectsend_traefik_enabled is true or projectsend_dockflare_enabled is true) else [])
               }}
   when: projectsend_enabled is true
 

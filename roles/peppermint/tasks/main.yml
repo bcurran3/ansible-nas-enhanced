@@ -23,8 +23,8 @@
           POSTGRES_PASSWORD: "{{ peppermint_db_password }}"
           POSTGRES_DB: "peppermint"
         labels:
-          autoheal: "{{ peppermint_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ peppermint_db_watchtower_enabled | string }}"
+          autoheal: "{{ peppermint_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ peppermint_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ peppermint_db_homepage_group }}"
@@ -33,8 +33,8 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ peppermint_db_container_name }}"
-          homepage.showStats: "{{ peppermint_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ peppermint_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ peppermint_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ peppermint_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ peppermint_db_repliqate_engine }}"
           repliqate.schedule: "{{ peppermint_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ peppermint_db_repliqate_backup_id }}"
@@ -66,9 +66,9 @@
         links:
           - "{{ peppermint_db_container_name }}"
         labels:
-          autoheal: "{{ peppermint_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ peppermint_watchtower_enabled | string }}"
-          dockflare.enable: "{{ peppermint_dockflare_enabled | string }}"
+          autoheal: "{{ peppermint_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ peppermint_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ peppermint_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ peppermint_dockflare_access_group }}"
           dockflare.hostname: "{{ peppermint_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ peppermint_port_http }}"
@@ -80,13 +80,13 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ peppermint_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ peppermint_container_name }}"
-          homepage.showStats: "{{ peppermint_homepage_showstats | string }}"
-          repliqate.enabled: "{{ peppermint_repliqate_enabled | string }}"
+          homepage.showStats: "{{ peppermint_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ peppermint_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ peppermint_repliqate_engine }}"
           repliqate.schedule: "{{ peppermint_repliqate_schedule }}"
           repliqate.backup_id: "{{ peppermint_repliqate_backup_id }}"
           repliqate.retention: "{{ peppermint_repliqate_retention }}"
-          traefik.enable: "{{ peppermint_available_externally | string }}"
+          traefik.enable: "{{ peppermint_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.peppermint.rule: "Host(`{{ peppermint_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.peppermint.tls.certresolver: "letsencrypt"
           traefik.http.routers.peppermint.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -106,7 +106,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (peppermint_port_http | string)] +
-                (['https://' + peppermint_hostname + '.' + ansible_nas_domain] if (peppermint_available_externally is true or peppermint_dockflare_enabled is true) else [])
+                (['https://' + peppermint_hostname + '.' + ansible_nas_domain] if (peppermint_traefik_enabled is true or peppermint_dockflare_enabled is true) else [])
               }}
   when: peppermint_enabled is true
 

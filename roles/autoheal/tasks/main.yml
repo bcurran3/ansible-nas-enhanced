@@ -20,8 +20,8 @@
           - "/etc/localtime:/etc/localtime:ro"
           - "/var/run/docker.sock:/var/run/docker.sock"
         labels:
-          autoheal: "{{ autoheal_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ autoheal_watchtower_enabled | string }}"
+          autoheal: "{{ autoheal_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ autoheal_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ autoheal_homepage_group }}"
@@ -29,7 +29,7 @@
           homepage.description: "{{ 'Monitor and restart unhealthy docker containers.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ autoheal_container_name }}"
-          homepage.showStats: "{{ autoheal_homepage_showstats | string }}"
+          homepage.showStats: "{{ autoheal_homepage_showstats | ternary('true', 'false') }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

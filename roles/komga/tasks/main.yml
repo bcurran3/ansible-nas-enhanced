@@ -34,9 +34,9 @@
           SERVER_PORT: "{{ komga_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ komga_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ komga_watchtower_enabled | string }}"
-          dockflare.enable: "{{ komga_dockflare_enabled | string }}"
+          autoheal: "{{ komga_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ komga_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ komga_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ komga_dockflare_access_group }}"
           dockflare.hostname: "{{ komga_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
@@ -48,18 +48,18 @@
           homepage.description: "{{ 'Media server for comics/mangas/BDs/magazines/eBooks with API, OPDS, Kobo Sync and KOReader Sync support' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ komga_container_name }}"
-          homepage.showStats: "{{ komga_homepage_showstats | string }}"
+          homepage.showStats: "{{ komga_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "komga"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
           homepage.widget.username: "{{ komga_homepage_widget_username }}"
           homepage.widget.password: "{{ komga_homepage_widget_password }}"
           homepage.widget.key: "{{ komga_homepage_widget_key }}"
-          repliqate.enabled: "{{ komga_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ komga_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ komga_repliqate_engine }}"
           repliqate.schedule: "{{ komga_repliqate_schedule }}"
           repliqate.backup_id: "{{ komga_repliqate_backup_id }}"
           repliqate.retention: "{{ komga_repliqate_retention }}"
-          traefik.enable: "{{ komga_available_externally | string }}"
+          traefik.enable: "{{ komga_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.komga.rule: "Host(`{{ komga_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.komga.tls.certresolver: "letsencrypt"
           traefik.http.routers.komga.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -80,7 +80,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (komga_port_http | string)] +
-                (['https://' + komga_hostname + '.' + ansible_nas_domain] if (komga_available_externally is true or komga_dockflare_enabled is true) else [])
+                (['https://' + komga_hostname + '.' + ansible_nas_domain] if (komga_traefik_enabled is true or komga_dockflare_enabled is true) else [])
               }}
   when: komga_enabled is true
 

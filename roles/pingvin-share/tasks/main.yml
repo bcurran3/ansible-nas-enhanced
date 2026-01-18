@@ -27,9 +27,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ pingvin_share_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ pingvin_share_watchtower_enabled | string }}"
-          dockflare.enable: "{{ pingvin_share_dockflare_enabled | string }}"
+          autoheal: "{{ pingvin_share_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ pingvin_share_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ pingvin_share_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ pingvin_share_dockflare_access_group }}"
           dockflare.hostname: "{{ pingvin_share_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pingvin_share_port_http }}"
@@ -41,13 +41,13 @@
           homepage.description: "{{ 'A self-hosted file sharing platform that combines lightness and beauty, perfect for seamless and efficient file sharing.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pingvin_share_container_name }}"
-          homepage.showStats: "{{ pingvin_share_homepage_showstats | string }}"
-          repliqate.enabled: "{{ pingvin_share_repliqate_enabled | string }}"
+          homepage.showStats: "{{ pingvin_share_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ pingvin_share_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ pingvin_share_repliqate_engine }}"
           repliqate.schedule: "{{ pingvin_share_repliqate_schedule }}"
           repliqate.backup_id: "{{ pingvin_share_repliqate_backup_id }}"
           repliqate.retention: "{{ pingvin_share_repliqate_retention }}"
-          traefik.enable: "{{ pingvin_share_available_externally | string }}"
+          traefik.enable: "{{ pingvin_share_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.pingvinshare.rule: "Host(`{{ pingvin_share_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pingvinshare.tls.certresolver: "letsencrypt"
           traefik.http.routers.pingvinshare.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pingvin_share_port_http | string)] +
-                (['https://' + pingvin_share_hostname + '.' + ansible_nas_domain] if (pingvin_share_available_externally is true or pingvin_share_dockflare_enabled is true) else [])
+                (['https://' + pingvin_share_hostname + '.' + ansible_nas_domain] if (pingvin_share_traefik_enabled is true or pingvin_share_dockflare_enabled is true) else [])
               }}
   when: pingvin_share_enabled is true
 

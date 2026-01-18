@@ -37,9 +37,9 @@
         ports:
           - "{{ readarr_port_http }}:8787"
         labels:
-          autoheal: "{{ readarr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ readarr_watchtower_enabled | string }}"
-          dockflare.enable: "{{ readarr_dockflare_enabled | string }}"
+          autoheal: "{{ readarr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ readarr_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ readarr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ readarr_dockflare_access_group }}"
           dockflare.hostname: "{{ readarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ readarr_port_http }}"
@@ -51,16 +51,16 @@
           homepage.description: "{{ 'Book Manager and Automation (Sonarr for Ebooks)' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ readarr_container_name }}"
-          homepage.showStats: "{{ readarr_homepage_showstats | string }}"
+          homepage.showStats: "{{ readarr_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "readarr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ readarr_port_http }}"
           homepage.widget.key: "{{ readarr_homepage_widget_key }}"
-          repliqate.enabled: "{{ readarr_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ readarr_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ readarr_repliqate_engine }}"
           repliqate.schedule: "{{ readarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ readarr_repliqate_backup_id }}"
           repliqate.retention: "{{ readarr_repliqate_retention }}"
-          traefik.enable: "{{ readarr_available_externally | string }}"
+          traefik.enable: "{{ readarr_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.readarr.rule: "Host(`{{ readarr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.readarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.readarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -79,7 +79,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (readarr_port_http | string)] +
-                (['https://' + readarr_hostname + '.' + ansible_nas_domain] if (readarr_available_externally is true or readarr_dockflare_enabled is true) else [])
+                (['https://' + readarr_hostname + '.' + ansible_nas_domain] if (readarr_traefik_enabled is true or readarr_dockflare_enabled is true) else [])
               }}
   when: readarr_enabled is true
 

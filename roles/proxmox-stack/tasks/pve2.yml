@@ -25,9 +25,9 @@
           PASSWORD: "{{ pve_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ pve_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enabled | string }}"
-          dockflare.enable: "{{ pve_dockflare_enabled | string }}"
+          autoheal: "{{ pve_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ pve_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ pve_dockflare_access_group }}"
           dockflare.hostname: "{{ pve2_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve2_port_http }}"
@@ -38,14 +38,14 @@
           homepage.description: "{{ 'pve description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pve2_container_name }}"
-          homepage.showStats: "{{ pve_homepage_showstats | string }}"
+          homepage.showStats: "{{ pve_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve2_port_http }}"
-          repliqate.enabled: "{{ pve_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ pve_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ pve_repliqate_engine }}"
           repliqate.schedule: "{{ pve_repliqate_schedule }}"
           repliqate.backup_id: "{{ pve_repliqate_backup_id }}"
           repliqate.retention: "{{ pve_repliqate_retention }}"
-          traefik.enable: "{{ pve_available_externally | string }}"
+          traefik.enable: "{{ pve_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.pve2.rule: "Host(`{{ pve2_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pve2.tls.certresolver: "letsencrypt"
           traefik.http.routers.pve2.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -78,7 +78,7 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pve2_port_http | string)] +
-                (['https://' + pve2_hostname + '.' + ansible_nas_domain] if (pve_available_externally is true or pve_dockflare_enabled is true) else [])
+                (['https://' + pve2_hostname + '.' + ansible_nas_domain] if (pve_traefik_enabled is true or pve_dockflare_enabled is true) else [])
               }}
   when: 
     - pve2_enabled is true

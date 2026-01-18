@@ -30,8 +30,8 @@
           timeout: "20s"
           retries: 20
         labels:
-          autoheal: "{{ openeats_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ openeats_db_watchtower_enabled | string }}"
+          autoheal: "{{ openeats_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ openeats_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ openeats_db_homepage_group }}"
@@ -40,8 +40,8 @@
           homepage.description: "{{ 'The innovative open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_db_container_name }}"
-          homepage.showStats: "{{ openeats_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ openeats_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ openeats_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ openeats_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ openeats_db_repliqate_engine }}"
           repliqate.schedule: "{{ openeats_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ openeats_db_repliqate_backup_id }}"
@@ -93,8 +93,8 @@
         links:
           - "{{ openeats_db_container_name }}"
         labels:
-          autoheal: "{{ openeats_api_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ openeats_api_watchtower_enabled | string }}"
+          autoheal: "{{ openeats_api_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ openeats_api_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} API"
           homepage.group: "{{ openeats_api_homepage_group }}"
@@ -103,8 +103,8 @@
           homepage.description: "{{ 'OpenEats API' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_api_container_name }}"
-          homepage.showStats: "{{ openeats_api_homepage_showstats | string }}"
-          repliqate.enabled: "{{ openeats_api_repliqate_enabled | string }}"
+          homepage.showStats: "{{ openeats_api_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ openeats_api_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ openeats_api_repliqate_engine }}"
           repliqate.schedule: "{{ openeats_api_repliqate_schedule }}"
           repliqate.backup_id: "{{ openeats_api_repliqate_backup_id }}"
@@ -138,8 +138,8 @@
           NODE_LOCALE: "{{ openeats_env_node_locale }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ openeats_web_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ openeats_web_watchtower_enabled | string }}"
+          autoheal: "{{ openeats_web_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ openeats_web_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Web"
           homepage.group: "{{ openeats_web_homepage_group }}"
@@ -148,8 +148,8 @@
           homepage.description: "{{ 'OpenEats Web UI' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_web_container_name }}"
-          homepage.showStats: "{{ openeats_web_homepage_showstats | string }}"
-          repliqate.enabled: "{{ openeats_web_repliqate_enabled | string }}"
+          homepage.showStats: "{{ openeats_web_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ openeats_web_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ openeats_web_repliqate_engine }}"
           repliqate.schedule: "{{ openeats_web_repliqate_schedule }}"
           repliqate.backup_id: "{{ openeats_web_repliqate_backup_id }}"
@@ -185,9 +185,9 @@
           - "{{ openeats_api_container_name }}:api"
           - "{{ openeats_web_container_name }}:web"
         labels:
-          autoheal: "{{ openeats_nginx_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ openeats_nginx_watchtower_enabled | string }}"
-          dockflare.enable: "{{ openeats_dockflare_enabled | string }}"
+          autoheal: "{{ openeats_nginx_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ openeats_nginx_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ openeats_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ openeats_dockflare_access_group }}"
           dockflare.hostname: "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openeats_port_http }}"
@@ -198,13 +198,13 @@
           homepage.description: "{{ 'Self Hosted Recipe Management App' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openeats_nginx_container_name }}"
-          homepage.showStats: "{{ openeats_nginx_homepage_showstats | string }}"
-          repliqate.enabled: "{{ openeats_nginx_repliqate_enabled | string }}"
+          homepage.showStats: "{{ openeats_nginx_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ openeats_nginx_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ openeats_nginx_repliqate_engine }}"
           repliqate.schedule: "{{ openeats_nginx_repliqate_schedule }}"
           repliqate.backup_id: "{{ openeats_nginx_repliqate_backup_id }}"
           repliqate.retention: "{{ openeats_nginx_repliqate_retention }}"
-          traefik.enable: "{{ openeats_available_externally | string }}"
+          traefik.enable: "{{ openeats_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.openeats.rule: "Host(`{{ openeats_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.openeats.tls.certresolver: "letsencrypt"
           traefik.http.routers.openeats.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -224,7 +224,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (openeats_port_http | string)] +
-                (['https://' + openeats_hostname + '.' + ansible_nas_domain] if (openeats_available_externally is true or openeats_dockflare_enabled is true) else [])
+                (['https://' + openeats_hostname + '.' + ansible_nas_domain] if (openeats_traefik_enabled is true or openeats_dockflare_enabled is true) else [])
               }}
   when: openeats_enabled is true
 

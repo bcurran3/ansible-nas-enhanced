@@ -32,8 +32,8 @@
           - "{{ mosquitto_port_b }}:9001"
         restart_policy: unless-stopped
         labels:
-          autoheal: "{{ mosquitto_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ mosquitto_watchtower_enabled | string }}"
+          autoheal: "{{ mosquitto_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ mosquitto_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mosquitto_homepage_group }}"
@@ -41,8 +41,8 @@
           homepage.description: "{{ 'An open source MQTT broker' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mosquitto_container_name }}"
-          homepage.showStats: "{{ mosquitto_homepage_showstats | string }}"
-          repliqate.enabled: "{{ mosquitto_repliqate_enabled | string }}"
+          homepage.showStats: "{{ mosquitto_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ mosquitto_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ mosquitto_repliqate_engine }}"
           repliqate.schedule: "{{ mosquitto_repliqate_schedule }}"
           repliqate.backup_id: "{{ mosquitto_repliqate_backup_id }}"

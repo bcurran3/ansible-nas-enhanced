@@ -60,9 +60,9 @@
           - "{{ webtop_port_http }}:{{ webtop_port_http }}"
           - "{{ webtop_port_https }}:{{ webtop_port_https }}"
         labels:
-          autoheal: "{{ webtop_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ webtop_watchtower_enabled | string }}"
-          dockflare.enable: "{{ webtop_dockflare_enabled | string }}"
+          autoheal: "{{ webtop_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ webtop_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ webtop_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ webtop_dockflare_access_group }}"
           dockflare.hostname: "{{ webtop_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ webtop_port_https }}"
@@ -74,13 +74,13 @@
           homepage.description: "{{ 'Alpine, Ubuntu, Fedora, and Arch based containers containing full desktop environments in officially supported flavors' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ webtop_container_name }}"
-          homepage.showStats: "{{ webtop_homepage_showstats | string }}"
-          repliqate.enabled: "{{ webtop_repliqate_enabled | string }}"
+          homepage.showStats: "{{ webtop_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ webtop_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ webtop_repliqate_engine }}"
           repliqate.schedule: "{{ webtop_repliqate_schedule }}"
           repliqate.backup_id: "{{ webtop_repliqate_backup_id }}"
           repliqate.retention: "{{ webtop_repliqate_retention }}"
-          traefik.enable: "{{ webtop_available_externally | string }}"
+          traefik.enable: "{{ webtop_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.webtop.rule: "Host(`{{ webtop_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.webtop.tls.certresolver: "letsencrypt"
           traefik.http.routers.webtop.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -103,7 +103,7 @@
               'https://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ webtop_port_https
             ] + (
               ['https://' ~ webtop_hostname ~ '.' ~ ansible_nas_domain]
-              if (webtop_available_externally is true or webtop_dockflare_enabled is true) else []
+              if (webtop_traefik_enabled is true or webtop_dockflare_enabled is true) else []
             )
           }}
   when: webtop_enabled is true

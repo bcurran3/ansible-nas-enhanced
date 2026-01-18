@@ -29,8 +29,8 @@
           POSTGRES_DB: "gamevault"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ gamevault_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ gamevault_db_watchtower_enabled | string }}"
+          autoheal: "{{ gamevault_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ gamevault_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ gamevault_db_homepage_group }}"
@@ -39,8 +39,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gamevault_db_container_name }}"
-          homepage.showStats: "{{ gamevault_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ gamevault_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ gamevault_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ gamevault_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ gamevault_db_repliqate_engine }}"
           repliqate.schedule: "{{ gamevault_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ gamevault_db_repliqate_backup_id }}"
@@ -83,9 +83,9 @@
           PGID: "{{ gamevault_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ gamevault_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ gamevault_watchtower_enabled | string }}"
-          dockflare.enable: "{{ gamevault_dockflare_enabled | string }}"
+          autoheal: "{{ gamevault_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ gamevault_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ gamevault_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ gamevault_dockflare_access_group }}"
           dockflare.hostname: "{{ gamevault_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gamevault_port_http }}"
@@ -97,13 +97,13 @@
           homepage.description: "{{ 'the self-hosted gaming platform for drm-free games' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gamevault_container_name }}"
-          homepage.showStats: "{{ gamevault_homepage_showstats | string }}"
-          repliqate.enabled: "{{ gamevault_repliqate_enabled | string }}"
+          homepage.showStats: "{{ gamevault_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ gamevault_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ gamevault_repliqate_engine }}"
           repliqate.schedule: "{{ gamevault_repliqate_schedule }}"
           repliqate.backup_id: "{{ gamevault_repliqate_backup_id }}"
           repliqate.retention: "{{ gamevault_repliqate_retention }}"
-          traefik.enable: "{{ gamevault_available_externally | string }}"
+          traefik.enable: "{{ gamevault_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.gamevault.rule: "Host(`{{ gamevault_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gamevault.tls.certresolver: "letsencrypt"
           traefik.http.routers.gamevault.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -124,7 +124,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gamevault_port_http | string)] +
-                (['https://' + gamevault_hostname + '.' + ansible_nas_domain] if (gamevault_available_externally is true or gamevault_dockflare_enabled is true) else [])
+                (['https://' + gamevault_hostname + '.' + ansible_nas_domain] if (gamevault_traefik_enabled is true or gamevault_dockflare_enabled is true) else [])
               }}
   when: gamevault_enabled is true
 

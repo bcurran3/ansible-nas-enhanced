@@ -25,9 +25,9 @@
 #         KES_PORT: "{{ karaoke_eternal_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ karaoke_eternal_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ karaoke_eternal_watchtower_enabled | string }}"
-          dockflare.enable: "{{ karaoke_eternal_dockflare_enabled | string }}"
+          autoheal: "{{ karaoke_eternal_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ karaoke_eternal_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ karaoke_eternal_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ karaoke_eternal_dockflare_access_group }}"
           dockflare.hostname: "{{ karaoke_eternal_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ karaoke_eternal_port_http }}"
@@ -39,13 +39,13 @@
           homepage.description: "{{ 'Open karaoke party system' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ karaoke_eternal_container_name }}"
-          homepage.showStats: "{{ karaoke_eternal_homepage_showstats | string }}"
-          repliqate.enabled: "{{ karaoke_eternal_repliqate_enabled | string }}"
+          homepage.showStats: "{{ karaoke_eternal_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ karaoke_eternal_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ karaoke_eternal_repliqate_engine }}"
           repliqate.schedule: "{{ karaoke_eternal_repliqate_schedule }}"
           repliqate.backup_id: "{{ karaoke_eternal_repliqate_backup_id }}"
           repliqate.retention: "{{ karaoke_eternal_repliqate_retention }}"
-          traefik.enable: "{{ karaoke_eternal_available_externally | string }}"
+          traefik.enable: "{{ karaoke_eternal_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.karaokeeternal.rule: "Host(`{{ karaoke_eternal_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.karaokeeternal.tls.certresolver: "letsencrypt"
           traefik.http.routers.karaokeeternal.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -65,7 +65,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (karaoke_eternal_port_http | string)] +
-                (['https://' + karaoke_eternal_hostname + '.' + ansible_nas_domain] if (karaoke_eternal_available_externally is true or karaoke_eternal_dockflare_enabled is true) else [])
+                (['https://' + karaoke_eternal_hostname + '.' + ansible_nas_domain] if (karaoke_eternal_traefik_enabled is true or karaoke_eternal_dockflare_enabled is true) else [])
               }}
   when: karaoke_eternal_enabled is true
 

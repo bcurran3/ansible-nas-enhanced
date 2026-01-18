@@ -133,9 +133,9 @@
           MIX_ENV: "local"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ twofauth_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ twofauth_watchtower_enabled | string }}"
-          dockflare.enable: "{{ twofauth_dockflare_enabled | string }}"
+          autoheal: "{{ twofauth_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ twofauth_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ twofauth_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ twofauth_dockflare_access_group }}"
           dockflare.hostname: "{{ twofauth_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ twofauth_port_http }}"
@@ -147,13 +147,13 @@
           homepage.description: "{{ 'A Web app to manage your Two-Factor Authentication (2FA) accounts' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ twofauth_container_name }}"
-          homepage.showStats: "{{ twofauth_homepage_showstats | string }}"
-          repliqate.enabled: "{{ twofauth_repliqate_enabled | string }}"
+          homepage.showStats: "{{ twofauth_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ twofauth_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ twofauth_repliqate_engine }}"
           repliqate.schedule: "{{ twofauth_repliqate_schedule }}"
           repliqate.backup_id: "{{ twofauth_repliqate_backup_id }}"
           repliqate.retention: "{{ twofauth_repliqate_retention }}"
-          traefik.enable: "{{ twofauth_available_externally | string }}"
+          traefik.enable: "{{ twofauth_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.twofauth.rule: "Host(`{{ twofauth_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.twofauth.tls.certresolver: "letsencrypt"
           traefik.http.routers.twofauth.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -173,7 +173,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (twofauth_port_http | string)] +
-                (['https://' + twofauth_hostname + '.' + ansible_nas_domain] if (twofauth_available_externally is true or twofauth_dockflare_enabled is true) else [])
+                (['https://' + twofauth_hostname + '.' + ansible_nas_domain] if (twofauth_traefik_enabled is true or twofauth_dockflare_enabled is true) else [])
               }}
   when: twofauth_enabled is true
 

@@ -14,9 +14,9 @@
         ports:
           - "{{ chatpadai_port_http }}: 80"
         labels:
-          autoheal: "{{ chatpadai_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ chatpadai_watchtower_enabled | string }}"
-          dockflare.enable: "{{ chatpadai_dockflare_enabled | string }}"
+          autoheal: "{{ chatpadai_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ chatpadai_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ chatpadai_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ chatpadai_dockflare_access_group }}"
           dockflare.hostname: "{{ chatpadai_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chatpadai_port_http }}"
@@ -28,9 +28,9 @@
           homepage.description: "{{ 'Not just another ChatGPT user-interface!' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ chatpadai_container_name }}"
-          homepage.showStats: "{{ chatpadai_homepage_showstats | string }}"
+          homepage.showStats: "{{ chatpadai_homepage_showstats | ternary('true', 'false') }}"
           repliqate.enabled: "false"
-          traefik.enable: "{{ chatpadai_available_externally | string }}"
+          traefik.enable: "{{ chatpadai_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.chatpadai.rule: "Host(`{{ chatpadai_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.chatpadai.tls.certresolver: "letsencrypt"
           traefik.http.routers.chatpadai.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -50,7 +50,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (chatpadai_port_http | string)] +
-                (['https://' + chatpadai_hostname + '.' + ansible_nas_domain] if (chatpadai_available_externally is true or chatpadai_dockflare_enabled is true) else [])
+                (['https://' + chatpadai_hostname + '.' + ansible_nas_domain] if (chatpadai_traefik_enabled is true or chatpadai_dockflare_enabled is true) else [])
               }}
   when: chatpadai_enabled is true
 

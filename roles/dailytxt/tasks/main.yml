@@ -29,9 +29,9 @@
           SECRET_KEY: "{{ dailytxt_env_secret_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ dailytxt_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ dailytxt_watchtower_enabled | string }}"
-          dockflare.enable: "{{ dailytxt_dockflare_enabled | string }}"
+          autoheal: "{{ dailytxt_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dailytxt_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ dailytxt_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ dailytxt_dockflare_access_group }}"
           dockflare.hostname: "{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
@@ -43,13 +43,13 @@
           homepage.description: "{{ 'Encrypted Diary Web-App' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "dailytxt"
-          homepage.showStats: "{{ dailytxt_homepage_showstats | string }}"
-          repliqate.enabled: "{{ dailytxt_repliqate_enabled | string }}"
+          homepage.showStats: "{{ dailytxt_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ dailytxt_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ dailytxt_repliqate_engine }}"
           repliqate.schedule: "{{ dailytxt_repliqate_schedule }}"
           repliqate.backup_id: "{{ dailytxt_repliqate_backup_id }}"
           repliqate.retention: "{{ dailytxt_repliqate_retention }}"
-          traefik.enable: "{{ dailytxt_available_externally | string }}"
+          traefik.enable: "{{ dailytxt_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.dailytxt.rule: "Host(`{{ dailytxt_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.dailytxt.tls.certresolver: "letsencrypt"
           traefik.http.routers.dailytxt.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -69,7 +69,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dailytxt_port_http | string)] +
-                (['https://' + dailytxt_hostname + '.' + ansible_nas_domain] if (dailytxt_available_externally is true or dailytxt_dockflare_enabled is true) else [])
+                (['https://' + dailytxt_hostname + '.' + ansible_nas_domain] if (dailytxt_traefik_enabled is true or dailytxt_dockflare_enabled is true) else [])
               }}
   when: dailytxt_enabled is true
 

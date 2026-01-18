@@ -46,9 +46,9 @@
                     else (netdata_devices | default(omit))
                   }}
         labels:
-          autoheal: "{{ frigate_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ frigate_watchtower_enabled | string }}"
-          dockflare.enable: "{{ frigate_dockflare_enabled | string }}"
+          autoheal: "{{ frigate_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ frigate_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ frigate_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ frigate_dockflare_access_group }}"
           dockflare.hostname: "{{ frigate_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
@@ -59,19 +59,19 @@
           homepage.description: "{{ 'A complete and local NVR designed for Home Assistant with AI object detection.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ frigate_container_name }}"
-          homepage.showStats: "{{ frigate_homepage_showstats | string }}"
+          homepage.showStats: "{{ frigate_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
           homepage.widget.type: "frigate"
           homepage.widget.url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
           homepage.widget.enableRecentEvents: "{{ frigate_homepage_widget_enablerecentevents }}"
           homepage.widget.username: "{{ frigate_homepage_widget_username }}"
           homepage.widget.password: "{{ frigate_homepage_widget_password }}"
-          repliqate.enabled: "{{ frigate_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ frigate_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ frigate_repliqate_engine }}"
           repliqate.schedule: "{{ frigate_repliqate_schedule }}"
           repliqate.backup_id: "{{ frigate_repliqate_backup_id }}"
           repliqate.retention: "{{ frigate_repliqate_retention }}"
-          traefik.enable: "{{ frigate_available_externally | string }}"
+          traefik.enable: "{{ frigate_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.frigate.rule: "Host(`{{ frigate_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.frigate.tls.certresolver: "letsencrypt"
           traefik.http.routers.frigate.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -92,7 +92,7 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (frigate_port_http | string)] +
-                (['https://' + frigate_hostname + '.' + ansible_nas_domain] if (frigate_available_externally is true or frigate_dockflare_enabled is true) else [])
+                (['https://' + frigate_hostname + '.' + ansible_nas_domain] if (frigate_traefik_enabled is true or frigate_dockflare_enabled is true) else [])
               }}
   when: frigate_enabled is true
 

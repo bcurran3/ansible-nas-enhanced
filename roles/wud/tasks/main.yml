@@ -74,9 +74,9 @@
           retries: "3"
           start_period: "10s"
         labels:
-          autoheal: "{{ wud_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ wud_watchtower_enabled | string }}"
-          dockflare.enable: "{{ wud_dockflare_enabled | string }}"
+          autoheal: "{{ wud_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ wud_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ wud_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ wud_dockflare_access_group }}"
           dockflare.hostname: "{{ wud_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
@@ -88,17 +88,17 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wud_container_name }}"
-          homepage.showStats: "{{ wud_homepage_showstats | string }}"
+          homepage.showStats: "{{ wud_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "whatsupdocker"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.widget.username: "{{ wud_homepage_widget_username }}"
           homepage.widget.password: "{{ wud_homepage_widget_password }}"
-          repliqate.enabled: "{{ wud_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ wud_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ wud_repliqate_engine }}"
           repliqate.schedule: "{{ wud_repliqate_schedule }}"
           repliqate.backup_id: "{{ wud_repliqate_backup_id }}"
           repliqate.retention: "{{ wud_repliqate_retention }}"
-          traefik.enable: "{{ wud_available_externally | string }}"
+          traefik.enable: "{{ wud_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.wud.rule: "Host(`{{ wud_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.wud.tls.certresolver: "letsencrypt"
           traefik.http.routers.wud.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -118,7 +118,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wud_port_http | string)] +
-                (['https://' + wud_hostname + '.' + ansible_nas_domain] if (wud_available_externally is true or wud_dockflare_enabled is true) else [])
+                (['https://' + wud_hostname + '.' + ansible_nas_domain] if (wud_traefik_enabled is true or wud_dockflare_enabled is true) else [])
               }}
   when: wud_enabled is true
 

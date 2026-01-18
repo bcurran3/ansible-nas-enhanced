@@ -24,8 +24,8 @@
           POSTGRES_USER: "koillection"
           POSTGRES_PASSWORD: "koillection"
         labels:
-          autoheal: "{{ koillection_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ koillection_db_watchtower_enabled | string }}"
+          autoheal: "{{ koillection_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ koillection_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ koillection_db_homepage_group }}"
@@ -34,8 +34,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ koillection_db_container_name }}"
-          homepage.showStats: "{{ koillection_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ koillection_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ koillection_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ koillection_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ koillection_db_repliqate_engine }}"
           repliqate.schedule: "{{ koillection_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ koillection_db_repliqate_backup_id }}"
@@ -79,9 +79,9 @@
         links:
           - "{{ koillection_db_container_name }}"
         labels:
-          autoheal: "{{ koillection_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ koillection_watchtower_enabled | string }}"
-          dockflare.enable: "{{ koillection_dockflare_enabled | string }}"
+          autoheal: "{{ koillection_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ koillection_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ koillection_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ koillection_dockflare_access_group }}"
           dockflare.hostname: "{{ koillection_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koillection_port_http }}"
@@ -93,13 +93,13 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koillection_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ koillection_container_name }}"
-          homepage.showStats: "{{ koillection_homepage_showstats | string }}"
-          repliqate.enabled: "{{ koillection_repliqate_enabled | string }}"
+          homepage.showStats: "{{ koillection_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ koillection_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ koillection_repliqate_engine }}"
           repliqate.schedule: "{{ koillection_repliqate_schedule }}"
           repliqate.backup_id: "{{ koillection_repliqate_backup_id }}"
           repliqate.retention: "{{ koillection_repliqate_retention }}"
-          traefik.enable: "{{ koillection_available_externally | string }}"
+          traefik.enable: "{{ koillection_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.koillection.rule: "Host(`{{ koillection_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.koillection.tls.certresolver: "letsencrypt"
           traefik.http.routers.koillection.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -120,7 +120,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (koillection_port_http | string)] +
-                (['https://' + koillection_hostname + '.' + ansible_nas_domain] if (koillection_available_externally is true or koillection_dockflare_enabled is true) else [])
+                (['https://' + koillection_hostname + '.' + ansible_nas_domain] if (koillection_traefik_enabled is true or koillection_dockflare_enabled is true) else [])
               }}
   when: koillection_enabled is true
 

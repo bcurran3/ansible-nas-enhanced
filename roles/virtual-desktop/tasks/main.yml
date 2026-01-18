@@ -33,8 +33,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         privileged: true
         labels:
-          autoheal: "{{ virtual_desktop_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ virtual_desktop_watchtower_enabled | string }}"
+          autoheal: "{{ virtual_desktop_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ virtual_desktop_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ virtual_desktop_homepage_group }}"
@@ -42,8 +42,8 @@
           homepage.description: "{{ 'Ubuntu with XRDP and MATE' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ virtual_desktop_container_name }}"
-          homepage.showStats: "{{ virtual_desktop_homepage_showstats | string }}"
-          repliqate.enabled: "{{ virtual_desktop_repliqate_enabled | string }}"
+          homepage.showStats: "{{ virtual_desktop_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ virtual_desktop_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ virtual_desktop_repliqate_engine }}"
           repliqate.schedule: "{{ virtual_desktop_repliqate_schedule }}"
           repliqate.backup_id: "{{ virtual_desktop_repliqate_backup_id }}"

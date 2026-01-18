@@ -44,8 +44,8 @@
         ##### linuxserver/mariadb
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ osclass_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ osclass_db_watchtower_enabled | string }}"
+          autoheal: "{{ osclass_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ osclass_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ osclass_db_homepage_group }}"
@@ -54,8 +54,8 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ osclass_db_container_name }}"
-          homepage.showStats: "{{ osclass_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ osclass_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ osclass_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ osclass_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ osclass_db_repliqate_engine }}"
           repliqate.schedule: "{{ osclass_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ osclass_db_repliqate_backup_id }}"
@@ -100,9 +100,9 @@
         links:
           - "{{ osclass_db_container_name }}"
         labels:
-          autoheal: "{{ osclass_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ osclass_watchtower_enabled | string }}"
-          dockflare.enable: "{{ osclass_dockflare_enabled | string }}"
+          autoheal: "{{ osclass_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ osclass_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ osclass_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ osclass_dockflare_access_group }}"
           dockflare.hostname: "{{ osclass_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osclass_port_http }}"
@@ -114,13 +114,13 @@
           homepage.description: "{{ 'Best free classifieds script created in PHP for classifieds CMS' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ osclass_container_name }}"
-          homepage.showStats: "{{ osclass_homepage_showstats | string }}"
-          repliqate.enabled: "{{ osclass_repliqate_enabled | string }}"
+          homepage.showStats: "{{ osclass_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ osclass_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ osclass_repliqate_engine }}"
           repliqate.schedule: "{{ osclass_repliqate_schedule }}"
           repliqate.backup_id: "{{ osclass_repliqate_backup_id }}"
           repliqate.retention: "{{ osclass_repliqate_retention }}"
-          traefik.enable: "{{ osclass_available_externally | string }}"
+          traefik.enable: "{{ osclass_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.osclass.rule: "Host(`{{ osclass_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.osclass.tls.certresolver: "letsencrypt"
           traefik.http.routers.osclass.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -140,7 +140,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (osclass_port_http | string)] +
-                (['https://' + osclass_hostname + '.' + ansible_nas_domain] if (osclass_available_externally is true or osclass_dockflare_enabled is true) else [])
+                (['https://' + osclass_hostname + '.' + ansible_nas_domain] if (osclass_traefik_enabled is true or osclass_dockflare_enabled is true) else [])
               }}
   when: osclass_enabled is true
 

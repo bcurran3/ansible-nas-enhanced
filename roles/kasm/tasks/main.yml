@@ -44,9 +44,9 @@
         privileged: true
 #       security_opts: ["apparmor=rootlesskit"] #optional
         labels:
-          autoheal: "{{ kasm_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ kasm_watchtower_enabled | string }}"
-          dockflare.enable: "{{ kasm_dockflare_enabled | string }}"
+          autoheal: "{{ kasm_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ kasm_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ kasm_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ kasm_dockflare_access_group }}"
           dockflare.hostname: "{{ kasm_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kasm_port_https }}"
@@ -58,13 +58,13 @@
           homepage.description: "{{ 'Kasm⁠ Workspaces is a docker container streaming platform for delivering browser-based access to desktops, applications, and web services.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ kasm_container_name }}"
-          homepage.showStats: "{{ kasm_homepage_showstats | string }}"
-          repliqate.enabled: "{{ kasm_repliqate_enabled | string }}"
+          homepage.showStats: "{{ kasm_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ kasm_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ kasm_repliqate_engine }}"
           repliqate.schedule: "{{ kasm_repliqate_schedule }}"
           repliqate.backup_id: "{{ kasm_repliqate_backup_id }}"
           repliqate.retention: "{{ kasm_repliqate_retention }}"
-          traefik.enable: "{{ kasm_available_externally | string }}"
+          traefik.enable: "{{ kasm_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.kasm-main.rule: "Host(`{{ kasm_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.kasm-main.entrypoints: "websecure"
           traefik.http.routers.kasm-main.tls.certresolver: "letsencrypt"
@@ -101,9 +101,9 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (kasm_port_https | string)] +
-                (['https://' + kasm_hostname + '.' + ansible_nas_domain] if (kasm_available_externally is true or kasm_dockflare_enabled is true) else []) + 
+                (['https://' + kasm_hostname + '.' + ansible_nas_domain] if (kasm_traefik_enabled is true or kasm_dockflare_enabled is true) else []) + 
                 ['https://' + ansible_default_ipv4.address + ':' + (kasm_port_install_https | string) + ' (Kasm Install)'] +
-                (['https://' + kasm_hostname + '-admin.' + ansible_nas_domain + ' (Kasm Install)'] if (kasm_available_externally is true or kasm_dockflare_enabled is true) else [])
+                (['https://' + kasm_hostname + '-admin.' + ansible_nas_domain + ' (Kasm Install)'] if (kasm_traefik_enabled is true or kasm_dockflare_enabled is true) else [])
               }}
   when: kasm_enabled is true
 

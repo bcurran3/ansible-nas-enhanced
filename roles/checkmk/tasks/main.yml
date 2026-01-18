@@ -27,9 +27,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ checkmk_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ checkmk_watchtower_enabled | string }}"
-          dockflare.enable: "{{ checkmk_dockflare_enabled | string }}"
+          autoheal: "{{ checkmk_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ checkmk_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ checkmk_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ checkmk_dockflare_access_group }}"
           dockflare.hostname: "{{ checkmk_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmk_port_http }}"
@@ -41,18 +41,18 @@
           homepage.description: "{{ 'Best-in-class infrastructure & application monitoring' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ checkmk_container_name }}"
-          homepage.showStats: "{{ checkmk_homepage_showstats | string }}"
+          homepage.showStats: "{{ checkmk_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "checkmk"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkmk_port_http }}"
           homepage.widget.site: "{{ checkmk_homepage_widget_site }}"
           homepage.widget.username: "{{ checkmk_homepage_widget_username }}"
           homepage.widget.password: "{{ checkmk_homepage_widget_password }}"
-          repliqate.enabled: "{{ checkmk_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ checkmk_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ checkmk_repliqate_engine }}"
           repliqate.schedule: "{{ checkmk_repliqate_schedule }}"
           repliqate.backup_id: "{{ checkmk_repliqate_backup_id }}"
           repliqate.retention: "{{ checkmk_repliqate_retention }}"
-          traefik.enable: "{{ checkmk_available_externally | string }}"
+          traefik.enable: "{{ checkmk_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.checkmk.rule: "Host(`{{ checkmk_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.checkmk.tls.certresolver: "letsencrypt"
           traefik.http.routers.checkmk.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -72,7 +72,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (checkmk_port_http | string)] +
-                (['https://' + checkmk_hostname + '.' + ansible_nas_domain] if (checkmk_available_externally is true or checkmk_dockflare_enabled is true) else [])
+                (['https://' + checkmk_hostname + '.' + ansible_nas_domain] if (checkmk_traefik_enabled is true or checkmk_dockflare_enabled is true) else [])
               }}
   when: checkmk_enabled is true
 

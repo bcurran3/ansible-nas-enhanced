@@ -32,9 +32,9 @@
           PGID: "{{ prowlarr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ prowlarr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ prowlarr_watchtower_enabled | string }}"
-          dockflare.enable: "{{ prowlarr_dockflare_enabled | string }}"
+          autoheal: "{{ prowlarr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ prowlarr_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ prowlarr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ prowlarr_dockflare_access_group }}"
           dockflare.hostname: "{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port_http }}"
@@ -46,16 +46,16 @@
           homepage.description: "{{ 'Indexer Proxy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ prowlarr_container_name }}"
-          homepage.showStats: "{{ prowlarr_homepage_showstats | string }}"
+          homepage.showStats: "{{ prowlarr_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "prowlarr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port_http }}"
           homepage.widget.key: "{{ prowlarr_homepage_widget_key }}"
-          repliqate.enabled: "{{ prowlarr_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ prowlarr_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ prowlarr_repliqate_engine }}"
           repliqate.schedule: "{{ prowlarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ prowlarr_repliqate_backup_id }}"
           repliqate.retention: "{{ prowlarr_repliqate_retention }}"
-          traefik.enable: "{{ prowlarr_available_externally | string }}"
+          traefik.enable: "{{ prowlarr_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.prowlarr.rule: "Host(`{{ prowlarr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.prowlarr.tls.certresolver: "letsencrypt"
           traefik.http.routers.prowlarr.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -76,7 +76,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (prowlarr_port_http | string)] +
-                (['https://' + prowlarr_hostname + '.' + ansible_nas_domain] if (prowlarr_available_externally is true or prowlarr_dockflare_enabled is true) else [])
+                (['https://' + prowlarr_hostname + '.' + ansible_nas_domain] if (prowlarr_traefik_enabled is true or prowlarr_dockflare_enabled is true) else [])
               }}
   when: prowlarr_enabled is true
 

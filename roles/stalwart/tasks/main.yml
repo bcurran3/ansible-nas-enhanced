@@ -30,9 +30,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ stalwart_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ stalwart_watchtower_enabled | string }}"
-          dockflare.enable: "{{ stalwart_dockflare_enabled | string }}"
+          autoheal: "{{ stalwart_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ stalwart_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ stalwart_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ stalwart_dockflare_access_group }}"
           dockflare.hostname: "{{ stalwart_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stalwart_port_http }}"
@@ -44,13 +44,13 @@
           homepage.description: "{{ 'Secure & Modern All-in-One Mail Server (IMAP, JMAP, POP3, SMTP)' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stalwart_container_name }}"
-          homepage.showStats: "{{ stalwart_homepage_showstats | string }}"
-          repliqate.enabled: "{{ stalwart_repliqate_enabled | string }}"
+          homepage.showStats: "{{ stalwart_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ stalwart_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ stalwart_repliqate_engine }}"
           repliqate.schedule: "{{ stalwart_repliqate_schedule }}"
           repliqate.backup_id: "{{ stalwart_repliqate_backup_id }}"
           repliqate.retention: "{{ stalwart_repliqate_retention }}"
-          traefik.enable: "{{ stalwart_available_externally | string }}"
+          traefik.enable: "{{ stalwart_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.stalwart.rule: "Host(`{{ stalwart_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.stalwart.tls.certresolver: "letsencrypt"
           traefik.http.routers.stalwart.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -70,7 +70,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (stalwart_port_http | string)] +
-                (['https://' + stalwart_hostname + '.' + ansible_nas_domain] if (stalwart_available_externally is true or stalwart_dockflare_enabled is true) else [])
+                (['https://' + stalwart_hostname + '.' + ansible_nas_domain] if (stalwart_traefik_enabled is true or stalwart_dockflare_enabled is true) else [])
               }}
   when: stalwart_enabled is true
 

@@ -30,9 +30,9 @@
           PGID: "{{ whisparr_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ whisparr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ whisparr_watchtower_enabled | string }}"
-          dockflare.enable: "{{ whisparr_dockflare_enabled | string }}"
+          autoheal: "{{ whisparr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ whisparr_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ whisparr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ whisparr_dockflare_access_group }}"
           dockflare.hostname: "{{ whisparr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whisparr_port_http }}"
@@ -44,13 +44,13 @@
           homepage.description: "{{ 'Whisparr is an adult movie collection manager for Usenet and BitTorrent users.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ whisparr_container_name }}"
-          homepage.showStats: "{{ whisparr_homepage_showstats | string }}"
-          repliqate.enabled: "{{ whisparr_repliqate_enabled | string }}"
+          homepage.showStats: "{{ whisparr_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ whisparr_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ whisparr_repliqate_engine }}"
           repliqate.schedule: "{{ whisparr_repliqate_schedule }}"
           repliqate.backup_id: "{{ whisparr_repliqate_backup_id }}"
           repliqate.retention: "{{ whisparr_repliqate_retention }}"
-          traefik.enable: "{{ whisparr_available_externally | string }}"
+          traefik.enable: "{{ whisparr_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.whisparr.rule: "Host(`{{ whisparr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.whisparr.tls.certresolver: "letsencrypt"
           traefik.http.routers.whisparr.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -70,7 +70,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (whisparr_port_http | string)] +
-                (['https://' + whisparr_hostname + '.' + ansible_nas_domain] if (whisparr_available_externally is true or whisparr_dockflare_enabled is true) else [])
+                (['https://' + whisparr_hostname + '.' + ansible_nas_domain] if (whisparr_traefik_enabled is true or whisparr_dockflare_enabled is true) else [])
               }}
   when: whisparr_enabled is true
 

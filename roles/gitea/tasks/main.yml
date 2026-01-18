@@ -28,8 +28,8 @@
           MYSQL_ROOT_PASSWORD: "gitea"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ gitea_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ gitea_db_watchtower_enabled | string }}"
+          autoheal: "{{ gitea_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ gitea_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ gitea_db_homepage_group }}"
@@ -38,8 +38,8 @@
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gitea_db_container_name }}"
-          homepage.showStats: "{{ gitea_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ gitea_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ gitea_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ gitea_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ gitea_db_repliqate_engine }}"
           repliqate.schedule: "{{ gitea_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ gitea_db_repliqate_backup_id }}"
@@ -83,9 +83,9 @@
           USER_GID: "{{ gitea_gid }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ gitea_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ gitea_watchtower_enabled | string }}"
-          dockflare.enable: "{{ gitea_dockflare_enabled | string }}"
+          autoheal: "{{ gitea_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ gitea_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ gitea_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ gitea_dockflare_access_group }}"
           dockflare.hostname: "{{ gitea_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"
@@ -97,16 +97,16 @@
           homepage.description: "{{ 'git with a cup of tea' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gitea_container_name }}"
-          homepage.showStats: "{{ gitea_homepage_showstats | string }}"
+          homepage.showStats: "{{ gitea_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "gitea"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"
           homepage.widget.key: "{{ gitea_homepage_widget_key }}"
-          repliqate.enabled: "{{ gitea_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ gitea_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ gitea_repliqate_engine }}"
           repliqate.schedule: "{{ gitea_repliqate_schedule }}"
           repliqate.backup_id: "{{ gitea_repliqate_backup_id }}"
           repliqate.retention: "{{ gitea_repliqate_retention }}"
-          traefik.enable: "{{ gitea_available_externally | string }}"
+          traefik.enable: "{{ gitea_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.gitea.rule: "Host(`{{ gitea_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gitea.tls.certresolver: "letsencrypt"
           traefik.http.routers.gitea.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -127,7 +127,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gitea_port_http | string)] +
-                (['https://' + gitea_hostname + '.' + ansible_nas_domain] if (gitea_available_externally is true or gitea_dockflare_enabled is true) else [])
+                (['https://' + gitea_hostname + '.' + ansible_nas_domain] if (gitea_traefik_enabled is true or gitea_dockflare_enabled is true) else [])
               }}
   when: gitea_enabled is true
 

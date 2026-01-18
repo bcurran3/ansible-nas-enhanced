@@ -50,8 +50,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         restart: "{{ telegraf_config is changed }}"
         labels:
-          autoheal: "{{ stats_telegraf_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ stats_telegraf_watchtower_enabled | string }}"
+          autoheal: "{{ stats_telegraf_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ stats_telegraf_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "Telegraf"
           homepage.group: "{{ stats_telegraf_homepage_group }}"
@@ -59,7 +59,7 @@
           homepage.description: "{{ 'Agent for collecting, processing, aggregating, and writing metrics, logs, and other arbitrary data.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stats_telegraf_container_name }}"
-          homepage.showStats: "{{ stats_telegraf_homepage_showstats | string }}"
+          homepage.showStats: "{{ stats_telegraf_homepage_showstats | ternary('true', 'false') }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"

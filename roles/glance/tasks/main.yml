@@ -37,9 +37,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ glance_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ glance_watchtower_enabled | string }}"
-          dockflare.enable: "{{ glance_dockflare_enabled | string }}"
+          autoheal: "{{ glance_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ glance_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ glance_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ glance_dockflare_access_group }}"
           dockflare.hostname: "{{ glance_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glance_port_http }}"
@@ -51,13 +51,13 @@
           homepage.description: "{{ 'A self-hosted dashboard that puts all your feeds in one place.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ glance_container_name }}"
-          homepage.showStats: "{{ glance_homepage_showstats | string }}"
-          repliqate.enabled: "{{ glance_repliqate_enabled | string }}"
+          homepage.showStats: "{{ glance_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ glance_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ glance_repliqate_engine }}"
           repliqate.schedule: "{{ glance_repliqate_schedule }}"
           repliqate.backup_id: "{{ glance_repliqate_backup_id }}"
           repliqate.retention: "{{ glance_repliqate_retention }}"
-          traefik.enable: "{{ glance_available_externally | string }}"
+          traefik.enable: "{{ glance_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.glance.rule: "Host(`{{ glance_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.glance.tls.certresolver: "letsencrypt"
           traefik.http.routers.glance.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -78,7 +78,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (glance_port_http | string)] +
-                (['https://' + glance_hostname + '.' + ansible_nas_domain] if (glance_available_externally is true or glance_dockflare_enabled is true) else [])
+                (['https://' + glance_hostname + '.' + ansible_nas_domain] if (glance_traefik_enabled is true or glance_dockflare_enabled is true) else [])
               }}
   when: glance_enabled is true
 

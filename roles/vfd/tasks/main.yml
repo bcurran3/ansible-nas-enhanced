@@ -33,9 +33,9 @@
           VFD_DASHBOARD_PORT: "{{ vfd_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ vfd_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ vfd_watchtower_enabled | string }}"
-          dockflare.enable: "{{ vfd_dockflare_enabled | string }}"
+          autoheal: "{{ vfd_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ vfd_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ vfd_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ vfd_dockflare_access_group }}"
           dockflare.hostname: "{{ vfd_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vfd_port_http }}"
@@ -47,13 +47,13 @@
           homepage.description: "{{ 'A small flight price tracking script' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vfd_container_name }}"
-          homepage.showStats: "{{ vfd_homepage_showstats | string }}"
-          repliqate.enabled: "{{ vfd_repliqate_enabled | string }}"
+          homepage.showStats: "{{ vfd_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ vfd_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ vfd_repliqate_engine }}"
           repliqate.schedule: "{{ vfd_repliqate_schedule }}"
           repliqate.backup_id: "{{ vfd_repliqate_backup_id }}"
           repliqate.retention: "{{ vfd_repliqate_retention }}"
-          traefik.enable: "{{ vfd_available_externally | string }}"
+          traefik.enable: "{{ vfd_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.vfd.rule: "Host(`{{ vfd_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.vfd.tls.certresolver: "letsencrypt"
           traefik.http.routers.vfd.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -73,7 +73,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (vfd_port_http | string)] +
-                (['https://' + vfd_hostname + '.' + ansible_nas_domain] if (vfd_available_externally is true or vfd_dockflare_enabled is true) else [])
+                (['https://' + vfd_hostname + '.' + ansible_nas_domain] if (vfd_traefik_enabled is true or vfd_dockflare_enabled is true) else [])
               }}
   when: vfd_enabled is true
 

@@ -31,9 +31,9 @@
           TZ: "{{ ansible_nas_timezone }}"
           WEB_APP_PORT: "{{ netbootxyz_port_http }}"
         labels:
-          autoheal: "{{ netbootxyz_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ netbootxyz_watchtower_enabled | string }}"
-          dockflare.enable: "{{ netbootxyz_dockflare_enabled | string }}"
+          autoheal: "{{ netbootxyz_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ netbootxyz_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ netbootxyz_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ netbootxyz_dockflare_access_group }}"
           dockflare.hostname: "{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbootxyz_port_http }}"
@@ -45,13 +45,13 @@
           homepage.description: "{{ 'Your favorite operating systems in one place. A network-based bootable operating system installer based on iPXE.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ netbootxyz_container_name }}"
-          homepage.showStats: "{{ netbootxyz_homepage_showstats | string }}"
-          repliqate.enabled: "{{ netbootxyz_repliqate_enabled | string }}"
+          homepage.showStats: "{{ netbootxyz_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ netbootxyz_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ netbootxyz_repliqate_engine }}"
           repliqate.schedule: "{{ netbootxyz_repliqate_schedule }}"
           repliqate.backup_id: "{{ netbootxyz_repliqate_backup_id }}"
           repliqate.retention: "{{ netbootxyz_repliqate_retention }}"
-          traefik.enable: "{{ netbootxyz_available_externally | string }}"
+          traefik.enable: "{{ netbootxyz_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.netbootxyz.rule: "Host(`{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.netbootxyz.entrypoints: "websecure"
           traefik.http.routers.netbootxyz.tls.certresolver: "letsencrypt"
@@ -82,9 +82,9 @@
         msg: >-
           {{
             ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netbootxyz_port_http | string)] +
-            (['https://' + netbootxyz_hostname + '.' + ansible_nas_domain] if (netbootxyz_available_externally is true or netbootxyz_dockflare_enabled is true) else []) +
+            (['https://' + netbootxyz_hostname + '.' + ansible_nas_domain] if (netbootxyz_traefik_enabled is true or netbootxyz_dockflare_enabled is true) else []) +
             ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netbootxyz_port_http2 | string) + ' (assets)'] +
-            (['https://' + netbootxyz_hostname2 + '.' + ansible_nas_domain + '(assets)'] if (netbootxyz_available_externally is true or netbootxyz_dockflare_enabled is true) else [])
+            (['https://' + netbootxyz_hostname2 + '.' + ansible_nas_domain + '(assets)'] if (netbootxyz_traefik_enabled is true or netbootxyz_dockflare_enabled is true) else [])
           }}
   when: netbootxyz_enabled is true
 

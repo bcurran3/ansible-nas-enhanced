@@ -39,9 +39,9 @@
           PGID: "{{ transmission_group_id }}"
           TZ: "{{ transmission_timezone }}"
         labels:
-          autoheal: "{{ transmission_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ transmission_watchtower_enabled | string }}"
-          dockflare.enable: "{{ transmission_dockflare_enabled | string }}"
+          autoheal: "{{ transmission_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ transmission_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ transmission_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ transmission_dockflare_access_group }}"
           dockflare.hostname: "{{ transmission_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_port_http }}"
@@ -53,17 +53,17 @@
           homepage.description: "{{ 'BitTorrent client' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ transmission_container_name }}"
-          homepage.showStats: "{{ transmission_homepage_showstats | string }}"
+          homepage.showStats: "{{ transmission_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "transmission"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_port_http }}"
           homepage.widget.user: "{{ transmission_homepage_widget_user }}"
           homepage.widget.password: "{{ transmission_homepage_widget_password }}"
-          repliqate.enabled: "{{ transmission_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ transmission_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ transmission_repliqate_engine }}"
           repliqate.schedule: "{{ transmission_repliqate_schedule }}"
           repliqate.backup_id: "{{ transmission_repliqate_backup_id }}"
           repliqate.retention: "{{ transmission_repliqate_retention }}"
-          traefik.enable: "{{ transmission_available_externally | string }}"
+          traefik.enable: "{{ transmission_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.transmission.rule: "Host(`{{ transmission_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.transmission.tls.certresolver: "letsencrypt"
           traefik.http.routers.transmission.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -84,7 +84,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (transmission_port_http | string)] +
-                (['https://' + transmission_hostname + '.' + ansible_nas_domain] if (transmission_available_externally is true or transmission_dockflare_enabled is true) else [])
+                (['https://' + transmission_hostname + '.' + ansible_nas_domain] if (transmission_traefik_enabled is true or transmission_dockflare_enabled is true) else [])
               }}
   when: transmission_enabled is true
 

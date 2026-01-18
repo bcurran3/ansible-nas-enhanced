@@ -31,9 +31,9 @@
           PGID: "{{ filebrowser_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ filebrowser_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ filebrowser_watchtower_enabled | string }}"
-          dockflare.enable: "{{ filebrowser_dockflare_enabled | string }}"
+          autoheal: "{{ filebrowser_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebrowser_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ filebrowser_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ filebrowser_dockflare_access_group }}"
           dockflare.hostname: "{{ filebrowser_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebrowser_port_http }}"
@@ -45,13 +45,13 @@
           homepage.description: "{{ 'Web File Browser' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ filebrowser_container_name }}"
-          homepage.showStats: "{{ filebrowser_homepage_showstats | string }}"
-          repliqate.enabled: "{{ filebrowser_repliqate_enabled | string }}"
+          homepage.showStats: "{{ filebrowser_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ filebrowser_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ filebrowser_repliqate_engine }}"
           repliqate.schedule: "{{ filebrowser_repliqate_schedule }}"
           repliqate.backup_id: "{{ filebrowser_repliqate_backup_id }}"
           repliqate.retention: "{{ filebrowser_repliqate_retention }}"
-          traefik.enable: "{{ filebrowser_available_externally | string }}"
+          traefik.enable: "{{ filebrowser_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.filebrowser.rule: "Host(`{{ filebrowser_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.filebrowser.tls.certresolver: "letsencrypt"
           traefik.http.routers.filebrowser.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -72,7 +72,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (filebrowser_port_http | string)] +
-                (['https://' + filebrowser_hostname + '.' + ansible_nas_domain] if (filebrowser_available_externally is true or filebrowser_dockflare_enabled is true) else [])
+                (['https://' + filebrowser_hostname + '.' + ansible_nas_domain] if (filebrowser_traefik_enabled is true or filebrowser_dockflare_enabled is true) else [])
               }}
   when: filebrowser_enabled is true
 

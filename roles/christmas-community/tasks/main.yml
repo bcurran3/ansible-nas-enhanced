@@ -26,9 +26,9 @@
           NODE_OPTIONS: "--max-http-header-size=32768"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ christmas_community_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ christmas_community_watchtower_enabled | string }}"
-          dockflare.enable: "{{ christmas_community_dockflare_enabled | string }}"
+          autoheal: "{{ christmas_community_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ christmas_community_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ christmas_community_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ christmas_community_dockflare_access_group }}"
           dockflare.hostname: "{{ christmas_community_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ christmas_community_port_http }}"
@@ -40,13 +40,13 @@
           homepage.description: "{{ 'Christmas lists for families' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "christmas-community"
-          homepage.showStats: "{{ christmas_community_homepage_showstats | string }}"
-          repliqate.enabled: "{{ christmas_community_repliqate_enabled | string }}"
+          homepage.showStats: "{{ christmas_community_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ christmas_community_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ christmas_community_repliqate_engine }}"
           repliqate.schedule: "{{ christmas_community_repliqate_schedule }}"
           repliqate.backup_id: "{{ christmas_community_repliqate_backup_id }}"
           repliqate.retention: "{{ christmas_community_repliqate_retention }}"
-          traefik.enable: "{{ christmas_community_available_externally | string }}"
+          traefik.enable: "{{ christmas_community_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.christmascommunity.rule: "Host(`{{ christmas_community_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.christmascommunity.tls.certresolver: "letsencrypt"
           traefik.http.routers.christmascommunity.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (christmas_community_port_http | string)] +
-                (['https://' + christmas_community_hostname + '.' + ansible_nas_domain] if (christmas_community_available_externally is true or christmas_community_dockflare_enabled is true) else [])
+                (['https://' + christmas_community_hostname + '.' + ansible_nas_domain] if (christmas_community_traefik_enabled is true or christmas_community_dockflare_enabled is true) else [])
               }}
   when: christmas_community_enabled is true
 

@@ -61,9 +61,9 @@
                     else (netdata_devices | default(omit))
                   }}
         labels:
-          autoheal: "{{ netdata_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ netdata_watchtower_enabled | string }}"
-          dockflare.enable: "{{ netdata_dockflare_enabled | string }}"
+          autoheal: "{{ netdata_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ netdata_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ netdata_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ netdata_dockflare_access_group }}"
           dockflare.hostname: "{{ netdata_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netdata_port_http }}"
@@ -75,11 +75,11 @@
           homepage.description: "{{ 'The fastest path to AI-powered full stack observability, even for lean teams.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ netdata_container_name }}"
-          homepage.showStats: "{{ netdata_homepage_showstats | string }}"
+          homepage.showStats: "{{ netdata_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "netdata"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netdata_port_http }}"
           repliqate.enabled: "false"
-          traefik.enable: "{{ netdata_available_externally | string }}"
+          traefik.enable: "{{ netdata_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.netdata.rule: "Host(`{{ netdata_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.netdata.tls.certresolver: "letsencrypt"
           traefik.http.routers.netdata.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -100,7 +100,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netdata_port_http | string)] +
-                (['https://' + netdata_hostname + '.' + ansible_nas_domain] if (netdata_available_externally is true or netdata_dockflare_enabled is true) else [])
+                (['https://' + netdata_hostname + '.' + ansible_nas_domain] if (netdata_traefik_enabled is true or netdata_dockflare_enabled is true) else [])
               }}
   when: netdata_enabled is true
 

@@ -25,8 +25,8 @@
           - "nofile:1048576:1048576"
         network_mode: bridge
         labels:
-          autoheal: "{{ timemachine_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ timemachine_watchtower_enabled | string }}"
+          autoheal: "{{ timemachine_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ timemachine_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ timemachine_homepage_group }}"
@@ -34,8 +34,8 @@
           homepage.description: "{{ 'Docker Container to run a TimeMachine Backup target' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ timemachine_container_name }}"
-          homepage.showStats: "{{ timemachine_homepage_showstats | string }}"
-          repliqate.enabled: "{{ timemachine_repliqate_enabled | string }}"
+          homepage.showStats: "{{ timemachine_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ timemachine_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ timemachine_repliqate_engine }}"
           repliqate.schedule: "{{ timemachine_repliqate_schedule }}"
           repliqate.backup_id: "{{ timemachine_repliqate_backup_id }}"

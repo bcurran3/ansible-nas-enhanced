@@ -35,8 +35,8 @@
           test: ['CMD', 'redis-cli', 'ping']
         command: "--save 60 1"
         labels:
-          autoheal: "{{ ssm_redis_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ ssm_redis_watchtower_enabled | string }}"
+          autoheal: "{{ ssm_redis_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ ssm_redis_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
@@ -65,8 +65,8 @@
         healthcheck:
           test: ['CMD', 'pg_isready', '-U', 'postgres']
         labels:
-          autoheal: "{{ ssm_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ ssm_db_watchtower_enabled | string }}"
+          autoheal: "{{ ssm_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ ssm_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
@@ -92,13 +92,13 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ ssm_client_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ ssm_client_watchtower_enabled | string }}"
-          dockflare.enable: "{{ ssm_dockflare_enabled | string }}"
+          autoheal: "{{ ssm_client_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ ssm_client_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ ssm_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ ssm_dockflare_access_group }}"
           dockflare.hostname: "{{ ssm_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ssm_port_http }}"
-          traefik.enable: "{{ ssm_available_externally | string }}"
+          traefik.enable: "{{ ssm_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.ssm.rule: "Host(`{{ ssm_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ssm.tls.certresolver: "letsencrypt"
           traefik.http.routers.ssm.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -118,7 +118,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ssm_port_http | string)] +
-                (['https://' + ssm_hostname + '.' + ansible_nas_domain] if (ssm_available_externally is true or ssm_dockflare_enabled is true) else [])
+                (['https://' + ssm_hostname + '.' + ansible_nas_domain] if (ssm_traefik_enabled is true or ssm_dockflare_enabled is true) else [])
               }}
 
     - name: Create {{ ansible_nas_app_name }} Server Container
@@ -148,8 +148,8 @@
         volumes:
           - "{{ ssm_data_directory }}/playbooks:/playbooks"
         labels:
-          autoheal: "{{ ssm_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ ssm_watchtower_enabled | string }}"
+          autoheal: "{{ ssm_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ ssm_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           wud.tag.include: '^v\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"

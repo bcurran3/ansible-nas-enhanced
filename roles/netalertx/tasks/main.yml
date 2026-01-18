@@ -40,9 +40,9 @@
         tmpfs:
               - "/tmp:uid=20211,gid=20211,mode=1700,rw,noexec,nosuid,nodev,async,noatime,nodiratime"
         labels:
-          autoheal: "{{ netalertx_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ netalertx_watchtower_enabled | string }}"
-          dockflare.enable: "{{ netalertx_dockflare_enabled | string }}"
+          autoheal: "{{ netalertx_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ netalertx_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ netalertx_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ netalertx_dockflare_access_group }}"
           dockflare.hostname: "{{ netalertx_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
@@ -58,12 +58,12 @@
           homepage.widget.type: "netalertx"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
           homepage.widget.key: "{{ netalertx_homepage_widget_key }}"
-          repliqate.enabled: "{{ netalertx_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ netalertx_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ netalertx_repliqate_engine }}"
           repliqate.schedule: "{{ netalertx_repliqate_schedule }}"
           repliqate.backup_id: "{{ netalertx_repliqate_backup_id }}"
           repliqate.retention: "{{ netalertx_repliqate_retention }}"
-          traefik.enable: "{{ netalertx_available_externally | string }}"
+          traefik.enable: "{{ netalertx_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.netalertx.rule: "Host(`{{ netalertx_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.netalertx.entrypoints: "websecure"
           traefik.http.routers.netalertx.tls.certresolver: "letsencrypt"
@@ -97,7 +97,7 @@
         msg: >-
           {{
             ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netalertx_port_http | string)] +
-            (['https://' + netalertx_hostname + '.' + ansible_nas_domain] if (netalertx_available_externally is true or netalertx_dockflare_enabled is true) else [])
+            (['https://' + netalertx_hostname + '.' + ansible_nas_domain] if (netalertx_traefik_enabled is true or netalertx_dockflare_enabled is true) else [])
           }}
   when: netalertx_enabled is true
 

@@ -36,8 +36,8 @@
           UN_WHISPARR_0_API_KEY: "{{ unpackerr_env_un_whisparr_0_api_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ unpackerr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ unpackerr_watchtower_enabled | string }}"
+          autoheal: "{{ unpackerr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ unpackerr_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ unpackerr_homepage_group }}"
@@ -45,7 +45,7 @@
           homepage.description: "{{ 'xtracts downloads for Radarr, Sonarr, Lidarr, Readarr, and/or a Watch folder - Deletes extracted files after import' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ unpackerr_container_name }}"
-          homepage.showStats: "{{ unpackerr_homepage_showstats | string }}"
+          homepage.showStats: "{{ unpackerr_homepage_showstats | ternary('true', 'false') }}"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"

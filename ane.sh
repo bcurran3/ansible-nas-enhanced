@@ -310,7 +310,7 @@ function enable_app {
                 if ! grep -q "${arg_clean}_enabled" "$FILE"; then
                     echo -e "\n### ${arg}\n$ENABLED_LINE" >> "$FILE"
                     if grep -xq "traefik_enabled: true" "$FILE"; then
-                        echo "${arg_clean}_available_externally: true" >> "$FILE"
+                        echo "${arg_clean}_traefik_enabled: true" >> "$FILE"
                         echo "${arg_clean}_homepage_href: \"https://{{ ${arg_clean}_hostname }}.{{ ansible_nas_domain }}\"" >> "$FILE"
                     fi
                     echo "  ** ${arg} enabled (new entry)."

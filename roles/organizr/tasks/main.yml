@@ -25,9 +25,9 @@
           - "{{ organizr_port_http }}:80"
           - "{{ organizr_port_https }}:443"
         labels:
-          autoheal: "{{ organizr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ organizr_watchtower_enabled | string }}"
-          dockflare.enable: "{{ organizr_dockflare_enabled | string }}"
+          autoheal: "{{ organizr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ organizr_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ organizr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ organizr_dockflare_access_group }}"
           dockflare.hostname: "{{ organizr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ organizr_port_http }}"
@@ -38,14 +38,14 @@
           homepage.description: "{{ 'organizr description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ organizr_container_name }}"
-          homepage.showStats: "{{ organizr_homepage_showstats | string }}"
+          homepage.showStats: "{{ organizr_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ organizr_port_http }}"
-          repliqate.enabled: "{{ organizr_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ organizr_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ organizr_repliqate_engine }}"
           repliqate.schedule: "{{ organizr_repliqate_schedule }}"
           repliqate.backup_id: "{{ organizr_repliqate_backup_id }}"
           repliqate.retention: "{{ organizr_repliqate_retention }}"
-          traefik.enable: "{{ organizr_available_externally | string }}"
+          traefik.enable: "{{ organizr_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.organizr.rule: "Host(`{{ organizr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.organizr.tls.certresolver: "letsencrypt"
           traefik.http.routers.organizr.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -65,7 +65,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (organizr_port_http | string)] +
-                (['https://' + organizr_hostname + '.' + ansible_nas_domain] if (organizr_available_externally is true or organizr_dockflare_enabled is true) else [])
+                (['https://' + organizr_hostname + '.' + ansible_nas_domain] if (organizr_traefik_enabled is true or organizr_dockflare_enabled is true) else [])
               }}
   when: organizr_enabled is true
 

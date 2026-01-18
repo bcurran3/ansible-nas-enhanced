@@ -45,8 +45,8 @@
           MSSQL_PID: "{{ proget_db_mssql_pid }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ proget_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ proget_db_watchtower_enabled | string }}"
+          autoheal: "{{ proget_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ proget_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MSSQL"
           homepage.group: "{{ proget_db_homepage_group }}"
@@ -55,8 +55,8 @@
           homepage.description: "{{ 'Microsoft SQL Server' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ proget_db_container_name }}"
-          homepage.showStats: "{{ proget_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ proget_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ proget_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ proget_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ proget_db_repliqate_engine }}"
           repliqate.schedule: "{{ proget_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ proget_db_repliqate_backup_id }}"
@@ -104,9 +104,9 @@
         links:
           - "{{ proget_db_container_name }}"
         labels:
-          autoheal: "{{ proget_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ proget_watchtower_enabled | string }}"
-          dockflare.enable: "{{ proget_dockflare_enabled | string }}"
+          autoheal: "{{ proget_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ proget_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ proget_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ proget_dockflare_access_group }}"
           dockflare.hostname: "{{ proget_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proget_port_http }}"
@@ -118,13 +118,13 @@
           homepage.description: "{{ 'ProGet' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ proget_container_name }}"
-          homepage.showStats: "{{ proget_homepage_showstats | string }}"
-          repliqate.enabled: "{{ proget_repliqate_enabled | string }}"
+          homepage.showStats: "{{ proget_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ proget_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ proget_repliqate_engine }}"
           repliqate.schedule: "{{ proget_repliqate_schedule }}"
           repliqate.backup_id: "{{ proget_repliqate_backup_id }}"
           repliqate.retention: "{{ proget_repliqate_retention }}"
-          traefik.enable: "{{ proget_available_externally | string }}"
+          traefik.enable: "{{ proget_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.proget.rule: "Host(`{{ proget_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.proget.tls.certresolver: "letsencrypt"
           traefik.http.routers.proget.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -144,7 +144,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (proget_port_http | string)] +
-                (['https://' + proget_hostname + '.' + ansible_nas_domain] if (proget_available_externally is true or proget_dockflare_enabled is true) else [])
+                (['https://' + proget_hostname + '.' + ansible_nas_domain] if (proget_traefik_enabled is true or proget_dockflare_enabled is true) else [])
               }}
   when: proget_enabled is true
 

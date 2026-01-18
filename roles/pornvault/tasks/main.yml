@@ -26,9 +26,9 @@
         ports:
           - "{{ pornvault_port_http }}:3000"
         labels:
-          autoheal: "{{ pornvault_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ pornvault_watchtower_enabled | string }}"
-          dockflare.enable: "{{ pornvault_dockflare_enabled | string }}"
+          autoheal: "{{ pornvault_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ pornvault_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ pornvault_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ pornvault_dockflare_access_group }}"
           dockflare.hostname: "{{ pornvault_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pornvault_port_http }}"
@@ -40,13 +40,13 @@
           homepage.description: "{{ 'Porn-Vault is a self hosted organizer for adult videos and imagery.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pornvault_container_name }}"
-          homepage.showStats: "{{ pornvault_homepage_showstats | string }}"
-          repliqate.enabled: "{{ pornvault_repliqate_enabled | string }}"
+          homepage.showStats: "{{ pornvault_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ pornvault_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ pornvault_repliqate_engine }}"
           repliqate.schedule: "{{ pornvault_repliqate_schedule }}"
           repliqate.backup_id: "{{ pornvault_repliqate_backup_id }}"
           repliqate.retention: "{{ pornvault_repliqate_retention }}"
-          traefik.enable: "{{ pornvault_available_externally | string }}"
+          traefik.enable: "{{ pornvault_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.pornvault.rule: "Host(`{{ pornvault_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pornvault.tls.certresolver: "letsencrypt"
           traefik.http.routers.pornvault.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -66,7 +66,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pornvault_port_http | string)] +
-                (['https://' + pornvault_hostname + '.' + ansible_nas_domain] if (pornvault_available_externally is true or pornvault_dockflare_enabled is true) else [])
+                (['https://' + pornvault_hostname + '.' + ansible_nas_domain] if (pornvault_traefik_enabled is true or pornvault_dockflare_enabled is true) else [])
               }}
   when: pornvault_enabled is true
 

@@ -38,8 +38,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ bytestash_autoheal | string }} | string"
-          com.centurylinklabs.watchtower.enable: "{{ bytestash_watchtower_enabled | string }}"
-          dockflare.enable: "{{ bytestash_dockflare_enabled | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ bytestash_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ bytestash_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ bytestash_dockflare_access_group }}"
           dockflare.hostname: "{{ bytestash_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bytestash_port_http }}"
@@ -50,14 +50,14 @@
           homepage.description: "{{ 'code snippet storage solution' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ bytestash_container_name }}"
-          homepage.showStats: "{{ bytestash_homepage_showstats | string }}"
+          homepage.showStats: "{{ bytestash_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bytestash_port_http }}"
           repliqate.enabled: "{{ bytestash_repliqate_enabled }} | string"
           repliqate.engine: "{{ bytestash_repliqate_engine }}"
           repliqate.schedule: "{{ bytestash_repliqate_schedule }}"
           repliqate.backup_id: "{{ bytestash_repliqate_backup_id }}"
           repliqate.retention: "{{ bytestash_repliqate_retention }}"
-          traefik.enable: "{{ bytestash_available_externally | string }}"
+          traefik.enable: "{{ bytestash_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.bytestash.rule: "Host(`{{ bytestash_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.bytestash.tls.certresolver: "letsencrypt"
           traefik.http.routers.bytestash.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -77,7 +77,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (bytestash_port_http | string)] +
-                (['https://' + bytestash_hostname + '.' + ansible_nas_domain] if (bytestash_available_externally is true or bytestash_dockflare_enabled is true) else [])
+                (['https://' + bytestash_hostname + '.' + ansible_nas_domain] if (bytestash_traefik_enabled is true or bytestash_dockflare_enabled is true) else [])
               }}
   when: bytestash_enabled is true
 

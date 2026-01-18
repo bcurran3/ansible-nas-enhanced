@@ -31,7 +31,7 @@
 #          TZ: "{{ ansible_nas_timezone }}"
 #        command: "celery -A gramps_webapi.celery worker --loglevel=INFO --concurrency=2"
 #        labels:
-#          autoheal: "{{ grampsweb_celery_autoheal | string }}"
+#          autoheal: "{{ grampsweb_celery_autoheal_enabled | ternary('true', 'false') }}"
 #          com.centurylinklabs.watchtower.enable: "false"
 #          dockflare.enable: "false"
 #          com.centurylinklabs.watchtower.enable: "true"
@@ -43,7 +43,7 @@
 #          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
 #          homepage.server: "my-docker"
 #          homepage.container: "{{ grampsweb_celery_container_name }}"
-#          homepage.showStats: "{{ grampsweb_celery_homepage_showstats | string }}"
+#          homepage.showStats: "{{ grampsweb_celery_homepage_showstats | ternary('true', 'false') }}"
 #          traefik.enable: "false"
 #        cpu_shares: "{{ gramsweb_celery_cpu_shares }}"
 #        memory: "{{ grampsweb_celery_memory }}"
@@ -60,7 +60,7 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ grampsweb_redis_autoheal | string }}"
+          autoheal: "{{ grampsweb_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
@@ -71,7 +71,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ grampsweb_redis_container_name }}"
-          homepage.showStats: "{{ grampsweb_redis_homepage_showstats | string }}"
+          homepage.showStats: "{{ grampsweb_redis_homepage_showstats | ternary('true', 'false') }}"
           traefik.enable: "false"
         cpu_shares: "{{ grampsweb_redis_cpu_shares }}"
         memory: "{{ grampsweb_redis_memory }}"
@@ -105,9 +105,9 @@
 #          - "{{ grampsweb_celery_container_name }}"
           - "{{ grampsweb_redis_container_name }}"
         labels:
-          autoheal: "{{ grampsweb_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ grampsweb_watchtower_enabled | string }}"
-          dockflare.enable: "{{ grampsweb_dockflare_enabled | string }}"
+          autoheal: "{{ grampsweb_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ grampsweb_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ grampsweb_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ grampsweb_dockflare_access_group }}"
           dockflare.hostname: "{{ grampsweb_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
@@ -119,8 +119,8 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ grampsweb_container_name }}"
-          homepage.showStats: "{{ grampsweb_homepage_showstats | string }}"
-          traefik.enable: "{{ grampsweb_available_externally | string }}"
+          homepage.showStats: "{{ grampsweb_homepage_showstats | ternary('true', 'false') }}"
+          traefik.enable: "{{ grampsweb_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.grampsweb.rule: "Host(`{{ grampsweb_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.grampsweb.tls.certresolver: "letsencrypt"
           traefik.http.routers.grampsweb.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -140,7 +140,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (grampsweb_port_http | string)] +
-                (['https://' + grampsweb_hostname + '.' + ansible_nas_domain] if (grampsweb_available_externally is true or grampsweb_dockflare_enabled is true) else [])
+                (['https://' + grampsweb_hostname + '.' + ansible_nas_domain] if (grampsweb_traefik_enabled is true or grampsweb_dockflare_enabled is true) else [])
               }}
   when: grampsweb_enabled is true
 

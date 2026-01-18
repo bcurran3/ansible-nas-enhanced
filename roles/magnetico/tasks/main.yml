@@ -41,8 +41,8 @@
         command:
           - "--indexer-addr=0.0.0.0:1212"
         labels:
-          autoheal: "{{ magneticod_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enabled | string }}"
+          autoheal: "{{ magneticod_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Crawler"
           homepage.group: "{{ magneticod_homepage_group }}"
@@ -51,8 +51,8 @@
           homepage.description: "{{ 'Autonomous (self-hosted) BitTorrent DHT search engine suite.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ magneticod_container_name }}"
-          homepage.showStats: "{{ magneticod_homepage_showstats | string }}"
-          repliqate.enabled: "{{ magneticod_repliqate_enabled | string }}"
+          homepage.showStats: "{{ magneticod_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ magneticod_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ magneticod_repliqate_engine }}"
           repliqate.schedule: "{{ magneticod_repliqate_schedule }}"
           repliqate.backup_id: "{{ magneticod_repliqate_backup_id }}"
@@ -83,9 +83,9 @@
         links:
           - "{{ magneticod_container_name }}"
         labels:
-          autoheal: "{{ magnetico_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enabled | string }}"
-          dockflare.enable: "{{ magnetico_dockflare_enabled | string }}"
+          autoheal: "{{ magnetico_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ magnetico_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ magnetico_dockflare_access_group }}"
           dockflare.hostname: "{{ magnetico_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ magnetico_port_http }}"
@@ -97,13 +97,13 @@
           homepage.description: "{{ 'Autonomous (self-hosted) BitTorrent DHT search engine suite.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ magnetico_container_name }}"
-          homepage.showStats: "{{ magnetico_homepage_showstats | string }}"
-          repliqate.enabled: "{{ magnetico_repliqate_enabled | string }}"
+          homepage.showStats: "{{ magnetico_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ magnetico_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ magnetico_repliqate_engine }}"
           repliqate.schedule: "{{ magnetico_repliqate_schedule }}"
           repliqate.backup_id: "{{ magnetico_repliqate_backup_id }}"
           repliqate.retention: "{{ magnetico_repliqate_retention }}"
-          traefik.enable: "{{ magnetico_available_externally | string }}"
+          traefik.enable: "{{ magnetico_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.magnetico.rule: "Host(`{{ magnetico_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.magnetico.tls.certresolver: "letsencrypt"
           traefik.http.routers.magnetico.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -124,7 +124,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (magnetico_port_http | string)] +
-                (['https://' + magnetico_hostname + '.' + ansible_nas_domain] if (magnetico_available_externally is true or magnetico_dockflare_enabled is true) else [])
+                (['https://' + magnetico_hostname + '.' + ansible_nas_domain] if (magnetico_traefik_enabled is true or magnetico_dockflare_enabled is true) else [])
               }}
   when: magnetico_enabled is true
 

@@ -34,9 +34,9 @@
         ports:
           - "{{ conduit_port_http }}:6167"
         labels:
-          autoheal: "{{ conduit_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ conduit_watchtower_enabled | string }}"
-          dockflare.enable: "{{ conduit_dockflare_enabled | string }}"
+          autoheal: "{{ conduit_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ conduit_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ conduit_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ conduit_dockflare_access_group }}"
           dockflare.hostname: "{{ conduit_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ conduit_port_http }}"
@@ -48,13 +48,13 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ conduit_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ conduit_container_name }}"
-          homepage.showStats: "{{ conduit_homepage_showstats | string }}"
-          repliqate.enabled: "{{ conduit_repliqate_enabled | string }}"
+          homepage.showStats: "{{ conduit_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ conduit_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ conduit_repliqate_engine }}"
           repliqate.schedule: "{{ conduit_repliqate_schedule }}"
           repliqate.backup_id: "{{ conduit_repliqate_backup_id }}"
           repliqate.retention: "{{ conduit_repliqate_retention }}"
-          traefik.enable: "{{ conduit_available_externally | string }}"
+          traefik.enable: "{{ conduit_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.conduit.rule: "Host(`{{ conduit_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.conduit.tls.certresolver: "letsencrypt"
           traefik.http.routers.conduit.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -74,7 +74,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (conduit_port_http | string)] +
-                (['https://' + conduit_hostname + '.' + ansible_nas_domain] if (conduit_available_externally is true or conduit_dockflare_enabled is true) else [])
+                (['https://' + conduit_hostname + '.' + ansible_nas_domain] if (conduit_traefik_enabled is true or conduit_dockflare_enabled is true) else [])
               }}
   when: conduit_enabled is true
 

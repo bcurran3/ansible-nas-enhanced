@@ -22,8 +22,8 @@
         env:
           EULA: "TRUE"
         labels:
-          autoheal: "{{ minecraft_server_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ minecraft_server_watchtower_enabled | string }}"
+          autoheal: "{{ minecraft_server_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ minecraft_server_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ minecraft_server_homepage_group }}"
@@ -31,10 +31,10 @@
           homepage.description: "{{ 'minecraft_server description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ minecraft_server_container_name }}"
-          homepage.showStats: "{{ minecraft_server_homepage_showstats | string }}"
+          homepage.showStats: "{{ minecraft_server_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "minecraft"
           homepage.widget.url: "udp://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ minecraft_server_port }}"
-          repliqate.enabled: "{{ minecraft_server_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ minecraft_server_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ minecraft_server_repliqate_engine }}"
           repliqate.schedule: "{{ minecraft_server_repliqate_schedule }}"
           repliqate.backup_id: "{{ minecraft_server_repliqate_backup_id }}"

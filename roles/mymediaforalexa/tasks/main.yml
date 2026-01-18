@@ -23,8 +23,8 @@
           - "{{ mymediaforalexa_data_directory }}:/datadir:rw"
         network_mode: bridge
         labels:
-          autoheal: "{{ mymediaforalexa_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ mymediaforalexa_watchtower_enabled | string }}"
+          autoheal: "{{ mymediaforalexa_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ mymediaforalexa_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mymediaforalexa_homepage_group }}"
@@ -32,8 +32,8 @@
           homepage.description: "{{ 'a tiny media server that integrates with Alexa for controlling your media collection' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mymediaforalexa_container_name }}"
-          homepage.showStats: "{{ mymediaforalexa_homepage_showstats | string }}"
-          repliqate.enabled: "{{ mymediaforalexa_repliqate_enabled | string }}"
+          homepage.showStats: "{{ mymediaforalexa_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ mymediaforalexa_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ mymediaforalexa_repliqate_engine }}"
           repliqate.schedule: "{{ mymediaforalexa_repliqate_schedule }}"
           repliqate.backup_id: "{{ mymediaforalexa_repliqate_backup_id }}"

@@ -27,9 +27,9 @@
           DOMAIN_NAME: "{{ journiv_env_domain_name }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ journiv_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ journiv_watchtower_enabled | string }}"
-          dockflare.enable: "{{ journiv_dockflare_enabled | string }}"
+          autoheal: "{{ journiv_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ journiv_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ journiv_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ journiv_dockflare_access_group }}"
           dockflare.hostname: "{{ journiv_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ journiv_port_http }}"
@@ -40,14 +40,14 @@
           homepage.description: "{{ 'Self hosted private journaling app' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ journiv_container_name }}"
-          homepage.showStats: "{{ journiv_homepage_showstats | string }}"
+          homepage.showStats: "{{ journiv_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ journiv_port_http }}"
-          repliqate.enabled: "{{ journiv_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ journiv_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ journiv_repliqate_engine }}"
           repliqate.schedule: "{{ journiv_repliqate_schedule }}"
           repliqate.backup_id: "{{ journiv_repliqate_backup_id }}"
           repliqate.retention: "{{ journiv_repliqate_retention }}"
-          traefik.enable: "{{ journiv_available_externally | string }}"
+          traefik.enable: "{{ journiv_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.journiv.rule: "Host(`{{ journiv_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.journiv.tls.certresolver: "letsencrypt"
           traefik.http.routers.journiv.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (journiv_port_http | string)] +
-                (['https://' + journiv_hostname + '.' + ansible_nas_domain] if (journiv_available_externally is true or journiv_dockflare_enabled is true) else [])
+                (['https://' + journiv_hostname + '.' + ansible_nas_domain] if (journiv_traefik_enabled is true or journiv_dockflare_enabled is true) else [])
               }}
   when: journiv_enabled is true
 

@@ -14,9 +14,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ fast_music_remover_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ fast_music_remover_watchtower_enabled | string }}"
-          dockflare.enable: "{{ fast_music_remover_dockflare_enabled | string }}"
+          autoheal: "{{ fast_music_remover_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ fast_music_remover_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ fast_music_remover_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ fast_music_remover_dockflare_access_group }}"
           dockflare.hostname: "{{ fast_music_remover_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fast_music_remover_port_http }}"
@@ -28,9 +28,9 @@
           homepage.description: "{{ 'lightweight music and noise remover for YouTube and other internet media, using DeepFilterNet for audio enhancement' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "fast_music_remover"
-          homepage.showStats: "{{ fast_music_remover_homepage_showstats | string }}"
+          homepage.showStats: "{{ fast_music_remover_homepage_showstats | ternary('true', 'false') }}"
           repliqate.enabled: "false"
-          traefik.enable: "{{ fast_music_remover_available_externally | string }}"
+          traefik.enable: "{{ fast_music_remover_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.fastmusicremover.rule: "Host(`{{ fast_music_remover_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.fastmusicremover.tls.certresolver: "letsencrypt"
           traefik.http.routers.fastmusicremover.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -50,7 +50,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (fast_music_remover_port_http | string)] +
-                (['https://' + fast_music_remover_hostname + '.' + ansible_nas_domain] if (fast_music_remover_available_externally is true or fast_music_remover_dockflare_enabled is true) else [])
+                (['https://' + fast_music_remover_hostname + '.' + ansible_nas_domain] if (fast_music_remover_traefik_enabled is true or fast_music_remover_dockflare_enabled is true) else [])
               }}
   when: fast_music_remover_enabled is true
 

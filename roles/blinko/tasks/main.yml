@@ -31,8 +31,8 @@
           timeout: 10s
           retries: 5
         labels:
-          autoheal: "{{ blinko_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ blinko_db_watchtower_enabled | string }}"
+          autoheal: "{{ blinko_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ blinko_db_watchtower_enabled | ternary('true', 'false') }}"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ blinko_db_homepage_group }}"
           homepage.icon: "{{ blinko_db_homepage_icon }}"
@@ -40,8 +40,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ blinko_db_container_name }}"
-          homepage.showStats: "{{ blinko_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ blinko_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ blinko_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ blinko_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ blinko_db_repliqate_engine }}"
           repliqate.schedule: "{{ blinko_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ blinko_db_repliqate_backup_id }}"
@@ -87,9 +87,9 @@
         links:
           - "{{ blinko_db_container_name }}"
         labels:
-          autoheal: "{{ blinko_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ blinko_watchtower_enabled | string }}"
-          dockflare.enable: "{{ blinko_dockflare_enabled | string }}"
+          autoheal: "{{ blinko_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ blinko_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ blinko_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ blinko_dockflare_access_group }}"
           dockflare.hostname: "{{ blinko_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ blinko_port_http }}"
@@ -100,14 +100,14 @@
           homepage.description: "{{ 'An open-source, self-hosted personal AI note tool prioritizing privacy, built using TypeScript .' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ blinko_container_name }}"
-          homepage.showStats: "{{ blinko_homepage_showstats | string }}"
+          homepage.showStats: "{{ blinko_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ blinko_port_http }}"
-          repliqate.enabled: "{{ blinko_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ blinko_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ blinko_repliqate_engine }}"
           repliqate.schedule: "{{ blinko_repliqate_schedule }}"
           repliqate.backup_id: "{{ blinko_repliqate_backup_id }}"
           repliqate.retention: "{{ blinko_repliqate_retention }}"
-          traefik.enable: "{{ blinko_available_externally | string }}"
+          traefik.enable: "{{ blinko_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.blinko.rule: "Host(`{{ blinko_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.blinko.tls.certresolver: "letsencrypt"
           traefik.http.routers.blinko.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -128,7 +128,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (blinko_port_http | string)] +
-                (['https://' + blinko_hostname + '.' + ansible_nas_domain] if (blinko_available_externally is true or blinko_dockflare_enabled is true) else [])
+                (['https://' + blinko_hostname + '.' + ansible_nas_domain] if (blinko_traefik_enabled is true or blinko_dockflare_enabled is true) else [])
               }}
   when: blinko_enabled is true
 

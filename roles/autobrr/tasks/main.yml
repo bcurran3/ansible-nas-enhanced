@@ -24,9 +24,9 @@
           USER: "1000:1000"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ autobrr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ autobrr_watchtower_enabled | string }}"
-          dockflare.enable: "{{ autobrr_dockflare_enabled | string }}"
+          autoheal: "{{ autobrr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ autobrr_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ autobrr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ autobrr_dockflare_access_group }}"
           dockflare.hostname: "{{ autobrr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ autobrr_port_http }}"
@@ -38,16 +38,16 @@
           homepage.description: "{{ 'Modern, easy to use download automation for torrents and usenet.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ autobrr_container_name }}"
-          homepage.showStats: "{{ autobrr_homepage_showstats | string }}"
+          homepage.showStats: "{{ autobrr_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "autobrr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ autobrr_port_http }}"
           homepage.widget.key: "{{ autobrr_homepage_widget_key }}"
-          repliqate.enabled: "{{ autobrr_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ autobrr_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ autobrr_repliqate_engine }}"
           repliqate.schedule: "{{ autobrr_repliqate_schedule }}"
           repliqate.backup_id: "{{ autobrr_repliqate_backup_id }}"
           repliqate.retention: "{{ autobrr_repliqate_retention }}"
-          traefik.enable: "{{ autobrr_available_externally | string }}"
+          traefik.enable: "{{ autobrr_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.autobr.rule: "Host(`{{ autobrr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.autobr.tls.certresolver: "letsencrypt"
           traefik.http.routers.autobr.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (autobrr_port_http | string)] +
-                (['https://' + autobrr_hostname + '.' + ansible_nas_domain] if (autobrr_available_externally is true or autobrr_dockflare_enabled is true) else [])
+                (['https://' + autobrr_hostname + '.' + ansible_nas_domain] if (autobrr_traefik_enabled is true or autobrr_dockflare_enabled is true) else [])
               }}
   when: autobrr_enabled is true
 

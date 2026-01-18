@@ -22,8 +22,8 @@
         ports:
           - "{{ get_iplayer_port }}:8181"
         labels:
-          autoheal: "{{ get_iplayer_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ get_iplayer_watchtower_enabled | string }}"
+          autoheal: "{{ get_iplayer_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ get_iplayer_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ get_iplayer_homepage_group }}"
@@ -31,8 +31,8 @@
           homepage.description: "{{ 'get_iplayer description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ get_iplayer_container_name }}"
-          homepage.showStats: "{{ get_iplayer_homepage_showstats | string }}"
-          repliqate.enabled: "{{ get_iplayer_repliqate_enabled | string }}"
+          homepage.showStats: "{{ get_iplayer_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ get_iplayer_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ get_iplayer_repliqate_engine }}"
           repliqate.schedule: "{{ get_iplayer_repliqate_schedule }}"
           repliqate.backup_id: "{{ get_iplayer_repliqate_backup_id }}"

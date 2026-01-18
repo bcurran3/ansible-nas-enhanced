@@ -40,8 +40,8 @@
               timeout: "10s"
               retries: "5"
         labels:
-          autoheal: "{{ osticket_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ osticket_db_watchtower_enabled | string }}"
+          autoheal: "{{ osticket_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ osticket_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ osticket_db_homepage_group }}"
@@ -50,8 +50,8 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ osticket_db_container_name }}"
-          homepage.showStats: "{{ osticket_homepage_showstats | string }}"
-          repliqate.enabled: "{{ osticket_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ osticket_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ osticket_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ osticket_db_repliqate_engine }}"
           repliqate.schedule: "{{ osticket_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ osticket_db_repliqate_backup_id }}"
@@ -88,9 +88,9 @@
         links:
           - "{{ osticket_db_container_name }}"
         labels:
-          autoheal: "{{ osticket_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ osticket_watchtower_enabled | string }}"
-          dockflare.enable: "{{ osticket_dockflare_enabled | string }}"
+          autoheal: "{{ osticket_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ osticket_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ osticket_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ osticket_dockflare_access_group }}"
           dockflare.hostname: "{{ osticket_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osticket_port_http }}"
@@ -102,13 +102,13 @@
           homepage.description: "{{ 'OsTicket' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ osticket_container_name }}"
-          homepage.showStats: "{{ osticket_homepage_showstats | string }}"
-          repliqate.enabled: "{{ osticket_repliqate_enabled | string }}"
+          homepage.showStats: "{{ osticket_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ osticket_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ osticket_repliqate_engine }}"
           repliqate.schedule: "{{ osticket_repliqate_schedule }}"
           repliqate.backup_id: "{{ osticket_repliqate_backup_id }}"
           repliqate.retention: "{{ osticket_repliqate_retention }}"
-          traefik.enable: "{{ osticket_available_externally | string }}"
+          traefik.enable: "{{ osticket_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.osticket.rule: "Host(`{{ osticket_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.osticket.tls.certresolver: "letsencrypt"
           traefik.http.routers.osticket.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -128,7 +128,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (osticket_port_http | string)] +
-                (['https://' + osticket_hostname + '.' + ansible_nas_domain] if (osticket_available_externally is true or osticket_dockflare_enabled is true) else [])
+                (['https://' + osticket_hostname + '.' + ansible_nas_domain] if (osticket_traefik_enabled is true or osticket_dockflare_enabled is true) else [])
               }}
   when: osticket_enabled is true
 

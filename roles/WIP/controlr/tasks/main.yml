@@ -34,8 +34,8 @@
           Dashboard__Frontend__BrowserToken: "aspireToken"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ controlr_aspire_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ controlr_aspire_watchtower_enabled | string }}"
+          autoheal: "{{ controlr_aspire_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ controlr_aspire_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Aspire"
           homepage.group: "{{ controlr_aspire_homepage_group }}"
@@ -44,7 +44,7 @@
           homepage.description: "{{ 'Aspire' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ controlr_aspire_container_name }}"
-          homepage.showStats: "{{ controlr_aspire_homepage_showstats | string }}"
+          homepage.showStats: "{{ controlr_aspire_homepage_showstats | ternary('true', 'false') }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://hub.docker.com/_/postgres/tag/$${major}.$${minor}.$${patch}"
@@ -68,8 +68,8 @@
           POSTGRES_DB: "controlr"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ controlr_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ controlr_db_watchtower_enabled | string }}"
+          autoheal: "{{ controlr_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ controlr_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ controlr_db_homepage_group }}"
@@ -78,7 +78,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ controlr_db_container_name }}"
-          homepage.showStats: "{{ controlr_db_homepage_showstats | string }}"
+          homepage.showStats: "{{ controlr_db_homepage_showstats | ternary('true', 'false') }}"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: "https://hub.docker.com/_/postgres/tag/$${major}.$${minor}.$${patch}"
@@ -162,9 +162,9 @@
           #ControlR_AppOptions__ExternalWebSocketHosts__0__Longitude:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ controlr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ controlr_watchtower_enabled | string }}"
-          dockflare.enable: "{{ controlr_dockflare_enabled | string }}"
+          autoheal: "{{ controlr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ controlr_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ controlr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ controlr_dockflare_access_group }}"
           dockflare.hostname: "{{ controlr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ controlr_port_http }}"
@@ -175,8 +175,8 @@
           homepage.description: "{{ 'Open-source, self-hostable remote control and remote access.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ controlr_container_name }}"
-          homepage.showStats: "{{ controlr_homepage_showstats | string }}"
-          traefik.enable: "{{ controlr_available_externally | string }}"
+          homepage.showStats: "{{ controlr_homepage_showstats | ternary('true', 'false') }}"
+          traefik.enable: "{{ controlr_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.controlr.rule: "Host(`{{ controlr_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.controlr.tls.certresolver: "letsencrypt"
           traefik.http.routers.controlr.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -196,7 +196,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (controlr_port_http | string)] +
-                (['https://' + controlr_hostname + '.' + ansible_nas_domain] if (controlr_available_externally is true or controlr_dockflare_enabled is true) else [])
+                (['https://' + controlr_hostname + '.' + ansible_nas_domain] if (controlr_traefik_enabled is true or controlr_dockflare_enabled is true) else [])
               }}
   when: controlr_enabled is true
 

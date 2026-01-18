@@ -18,7 +18,7 @@
             if dns_exists
             else
             "DNS record not found. External access to be configured."
-            if (netlockrmm_available_externally | bool or netlockrmm_dockflare_enabled | bool)
+            if (netlockrmm_traefik_enabled | bool or netlockrmm_dockflare_enabled | bool)
             else
             "DNS record not found. External access not configured. Skipping container creation."
           }}
@@ -69,7 +69,7 @@
               TZ: "{{ ansible_nas_timezone }}"
             labels:
               autoheal: "{{ netlockrmm_db_autoheal | string }} | string"
-              com.centurylinklabs.watchtower.enable: "{{ netlockrmm_db_watchtower_enabled | string }}"
+              com.centurylinklabs.watchtower.enable: "{{ netlockrmm_db_watchtower_enabled | ternary('true', 'false') }}"
               dockflare.enable: "false"
               homepage.name: "{{ ansible_nas_app_name }} MySQL"
               homepage.group: "{{ netlockrmm_db_homepage_group }}"
@@ -78,7 +78,7 @@
               homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
               homepage.server: "my-docker"
               homepage.container: "{{ netlockrmm_db_container_name }}"
-              homepage.showStats: "{{ netlockrmm_db_homepage_showstats | string }}"
+              homepage.showStats: "{{ netlockrmm_db_homepage_showstats | ternary('true', 'false') }}"
               repliqate.enabled: "{{ netlockrmm_db_repliqate_enabled }} | string"
               repliqate.engine: "{{ netlockrmm_db_repliqate_engine }}"
               repliqate.schedule: "{{ netlockrmm_db_repliqate_schedule }}"
@@ -114,8 +114,8 @@
               - "{{ netlockrmm_db_container_name }}"
             labels:
               autoheal: "{{ netlockrmm_web_autoheal | string }} | string"
-              com.centurylinklabs.watchtower.enable: "{{ netlockrmm_web_watchtower_enabled | string }}"
-              dockflare.enable: "{{ netlockrmm_dockflare_enabled | string }}"
+              com.centurylinklabs.watchtower.enable: "{{ netlockrmm_web_watchtower_enabled | ternary('true', 'false') }}"
+              dockflare.enable: "{{ netlockrmm_dockflare_enabled | ternary('true', 'false') }}"
               dockflare.access.group: "{{ netlockrmm_dockflare_access_group }}"
               dockflare.hostname: "{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
@@ -126,14 +126,14 @@
               homepage.description: "{{ 'netlockrmm web description' if homepage_show_description else omit }}"
               homepage.server: "my-docker"
               homepage.container: "{{ netlockrmm_web_container_name }}"
-              homepage.showStats: "{{ netlockrmm_web_homepage_showstats | string }}"
+              homepage.showStats: "{{ netlockrmm_web_homepage_showstats | ternary('true', 'false') }}"
               homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_port_http }}"
               repliqate.enabled: "{{ netlockrmm_web_repliqate_enabled }} | string"
               repliqate.engine: "{{ netlockrmm_web_repliqate_engine }}"
               repliqate.schedule: "{{ netlockrmm_web_repliqate_schedule }}"
               repliqate.backup_id: "{{ netlockrmm_web_repliqate_backup_id }}"
               repliqate.retention: "{{ netlockrmm_web_repliqate_retention }}"
-              traefik.enable: "{{ netlockrmm_available_externally | string }}"
+              traefik.enable: "{{ netlockrmm_traefik_enabled | ternary('true', 'false') }}"
               traefik.http.routers.netlockrmm.rule: "Host(`{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}`)"
               traefik.http.routers.netlockrmm.tls.certresolver: "letsencrypt"
               traefik.http.routers.netlockrmm.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -173,8 +173,8 @@
               - "{{ netlockrmm_db_container_name }}"
             labels:
               autoheal: "{{ netlockrmm_autoheal | string }} | string"
-              com.centurylinklabs.watchtower.enable: "{{ netlockrmm_watchtower_enabled | string }}"
-              dockflare.enable: "{{ netlockrmm_dockflare_enabled | string }}"
+              com.centurylinklabs.watchtower.enable: "{{ netlockrmm_watchtower_enabled | ternary('true', 'false') }}"
+              dockflare.enable: "{{ netlockrmm_dockflare_enabled | ternary('true', 'false') }}"
               dockflare.access.group: "{{ netlockrmm_dockflare_access_group }}"
               dockflare.hostname: "{{ netlockrmm_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netlockrmm_server_port_http }}"
@@ -185,13 +185,13 @@
               homepage.description: "{{ 'netlockrmm description' if homepage_show_description else omit }}"
               homepage.server: "my-docker"
               homepage.container: "{{ netlockrmm_container_name }}"
-              homepage.showStats: "{{ netlockrmm_homepage_showstats | string }}"
+              homepage.showStats: "{{ netlockrmm_homepage_showstats | ternary('true', 'false') }}"
               repliqate.enabled: "{{ netlockrmm_repliqate_enabled }} | string"
               repliqate.engine: "{{ netlockrmm_repliqate_engine }}"
               repliqate.schedule: "{{ netlockrmm_repliqate_schedule }}"
               repliqate.backup_id: "{{ netlockrmm_repliqate_backup_id }}"
               repliqate.retention: "{{ netlockrmm_repliqate_retention }}"
-              traefik.enable: "{{ netlockrmm_available_externally | string }}"
+              traefik.enable: "{{ netlockrmm_traefik_enabled | ternary('true', 'false') }}"
               traefik.http.routers.netlockrmmserver.rule: "Host(`{{ netlockrmm_server_hostname }}.{{ ansible_nas_domain }}`)"
               traefik.http.routers.netlockrmmserver.tls.certresolver: "letsencrypt"
               traefik.http.routers.netlockrmmserver.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -212,11 +212,11 @@
           ansible.builtin.debug:
             msg: >-
                   {{
-                    (['https://' + netlockrmm_hostname + '.' + ansible_nas_domain] if (netlockrmm_available_externally is true or netlockrmm_dockflare_enabled is true) else [])
+                    (['https://' + netlockrmm_hostname + '.' + ansible_nas_domain] if (netlockrmm_traefik_enabled is true or netlockrmm_dockflare_enabled is true) else [])
                   }}
       when:
         - dns_exists
-        - (netlockrmm_dockflare_enabled | bool or netlockrmm_available_externally | bool)
+        - (netlockrmm_dockflare_enabled | bool or netlockrmm_traefik_enabled | bool)
   when: netlockrmm_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

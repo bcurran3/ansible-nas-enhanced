@@ -23,9 +23,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ mind_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ mind_watchtower_enabled | string }}"
-          dockflare.enable: "{{ mind_dockflare_enabled | string }}"
+          autoheal: "{{ mind_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ mind_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ mind_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ mind_dockflare_access_group }}"
           dockflare.hostname: "{{ mind_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mind_port_http }}"
@@ -37,13 +37,13 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mind_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mind_container_name }}"
-          homepage.showStats: "{{ mind_homepage_showstats | string }}"
-          repliqate.enabled: "{{ mind_repliqate_enabled | string }}"
+          homepage.showStats: "{{ mind_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ mind_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ mind_repliqate_engine }}"
           repliqate.schedule: "{{ mind_repliqate_schedule }}"
           repliqate.backup_id: "{{ mind_repliqate_backup_id }}"
           repliqate.retention: "{{ mind_repliqate_retention }}"
-          traefik.enable: "{{ mind_available_externally | string }}"
+          traefik.enable: "{{ mind_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.mind.rule: "Host(`{{ mind_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.mind.tls.certresolver: "letsencrypt"
           traefik.http.routers.mind.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -64,7 +64,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mind_port_http | string)] +
-                (['https://' + mind_hostname + '.' + ansible_nas_domain] if (mind_available_externally is true or mind_dockflare_enabled is true) else [])
+                (['https://' + mind_hostname + '.' + ansible_nas_domain] if (mind_traefik_enabled is true or mind_dockflare_enabled is true) else [])
               }}
   when: mind_enabled is true
 

@@ -33,9 +33,9 @@
           GTS_WAZERO_COMPILATION_CACHE: "/gotosocial/.cache"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ gotosocial_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ gotosocial_watchtower_enabled | string }}"
-          dockflare.enable: "{{ gotosocial_dockflare_enabled | string }}"
+          autoheal: "{{ gotosocial_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ gotosocial_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ gotosocial_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ gotosocial_dockflare_access_group }}"
           dockflare.hostname: "{{ gotosocial_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotosocial_port_http }}"
@@ -47,13 +47,13 @@
           homepage.description: "{{ 'Fast, fun, small ActivityPub server.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gotosocial_container_name }}"
-          homepage.showStats: "{{ gotosocial_homepage_showstats | string }}"
-          repliqate.enabled: "{{ gotosocial_repliqate_enabled | string }}"
+          homepage.showStats: "{{ gotosocial_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ gotosocial_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ gotosocial_repliqate_engine }}"
           repliqate.schedule: "{{ gotosocial_repliqate_schedule }}"
           repliqate.backup_id: "{{ gotosocial_repliqate_backup_id }}"
           repliqate.retention: "{{ gotosocial_repliqate_retention }}"
-          traefik.enable: "{{ gotosocial_available_externally | string }}"
+          traefik.enable: "{{ gotosocial_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.gotosocial.rule: "Host(`{{ gotosocial_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gotosocial.tls.certresolver: "letsencrypt"
           traefik.http.routers.gotosocial.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -74,7 +74,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gotosocial_port_http | string)] +
-                (['https://' + gotosocial_hostname + '.' + ansible_nas_domain] if (gotosocial_available_externally is true or gotosocial_dockflare_enabled is true) else [])
+                (['https://' + gotosocial_hostname + '.' + ansible_nas_domain] if (gotosocial_traefik_enabled is true or gotosocial_dockflare_enabled is true) else [])
               }}
   when: gotosocial_enabled is true
 

@@ -19,7 +19,7 @@
             if dns_exists
             else
             "DNS record not found. External access to be configured."
-            if (vaultwarden_available_externally | bool or vaultwarden_dockflare_enabled | bool)
+            if (vaultwarden_traefik_enabled | bool or vaultwarden_dockflare_enabled | bool)
             else
             "DNS record not found. External access not configured. Skipping container creation."
           }}
@@ -67,9 +67,9 @@
                 } | dict2items | selectattr('value', 'ne', none) | selectattr('value', 'ne', '') | items2dict
               }}
             labels:
-              autoheal: "{{ vaultwarden_autoheal | string }}"
-              com.centurylinklabs.watchtower.enable: "{{ vaultwarden_watchtower_enabled | string }}"
-              dockflare.enable: "{{ vaultwarden_dockflare_enabled | string }}"
+              autoheal: "{{ vaultwarden_autoheal_enabled | ternary('true', 'false') }}"
+              com.centurylinklabs.watchtower.enable: "{{ vaultwarden_watchtower_enabled | ternary('true', 'false') }}"
+              dockflare.enable: "{{ vaultwarden_dockflare_enabled | ternary('true', 'false') }}"
               dockflare.access.group: "{{ vaultwarden_dockflare_access_group }}"
               dockflare.hostname: "{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vaultwarden_port_http }}"
@@ -81,13 +81,13 @@
               homepage.siteMonitor: "https://{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}"
               homepage.server: "my-docker"
               homepage.container: "{{ vaultwarden_container_name }}"
-              homepage.showStats: "{{ vaultwarden_homepage_showstats | string }}"
-              repliqate.enabled: "{{ vaultwarden_repliqate_enabled | string }}"
+              homepage.showStats: "{{ vaultwarden_homepage_showstats | ternary('true', 'false') }}"
+              repliqate.enabled: "{{ vaultwarden_repliqate_enabled | ternary('true', 'false') }}"
               repliqate.engine: "{{ vaultwarden_repliqate_engine }}"
               repliqate.schedule: "{{ vaultwarden_repliqate_schedule }}"
               repliqate.backup_id: "{{ vaultwarden_repliqate_backup_id }}"
               repliqate.retention: "{{ vaultwarden_repliqate_retention }}"
-              traefik.enable: "{{ vaultwarden_available_externally | string }}"
+              traefik.enable: "{{ vaultwarden_traefik_enabled | ternary('true', 'false') }}"
               traefik.http.routers.vaultwarden.rule: "Host(`{{ vaultwarden_hostname }}.{{ ansible_nas_domain }}`)"
               traefik.http.routers.vaultwarden.tls.certresolver: "letsencrypt"
               traefik.http.routers.vaultwarden.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -107,7 +107,7 @@
           ansible.builtin.debug:
             msg: >-
                   {{
-                    (['https://' + vaultwarden_hostname + '.' + ansible_nas_domain] if (vaultwarden_available_externally is true or vaultwarden_dockflare_enabled is true) else [])
+                    (['https://' + vaultwarden_hostname + '.' + ansible_nas_domain] if (vaultwarden_traefik_enabled is true or vaultwarden_dockflare_enabled is true) else [])
                   }}
 
         - name: Create {{ ansible_nas_app_name }} Backup Container Directory
@@ -134,8 +134,8 @@
               TIMESTAMP: "{{ vaultwarden_backup_env_timestamp }}"
               TZ: "{{ ansible_nas_timezone }}"
             labels:
-              autoheal: "{{ vaultwarden_backup_autoheal | string }}"
-              com.centurylinklabs.watchtower.enable: "{{ vaultwarden_backup_watchtower_enabled | string }}"
+              autoheal: "{{ vaultwarden_backup_autoheal_enabled | ternary('true', 'false') }}"
+              com.centurylinklabs.watchtower.enable: "{{ vaultwarden_backup_watchtower_enabled | ternary('true', 'false') }}"
               dockflare.enable: "false"
               homepage.name: "{{ ansible_nas_app_name }} Backup"
               homepage.group: "{{ vaultwarden_backup_homepage_group }}"
@@ -144,7 +144,7 @@
               homepage.description: "{{ 'A simple cron powered backup image for vaultwarden.' if homepage_show_description else omit }}"
               homepage.server: "my-docker"
               homepage.container: "{{ vaultwarden_backup_container_name }}"
-              homepage.showStats: "{{ vaultwarden_backup_homepage_showstats | string }}"
+              homepage.showStats: "{{ vaultwarden_backup_homepage_showstats | ternary('true', 'false') }}"
               traefik.enable: "false"
               wud.tag.include: '^\d+\.\d+\.\d+$'
               wud.tag.transform.type: "semver"
@@ -155,7 +155,7 @@
             restart_policy: unless-stopped
       when:
         - dns_exists
-        - (vaultwarden_dockflare_enabled | bool or vaultwarden_available_externally | bool)
+        - (vaultwarden_dockflare_enabled | bool or vaultwarden_traefik_enabled | bool)
   when: vaultwarden_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

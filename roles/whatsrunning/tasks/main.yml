@@ -17,9 +17,9 @@
         ports:
           - "{{ whatsrunning_port_http }}:5000"
         labels:
-          autoheal: "{{ whatsrunning_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ whatsrunning_watchtower_enabled | string }}"
-          dockflare.enable: "{{ whatsrunning_dockflare_enabled | string }}"
+          autoheal: "{{ whatsrunning_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ whatsrunning_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ whatsrunning_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ whatsrunning_dockflare_access_group }}"
           dockflare.hostname: "{{ whatsrunning_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
@@ -31,9 +31,9 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ whatsrunning_container_name }}"
-          homepage.showStats: "{{ whatsrunning_homepage_showstats | string }}"
+          homepage.showStats: "{{ whatsrunning_homepage_showstats | ternary('true', 'false') }}"
           repliqate.enabled: "false"
-          traefik.enable: "{{ whatsrunning_available_externally | string }}"
+          traefik.enable: "{{ whatsrunning_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.whatsrunning.rule: "Host(`{{ whatsrunning_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.whatsrunning.tls.certresolver: "letsencrypt"
           traefik.http.routers.whatsrunning.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -54,7 +54,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (whatsrunning_port_http | string)] +
-                (['https://' + whatsrunning_hostname + '.' + ansible_nas_domain] if (whatsrunning_available_externally is true or whatsrunning_dockflare_enabled is true) else [])
+                (['https://' + whatsrunning_hostname + '.' + ansible_nas_domain] if (whatsrunning_traefik_enabled is true or whatsrunning_dockflare_enabled is true) else [])
               }}
   when: whatsrunning_enabled is true
 

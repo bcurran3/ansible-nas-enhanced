@@ -22,9 +22,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ flood_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ flood_watchtower_enabled | string }}"
-          dockflare.enable: "{{ flood_dockflare_enabled | string }}"
+          autoheal: "{{ flood_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ flood_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ flood_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ flood_dockflare_access_group }}"
           dockflare.hostname: "{{ flood_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flood_port_http }}"
@@ -36,17 +36,17 @@
           homepage.description: "{{ 'A modern web UI for various torrent clients with a Node.js backend and React frontend.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ flood_container_name }}"
-          homepage.showStats: "{{ flood_homepage_showstats | string }}"
+          homepage.showStats: "{{ flood_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "flood"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flood_port_http }}"
           homepage.widget.username: "{{ flood_homepage_widget_username }}"
           homepage.widget.password: "{{ flood_homepage_widget_password }}"
-          repliqate.enabled: "{{ flood_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ flood_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ flood_repliqate_engine }}"
           repliqate.schedule: "{{ flood_repliqate_schedule }}"
           repliqate.backup_id: "{{ flood_repliqate_backup_id }}"
           repliqate.retention: "{{ flood_repliqate_retention }}"
-          traefik.enable: "{{ flood_available_externally | string }}"
+          traefik.enable: "{{ flood_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.flood.rule: "Host(`{{ flood_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.flood.tls.certresolver: "letsencrypt"
           traefik.http.routers.flood.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (flood_port_http | string)] +
-                (['https://' + flood_hostname + '.' + ansible_nas_domain] if (flood_available_externally is true or flood_dockflare_enabled is true) else [])
+                (['https://' + flood_hostname + '.' + ansible_nas_domain] if (flood_traefik_enabled is true or flood_dockflare_enabled is true) else [])
               }}
   when: flood_enabled is true
 

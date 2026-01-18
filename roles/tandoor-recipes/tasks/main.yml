@@ -26,8 +26,8 @@
           POSTGRES_DB: "{{ tandoor_recipes_env_postgres_db }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ tandoor_recipes_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ tandoor_recipes_db_watchtower_enabled | string }}"
+          autoheal: "{{ tandoor_recipes_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tandoor_recipes_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ tandoor_recipes_db_homepage_group }}"
@@ -36,8 +36,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tandoor_recipes_db_container_name }}"
-          homepage.showStats: "{{ tandoor_recipes_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ tandoor_recipes_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ tandoor_recipes_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ tandoor_recipes_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ tandoor_recipes_db_repliqate_engine }}"
           repliqate.schedule: "{{ tandoor_recipes_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ tandoor_recipes_db_repliqate_backup_id }}"
@@ -138,9 +138,9 @@
         links:
           - "{{ tandoor_recipes_db_container_name }}"
         labels:
-          autoheal: "{{ tandoor_recipes_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ tandoor_recipes_watchtower_enabled | string }}"
-          dockflare.enable: "{{ tandoor_recipes_dockflare_enabled | string }}"
+          autoheal: "{{ tandoor_recipes_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tandoor_recipes_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ tandoor_recipes_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ tandoor_recipes_dockflare_access_group }}"
           dockflare.hostname: "{{ tandoor_recipes_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port_http }}"
@@ -151,17 +151,17 @@
           homepage.description: "{{ 'tandoor_recipes description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tandoor_recipes_container_name }}"
-          homepage.showStats: "{{ tandoor_recipes_homepage_showstats | string }}"
+          homepage.showStats: "{{ tandoor_recipes_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port_http }}"
           homepage.widget.type: "tandoor"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tandoor_recipes_port_http }}"
           homepage.widget.key: "{{ tandoor_recipes_homepage_widget_key }}"
-          repliqate.enabled: "{{ tandoor_recipes_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ tandoor_recipes_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ tandoor_recipes_repliqate_engine }}"
           repliqate.schedule: "{{ tandoor_recipes_repliqate_schedule }}"
           repliqate.backup_id: "{{ tandoor_recipes_repliqate_backup_id }}"
           repliqate.retention: "{{ tandoor_recipes_repliqate_retention }}"
-          traefik.enable: "{{ tandoor_recipes_available_externally | string }}"
+          traefik.enable: "{{ tandoor_recipes_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.tandoorrecipes.rule: "Host(`{{ tandoor_recipes_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tandoorrecipes.tls.certresolver: "letsencrypt"
           traefik.http.routers.tandoorrecipes.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -181,7 +181,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tandoor_recipes_port_http | string)] +
-                (['https://' + tandoor_recipes_hostname + '.' + ansible_nas_domain] if (tandoor_recipes_available_externally is true or tandoor_recipes_dockflare_enabled is true) else [])
+                (['https://' + tandoor_recipes_hostname + '.' + ansible_nas_domain] if (tandoor_recipes_traefik_enabled is true or tandoor_recipes_dockflare_enabled is true) else [])
               }}
   when: tandoor_recipes_enabled is true
 

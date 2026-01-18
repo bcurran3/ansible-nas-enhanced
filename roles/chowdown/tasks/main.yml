@@ -24,9 +24,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ chowdown_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ chowdown_watchtower_enabled | string }}"
-          dockflare.enable: "{{ chowdown_dockflare_enabled | string }}"
+          autoheal: "{{ chowdown_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ chowdown_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ chowdown_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ chowdown_dockflare_access_group }}"
           dockflare.hostname: "{{ chowdown_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chowdown_port_http }}"
@@ -38,13 +38,13 @@
           homepage.description: "{{ 'Simple recipes in Markdown format' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ chowdown_container_name }}"
-          homepage.showStats: "{{ chowdown_homepage_showstats | string }}"
-          repliqate.enabled: "{{ chowdown_repliqate_enabled | string }}"
+          homepage.showStats: "{{ chowdown_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ chowdown_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ chowdown_repliqate_engine }}"
           repliqate.schedule: "{{ chowdown_repliqate_schedule }}"
           repliqate.backup_id: "{{ chowdown_repliqate_backup_id }}"
           repliqate.retention: "{{ chowdown_repliqate_retention }}"
-          traefik.enable: "{{ chowdown_available_externally | string }}"
+          traefik.enable: "{{ chowdown_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.chowdown.rule: "Host(`{{ chowdown_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.chowdown.tls.certresolver: "letsencrypt"
           traefik.http.routers.chowdown.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -64,7 +64,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (chowdown_port_http | string)] +
-                (['https://' + chowdown_hostname + '.' + ansible_nas_domain] if (chowdown_available_externally is true or chowdown_dockflare_enabled is true) else [])
+                (['https://' + chowdown_hostname + '.' + ansible_nas_domain] if (chowdown_traefik_enabled is true or chowdown_dockflare_enabled is true) else [])
               }}
   when: chowdown_enabled is true
 

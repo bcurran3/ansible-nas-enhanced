@@ -36,8 +36,8 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ meshcentral_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ meshcentral_db_watchtower_enabled | string }}"
+          autoheal: "{{ meshcentral_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ meshcentral_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ meshcentral_db_homepage_group }}"
@@ -46,8 +46,8 @@
           homepage.description: "{{ 'The MongoDB Database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ meshcentral_db_container_name }}"
-          homepage.showStats: "{{ meshcentral_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ meshcentral_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ meshcentral_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ meshcentral_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ meshcentral_db_repliqate_engine }}"
           repliqate.schedule: "{{ meshcentral_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ meshcentral_db_repliqate_backup_id }}"
@@ -98,9 +98,9 @@
         links:
           - "{{ meshcentral_db_container_name }}"
         labels:
-          autoheal: "{{ meshcentral_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ meshcentral_watchtower_enabled | string }}"
-          dockflare.enable: "{{ meshcentral_dockflare_enabled | string }}"
+          autoheal: "{{ meshcentral_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ meshcentral_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ meshcentral_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ meshcentral_dockflare_access_group }}"
           dockflare.hostname: "{{ meshcentral_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
@@ -112,13 +112,13 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ meshcentral_container_name }}"
-          homepage.showStats: "{{ meshcentral_homepage_showstats | string }}"
-          repliqate.enabled: "{{ meshcentral_repliqate_enabled | string }}"
+          homepage.showStats: "{{ meshcentral_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ meshcentral_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ meshcentral_repliqate_engine }}"
           repliqate.schedule: "{{ meshcentral_repliqate_schedule }}"
           repliqate.backup_id: "{{ meshcentral_repliqate_backup_id }}"
           repliqate.retention: "{{ meshcentral_repliqate_retention }}"
-          traefik.enable: "{{ meshcentral_available_externally | string }}"
+          traefik.enable: "{{ meshcentral_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.meshcentral.rule: "Host(`{{ meshcentral_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.meshcentral.tls.certresolver: "letsencrypt"
           traefik.http.routers.meshcentral.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -139,7 +139,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (meshcentral_port_http | string)] +
-                (['https://' + meshcentral_hostname + '.' + ansible_nas_domain] if (meshcentral_available_externally is true or meshcentral_dockflare_enabled is true) else [])
+                (['https://' + meshcentral_hostname + '.' + ansible_nas_domain] if (meshcentral_traefik_enabled is true or meshcentral_dockflare_enabled is true) else [])
               }}
   when: meshcentral_enabled is true
 

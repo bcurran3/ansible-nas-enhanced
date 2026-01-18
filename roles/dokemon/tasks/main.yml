@@ -24,9 +24,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ dokemon_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ dokemon_watchtower_enabled | string }}"
-          dockflare.enable: "{{ dokemon_dockflare_enabled | string }}"
+          autoheal: "{{ dokemon_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dokemon_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ dokemon_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ dokemon_dockflare_access_group }}"
           dockflare.hostname: "{{ dokemon_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dokemon_port_http }}"
@@ -38,13 +38,13 @@
           homepage.description: "{{ 'Docker Container Management GUI' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dokemon_container_name }}"
-          homepage.showStats: "{{ dokemon_homepage_showstats | string }}"
-          repliqate.enabled: "{{ dokemon_repliqate_enabled | string }}"
+          homepage.showStats: "{{ dokemon_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ dokemon_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ dokemon_repliqate_engine }}"
           repliqate.schedule: "{{ dokemon_repliqate_schedule }}"
           repliqate.backup_id: "{{ dokemon_repliqate_backup_id }}"
           repliqate.retention: "{{ dokemon_repliqate_retention }}"
-          traefik.enable: "{{ dokemon_available_externally | string }}"
+          traefik.enable: "{{ dokemon_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.dokemon.rule: "Host(`{{ dokemon_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.dokemon.tls.certresolver: "letsencrypt"
           traefik.http.routers.dokemon.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -65,7 +65,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dokemon_port_http | string)] +
-                (['https://' + dokemon_hostname + '.' + ansible_nas_domain] if (dokemon_available_externally is true or dokemon_dockflare_enabled is true) else [])
+                (['https://' + dokemon_hostname + '.' + ansible_nas_domain] if (dokemon_traefik_enabled is true or dokemon_dockflare_enabled is true) else [])
               }}
   when: dokemon_enabled is true
 

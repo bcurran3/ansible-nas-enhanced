@@ -25,9 +25,9 @@
           PASSWORD: "{{ pve_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ pve_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enabled | string }}"
-          dockflare.enable: "{{ pve_dockflare_enabled | string }}"
+          autoheal: "{{ pve_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ pve_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ pve_dockflare_access_group }}"
           dockflare.hostname: "{{ pve3_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve3_port_http }}"
@@ -38,10 +38,10 @@
           homepage.description: "{{ 'pve description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pve3_container_name }}"
-          homepage.showStats: "{{ pve_homepage_showstats | string }}"
+          homepage.showStats: "{{ pve_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve3_port_http }}"
           repliqate.enabled: "false"
-          traefik.enable: "{{ pve_available_externally | string }}"
+          traefik.enable: "{{ pve_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.pve3.rule: "Host(`{{ pve3_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.pve3.tls.certresolver: "letsencrypt"
           traefik.http.routers.pve3.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -74,7 +74,7 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pve3_port_http | string)] +
-                (['https://' + pve3_hostname + '.' + ansible_nas_domain] if (pve_available_externally is true or pve_dockflare_enabled is true) else [])
+                (['https://' + pve3_hostname + '.' + ansible_nas_domain] if (pve_traefik_enabled is true or pve_dockflare_enabled is true) else [])
               }}
   when: 
     - pve3_enabled is true

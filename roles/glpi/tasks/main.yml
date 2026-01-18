@@ -37,8 +37,8 @@
               retries: "3"
               start_period: "30s"
         labels:
-          autoheal: "{{ glpi_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ glpi_db_watchtower_enabled | string }}"
+          autoheal: "{{ glpi_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ glpi_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ glpi_db_homepage_group }}"
@@ -47,8 +47,8 @@
           homepage.description: "{{ 'MariaDB' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ glpi_db_container_name }}"
-          homepage.showStats: "{{ glpi_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ glpi_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ glpi_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ glpi_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ glpi_db_repliqate_engine }}"
           repliqate.schedule: "{{ glpi_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ glpi_db_repliqate_backup_id }}"
@@ -81,9 +81,9 @@
         links:
           - "{{ glpi_db_container_name }}"
         labels:
-          autoheal: "{{ glpi_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ glpi_watchtower_enabled | string }}"
-          dockflare.enable: "{{ glpi_dockflare_enabled | string }}"
+          autoheal: "{{ glpi_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ glpi_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ glpi_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ glpi_dockflare_access_group }}"
           dockflare.hostname: "{{ glpi_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
@@ -95,13 +95,13 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ glpi_container_name }}"
-          homepage.showStats: "{{ glpi_homepage_showstats | string }}"
-          repliqate.enabled: "{{ glpi_repliqate_enabled | string }}"
+          homepage.showStats: "{{ glpi_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ glpi_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ glpi_repliqate_engine }}"
           repliqate.schedule: "{{ glpi_repliqate_schedule }}"
           repliqate.backup_id: "{{ glpi_repliqate_backup_id }}"
           repliqate.retention: "{{ glpi_repliqate_retention }}"
-          traefik.enable: "{{ glpi_available_externally | string }}"
+          traefik.enable: "{{ glpi_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.glpi.rule: "Host(`{{ glpi_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.glpi.tls.certresolver: "letsencrypt"
           traefik.http.routers.glpi.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -122,7 +122,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (glpi_port_http | string)] +
-                (['https://' + glpi_hostname + '.' + ansible_nas_domain] if (glpi_available_externally is true or glpi_dockflare_enabled is true) else [])
+                (['https://' + glpi_hostname + '.' + ansible_nas_domain] if (glpi_traefik_enabled is true or glpi_dockflare_enabled is true) else [])
               }}
   when: glpi_enabled is true
 

@@ -16,8 +16,8 @@
         ports:
           - "{{ portainer_agent_port }}:9001"
         labels:
-          autoheal: "{{ portainer_agent_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ portainer_agent_watchtower_enabled | string }}"
+          autoheal: "{{ portainer_agent_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ portainer_agent_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ portainer_agent_homepage_group }}"
@@ -25,7 +25,7 @@
           homepage.description: "{{ 'The Portainer agent' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ portainer_agent_container_name }}"
-          homepage.showStats: "{{ portainer_agent_homepage_showstats | string }}"
+          homepage.showStats: "{{ portainer_agent_homepage_showstats | ternary('true', 'false') }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

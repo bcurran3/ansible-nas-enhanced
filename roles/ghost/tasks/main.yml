@@ -42,8 +42,8 @@
           start_interval: "10s"
           retries: 120
         labels:
-          autoheal: "{{ ghost_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ ghost_db_watchtower_enabled | string }}"
+          autoheal: "{{ ghost_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ ghost_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ ghost_db_homepage_group }}"
@@ -52,8 +52,8 @@
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ghost_db_container_name }}"
-          homepage.showStats: "{{ ghost_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ ghost_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ ghost_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ ghost_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ ghost_db_repliqate_engine }}"
           repliqate.schedule: "{{ ghost_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ ghost_db_repliqate_backup_id }}"
@@ -99,9 +99,9 @@
         links:
           - "{{ ghost_db_container_name }}"
         labels:
-          autoheal: "{{ ghost_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ ghost_watchtower_enabled | string }}"
-          dockflare.enable: "{{ ghost_dockflare_enabled | string }}"
+          autoheal: "{{ ghost_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ ghost_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ ghost_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ ghost_dockflare_access_group }}"
           dockflare.hostname: "{{ ghost_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ ghost_hostname }}.{{ ansible_nas_domain }}"
@@ -113,13 +113,13 @@
           homepage.description: "{{ 'Independent technology for modern publishing, memberships, subscriptions and newsletters.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ghost_container_name }}"
-          homepage.showStats: "{{ ghost_homepage_showstats | string }}"
-          repliqate.enabled: "{{ ghost_repliqate_enabled | string }}"
+          homepage.showStats: "{{ ghost_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ ghost_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ ghost_repliqate_engine }}"
           repliqate.schedule: "{{ ghost_repliqate_schedule }}"
           repliqate.backup_id: "{{ ghost_repliqate_backup_id }}"
           repliqate.retention: "{{ ghost_repliqate_retention }}"
-          traefik.enable: "{{ ghost_available_externally | string }}"
+          traefik.enable: "{{ ghost_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.ghost.rule: "Host(`{{ ghost_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.ghost.tls.certresolver: "letsencrypt"
           traefik.http.routers.ghost.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -139,7 +139,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                (['https://' + ghost_hostname + '.' + ansible_nas_domain] if (ghost_available_externally is true or ghost_dockflare_enabled is true) else [])
+                (['https://' + ghost_hostname + '.' + ansible_nas_domain] if (ghost_traefik_enabled is true or ghost_dockflare_enabled is true) else [])
               }}
   when: ghost_enabled is true
 

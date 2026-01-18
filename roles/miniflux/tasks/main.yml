@@ -29,8 +29,8 @@
           POSTGRES_PASSWORD: "supersecure"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ miniflux_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ miniflux_db_watchtower_enabled | string }}"
+          autoheal: "{{ miniflux_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ miniflux_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ miniflux_db_homepage_group }}"
@@ -39,8 +39,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ miniflux_db_container_name }}"
-          homepage.showStats: "{{ miniflux_db_homepage_showstats | string }}"
-          repliqate.enabled: "{{ miniflux_db_repliqate_enabled | string }}"
+          homepage.showStats: "{{ miniflux_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ miniflux_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ miniflux_db_repliqate_engine }}"
           repliqate.schedule: "{{ miniflux_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ miniflux_db_repliqate_backup_id }}"
@@ -74,9 +74,9 @@
           ADMIN_PASSWORD: "{{ miniflux_admin_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ miniflux_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ miniflux_watchtower_enabled | string }}"
-          dockflare.enable: "{{ miniflux_dockflare_enabled | string }}"
+          autoheal: "{{ miniflux_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ miniflux_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ miniflux_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ miniflux_dockflare_access_group }}"
           dockflare.hostname: "{{ miniflux_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ miniflux_port_http }}"
@@ -87,12 +87,12 @@
           homepage.description: "{{ 'a minimalist and opinionated feed reader' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ miniflux_container_name }}"
-          homepage.showStats: "{{ miniflux_homepage_showstats | string }}"
+          homepage.showStats: "{{ miniflux_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "miniflux"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ miniflux_port_http }}"
           homepage.widget.key: "{{ miniflux_homepage_widget_key }}"
           repliqate.enabled: "false"
-          traefik.enable: "{{ miniflux_available_externally | string }}"
+          traefik.enable: "{{ miniflux_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.miniflux.rule: "Host(`{{ miniflux_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.miniflux.tls.certresolver: "letsencrypt"
           traefik.http.routers.miniflux.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -113,7 +113,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (miniflux_port_http | string)] +
-                (['https://' + miniflux_hostname + '.' + ansible_nas_domain] if (miniflux_available_externally is true or miniflux_dockflare_enabled is true) else [])
+                (['https://' + miniflux_hostname + '.' + ansible_nas_domain] if (miniflux_traefik_enabled is true or miniflux_dockflare_enabled is true) else [])
               }}
   when: miniflux_enabled is true
 

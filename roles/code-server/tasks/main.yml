@@ -39,9 +39,9 @@
           PASSWORD: "{{ code_server_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ code_server_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ code_server_watchtower_enabled | string }}"
-          dockflare.enable: "{{ code_server_dockflare_enabled | string }}"
+          autoheal: "{{ code_server_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ code_server_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ code_server_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ code_server_dockflare_access_group }}"
           dockflare.hostname: "{{ code_server_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ code_server_port_http }}"
@@ -53,13 +53,13 @@
           homepage.description: "{{ 'VS Code in the browser' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "code-server"
-          homepage.showStats: "{{ code_server_homepage_showstats | string }}"
-          repliqate.enabled: "{{ code_server_repliqate_enabled | string }}"
+          homepage.showStats: "{{ code_server_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ code_server_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ code_server_repliqate_engine }}"
           repliqate.schedule: "{{ code_server_repliqate_schedule }}"
           repliqate.backup_id: "{{ code_server_repliqate_backup_id }}"
           repliqate.retention: "{{ code_server_repliqate_retention }}"
-          traefik.enable: "{{ code_server_available_externally | string }}"
+          traefik.enable: "{{ code_server_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.codeserver.rule: "Host(`{{ code_server_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.codeserver.tls.certresolver: "letsencrypt"
           traefik.http.routers.codeserver.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -80,7 +80,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (code_server_port_http | string)] +
-                (['https://' + code_server_hostname + '.' + ansible_nas_domain] if (code_server_available_externally is true or code_server_dockflare_enabled is true) else [])
+                (['https://' + code_server_hostname + '.' + ansible_nas_domain] if (code_server_traefik_enabled is true or code_server_dockflare_enabled is true) else [])
               }}
   when: code_server_enabled is true
 

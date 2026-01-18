@@ -25,9 +25,9 @@
         ports:
           - "{{ gokapi_port_http }}:53842"
         labels:
-          autoheal: "{{ gokapi_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ gokapi_watchtower_enabled | string }}"
-          dockflare.enable: "{{ gokapi_dockflare_enabled | string }}"
+          autoheal: "{{ gokapi_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ gokapi_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ gokapi_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ gokapi_dockflare_access_group }}"
           dockflare.hostname: "{{ gokapi_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gokapi_port_http }}"
@@ -39,13 +39,13 @@
           homepage.description: "{{ 'Lightweight selfhosted Firefox Send alternative without public upload. AWS S3 supported.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gokapi_container_name }}"
-          homepage.showStats: "{{ gokapi_homepage_showstats | string }}"
-          repliqate.enabled: "{{ gokapi_repliqate_enabled | string }}"
+          homepage.showStats: "{{ gokapi_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ gokapi_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ gokapi_repliqate_engine }}"
           repliqate.schedule: "{{ gokapi_repliqate_schedule }}"
           repliqate.backup_id: "{{ gokapi_repliqate_backup_id }}"
           repliqate.retention: "{{ gokapi_repliqate_retention }}"
-          traefik.enable: "{{ gokapi_available_externally | string }}"
+          traefik.enable: "{{ gokapi_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.gokapi.rule: "Host(`{{ gokapi_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.gokapi.tls.certresolver: "letsencrypt"
           traefik.http.routers.gokapi.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -66,7 +66,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gokapi_port_http | string)] +
-                (['https://' + gokapi_hostname + '.' + ansible_nas_domain] if (gokapi_available_externally is true or gokapi_dockflare_enabled is true) else [])
+                (['https://' + gokapi_hostname + '.' + ansible_nas_domain] if (gokapi_traefik_enabled is true or gokapi_dockflare_enabled is true) else [])
               }}
   when: gokapi_enabled is true
 

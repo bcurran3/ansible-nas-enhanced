@@ -40,8 +40,8 @@
           EXEC: "1"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ dockflare_proxy_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ dockflare_proxy_watchtower_enabled | string }}"
+          autoheal: "{{ dockflare_proxy_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockflare_proxy_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Docker Socket Proxy"
           homepage.group: "{{ dockflare_proxy_homepage_group }}"
@@ -50,7 +50,7 @@
           homepage.description: "{{ 'Proxy over your Docker socket to restrict which requests it accepts' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dockflare_proxy_container_name }}"
-          homepage.showStats: "{{ dockflare_proxy_homepage_showstats | string }}"
+          homepage.showStats: "{{ dockflare_proxy_homepage_showstats | ternary('true', 'false') }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+$'
@@ -74,8 +74,8 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ dockflare_redis_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ dockflare_redis_watchtower_enabled | string }}"
+          autoheal: "{{ dockflare_redis_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockflare_redis_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ dockflare_redis_homepage_group }}"
@@ -84,8 +84,8 @@
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dockflare_redis_container_name }}"
-          homepage.showStats: "{{ dockflare_redis_homepage_showstats | string }}"
-          repliqate.enabled: "{{ dockflare_redis_repliqate_enabled | string }}"
+          homepage.showStats: "{{ dockflare_redis_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ dockflare_redis_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ dockflare_redis_repliqate_engine }}"
           repliqate.schedule: "{{ dockflare_redis_repliqate_schedule }}"
           repliqate.backup_id: "{{ dockflare_redis_repliqate_backup_id }}"
@@ -124,9 +124,9 @@
           - "{{ dockflare_proxy_container_name }}"
           - "{{ dockflare_redis_container_name }}"
         labels:
-          autoheal: "{{ dockflare_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ dockflare_watchtower_enabled | string }}"
-          dockflare.enable: "{{ dockflare_dockflare_enabled | string }}"
+          autoheal: "{{ dockflare_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockflare_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ dockflare_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ dockflare_dockflare_access_group }}"
           dockflare.hostname: "{{ dockflare_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port_http }}"
@@ -137,14 +137,14 @@
           homepage.description: "{{ 'Automate Cloudflare Tunnels with Docker Labels' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dockflare_container_name }}"
-          homepage.showStats: "{{ dockflare_homepage_showstats | string }}"
+          homepage.showStats: "{{ dockflare_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockflare_port_http }}"
-          repliqate.enabled: "{{ dockflare_repliqate_enabled | string }}"
+          repliqate.enabled: "{{ dockflare_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ dockflare_repliqate_engine }}"
           repliqate.schedule: "{{ dockflare_repliqate_schedule }}"
           repliqate.backup_id: "{{ dockflare_repliqate_backup_id }}"
           repliqate.retention: "{{ dockflare_repliqate_retention }}"
-          traefik.enable: "{{ dockflare_available_externally | string }}"
+          traefik.enable: "{{ dockflare_traefik_enabled | ternary('true', 'false') }}"
           traefik.http.routers.dockflare.rule: "Host(`{{ dockflare_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.dockflare.tls.certresolver: "letsencrypt"
           traefik.http.routers.dockflare.tls.domains[0].main: "{{ ansible_nas_domain }}"
@@ -165,7 +165,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockflare_port_http | string)] +
-                (['https://' + dockflare_hostname + '.' + ansible_nas_domain] if (dockflare_available_externally is true or dockflare_dockflare_enabled is true) else [])
+                (['https://' + dockflare_hostname + '.' + ansible_nas_domain] if (dockflare_traefik_enabled is true or dockflare_dockflare_enabled is true) else [])
               }}
   when: dockflare_enabled is true
 
