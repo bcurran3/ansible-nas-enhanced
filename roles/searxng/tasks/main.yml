@@ -27,9 +27,9 @@
           URL: "searxng.{{ ansible_nas_domain }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ searxng_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ searxng_watchtower_enable }}"
-          dockflare.enable: "{{ searxng_dockflare_tunnel }}"
+          autoheal: "{{ searxng_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ searxng_watchtower_enabled| string }}"
+          dockflare.enable: "{{ searxng_dockflare_enabled | string }}"
           dockflare.access.group: "{{ searxng_dockflare_access_group }}"
           dockflare.hostname: "{{ searxng_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
@@ -41,8 +41,8 @@
           homepage.description: "{{ 'SearXNG is a free internet metasearch engine which aggregates results from various search services and databases.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ searxng_container_name }}"
-          homepage.showStats: "{{ searxng_homepage_showstats }}"
-          repliqate.enabled: "{{ searxng_repliqate_enabled }}"
+          homepage.showStats: "{{ searxng_homepage_showstats | string }}"
+          repliqate.enabled: "{{ searxng_repliqate_enabled | string }}"
           repliqate.engine: "{{ searxng_repliqate_engine }}"
           repliqate.schedule: "{{ searxng_repliqate_schedule }}"
           repliqate.backup_id: "{{ searxng_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (searxng_port_http | string)] +
-                (['https://' + searxng_hostname + '.' + ansible_nas_domain] if (searxng_available_externally is true or searxng_dockflare_tunnel is true) else [])
+                (['https://' + searxng_hostname + '.' + ansible_nas_domain] if (searxng_available_externally is true or searxng_dockflare_enabled is true) else [])
               }}
   when: searxng_enabled is true
 

@@ -28,9 +28,9 @@
           VIRTUAL_PORT: "8000"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ focalboard_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ focalboard_watchtower_enable }}"
-          dockflare.enable: "{{ focalboard_dockflare_tunnel }}"
+          autoheal: "{{ focalboard_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ focalboard_watchtower_enabled| string }}"
+          dockflare.enable: "{{ focalboard_dockflare_enabled | string }}"
           dockflare.access.group: "{{ focalboard_dockflare_access_group }}"
           dockflare.hostname: "{{ focalboard_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ focalboard_port_http }}"
@@ -42,8 +42,8 @@
           homepage.description: "{{ 'an open source, self-hosted alternative to Trello, Notion, and Asana.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ focalboard_container_name }}"
-          homepage.showStats: "{{ focalboard_homepage_showstats }}"
-          repliqate.enabled: "{{ focalboard_repliqate_enabled }}"
+          homepage.showStats: "{{ focalboard_homepage_showstats | string }}"
+          repliqate.enabled: "{{ focalboard_repliqate_enabled | string }}"
           repliqate.engine: "{{ focalboard_repliqate_engine }}"
           repliqate.schedule: "{{ focalboard_repliqate_schedule }}"
           repliqate.backup_id: "{{ focalboard_repliqate_backup_id }}"
@@ -69,7 +69,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (focalboard_port_http | string)] +
-                (['https://' + focalboard_hostname + '.' + ansible_nas_domain] if (focalboard_available_externally is true or focalboard_dockflare_tunnel is true) else [])
+                (['https://' + focalboard_hostname + '.' + ansible_nas_domain] if (focalboard_available_externally is true or focalboard_dockflare_enabled is true) else [])
               }}
   when: focalboard_enabled is true
 

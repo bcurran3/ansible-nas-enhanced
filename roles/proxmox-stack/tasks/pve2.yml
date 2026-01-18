@@ -26,8 +26,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ pve_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enable | string }}"
-          dockflare.enable: "{{ pve_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enabled| string }}"
+          dockflare.enable: "{{ pve_dockflare_enabled | string }}"
           dockflare.access.group: "{{ pve_dockflare_access_group }}"
           dockflare.hostname: "{{ pve2_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve2_port_http }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'pve description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pve2_container_name }}"
-          homepage.showStats: "{{ pve_homepage_showstats }}"
+          homepage.showStats: "{{ pve_homepage_showstats | string }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve2_port_http }}"
           repliqate.enabled: "{{ pve_repliqate_enabled | string }}"
           repliqate.engine: "{{ pve_repliqate_engine }}"
@@ -78,7 +78,7 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pve2_port_http | string)] +
-                (['https://' + pve2_hostname + '.' + ansible_nas_domain] if (pve_available_externally is true or pve_dockflare_tunnel is true) else [])
+                (['https://' + pve2_hostname + '.' + ansible_nas_domain] if (pve_available_externally is true or pve_dockflare_enabled is true) else [])
               }}
   when: 
     - pve2_enabled is true

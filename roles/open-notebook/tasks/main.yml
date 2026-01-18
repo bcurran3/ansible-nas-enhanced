@@ -35,7 +35,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ open_notebook_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ open_notebook_db_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ open_notebook_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} SurrealDB"
           homepage.group: "{{ open_notebook_db_homepage_group }}"
@@ -44,7 +44,7 @@
           homepage.description: "{{ 'A scalable, distributed, collaborative, document-graph database, for the realtime web' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ open_notebook_db_container_name }}"
-          homepage.showStats: "{{ open_notebook_db_homepage_showstats }}"
+          homepage.showStats: "{{ open_notebook_db_homepage_showstats | string }}"
           repliqate.enabled: "{{ open_notebook_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ open_notebook_db_repliqate_engine }}"
           repliqate.schedule: "{{ open_notebook_db_repliqate_schedule }}"
@@ -103,8 +103,8 @@
           - "{{ open_notebook_db_container_name }}"
         labels:
           autoheal: "{{ open_notebook_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ open_notebook_watchtower_enable | string }}"
-          dockflare.enable: "{{ open_notebook_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ open_notebook_watchtower_enabled| string }}"
+          dockflare.enable: "{{ open_notebook_dockflare_enabled | string }}"
           dockflare.access.group: "{{ open_notebook_dockflare_access_group }}"
           dockflare.hostname: "{{ open_notebook_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ open_notebook_port_http }}"
@@ -115,7 +115,7 @@
           homepage.description: "{{ 'A private, multi-model, 100% local, full-featured alternative to Notebook LM' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ open_notebook_container_name }}"
-          homepage.showStats: "{{ open_notebook_homepage_showstats }}"
+          homepage.showStats: "{{ open_notebook_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ open_notebook_port_http }}"
           repliqate.enabled: "{{ open_notebook_repliqate_enabled | string }}"
           repliqate.engine: "{{ open_notebook_repliqate_engine }}"
@@ -143,7 +143,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (open_notebook_port_http | string)] +
-                (['https://' + open_notebook_hostname + '.' + ansible_nas_domain] if (open_notebook_available_externally is true or open_notebook_dockflare_tunnel is true) else [])
+                (['https://' + open_notebook_hostname + '.' + ansible_nas_domain] if (open_notebook_available_externally is true or open_notebook_dockflare_enabled is true) else [])
               }}
   when: open_notebook_enabled is true
 

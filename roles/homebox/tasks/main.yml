@@ -28,9 +28,9 @@
           HBOX_MAILER_FROM: "{{ homebox_mail_from }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ homebox_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ homebox_watchtower_enable }}"
-          dockflare.enable: "{{ homebox_dockflare_tunnel }}"
+          autoheal: "{{ homebox_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ homebox_watchtower_enabled| string }}"
+          dockflare.enable: "{{ homebox_dockflare_enabled | string }}"
           dockflare.access.group: "{{ homebox_dockflare_access_group }}"
           dockflare.hostname: "{{ homebox_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
@@ -42,12 +42,12 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ homebox_container_name }}"
-          homepage.showStats: "{{ homebox_homepage_showstats }}"
+          homepage.showStats: "{{ homebox_homepage_showstats | string }}"
           homepage.widget.type: "homebox"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
           homepage.widget.username: "{{ homebox_homepage_widget_username }}"
           homepage.widget.password: "{{ homebox_homepage_widget_password }}"
-          repliqate.enabled: "{{ homebox_repliqate_enabled }}"
+          repliqate.enabled: "{{ homebox_repliqate_enabled | string }}"
           repliqate.engine: "{{ homebox_repliqate_engine }}"
           repliqate.schedule: "{{ homebox_repliqate_schedule }}"
           repliqate.backup_id: "{{ homebox_repliqate_backup_id }}"
@@ -73,7 +73,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (homebox_port_http | string)] +
-                (['https://' + homebox_hostname + '.' + ansible_nas_domain] if (homebox_available_externally is true or homebox_dockflare_tunnel is true) else [])
+                (['https://' + homebox_hostname + '.' + ansible_nas_domain] if (homebox_available_externally is true or homebox_dockflare_enabled is true) else [])
               }}
   when: homebox_enabled is true
 

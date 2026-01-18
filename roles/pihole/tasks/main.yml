@@ -74,9 +74,9 @@
           - SYS_TIME
           - SYS_NICE
         labels:
-          autoheal: "{{ pihole_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ pihole_watchtower_enable }}"
-          dockflare.enable: "{{ pihole_dockflare_tunnel }}"
+          autoheal: "{{ pihole_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ pihole_watchtower_enabled| string }}"
+          dockflare.enable: "{{ pihole_dockflare_enabled | string }}"
           dockflare.access.group: "{{ pihole_dockflare_access_group }}"
           dockflare.hostname: "{{ pihole_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
@@ -87,13 +87,13 @@
           homepage.description: "{{ 'Network-wide Ad Blocking' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pihole_container_name }}"
-          homepage.showStats: "{{ pihole_homepage_showstats }}"
+          homepage.showStats: "{{ pihole_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
           homepage.widget.type: "pihole"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
           homepage.widget.version: "6"
           homepage.widget.key: "{{ pihole_homepage_widget_key }}"
-          repliqate.enabled: "{{ pihole_repliqate_enabled }}"
+          repliqate.enabled: "{{ pihole_repliqate_enabled | string }}"
           repliqate.engine: "{{ pihole_repliqate_engine }}"
           repliqate.schedule: "{{ pihole_repliqate_schedule }}"
           repliqate.backup_id: "{{ pihole_repliqate_backup_id }}"
@@ -118,7 +118,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pihole_port_http | string)] +
-                (['https://' + pihole_hostname + '.' + ansible_nas_domain] if (pihole_available_externally is true or pihole_dockflare_tunnel is true) else [])
+                (['https://' + pihole_hostname + '.' + ansible_nas_domain] if (pihole_available_externally is true or pihole_dockflare_enabled is true) else [])
               }}
   when: pihole_enabled is true
 

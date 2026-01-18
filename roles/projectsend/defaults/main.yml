@@ -30,22 +30,22 @@ projectsend_db_cpu_shares: 1024
 projectsend_db_memory: "1G"
 
 # autoheal
-projectsend_autoheal: "false"
-projectsend_db_autoheal: "false"
+projectsend_autoheal: false
+projectsend_db_autoheal: false
 
 # dockflare
-projectsend_dockflare_tunnel: "false"
+projectsend_dockflare_enabled: false
 projectsend_dockflare_access_group: ""
 
 # homepage
 projectsend_homepage_group: "Apps"
 projectsend_homepage_icon: "projectsend.png"
 projectsend_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
-projectsend_homepage_showstats: "false"
+projectsend_homepage_showstats: false
 projectsend_db_homepage_group: "DBs"
 projectsend_db_homepage_icon: "mariadb.png"
 projectsend_db_homepage_href: "{{ projectsend_homepage_href}}"
-projectsend_db_homepage_showstats: "false"
+projectsend_db_homepage_showstats: false
 
 # linuxserver.io docker mods
 # https://mods.linuxserver.io/?mod=projectsend
@@ -57,12 +57,12 @@ projectsend_db_env_docker_mods_install_packages: ""
 projectsend_db_env_docker_mods_install_pip_packages: ""
 
 # repliqate
-projectsend_repliqate_enabled: "false"
+projectsend_repliqate_enabled: false
 projectsend_repliqate_engine: "restic"
 projectsend_repliqate_schedule: "@daily 3am"
 projectsend_repliqate_backup_id: "{{ projectsend_container_name }}"
 projectsend_repliqate_retention: "30d"
-projectsend_db_repliqate_enabled: "false"
+projectsend_db_repliqate_enabled: false
 projectsend_db_repliqate_engine: "restic"
 projectsend_db_repliqate_schedule: "@daily 3am"
 projectsend_db_repliqate_backup_id: "{{ projectsend_container_name }}"
@@ -72,5 +72,5 @@ projectsend_db_repliqate_retention: "30d"
 projectsend_tinyauth_enabled: false
 
 # watchtower
-projectsend_watchtower_enable: "false"
-projectsend_db_watchtower_enable: "false"
+projectsend_watchtower_enabled: false
+projectsend_db_watchtower_enabled: false

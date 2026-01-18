@@ -23,9 +23,9 @@
           SB_USER: "{{ silverbullet_username }}:{{ silverbullet_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ silverbullet_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ silverbullet_watchtower_enable }}"
-          dockflare.enable: "{{ silverbullet_dockflare_tunnel }}"
+          autoheal: "{{ silverbullet_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ silverbullet_watchtower_enabled| string }}"
+          dockflare.enable: "{{ silverbullet_dockflare_enabled | string }}"
           dockflare.access.group: "{{ silverbullet_dockflare_access_group }}"
           dockflare.hostname: "{{ silverbullet_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ silverbullet_port_http }}"
@@ -36,9 +36,9 @@
           homepage.description: "{{ 'Notes for developers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ silverbullet_container_name }}"
-          homepage.showStats: "{{ silverbullet_homepage_showstats }}"
+          homepage.showStats: "{{ silverbullet_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ silverbullet_port_http }}"
-          repliqate.enabled: "{{ silverbullet_repliqate_enabled }}"
+          repliqate.enabled: "{{ silverbullet_repliqate_enabled | string }}"
           repliqate.engine: "{{ silverbullet_repliqate_engine }}"
           repliqate.schedule: "{{ silverbullet_repliqate_schedule }}"
           repliqate.backup_id: "{{ silverbullet_repliqate_backup_id }}"
@@ -63,7 +63,7 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (silverbullet_port_http | string)] +
-                (['https://' + silverbullet_hostname + '.' + ansible_nas_domain] if (silverbullet_available_externally is true or silverbullet_dockflare_tunnel is true) else [])
+                (['https://' + silverbullet_hostname + '.' + ansible_nas_domain] if (silverbullet_available_externally is true or silverbullet_dockflare_enabled is true) else [])
               }}
   when: silverbullet_enabled is true
 

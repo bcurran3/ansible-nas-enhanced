@@ -28,9 +28,9 @@
           DOCKGE_STACKS_DIR: "/opt/stacks"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ dockge_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ dockge_watchtower_enable }}"
-          dockflare.enable: "{{ dockge_dockflare_tunnel }}"
+          autoheal: "{{ dockge_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockge_watchtower_enabled| string }}"
+          dockflare.enable: "{{ dockge_dockflare_enabled | string }}"
           dockflare.access.group: "{{ dockge_dockflare_access_group }}"
           dockflare.hostname: "{{ dockge_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockge_port_http }}"
@@ -41,9 +41,9 @@
           homepage.description: "{{ 'A fancy, easy-to-use and reactive self-hosted docker compose.yaml stack-oriented manager' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dockge_container_name }}"
-          homepage.showStats: "{{ dockge_homepage_showstats }}"
+          homepage.showStats: "{{ dockge_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockge_port_http }}"
-          repliqate.enabled: "{{ dockge_repliqate_enabled }}"
+          repliqate.enabled: "{{ dockge_repliqate_enabled | string }}"
           repliqate.engine: "{{ dockge_repliqate_engine }}"
           repliqate.schedule: "{{ dockge_repliqate_schedule }}"
           repliqate.backup_id: "{{ dockge_repliqate_backup_id }}"
@@ -69,7 +69,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockge_port_http | string)] +
-                (['https://' + dockge_hostname + '.' + ansible_nas_domain] if (dockge_available_externally is true or dockge_dockflare_tunnel is true) else [])
+                (['https://' + dockge_hostname + '.' + ansible_nas_domain] if (dockge_available_externally is true or dockge_dockflare_enabled is true) else [])
               }}
   when: dockge_enabled is true
 

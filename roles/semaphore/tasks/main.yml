@@ -27,9 +27,9 @@
           SEMAPHORE_ADMIN: "{{ semaphore_env_semaphore_admin }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ semaphore_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ semaphore_watchtower_enable }}"
-          dockflare.enable: "{{ semaphore_dockflare_tunnel }}"
+          autoheal: "{{ semaphore_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ semaphore_watchtower_enabled| string }}"
+          dockflare.enable: "{{ semaphore_dockflare_enabled | string }}"
           dockflare.access.group: "{{ semaphore_dockflare_access_group }}"
           dockflare.hostname: "{{ semaphore_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ semaphore_port_http }}"
@@ -41,8 +41,8 @@
           homepage.description: "{{ 'Modern UI and powerful API for Ansible, Terraform, OpenTofu, PowerShell and other DevOps tools.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ semaphore_container_name }}"
-          homepage.showStats: "{{ semaphore_homepage_showstats }}"
-          repliqate.enabled: "{{ semaphore_repliqate_enabled }}"
+          homepage.showStats: "{{ semaphore_homepage_showstats | string }}"
+          repliqate.enabled: "{{ semaphore_repliqate_enabled | string }}"
           repliqate.engine: "{{ semaphore_repliqate_engine }}"
           repliqate.schedule: "{{ semaphore_repliqate_schedule }}"
           repliqate.backup_id: "{{ semaphore_repliqate_backup_id }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (semaphore_port_http | string)] +
-                (['https://' + semaphore_hostname + '.' + ansible_nas_domain] if (semaphore_available_externally is true or semaphore_dockflare_tunnel is true) else [])
+                (['https://' + semaphore_hostname + '.' + ansible_nas_domain] if (semaphore_available_externally is true or semaphore_dockflare_enabled is true) else [])
               }}
   when: semaphore_enabled is true
 

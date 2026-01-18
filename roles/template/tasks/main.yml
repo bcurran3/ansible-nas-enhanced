@@ -8,6 +8,12 @@
       with_items:
         - "{{ appname_data_directory }}"
 
+#    - name: Create {{ ansible_nas_app_name }} Volumes
+#      community.docker.docker_volume:
+#        name: "{{ item }}"
+#      loop:
+#        - appname_volume1
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -28,8 +34,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ appname_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ appname_watchtower_enable | string }}"
-          dockflare.enable: "{{ appname_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_watchtower_enabled| string }}"
+          dockflare.enable: "{{ appname_dockflare_enabled | string }}"
           dockflare.access.group: "{{ appname_dockflare_access_group }}"
           dockflare.hostname: "{{ appname_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ appname_port_http }}"
@@ -39,10 +45,10 @@
           homepage.group: "{{ appname_homepage_group }}"
           homepage.icon: "{{ appname_homepage_icon }}"
           homepage.href: "{{ appname_homepage_href }}"
-          homepage.description: "{{ 'appname description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'appname_homepage_description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_container_name }}"
-          homepage.showStats: "{{ appname_homepage_showstats }}"
+          homepage.showStats: "{{ appname_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ appname_port_http }}"
           repliqate.enabled: "{{ appname_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_repliqate_engine }}"
@@ -79,7 +85,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (appname_port_http | string)] +
-                (['https://' + appname_hostname + '.' + ansible_nas_domain] if (appname_available_externally is true or appname_dockflare_tunnel is true) else [])
+                (['https://' + appname_hostname + '.' + ansible_nas_domain] if (appname_available_externally is true or appname_dockflare_enabled is true) else [])
               }}
   when: appname_enabled is true
 
@@ -156,7 +162,7 @@
               start_period: "30s"
         labels:
           autoheal: "{{ appname_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ appname_db_homepage_group }}"
@@ -165,7 +171,7 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
-          homepage.showStats: "{{ appname_db_homepage_showstats }}"
+          homepage.showStats: "{{ appname_db_homepage_showstats | string }}"
           repliqate.enabled: "{{ appname_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_db_repliqate_engine }}"
           repliqate.schedule: "{{ appname_db_repliqate_schedule }}"
@@ -204,7 +210,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ appname_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ appname_db_homepage_group }}"
@@ -213,7 +219,7 @@
           homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
-          homepage.showStats: "{{ appname_db_homepage_showstats }}"
+          homepage.showStats: "{{ appname_db_homepage_showstats | string }}"
           repliqate.enabled: "{{ appname_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_db_repliqate_engine }}"
           repliqate.schedule: "{{ appname_db_repliqate_schedule }}"
@@ -257,7 +263,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ appname_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ appname_db_homepage_group }}"
@@ -266,7 +272,7 @@
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
-          homepage.showStats: "{{ appname_db_homepage_showstats }}"
+          homepage.showStats: "{{ appname_db_homepage_showstats | string }}"
           repliqate.enabled: "{{ appname_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_db_repliqate_engine }}"
           repliqate.schedule: "{{ appname_db_repliqate_schedule }}"
@@ -308,7 +314,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ appname_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ appname_db_homepage_group }}"
@@ -317,7 +323,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
-          homepage.showStats: "{{ appname_db_homepage_showstats }}"
+          homepage.showStats: "{{ appname_db_homepage_showstats | string }}"
           repliqate.enabled: "{{ appname_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_db_repliqate_engine }}"
           repliqate.schedule: "{{ appname_db_repliqate_schedule }}"
@@ -354,7 +360,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ appname_redis_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ appname_redis_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ appname_redis_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ appname_redis_homepage_group }}"
@@ -363,7 +369,7 @@
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_redis_container_name }}"
-          homepage.showStats: "{{ appname_redis_homepage_showstats }}"
+          homepage.showStats: "{{ appname_redis_homepage_showstats | string }}"
           repliqate.enabled: "{{ appname_redis_repliqate_enabled | string }}"
           repliqate.engine: "{{ appname_redis_repliqate_engine }}"
           repliqate.schedule: "{{ appname_redis_repliqate_schedule }}"

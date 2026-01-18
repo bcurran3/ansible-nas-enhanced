@@ -34,9 +34,9 @@
           PGID: "{{ deluge_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ deluge_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ deluge_watchtower_enable }}"
-          dockflare.enable: "{{ deluge_dockflare_tunnel }}"
+          autoheal: "{{ deluge_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ deluge_watchtower_enabled| string }}"
+          dockflare.enable: "{{ deluge_dockflare_enabled | string }}"
           dockflare.access.group: "{{ deluge_dockflare_access_group }}"
           dockflare.hostname: "{{ deluge_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ deluge_port_http }}"
@@ -47,13 +47,13 @@
           homepage.description: "{{ 'BitTorrent client' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ deluge_container_name }}"
-          homepage.showStats: "{{ deluge_homepage_showstats }}"
+          homepage.showStats: "{{ deluge_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ deluge_port_http }}"
           homepage.widget.type: "deluge"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ deluge_port_http }}"
           homepage.widget.password: "{{ deluge_homepage_widget_password }}"
           homepage.widget.enableLeechProgress: "{{ deluge_homepage_widget_enableleechprogress }}"
-          repliqate.enabled: "{{ deluge_repliqate_enabled }}"
+          repliqate.enabled: "{{ deluge_repliqate_enabled | string }}"
           repliqate.engine: "{{ deluge_repliqate_engine }}"
           repliqate.schedule: "{{ deluge_repliqate_schedule }}"
           repliqate.backup_id: "{{ deluge_repliqate_backup_id }}"
@@ -79,7 +79,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (deluge_port_http | string)] +
-                (['https://' + deluge_hostname + '.' + ansible_nas_domain] if (deluge_available_externally is true or deluge_dockflare_tunnel is true) else [])
+                (['https://' + deluge_hostname + '.' + ansible_nas_domain] if (deluge_available_externally is true or deluge_dockflare_enabled is true) else [])
               }}
   when: deluge_enabled is true
 

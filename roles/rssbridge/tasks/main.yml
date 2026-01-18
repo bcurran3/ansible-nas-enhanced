@@ -23,9 +23,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ rssbridge_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ rssbridge_watchtower_enable }}"
-          dockflare.enable: "{{ rssbridge_dockflare_tunnel }}"
+          autoheal: "{{ rssbridge_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ rssbridge_watchtower_enabled| string }}"
+          dockflare.enable: "{{ rssbridge_dockflare_enabled | string }}"
           dockflare.access.group: "{{ rssbridge_dockflare_access_group }}"
           dockflare.hostname: "{{ rssbridge_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rssbridge_port_http }}"
@@ -36,9 +36,9 @@
           homepage.description: "{{ 'rssbridge description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ rssbridge_container_name }}"
-          homepage.showStats: "{{ rssbridge_homepage_showstats }}"
+          homepage.showStats: "{{ rssbridge_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rssbridge_port_http }}"
-          repliqate.enabled: "{{ rssbridge_repliqate_enabled }}"
+          repliqate.enabled: "{{ rssbridge_repliqate_enabled | string }}"
           repliqate.engine: "{{ rssbridge_repliqate_engine }}"
           repliqate.schedule: "{{ rssbridge_repliqate_schedule }}"
           repliqate.backup_id: "{{ rssbridge_repliqate_backup_id }}"
@@ -62,7 +62,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (rssbridge_port_http | string)] +
-                (['https://' + rssbridge_hostname + '.' + ansible_nas_domain] if (rssbridge_available_externally is true or rssbridge_dockflare_tunnel is true) else [])
+                (['https://' + rssbridge_hostname + '.' + ansible_nas_domain] if (rssbridge_available_externally is true or rssbridge_dockflare_enabled is true) else [])
               }}
   when: rssbridge_enabled is true
 

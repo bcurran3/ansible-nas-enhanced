@@ -50,9 +50,9 @@
           PUID: "{{ gitlab_user_id }}"
           PGID: "{{ gitlab_group_id }}"
         labels:
-          autoheal: "{{ gitlab_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ gitlab_watchtower_enable }}"
-          dockflare.enable: "{{ gitlab_dockflare_tunnel }}"
+          autoheal: "{{ gitlab_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ gitlab_watchtower_enabled| string }}"
+          dockflare.enable: "{{ gitlab_dockflare_enabled | string }}"
           dockflare.access.group: "{{ gitlab_dockflare_access_group }}"
           dockflare.hostname: "{{ gitlab_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitlab_port_http }}"
@@ -63,13 +63,13 @@
           homepage.description: "{{ 'gitlab description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gitlab_container_name }}"
-          homepage.showStats: "{{ gitlab_homepage_showstats }}"
+          homepage.showStats: "{{ gitlab_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitlab_port }}"
           homepage.widget.type: "gitlab"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitlab_port }}"
           homepage.widget.key: "{{ gitlab_homepage_widget_key }}"
           homepage.widget.user_id: "{{ gitlab_homepage_widget_user_id }}"
-          repliqate.enabled: "{{ gitlab_repliqate_enabled }}"
+          repliqate.enabled: "{{ gitlab_repliqate_enabled | string }}"
           repliqate.engine: "{{ gitlab_repliqate_engine }}"
           repliqate.schedule: "{{ gitlab_repliqate_schedule }}"
           repliqate.backup_id: "{{ gitlab_repliqate_backup_id }}"
@@ -95,7 +95,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gitlab_port_http | string)] +
-                (['https://' + gitlab_hostname + '.' + ansible_nas_domain] if (gitlab_available_externally is true or gitlab_dockflare_tunnel is true) else [])
+                (['https://' + gitlab_hostname + '.' + ansible_nas_domain] if (gitlab_available_externally is true or gitlab_dockflare_enabled is true) else [])
               }}
   when: gitlab_enabled is true
 

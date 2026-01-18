@@ -36,8 +36,8 @@
           GROUP_ID: "{{ idrac6_env_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ idrac6_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ idrac6_watchtower_enable }}"
+          autoheal: "{{ idrac6_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ idrac6_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.group: "{{ idrac6_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
@@ -46,9 +46,9 @@
           homepage.description: "{{ 'iDRAC 6 web interface and VNC proxy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ idrac6_container_name }}"
-          homepage.showStats: "{{ idrac6_homepage_showstats }}"
+          homepage.showStats: "{{ idrac6_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ idrac6_port_http }}"
-          repliqate.enabled: "{{ idrac6_repliqate_enabled }}"
+          repliqate.enabled: "{{ idrac6_repliqate_enabled | string }}"
           repliqate.engine: "{{ idrac6_repliqate_engine }}"
           repliqate.schedule: "{{ idrac6_repliqate_schedule }}"
           repliqate.backup_id: "{{ idrac6_repliqate_backup_id }}"
@@ -79,7 +79,7 @@
                 'https://' ~ idrac6_hostname ~ '.' ~ ansible_nas_domain,
                 'vnc://' ~ idrac6_hostname ~ '.' ~ ansible_nas_domain ~ ':' ~ idrac6_port_vnc
               ]
-              if (idrac6_available_externally is true or idrac6_dockflare_tunnel is true) else []
+              if (idrac6_available_externally is true or idrac6_dockflare_enabled is true) else []
             ) + [
               'vnc://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ idrac6_port_vnc
             ]

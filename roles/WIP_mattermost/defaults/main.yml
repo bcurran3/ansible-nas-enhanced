@@ -27,17 +27,17 @@ mattermost_memory: "1G"
 mattermost_memory_swap: -1
 
 # autoheal
-mattermost_autoheal: "false"
+mattermost_autoheal: false
 
 # dockflare
-mattermost_dockflare_tunnel: false
+mattermost_dockflare_enabled: false
 mattermost_dockflare_access_group: ""
 
 # homepage
 mattermost_homepage_group: "Apps"
 mattermost_homepage_icon: "appname.png"
 mattermost_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mattermost_port_http }}"
-mattermost_homepage_showstats: "false"
+mattermost_homepage_showstats: false
 
 # linuxserver.io docker mods for linuxserver.io images
 #mattermost_env_docker_mods: ""
@@ -55,7 +55,7 @@ mattermost_repliqate_retention: "30d"
 mattermost_tinyauth_enabled: false
 
 # watchtower
-mattermost_watchtower_enable: false
+mattermost_watchtower_enabled: false
 
 
 ##############################################################################
@@ -88,13 +88,13 @@ mattermost_db_memory: "1G"
 mattermost_db_memory_swap: "{{ mattermost_db_memory }}"
 
 # autoheal
-mattermost_db_autoheal: "false"
+mattermost_db_autoheal: false
 
 # homepage
 mattermost_db_homepage_group: "DBs"
 mattermost_db_homepage_icon: "mariadb.png"
 mattermost_db_homepage_href: "{{ mattermost_homepage_href }}"
-mattermost_db_homepage_showstats: "false"
+mattermost_db_homepage_showstats: false
 
 # repliqate
 mattermost_db_repliqate_enabled: false
@@ -104,7 +104,7 @@ mattermost_db_repliqate_backup_id: "{{ mattermost_db_container_name }}"
 mattermost_db_repliqate_retention: "30d"
 
 # watchtower
-mattermost_db_watchtower_enable: false
+mattermost_db_watchtower_enabled: false
 
 
 ######################################################
@@ -128,23 +128,23 @@ mattermost_db_memory: "1G"
 mattermost_db_memory_swap: "{{ mattermost_db_memory }}"
 
 # autoheal
-mattermost_db_autoheal: "false"
+mattermost_db_autoheal: false
 
 # homepage
 mattermost_db_homepage_group: "DBs"
 mattermost_db_homepage_icon: "mongodb.png"
 mattermost_db_homepage_href: "{{ mattermost_homepage_href }}"
-mattermost_db_homepage_showstats: "false"
+mattermost_db_homepage_showstats: false
 
 # repliqate
-mattermost_db_repliqate_enabled: "false"
+mattermost_db_repliqate_enabled: false
 mattermost_db_repliqate_engine: "restic"
 mattermost_db_repliqate_schedule: "@daily 3am"
 mattermost_db_repliqate_backup_id: "{{ mattermost_db_container_name }}"
 mattermost_db_repliqate_retention: "30d"
 
 # watchtower
-mattermost_db_watchtower_enable: "false"
+mattermost_db_watchtower_enabled: false
 
 
 ##########################################
@@ -168,23 +168,23 @@ mattermost_db_memory: "1G"
 mattermost_db_memory_swap: "{{ mattermost_db_memory }}"
 
 # autoheal
-mattermost_db_autoheal: "false"
+mattermost_db_autoheal: false
 
 # homepage
 mattermost_db_homepage_group: "DBs"
 mattermost_db_homepage_icon: "mysql.png"
 mattermost_db_homepage_href: "{{ mattermost_homepage_href }}"
-mattermost_db_homepage_showstats: "false"
+mattermost_db_homepage_showstats: false
 
 # repliqate
-mattermost_db_repliqate_enabled: "false"
+mattermost_db_repliqate_enabled: false
 mattermost_db_repliqate_engine: "restic"
 mattermost_db_repliqate_schedule: "@daily 3am"
 mattermost_db_repliqate_backup_id: "{{ mattermost_db_container_name }}"
 mattermost_db_repliqate_retention: "30d"
 
 # watchtower
-mattermost_db_watchtower_enable: "false"
+mattermost_db_watchtower_enabled: false
 
 
 ##############################################################
@@ -208,23 +208,23 @@ mattermost_db_memory: "1G"
 mattermost_db_memory_swap: "{{ mattermost_db_memory }}"
 
 # autoheal
-mattermost_db_autoheal: "false"
+mattermost_db_autoheal: false
 
 # homepage
 mattermost_db_homepage_group: "DBs"
 mattermost_db_homepage_icon: "postgres.png"
 mattermost_db_homepage_href: "{{ mattermost_homepage_href }}"
-mattermost_db_homepage_showstats: "false"
+mattermost_db_homepage_showstats: false
 
 # repliqate
-mattermost_db_repliqate_enabled: "false"
+mattermost_db_repliqate_enabled: false
 mattermost_db_repliqate_engine: "restic"
 mattermost_db_repliqate_schedule: "@daily 3am"
 mattermost_db_repliqate_backup_id: "{{ mattermost_db_container_name }}"
 mattermost_db_repliqate_retention: "30d"
 
 # watchtower
-mattermost_db_watchtower_enable: "false"
+mattermost_db_watchtower_enabled: false
 
 
 #########################################
@@ -247,20 +247,20 @@ mattermost_redis_memory: "1G"
 mattermost_redis_memory_swap: "{{ mattermost_db_memory }}"
 
 # autoheal
-mattermost_redis_autoheal: "false"
+mattermost_redis_autoheal: false
 
 # homepage
 mattermost_redis_homepage_group: "DBs"
 mattermost_redis_homepage_icon: "redis.png"
 mattermost_redis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mattermost_port_http }}"
-mattermost_redis_homepage_showstats: "false"
+mattermost_redis_homepage_showstats: false
 
 # repliqate
-mattermost_redis_repliqate_enabled: "false"
+mattermost_redis_repliqate_enabled: false
 mattermost_redis_repliqate_engine: "restic"
 mattermost_redis_repliqate_schedule: "@daily 3am"
 mattermost_redis_repliqate_backup_id: "{{ mattermost_redis_container_name }}"
 mattermost_redis_repliqate_retention: "30d"
 
 # watchtower
-mattermost_redis_watchtower_enable: "false"
+mattermost_redis_watchtower_enabled: false

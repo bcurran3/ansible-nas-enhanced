@@ -38,8 +38,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ bytestash_autoheal | string }} | string"
-          com.centurylinklabs.watchtower.enable: "{{ bytestash_watchtower_enable | string }}"
-          dockflare.enable: "{{ bytestash_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ bytestash_watchtower_enabled| string }}"
+          dockflare.enable: "{{ bytestash_dockflare_enabled | string }}"
           dockflare.access.group: "{{ bytestash_dockflare_access_group }}"
           dockflare.hostname: "{{ bytestash_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bytestash_port_http }}"
@@ -50,7 +50,7 @@
           homepage.description: "{{ 'code snippet storage solution' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ bytestash_container_name }}"
-          homepage.showStats: "{{ bytestash_homepage_showstats }}"
+          homepage.showStats: "{{ bytestash_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bytestash_port_http }}"
           repliqate.enabled: "{{ bytestash_repliqate_enabled }} | string"
           repliqate.engine: "{{ bytestash_repliqate_engine }}"
@@ -77,7 +77,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (bytestash_port_http | string)] +
-                (['https://' + bytestash_hostname + '.' + ansible_nas_domain] if (bytestash_available_externally is true or bytestash_dockflare_tunnel is true) else [])
+                (['https://' + bytestash_hostname + '.' + ansible_nas_domain] if (bytestash_available_externally is true or bytestash_dockflare_enabled is true) else [])
               }}
   when: bytestash_enabled is true
 

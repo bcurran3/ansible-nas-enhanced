@@ -30,7 +30,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ mailrise_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ mailrise_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ mailrise_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mailrise_homepage_group }}"
@@ -38,7 +38,7 @@
           homepage.description: "{{ 'An SMTP gateway for Apprise notifications.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mailrise_container_name }}"
-          homepage.showStats: "{{ mailrise_homepage_showstats }}"
+          homepage.showStats: "{{ mailrise_homepage_showstats | string }}"
           repliqate.enabled: "false"
           traefik.enable: "true"
           traefik.docker.network: "bridge"

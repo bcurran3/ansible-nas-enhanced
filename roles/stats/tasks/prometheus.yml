@@ -40,9 +40,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ stats_prometheus_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ stats_prometheus_watchtower_enable }}"
-          dockflare.enable: "{{ stats_prometheus_dockflare_tunnel }}"
+          autoheal: "{{ stats_prometheus_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ stats_prometheus_watchtower_enabled| string }}"
+          dockflare.enable: "{{ stats_prometheus_dockflare_enabled | string }}"
           dockflare.access.group: "{{ stats_prometheus_dockflare_access_group }}"
           dockflare.hostname: "{{ stats_prometheus_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_port }}"
@@ -53,7 +53,7 @@
           homepage.description: "{{ 'The Prometheus monitoring system and time series database.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stats_prometheus_container_name }}"
-          homepage.showStats: "{{ stats_prometheus_homepage_showstats }}"
+          homepage.showStats: "{{ stats_prometheus_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_port }}"
           homepage.widget.type: "prometheus"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_port }}"
@@ -78,7 +78,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (stats_prometheus_port | string)] +
-                (['https://' + stats_prometheus_hostname + '.' + ansible_nas_domain] if (stats_prometheus_available_externally is true or stats_prometheus_dockflare_tunnel is true) else [])
+                (['https://' + stats_prometheus_hostname + '.' + ansible_nas_domain] if (stats_prometheus_available_externally is true or stats_prometheus_dockflare_enabled is true) else [])
               }}
   when: stats_enabled is true
 

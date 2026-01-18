@@ -74,9 +74,9 @@
           retries: "3"
           start_period: "10s"
         labels:
-          autoheal: "{{ wud_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ wud_watchtower_enable }}"
-          dockflare.enable: "{{ wud_dockflare_tunnel }}"
+          autoheal: "{{ wud_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ wud_watchtower_enabled| string }}"
+          dockflare.enable: "{{ wud_dockflare_enabled | string }}"
           dockflare.access.group: "{{ wud_dockflare_access_group }}"
           dockflare.hostname: "{{ wud_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
@@ -88,12 +88,12 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wud_container_name }}"
-          homepage.showStats: "{{ wud_homepage_showstats }}"
+          homepage.showStats: "{{ wud_homepage_showstats | string }}"
           homepage.widget.type: "whatsupdocker"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.widget.username: "{{ wud_homepage_widget_username }}"
           homepage.widget.password: "{{ wud_homepage_widget_password }}"
-          repliqate.enabled: "{{ wud_repliqate_enabled }}"
+          repliqate.enabled: "{{ wud_repliqate_enabled | string }}"
           repliqate.engine: "{{ wud_repliqate_engine }}"
           repliqate.schedule: "{{ wud_repliqate_schedule }}"
           repliqate.backup_id: "{{ wud_repliqate_backup_id }}"
@@ -118,7 +118,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wud_port_http | string)] +
-                (['https://' + wud_hostname + '.' + ansible_nas_domain] if (wud_available_externally is true or wud_dockflare_tunnel is true) else [])
+                (['https://' + wud_hostname + '.' + ansible_nas_domain] if (wud_available_externally is true or wud_dockflare_enabled is true) else [])
               }}
   when: wud_enabled is true
 

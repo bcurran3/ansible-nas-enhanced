@@ -31,9 +31,9 @@
           - "{{ thelounge_data_directory }}:/var/opt/thelounge"
           - "/var/run/dbus:/var/run/dbus"
         labels:
-          autoheal: "{{ thelounge_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ thelounge_watchtower_enable }}"
-          dockflare.enable: "{{ thelounge_dockflare_tunnel }}"
+          autoheal: "{{ thelounge_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ thelounge_watchtower_enabled| string }}"
+          dockflare.enable: "{{ thelounge_dockflare_enabled | string }}"
           dockflare.access.group: "{{ thelounge_dockflare_access_group }}"
           dockflare.hostname: "{{ thelounge_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ thelounge_port_http }}"
@@ -44,9 +44,9 @@
           homepage.description: "{{ 'Modern, responsive, cross-platform, self-hosted web IRC client' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ thelounge_container_name }}"
-          homepage.showStats: "{{ thelounge_homepage_showstats }}"
+          homepage.showStats: "{{ thelounge_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ thelounge_port_http }}"
-          repliqate.enabled: "{{ thelounge_repliqate_enabled }}"
+          repliqate.enabled: "{{ thelounge_repliqate_enabled | string }}"
           repliqate.engine: "{{ thelounge_repliqate_engine }}"
           repliqate.schedule: "{{ thelounge_repliqate_schedule }}"
           repliqate.backup_id: "{{ thelounge_repliqate_backup_id }}"
@@ -71,7 +71,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (thelounge_port_http | string)] +
-                (['https://' + thelounge_hostname + '.' + ansible_nas_domain] if (thelounge_available_externally is true or thelounge_dockflare_tunnel is true) else [])
+                (['https://' + thelounge_hostname + '.' + ansible_nas_domain] if (thelounge_available_externally is true or thelounge_dockflare_enabled is true) else [])
               }}
   when: thelounge_enabled is true
 

@@ -44,7 +44,7 @@
           retries: 5
           timeout: "5s"
         labels:
-          autoheal: "{{ immich_db_autoheal }}"
+          autoheal: "{{ immich_db_autoheal | string }}"
           com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
           homepage.group: "{{ immich_db_homepage_group }}"
@@ -55,7 +55,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ immich_db_container_name }}"
           homepage.showStats: "false"
-          repliqate.enabled: "{{ immich_db_repliqate_enabled }}"
+          repliqate.enabled: "{{ immich_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ immich_db_repliqate_engine }}"
           repliqate.schedule: "{{ immich_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ immich_db_repliqate_backup_id }}"
@@ -86,8 +86,8 @@
         healthcheck:
           test: ["CMD-SHELL", "redis-cli ping || exit 1"]
         labels:
-          autoheal: "{{ immich_redis_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ immich_watchtower_enable }}"
+          autoheal: "{{ immich_redis_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ immich_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.group: "{{ immich_redis_homepage_group }}"
           homepage.name: "Immich Redis"
@@ -96,7 +96,7 @@
           homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ immich_redis_container_name }}"
-          homepage.showStats: "{{ immich_redis_homepage_showstats }}"
+          homepage.showStats: "{{ immich_redis_homepage_showstats | string }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: "^\\d+$"
@@ -136,7 +136,7 @@
 #        healthcheck:
 #          disable: "false"
         labels:
-          autoheal: "{{ immich_ml_autoheal }}"
+          autoheal: "{{ immich_ml_autoheal | string }}"
           com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
           homepage.group: "{{ immich_ml_homepage_group }}"
@@ -147,7 +147,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ immich_ml_container_name }}"
           homepage.showStats: "false"
-          repliqate.enabled: "{{ immich_ml_repliqate_enabled }}"
+          repliqate.enabled: "{{ immich_ml_repliqate_enabled | string }}"
           repliqate.engine: "{{ immich_ml_repliqate_engine }}"
           repliqate.schedule: "{{ immich_ml_repliqate_schedule }}"
           repliqate.backup_id: "{{ immich_ml_repliqate_backup_id }}"
@@ -193,9 +193,9 @@
 #        healthcheck:
 #          disable: "false"
         labels:
-          autoheal: "{{ immich_autoheal }}"
+          autoheal: "{{ immich_autoheal | string }}"
           com.centurylinklabs.watchtower.enable: "true"
-          dockflare.enable: "{{ immich_dockflare_tunnel }}"
+          dockflare.enable: "{{ immich_dockflare_enabled | string }}"
           dockflare.access.group: "{{ immich_dockflare_access_group }}"
           dockflare.hostname: "{{ immich_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port_http }}"
@@ -207,12 +207,12 @@
           homepage.description: "{{ 'High performance self-hosted photo and video management solution' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ immich_server_container_name }}"
-          homepage.showStats: "{{ immich_homepage_showstats }}"
+          homepage.showStats: "{{ immich_homepage_showstats | string }}"
           homepage.widget.type: "immich"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ immich_port_http }}"
           homepage.widget.key: "{{ immich_homepage_widget_key }}"
           homepage.widget.version: "2"
-          repliqate.enabled: "{{ immich_server_repliqate_enabled }}"
+          repliqate.enabled: "{{ immich_server_repliqate_enabled | string }}"
           repliqate.engine: "{{ immich_server_repliqate_engine }}"
           repliqate.schedule: "{{ immich_server_repliqate_schedule }}"
           repliqate.backup_id: "{{ immich_server_repliqate_backup_id }}"
@@ -238,7 +238,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (immich_port_http | string)] +
-                (['https://' + immich_hostname + '.' + ansible_nas_domain] if (immich_available_externally is true or immich_dockflare_tunnel is true) else [])
+                (['https://' + immich_hostname + '.' + ansible_nas_domain] if (immich_available_externally is true or immich_dockflare_enabled is true) else [])
               }}
   when: immich_enabled is true
 

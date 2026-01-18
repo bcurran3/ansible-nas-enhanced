@@ -41,7 +41,7 @@
           retries: 15
         labels:
           autoheal: "{{ scanopy_daemon_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ scanopy_daemon_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ scanopy_daemon_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} daemon"
           homepage.group: "{{ scanopy_daemon_homepage_group }}"
@@ -50,8 +50,8 @@
           homepage.description: "{{ 'Scanopy daemon' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ scanopy_daemon_container_name }}"
-          homepage.showStats: "{{ scanopy_daemon_homepage_showstats }}"
-          repliqate.enabled: "{{ scanopy_daemon_repliqate_enabled }}"
+          homepage.showStats: "{{ scanopy_daemon_homepage_showstats | string }}"
+          repliqate.enabled: "{{ scanopy_daemon_repliqate_enabled | string }}"
           repliqate.engine: "{{ scanopy_daemon_repliqate_engine }}"
           repliqate.schedule: "{{ scanopy_daemon_repliqate_schedule }}"
           repliqate.backup_id: "{{ scanopy_daemon_repliqate_backup_id }}"
@@ -84,8 +84,8 @@
           timeout: "5s"
           retries: 5
         labels:
-          autoheal: "{{ scanopy_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ scanopy_db_watchtower_enable }}"
+          autoheal: "{{ scanopy_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ scanopy_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ scanopy_db_homepage_group }}"
@@ -94,8 +94,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ scanopy_db_container_name }}"
-          homepage.showStats: "{{ scanopy_db_homepage_showstats }}"
-          repliqate.enabled: "{{ scanopy_db_repliqate_enabled }}"
+          homepage.showStats: "{{ scanopy_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ scanopy_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ scanopy_db_repliqate_engine }}"
           repliqate.schedule: "{{ scanopy_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ scanopy_db_repliqate_backup_id }}"
@@ -129,8 +129,8 @@
           - "{{ scanopy_db_container_name }}"
         labels:
           autoheal: "{{ scanopy_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ scanopy_watchtower_enable | string }}"
-          dockflare.enable: "{{ scanopy_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ scanopy_watchtower_enabled| string }}"
+          dockflare.enable: "{{ scanopy_dockflare_enabled | string }}"
           dockflare.access.group: "{{ scanopy_dockflare_access_group }}"
           dockflare.hostname: "{{ scanopy_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
@@ -141,7 +141,7 @@
           homepage.description: "{{ 'Clean network diagrams. One-time setup, zero upkeep.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ scanopy_container_name }}"
-          homepage.showStats: "{{ scanopy_homepage_showstats }}"
+          homepage.showStats: "{{ scanopy_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
           repliqate.enabled: "{{ scanopy_repliqate_enabled }} | string"
           repliqate.engine: "{{ scanopy_repliqate_engine }}"
@@ -168,7 +168,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (scanopy_port_http | string)] +
-                (['https://' + scanopy_hostname + '.' + ansible_nas_domain] if (scanopy_available_externally is true or scanopy_dockflare_tunnel is true) else [])
+                (['https://' + scanopy_hostname + '.' + ansible_nas_domain] if (scanopy_available_externally is true or scanopy_dockflare_enabled is true) else [])
               }}
   when: scanopy_enabled is true
 

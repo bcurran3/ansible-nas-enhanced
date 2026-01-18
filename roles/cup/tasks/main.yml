@@ -27,9 +27,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ cup_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ cup_watchtower_enable }}"
-          dockflare.enable: "{{ cup_dockflare_tunnel }}"
+          autoheal: "{{ cup_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ cup_watchtower_enabled| string }}"
+          dockflare.enable: "{{ cup_dockflare_enabled | string }}"
           dockflare.access.group: "{{ cup_dockflare_access_group }}"
           dockflare.hostname: "{{ cup_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cup_port_http }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'Docker container updates made easy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ cup_container_name }}"
-          homepage.showStats: "{{ cup_homepage_showstats }}"
+          homepage.showStats: "{{ cup_homepage_showstats | string }}"
           homepage.widget.type: "customapi"
           homepage.widget.url: "{{ cup_homepage_widget_url }}"
           homepage.widget.mappings[0].label: "Monitoring"
@@ -53,7 +53,7 @@
           homepage.widget.mappings[2].label: "Updates"
           homepage.widget.mappings[2].field.metrics: "update_available"
           homepage.widget.mappings[2].format: "number"
-          repliqate.enabled: "{{ cup_repliqate_enabled }}"
+          repliqate.enabled: "{{ cup_repliqate_enabled | string }}"
           repliqate.engine: "{{ cup_repliqate_engine }}"
           repliqate.schedule: "{{ cup_repliqate_schedule }}"
           repliqate.backup_id: "{{ cup_repliqate_backup_id }}"
@@ -79,7 +79,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (cup_port_http | string)] +
-                (['https://' + cup_hostname + '.' + ansible_nas_domain] if (cup_available_externally is true or cup_dockflare_tunnel is true) else [])
+                (['https://' + cup_hostname + '.' + ansible_nas_domain] if (cup_available_externally is true or cup_dockflare_enabled is true) else [])
               }}
   when: cup_enabled is true
 

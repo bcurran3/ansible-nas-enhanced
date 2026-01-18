@@ -32,7 +32,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ activepieces_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ activepieces_db_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ activepieces_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ activepieces_db_homepage_group }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ activepieces_db_container_name }}"
-          homepage.showStats: "{{ activepieces_db_homepage_showstats }}"
+          homepage.showStats: "{{ activepieces_db_homepage_showstats | string }}"
           repliqate.enabled: "{{ activepieces_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ activepieces_db_repliqate_engine }}"
           repliqate.schedule: "{{ activepieces_db_repliqate_schedule }}"
@@ -69,7 +69,7 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ activepieces_redis_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ activepieces_redis_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ activepieces_redis_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ activepieces_redis_homepage_group }}"
@@ -78,7 +78,7 @@
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ activepieces_redis_container_name }}"
-          homepage.showStats: "{{ activepieces_redis_homepage_showstats }}"
+          homepage.showStats: "{{ activepieces_redis_homepage_showstats | string }}"
           repliqate.enabled: "{{ activepieces_redis_repliqate_enabled | string }}"
           repliqate.engine: "{{ activepieces_redis_repliqate_engine }}"
           repliqate.schedule: "{{ activepieces_redis_repliqate_schedule }}"
@@ -136,8 +136,8 @@
           - "{{ activepieces_redis_container_name }}"
         labels:
           autoheal: "{{ activepieces_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ activepieces_watchtower_enable | string }}"
-          dockflare.enable: "{{ activepieces_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ activepieces_watchtower_enabled| string }}"
+          dockflare.enable: "{{ activepieces_dockflare_enabled | string }}"
           dockflare.access.group: "{{ activepieces_dockflare_access_group }}"
           dockflare.hostname: "{{ activepieces_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ activepieces_port_http }}"
@@ -148,7 +148,7 @@
           homepage.description: "{{ 'All-in-one AI automation designed to be extensible' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ activepieces_container_name }}"
-          homepage.showStats: "{{ activepieces_homepage_showstats }}"
+          homepage.showStats: "{{ activepieces_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ activepieces_port_http }}"
           repliqate.enabled: "{{ activepieces_repliqate_enabled | string }}"
           repliqate.engine: "{{ activepieces_repliqate_engine }}"
@@ -176,7 +176,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (activepieces_port_http | string)] +
-                (['https://' + activepieces_hostname + '.' + ansible_nas_domain] if (activepieces_available_externally is true or activepieces_dockflare_tunnel is true) else [])
+                (['https://' + activepieces_hostname + '.' + ansible_nas_domain] if (activepieces_available_externally is true or activepieces_dockflare_enabled is true) else [])
               }}
   when: activepieces_enabled is true
 

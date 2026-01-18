@@ -29,30 +29,30 @@ phpbb_db_cpu_shares: 1024
 phpbb_db_memory: "1G"
 
 # autoheal
-phpbb_autoheal: "false"
-phpbb_db_autoheal: "false"
+phpbb_autoheal: false
+phpbb_db_autoheal: false
 
 # dockflare
-phpbb_dockflare_tunnel: "false"
+phpbb_dockflare_enabled: false
 phpbb_dockflare_access_group: ""
 
 # homepage
 phpbb_homepage_group: "Apps"
 phpbb_homepage_icon: "https://raw.githubusercontent.com/phpbb/phpbb/master/phpBB/styles/all/imgs/svg/phpbb_logo_large_cosmic.svg"
 phpbb_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ phpbb_port_http }}"
-phpbb_homepage_showstats: "false"
+phpbb_homepage_showstats: false
 phpbb_db_homepage_group: "DBs"
 phpbb_db_homepage_icon: "mariadb.png"
 phpbb_db_homepage_href: "{{ phpbb_homepage_href }}"
-phpbb_db_homepage_showstats: "false"
+phpbb_db_homepage_showstats: false
 
 # repliqate
-phpbb_repliqate_enabled: "false"
+phpbb_repliqate_enabled: false
 phpbb_repliqate_engine: "restic"
 phpbb_repliqate_schedule: "@daily 3am"
 phpbb_repliqate_backup_id: "{{ phpbb_container_name }}"
 phpbb_repliqate_retention: "30d"
-phpbb_db_repliqate_enabled: "false"
+phpbb_db_repliqate_enabled: false
 phpbb_db_repliqate_engine: "restic"
 phpbb_db_repliqate_schedule: "@daily 3am"
 phpbb_db_repliqate_backup_id: "{{ phpbb_container_name }}"
@@ -62,5 +62,5 @@ phpbb_db_repliqate_retention: "30d"
 phpbb_tinyauth_enabled: false
 
 # watchtower
-phpbb_watchtower_enable: "false"
-phpbb_db_watchtower_enable: "false"
+phpbb_watchtower_enabled: false
+phpbb_db_watchtower_enabled: false

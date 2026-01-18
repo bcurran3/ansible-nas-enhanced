@@ -15,9 +15,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ sonos_web_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ sonos_web_watchtower_enable }}"
-          dockflare.enable: "{{ sonos_web_dockflare_tunnel }}"
+          autoheal: "{{ sonos_web_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ sonos_web_watchtower_enabled| string }}"
+          dockflare.enable: "{{ sonos_web_dockflare_enabled | string }}"
           dockflare.access.group: "{{ sonos_web_dockflare_access_group }}"
           dockflare.hostname: "{{ sonos_web_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonos_web_port_http }}"
@@ -29,7 +29,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonos_web_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ sonos_web_container_name }}"
-          homepage.showStats: "{{ sonos_web_homepage_showstats }}"
+          homepage.showStats: "{{ sonos_web_homepage_showstats | string }}"
           repliqate.enabled: "false"
           traefik.enable: "{{ sonos_web_available_externally | string }}"
           traefik.http.routers.sonos-web.rule: "Host(`{{ sonos_web_hostname }}.{{ ansible_nas_domain }}`)"
@@ -52,7 +52,7 @@
         msg: >-
           {{
             ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (sonos_web_port_http | string)] +
-            (['https://' + sonos_web_hostname + '.' + ansible_nas_domain] if (sonos_web_available_externally is true or sonos_web_dockflare_tunnel is true) else [])
+            (['https://' + sonos_web_hostname + '.' + ansible_nas_domain] if (sonos_web_available_externally is true or sonos_web_dockflare_enabled is true) else [])
           }}
   when: sonos_web_enabled is true
 

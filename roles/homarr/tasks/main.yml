@@ -24,9 +24,9 @@
           SECRET_ENCRYPTION_KEY: "{{ homarr_env_secret_encryption_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ homarr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ homarr_watchtower_enable }}"
-          dockflare.enable: "{{ homarr_dockflare_tunnel }}"
+          autoheal: "{{ homarr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ homarr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ homarr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ homarr_dockflare_access_group }}"
           dockflare.hostname: "{{ homarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homarr_port_http }}"
@@ -38,8 +38,8 @@
           homepage.description: "{{ 'A modern and easy to use dashboard.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ homarr_container_name }}"
-          homepage.showStats: "{{ homarr_homepage_showstats }}"
-          repliqate.enabled: "{{ homarr_repliqate_enabled }}"
+          homepage.showStats: "{{ homarr_homepage_showstats | string }}"
+          repliqate.enabled: "{{ homarr_repliqate_enabled | string }}"
           repliqate.engine: "{{ homarr_repliqate_engine }}"
           repliqate.schedule: "{{ homarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ homarr_repliqate_backup_id }}"
@@ -65,7 +65,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (homarr_port_http | string)] +
-                (['https://' + homarr_hostname + '.' + ansible_nas_domain] if (homarr_available_externally is true or homarr_dockflare_tunnel is true) else [])
+                (['https://' + homarr_hostname + '.' + ansible_nas_domain] if (homarr_available_externally is true or homarr_dockflare_enabled is true) else [])
               }}
   when: homarr_enabled is true
 

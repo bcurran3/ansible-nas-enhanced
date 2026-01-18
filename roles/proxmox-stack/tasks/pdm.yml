@@ -27,8 +27,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ pve_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enable | string }}"
-          dockflare.enable: "{{ pve_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ pve_watchtower_enabled| string }}"
+          dockflare.enable: "{{ pve_dockflare_enabled | string }}"
           dockflare.access.group: "{{ pve_dockflare_access_group }}"
           dockflare.hostname: "{{ pdm_hostname }}.{{ ansible_nas_domain }}"
           dockflare.option.no-tls-verify: "true"
@@ -40,7 +40,7 @@
           homepage.description: "{{ 'pdm description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pdm_container_name }}"
-          homepage.showStats: "{{ pve_homepage_showstats }}"
+          homepage.showStats: "{{ pve_homepage_showstats | string }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pdm_port_http }}"
           repliqate.enabled: "false"
           traefik.enable: "{{ pve_available_externally | string }}"
@@ -66,7 +66,7 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pdm_port_http | string)] +
-                (['https://' + pdm_hostname + '.' + ansible_nas_domain] if (pve_available_externally | bool or pve_dockflare_tunnel | bool) else [])
+                (['https://' + pdm_hostname + '.' + ansible_nas_domain] if (pve_available_externally | bool or pve_dockflare_enabled | bool) else [])
               }}
   when: 
     - pdm_enabled is true

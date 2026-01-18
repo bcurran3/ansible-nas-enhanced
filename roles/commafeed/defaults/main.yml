@@ -29,30 +29,30 @@ commafeed_db_memory: "1G"
 commafeed_db_memory_swap: "{{ commafeed_db_memory }}"
 
 # autoheal
-commafeed_autoheal: "false"
-commafeed_db_autoheal: "false"
+commafeed_autoheal: false
+commafeed_db_autoheal: false
 
 # dockflare
-commafeed_dockflare_tunnel: "false"
+commafeed_dockflare_enabled: false
 commafeed_dockflare_access_group: ""
 
 # homepage
 commafeed_homepage_group: "Apps"
 commafeed_homepage_icon: "commafeed.png"
 commafeed_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ commafeed_port_http }}"
-commafeed_homepage_showstats: "false"
+commafeed_homepage_showstats: false
 commafeed_db_homepage_group: "DBs"
 commafeed_db_homepage_icon: "postgres.png"
 commafeed_db_homepage_href: "{{ commafeed_homepage_href }}"
-commafeed_db_homepage_showstats: "false"
+commafeed_db_homepage_showstats: false
 
 # repliqate
-commafeed_repliqate_enabled: "false"
+commafeed_repliqate_enabled: false
 commafeed_repliqate_engine: "restic"
 commafeed_repliqate_schedule: "@daily 3am"
 commafeed_repliqate_backup_id: "{{ commafeed_container_name }}"
 commafeed_repliqate_retention: "30d"
-commafeed_db_repliqate_enabled: "false"
+commafeed_db_repliqate_enabled: false
 commafeed_db_repliqate_engine: "restic"
 commafeed_db_repliqate_schedule: "@daily 3am"
 commafeed_db_repliqate_backup_id: "{{ commafeed_db_container_name}}"
@@ -62,5 +62,5 @@ commafeed_db_repliqate_retention: "30d"
 commafeed_tinyauth_enabled: false
 
 # watchtower
-commafeed_watchtower_enable: "false"
-commafeed_db_watchtower_enable: "false"
+commafeed_watchtower_enabled: false
+commafeed_db_watchtower_enabled: false

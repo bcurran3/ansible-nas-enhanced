@@ -44,9 +44,9 @@
           PUID: "{{ ispyagentdvr_user_id }}"
           PGID: "{{ ispyagentdvr_group_id }}"
         labels:
-          autoheal: "{{ ispyagentdvr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ ispyagentdvr_watchtower_enable }}"
-          dockflare.enable: "{{ ispyagentdvr_dockflare_tunnel }}"
+          autoheal: "{{ ispyagentdvr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ ispyagentdvr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ ispyagentdvr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ ispyagentdvr_dockflare_access_group }}"
           dockflare.hostname: "{{ ispyagentdvr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ispyagentdvr_port_http }}"
@@ -57,9 +57,9 @@
           homepage.description: "{{ 'Camera Monitoring software' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ispyagentdvr_container_name }}"
-          homepage.showStats: "{{ ispyagentdvr_homepage_showstats }}"
+          homepage.showStats: "{{ ispyagentdvr_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ispyagentdvr_port_http }}"
-          repliqate.enabled: "{{ ispyagentdvr_repliqate_enabled }}"
+          repliqate.enabled: "{{ ispyagentdvr_repliqate_enabled | string }}"
           repliqate.engine: "{{ ispyagentdvr_repliqate_engine }}"
           repliqate.schedule: "{{ ispyagentdvr_repliqate_schedule }}"
           repliqate.backup_id: "{{ ispyagentdvr_repliqate_backup_id }}"
@@ -85,7 +85,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ispyagentdvr_port_http | string)] +
-                (['https://' + ispyagentdvr_hostname + '.' + ansible_nas_domain] if (ispyagentdvr_available_externally is true or ispyagentdvr_dockflare_tunnel is true) else [])
+                (['https://' + ispyagentdvr_hostname + '.' + ansible_nas_domain] if (ispyagentdvr_available_externally is true or ispyagentdvr_dockflare_enabled is true) else [])
               }}
   when: ispyagentdvr_enabled is true
 

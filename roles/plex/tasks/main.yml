@@ -78,9 +78,9 @@
           retries: 3
           start_period: 1m00s
         labels:
-          autoheal: "{{ plex_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ plex_watchtower_enable }}"
-          dockflare.enable: "{{ plex_dockflare_tunnel }}"
+          autoheal: "{{ plex_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ plex_watchtower_enabled| string }}"
+          dockflare.enable: "{{ plex_dockflare_enabled | string }}"
           dockflare.access.group: "{{ plex_dockflare_access_group }}"
           dockflare.hostname: "{{ plex_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plex_port_http }}"
@@ -92,11 +92,11 @@
           homepage.description: "{{ 'Plex Media Server' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ plex_container_name }}"
-          homepage.showStats: "{{ plex_homepage_showstats }}"
+          homepage.showStats: "{{ plex_homepage_showstats | string }}"
           homepage.widget.type: "tautulli"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tautulli_port_http }}"
           homepage.widget.key: "{{ plex_homepage_widget_key }}"
-          repliqate.enabled: "{{ plex_repliqate_enabled }}"
+          repliqate.enabled: "{{ plex_repliqate_enabled | string }}"
           repliqate.engine: "{{ plex_repliqate_engine }}"
           repliqate.schedule: "{{ plex_repliqate_schedule }}"
           repliqate.backup_id: "{{ plex_repliqate_backup_id }}"
@@ -123,7 +123,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (plex_port_http | string) ] +
-                (['https://' + plex_hostname + '.' + ansible_nas_domain ] if (plex_available_externally is true or plex_dockflare_tunnel is true) else [])
+                (['https://' + plex_hostname + '.' + ansible_nas_domain ] if (plex_available_externally is true or plex_dockflare_enabled is true) else [])
               }}
   when: plex_enabled is true
 

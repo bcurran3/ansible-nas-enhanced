@@ -41,22 +41,22 @@ openemr_env_openemr__environment: "prod"
 openemr_db_env_allow_empty_password: "no"
 
 # autoheal
-openemr_autoheal: "false"
-openemr_db_autoheal: "false"
+openemr_autoheal: false
+openemr_db_autoheal: false
 
 # dockflare
-openemr_dockflare_tunnel: "false"
+openemr_dockflare_enabled: false
 openemr_dockflare_access_group: ""
 
 # homepage
 openemr_homepage_group: "Apps"
 openemr_homepage_icon: "openemr.png"
 openemr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
-openemr_homepage_showstats: "false"
+openemr_homepage_showstats: false
 openemr_db_homepage_group: "DBs"
 openemr_db_homepage_icon: "mariadb.png"
 openemr_db_homepage_href: "{{ openemr_homepage_href }}"
-openemr_db_homepage_showstats: "false"
+openemr_db_homepage_showstats: false
 
 # linuxserver.io docker mods
 openemr_db_env_docker_mods: ""
@@ -64,12 +64,12 @@ openemr_db_env_docker_mods_install_packages: ""
 openemr_db_env_docker_mods_install_pip_packages: ""
 
 # repliqate
-openemr_repliqate_enabled: "false"
+openemr_repliqate_enabled: false
 openemr_repliqate_engine: "restic"
 openemr_repliqate_schedule: "@daily 3am"
 openemr_repliqate_backup_id: "{{ openemr_container_name }}"
 openemr_repliqate_retention: "30d"
-openemr_db_repliqate_enabled: "false"
+openemr_db_repliqate_enabled: false
 openemr_db_repliqate_engine: "restic"
 openemr_db_repliqate_schedule: "@daily 3am"
 openemr_db_repliqate_backup_id: "{{ openemr_container_name }}"
@@ -79,5 +79,5 @@ openemr_db_repliqate_retention: "30d"
 openemr_tinyauth_enabled: false
 
 # watchtower
-openemr_watchtower_enable: "false"
-openemr_db_watchtower_enable: "false"
+openemr_watchtower_enabled: false
+openemr_db_watchtower_enabled: false

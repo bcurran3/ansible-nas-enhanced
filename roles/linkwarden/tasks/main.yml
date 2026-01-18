@@ -24,8 +24,8 @@
           MEILI_MASTER_KEY: "{{ linkwarden_env_meili_master_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ linkwarden_search_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ linkwarden_search_watchtower_enable }}"
+          autoheal: "{{ linkwarden_search_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ linkwarden_search_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Meilisearch"
           homepage.group: "{{ linkwarden_search_homepage_group }}"
@@ -34,11 +34,11 @@
           homepage.description: "{{ 'A lightning-fast search engine API bringing AI-powered hybrid search to your sites and applications.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ linkwarden_search_container_name }}"
-          homepage.showStats: "{{ linkwarden_search_homepage_showstats }}"
+          homepage.showStats: "{{ linkwarden_search_homepage_showstats | string }}"
           homepage.widget.type: "linkwarden"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port_http }}"
           homepage.widget.key: "{{ linkwarden_homepage_widget_key }}"
-          repliqate.enabled: "{{ linkwarden_search_repliqate_enabled }}"
+          repliqate.enabled: "{{ linkwarden_search_repliqate_enabled | string }}"
           repliqate.engine: "{{ linkwarden_search_repliqate_engine }}"
           repliqate.schedule: "{{ linkwarden_search_repliqate_schedule }}"
           repliqate.backup_id: "{{ linkwarden_search_repliqate_backup_id }}"
@@ -67,8 +67,8 @@
           POSTGRES_DB: "linkwarden_db"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ linkwarden_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ linkwarden_db_watchtower_enable }}"
+          autoheal: "{{ linkwarden_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ linkwarden_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ linkwarden_db_homepage_group }}"
@@ -77,8 +77,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ linkwarden_db_container_name }}"
-          homepage.showStats: "{{ linkwarden_db_homepage_showstats }}"
-          repliqate.enabled: "{{ linkwarden_db_repliqate_enabled }}"
+          homepage.showStats: "{{ linkwarden_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ linkwarden_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ linkwarden_db_repliqate_engine }}"
           repliqate.schedule: "{{ linkwarden_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ linkwarden_db_repliqate_backup_id }}"
@@ -119,9 +119,9 @@
           - "{{ linkwarden_db_container_name }}"
           - "{{ linkwarden_search_container_name }}"
         labels:
-          autoheal: "{{ linkwarden_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ linkwarden_watchtower_enable }}"
-          dockflare.enable: "{{ linkwarden_dockflare_tunnel }}"
+          autoheal: "{{ linkwarden_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ linkwarden_watchtower_enabled| string }}"
+          dockflare.enable: "{{ linkwarden_dockflare_enabled | string }}"
           dockflare.access.group: "{{ linkwarden_dockflare_access_group }}"
           dockflare.hostname: "{{ linkwarden_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port_http }}"
@@ -132,9 +132,9 @@
           homepage.description: "{{ 'linkwarden description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ linkwarden_container_name }}"
-          homepage.showStats: "{{ linkwarden_homepage_showstats }}"
+          homepage.showStats: "{{ linkwarden_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ linkwarden_port_http }}"
-          repliqate.enabled: "{{ linkwarden_repliqate_enabled }}"
+          repliqate.enabled: "{{ linkwarden_repliqate_enabled | string }}"
           repliqate.engine: "{{ linkwarden_repliqate_engine }}"
           repliqate.schedule: "{{ linkwarden_repliqate_schedule }}"
           repliqate.backup_id: "{{ linkwarden_repliqate_backup_id }}"
@@ -160,7 +160,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (linkwarden_port_http | string)] +
-                (['https://' + linkwarden_hostname + '.' + ansible_nas_domain] if (linkwarden_available_externally is true or linkwarden_dockflare_tunnel is true) else [])
+                (['https://' + linkwarden_hostname + '.' + ansible_nas_domain] if (linkwarden_available_externally is true or linkwarden_dockflare_enabled is true) else [])
               }}
   when: linkwarden_enabled is true
 

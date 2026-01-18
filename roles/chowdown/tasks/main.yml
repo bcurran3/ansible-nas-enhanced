@@ -24,9 +24,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ chowdown_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ chowdown_watchtower_enable }}"
-          dockflare.enable: "{{ chowdown_dockflare_tunnel }}"
+          autoheal: "{{ chowdown_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ chowdown_watchtower_enabled| string }}"
+          dockflare.enable: "{{ chowdown_dockflare_enabled | string }}"
           dockflare.access.group: "{{ chowdown_dockflare_access_group }}"
           dockflare.hostname: "{{ chowdown_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chowdown_port_http }}"
@@ -38,8 +38,8 @@
           homepage.description: "{{ 'Simple recipes in Markdown format' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ chowdown_container_name }}"
-          homepage.showStats: "{{ chowdown_homepage_showstats }}"
-          repliqate.enabled: "{{ chowdown_repliqate_enabled }}"
+          homepage.showStats: "{{ chowdown_homepage_showstats | string }}"
+          repliqate.enabled: "{{ chowdown_repliqate_enabled | string }}"
           repliqate.engine: "{{ chowdown_repliqate_engine }}"
           repliqate.schedule: "{{ chowdown_repliqate_schedule }}"
           repliqate.backup_id: "{{ chowdown_repliqate_backup_id }}"
@@ -64,7 +64,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (chowdown_port_http | string)] +
-                (['https://' + chowdown_hostname + '.' + ansible_nas_domain] if (chowdown_available_externally is true or chowdown_dockflare_tunnel is true) else [])
+                (['https://' + chowdown_hostname + '.' + ansible_nas_domain] if (chowdown_available_externally is true or chowdown_dockflare_enabled is true) else [])
               }}
   when: chowdown_enabled is true
 

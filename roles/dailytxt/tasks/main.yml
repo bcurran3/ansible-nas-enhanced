@@ -29,9 +29,9 @@
           SECRET_KEY: "{{ dailytxt_env_secret_key }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ dailytxt_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ dailytxt_watchtower_enable }}"
-          dockflare.enable: "{{ dailytxt_dockflare_tunnel }}"
+          autoheal: "{{ dailytxt_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ dailytxt_watchtower_enabled| string }}"
+          dockflare.enable: "{{ dailytxt_dockflare_enabled | string }}"
           dockflare.access.group: "{{ dailytxt_dockflare_access_group }}"
           dockflare.hostname: "{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
@@ -43,8 +43,8 @@
           homepage.description: "{{ 'Encrypted Diary Web-App' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "dailytxt"
-          homepage.showStats: "{{ dailytxt_homepage_showstats }}"
-          repliqate.enabled: "{{ dailytxt_repliqate_enabled }}"
+          homepage.showStats: "{{ dailytxt_homepage_showstats | string }}"
+          repliqate.enabled: "{{ dailytxt_repliqate_enabled | string }}"
           repliqate.engine: "{{ dailytxt_repliqate_engine }}"
           repliqate.schedule: "{{ dailytxt_repliqate_schedule }}"
           repliqate.backup_id: "{{ dailytxt_repliqate_backup_id }}"
@@ -69,7 +69,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dailytxt_port_http | string)] +
-                (['https://' + dailytxt_hostname + '.' + ansible_nas_domain] if (dailytxt_available_externally is true or dailytxt_dockflare_tunnel is true) else [])
+                (['https://' + dailytxt_hostname + '.' + ansible_nas_domain] if (dailytxt_available_externally is true or dailytxt_dockflare_enabled is true) else [])
               }}
   when: dailytxt_enabled is true
 

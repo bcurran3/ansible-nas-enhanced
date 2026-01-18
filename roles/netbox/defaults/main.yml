@@ -52,27 +52,27 @@ netbox_env_redis_db_task: "0"
 netbox_env_redis_db_cache: "1"
 
 # autoheal
-netbox_autoheal: "false"
-netbox_db_autoheal: "false"
-netbox_redis_autoheal: "false"
+netbox_autoheal: false
+netbox_db_autoheal: false
+netbox_redis_autoheal: false
 
 # dockflare
-netbox_dockflare_tunnel: false
+netbox_dockflare_enabled: false
 netbox_dockflare_access_group: ""
 
 # homepage
 netbox_homepage_group: "Apps"
 netbox_homepage_icon: "netbox.png"
 netbox_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netbox_port_http }}"
-netbox_homepage_showstats: "false"
+netbox_homepage_showstats: false
 netbox_db_homepage_group: "DBs"
 netbox_db_homepage_icon: "postgres.png"
 netbox_db_homepage_href: "{{ netbox_homepage_href }}"
-netbox_db_homepage_showstats: "false"
+netbox_db_homepage_showstats: false
 netbox_redis_homepage_group: "DBs"
 netbox_redis_homepage_icon: "redis.png"
 netbox_redis_homepage_href: "{{ netbox_homepage_href }}"
-netbox_redis_homepage_showstats: "false"
+netbox_redis_homepage_showstats: false
 
 # linuxserver.io docker mods for linuxserver.io images
 netbox_env_docker_mods: ""
@@ -85,12 +85,12 @@ netbox_repliqate_engine: "restic"
 netbox_repliqate_schedule: "@daily 3am"
 netbox_repliqate_backup_id: "{{ netbox_container_name }}"
 netbox_repliqate_retention: "30d"
-netbox_db_repliqate_enabled: "false"
+netbox_db_repliqate_enabled: false
 netbox_db_repliqate_engine: "restic"
 netbox_db_repliqate_schedule: "@daily 3am"
 netbox_db_repliqate_backup_id: "{{ netbox_db_container_name }}"
 netbox_db_repliqate_retention: "30d"
-netbox_redis_repliqate_enabled: "false"
+netbox_redis_repliqate_enabled: false
 netbox_redis_repliqate_engine: "restic"
 netbox_redis_repliqate_schedule: "@daily 3am"
 netbox_redis_repliqate_backup_id: "{{ netbox_redis_container_name }}"
@@ -100,6 +100,6 @@ netbox_redis_repliqate_retention: "30d"
 netbox_tinyauth_enabled: false
 
 # watchtower
-netbox_watchtower_enable: false
-netbox_db_watchtower_enable: "false"
-netbox_redis_watchtower_enable: "false"
+netbox_watchtower_enabled: false
+netbox_db_watchtower_enabled: false
+netbox_redis_watchtower_enabled: false

@@ -38,9 +38,9 @@
           USER_ID: "{{ makemkv_user_id }}"
           GROUP_ID: "{{ makemkv_group_id }}"
         labels:
-          autoheal: "{{ makemkv_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ makemkv_watchtower_enable }}"
-          dockflare.enable: "{{ makemkv_dockflare_tunnel }}"
+          autoheal: "{{ makemkv_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ makemkv_watchtower_enabled| string }}"
+          dockflare.enable: "{{ makemkv_dockflare_enabled | string }}"
           dockflare.access.group: "{{ makemkv_dockflare_access_group }}"
           dockflare.hostname: "{{ makemkv_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ makemkv_port_http }}"
@@ -52,8 +52,8 @@
           homepage.description: "{{ 'Backup your Bluray and DVD discs' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ makemkv_container_name }}"
-          homepage.showStats: "{{ makemkv_homepage_showstats }}"
-          repliqate.enabled: "{{ makemkv_repliqate_enabled }}"
+          homepage.showStats: "{{ makemkv_homepage_showstats | string }}"
+          repliqate.enabled: "{{ makemkv_repliqate_enabled | string }}"
           repliqate.engine: "{{ makemkv_repliqate_engine }}"
           repliqate.schedule: "{{ makemkv_repliqate_schedule }}"
           repliqate.backup_id: "{{ makemkv_repliqate_backup_id }}"
@@ -79,7 +79,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (makemkv_port_http | string)] +
-                (['https://' + makemkv_hostname + '.' + ansible_nas_domain] if (makemkv_available_externally is true or makemkv_dockflare_tunnel is true) else [])
+                (['https://' + makemkv_hostname + '.' + ansible_nas_domain] if (makemkv_available_externally is true or makemkv_dockflare_enabled is true) else [])
               }}
   when: makemkv_enabled is true
 

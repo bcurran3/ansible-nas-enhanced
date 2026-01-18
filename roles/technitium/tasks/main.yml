@@ -93,9 +93,9 @@
           DNS_SERVER_LOG_USING_LOCAL_TIME: "true" #Enable this option to use local time instead of UTC for logging.
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ technitium_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ technitium_watchtower_enable }}"
-          dockflare.enable: "{{ technitium_dockflare_tunnel }}"
+          autoheal: "{{ technitium_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ technitium_watchtower_enabled| string }}"
+          dockflare.enable: "{{ technitium_dockflare_enabled | string }}"
           dockflare.access.group: "{{ technitium_dockflare_access_group }}"
           dockflare.hostname: "{{ technitium_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
@@ -106,13 +106,13 @@
           homepage.description: "{{ 'DNS server for privacy & security Block ads & malware at DNS level for your entire network!' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ technitium_container_name }}"
-          homepage.showStats: "{{ technitium_homepage_showstats }}"
+          homepage.showStats: "{{ technitium_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
           homepage.widget.type: "technitium"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
           homepage.widget.key: "{{ technitium_homepage_widget_key }}"
           homepage.widget.range: "{{ technitium_homepage_widget_range }}"
-          repliqate.enabled: "{{ technitium_repliqate_enabled }}"
+          repliqate.enabled: "{{ technitium_repliqate_enabled | string }}"
           repliqate.engine: "{{ technitium_repliqate_engine }}"
           repliqate.schedule: "{{ technitium_repliqate_schedule }}"
           repliqate.backup_id: "{{ technitium_repliqate_backup_id }}"
@@ -137,7 +137,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (technitium_port_http | string)] +
-                (['https://' + technitium_hostname + '.' + ansible_nas_domain] if (technitium_available_externally is true or technitium_dockflare_tunnel is true) else [])
+                (['https://' + technitium_hostname + '.' + ansible_nas_domain] if (technitium_available_externally is true or technitium_dockflare_enabled is true) else [])
               }}
   when: technitium_enabled is true
 

@@ -28,8 +28,8 @@
           PUID: "{{ filebot_user_id }}"
           PGID: "{{ filebot_group_id }}"
         labels:
-          autoheal: "{{ filebot_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enable }}"
+          autoheal: "{{ filebot_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -49,9 +49,9 @@
           - "5452:5452"
         volumes_from: filebot
         labels:
-          autoheal: "{{ filebot_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enable }}"
-          dockflare.enable: "{{ filebot_dockflare_tunnel }}"
+          autoheal: "{{ filebot_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enabled| string }}"
+          dockflare.enable: "{{ filebot_dockflare_enabled | string }}"
           dockflare.access.group: "{{ filebot_dockflare_access_group }}"
           dockflare.hostname: "{{ filebot_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebot_port }}"
@@ -63,7 +63,7 @@
 #         homepage.description: ""
           homepage.server: "my-docker"
           homepage.container: "{{ filebot_container_name }}"
-          homepage.showStats: "{{ filebot_homepage_showstats }}"
+          homepage.showStats: "{{ filebot_homepage_showstats | string }}"
           traefik.enable: "{{ filebot_available_externally | string }}"
           traefik.http.routers.filebot.rule: "Host(`{{ filebot_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.filebot.tls.certresolver: "letsencrypt"
@@ -87,8 +87,8 @@
         pull: true
         volumes_from: filebot
         labels:
-          autoheal: "{{ filebot_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enable }}"
+          autoheal: "{{ filebot_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebot_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -102,7 +102,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (filebot_port_http | string)] +
-                (['https://' + filebot_hostname + '.' + ansible_nas_domain] if (filebot_available_externally is true or filebot_dockflare_tunnel is true) else [])
+                (['https://' + filebot_hostname + '.' + ansible_nas_domain] if (filebot_available_externally is true or filebot_dockflare_enabled is true) else [])
               }}
   when: filebot_enabled is true
 

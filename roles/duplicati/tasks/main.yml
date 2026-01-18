@@ -43,9 +43,9 @@
           PGID: "{{ duplicati_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ duplicati_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ duplicati_watchtower_enable }}"
-          dockflare.enable: "{{ duplicati_dockflare_tunnel }}"
+          autoheal: "{{ duplicati_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ duplicati_watchtower_enabled| string }}"
+          dockflare.enable: "{{ duplicati_dockflare_enabled | string }}"
           dockflare.access.group: "{{ duplicati_dockflare_access_group }}"
           dockflare.hostname: "{{ duplicati_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ duplicati_port_http }}"
@@ -56,9 +56,9 @@
           homepage.description: "{{ 'backup client that securely stores encrypted, incremental, compressed backups' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ duplicati_container_name }}"
-          homepage.showStats: "{{ duplicati_homepage_showstats }}"
+          homepage.showStats: "{{ duplicati_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ duplicati_port_http }}"
-          repliqate.enabled: "{{ duplicati_repliqate_enabled }}"
+          repliqate.enabled: "{{ duplicati_repliqate_enabled | string }}"
           repliqate.engine: "{{ duplicati_repliqate_engine }}"
           repliqate.schedule: "{{ duplicati_repliqate_schedule }}"
           repliqate.backup_id: "{{ duplicati_repliqate_backup_id }}"
@@ -84,7 +84,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (duplicati_port_http | string)] +
-                (['https://' + duplicati_hostname + '.' + ansible_nas_domain] if (duplicati_available_externally is true or duplicati_dockflare_tunnel is true) else [])
+                (['https://' + duplicati_hostname + '.' + ansible_nas_domain] if (duplicati_available_externally is true or duplicati_dockflare_enabled is true) else [])
               }}
   when: duplicati_enabled is true
 

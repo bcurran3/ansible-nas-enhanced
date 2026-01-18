@@ -27,9 +27,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ kapowarr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ kapowarr_watchtower_enable }}"
-          dockflare.enable: "{{ kapowarr_dockflare_tunnel }}"
+          autoheal: "{{ kapowarr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ kapowarr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ kapowarr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ kapowarr_dockflare_access_group }}"
           dockflare.hostname: "{{ kapowarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kapowarr_port_http }}"
@@ -41,8 +41,8 @@
           homepage.description: "{{ 'Kapowarr is a software to build and manage a comic book library, fitting in the *arr suite of software.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ kapowarr_container_name }}"
-          homepage.showStats: "{{ kapowarr_homepage_showstats }}"
-          repliqate.enabled: "{{ kapowarr_repliqate_enabled }}"
+          homepage.showStats: "{{ kapowarr_homepage_showstats | string }}"
+          repliqate.enabled: "{{ kapowarr_repliqate_enabled | string }}"
           repliqate.engine: "{{ kapowarr_repliqate_engine }}"
           repliqate.schedule: "{{ kapowarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ kapowarr_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (kapowarr_port_http | string)] +
-                (['https://' + kapowarr_hostname + '.' + ansible_nas_domain] if (kapowarr_available_externally is true or kapowarr_dockflare_tunnel is true) else [])
+                (['https://' + kapowarr_hostname + '.' + ansible_nas_domain] if (kapowarr_available_externally is true or kapowarr_dockflare_enabled is true) else [])
               }}
   when: kapowarr_enabled is true
 

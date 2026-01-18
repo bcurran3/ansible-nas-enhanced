@@ -20,8 +20,8 @@
           MINIDLNA_PORT: "{{ minidlna_port }}"
         network_mode: host
         labels:
-          autoheal: "{{ minidlna_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ minidlna_watchtower_enable }}"
+          autoheal: "{{ minidlna_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ minidlna_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ minidlna_homepage_group }}"
@@ -29,7 +29,7 @@
           homepage.description: "{{ 'minidlna description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ minidlna_container_name }}"
-          homepage.showStats: "{{ minidlna_homepage_showstats }}"
+          homepage.showStats: "{{ minidlna_homepage_showstats | string }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'

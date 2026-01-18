@@ -23,8 +23,8 @@
           APPRISE_WORKER_COUNT: "{{ patchpanda_apprise_env_apprise_worker_count }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ patchpanda_apprise_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ patchpanda_apprise_watchtower_enable }}"
+          autoheal: "{{ patchpanda_apprise_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchpanda_apprise_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Apprise API"
           homepage.group: "{{ patchpanda_apprise_homepage_group }}"
@@ -33,7 +33,7 @@
           homepage.description: "{{ 'Apprise' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ patchpanda_apprise_container_name }}"
-          homepage.showStats: "{{ patchpanda_apprise_homepage_showstats }}"
+          homepage.showStats: "{{ patchpanda_apprise_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
@@ -71,9 +71,9 @@
         links:
           - "{{ patchpanda_apprise_container_name }}"
         labels:
-          autoheal: "{{ patchpanda_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ patchpanda_watchtower_enable }}"
-          dockflare.enable: "{{ patchpanda_dockflare_tunnel }}"
+          autoheal: "{{ patchpanda_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchpanda_watchtower_enabled| string }}"
+          dockflare.enable: "{{ patchpanda_dockflare_enabled | string }}"
           dockflare.access.group: "{{ patchpanda_dockflare_access_group }}"
           dockflare.hostname: "{{ patchpanda_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
@@ -84,9 +84,9 @@
           homepage.description: "{{ 'Self-hostable Docker Compose stack update manager.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ patchpanda_container_name }}"
-          homepage.showStats: "{{ patchpanda_homepage_showstats }}"
+          homepage.showStats: "{{ patchpanda_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
-          repliqate.enabled: "{{ patchpanda_repliqate_enabled }}"
+          repliqate.enabled: "{{ patchpanda_repliqate_enabled | string }}"
           repliqate.engine: "{{ patchpanda_repliqate_engine }}"
           repliqate.schedule: "{{ patchpanda_repliqate_schedule }}"
           repliqate.backup_id: "{{ patchpanda_repliqate_backup_id }}"
@@ -111,7 +111,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (patchpanda_port_http | string)] +
-                (['https://' + patchpanda_hostname + '.' + ansible_nas_domain] if (patchpanda_available_externally is true or patchpanda_dockflare_tunnel is true) else [])
+                (['https://' + patchpanda_hostname + '.' + ansible_nas_domain] if (patchpanda_available_externally is true or patchpanda_dockflare_enabled is true) else [])
               }}
   when: patchpanda_enabled is true
 

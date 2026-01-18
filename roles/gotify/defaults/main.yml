@@ -35,10 +35,10 @@ gotify_env_gotify_server_stream_alloworigins: '["*"]' # '["localhost", ".+\\.{{ 
 gotify_env_gotify_server_trustedproxies: "[127.0.0.1, 172.16.0.0/12, {{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ansible.utils.ipaddr('net') }}]" # [127.0.0.1,192.168.178.2/24]
 
 # autoheal
-gotify_autoheal: "false"
+gotify_autoheal: false
 
 # dockflare
-gotify_dockflare_tunnel: "false"
+gotify_dockflare_enabled: false
 gotify_dockflare_access_group: ""
 
 # homepage
@@ -46,11 +46,11 @@ gotify_homepage_group: "Apps"
 gotify_homepage_name: "Gotify"
 gotify_homepage_icon: "gotify.png"
 gotify_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port_http }}"
-gotify_homepage_showstats: "false"
+gotify_homepage_showstats: false
 gotify_homepage_widget_key: ""
 
 # repliqate
-gotify_repliqate_enabled: "false"
+gotify_repliqate_enabled: false
 gotify_repliqate_engine: "restic"
 gotify_repliqate_schedule: "@daily 3am"
 gotify_repliqate_backup_id: "{{ gotify_container_name }}"
@@ -60,4 +60,4 @@ gotify_repliqate_retention: "30d"
 gotify_tinyauth_enabled: false
 
 # watchtower
-gotify_watchtower_enable: "false"
+gotify_watchtower_enabled: false

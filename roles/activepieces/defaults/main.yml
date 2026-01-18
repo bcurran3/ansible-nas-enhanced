@@ -68,22 +68,22 @@ activepieces_db_autoheal: false
 activepieces_redis_autoheal: false
 
 # dockflare
-activepieces_dockflare_tunnel: false
+activepieces_dockflare_enabled: false
 activepieces_dockflare_access_group: ""
 
 # homepage
 activepieces_homepage_group: "Apps"
 activepieces_homepage_icon: "activepieces.png"
 activepieces_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ activepieces_port_http }}"
-activepieces_homepage_showstats: "false"
+activepieces_homepage_showstats: false
 activepieces_db_homepage_group: "DBs"
 activepieces_db_homepage_icon: "postgres.png"
 activepieces_db_homepage_href: "{{ activepieces_homepage_href }}"
-activepieces_db_homepage_showstats: "false"
+activepieces_db_homepage_showstats: false
 activepieces_redis_homepage_group: "DBs"
 activepieces_redis_homepage_icon: "redis.png"
 activepieces_redis_homepage_href: "{{ activepieces_homepage_href }}"
-activepieces_redis_homepage_showstats: "false"
+activepieces_redis_homepage_showstats: false
 
 # repliqate
 activepieces_repliqate_enabled: false
@@ -91,12 +91,12 @@ activepieces_repliqate_engine: "restic"
 activepieces_repliqate_schedule: "@daily 3am"
 activepieces_repliqate_backup_id: "{{ activepieces_container_name }}"
 activepieces_repliqate_retention: "30d"
-activepieces_db_repliqate_enabled: "false"
+activepieces_db_repliqate_enabled: false
 activepieces_db_repliqate_engine: "restic"
 activepieces_db_repliqate_schedule: "@daily 3am"
 activepieces_db_repliqate_backup_id: "{{ activepieces_db_container_name }}"
 activepieces_db_repliqate_retention: "30d"
-activepieces_redis_repliqate_enabled: "false"
+activepieces_redis_repliqate_enabled: false
 activepieces_redis_repliqate_engine: "restic"
 activepieces_redis_repliqate_schedule: "@daily 3am"
 activepieces_redis_repliqate_backup_id: "{{ activepieces_redis_container_name }}"
@@ -106,6 +106,6 @@ activepieces_redis_repliqate_retention: "30d"
 activepieces_tinyauth_enabled: false
 
 # watchtower
-activepieces_watchtower_enable: false
-activepieces_db_watchtower_enable: false
-activepieces_redis_watchtower_enable: false
+activepieces_watchtower_enabled: false
+activepieces_db_watchtower_enabled: false
+activepieces_redis_watchtower_enabled: false

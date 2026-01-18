@@ -26,8 +26,8 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ rustdesk_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ rustdesk_watchtower_enable }}"
+          autoheal: "{{ rustdesk_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ rustdesk_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Relay Server"
           homepage.group: "{{ rustdesk_hbbr_homepage_group }}"
@@ -37,7 +37,7 @@
 #         homepage.description: "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer."
           homepage.server: "my-docker"
           homepage.container: "{{ rustdesk_hbbr_container_name }}"
-          homepage.showStats: "{{ rustdesk_hbbr_homepage_showstats }}"
+          homepage.showStats: "{{ rustdesk_hbbr_homepage_showstats | string }}"
           trafik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -68,8 +68,8 @@
         links:
           - "{{ rustdesk_hbbr_container_name }}"
         labels:
-          autoheal: "{{ rustdesk_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ rustdesk_watchtower_enable }}"
+          autoheal: "{{ rustdesk_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ rustdesk_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} ID Server"
           homepage.group: "{{ rustdesk_hbbs_homepage_group }}"
@@ -79,7 +79,7 @@
 #         homepage.description: "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer."
           homepage.server: "my-docker"
           homepage.container: "{{ rustdesk_hbbs_container_name }}"
-          homepage.showStats: "{{ rustdesk_hbbs_homepage_showstats }}"
+          homepage.showStats: "{{ rustdesk_hbbs_homepage_showstats | string }}"
           trafik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
@@ -104,9 +104,9 @@
           - "{{ rustdesk_hbbs_container_name }}"
           - "{{ rustdesk_hbbr_container_name }}"
         labels:
-          autoheal: "{{ rustdesk_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ rustdesk_watchtower_enable }}"
-          dockflare.enable: "{{ rustdesk_dockflare_tunnel }}"
+          autoheal: "{{ rustdesk_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ rustdesk_watchtower_enabled| string }}"
+          dockflare.enable: "{{ rustdesk_dockflare_enabled | string }}"
           dockflare.access.group: "{{ rustdesk_dockflare_access_group }}"
           dockflare.hostname: "{{ rustdesk_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
@@ -118,7 +118,7 @@
 #         homepage.description: "RustDesk Web Client"
           homepage.server: "my-docker"
           homepage.container: "{{ rustdesk_web_container_name }}"
-          homepage.showStats: "{{ rustdesk_web_homepage_showstats }}"
+          homepage.showStats: "{{ rustdesk_web_homepage_showstats | string }}"
           traefik.enable: "{{ rustdesk_available_externally | string }}"
           traefik.http.routers.rustdesk.rule: "Host(`{{ rustdesk_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.rustdesk.tls.certresolver: "letsencrypt"
@@ -139,7 +139,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (rustdesk_port_http | string)] +
-                (['https://' + rustdesk_hostname + '.' + ansible_nas_domain] if (rustdesk_available_externally is true or rustdesk_dockflare_tunnel is true) else [])
+                (['https://' + rustdesk_hostname + '.' + ansible_nas_domain] if (rustdesk_available_externally is true or rustdesk_dockflare_enabled is true) else [])
               }}
   when: rustdesk_enabled is true
 

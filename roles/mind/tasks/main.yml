@@ -23,9 +23,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ mind_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ mind_watchtower_enable }}"
-          dockflare.enable: "{{ mind_dockflare_tunnel }}"
+          autoheal: "{{ mind_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ mind_watchtower_enabled| string }}"
+          dockflare.enable: "{{ mind_dockflare_enabled | string }}"
           dockflare.access.group: "{{ mind_dockflare_access_group }}"
           dockflare.hostname: "{{ mind_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mind_port_http }}"
@@ -37,8 +37,8 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mind_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mind_container_name }}"
-          homepage.showStats: "{{ mind_homepage_showstats }}"
-          repliqate.enabled: "{{ mind_repliqate_enabled }}"
+          homepage.showStats: "{{ mind_homepage_showstats | string }}"
+          repliqate.enabled: "{{ mind_repliqate_enabled | string }}"
           repliqate.engine: "{{ mind_repliqate_engine }}"
           repliqate.schedule: "{{ mind_repliqate_schedule }}"
           repliqate.backup_id: "{{ mind_repliqate_backup_id }}"
@@ -64,7 +64,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mind_port_http | string)] +
-                (['https://' + mind_hostname + '.' + ansible_nas_domain] if (mind_available_externally is true or mind_dockflare_tunnel is true) else [])
+                (['https://' + mind_hostname + '.' + ansible_nas_domain] if (mind_available_externally is true or mind_dockflare_enabled is true) else [])
               }}
   when: mind_enabled is true
 

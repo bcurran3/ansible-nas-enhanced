@@ -31,9 +31,9 @@
           PGID: "{{ filebrowser_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ filebrowser_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ filebrowser_watchtower_enable }}"
-          dockflare.enable: "{{ filebrowser_dockflare_tunnel }}"
+          autoheal: "{{ filebrowser_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ filebrowser_watchtower_enabled| string }}"
+          dockflare.enable: "{{ filebrowser_dockflare_enabled | string }}"
           dockflare.access.group: "{{ filebrowser_dockflare_access_group }}"
           dockflare.hostname: "{{ filebrowser_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ filebrowser_port_http }}"
@@ -45,8 +45,8 @@
           homepage.description: "{{ 'Web File Browser' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ filebrowser_container_name }}"
-          homepage.showStats: "{{ filebrowser_homepage_showstats }}"
-          repliqate.enabled: "{{ filebrowser_repliqate_enabled }}"
+          homepage.showStats: "{{ filebrowser_homepage_showstats | string }}"
+          repliqate.enabled: "{{ filebrowser_repliqate_enabled | string }}"
           repliqate.engine: "{{ filebrowser_repliqate_engine }}"
           repliqate.schedule: "{{ filebrowser_repliqate_schedule }}"
           repliqate.backup_id: "{{ filebrowser_repliqate_backup_id }}"
@@ -72,7 +72,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (filebrowser_port_http | string)] +
-                (['https://' + filebrowser_hostname + '.' + ansible_nas_domain] if (filebrowser_available_externally is true or filebrowser_dockflare_tunnel is true) else [])
+                (['https://' + filebrowser_hostname + '.' + ansible_nas_domain] if (filebrowser_available_externally is true or filebrowser_dockflare_enabled is true) else [])
               }}
   when: filebrowser_enabled is true
 

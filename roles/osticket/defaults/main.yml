@@ -33,21 +33,21 @@ osticket_env_mysql_password: "topsecret"
 osticket_env_mysql_database: "osticket_db"
 
 # autoheal
-osticket_autoheal: "false"
-osticket_db_autoheal: "false"
+osticket_autoheal: false
+osticket_db_autoheal: false
 
 # dockflare
-osticket_dockflare_tunnel: "false"
+osticket_dockflare_enabled: false
 osticket_dockflare_access_group: ""
 
 # homepage
 osticket_homepage_group: "Apps"
 osticket_homepage_icon: "osticket.png"
 osticket_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ osticket_port_http }}"
-osticket_homepage_showstats: "false"
+osticket_homepage_showstats: false
 osticket_db_homepage_group: "DBs"
 osticket_db_homepage_icon: "mariadb.png"
-osticket_db_homepage_showstats: "false"
+osticket_db_homepage_showstats: false
 
 # linuxserver.io docker mods
 osticket_db_env_docker_mods: ""
@@ -55,12 +55,12 @@ osticket_db_env_docker_mods_install_packages: ""
 osticket_db_env_docker_mods_install_pip_packages: ""
 
 # repliqate
-osticket_repliqate_enabled: "false"
+osticket_repliqate_enabled: false
 osticket_repliqate_engine: "restic"
 osticket_repliqate_schedule: "@daily 3am"
 osticket_repliqate_backup_id: "{{ osticket_container_name }}"
 osticket_repliqate_retention: "30d"
-osticket_db_repliqate_enabled: "false"
+osticket_db_repliqate_enabled: false
 osticket_db_repliqate_engine: "restic"
 osticket_db_repliqate_schedule: "@daily 3am"
 osticket_db_repliqate_backup_id: "{{ osticket_container_name }}"
@@ -70,5 +70,5 @@ osticket_db_repliqate_retention: "30d"
 osticket_tinyauth_enabled: false
 
 # watchtower
-osticket_watchtower_enable: "false"
-osticket_db_watchtower_enable: "false"
+osticket_watchtower_enabled: false
+osticket_db_watchtower_enabled: false

@@ -36,9 +36,9 @@
           net.ipv6.conf.all.forwarding=1
           net.ipv6.conf.default.forwarding=1
         labels:
-          autoheal: "{{ wireguard_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ wireguard_watchtower_enable }}"
-          dockflare.enable: "{{ wireguard_dockflare_tunnel }}"
+          autoheal: "{{ wireguard_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ wireguard_watchtower_enabled| string }}"
+          dockflare.enable: "{{ wireguard_dockflare_enabled | string }}"
           dockflare.access.group: "{{ wireguard_dockflare_access_group }}"
           dockflare.hostname: "{{ wireguard_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireguard_port_http }}"
@@ -50,14 +50,14 @@
           homepage.description: "{{ 'The easiest way to run WireGuard VPN + Web-based Admin UI.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wireguard_container_name }}"
-          homepage.showStats: "{{ wireguard_homepage_showstats }}"
+          homepage.showStats: "{{ wireguard_homepage_showstats | string }}"
           homepage.widget.type: "wgeasy"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wireguard_port_http }}"
           homepage.widget.username: "{{ wireguard_homepage_widget_username }}"
           homepage.widget.password: "{{ wireguard_homepage_widget_password }}"
           homepage.widget.threshold: "{{ wireguard_homepage_widget_threshold }}"
           homepage.widget.version: "{{ wireguard_homepage_widget_version }}"
-          repliqate.enabled: "{{ wireguard_repliqate_enabled }}"
+          repliqate.enabled: "{{ wireguard_repliqate_enabled | string }}"
           repliqate.engine: "{{ wireguard_repliqate_engine }}"
           repliqate.schedule: "{{ wireguard_repliqate_schedule }}"
           repliqate.backup_id: "{{ wireguard_repliqate_backup_id }}"
@@ -82,7 +82,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wireguard_port_http | string)] +
-                (['https://' + wireguard_hostname + '.' + ansible_nas_domain] if (wireguard_available_externally is true or wireguard_dockflare_tunnel is true) else [])
+                (['https://' + wireguard_hostname + '.' + ansible_nas_domain] if (wireguard_available_externally is true or wireguard_dockflare_enabled is true) else [])
               }}
   when: wireguard_enabled is true
 

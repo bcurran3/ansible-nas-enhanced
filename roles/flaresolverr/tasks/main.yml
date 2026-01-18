@@ -24,9 +24,9 @@
           LOG_HTML: "false"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ flaresolverr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ flaresolverr_watchtower_enable }}"
-          dockflare.enable: "{{ flaresolverr_dockflare_tunnel }}"
+          autoheal: "{{ flaresolverr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ flaresolverr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ flaresolverr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ flaresolverr_dockflare_access_group }}"
           dockflare.hostname: "{{ flaresolverr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ flaresolverr_port_http }}"
@@ -38,8 +38,8 @@
           homepage.description: "{{ 'Proxy server to bypass Cloudflare protection' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ flaresolverr_container_name }}"
-          homepage.showStats: "{{ flaresolverr_homepage_showstats }}"
-          repliqate.enabled: "{{ flaresolverr_repliqate_enabled }}"
+          homepage.showStats: "{{ flaresolverr_homepage_showstats | string }}"
+          repliqate.enabled: "{{ flaresolverr_repliqate_enabled | string }}"
           repliqate.engine: "{{ flaresolverr_repliqate_engine }}"
           repliqate.schedule: "{{ flaresolverr_repliqate_schedule }}"
           repliqate.backup_id: "{{ flaresolverr_repliqate_backup_id }}"
@@ -65,7 +65,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (flaresolverr_port_http | string)] +
-                (['https://' + flaresolverr_hostname + '.' + ansible_nas_domain] if (flaresolverr_available_externally is true or flaresolverr_dockflare_tunnel is true) else [])
+                (['https://' + flaresolverr_hostname + '.' + ansible_nas_domain] if (flaresolverr_available_externally is true or flaresolverr_dockflare_enabled is true) else [])
               }}
   when: flaresolverr_enabled is true
 

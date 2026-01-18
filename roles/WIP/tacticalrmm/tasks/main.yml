@@ -60,8 +60,8 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/postgres:/var/lib/postgresql/data"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -93,8 +93,8 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/mongo:/data/db"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -123,8 +123,8 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/redis:/data"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -154,9 +154,9 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
-#          dockflare.enable: "{{ tacticalrmm_dockflare_tunnel }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
+#          dockflare.enable: "{{ tacticalrmm_dockflare_enabled | string }}"
 #          dockflare.access.group: "{{ tacticalrmm_dockflare_access_group }}"
 #          dockflare.hostname: "{{ tacticalrmm_hostname }}.{{ ansible_nas_domain }}"
 #          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tacticalrmm_port }}"
@@ -204,9 +204,9 @@
         links:
           - tactical-mongodb
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
-#          dockflare.enable: "{{ tacticalrmm_dockflare_tunnel }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
+#          dockflare.enable: "{{ tacticalrmm_dockflare_enabled | string }}"
 #          dockflare.access.group: "{{ tacticalrmm_dockflare_access_group }}"
 #          dockflare.hostname: "{{ tacticalrmm_hostname }}.{{ ansible_nas_domain }}"
 #          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tacticalrmm_port }}"
@@ -257,7 +257,7 @@
           - "{{ tacticalrmm_data_directory }}/redis:/redis/data"
         labels:
           autoheal: "false"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -289,8 +289,8 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -321,8 +321,8 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -355,8 +355,8 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -390,8 +390,8 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -425,8 +425,8 @@
         volumes:
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
@@ -466,9 +466,9 @@
           - "{{ tacticalrmm_data_directory }}/data:/opt/tactical"
           - "{{ tacticalrmm_certs_directory }}:/certs"
         labels:
-          autoheal: "{{ tacticalrmm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enable }}"
-          dockflare.enable: "{{ tacticalrmm_dockflare_tunnel }}"
+          autoheal: "{{ tacticalrmm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled| string }}"
+          dockflare.enable: "{{ tacticalrmm_dockflare_enabled | string }}"
           dockflare.access.group: "{{ tacticalrmm_dockflare_access_group }}"
           dockflare.hostname: "{{ tacticalrmm_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tacticalrmm_port }}"
@@ -499,7 +499,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tacticalrmm_port_http | string)] +
-                (['https://' + tacticalrmm_hostname + '.' + ansible_nas_domain] if (tacticalrmm_available_externally is true or tacticalrmm_dockflare_tunnel is true) else [])
+                (['https://' + tacticalrmm_hostname + '.' + ansible_nas_domain] if (tacticalrmm_available_externally is true or tacticalrmm_dockflare_enabled is true) else [])
               }}
   when: tacticalrmm_enabled is true
 

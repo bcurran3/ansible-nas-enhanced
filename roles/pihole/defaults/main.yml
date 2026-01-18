@@ -31,21 +31,21 @@ pihole_env_additional_packages: "" # dig, ping, nslookup already in the image
 pihole_env_ftlconf_webserver_api_password: "{{ ansible_nas_app_admin_password }}"
 
 # autoheal
-pihole_autoheal: "false"
+pihole_autoheal: false
 
 # dockflare
-pihole_dockflare_tunnel: "false"
+pihole_dockflare_enabled: false
 pihole_dockflare_access_group: ""
 
 # homepage
 pihole_homepage_group: "Network"
 pihole_homepage_icon: "pi-hole.png"
 pihole_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port }}/admin"
-pihole_homepage_showstats: "false"
+pihole_homepage_showstats: false
 pihole_homepage_widget_key: "{{ pihole_env_ftlconf_webserver_api_password }}"
 
 # repliqate
-pihole_repliqate_enabled: "false"
+pihole_repliqate_enabled: false
 pihole_repliqate_engine: "restic"
 pihole_repliqate_schedule: "@daily 3am"
 pihole_repliqate_backup_id: "{{ pihole_container_name }}"
@@ -55,4 +55,4 @@ pihole_repliqate_retention: "30d"
 pihole_tinyauth_enabled: false
 
 # watchtower
-pihole_watchtower_enable: "false"
+pihole_watchtower_enabled: false

@@ -24,9 +24,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ uptime_kuma_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ uptime_kuma_watchtower_enable }}"
-          dockflare.enable: "{{ uptime_kuma_dockflare_tunnel }}"
+          autoheal: "{{ uptime_kuma_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ uptime_kuma_watchtower_enabled| string }}"
+          dockflare.enable: "{{ uptime_kuma_dockflare_enabled | string }}"
           dockflare.access.group: "{{ uptime_kuma_dockflare_access_group }}"
           dockflare.hostname: "{{ uptime_kuma_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptime_kuma_port_http }}"
@@ -38,11 +38,11 @@
           homepage.description: "{{ 'A fancy self-hosted monitoring tool' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ uptime_kuma_container_name }}"
-          homepage.showStats: "{{ uptime_kuma_homepage_showstats }}"
+          homepage.showStats: "{{ uptime_kuma_homepage_showstats | string }}"
           homepage.widget.type: "uptimekuma"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ uptime_kuma_port_http }}"
           homepage.widget.slug: "{{ uptime_kuma_homepage_widget_slug }}"
-          repliqate.enabled: "{{ uptime_kuma_repliqate_enabled }}"
+          repliqate.enabled: "{{ uptime_kuma_repliqate_enabled | string }}"
           repliqate.engine: "{{ uptime_kuma_repliqate_engine }}"
           repliqate.schedule: "{{ uptime_kuma_repliqate_schedule }}"
           repliqate.backup_id: "{{ uptime_kuma_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (uptime_kuma_port_http | string)] +
-                (['https://' + uptime_kuma_hostname + '.' + ansible_nas_domain] if (uptime_kuma_available_externally is true or uptime_kuma_dockflare_tunnel is true) else [])
+                (['https://' + uptime_kuma_hostname + '.' + ansible_nas_domain] if (uptime_kuma_available_externally is true or uptime_kuma_dockflare_enabled is true) else [])
               }}
   when: uptime_kuma_enabled is true
 

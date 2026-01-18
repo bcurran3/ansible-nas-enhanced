@@ -44,9 +44,9 @@
         privileged: true
 #       security_opts: ["apparmor=rootlesskit"] #optional
         labels:
-          autoheal: "{{ kasm_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ kasm_watchtower_enable }}"
-          dockflare.enable: "{{ kasm_dockflare_tunnel }}"
+          autoheal: "{{ kasm_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ kasm_watchtower_enabled| string }}"
+          dockflare.enable: "{{ kasm_dockflare_enabled | string }}"
           dockflare.access.group: "{{ kasm_dockflare_access_group }}"
           dockflare.hostname: "{{ kasm_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ kasm_port_https }}"
@@ -58,8 +58,8 @@
           homepage.description: "{{ 'Kasm⁠ Workspaces is a docker container streaming platform for delivering browser-based access to desktops, applications, and web services.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ kasm_container_name }}"
-          homepage.showStats: "{{ kasm_homepage_showstats }}"
-          repliqate.enabled: "{{ kasm_repliqate_enabled }}"
+          homepage.showStats: "{{ kasm_homepage_showstats | string }}"
+          repliqate.enabled: "{{ kasm_repliqate_enabled | string }}"
           repliqate.engine: "{{ kasm_repliqate_engine }}"
           repliqate.schedule: "{{ kasm_repliqate_schedule }}"
           repliqate.backup_id: "{{ kasm_repliqate_backup_id }}"
@@ -101,9 +101,9 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (kasm_port_https | string)] +
-                (['https://' + kasm_hostname + '.' + ansible_nas_domain] if (kasm_available_externally is true or kasm_dockflare_tunnel is true) else []) + 
+                (['https://' + kasm_hostname + '.' + ansible_nas_domain] if (kasm_available_externally is true or kasm_dockflare_enabled is true) else []) + 
                 ['https://' + ansible_default_ipv4.address + ':' + (kasm_port_install_https | string) + ' (Kasm Install)'] +
-                (['https://' + kasm_hostname + '-admin.' + ansible_nas_domain + ' (Kasm Install)'] if (kasm_available_externally is true or kasm_dockflare_tunnel is true) else [])
+                (['https://' + kasm_hostname + '-admin.' + ansible_nas_domain + ' (Kasm Install)'] if (kasm_available_externally is true or kasm_dockflare_enabled is true) else [])
               }}
   when: kasm_enabled is true
 

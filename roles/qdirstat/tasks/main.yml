@@ -28,9 +28,9 @@
           WEB_LISTENING_PORT: "{{ qdirstat_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ qdirstat_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ qdirstat_watchtower_enable }}"
-          dockflare.enable: "{{ qdirstat_dockflare_tunnel }}"
+          autoheal: "{{ qdirstat_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ qdirstat_watchtower_enabled| string }}"
+          dockflare.enable: "{{ qdirstat_dockflare_enabled | string }}"
           dockflare.access.group: "{{ qdirstat_dockflare_access_group }}"
           dockflare.hostname: "{{ qdirstat_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
@@ -42,8 +42,8 @@
           homepage.description: "{{ 'Qt-based directory statistics' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ qdirstat_container_name }}"
-          homepage.showStats: "{{ qdirstat_homepage_showstats }}"
-          repliqate.enabled: "{{ qdirstat_repliqate_enabled }}"
+          homepage.showStats: "{{ qdirstat_homepage_showstats | string }}"
+          repliqate.enabled: "{{ qdirstat_repliqate_enabled | string }}"
           repliqate.engine: "{{ qdirstat_repliqate_engine }}"
           repliqate.schedule: "{{ qdirstat_repliqate_schedule }}"
           repliqate.backup_id: "{{ qdirstat_repliqate_backup_id }}"
@@ -74,7 +74,7 @@
                 'https://' ~ qdirstat_hostname ~ '.' ~ ansible_nas_domain,
                 'vnc://' ~ qdirstat_hostname ~ '.' ~ ansible_nas_domain ~ ':' ~ qdirstat_port_vnc
               ]
-              if (qdirstat_available_externally is true or qdirstat_dockflare_tunnel is true) else []
+              if (qdirstat_available_externally is true or qdirstat_dockflare_enabled is true) else []
             ) + [
               'vnc://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ qdirstat_port_vnc
             ]

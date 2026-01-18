@@ -27,9 +27,9 @@
           PGID: "{{ lancommander_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ lancommander_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ lancommander_watchtower_enable }}"
-          dockflare.enable: "{{ lancommander_dockflare_tunnel }}"
+          autoheal: "{{ lancommander_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ lancommander_watchtower_enabled| string }}"
+          dockflare.enable: "{{ lancommander_dockflare_enabled | string }}"
           dockflare.access.group: "{{ lancommander_dockflare_access_group }}"
           dockflare.hostname: "{{ lancommander_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lancommander_port_http }}"
@@ -41,8 +41,8 @@
           homepage.description: "{{ 'LANCommander is an open-source digital game platform.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ lancommander_container_name }}"
-          homepage.showStats: "{{ lancommander_homepage_showstats }}"
-          repliqate.enabled: "{{ lancommander_repliqate_enabled }}"
+          homepage.showStats: "{{ lancommander_homepage_showstats | string }}"
+          repliqate.enabled: "{{ lancommander_repliqate_enabled | string }}"
           repliqate.engine: "{{ lancommander_repliqate_engine }}"
           repliqate.schedule: "{{ lancommander_repliqate_schedule }}"
           repliqate.backup_id: "{{ lancommander_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (lancommander_port_http | string)] +
-                (['https://' + lancommander_hostname + '.' + ansible_nas_domain] if (lancommander_available_externally is true or lancommander_dockflare_tunnel is true) else [])
+                (['https://' + lancommander_hostname + '.' + ansible_nas_domain] if (lancommander_available_externally is true or lancommander_dockflare_enabled is true) else [])
               }}
   when: lancommander_enabled is true
 

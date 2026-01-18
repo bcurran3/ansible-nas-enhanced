@@ -21,8 +21,8 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ recyclarr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ recyclarr_watchtower_enable }}"
+          autoheal: "{{ recyclarr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ recyclarr_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ recyclarr_homepage_group }}"
@@ -30,8 +30,8 @@
           homepage.description: "{{ 'Automatically sync TRaSH Guides to your Sonarr and Radarr instances' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ recyclarr_container_name }}"
-          homepage.showStats: "{{ recyclarr_homepage_showstats }}"
-          repliqate.enabled: "{{ recyclarr_repliqate_enabled }}"
+          homepage.showStats: "{{ recyclarr_homepage_showstats | string }}"
+          repliqate.enabled: "{{ recyclarr_repliqate_enabled | string }}"
           repliqate.engine: "{{ recyclarr_repliqate_engine }}"
           repliqate.schedule: "{{ recyclarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ recyclarr_repliqate_backup_id }}"

@@ -27,9 +27,9 @@
         devices:
           - "/dev/kvm"
         labels:
-          autoheal: "{{ docker_android_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ docker_android_watchtower_enable }}"
-          dockflare.enable: "{{ docker_android_dockflare_tunnel }}"
+          autoheal: "{{ docker_android_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ docker_android_watchtower_enabled| string }}"
+          dockflare.enable: "{{ docker_android_dockflare_enabled | string }}"
           dockflare.access.group: "{{ docker_android_dockflare_access_group }}"
           dockflare.hostname: "{{ docker_android_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ docker_android_port_http }}"
@@ -40,9 +40,9 @@
           homepage.description: "{{ 'Android in docker solution with noVNC supported and video recording' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ docker_android_container_name }}"
-          homepage.showStats: "{{ docker_android_homepage_showstats }}"
+          homepage.showStats: "{{ docker_android_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ docker_android_port_http }}"
-          repliqate.enabled: "{{ docker_android_repliqate_enabled }}"
+          repliqate.enabled: "{{ docker_android_repliqate_enabled | string }}"
           repliqate.engine: "{{ docker_android_repliqate_engine }}"
           repliqate.schedule: "{{ docker_android_repliqate_schedule }}"
           repliqate.backup_id: "{{ docker_android_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (docker_android_port_http | string)] +
-                (['https://' + docker_android_hostname + '.' + ansible_nas_domain] if (docker_android_available_externally is true or docker_android_dockflare_tunnel is true) else [])
+                (['https://' + docker_android_hostname + '.' + ansible_nas_domain] if (docker_android_available_externally is true or docker_android_dockflare_enabled is true) else [])
               }}
   when: docker_android_enabled is true
 

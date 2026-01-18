@@ -32,9 +32,9 @@
           TP_ADDON: "{{ jackett_env_docker_mods_tp_addon }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ jackett_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ jackett_watchtower_enable }}"
-          dockflare.enable: "{{ jackett_dockflare_tunnel }}"
+          autoheal: "{{ jackett_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ jackett_watchtower_enabled| string }}"
+          dockflare.enable: "{{ jackett_dockflare_enabled | string }}"
           dockflare.access.group: "{{ jackett_dockflare_access_group }}"
           dockflare.hostname: "{{ jackett_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jackett_port_http }}"
@@ -45,12 +45,12 @@
           homepage.description: "{{ 'API Support for your favorite torrent trackers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ jackett_container_name }}"
-          homepage.showStats: "{{ jackett_homepage_showstats }}"
+          homepage.showStats: "{{ jackett_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jackett_port_http }}"
           homepage.widget.type: "jackett"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jackett_port_http }}"
           homepage.widget.password: "{{ jackett_homepage_widget_password }}"
-          repliqate.enabled: "{{ jackett_repliqate_enabled }}"
+          repliqate.enabled: "{{ jackett_repliqate_enabled | string }}"
           repliqate.engine: "{{ jackett_repliqate_engine }}"
           repliqate.schedule: "{{ jackett_repliqate_schedule }}"
           repliqate.backup_id: "{{ jackett_repliqate_backup_id }}"
@@ -76,7 +76,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (jackett_port_http | string)] +
-                (['https://' + jackett_hostname + '.' + ansible_nas_domain] if (jackett_available_externally is true or jackett_dockflare_tunnel is true) else [])
+                (['https://' + jackett_hostname + '.' + ansible_nas_domain] if (jackett_available_externally is true or jackett_dockflare_enabled is true) else [])
               }}
   when: jackett_enabled is true
 

@@ -2,7 +2,7 @@
 # ANE
 ansible_nas_app_name: "koel"
 koel_enabled: false
-koel_available_externally: "false"
+koel_available_externally: false
 koel_traefik_whitelist: "{{ lan }}"
 
 # directories
@@ -37,30 +37,30 @@ koel_env_db_database: "koel_db"
 koel_db_env_mysql_root_password: "topsecret"
 
 # autoheal
-koel_autoheal: "false"
-koel_db_autoheal: "false"
+koel_autoheal: false
+koel_db_autoheal: false
 
 # dockflare
-koel_dockflare_tunnel: "false"
+koel_dockflare_enabled: false
 koel_dockflare_access_group: ""
 
 # homepage
 koel_homepage_group: "Apps"
 koel_homepage_icon: "koel.png"
 koel_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
-koel_homepage_showstats: "false"
+koel_homepage_showstats: false
 koel_db_homepage_group: "DBs"
 koel_db_homepage_icon: "mariadb.png"
 koel_db_homepage_href: "{{ koel_homepage_href }}"
-koel_db_homepage_showstats: "false"
+koel_db_homepage_showstats: false
 
 # repliqate
-koel_repliqate_enabled: "false"
+koel_repliqate_enabled: false
 koel_repliqate_engine: "restic"
 koel_repliqate_schedule: "@daily 3am"
 koel_repliqate_backup_id: "{{ koel_container_name }}"
 koel_repliqate_retention: "30d"
-koel_db_repliqate_enabled: "false"
+koel_db_repliqate_enabled: false
 koel_db_repliqate_engine: "restic"
 koel_db_repliqate_schedule: "@daily 3am"
 koel_db_repliqate_backup_id: "{{ koel_db_container_name }}"
@@ -70,5 +70,5 @@ koel_db_repliqate_retention: "30d"
 koel_tinyauth_enabled: false
 
 # watchtower
-koel_watchtower_enable: "false"
-koel_db_watchtower_enable: "false"
+koel_watchtower_enabled: false
+koel_db_watchtower_enabled: false

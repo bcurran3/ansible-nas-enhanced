@@ -24,8 +24,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ dockhand_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ dockhand_watchtower_enable | string }}"
-          dockflare.enable: "{{ dockhand_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockhand_watchtower_enabled| string }}"
+          dockflare.enable: "{{ dockhand_dockflare_enabled | string }}"
           dockflare.access.group: "{{ dockhand_dockflare_access_group }}"
           dockflare.hostname: "{{ dockhand_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockhand_port_http }}"
@@ -36,7 +36,7 @@
           homepage.description: "{{ 'Docker management you will like' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dockhand_container_name }}"
-          homepage.showStats: "{{ dockhand_homepage_showstats }}"
+          homepage.showStats: "{{ dockhand_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dockhand_port_http }}"
           repliqate.enabled: "{{ dockhand_repliqate_enabled | string  }}"
           repliqate.engine: "{{ dockhand_repliqate_engine }}"
@@ -63,7 +63,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dockhand_port_http | string)] +
-                (['https://' + dockhand_hostname + '.' + ansible_nas_domain] if (dockhand_available_externally is true or dockhand_dockflare_tunnel is true) else [])
+                (['https://' + dockhand_hostname + '.' + ansible_nas_domain] if (dockhand_available_externally is true or dockhand_dockflare_enabled is true) else [])
               }}
   when: dockhand_enabled is true
 

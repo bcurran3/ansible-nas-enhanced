@@ -33,30 +33,30 @@ wordpress_env_wordpress_db_name: "wordpress"
 wordpress_db_env_mysql_random_root_password: "1"
 
 # autoheal
-wordpress_autoheal: "false"
-wordpress_db_autoheal: "false"
+wordpress_autoheal: false
+wordpress_db_autoheal: false
 
 # dockflare
-wordpress_dockflare_tunnel: "false"
+wordpress_dockflare_enabled: false
 wordpress_dockflare_access_group: ""
 
 # homepage
 wordpress_homepage_group: "Apps"
 wordpress_homepage_icon: "wordpress.png"
 wordpress_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wordpress_port_http }}"
-wordpress_homepage_showstats: "false"
+wordpress_homepage_showstats: false
 wordpress_db_homepage_group: "DBs"
 wordpress_db_homepage_icon: "mysql.png"
 wordpress_db_homepage_href: "{{ wordpress_homepage_href }}"
-wordpress_db_homepage_showstats: "false"
+wordpress_db_homepage_showstats: false
 
 # repliqate
-wordpress_repliqate_enabled: "false"
+wordpress_repliqate_enabled: false
 wordpress_repliqate_engine: "restic"
 wordpress_repliqate_schedule: "@daily 3am"
 wordpress_repliqate_backup_id: "{{ wordpress_container_name }}"
 wordpress_repliqate_retention: "30d"
-wordpress_db_repliqate_enabled: "false"
+wordpress_db_repliqate_enabled: false
 wordpress_db_repliqate_engine: "restic"
 wordpress_db_repliqate_schedule: "@daily 3am"
 wordpress_db_repliqate_backup_id: "{{ wordpress_container_name }}"
@@ -66,5 +66,5 @@ wordpress_db_repliqate_retention: "30d"
 wordpress_tinyauth_enabled: false
 
 # watchtower
-wordpress_watchtower_enable: "false"
-wordpress_db_watchtower_enable: "false"
+wordpress_watchtower_enabled: false
+wordpress_db_watchtower_enabled: false

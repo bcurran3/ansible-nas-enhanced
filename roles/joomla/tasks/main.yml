@@ -33,8 +33,8 @@
           MYSQL_RANDOM_ROOT_PASSWORD: '1'
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ joomla_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ joomla_db_watchtower_enable }}"
+          autoheal: "{{ joomla_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ joomla_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ joomla_db_homepage_group }}"
@@ -43,8 +43,8 @@
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ joomla_db_container_name }}"
-          homepage.showStats: "{{ joomla_db_homepage_showstats }}"
-          repliqate.enabled: "{{ joomla_db_repliqate_enabled }}"
+          homepage.showStats: "{{ joomla_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ joomla_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ joomla_db_repliqate_engine }}"
           repliqate.schedule: "{{ joomla_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ joomla_db_repliqate_backup_id }}"
@@ -93,9 +93,9 @@
         links:
           - "{{ joomla_db_container_name }}"
         labels:
-          autoheal: "{{ joomla_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ joomla_watchtower_enable }}"
-          dockflare.enable: "{{ joomla_dockflare_tunnel }}"
+          autoheal: "{{ joomla_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ joomla_watchtower_enabled| string }}"
+          dockflare.enable: "{{ joomla_dockflare_enabled | string }}"
           dockflare.access.group: "{{ joomla_dockflare_access_group }}"
           dockflare.hostname: "{{ joomla_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joomla_port_http }}"
@@ -106,9 +106,9 @@
           homepage.description: "{{ 'open source content management system' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ joomla_container_name }}"
-          homepage.showStats: "{{ joomla_homepage_showstats }}"
+          homepage.showStats: "{{ joomla_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joomla_port_http }}"
-          repliqate.enabled: "{{ joomla_repliqate_enabled }}"
+          repliqate.enabled: "{{ joomla_repliqate_enabled | string }}"
           repliqate.engine: "{{ joomla_repliqate_engine }}"
           repliqate.schedule: "{{ joomla_repliqate_schedule }}"
           repliqate.backup_id: "{{ joomla_repliqate_backup_id }}"
@@ -134,7 +134,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (joomla_port_http | string)] +
-                (['https://' + joomla_hostname + '.' + ansible_nas_domain] if (joomla_available_externally is true or joomla_dockflare_tunnel is true) else [])
+                (['https://' + joomla_hostname + '.' + ansible_nas_domain] if (joomla_available_externally is true or joomla_dockflare_enabled is true) else [])
               }}
   when: joomla_enabled is true
 

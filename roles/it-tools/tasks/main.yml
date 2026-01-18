@@ -13,9 +13,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ it_tools_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ it_tools_watchtower_enable }}"
-          dockflare.enable: "{{ it_tools_dockflare_tunnel }}"
+          autoheal: "{{ it_tools_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ it_tools_watchtower_enabled| string }}"
+          dockflare.enable: "{{ it_tools_dockflare_enabled | string }}"
           dockflare.access.group: "{{ it_tools_dockflare_access_group }}"
           dockflare.hostname: "{{ it_tools_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ it_tools_port_http }}"
@@ -26,7 +26,7 @@
           homepage.description: "{{ 'Collection of handy online tools for developers, with great UX.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ it_tools_container_name }}"
-          homepage.showStats: "{{ it_tools_homepage_showstats }}"
+          homepage.showStats: "{{ it_tools_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ it_tools_port_http }}"
           traefik.enable: "{{ it_tools_available_externally | string }}"
           traefik.http.routers.ittools.rule: "Host(`{{ it_tools_hostname }}.{{ ansible_nas_domain }}`)"
@@ -49,7 +49,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (it_tools_port_http | string)] +
-                (['https://' + it_tools_hostname + '.' + ansible_nas_domain] if (it_tools_available_externally is true or it_tools_dockflare_tunnel is true) else [])
+                (['https://' + it_tools_hostname + '.' + ansible_nas_domain] if (it_tools_available_externally is true or it_tools_dockflare_enabled is true) else [])
               }}
   when: it_tools_enabled is true
 

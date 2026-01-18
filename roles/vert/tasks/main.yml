@@ -24,8 +24,8 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ vertd_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ vertd_watchtower_enable }}"
+          autoheal: "{{ vertd_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ vertd_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} daemon"
           homepage.group: "{{ vertd_homepage_group }}"
@@ -34,7 +34,7 @@
           homepage.description: "{{ 'VERT''s solution to crappy video conversion services.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vertd_container_name }}"
-          homepage.showStats: "{{ vertd_homepage_showstats }}"
+          homepage.showStats: "{{ vertd_homepage_showstats | string }}"
           traefik.enable: "false"
           wud.watch.digest: "true"
           wud.link.template: "https://github.com/VERT-sh/vertd/pkgs/container/vertd"
@@ -89,9 +89,9 @@
             links:
               - "{{ vertd_container_name }}"
             labels:
-              autoheal: "{{ vert_autoheal }}"
-              com.centurylinklabs.watchtower.enable: "{{ vert_watchtower_enable }}"
-              dockflare.enable: "{{ vert_dockflare_tunnel }}"
+              autoheal: "{{ vert_autoheal | string }}"
+              com.centurylinklabs.watchtower.enable: "{{ vert_watchtower_enabled| string }}"
+              dockflare.enable: "{{ vert_dockflare_enabled | string }}"
               dockflare.access.group: "{{ vert_dockflare_access_group }}"
               dockflare.hostname: "{{ vert_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
@@ -102,7 +102,7 @@
               homepage.description: "{{ 'VERT''s solution to crappy video conversion services.' if homepage_show_description else omit }}"
               homepage.server: "my-docker"
               homepage.container: "{{ vert_container_name }}"
-              homepage.showStats: "{{ vert_homepage_showstats }}"
+              homepage.showStats: "{{ vert_homepage_showstats | string }}"
               homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vert_port_http }}"
               traefik.enable: "{{ vert_available_externally | string }}"
               traefik.http.routers.vert.rule: "Host(`{{ vert_hostname }}.{{ ansible_nas_domain }}`)"
@@ -123,7 +123,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (vert_port_http | string)] +
-                (['https://' + vert_hostname + '.' + ansible_nas_domain] if (vert_available_externally is true or vert_dockflare_tunnel is true) else [])
+                (['https://' + vert_hostname + '.' + ansible_nas_domain] if (vert_available_externally is true or vert_dockflare_enabled is true) else [])
               }}
   when: vert_enabled is true
 

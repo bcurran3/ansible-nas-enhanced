@@ -34,8 +34,8 @@
           test: ['CMD', 'redis-cli', 'ping']
         command: "redis-server --requirepass topsecret"
         labels:
-          autoheal: "{{ mastodon_redis_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ mastodon_redis_watchtower_enable }}"
+          autoheal: "{{ mastodon_redis_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_redis_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
           wud.tag.include: "^v?\\d+-alpine$"
@@ -68,8 +68,8 @@
         healthcheck:
           test: ['CMD', 'pg_isready', '-U', 'postgres']
         labels:
-          autoheal: "{{ mastodon_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ mastodon_db_watchtower_enable }}"
+          autoheal: "{{ mastodon_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+.*$'
@@ -148,9 +148,9 @@
           - "{{ mastodon_redis_container_name }}"
           - "{{ mastodon_db_container_name }}"
         labels:
-          autoheal: "{{ mastodon_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ mastodon_watchtower_enable }}"
-          dockflare.enable: "{{ mastodon_dockflare_tunnel }}"
+          autoheal: "{{ mastodon_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ mastodon_watchtower_enabled| string }}"
+          dockflare.enable: "{{ mastodon_dockflare_enabled | string }}"
           dockflare.access.group: "{{ mastodon_dockflare_access_group }}"
           dockflare.hostname: "{{ mastodon_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mastodon_port_https }}"
@@ -162,7 +162,7 @@
 #         homepage.description: ""
           homepage.server: "my-docker"
           homepage.container: "{{ mastodon_container_name }}"
-          homepage.showStats: "{{ mastodon_homepage_showstats }}"
+          homepage.showStats: "{{ mastodon_homepage_showstats | string }}"
           traefik.enable: "{{ mastodon_available_externally | string }}"
           traefik.http.routers.mastodon.rule: "Host(`{{ mastodon_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.mastodon.tls.certresolver: "letsencrypt"
@@ -186,7 +186,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mastodon_port_http | string)] +
-                (['https://' + mastodon_hostname + '.' + ansible_nas_domain] if (mastodon_available_externally is true or mastodon_dockflare_tunnel is true) else [])
+                (['https://' + mastodon_hostname + '.' + ansible_nas_domain] if (mastodon_available_externally is true or mastodon_dockflare_enabled is true) else [])
               }}
   when: mastodon_enabled is true
 

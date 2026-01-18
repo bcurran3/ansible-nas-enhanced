@@ -44,9 +44,9 @@
           WEBUI_PORT: "{{ qbittorrent_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ qbittorrent_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ qbittorrent_watchtower_enable }}"
-          dockflare.enable: "{{ qbittorrent_dockflare_tunnel }}"
+          autoheal: "{{ qbittorrent_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ qbittorrent_watchtower_enabled| string }}"
+          dockflare.enable: "{{ qbittorrent_dockflare_enabled | string }}"
           dockflare.access.group: "{{ qbittorrent_dockflare_access_group }}"
           dockflare.hostname: "{{ qbittorrent_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qbittorrent_port_http }}"
@@ -58,12 +58,12 @@
           homepage.description: "{{ 'qBittorrent BitTorrent client' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ qbittorrent_container_name }}"
-          homepage.showStats: "{{ qbittorrent_homepage_showstats }}"
+          homepage.showStats: "{{ qbittorrent_homepage_showstats | string }}"
           homepage.widget.type: "qbittorrent"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qbittorrent_port_http }}"
           homepage.widget.username: "{{ qbittorrent_homepage_widget_username }}"
           homepage.widget.password: "{{ qbittorrent_homepage_widget_password }}"
-          repliqate.enabled: "{{ qbittorrent_repliqate_enabled }}"
+          repliqate.enabled: "{{ qbittorrent_repliqate_enabled | string }}"
           repliqate.engine: "{{ qbittorrent_repliqate_engine }}"
           repliqate.schedule: "{{ qbittorrent_repliqate_schedule }}"
           repliqate.backup_id: "{{ qbittorrent_repliqate_backup_id }}"
@@ -89,7 +89,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (qbittorrent_port_http | string)] +
-                (['https://' + qbittorrent_hostname + '.' + ansible_nas_domain] if (qbittorrent_available_externally is true or qbittorrent_dockflare_tunnel is true) else [])
+                (['https://' + qbittorrent_hostname + '.' + ansible_nas_domain] if (qbittorrent_available_externally is true or qbittorrent_dockflare_enabled is true) else [])
               }}
   when: qbittorrent_enabled is true
 

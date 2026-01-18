@@ -25,9 +25,9 @@
           - "{{ organizr_port_http }}:80"
           - "{{ organizr_port_https }}:443"
         labels:
-          autoheal: "{{ organizr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ organizr_watchtower_enable }}"
-          dockflare.enable: "{{ organizr_dockflare_tunnel }}"
+          autoheal: "{{ organizr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ organizr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ organizr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ organizr_dockflare_access_group }}"
           dockflare.hostname: "{{ organizr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ organizr_port_http }}"
@@ -38,9 +38,9 @@
           homepage.description: "{{ 'organizr description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ organizr_container_name }}"
-          homepage.showStats: "{{ organizr_homepage_showstats }}"
+          homepage.showStats: "{{ organizr_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ organizr_port_http }}"
-          repliqate.enabled: "{{ organizr_repliqate_enabled }}"
+          repliqate.enabled: "{{ organizr_repliqate_enabled | string }}"
           repliqate.engine: "{{ organizr_repliqate_engine }}"
           repliqate.schedule: "{{ organizr_repliqate_schedule }}"
           repliqate.backup_id: "{{ organizr_repliqate_backup_id }}"
@@ -65,7 +65,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (organizr_port_http | string)] +
-                (['https://' + organizr_hostname + '.' + ansible_nas_domain] if (organizr_available_externally is true or organizr_dockflare_tunnel is true) else [])
+                (['https://' + organizr_hostname + '.' + ansible_nas_domain] if (organizr_available_externally is true or organizr_dockflare_enabled is true) else [])
               }}
   when: organizr_enabled is true
 

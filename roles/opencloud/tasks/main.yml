@@ -21,7 +21,7 @@
             if dns_exists
             else
             "DNS record not found. External access to be configured."
-            if (opencloud_available_externally | bool or opencloud_dockflare_tunnel | bool)
+            if (opencloud_available_externally | bool or opencloud_dockflare_enabled | bool)
             else
             "DNS record not found. External access not configured. Skipping container creation."
           }}
@@ -91,9 +91,9 @@
               NOTIFICATIONS_SMTP_ENCRYPTION: "{{ opencloud_env_smtp_encryption }}"
               TZ: "{{ ansible_nas_timezone }}"
             labels:
-              autoheal: "{{ opencloud_autoheal }}"
-              com.centurylinklabs.watchtower.enable: "{{ opencloud_watchtower_enable }}"
-              dockflare.enable: "{{ opencloud_dockflare_tunnel }}"
+              autoheal: "{{ opencloud_autoheal | string }}"
+              com.centurylinklabs.watchtower.enable: "{{ opencloud_watchtower_enabled| string }}"
+              dockflare.enable: "{{ opencloud_dockflare_enabled | string }}"
               dockflare.access.group: "{{ opencloud_dockflare_access_group }}"
               dockflare.hostname: "{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port_http }}"
@@ -104,9 +104,9 @@
               homepage.description: "{{ 'open source platform for file management, sharing and collaboration' if homepage_show_description else omit }}"
               homepage.server: "my-docker"
               homepage.container: "{{ opencloud_container_name }}"
-              homepage.showStats: "{{ opencloud_homepage_showstats }}"
+              homepage.showStats: "{{ opencloud_homepage_showstats | string }}"
               homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port_http }}"
-              repliqate.enabled: "{{ opencloud_repliqate_enabled }}"
+              repliqate.enabled: "{{ opencloud_repliqate_enabled | string }}"
               repliqate.engine: "{{ opencloud_repliqate_engine }}"
               repliqate.schedule: "{{ opencloud_repliqate_schedule }}"
               repliqate.backup_id: "{{ opencloud_repliqate_backup_id }}"
@@ -130,11 +130,11 @@
           ansible.builtin.debug:
             msg: >-
                   {{
-                    (['https://' + opencloud_hostname + '.' + ansible_nas_domain] if (opencloud_available_externally is true or opencloud_dockflare_tunnel is true) else [])
+                    (['https://' + opencloud_hostname + '.' + ansible_nas_domain] if (opencloud_available_externally is true or opencloud_dockflare_enabled is true) else [])
                   }}
       when:
         - dns_exists
-        - (opencloud_dockflare_tunnel | bool or opencloud_available_externally | bool)
+        - (opencloud_dockflare_enabled | bool or opencloud_available_externally | bool)
   when: opencloud_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

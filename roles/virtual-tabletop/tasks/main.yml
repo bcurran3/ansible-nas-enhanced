@@ -33,9 +33,9 @@
           URLPREFIX: "{{ virtual_tabletop_env_urlprefix }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ virtual_tabletop_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ virtual_tabletop_watchtower_enable }}"
-          dockflare.enable: "{{ virtual_tabletop_dockflare_tunnel }}"
+          autoheal: "{{ virtual_tabletop_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ virtual_tabletop_watchtower_enabled| string }}"
+          dockflare.enable: "{{ virtual_tabletop_dockflare_enabled | string }}"
           dockflare.access.group: "{{ virtual_tabletop_dockflare_access_group }}"
           dockflare.hostname: "{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtual_tabletop_port_http }}"
@@ -46,7 +46,7 @@
           homepage.description: "{{ 'a virtual surface in the browser on which you can play board, dice and card games' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ virtual_tabletop_container_name }}"
-          homepage.showStats: "{{ virtual_tabletop_homepage_showstats }}"
+          homepage.showStats: "{{ virtual_tabletop_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ virtual_tabletop_port_http }}"
           repliqate.enabled: "false"
           traefik.enable: "{{ virtual_tabletop_available_externally | string }}"
@@ -69,7 +69,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (virtual_tabletop_port_http | string)] +
-                (['https://' + virtual_tabletop_hostname + '.' + ansible_nas_domain] if (virtual_tabletop_available_externally is true or virtual_tabletop_dockflare_tunnel is true) else [])
+                (['https://' + virtual_tabletop_hostname + '.' + ansible_nas_domain] if (virtual_tabletop_available_externally is true or virtual_tabletop_dockflare_enabled is true) else [])
               }}
   when: virtual_tabletop_enabled is true
 

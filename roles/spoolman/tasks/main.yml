@@ -24,9 +24,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ spoolman_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ spoolman_watchtower_enable }}"
-          dockflare.enable: "{{ spoolman_dockflare_tunnel }}"
+          autoheal: "{{ spoolman_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ spoolman_watchtower_enabled| string }}"
+          dockflare.enable: "{{ spoolman_dockflare_enabled | string }}"
           dockflare.access.group: "{{ spoolman_dockflare_access_group }}"
           dockflare.hostname: "{{ spoolman_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ spoolman_port_http }}"
@@ -37,11 +37,11 @@
           homepage.description: "{{ 'Keep track of your inventory of 3D-printer filament spools.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ spoolman_container_name }}"
-          homepage.showStats: "{{ spoolman_homepage_showstats }}"
+          homepage.showStats: "{{ spoolman_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ spoolman_port_http }}"
           homepage.widget.type: "spoolman"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ spoolman_port_http }}"
-          repliqate.enabled: "{{ spoolman_repliqate_enabled }}"
+          repliqate.enabled: "{{ spoolman_repliqate_enabled | string }}"
           repliqate.engine: "{{ spoolman_repliqate_engine }}"
           repliqate.schedule: "{{ spoolman_repliqate_schedule }}"
           repliqate.backup_id: "{{ spoolman_repliqate_backup_id }}"
@@ -66,7 +66,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (spoolman_port_http | string)] +
-                (['https://' + spoolman_hostname + '.' + ansible_nas_domain] if (spoolman_available_externally is true or spoolman_dockflare_tunnel is true) else [])
+                (['https://' + spoolman_hostname + '.' + ansible_nas_domain] if (spoolman_available_externally is true or spoolman_dockflare_enabled is true) else [])
               }}
   when: spoolman_enabled is true
 

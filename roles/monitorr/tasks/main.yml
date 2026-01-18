@@ -26,9 +26,9 @@
           PUID: "{{ monitorr_user_id }}"
           PGID: "{{ monitorr_group_id }}"
         labels:
-          autoheal: "{{ monitorr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ monitorr_watchtower_enable }}"
-          dockflare.enable: "{{ monitorr_dockflare_tunnel }}"
+          autoheal: "{{ monitorr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ monitorr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ monitorr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ monitorr_dockflare_access_group }}"
           dockflare.hostname: "{{ monitorr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ monitorr_port_http }}"
@@ -40,8 +40,8 @@
           homepage.description: "{{ 'a self-hosted PHP web app that monitors the status of local and remote network services, websites, and applications' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ monitorr_container_name }}"
-          homepage.showStats: "{{ monitorr_homepage_showstats }}"
-          repliqate.enabled: "{{ monitorr_repliqate_enabled }}"
+          homepage.showStats: "{{ monitorr_homepage_showstats | string }}"
+          repliqate.enabled: "{{ monitorr_repliqate_enabled | string }}"
           repliqate.engine: "{{ monitorr_repliqate_engine }}"
           repliqate.schedule: "{{ monitorr_repliqate_schedule }}"
           repliqate.backup_id: "{{ monitorr_repliqate_backup_id }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (monitorr_port_http | string)] +
-                (['https://' + monitorr_hostname + '.' + ansible_nas_domain] if (monitorr_available_externally is true or monitorr_dockflare_tunnel is true) else [])
+                (['https://' + monitorr_hostname + '.' + ansible_nas_domain] if (monitorr_available_externally is true or monitorr_dockflare_enabled is true) else [])
               }}
   when: monitorr_enabled is true
 

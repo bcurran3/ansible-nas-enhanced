@@ -31,30 +31,30 @@ glpi_db_memory_swap: "{{ glpi_db_memory }}"
 glpi_db_password: "glpi"
 
 # autoheal
-glpi_autoheal: "false"
-glpi_db_autoheal: "false"
+glpi_autoheal: false
+glpi_db_autoheal: false
 
 # dockflare
-glpi_dockflare_tunnel: "false"
+glpi_dockflare_enabled: false
 glpi_dockflare_access_group: ""
 
 # homepage
 glpi_homepage_group: "Apps"
 glpi_homepage_icon: "glpi.png"
 glpi_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
-glpi_homepage_showstats: "false"
+glpi_homepage_showstats: false
 glpi_db_homepage_group: "DBs"
 glpi_db_homepage_icon: "mariadb.png"
 glpi_db_homepage_href: "{{ glpi_homepage_href }}"
-glpi_db_homepage_showstats: "false"
+glpi_db_homepage_showstats: false
 
 # repliqate
-glpi_repliqate_enabled: "false"
+glpi_repliqate_enabled: false
 glpi_repliqate_engine: "restic"
 glpi_repliqate_schedule: "@daily 3am"
 glpi_repliqate_backup_id: "{{ glpi_container_name }}"
 glpi_repliqate_retention: "30d"
-glpi_db_repliqate_enabled: "false"
+glpi_db_repliqate_enabled: false
 glpi_db_repliqate_engine: "restic"
 glpi_db_repliqate_schedule: "@daily 3am"
 glpi_db_repliqate_backup_id: "{{ glpi_db_container_name }}"
@@ -64,5 +64,5 @@ glpi_db_repliqate_retention: "30d"
 glpi_tinyauth_enabled: false
 
 # watchtower
-glpi_watchtower_enable: "false"
-glpi_db_watchtower_enable: "false"
+glpi_watchtower_enabled: false
+glpi_db_watchtower_enabled: false

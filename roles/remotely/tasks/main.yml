@@ -27,9 +27,9 @@
           Remotely_ConnectionStrings__SQLite: "Data Source=/app/AppData/Remotely.db"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ remotely_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ remotely_watchtower_enable }}"
-          dockflare.enable: "{{ remotely_dockflare_tunnel }}"
+          autoheal: "{{ remotely_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ remotely_watchtower_enabled| string }}"
+          dockflare.enable: "{{ remotely_dockflare_enabled | string }}"
           dockflare.access.group: "{{ remotely_dockflare_access_group }}"
           dockflare.hostname: "{{ remotely_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ remotely_port_http }}"
@@ -41,8 +41,8 @@
           homepage.description: "{{ 'A remote control and remote scripting solution, built with .NET 8, Blazor, and SignalR.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ remotely_container_name }}"
-          homepage.showStats: "{{ remotely_homepage_showstats }}"
-          repliqate.enabled: "{{ remotely_repliqate_enabled }}"
+          homepage.showStats: "{{ remotely_homepage_showstats | string }}"
+          repliqate.enabled: "{{ remotely_repliqate_enabled | string }}"
           repliqate.engine: "{{ remotely_repliqate_engine }}"
           repliqate.schedule: "{{ remotely_repliqate_schedule }}"
           repliqate.backup_id: "{{ remotely_repliqate_backup_id }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (remotely_port_http | string)] +
-                (['https://' + remotely_hostname + '.' + ansible_nas_domain] if (remotely_available_externally is true or remotely_dockflare_tunnel is true) else [])
+                (['https://' + remotely_hostname + '.' + ansible_nas_domain] if (remotely_available_externally is true or remotely_dockflare_enabled is true) else [])
               }}
   when: remotely_enabled is true
 

@@ -35,9 +35,9 @@
           PGID: "{{ tautulli_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ tautulli_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tautulli_watchtower_enable }}"
-          dockflare.enable: "{{ tautulli_dockflare_tunnel }}"
+          autoheal: "{{ tautulli_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tautulli_watchtower_enabled| string }}"
+          dockflare.enable: "{{ tautulli_dockflare_enabled | string }}"
           dockflare.access.group: "{{ tautulli_dockflare_access_group }}"
           dockflare.hostname: "{{ tautulli_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tautulli_port_http }}"
@@ -48,9 +48,9 @@
           homepage.description: "{{ 'a python based web application for monitoring, analytics and notifications for Plex Media Server' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tautulli_container_name }}"
-          homepage.showStats: "{{ tautulli_homepage_showstats }}"
+          homepage.showStats: "{{ tautulli_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tautulli_port_http }}"
-          repliqate.enabled: "{{ tautulli_repliqate_enabled }}"
+          repliqate.enabled: "{{ tautulli_repliqate_enabled | string }}"
           repliqate.engine: "{{ tautulli_repliqate_engine }}"
           repliqate.schedule: "{{ tautulli_repliqate_schedule }}"
           repliqate.backup_id: "{{ tautulli_repliqate_backup_id }}"
@@ -76,7 +76,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tautulli_port_http | string)] +
-                (['https://' + tautulli_hostname + '.' + ansible_nas_domain] if (tautulli_available_externally is true or tautulli_dockflare_tunnel is true) else [])
+                (['https://' + tautulli_hostname + '.' + ansible_nas_domain] if (tautulli_available_externally is true or tautulli_dockflare_enabled is true) else [])
               }}
   when: tautulli_enabled is true
 

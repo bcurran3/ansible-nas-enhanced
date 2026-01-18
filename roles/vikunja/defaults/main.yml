@@ -50,22 +50,22 @@ vikunja_env_vikunja_mailer_queuetimeout: "30" # timeout in seconds after which t
 vikunja_env_vikunja_mailer_forcessl: "false" # Vikunja will try to connect with starttls, use this option to force it to use ssl
 
 # autoheal
-vikunja_autoheal: "false"
-vikunja_db_autoheal: "false"
+vikunja_autoheal: false
+vikunja_db_autoheal: false
 
 # dockflare
-vikunja_dockflare_tunnel: false
+vikunja_dockflare_enabled: false
 vikunja_dockflare_access_group: ""
 
 # homepage
 vikunja_homepage_group: "Apps"
 vikunja_homepage_icon: "vikunja.png"
 vikunja_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vikunja_port_http }}"
-vikunja_homepage_showstats: "false"
+vikunja_homepage_showstats: false
 vikunja_db_homepage_group: "DBs"
 vikunja_db_homepage_icon: "postgres.png"
 vikunja_db_homepage_href: "{{ vikunja_homepage_href }}"
-vikunja_db_homepage_showstats: "false"
+vikunja_db_homepage_showstats: false
 
 # repliqate
 vikunja_repliqate_enabled: false
@@ -73,7 +73,7 @@ vikunja_repliqate_engine: "restic"
 vikunja_repliqate_schedule: "@daily 3am"
 vikunja_repliqate_backup_id: "{{ vikunja_container_name }}"
 vikunja_repliqate_retention: "30d"
-vikunja_db_repliqate_enabled: "false"
+vikunja_db_repliqate_enabled: false
 vikunja_db_repliqate_engine: "restic"
 vikunja_db_repliqate_schedule: "@daily 3am"
 vikunja_db_repliqate_backup_id: "{{ vikunja_db_container_name }}"
@@ -83,5 +83,5 @@ vikunja_db_repliqate_retention: "30d"
 vikunja_tinyauth_enabled: false
 
 # watchtower
-vikunja_watchtower_enable: false
-vikunja_db_watchtower_enable: "false"
+vikunja_watchtower_enabled: false
+vikunja_db_watchtower_enabled: false

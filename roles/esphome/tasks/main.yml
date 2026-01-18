@@ -25,9 +25,9 @@
           PUID: "{{ esphome_user_id }}"
           PGID: "{{ esphome_group_id }}"
         labels:
-          autoheal: "{{ esphome_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ esphome_watchtower_enable }}"
-          dockflare.enable: "{{ esphome_dockflare_tunnel }}"
+          autoheal: "{{ esphome_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ esphome_watchtower_enabled| string }}"
+          dockflare.enable: "{{ esphome_dockflare_enabled | string }}"
           dockflare.access.group: "{{ esphome_dockflare_access_group }}"
           dockflare.hostname: "{{ esphome_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ esphome_port_http }}"
@@ -38,9 +38,9 @@
           homepage.description: "{{ 'a system to control your ESP8266/ESP32' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ esphome_container_name }}"
-          homepage.showStats: "{{ esphome_homepage_showstats }}"
+          homepage.showStats: "{{ esphome_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ esphome_port_http }}"
-          repliqate.enabled: "{{ esphome_repliqate_enabled }}"
+          repliqate.enabled: "{{ esphome_repliqate_enabled | string }}"
           repliqate.engine: "{{ esphome_repliqate_engine }}"
           repliqate.schedule: "{{ esphome_repliqate_schedule }}"
           repliqate.backup_id: "{{ esphome_repliqate_backup_id }}"
@@ -66,7 +66,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (esphome_port_http | string)] +
-                (['https://' + esphome_hostname + '.' + ansible_nas_domain] if (esphome_available_externally is true or esphome_dockflare_tunnel is true) else [])
+                (['https://' + esphome_hostname + '.' + ansible_nas_domain] if (esphome_available_externally is true or esphome_dockflare_enabled is true) else [])
               }}
   when: esphome_enabled is true
 

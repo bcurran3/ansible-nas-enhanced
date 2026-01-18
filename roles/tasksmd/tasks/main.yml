@@ -28,9 +28,9 @@
           PGID: "{{ tasksmd_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ tasksmd_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tasksmd_watchtower_enable }}"
-          dockflare.enable: "{{ tasksmd_dockflare_tunnel }}"
+          autoheal: "{{ tasksmd_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tasksmd_watchtower_enabled| string }}"
+          dockflare.enable: "{{ tasksmd_dockflare_enabled | string }}"
           dockflare.access.group: "{{ tasksmd_dockflare_access_group }}"
           dockflare.hostname: "{{ tasksmd_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tasksmd_port_http }}"
@@ -42,8 +42,8 @@
           homepage.description: "{{ 'a self-hosted, Markdown file based task management board' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tasksmd_container_name }}"
-          homepage.showStats: "{{ tasksmd_homepage_showstats }}"
-          repliqate.enabled: "{{ tasksmd_repliqate_enabled }}"
+          homepage.showStats: "{{ tasksmd_homepage_showstats | string }}"
+          repliqate.enabled: "{{ tasksmd_repliqate_enabled | string }}"
           repliqate.engine: "{{ tasksmd_repliqate_engine }}"
           repliqate.schedule: "{{ tasksmd_repliqate_schedule }}"
           repliqate.backup_id: "{{ tasksmd_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tasksmd_port_http | string)] +
-                (['https://' + tasksmd_hostname + '.' + ansible_nas_domain] if (tasksmd_available_externally is true or tasksmd_dockflare_tunnel is true) else [])
+                (['https://' + tasksmd_hostname + '.' + ansible_nas_domain] if (tasksmd_available_externally is true or tasksmd_dockflare_enabled is true) else [])
               }}
   when: tasksmd_enabled is true
 

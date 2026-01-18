@@ -27,9 +27,9 @@
           HOMEBRIDGE_CONFIG_UI: "1"
           HOMEBRIDGE_CONFIG_UI_PORT: "{{ homebridge_port_http }}"
         labels:
-          autoheal: "{{ homebridge_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ homebridge_watchtower_enable }}"
-          dockflare.enable: "{{ homebridge_dockflare_tunnel }}"
+          autoheal: "{{ homebridge_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ homebridge_watchtower_enabled| string }}"
+          dockflare.enable: "{{ homebridge_dockflare_enabled | string }}"
           dockflare.access.group: "{{ homebridge_dockflare_access_group }}"
           dockflare.hostname: "{{ homebridge_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebridge_port_http }}"
@@ -40,13 +40,13 @@
           homepage.description: "{{ 'homebridge description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ homebridge_container_name }}"
-          homepage.showStats: "{{ homebridge_homepage_showstats }}"
+          homepage.showStats: "{{ homebridge_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebridge_port_http }}"
           homepage.widget.type: "homebridge"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebridge_port_http }}"
           homepage.widget.username: "{{ homebridge_homepage_widget_username }}"
           homepage.widget.password: "{{ homebridge_homepage_widget_password }}"
-          repliqate.enabled: "{{ homebridge_repliqate_enabled }}"
+          repliqate.enabled: "{{ homebridge_repliqate_enabled | string }}"
           repliqate.engine: "{{ homebridge_repliqate_engine }}"
           repliqate.schedule: "{{ homebridge_repliqate_schedule }}"
           repliqate.backup_id: "{{ homebridge_repliqate_backup_id }}"
@@ -72,7 +72,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (homebridge_port_http | string)] +
-                (['https://' + homebridge_hostname + '.' + ansible_nas_domain] if (homebridge_available_externally is true or homebridge_dockflare_tunnel is true) else [])
+                (['https://' + homebridge_hostname + '.' + ansible_nas_domain] if (homebridge_available_externally is true or homebridge_dockflare_enabled is true) else [])
               }}
   when: homebridge_enabled is true
 

@@ -19,7 +19,7 @@
             if dns_exists
             else
             "DNS record not found. External access to be configured."
-            if (rocket_chat_available_externally | bool or rocket_chat_dockflare_tunnel | bool)
+            if (rocket_chat_available_externally | bool or rocket_chat_dockflare_enabled | bool)
             else
             "DNS record not found. External access not configured. Skipping container creation."
           }}
@@ -71,8 +71,8 @@
               retries: "10"
               start_period: "30s"
             labels:
-              autoheal: "{{ rocket_chat_db_autoheal }}"
-              com.centurylinklabs.watchtower.enable: "{{ rocket_chat_db_watchtower_enable }}"
+              autoheal: "{{ rocket_chat_db_autoheal | string }}"
+              com.centurylinklabs.watchtower.enable: "{{ rocket_chat_db_watchtower_enabled| string }}"
               dockflare.enable: "false"
               homepage.name: "{{ ansible_nas_app_name }} MongoDB"
               homepage.group: "{{ rocket_chat_db_homepage_group }}"
@@ -81,8 +81,8 @@
               homepage.description: "{{ 'The MongoDB Database' if homepage_show_description else omit }}"
               homepage.server: "my-docker"
               homepage.container: "{{ rocket_chat_db_container_name }}"
-              homepage.showStats: "{{ rocket_chat_db_homepage_showstats }}"
-              repliqate.enabled: "{{ rocket_chat_db_repliqate_enabled }}"
+              homepage.showStats: "{{ rocket_chat_db_homepage_showstats | string }}"
+              repliqate.enabled: "{{ rocket_chat_db_repliqate_enabled | string }}"
               repliqate.engine: "{{ rocket_chat_db_repliqate_engine }}"
               repliqate.schedule: "{{ rocket_chat_db_repliqate_schedule }}"
               repliqate.backup_id: "{{ rocket_chat_db_repliqate_backup_id }}"
@@ -126,9 +126,9 @@
             links:
               - "{{ rocket_chat_db_container_name }}"
             labels:
-              autoheal: "{{ rocket_chat_autoheal }}"
-              com.centurylinklabs.watchtower.enable: "{{ rocket_chat_watchtower_enable }}"
-              dockflare.enable: "{{ rocket_chat_dockflare_tunnel }}"
+              autoheal: "{{ rocket_chat_autoheal | string }}"
+              com.centurylinklabs.watchtower.enable: "{{ rocket_chat_watchtower_enabled| string }}"
+              dockflare.enable: "{{ rocket_chat_dockflare_enabled | string }}"
               dockflare.access.group: "{{ rocket_chat_dockflare_access_group }}"
               dockflare.hostname: "{{ rocket_chat_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
@@ -140,8 +140,8 @@
               homepage.description: "{{ 'The communications platform that puts data protection first.' if homepage_show_description else omit }}"
               homepage.server: "my-docker"
               homepage.container: "{{ rocket_chat_container_name }}"
-              homepage.showStats: "{{ rocket_chat_homepage_showstats }}"
-              repliqate.enabled: "{{ rocket_chat_repliqate_enabled }}"
+              homepage.showStats: "{{ rocket_chat_homepage_showstats | string }}"
+              repliqate.enabled: "{{ rocket_chat_repliqate_enabled | string }}"
               repliqate.engine: "{{ rocket_chat_repliqate_engine }}"
               repliqate.schedule: "{{ rocket_chat_repliqate_schedule }}"
               repliqate.backup_id: "{{ rocket_chat_repliqate_backup_id }}"
@@ -165,11 +165,11 @@
           ansible.builtin.debug:
             msg: >-
                   {{
-                    (['https://' + rocket_chat_hostname + '.' + ansible_nas_domain] if (rocket_chat_available_externally is true or rocket_chat_dockflare_tunnel is true) else [])
+                    (['https://' + rocket_chat_hostname + '.' + ansible_nas_domain] if (rocket_chat_available_externally is true or rocket_chat_dockflare_enabled is true) else [])
                   }}
       when:
         - dns_exists
-        - (rocket_chat_dockflare_tunnel | bool or rocket_chat_available_externally | bool)
+        - (rocket_chat_dockflare_enabled | bool or rocket_chat_available_externally | bool)
   when: rocket_chat_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

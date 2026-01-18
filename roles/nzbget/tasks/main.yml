@@ -32,9 +32,9 @@
           PGID: "{{ nzbget_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ nzbget_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ nzbget_watchtower_enable }}"
-          dockflare.enable: "{{ nzbget_dockflare_tunnel }}"
+          autoheal: "{{ nzbget_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ nzbget_watchtower_enabled| string }}"
+          dockflare.enable: "{{ nzbget_dockflare_enabled | string }}"
           dockflare.access.group: "{{ nzbget_dockflare_access_group }}"
           dockflare.hostname: "{{ nzbget_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nzbget_port_http }}"
@@ -45,13 +45,13 @@
           homepage.description: "{{ 'nzbget description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nzbget_container_name }}"
-          homepage.showStats: "{{ nzbget_homepage_showstats }}"
+          homepage.showStats: "{{ nzbget_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nzbget_port_http }}"
           homepage.widget.type: "nzbget"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nzbget_port_http }}"
           homepage.widget.username: "{{ nzbget_homepage_widget_username }}"
           homepage.widget.password: "{{ nzbget_homepage_widget_password }}"
-          repliqate.enabled: "{{ nzbget_repliqate_enabled }}"
+          repliqate.enabled: "{{ nzbget_repliqate_enabled | string }}"
           repliqate.engine: "{{ nzbget_repliqate_engine }}"
           repliqate.schedule: "{{ nzbget_repliqate_schedule }}"
           repliqate.backup_id: "{{ nzbget_repliqate_backup_id }}"
@@ -77,7 +77,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (nzbget_port_http | string)] +
-                (['https://' + nzbget_hostname + '.' + ansible_nas_domain] if (nzbget_available_externally is true or nzbget_dockflare_tunnel is true) else [])
+                (['https://' + nzbget_hostname + '.' + ansible_nas_domain] if (nzbget_available_externally is true or nzbget_dockflare_enabled is true) else [])
               }}
   when: nzbget_enabled is true
 

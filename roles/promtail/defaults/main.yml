@@ -26,20 +26,20 @@ promtail_memory: "1G"
 promtail_loki_url: http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ loki_http_port }}/loki/api/v1/push
 
 # autoheal
-promtail_autoheal: "false"
+promtail_autoheal: false
 
 # dockflare
-promtail_dockflare_tunnel: "false"
+promtail_dockflare_enabled: false
 promtail_dockflare_access_group: ""
 
 # homepage
 promtail_homepage_group: "Apps"
 promtail_homepage_icon: "promtail.png"
 promtail_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ promtail_port_http }}"
-promtail_homepage_showstats: "false"
+promtail_homepage_showstats: false
 
 # repliqate
-promtail_repliqate_enabled: "false"
+promtail_repliqate_enabled: false
 promtail_repliqate_engine: "restic"
 promtail_repliqate_schedule: "@daily 3am"
 promtail_repliqate_backup_id: "{{ promtail_container_name }}"
@@ -49,4 +49,4 @@ promtail_repliqate_retention: "30d"
 promtail_tinyauth_enabled: false
 
 # watchtower
-promtail_watchtower_enable: "false"
+promtail_watchtower_enabled: false

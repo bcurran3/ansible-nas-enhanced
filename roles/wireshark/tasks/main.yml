@@ -57,8 +57,8 @@
           - NET_ADMIN
           - NET_RAW
         labels:
-          autoheal: "{{ wireshark_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ wireshark_watchtower_enable }}"
+          autoheal: "{{ wireshark_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ wireshark_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ wireshark_homepage_group }}"
@@ -67,9 +67,9 @@
           homepage.description: "{{ 'network traffic analyzer' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wireshark_container_name }}"
-          homepage.showStats: "{{ wireshark_homepage_showstats }}"
+          homepage.showStats: "{{ wireshark_homepage_showstats | string }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:3001"
-          repliqate.enabled: "{{ wireshark_repliqate_enabled }}"
+          repliqate.enabled: "{{ wireshark_repliqate_enabled | string }}"
           repliqate.engine: "{{ wireshark_repliqate_engine }}"
           repliqate.schedule: "{{ wireshark_repliqate_schedule }}"
           repliqate.backup_id: "{{ wireshark_repliqate_backup_id }}"

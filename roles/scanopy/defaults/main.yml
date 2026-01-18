@@ -47,27 +47,27 @@ scanopy_daemon_env_scanopy_mode: "Push"
 scanopy_daemon_env_scanopy_integrated_daemon_url: "172.17.0.1"
 
 # autoheal
-scanopy_autoheal: "false"
-scanopy_db_autoheal: "false"
-scanopy_daemon_autoheal: "false"
+scanopy_autoheal: false
+scanopy_db_autoheal: false
+scanopy_daemon_autoheal: false
 
 # dockflare
-scanopy_dockflare_tunnel: false
+scanopy_dockflare_enabled: false
 scanopy_dockflare_access_group: ""
 
 # homepage
 scanopy_homepage_group: "Apps"
 scanopy_homepage_icon: "scanopy.png"
 scanopy_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
-scanopy_homepage_showstats: "false"
+scanopy_homepage_showstats: false
 scanopy_db_homepage_group: "DBs"
 scanopy_db_homepage_icon: "postgres.png"
 scanopy_db_homepage_href: "{{ scanopy_homepage_href }}"
-scanopy_db_homepage_showstats: "false"
+scanopy_db_homepage_showstats: false
 scanopy_daemon_homepage_group: "Misc"
 scanopy_daemon_homepage_icon: "scanopy.png"
 scanopy_daemon_homepage_href: "{{ scanopy_homepage_href }}"
-scanopy_daemon_homepage_showstats: "false"
+scanopy_daemon_homepage_showstats: false
 
 # repliqate
 scanopy_repliqate_enabled: false
@@ -75,12 +75,12 @@ scanopy_repliqate_engine: "restic"
 scanopy_repliqate_schedule: "@daily 3am"
 scanopy_repliqate_backup_id: "{{ scanopy_container_name }}"
 scanopy_repliqate_retention: "30d"
-scanopy_db_repliqate_enabled: "false"
+scanopy_db_repliqate_enabled: false
 scanopy_db_repliqate_engine: "restic"
 scanopy_db_repliqate_schedule: "@daily 3am"
 scanopy_db_repliqate_backup_id: "{{ scanopy_db_container_name }}"
 scanopy_db_repliqate_retention: "30d"
-scanopy_daemon_repliqate_enabled: "false"
+scanopy_daemon_repliqate_enabled: false
 scanopy_daemon_repliqate_engine: "restic"
 scanopy_daemon_repliqate_schedule: "@daily 3am"
 scanopy_daemon_repliqate_backup_id: "{{ scanopy_db_container_name }}"
@@ -90,6 +90,6 @@ scanopy_daemon_repliqate_retention: "30d"
 scanopy_tinyauth_enabled: false
 
 # watchtower
-scanopy_watchtower_enable: false
-scanopy_db_watchtower_enable: "false"
-scanopy_daemon_watchtower_enable: "false"
+scanopy_watchtower_enabled: false
+scanopy_db_watchtower_enabled: false
+scanopy_daemon_watchtower_enabled: false

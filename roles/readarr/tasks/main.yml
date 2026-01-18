@@ -37,9 +37,9 @@
         ports:
           - "{{ readarr_port_http }}:8787"
         labels:
-          autoheal: "{{ readarr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ readarr_watchtower_enable }}"
-          dockflare.enable: "{{ readarr_dockflare_tunnel }}"
+          autoheal: "{{ readarr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ readarr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ readarr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ readarr_dockflare_access_group }}"
           dockflare.hostname: "{{ readarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ readarr_port_http }}"
@@ -51,11 +51,11 @@
           homepage.description: "{{ 'Book Manager and Automation (Sonarr for Ebooks)' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ readarr_container_name }}"
-          homepage.showStats: "{{ readarr_homepage_showstats }}"
+          homepage.showStats: "{{ readarr_homepage_showstats | string }}"
           homepage.widget.type: "readarr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ readarr_port_http }}"
           homepage.widget.key: "{{ readarr_homepage_widget_key }}"
-          repliqate.enabled: "{{ readarr_repliqate_enabled }}"
+          repliqate.enabled: "{{ readarr_repliqate_enabled | string }}"
           repliqate.engine: "{{ readarr_repliqate_engine }}"
           repliqate.schedule: "{{ readarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ readarr_repliqate_backup_id }}"
@@ -79,7 +79,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (readarr_port_http | string)] +
-                (['https://' + readarr_hostname + '.' + ansible_nas_domain] if (readarr_available_externally is true or readarr_dockflare_tunnel is true) else [])
+                (['https://' + readarr_hostname + '.' + ansible_nas_domain] if (readarr_available_externally is true or readarr_dockflare_enabled is true) else [])
               }}
   when: readarr_enabled is true
 

@@ -32,8 +32,8 @@
               start_period: "20s"
         labels:
           autoheal: "{{ jellyseerr_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ jellyseerr_watchtower_enable | string }}"
-          dockflare.enable: "{{ jellyseerr_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ jellyseerr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ jellyseerr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ jellyseerr_dockflare_access_group }}"
           dockflare.hostname: "{{ jellyseerr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyseerr_port_http }}"
@@ -44,7 +44,7 @@
           homepage.description: "{{ 'a free and open source software application for managing requests for your media library' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ jellyseerr_container_name }}"
-          homepage.showStats: "{{ jellyseerr_homepage_showstats }}"
+          homepage.showStats: "{{ jellyseerr_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyseerr_port_http }}"
           homepage.widget.type: "jellyseerr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ jellyseerr_port_http }}"
@@ -75,7 +75,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (jellyseerr_port_http | string)] +
-                (['https://' + jellyseerr_hostname + '.' + ansible_nas_domain] if (jellyseerr_available_externally is true or jellyseerr_dockflare_tunnel is true) else [])
+                (['https://' + jellyseerr_hostname + '.' + ansible_nas_domain] if (jellyseerr_available_externally is true or jellyseerr_dockflare_enabled is true) else [])
               }}
   when: jellyseerr_enabled is true
 

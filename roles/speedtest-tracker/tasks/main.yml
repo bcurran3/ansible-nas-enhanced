@@ -33,9 +33,9 @@
           PGID: " {{ speedtest_tracker_pgid }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ speedtest_tracker_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ speedtest_tracker_watchtower_enable }}"
-          dockflare.enable: "{{ speedtest_tracker_dockflare_tunnel }}"
+          autoheal: "{{ speedtest_tracker_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ speedtest_tracker_watchtower_enabled| string }}"
+          dockflare.enable: "{{ speedtest_tracker_dockflare_enabled | string }}"
           dockflare.access.group: "{{ speedtest_tracker_dockflare_access_group }}"
           dockflare.hostname: "{{ speedtest_tracker_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ speedtest_tracker_port_http }}"
@@ -47,11 +47,11 @@
           homepage.description: "{{ 'Continuously track your internet speed' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ speedtest_tracker_container_name }}"
-          homepage.showStats: "{{ speedtest_tracker_homepage_showstats }}"
+          homepage.showStats: "{{ speedtest_tracker_homepage_showstats | string }}"
           homepage.widget.type: "speedtest"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ speedtest_tracker_port_http }}"
           homepage.widget.version: "{{ speedtest_tracker_homepage_widget_version }}"
-          repliqate.enabled: "{{ speedtest_tracker_repliqate_enabled }}"
+          repliqate.enabled: "{{ speedtest_tracker_repliqate_enabled | string }}"
           repliqate.engine: "{{ speedtest_tracker_repliqate_engine }}"
           repliqate.schedule: "{{ speedtest_tracker_repliqate_schedule }}"
           repliqate.backup_id: "{{ speedtest_tracker_repliqate_backup_id }}"
@@ -77,7 +77,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (speedtest_tracker_port_http | string)] +
-                (['https://' + speedtest_tracker_hostname + '.' + ansible_nas_domain] if (speedtest_tracker_available_externally is true or speedtest_tracker_dockflare_tunnel is true) else [])
+                (['https://' + speedtest_tracker_hostname + '.' + ansible_nas_domain] if (speedtest_tracker_available_externally is true or speedtest_tracker_dockflare_enabled is true) else [])
               }}
   when: speedtest_tracker_enabled is true
 

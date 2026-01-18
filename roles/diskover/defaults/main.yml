@@ -35,22 +35,22 @@ diskover_elasticsearch_memory: "2g"
 diskover_elasticsearch_memory_swap: -1
 
 # autoheal
-diskover_autoheal: "false"
-diskover_elasticsearch_autoheal: "false"
+diskover_autoheal: false
+diskover_elasticsearch_autoheal: false
 
 # dockflare
-diskover_dockflare_tunnel: "false"
+diskover_dockflare_enabled: false
 diskover_dockflare_access_group: ""
 
 # homepage
 diskover_homepage_group: "Apps"
 diskover_homepage_icon: "diskover.png"
 diskover_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_port_http }}"
-diskover_homepage_showstats: "false"
+diskover_homepage_showstats: false
 diskover_elasticsearch_homepage_group: "Apps"
 diskover_elasticsearch_homepage_icon: "elasticsearch.png"
 diskover_elasticsearch_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ diskover_elasticsearch_port_http }}"
-diskover_elasticsearch_homepage_showstats: "false"
+diskover_elasticsearch_homepage_showstats: false
 
 # linuxserver.io docker mods
 diskover_env_docker_mods: ""
@@ -58,12 +58,12 @@ diskover_env_docker_mods_install_packages: ""
 diskover_env_docker_mods_install_pip_packages: ""
 
 # repliqate
-diskover_repliqate_enabled: "false"
+diskover_repliqate_enabled: false
 diskover_repliqate_engine: "restic"
 diskover_repliqate_schedule: "@daily 3am"
 diskover_repliqate_backup_id: "{{ diskover_container_name }}"
 diskover_repliqate_retention: "30d"
-diskover_elasticsearch_repliqate_enabled: "false"
+diskover_elasticsearch_repliqate_enabled: false
 diskover_elasticsearch_repliqate_engine: "restic"
 diskover_elasticsearch_repliqate_schedule: "@daily 3am"
 diskover_elasticsearch_repliqate_backup_id: "{{ diskover_elasticsearch_container_name }}"
@@ -74,5 +74,5 @@ diskover_tinyauth_enabled: false
 diskover_elasticsearch_tinyauth_enabled: false
 
 # watchtower
-diskover_watchtower_enable: "false"
-diskover_elasticsearch_watchtower_enable: "false"
+diskover_watchtower_enabled: false
+diskover_elasticsearch_watchtower_enabled: false

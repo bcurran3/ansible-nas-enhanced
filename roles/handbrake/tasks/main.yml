@@ -55,9 +55,9 @@
           GROUP_ID: "{{ handbrake_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ handbrake_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ handbrake_watchtower_enable }}"
-          dockflare.enable: "{{ handbrake_dockflare_tunnel }}"
+          autoheal: "{{ handbrake_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ handbrake_watchtower_enabled| string }}"
+          dockflare.enable: "{{ handbrake_dockflare_enabled | string }}"
           dockflare.access.group: "{{ handbrake_dockflare_access_group }}"
           dockflare.hostname: "{{ handbrake_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ handbrake_port_http }}"
@@ -69,8 +69,8 @@
           homepage.description: "{{ 'an open-source, GPL-licensed, multiplatform video transcoder.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ handbrake_container_name }}"
-          homepage.showStats: "{{ handbrake_homepage_showstats }}"
-          repliqate.enabled: "{{ handbrake_repliqate_enabled }}"
+          homepage.showStats: "{{ handbrake_homepage_showstats | string }}"
+          repliqate.enabled: "{{ handbrake_repliqate_enabled | string }}"
           repliqate.engine: "{{ handbrake_repliqate_engine }}"
           repliqate.schedule: "{{ handbrake_repliqate_schedule }}"
           repliqate.backup_id: "{{ handbrake_repliqate_backup_id }}"
@@ -96,7 +96,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (handbrake_port_http | string)] +
-                (['https://' + handbrake_hostname + '.' + ansible_nas_domain] if (handbrake_available_externally is true or handbrake_dockflare_tunnel is true) else [])
+                (['https://' + handbrake_hostname + '.' + ansible_nas_domain] if (handbrake_available_externally is true or handbrake_dockflare_enabled is true) else [])
               }}
   when: handbrake_enabled is true
 

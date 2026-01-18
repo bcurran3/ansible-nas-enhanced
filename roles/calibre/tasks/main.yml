@@ -48,9 +48,9 @@
           - "{{ calibre_port_websocket }}:{{ calibre_port_websocket }}"
         security_opts: "{{ calibre_security_opts }}"
         labels:
-          autoheal: "{{ calibre_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ calibre_watchtower_enable }}"
-          dockflare.enable: "{{ calibre_dockflare_tunnel }}"
+          autoheal: "{{ calibre_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ calibre_watchtower_enabled| string }}"
+          dockflare.enable: "{{ calibre_dockflare_enabled | string }}"
           dockflare.access.group: "{{ calibre_dockflare_access_group }}"
           dockflare.hostname: "{{ calibre_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_port_http }}"
@@ -61,9 +61,9 @@
           homepage.description: "{{ 'a powerful and easy to use e-book manager' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ calibre_container_name }}"
-          homepage.showStats: "{{ calibre_homepage_showstats }}"
+          homepage.showStats: "{{ calibre_homepage_showstats | string }}"
           homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_port_https }}"
-          repliqate.enabled: "{{ calibre_repliqate_enabled }}"
+          repliqate.enabled: "{{ calibre_repliqate_enabled | string }}"
           repliqate.engine: "{{ calibre_repliqate_engine }}"
           repliqate.schedule: "{{ calibre_repliqate_schedule }}"
           repliqate.backup_id: "{{ calibre_repliqate_backup_id }}"
@@ -90,7 +90,7 @@
         msg: >-
               {{
                 ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (calibre_port_https | string)] +
-                (['https://' + calibre_hostname + '.' + ansible_nas_domain] if (calibre_available_externally is true or calibre_dockflare_tunnel is true) else [])
+                (['https://' + calibre_hostname + '.' + ansible_nas_domain] if (calibre_available_externally is true or calibre_dockflare_enabled is true) else [])
               }}
   when: calibre_enabled is true
 

@@ -41,22 +41,22 @@ piwigo_db_memory: "1G"
 piwigo_version: "docker"
 
 # autoheal
-piwigo_autoheal: "false"
-piwigo_db_autoheal: "false"
+piwigo_autoheal: false
+piwigo_db_autoheal: false
 
 # dockflare
-piwigo_dockflare_tunnel: "false"
+piwigo_dockflare_enabled: false
 piwigo_dockflare_access_group: ""
 
 # homepage
 piwigo_homepage_group: "Apps"
 piwigo_homepage_icon: "piwigo.png"
 piwigo_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ piwigo_port_http }}"
-piwigo_homepage_showstats: "false"
+piwigo_homepage_showstats: false
 piwigo_db_homepage_group: "DBs"
 piwigo_db_homepage_icon: "mysql.png"
 piwigo_db_homepage_href: "{{ piwigo_homepage_href }}"
-piwigo_db_homepage_showstats: "false"
+piwigo_db_homepage_showstats: false
 
 # linuxserver.io docker mods
 piwigo_env_docker_mods: ""
@@ -64,12 +64,12 @@ piwigo_env_docker_mods_install_packages: ""
 piwigo_env_docker_mods_install_pip_packages: ""
 
 # repliqate
-piwigo_repliqate_enabled: "false"
+piwigo_repliqate_enabled: false
 piwigo_repliqate_engine: "restic"
 piwigo_repliqate_schedule: "@daily 3am"
 piwigo_repliqate_backup_id: "{{ piwigo_container_name }}"
 piwigo_repliqate_retention: "30d"
-piwigo_db_repliqate_enabled: "false"
+piwigo_db_repliqate_enabled: false
 piwigo_db_repliqate_engine: "restic"
 piwigo_db_repliqate_schedule: "@daily 3am"
 piwigo_db_repliqate_backup_id: "{{ piwigo_container_name }}"
@@ -79,5 +79,5 @@ piwigo_db_repliqate_retention: "30d"
 piwigo_tinyauth_enabled: false
 
 # watchtower
-piwigo_watchtower_enable: "false"
-piwigo_db_watchtower_enable: "false"
+piwigo_watchtower_enabled: false
+piwigo_db_watchtower_enabled: false

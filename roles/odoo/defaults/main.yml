@@ -26,29 +26,29 @@ odoo_db_cpu_shares: 1024
 odoo_db_memory: "1G"
 
 # autoheal
-odoo_autoheal: "false"
-odoo_db_autoheal: "false"
+odoo_autoheal: false
+odoo_db_autoheal: false
 
 # dockflare
-odoo_dockflare_tunnel: "false"
+odoo_dockflare_enabled: false
 odoo_dockflare_access_group: ""
 
 # homepage
 odoo_homepage_group: "Apps"
 odoo_homepage_icon: "odoo.png"
 odoo_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ odoo_port_http }}"
-odoo_homepage_showstats: "false"
+odoo_homepage_showstats: false
 odoo_db_homepage_group: "DBs"
 odoo_db_homepage_icon: "postgres.png"
-odoo_db_homepage_showstats: "false"
+odoo_db_homepage_showstats: false
 
 # repliqate
-odoo_repliqate_enabled: "false"
+odoo_repliqate_enabled: false
 odoo_repliqate_engine: "restic"
 odoo_repliqate_schedule: "@daily 3am"
 odoo_repliqate_backup_id: "{{ odoo_container_name }}"
 odoo_repliqate_retention: "30d"
-odoo_db_repliqate_enabled: "false"
+odoo_db_repliqate_enabled: false
 odoo_db_repliqate_engine: "restic"
 odoo_db_repliqate_schedule: "@daily 3am"
 odoo_db_repliqate_backup_id: "{{ odoo_container_name }}"
@@ -58,5 +58,5 @@ odoo_db_repliqate_retention: "30d"
 odoo_tinyauth_enabled: false
 
 # watchtower
-odoo_watchtower_enable: "false"
-odoo_db_watchtower_enable: "false"
+odoo_watchtower_enabled: false
+odoo_db_watchtower_enabled: false

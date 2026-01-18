@@ -25,8 +25,8 @@
           MAX_CONCURRENT_CHROME_PROCESSES: "10"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ change_detection_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ change_detection_sockpuppet_watchtower_enable }}"
+          autoheal: "{{ change_detection_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ change_detection_sockpuppet_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "Sock Puppet(eer) Browser"
           homepage.group: "{{ change_detection_sockpuppet_homepage_group }}"
@@ -36,7 +36,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ change_detection_sockpuppet_container_name }}"
-          homepage.showStats: "{{ change_detection_sockpuppet_homepage_showstats }}"
+          homepage.showStats: "{{ change_detection_sockpuppet_homepage_showstats | string }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
@@ -67,9 +67,9 @@
         links:
           - "{{ change_detection_sockpuppet_container_name }}"
         labels:
-          autoheal: "{{ change_detection_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ change_detection_watchtower_enable }}"
-          dockflare.enable: "{{ change_detection_dockflare_tunnel }}"
+          autoheal: "{{ change_detection_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ change_detection_watchtower_enabled| string }}"
+          dockflare.enable: "{{ change_detection_dockflare_enabled | string }}"
           dockflare.access.group: "{{ change_detection_dockflare_access_group }}"
           dockflare.hostname: "{{ change_detection_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
@@ -81,11 +81,11 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ change_detection_container_name }}"
-          homepage.showStats: "{{ change_detection_homepage_showstats }}"
+          homepage.showStats: "{{ change_detection_homepage_showstats | string }}"
           homepage.widget.type: "changedetectionio"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
           homepage.widget.key: "{{ change_detection_widget_key }}"
-          repliqate.enabled: "{{ change_detection_repliqate_enabled }}"
+          repliqate.enabled: "{{ change_detection_repliqate_enabled | string }}"
           repliqate.engine: "{{ change_detection_repliqate_engine }}"
           repliqate.schedule: "{{ change_detection_repliqate_schedule }}"
           repliqate.backup_id: "{{ change_detection_repliqate_backup_id }}"
@@ -111,7 +111,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (change_detection_port_http | string)] +
-                (['https://' + change_detection_hostname + '.' + ansible_nas_domain] if (change_detection_available_externally is true or change_detection_dockflare_tunnel is true) else [])
+                (['https://' + change_detection_hostname + '.' + ansible_nas_domain] if (change_detection_available_externally is true or change_detection_dockflare_enabled is true) else [])
               }}
   when: change_detection_enabled is true
 

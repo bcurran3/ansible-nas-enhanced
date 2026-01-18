@@ -32,7 +32,7 @@
           start_period: 30s
         labels:
           autoheal: "{{ vikunja_db_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ vikunja_db_watchtower_enable | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ vikunja_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ vikunja_db_homepage_group }}"
@@ -41,7 +41,7 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vikunja_db_container_name }}"
-          homepage.showStats: "{{ vikunja_db_homepage_showstats }}"
+          homepage.showStats: "{{ vikunja_db_homepage_showstats | string }}"
           repliqate.enabled: "{{ vikunja_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ vikunja_db_repliqate_engine }}"
           repliqate.schedule: "{{ vikunja_db_repliqate_schedule }}"
@@ -94,8 +94,8 @@
           - "{{ vikunja_db_container_name }}"
         labels:
           autoheal: "{{ vikunja_autoheal | string }}"
-          com.centurylinklabs.watchtower.enable: "{{ vikunja_watchtower_enable | string }}"
-          dockflare.enable: "{{ vikunja_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ vikunja_watchtower_enabled| string }}"
+          dockflare.enable: "{{ vikunja_dockflare_enabled | string }}"
           dockflare.access.group: "{{ vikunja_dockflare_access_group }}"
           dockflare.hostname: "{{ vikunja_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vikunja_port_http }}"
@@ -106,7 +106,7 @@
           homepage.description: "{{ 'to-do app to organize your life' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ vikunja_container_name }}"
-          homepage.showStats: "{{ vikunja_homepage_showstats }}"
+          homepage.showStats: "{{ vikunja_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vikunja_port_http }}"
           repliqate.enabled: "{{ vikunja_repliqate_enabled | string }}"
           repliqate.engine: "{{ vikunja_repliqate_engine }}"
@@ -134,7 +134,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (vikunja_port_http | string)] +
-                (['https://' + vikunja_hostname + '.' + ansible_nas_domain] if (vikunja_available_externally is true or vikunja_dockflare_tunnel is true) else [])
+                (['https://' + vikunja_hostname + '.' + ansible_nas_domain] if (vikunja_available_externally is true or vikunja_dockflare_enabled is true) else [])
               }}
   when: vikunja_enabled is true
 

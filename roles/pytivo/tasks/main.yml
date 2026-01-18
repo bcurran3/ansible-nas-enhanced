@@ -33,9 +33,9 @@
           PUID: "{{ pytivo_user_id }}"
           PGID: "{{ pytivo_group_id }}"
         labels:
-          autoheal: "{{ pytivo_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ pytivo_watchtower_enable }}"
-          dockflare.enable: "{{ pytivo_dockflare_tunnel }}"
+          autoheal: "{{ pytivo_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ pytivo_watchtower_enabled| string }}"
+          dockflare.enable: "{{ pytivo_dockflare_enabled | string }}"
           dockflare.access.group: "{{ pytivo_dockflare_access_group }}"
           dockflare.hostname: "{{ pytivo_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:9032"
@@ -46,9 +46,9 @@
           homepage.description: "{{ 'pytivo description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pytivo_container_name }}"
-          homepage.showStats: "{{ pytivo_homepage_showstats }}"
+          homepage.showStats: "{{ pytivo_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:9032"
-          repliqate.enabled: "{{ pytivo_repliqate_enabled }}"
+          repliqate.enabled: "{{ pytivo_repliqate_enabled | string }}"
           repliqate.engine: "{{ pytivo_repliqate_engine }}"
           repliqate.schedule: "{{ pytivo_repliqate_schedule }}"
           repliqate.backup_id: "{{ pytivo_repliqate_backup_id }}"
@@ -72,7 +72,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':9032'] +
-                (['https://' + pytivo_hostname + '.' + ansible_nas_domain] if (pytivo_available_externally is true or pytivo_dockflare_tunnel is true) else [])
+                (['https://' + pytivo_hostname + '.' + ansible_nas_domain] if (pytivo_available_externally is true or pytivo_dockflare_enabled is true) else [])
               }}
   when: pytivo_enabled is true
 

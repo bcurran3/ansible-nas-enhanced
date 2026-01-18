@@ -36,7 +36,7 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ wekan_db_autoheal }} | string"
+          autoheal: "{{ wekan_db_autoheal | string }} | string"
           com.centurylinklabs.watchtower.enable: "{{ wekan_db_watchtower_enable }} | string"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
@@ -46,7 +46,7 @@
           homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wekan_db_container_name }}"
-          homepage.showStats: "{{ wekan_db_homepage_showstats }}"
+          homepage.showStats: "{{ wekan_db_homepage_showstats | string }}"
           repliqate.enabled: "{{ wekan_db_repliqate_enabled }} | string"
           repliqate.engine: "{{ wekan_db_repliqate_engine }}"
           repliqate.schedule: "{{ wekan_db_repliqate_schedule }}"
@@ -86,8 +86,8 @@
           - "{{ wekan_db_container_name }}"
         labels:
           autoheal: "{{ wekan_autoheal | string }} | string"
-          com.centurylinklabs.watchtower.enable: "{{ wekan_watchtower_enable | string }}"
-          dockflare.enable: "{{ wekan_dockflare_tunnel | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ wekan_watchtower_enabled| string }}"
+          dockflare.enable: "{{ wekan_dockflare_enabled | string }}"
           dockflare.access.group: "{{ wekan_dockflare_access_group }}"
           dockflare.hostname: "{{ wekan_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
@@ -98,7 +98,7 @@
           homepage.description: "{{ 'Open Source kanban' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ wekan_container_name }}"
-          homepage.showStats: "{{ wekan_homepage_showstats }}"
+          homepage.showStats: "{{ wekan_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
           repliqate.enabled: "{{ wekan_repliqate_enabled }} | string"
           repliqate.engine: "{{ wekan_repliqate_engine }}"
@@ -124,7 +124,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wekan_port_http | string)] +
-                (['https://' + wekan_hostname + '.' + ansible_nas_domain] if (wekan_available_externally is true or wekan_dockflare_tunnel is true) else [])
+                (['https://' + wekan_hostname + '.' + ansible_nas_domain] if (wekan_available_externally is true or wekan_dockflare_enabled is true) else [])
               }}
   when: wekan_enabled is true
 

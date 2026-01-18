@@ -27,9 +27,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ watchstate_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ watchstate_watchtower_enable }}"
-          dockflare.enable: "{{ watchstate_dockflare_tunnel }}"
+          autoheal: "{{ watchstate_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ watchstate_watchtower_enabled| string }}"
+          dockflare.enable: "{{ watchstate_dockflare_enabled | string }}"
           dockflare.access.group: "{{ watchstate_dockflare_access_group }}"
           dockflare.hostname: "{{ watchstate_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port_http }}"
@@ -40,9 +40,9 @@
           homepage.description: "{{ 'Self-hosted service to sync your plex, jellyfin and emby play state.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ watchstate_container_name }}"
-          homepage.showStats: "{{ watchstate_homepage_showstats }}"
+          homepage.showStats: "{{ watchstate_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchstate_port_http }}"
-          repliqate.enabled: "{{ watchstate_repliqate_enabled }}"
+          repliqate.enabled: "{{ watchstate_repliqate_enabled | string }}"
           repliqate.engine: "{{ watchstate_repliqate_engine }}"
           repliqate.schedule: "{{ watchstate_repliqate_schedule }}"
           repliqate.backup_id: "{{ watchstate_repliqate_backup_id }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (watchstate_port_http | string)] +
-                (['https://' + watchstate_hostname + '.' + ansible_nas_domain] if (watchstate_available_externally is true or watchstate_dockflare_tunnel is true) else [])
+                (['https://' + watchstate_hostname + '.' + ansible_nas_domain] if (watchstate_available_externally is true or watchstate_dockflare_enabled is true) else [])
               }}
   when: watchstate_enabled is true
 

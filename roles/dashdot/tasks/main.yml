@@ -15,9 +15,9 @@
         volumes:
           - "{{ dashdot_host_directory }}:/mnt/host:ro"
         labels:
-          autoheal: "{{ dashdot_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ dashdot_watchtower_enable }}"
-          dockflare.enable: "{{ dashdot_dockflare_tunnel }}"
+          autoheal: "{{ dashdot_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ dashdot_watchtower_enabled| string }}"
+          dockflare.enable: "{{ dashdot_dockflare_enabled | string }}"
           dockflare.access.group: "{{ dashdot_dockflare_access_group }}"
           dockflare.hostname: "{{ dashdot_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dashdot_port_http }}"
@@ -29,7 +29,7 @@
           homepage.description: "{{ 'A simple, modern server dashboard, primarily used by smaller private servers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dashdot_container_name }}"
-          homepage.showStats: "{{ dashdot_homepage_showstats }}"
+          homepage.showStats: "{{ dashdot_homepage_showstats | string }}"
           repliqate.enabled: "false"
           traefik.enable: "{{ dashdot_available_externally | string }}"
           traefik.http.routers.dashdot.rule: "Host(`{{ dashdot_hostname }}.{{ ansible_nas_domain }}`)"
@@ -52,7 +52,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dashdot_port_http | string)] +
-                (['https://' + dashdot_hostname + '.' + ansible_nas_domain] if (dashdot_available_externally is true or dashdot_dockflare_tunnel is true) else [])
+                (['https://' + dashdot_hostname + '.' + ansible_nas_domain] if (dashdot_available_externally is true or dashdot_dockflare_enabled is true) else [])
               }}
   when: dashdot_enabled is true
 

@@ -24,8 +24,8 @@
           POSTGRES_DB: "{{ joplin_env_postgres_database }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ joplin_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ joplin_db_watchtower_enable }}"
+          autoheal: "{{ joplin_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ joplin_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ joplin_db_homepage_group }}"
@@ -34,8 +34,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ joplin_db_container_name }}"
-          homepage.showStats: "{{ joplin_db_homepage_showstats }}"
-          repliqate.enabled: "{{ joplin_db_repliqate_enabled }}"
+          homepage.showStats: "{{ joplin_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ joplin_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ joplin_db_repliqate_engine }}"
           repliqate.schedule: "{{ joplin_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ joplin_db_repliqate_backup_id }}"
@@ -80,9 +80,9 @@
         links:
           - "{{ joplin_db_container_name }}"
         labels:
-          autoheal: "{{ joplin_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ joplin_watchtower_enable }}"
-          dockflare.enable: "{{ joplin_dockflare_tunnel }}"
+          autoheal: "{{ joplin_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ joplin_watchtower_enabled| string }}"
+          dockflare.enable: "{{ joplin_dockflare_enabled | string }}"
           dockflare.access.group: "{{ joplin_dockflare_access_group }}"
           dockflare.hostname: "{{ joplin_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joplin_port_http }}"
@@ -94,8 +94,8 @@
           homepage.description: "{{ 'the privacy-focused note taking app with sync capabilities for Windows, macOS, Linux, Android and iOS.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ joplin_container_name }}"
-          homepage.showStats: "{{ joplin_homepage_showstats }}"
-          repliqate.enabled: "{{ joplin_repliqate_enabled }}"
+          homepage.showStats: "{{ joplin_homepage_showstats | string }}"
+          repliqate.enabled: "{{ joplin_repliqate_enabled | string }}"
           repliqate.engine: "{{ joplin_repliqate_engine }}"
           repliqate.schedule: "{{ joplin_repliqate_schedule }}"
           repliqate.backup_id: "{{ joplin_repliqate_backup_id }}"
@@ -121,7 +121,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (joplin_port_http | string)] +
-                (['https://' + joplin_hostname + '.' + ansible_nas_domain] if (joplin_available_externally is true or joplin_dockflare_tunnel is true) else [])
+                (['https://' + joplin_hostname + '.' + ansible_nas_domain] if (joplin_available_externally is true or joplin_dockflare_enabled is true) else [])
               }}
   when: joplin_enabled is true
 

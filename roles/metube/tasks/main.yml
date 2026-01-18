@@ -22,9 +22,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ metube_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ metube_watchtower_enable }}"
-          dockflare.enable: "{{ metube_dockflare_tunnel }}"
+          autoheal: "{{ metube_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ metube_watchtower_enabled| string }}"
+          dockflare.enable: "{{ metube_dockflare_enabled | string }}"
           dockflare.access.group: "{{ metube_dockflare_access_group }}"
           dockflare.hostname: "{{ metube_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ metube_port_http }}"
@@ -36,7 +36,7 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ metube_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ metube_container_name }}"
-          homepage.showStats: "{{ metube_homepage_showstats }}"
+          homepage.showStats: "{{ metube_homepage_showstats | string }}"
           repliqate.enabled: "false"
           traefik.enable: "{{ metube_available_externally | string }}"
           traefik.http.routers.metube.rule: "Host(`metube.{{ ansible_nas_domain }}`)"
@@ -59,7 +59,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (metube_port_http | string)] +
-                (['https://' + metube_hostname + '.' + ansible_nas_domain] if (metube_available_externally is true or metube_dockflare_tunnel is true) else [])
+                (['https://' + metube_hostname + '.' + ansible_nas_domain] if (metube_available_externally is true or metube_dockflare_enabled is true) else [])
               }}
   when: metube_enabled is true
 

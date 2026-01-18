@@ -26,9 +26,9 @@
         ports:
           - "{{ airsonic_port_http }}:4040"
         labels:
-          autoheal: "{{ airsonic_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ airsonic_watchtower_enable }}"
-          dockflare.enable: "{{ airsonic_dockflare_tunnel }}"
+          autoheal: "{{ airsonic_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ airsonic_watchtower_enabled| string }}"
+          dockflare.enable: "{{ airsonic_dockflare_enabled | string }}"
           dockflare.access.group: "{{ airsonic_dockflare_access_group }}"
           dockflare.hostname: "{{ airsonic_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ airsonic_port_http }}"
@@ -39,9 +39,9 @@
           homepage.description: "{{ 'community driven media server' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ airsonic_container_name }}"
-          homepage.showStats: "{{ airsonic_homepage_showstats }}"
+          homepage.showStats: "{{ airsonic_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ airsonic_port_http }}"
-          repliqate.enabled: "{{ airsonic_repliqate_enabled }}"
+          repliqate.enabled: "{{ airsonic_repliqate_enabled | string }}"
           repliqate.engine: "{{ airsonic_repliqate_engine }}"
           repliqate.schedule: "{{ airsonic_repliqate_schedule }}"
           repliqate.backup_id: "{{ airsonic_repliqate_backup_id }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (airsonic_port_http | string)] +
-                (['https://' + airsonic_hostname + '.' + ansible_nas_domain] if (airsonic_available_externally is true or airsonic_dockflare_tunnel is true) else [])
+                (['https://' + airsonic_hostname + '.' + ansible_nas_domain] if (airsonic_available_externally is true or airsonic_dockflare_enabled is true) else [])
               }}
   when: airsonic_enabled is true
 

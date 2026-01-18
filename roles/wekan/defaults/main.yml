@@ -41,22 +41,22 @@ wekan_env_with_api: "true"
 wekan_env_writable_path: "/data"
 
 # autoheal
-wekan_autoheal: "false"
-wekan_db_autoheal: "false"
+wekan_autoheal: false
+wekan_db_autoheal: false
 
 # dockflare
-wekan_dockflare_tunnel: false
+wekan_dockflare_enabled: false
 wekan_dockflare_access_group: ""
 
 # homepage
 wekan_homepage_group: "Apps"
 wekan_homepage_icon: "wekan.png"
 wekan_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
-wekan_homepage_showstats: "false"
+wekan_homepage_showstats: false
 wekan_db_homepage_group: "DBs"
 wekan_db_homepage_icon: "mongodb.png"
 wekan_db_homepage_href: "{{ wekan_homepage_href }}"
-wekan_db_homepage_showstats: "false"
+wekan_db_homepage_showstats: false
 
 # repliqate
 wekan_repliqate_enabled: false
@@ -64,7 +64,7 @@ wekan_repliqate_engine: "restic"
 wekan_repliqate_schedule: "@daily 3am"
 wekan_repliqate_backup_id: "{{ wekan_container_name }}"
 wekan_repliqate_retention: "30d"
-wekan_db_repliqate_enabled: "false"
+wekan_db_repliqate_enabled: false
 wekan_db_repliqate_engine: "restic"
 wekan_db_repliqate_schedule: "@daily 3am"
 wekan_db_repliqate_backup_id: "{{ wekan_db_container_name }}"
@@ -74,5 +74,5 @@ wekan_db_repliqate_retention: "30d"
 wekan_tinyauth_enabled: false
 
 # watchtower
-wekan_watchtower_enable: false
-wekan_db_watchtower_enable: "false"
+wekan_watchtower_enabled: false
+wekan_db_watchtower_enabled: false

@@ -27,9 +27,9 @@
         ulimits:
           - "nofile:4096:8192"
         labels:
-          autoheal: "{{ checkcle_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ checkcle_watchtower_enable }}"
-          dockflare.enable: "{{ checkcle_dockflare_tunnel }}"
+          autoheal: "{{ checkcle_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ checkcle_watchtower_enabled| string }}"
+          dockflare.enable: "{{ checkcle_dockflare_enabled | string }}"
           dockflare.access.group: "{{ checkcle_dockflare_access_group }}"
           dockflare.hostname: "{{ checkcle_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkcle_port_http }}"
@@ -40,9 +40,9 @@
           homepage.description: "{{ 'a self-hosted, open-source monitoring platform for seamless, real-time full-stack systems, applications, and infrastructure' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ checkcle_container_name }}"
-          homepage.showStats: "{{ checkcle_homepage_showstats }}"
+          homepage.showStats: "{{ checkcle_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ checkcle_port_http }}"
-          repliqate.enabled: "{{ checkcle_repliqate_enabled }}"
+          repliqate.enabled: "{{ checkcle_repliqate_enabled | string }}"
           repliqate.engine: "{{ checkcle_repliqate_engine }}"
           repliqate.schedule: "{{ checkcle_repliqate_schedule }}"
           repliqate.backup_id: "{{ checkcle_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (checkcle_port_http | string)] +
-                (['https://' + checkcle_hostname + '.' + ansible_nas_domain] if (checkcle_available_externally is true or checkcle_dockflare_tunnel is true) else [])
+                (['https://' + checkcle_hostname + '.' + ansible_nas_domain] if (checkcle_available_externally is true or checkcle_dockflare_enabled is true) else [])
               }}
   when: checkcle_enabled is true
 

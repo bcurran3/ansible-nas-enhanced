@@ -29,8 +29,8 @@
           timeout: "5s"
           retries: "5"
         labels:
-          autoheal: "{{ tianji_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tianji_db_watchtower_enable }}"
+          autoheal: "{{ tianji_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tianji_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ tianji_db_homepage_group }}"
@@ -39,8 +39,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tianji_db_container_name }}"
-          homepage.showStats: "{{ tianji_homepage_showstats }}"
-          repliqate.enabled: "{{ tianji_db_repliqate_enabled }}"
+          homepage.showStats: "{{ tianji_homepage_showstats | string }}"
+          repliqate.enabled: "{{ tianji_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ tianji_db_repliqate_engine }}"
           repliqate.schedule: "{{ tianji_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ tianji_db_repliqate_backup_id }}"
@@ -73,9 +73,9 @@
         links:
           - "{{ tianji_db_container_name }}"
         labels:
-          autoheal: "{{ tianji_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ tianji_watchtower_enable }}"
-          dockflare.enable: "{{ tianji_dockflare_tunnel }}"
+          autoheal: "{{ tianji_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ tianji_watchtower_enabled| string }}"
+          dockflare.enable: "{{ tianji_dockflare_enabled | string }}"
           dockflare.access.group: "{{ tianji_dockflare_access_group }}"
           dockflare.hostname: "{{ tianji_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tianji_port_http }}"
@@ -87,8 +87,8 @@
           homepage.description: "{{ 'Tianji: Insight into everything, Website Analytics + Uptime Monitor + Server Status. not only another GA alternatives' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ tianji_container_name }}"
-          homepage.showStats: "{{ tianji_homepage_showstats }}"
-          repliqate.enabled: "{{ tianji_repliqate_enabled }}"
+          homepage.showStats: "{{ tianji_homepage_showstats | string }}"
+          repliqate.enabled: "{{ tianji_repliqate_enabled | string }}"
           repliqate.engine: "{{ tianji_repliqate_engine }}"
           repliqate.schedule: "{{ tianji_repliqate_schedule }}"
           repliqate.backup_id: "{{ tianji_repliqate_backup_id }}"
@@ -113,7 +113,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tianji_port_http | string)] +
-                (['https://' + tianji_hostname + '.' + ansible_nas_domain] if (tianji_available_externally is true or tianji_dockflare_tunnel is true) else [])
+                (['https://' + tianji_hostname + '.' + ansible_nas_domain] if (tianji_available_externally is true or tianji_dockflare_enabled is true) else [])
               }}
   when: tianji_enabled is true
 

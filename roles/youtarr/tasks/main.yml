@@ -39,8 +39,8 @@
           retries: 5
           start_period: 30s
         labels:
-          autoheal: "{{ youtarr_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ youtarr_db_watchtower_enable }}"
+          autoheal: "{{ youtarr_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ youtarr_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ youtarr_db_homepage_group }}"
@@ -49,8 +49,8 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ youtarr_db_container_name }}"
-          homepage.showStats: "{{ youtarr_db_homepage_showstats }}"
-          repliqate.enabled: "{{ youtarr_db_repliqate_enabled }}"
+          homepage.showStats: "{{ youtarr_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ youtarr_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ youtarr_db_repliqate_engine }}"
           repliqate.schedule: "{{ youtarr_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ youtarr_db_repliqate_backup_id }}"
@@ -100,9 +100,9 @@
         links:
           - "{{ youtarr_db_container_name }}"
         labels:
-          autoheal: "{{ youtarr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ youtarr_watchtower_enable }}"
-          dockflare.enable: "{{ youtarr_dockflare_tunnel }}"
+          autoheal: "{{ youtarr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ youtarr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ youtarr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ youtarr_dockflare_access_group }}"
           dockflare.hostname: "{{ youtarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port_http }}"
@@ -113,9 +113,9 @@
           homepage.description: "{{ 'youtarr description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ youtarr_container_name }}"
-          homepage.showStats: "{{ youtarr_homepage_showstats }}"
+          homepage.showStats: "{{ youtarr_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtarr_port_http }}"
-          repliqate.enabled: "{{ youtarr_repliqate_enabled }}"
+          repliqate.enabled: "{{ youtarr_repliqate_enabled | string }}"
           repliqate.engine: "{{ youtarr_repliqate_engine }}"
           repliqate.schedule: "{{ youtarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ youtarr_repliqate_backup_id }}"
@@ -141,7 +141,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (youtarr_port_http | string)] +
-                (['https://' + youtarr_hostname + '.' + ansible_nas_domain] if (youtarr_available_externally is true or youtarr_dockflare_tunnel is true) else [])
+                (['https://' + youtarr_hostname + '.' + ansible_nas_domain] if (youtarr_available_externally is true or youtarr_dockflare_enabled is true) else [])
               }}
   when: youtarr_enabled is true
 

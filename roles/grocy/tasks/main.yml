@@ -27,9 +27,9 @@
           PGID: "{{ grocy_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ grocy_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ grocy_watchtower_enable }}"
-          dockflare.enable: "{{ grocy_dockflare_tunnel }}"
+          autoheal: "{{ grocy_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ grocy_watchtower_enabled| string }}"
+          dockflare.enable: "{{ grocy_dockflare_enabled | string }}"
           dockflare.access.group: "{{ grocy_dockflare_access_group }}"
           dockflare.hostname: "{{ grocy_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ grocy_port_http }}"
@@ -41,8 +41,8 @@
           homepage.description: "{{ 'ERP beyond your fridge - Grocy is a web-based self-hosted groceries & household management solution for your home' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ grocy_container_name }}"
-          homepage.showStats: "{{ grocy_homepage_showstats }}"
-          repliqate.enabled: "{{ grocy_repliqate_enabled }}"
+          homepage.showStats: "{{ grocy_homepage_showstats | string }}"
+          repliqate.enabled: "{{ grocy_repliqate_enabled | string }}"
           repliqate.engine: "{{ grocy_repliqate_engine }}"
           repliqate.schedule: "{{ grocy_repliqate_schedule }}"
           repliqate.backup_id: "{{ grocy_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (grocy_port_http | string)] +
-                (['https://' + grocy_hostname + '.' + ansible_nas_domain] if (grocy_available_externally is true or grocy_dockflare_tunnel is true) else [])
+                (['https://' + grocy_hostname + '.' + ansible_nas_domain] if (grocy_available_externally is true or grocy_dockflare_enabled is true) else [])
               }}
   when: grocy_enabled is true
 

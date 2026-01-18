@@ -50,8 +50,8 @@
               retries: "3"
               start_period: "30s"
         labels:
-          autoheal: "{{ koel_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ koel_db_watchtower_enable }}"
+          autoheal: "{{ koel_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ koel_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ koel_db_homepage_group }}"
@@ -60,8 +60,8 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ koel_db_container_name }}"
-          homepage.showStats: "{{ koel_db_homepage_showstats }}"
-          repliqate.enabled: "{{ koel_db_repliqate_enabled }}"
+          homepage.showStats: "{{ koel_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ koel_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ koel_db_repliqate_engine }}"
           repliqate.schedule: "{{ koel_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ koel_db_repliqate_backup_id }}"
@@ -108,9 +108,9 @@
         links:
           - "{{ koel_db_container_name }}"
         labels:
-          autoheal: "{{ koel_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ koel_watchtower_enable }}"
-          dockflare.enable: "{{ koel_dockflare_tunnel }}"
+          autoheal: "{{ koel_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ koel_watchtower_enabled| string }}"
+          dockflare.enable: "{{ koel_dockflare_enabled | string }}"
           dockflare.access.group: "{{ koel_dockflare_access_group }}"
           dockflare.hostname: "{{ koel_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
@@ -121,9 +121,9 @@
           homepage.description: "{{ 'Open-source music streaming software' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ koel_container_name }}"
-          homepage.showStats: "{{ koel_homepage_showstats }}"
+          homepage.showStats: "{{ koel_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
-          repliqate.enabled: "{{ koel_repliqate_enabled }}"
+          repliqate.enabled: "{{ koel_repliqate_enabled | string }}"
           repliqate.engine: "{{ koel_repliqate_engine }}"
           repliqate.schedule: "{{ koel_repliqate_schedule }}"
           repliqate.backup_id: "{{ koel_repliqate_backup_id }}"
@@ -149,7 +149,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (koel_port_http | string)] +
-                (['https://' + koel_hostname + '.' + ansible_nas_domain] if (koel_available_externally is true or koel_dockflare_tunnel is true) else [])
+                (['https://' + koel_hostname + '.' + ansible_nas_domain] if (koel_available_externally is true or koel_dockflare_enabled is true) else [])
               }}
   when: koel_enabled is true
 

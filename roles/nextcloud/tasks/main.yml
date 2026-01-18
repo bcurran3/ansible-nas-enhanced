@@ -50,8 +50,8 @@
           TZ: "{{ ansible_nas_timezone }}"
         command: "redis-server --requirepass {{ nextcloud_env_redis_host_password }}"
         labels:
-          autoheal: "{{ nextcloud_redis_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ nextcloud_redis_watchtower_enable }}"
+          autoheal: "{{ nextcloud_redis_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_redis_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ nextcloud_redis_homepage_group }}"
@@ -60,7 +60,7 @@
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_redis_container_name }}"
-          homepage.showStats: "{{ nextcloud_redis_homepage_showstats }}"
+          homepage.showStats: "{{ nextcloud_redis_homepage_showstats | string }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
           wud.tag.include: '^\d+\.\d+\.\d+.*$'
@@ -103,8 +103,8 @@
               retries: "3"
               start_period: "30s"
         labels:
-          autoheal: "{{ nextcloud_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enable }}"
+          autoheal: "{{ nextcloud_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ nextcloud_db_homepage_group }}"
@@ -113,8 +113,8 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_db_container_name }}"
-          homepage.showStats: "{{ nextcloud_db_homepage_showstats }}"
-          repliqate.enabled: "{{ nextcloud_db_repliqate_enabled }}"
+          homepage.showStats: "{{ nextcloud_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ nextcloud_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ nextcloud_db_repliqate_engine }}"
           repliqate.schedule: "{{ nextcloud_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ nextcloud_db_repliqate_backup_id }}"
@@ -189,9 +189,9 @@
           - "{{ nextcloud_db_container_name }}"
           - "{{ nextcloud_redis_container_name }}"
         labels:
-          autoheal: "{{ nextcloud_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ nextcloud_watchtower_enable }}"
-          dockflare.enable: "{{ nextcloud_dockflare_tunnel }}"
+          autoheal: "{{ nextcloud_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ nextcloud_watchtower_enabled| string }}"
+          dockflare.enable: "{{ nextcloud_dockflare_enabled | string }}"
           dockflare.access.group: "{{ nextcloud_dockflare_access_group }}"
           dockflare.hostname: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port_http }}"
@@ -203,11 +203,11 @@
           homepage.description: "{{ 'Open source dropbox alternative' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_container_name }}"
-          homepage.showStats: "{{ nextcloud_homepage_showstats }}"
+          homepage.showStats: "{{ nextcloud_homepage_showstats | string }}"
           homepage.widget.type: "nextcloud"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port_http }}"
           homepage.widget.key: "{{ nextcloud_homepage_widget_key }}"
-          repliqate.enabled: "{{ nextcloud_repliqate_enabled }}"
+          repliqate.enabled: "{{ nextcloud_repliqate_enabled | string }}"
           repliqate.engine: "{{ nextcloud_repliqate_engine }}"
           repliqate.schedule: "{{ nextcloud_repliqate_schedule }}"
           repliqate.backup_id: "{{ nextcloud_repliqate_backup_id }}"
@@ -239,7 +239,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (nextcloud_port_http | string)] +
-                (['https://' + nextcloud_hostname + '.' + ansible_nas_domain] if (nextcloud_available_externally is true or nextcloud_dockflare_tunnel is true) else [])
+                (['https://' + nextcloud_hostname + '.' + ansible_nas_domain] if (nextcloud_available_externally is true or nextcloud_dockflare_enabled is true) else [])
               }}
   when: nextcloud_enabled is true
 

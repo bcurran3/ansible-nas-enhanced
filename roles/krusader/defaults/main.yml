@@ -2,7 +2,7 @@
 # ANE
 ansible_nas_app_name: "Krusader"
 krusader_enabled: false
-krusader_available_externally: "false"
+krusader_available_externally: false
 krusader_traefik_whitelist: "{{ lan }}"
 
 # uid / gid
@@ -35,20 +35,20 @@ krusader_vnc_password: "{{ ansible_nas_app_admin_password }}"
 krusader_webpage_title: "{{ ansible_nas_hostname }}"
 
 # autoheal
-krusader_autoheal: "false"
+krusader_autoheal: false
 
 # dockflare
-krusader_dockflare_tunnel: "false"
+krusader_dockflare_enabled: false
 krusader_dockflare_access_group: ""
 
 # homepage
 krusader_homepage_group: "Apps"
 krusader_homepage_icon: "krusader.png"
 krusader_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ krusader_port_http }}/vnc.html?resize=remote&host={{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}&port={{ krusader_port_http }}&autoconnect=1"
-krusader_homepage_showstats: "false"
+krusader_homepage_showstats: false
 
 # repliqate
-krusader_repliqate_enabled: "false"
+krusader_repliqate_enabled: false
 krusader_repliqate_engine: "restic"
 krusader_repliqate_schedule: "@daily 3am"
 krusader_repliqate_backup_id: "{{ krusader_container_name }}"
@@ -58,4 +58,4 @@ krusader_repliqate_retention: "30d"
 krusader_tinyauth_enabled: false
 
 # watchtower
-krusader_watchtower_enable: "false"
+krusader_watchtower_enabled: false

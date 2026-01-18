@@ -47,9 +47,9 @@
           PUID: "{{ emby_user_id }}"
           PGID: "{{ emby_group_id }}"
         labels:
-          autoheal: "{{ emby_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ emby_watchtower_enable }}"
-          dockflare.enable: "{{ emby_dockflare_tunnel }}"
+          autoheal: "{{ emby_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ emby_watchtower_enabled| string }}"
+          dockflare.enable: "{{ emby_dockflare_enabled | string }}"
           dockflare.access.group: "{{ emby_dockflare_access_group }}"
           dockflare.hostname: "{{ emby_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ emby_port_http }}"
@@ -60,9 +60,9 @@
           homepage.description: "{{ 'emby description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ emby_container_name }}"
-          homepage.showStats: "{{ emby_homepage_showstats }}"
+          homepage.showStats: "{{ emby_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ emby_port_http }}"
-          repliqate.enabled: "{{ emby_repliqate_enabled }}"
+          repliqate.enabled: "{{ emby_repliqate_enabled | string }}"
           repliqate.engine: "{{ emby_repliqate_engine }}"
           repliqate.schedule: "{{ emby_repliqate_schedule }}"
           repliqate.backup_id: "{{ emby_repliqate_backup_id }}"
@@ -88,7 +88,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (emby_port_http | string)] +
-                (['https://' + emby_hostname + '.' + ansible_nas_domain] if (emby_available_externally is true or emby_dockflare_tunnel is true) else [])
+                (['https://' + emby_hostname + '.' + ansible_nas_domain] if (emby_available_externally is true or emby_dockflare_enabled is true) else [])
               }}
   when: emby_enabled is true
 

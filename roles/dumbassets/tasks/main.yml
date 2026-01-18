@@ -32,9 +32,9 @@
           CURRENCY_LOCALE: "{{ dumbassets_locale }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ dumbassets_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ dumbassets_watchtower_enable }}"
-          dockflare.enable: "{{ dumbassets_dockflare_tunnel }}"
+          autoheal: "{{ dumbassets_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ dumbassets_watchtower_enabled| string }}"
+          dockflare.enable: "{{ dumbassets_dockflare_enabled | string }}"
           dockflare.access.group: "{{ dumbassets_dockflare_access_group }}"
           dockflare.hostname: "{{ dumbassets_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dumbassets_port_http }}"
@@ -45,9 +45,9 @@
           homepage.description: "{{ 'A Stupid Simple Asset Tracker' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dumbassets_container_name }}"
-          homepage.showStats: "{{ dumbassets_homepage_showstats }}"
+          homepage.showStats: "{{ dumbassets_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dumbassets_port_http }}"
-          repliqate.enabled: "{{ dumbassets_repliqate_enabled }}"
+          repliqate.enabled: "{{ dumbassets_repliqate_enabled | string }}"
           repliqate.engine: "{{ dumbassets_repliqate_engine }}"
           repliqate.schedule: "{{ dumbassets_repliqate_schedule }}"
           repliqate.backup_id: "{{ dumbassets_repliqate_backup_id }}"
@@ -73,7 +73,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dumbassets_port_http | string)] +
-                (['https://' + dumbassets_hostname + '.' + ansible_nas_domain] if (dumbassets_available_externally is true or dumbassets_dockflare_tunnel is true) else [])
+                (['https://' + dumbassets_hostname + '.' + ansible_nas_domain] if (dumbassets_available_externally is true or dumbassets_dockflare_enabled is true) else [])
               }}
   when: dumbassets_enabled is true
 

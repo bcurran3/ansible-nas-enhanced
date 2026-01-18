@@ -31,8 +31,8 @@
         capabilities:
           - SYS_NICE
         labels:
-          autoheal: "{{ valheim_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ valheim_watchtower_enable }}"
+          autoheal: "{{ valheim_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ valheim_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ valheim_homepage_group }}"
@@ -40,8 +40,8 @@
           homepage.description: "{{ 'dedicated gameserver manager' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ valheim_container_name }}"
-          homepage.showStats: "{{ valheim_homepage_showstats }}"
-          repliqate.enabled: "{{ valheim_repliqate_enabled }}"
+          homepage.showStats: "{{ valheim_homepage_showstats | string }}"
+          repliqate.enabled: "{{ valheim_repliqate_enabled | string }}"
           repliqate.engine: "{{ valheim_repliqate_engine }}"
           repliqate.schedule: "{{ valheim_repliqate_schedule }}"
           repliqate.backup_id: "{{ valheim_repliqate_backup_id }}"

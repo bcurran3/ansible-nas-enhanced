@@ -28,8 +28,8 @@
           timeout: 5s
           retries: "5"
         labels:
-          autoheal: "{{ umami_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ umami_db_watchtower_enable }}"
+          autoheal: "{{ umami_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ umami_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ umami_db_homepage_group }}"
@@ -38,8 +38,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ umami_db_container_name }}"
-          homepage.showStats: "{{ umami_db_homepage_showstats }}"
-          repliqate.enabled: "{{ umami_db_repliqate_enabled }}"
+          homepage.showStats: "{{ umami_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ umami_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ umami_db_repliqate_engine }}"
           repliqate.schedule: "{{ umami_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ umami_db_repliqate_backup_id }}"
@@ -74,9 +74,9 @@
         links:
           - "{{ umami_db_container_name }}"
         labels:
-          autoheal: "{{ umami_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ umami_watchtower_enable }}"
-          dockflare.enable: "{{ umami_dockflare_tunnel }}"
+          autoheal: "{{ umami_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ umami_watchtower_enabled| string }}"
+          dockflare.enable: "{{ umami_dockflare_enabled | string }}"
           dockflare.access.group: "{{ umami_dockflare_access_group }}"
           dockflare.hostname: "{{ umami_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
@@ -88,8 +88,8 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ umami_container_name }}"
-          homepage.showStats: "{{ umami_homepage_showstats }}"
-          repliqate.enabled: "{{ umami_repliqate_enabled }}"
+          homepage.showStats: "{{ umami_homepage_showstats | string }}"
+          repliqate.enabled: "{{ umami_repliqate_enabled | string }}"
           repliqate.engine: "{{ umami_repliqate_engine }}"
           repliqate.schedule: "{{ umami_repliqate_schedule }}"
           repliqate.backup_id: "{{ umami_repliqate_backup_id }}"
@@ -114,7 +114,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (umami_port_http | string)] +
-                (['https://' + umami_hostname + '.' + ansible_nas_domain] if (umami_available_externally is true or umami_dockflare_tunnel is true) else [])
+                (['https://' + umami_hostname + '.' + ansible_nas_domain] if (umami_available_externally is true or umami_dockflare_enabled is true) else [])
               }}
   when: umami_enabled is true
 

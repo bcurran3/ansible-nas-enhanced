@@ -34,8 +34,8 @@
           timeout: 5s
           retries: 5
         labels:
-          autoheal: "{{ owncloud_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ owncloud_db_watchtower_enable }}"
+          autoheal: "{{ owncloud_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ owncloud_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ owncloud_db_homepage_group }}"
@@ -44,8 +44,8 @@
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ owncloud_db_container_name }}"
-          homepage.showStats: "{{ owncloud_db_homepage_showstats }}"
-          repliqate.enabled: "{{ owncloud_db_repliqate_enabled }}"
+          homepage.showStats: "{{ owncloud_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ owncloud_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ owncloud_db_repliqate_engine }}"
           repliqate.schedule: "{{ owncloud_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ owncloud_db_repliqate_backup_id }}"
@@ -76,8 +76,8 @@
           timeout: 5s
           retries: 5
         labels:
-          autoheal: "{{ owncloud_redis_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ owncloud_redis_watchtower_enable }}"
+          autoheal: "{{ owncloud_redis_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ owncloud_redis_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ owncloud_redis_homepage_group }}"
@@ -86,8 +86,8 @@
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ owncloud_redis_container_name }}"
-          homepage.showStats: "{{ owncloud_redis_homepage_showstats }}"
-          repliqate.enabled: "{{ owncloud_redis_repliqate_enabled }}"
+          homepage.showStats: "{{ owncloud_redis_homepage_showstats | string }}"
+          repliqate.enabled: "{{ owncloud_redis_repliqate_enabled | string }}"
           repliqate.engine: "{{ owncloud_redis_repliqate_engine }}"
           repliqate.schedule: "{{ owncloud_redis_repliqate_schedule }}"
           repliqate.backup_id: "{{ owncloud_redis_repliqate_backup_id }}"
@@ -134,9 +134,9 @@
           - "{{ owncloud_db_container_name }}"
           - "{{ owncloud_redis_container_name }}"
         labels:
-          autoheal: "{{ owncloud_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ owncloud_watchtower_enable }}"
-          dockflare.enable: "{{ owncloud_dockflare_tunnel }}"
+          autoheal: "{{ owncloud_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ owncloud_watchtower_enabled| string }}"
+          dockflare.enable: "{{ owncloud_dockflare_enabled | string }}"
           dockflare.access.group: "{{ owncloud_dockflare_access_group }}"
           dockflare.hostname: "{{ owncloud_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
@@ -147,9 +147,9 @@
           homepage.description: "{{ 'Secure Collaboration Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ owncloud_container_name }}"
-          homepage.showStats: "{{ owncloud_homepage_showstats }}"
+          homepage.showStats: "{{ owncloud_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
-          repliqate.enabled: "{{ owncloud_repliqate_enabled }}"
+          repliqate.enabled: "{{ owncloud_repliqate_enabled | string }}"
           repliqate.engine: "{{ owncloud_repliqate_engine }}"
           repliqate.schedule: "{{ owncloud_repliqate_schedule }}"
           repliqate.backup_id: "{{ owncloud_repliqate_backup_id }}"
@@ -174,7 +174,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (owncloud_port_http | string)] +
-                (['https://' + owncloud_hostname + '.' + ansible_nas_domain] if (owncloud_available_externally is true or owncloud_dockflare_tunnel is true) else [])
+                (['https://' + owncloud_hostname + '.' + ansible_nas_domain] if (owncloud_available_externally is true or owncloud_dockflare_enabled is true) else [])
               }}
   when: owncloud_enabled is true
 

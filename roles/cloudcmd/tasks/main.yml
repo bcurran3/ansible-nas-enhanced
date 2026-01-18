@@ -26,9 +26,9 @@
           PUID: "{{ cloudcmd_user_id }}"
           PGID: "{{ cloudcmd_group_id }}"
         labels:
-          autoheal: "{{ cloudcmd_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ cloudcmd_watchtower_enable }}"
-          dockflare.enable: "{{ cloudcmd_dockflare_tunnel }}"
+          autoheal: "{{ cloudcmd_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ cloudcmd_watchtower_enabled| string }}"
+          dockflare.enable: "{{ cloudcmd_dockflare_enabled | string }}"
           dockflare.access.group: "{{ cloudcmd_dockflare_access_group }}"
           dockflare.hostname: "{{ cloudcmd_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cloudcmd_port_http }}"
@@ -39,9 +39,9 @@
           homepage.description: "{{ 'cloudcmd description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ cloudcmd_container_name }}"
-          homepage.showStats: "{{ cloudcmd_homepage_showstats }}"
+          homepage.showStats: "{{ cloudcmd_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cloudcmd_port_http }}"
-          repliqate.enabled: "{{ cloudcmd_repliqate_enabled }}"
+          repliqate.enabled: "{{ cloudcmd_repliqate_enabled | string }}"
           repliqate.engine: "{{ cloudcmd_repliqate_engine }}"
           repliqate.schedule: "{{ cloudcmd_repliqate_schedule }}"
           repliqate.backup_id: "{{ cloudcmd_repliqate_backup_id }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (cloudcmd_port_http | string)] +
-                (['https://' + cloudcmd_hostname + '.' + ansible_nas_domain] if (cloudcmd_available_externally is true or cloudcmd_dockflare_tunnel is true) else [])
+                (['https://' + cloudcmd_hostname + '.' + ansible_nas_domain] if (cloudcmd_available_externally is true or cloudcmd_dockflare_enabled is true) else [])
               }}
   when: cloudcmd_enabled is true
 

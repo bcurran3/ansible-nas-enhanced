@@ -56,9 +56,9 @@
           retries: 3
           start_period: "40s"
         labels:
-          autoheal: "{{ dasharr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ dasharr_watchtower_enable }}"
-          dockflare.enable: "{{ dasharr_dockflare_tunnel }}"
+          autoheal: "{{ dasharr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ dasharr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ dasharr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ dasharr_dockflare_access_group }}"
           dockflare.hostname: "{{ dasharr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dasharr_port_http }}"
@@ -69,9 +69,9 @@
           homepage.description: "{{ 'A unified media and network dashboard that consolidates your Plex, Jellyfin, Radarr, Sonarr, Bazarr, UniFi Network, and other services into one beautiful interface.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dasharr_container_name }}"
-          homepage.showStats: "{{ dasharr_homepage_showstats }}"
+          homepage.showStats: "{{ dasharr_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dasharr_port_http }}"
-          repliqate.enabled: "{{ dasharr_repliqate_enabled }}"
+          repliqate.enabled: "{{ dasharr_repliqate_enabled | string }}"
           repliqate.engine: "{{ dasharr_repliqate_engine }}"
           repliqate.schedule: "{{ dasharr_repliqate_schedule }}"
           repliqate.backup_id: "{{ dasharr_repliqate_backup_id }}"
@@ -96,7 +96,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dasharr_port_http | string)] +
-                (['https://' + dasharr_hostname + '.' + ansible_nas_domain] if (dasharr_available_externally is true or dasharr_dockflare_tunnel is true) else [])
+                (['https://' + dasharr_hostname + '.' + ansible_nas_domain] if (dasharr_available_externally is true or dasharr_dockflare_enabled is true) else [])
               }}
   when: dasharr_enabled is true
 

@@ -37,8 +37,8 @@
         network_mode: "{{ paperless_ngx_network_name }}"
         labels:
           traefik.enable: "false"
-          autoheal: "{{ paperless_ngx_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_db_watchtower_enable }}"
+          autoheal: "{{ paperless_ngx_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ paperless_ngx_db_homepage_group }}"
@@ -47,8 +47,8 @@
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_db_container_name }}"
-          homepage.showStats: "{{ paperless_ngx_db_homepage_showstats }}"
-          repliqate.enabled: "{{ paperless_ngx_db_repliqate_enabled }}"
+          homepage.showStats: "{{ paperless_ngx_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ paperless_ngx_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ paperless_ngx_db_repliqate_engine }}"
           repliqate.schedule: "{{ paperless_ngx_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ paperless_ngx_db_repliqate_backup_id }}"
@@ -74,8 +74,8 @@
         network_mode: "{{ paperless_ngx_network_name }}"
         labels:
           traefik.enable: "false"
-          autoheal: "{{ paperless_ngx_redis_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_redis_watchtower_enable }}"
+          autoheal: "{{ paperless_ngx_redis_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_redis_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ paperless_ngx_redis_homepage_group }}"
@@ -84,8 +84,8 @@
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_redis_container_name }}"
-          homepage.showStats: "{{ paperless_ngx_redis_homepage_showstats }}"
-          repliqate.enabled: "{{ paperless_ngx_redis_repliqate_enabled }}"
+          homepage.showStats: "{{ paperless_ngx_redis_homepage_showstats | string }}"
+          repliqate.enabled: "{{ paperless_ngx_redis_repliqate_enabled | string }}"
           repliqate.engine: "{{ paperless_ngx_redis_repliqate_engine }}"
           repliqate.schedule: "{{ paperless_ngx_redis_repliqate_schedule }}"
           repliqate.backup_id: "{{ paperless_ngx_redis_repliqate_backup_id }}"
@@ -128,9 +128,9 @@
           - "{{ paperless_ngx_db_container_name }}"
           - "{{ paperless_ngx_redis_container_name }}"
         labels:
-          autoheal: "{{ paperless_ngx_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_watchtower_enable }}"
-          dockflare.enable: "{{ paperless_ngx_dockflare_tunnel }}"
+          autoheal: "{{ paperless_ngx_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_watchtower_enabled| string }}"
+          dockflare.enable: "{{ paperless_ngx_dockflare_enabled | string }}"
           dockflare.access.group: "{{ paperless_ngx_dockflare_access_group }}"
           dockflare.hostname: "{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
@@ -142,13 +142,13 @@
           homepage.description: "{{ 'Open source dropbox alternative' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_container_name }}"
-          homepage.showStats: "{{ paperless_ngx_homepage_showstats }}"
+          homepage.showStats: "{{ paperless_ngx_homepage_showstats | string }}"
           homepage.widget.type: "paperlessngx"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
           homepage.widget.username: "{{ paperless_ngx_homepage_widget_username }}"
           homepage.widget.password: "{{ paperless_ngx_homepage_widget_password }}"
           homepage.widget.key: "{{ paperless_ngx_homepage_widget_key }}"
-          repliqate.enabled: "{{ paperless_ngx_repliqate_enabled }}"
+          repliqate.enabled: "{{ paperless_ngx_repliqate_enabled | string }}"
           repliqate.engine: "{{ paperless_ngx_repliqate_engine }}"
           repliqate.schedule: "{{ paperless_ngx_repliqate_schedule }}"
           repliqate.backup_id: "{{ paperless_ngx_repliqate_backup_id }}"
@@ -173,7 +173,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (paperless_ngx_port_http | string)] +
-                (['https://' + paperless_ngx_hostname + '.' + ansible_nas_domain] if (paperless_ngx_available_externally is true or paperless_ngx_dockflare_tunnel is true) else [])
+                (['https://' + paperless_ngx_hostname + '.' + ansible_nas_domain] if (paperless_ngx_available_externally is true or paperless_ngx_dockflare_enabled is true) else [])
               }}
   when: paperless_ngx_enabled is true
 

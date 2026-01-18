@@ -65,34 +65,34 @@ nextcloud_env_mail_from_address: "" # (not set by default): Set the local-part f
 nextcloud_env_mail_domain: "" # (not set by default): Set a different domain for the emails than the domain where Nextcloud is installed.
 
 # autoheal
-nextcloud_autoheal: "false"
-nextcloud_db_autoheal: "false"
-nextcloud_redis_autoheal: "false"
+nextcloud_autoheal: false
+nextcloud_db_autoheal: false
+nextcloud_redis_autoheal: false
 
 # dockflare
-nextcloud_dockflare_tunnel: "false"
+nextcloud_dockflare_enabled: false
 nextcloud_dockflare_access_group: ""
 
 # homepage
 nextcloud_homepage_group: "Apps"
 nextcloud_homepage_icon: "nextcloud.png"
 nextcloud_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port_http }}"
-nextcloud_homepage_showstats: "false"
+nextcloud_homepage_showstats: false
 nextcloud_homepage_widget_key: "" # your_api_key
 nextcloud_db_homepage_group: "DBs"
 nextcloud_db_homepage_icon: "mariadb.png"
-nextcloud_db_homepage_showstats: "false"
+nextcloud_db_homepage_showstats: false
 nextcloud_redis_homepage_group: "DBs"
 nextcloud_redis_homepage_icon: "redis.png"
-nextcloud_redis_homepage_showstats: "false"
+nextcloud_redis_homepage_showstats: false
 
 # repliqate
-nextcloud_repliqate_enabled: "false"
+nextcloud_repliqate_enabled: false
 nextcloud_repliqate_engine: "restic"
 nextcloud_repliqate_schedule: "@daily 3am"
 nextcloud_repliqate_backup_id: "{{ nextcloud_container_name }}"
 nextcloud_repliqate_retention: "30d"
-nextcloud_db_repliqate_enabled: "false"
+nextcloud_db_repliqate_enabled: false
 nextcloud_db_repliqate_engine: "restic"
 nextcloud_db_repliqate_schedule: "@daily 3am"
 nextcloud_db_repliqate_backup_id: "{{ nextcloud_db_container_name }}"
@@ -102,6 +102,6 @@ nextcloud_db_repliqate_retention: "30d"
 nextcloud_tinyauth_enabled: false
 
 # watchtower
-nextcloud_watchtower_enable: "false"
-nextcloud_db_watchtower_enable: "false"
-nextcloud_redis_watchtower_enable: "false"
+nextcloud_watchtower_enabled: false
+nextcloud_db_watchtower_enabled: false
+nextcloud_redis_watchtower_enabled: false

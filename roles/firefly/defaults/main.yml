@@ -48,31 +48,31 @@ firefly_env_site_owner: "" # you@example.com
 firefly_db_env_mysql_root_password: "firefly"
 
 # autoheal
-firefly_autoheal: "false"
-firefly_db_autoheal: "false"
+firefly_autoheal: false
+firefly_db_autoheal: false
 
 # dockflare
-firefly_dockflare_tunnel: "false"
+firefly_dockflare_enabled: false
 firefly_dockflare_access_group: ""
 
 # homepage
 firefly_homepage_group: "Apps"
 firefly_homepage_icon: "firefly.png"
 firefly_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
-firefly_homepage_showstats: "false"
+firefly_homepage_showstats: false
 firefly_homepage_widget_key: ""
 firefly_db_homepage_group: "DBs"
 firefly_db_homepage_icon: "mariadb.png"
 firefly_db_homepage_href: "{{ firefly_homepage_href }}"
-firefly_db_homepage_showstats: "false"
+firefly_db_homepage_showstats: false
 
 # repliqate
-firefly_repliqate_enabled: "false"
+firefly_repliqate_enabled: false
 firefly_repliqate_engine: "restic"
 firefly_repliqate_schedule: "@daily 3am"
 firefly_repliqate_backup_id: "{{ firefly_container_name }}"
 firefly_repliqate_retention: "30d"
-firefly_db_repliqate_enabled: "false"
+firefly_db_repliqate_enabled: false
 firefly_db_repliqate_engine: "restic"
 firefly_db_repliqate_schedule: "@daily 3am"
 firefly_db_repliqate_backup_id: "{{ firefly_db_container_name }}"
@@ -82,5 +82,5 @@ firefly_db_repliqate_retention: "30d"
 firefly_tinyauth_enabled: false
 
 # watchtower
-firefly_watchtower_enable: "false"
-firefly_db_watchtower_enable: "false"
+firefly_watchtower_enabled: false
+firefly_db_watchtower_enabled: false

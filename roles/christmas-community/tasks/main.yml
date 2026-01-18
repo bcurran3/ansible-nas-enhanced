@@ -26,9 +26,9 @@
           NODE_OPTIONS: "--max-http-header-size=32768"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ christmas_community_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ christmas_community_watchtower_enable }}"
-          dockflare.enable: "{{ christmas_community_dockflare_tunnel }}"
+          autoheal: "{{ christmas_community_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ christmas_community_watchtower_enabled| string }}"
+          dockflare.enable: "{{ christmas_community_dockflare_enabled | string }}"
           dockflare.access.group: "{{ christmas_community_dockflare_access_group }}"
           dockflare.hostname: "{{ christmas_community_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ christmas_community_port_http }}"
@@ -40,8 +40,8 @@
           homepage.description: "{{ 'Christmas lists for families' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "christmas-community"
-          homepage.showStats: "{{ christmas_community_homepage_showstats }}"
-          repliqate.enabled: "{{ christmas_community_repliqate_enabled }}"
+          homepage.showStats: "{{ christmas_community_homepage_showstats | string }}"
+          repliqate.enabled: "{{ christmas_community_repliqate_enabled | string }}"
           repliqate.engine: "{{ christmas_community_repliqate_engine }}"
           repliqate.schedule: "{{ christmas_community_repliqate_schedule }}"
           repliqate.backup_id: "{{ christmas_community_repliqate_backup_id }}"
@@ -67,7 +67,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (christmas_community_port_http | string)] +
-                (['https://' + christmas_community_hostname + '.' + ansible_nas_domain] if (christmas_community_available_externally is true or christmas_community_dockflare_tunnel is true) else [])
+                (['https://' + christmas_community_hostname + '.' + ansible_nas_domain] if (christmas_community_available_externally is true or christmas_community_dockflare_enabled is true) else [])
               }}
   when: christmas_community_enabled is true
 

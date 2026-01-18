@@ -29,8 +29,8 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ youtubedl_material_db_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ youtubedl_material_db_watchtower_enable }}"
+          autoheal: "{{ youtubedl_material_db_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ youtubedl_material_db_watchtower_enabled| string }}"
           dockflare.enable: "false"
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ youtubedl_material_db_homepage_group }}"
@@ -39,8 +39,8 @@
           homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ youtubedl_material_db_container_name }}"
-          homepage.showStats: "{{ youtubedl_material_db_homepage_showstats }}"
-          repliqate.enabled: "{{ youtubedl_material_db_repliqate_enabled }}"
+          homepage.showStats: "{{ youtubedl_material_db_homepage_showstats | string }}"
+          repliqate.enabled: "{{ youtubedl_material_db_repliqate_enabled | string }}"
           repliqate.engine: "{{ youtubedl_material_db_repliqate_engine }}"
           repliqate.schedule: "{{ youtubedl_material_db_repliqate_schedule }}"
           repliqate.backup_id: "{{ youtubedl_material_db_repliqate_backup_id }}"
@@ -83,9 +83,9 @@
         links:
           - "{{ youtubedl_material_db_container_name }}"
         labels:
-          autoheal: "{{ youtubedl_material_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ youtubedl_material_watchtower_enable }}"
-          dockflare.enable: "{{ youtubedl_material_dockflare_tunnel }}"
+          autoheal: "{{ youtubedl_material_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ youtubedl_material_watchtower_enabled| string }}"
+          dockflare.enable: "{{ youtubedl_material_dockflare_enabled | string }}"
           dockflare.access.group: "{{ youtubedl_material_dockflare_access_group }}"
           dockflare.hostname: "{{ youtubedl_material_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ youtubedl_material_port_http }}"
@@ -97,8 +97,8 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wud_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ youtubedl_material_container_name }}"
-          homepage.showStats: "{{ youtubedl_material_homepage_showstats }}"
-          repliqate.enabled: "{{ youtubedl_material_repliqate_enabled }}"
+          homepage.showStats: "{{ youtubedl_material_homepage_showstats | string }}"
+          repliqate.enabled: "{{ youtubedl_material_repliqate_enabled | string }}"
           repliqate.engine: "{{ youtubedl_material_repliqate_engine }}"
           repliqate.schedule: "{{ youtubedl_material_repliqate_schedule }}"
           repliqate.backup_id: "{{ youtubedl_material_repliqate_backup_id }}"
@@ -124,7 +124,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (youtubedl_material_port_http | string)] +
-                (['https://' + youtubedl_material_hostname + '.' + ansible_nas_domain] if (youtubedl_material_available_externally is true or youtubedl_material_dockflare_tunnel is true) else [])
+                (['https://' + youtubedl_material_hostname + '.' + ansible_nas_domain] if (youtubedl_material_available_externally is true or youtubedl_material_dockflare_enabled is true) else [])
               }}
   when: youtubedl_material_enabled is true
 

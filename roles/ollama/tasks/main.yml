@@ -28,9 +28,9 @@
           OLLAMA_HOST: "0.0.0.0"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ ollama_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ ollama_watchtower_enable }}"
-          dockflare.enable: "{{ ollama_dockflare_tunnel }}"
+          autoheal: "{{ ollama_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ ollama_watchtower_enabled| string }}"
+          dockflare.enable: "{{ ollama_dockflare_enabled | string }}"
           dockflare.access.group: "{{ ollama_dockflare_access_group }}"
           dockflare.hostname: "{{ ollama_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_port_http }}"
@@ -42,8 +42,8 @@
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ollama_container_name }}"
-          homepage.showStats: "{{ ollama_homepage_showstats }}"
-          repliqate.enabled: "{{ ollama_repliqate_enabled }}"
+          homepage.showStats: "{{ ollama_homepage_showstats | string }}"
+          repliqate.enabled: "{{ ollama_repliqate_enabled | string }}"
           repliqate.engine: "{{ ollama_repliqate_engine }}"
           repliqate.schedule: "{{ ollama_repliqate_schedule }}"
           repliqate.backup_id: "{{ ollama_repliqate_backup_id }}"
@@ -68,7 +68,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ollama_port_http | string)] +
-                (['https://' + ollama_hostname + '.' + ansible_nas_domain] if (ollama_available_externally is true or ollama_dockflare_tunnel is true) else [])
+                (['https://' + ollama_hostname + '.' + ansible_nas_domain] if (ollama_available_externally is true or ollama_dockflare_enabled is true) else [])
               }}
   when: ollama_enabled is true
 

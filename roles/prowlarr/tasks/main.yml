@@ -32,9 +32,9 @@
           PGID: "{{ prowlarr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ prowlarr_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ prowlarr_watchtower_enable }}"
-          dockflare.enable: "{{ prowlarr_dockflare_tunnel }}"
+          autoheal: "{{ prowlarr_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ prowlarr_watchtower_enabled| string }}"
+          dockflare.enable: "{{ prowlarr_dockflare_enabled | string }}"
           dockflare.access.group: "{{ prowlarr_dockflare_access_group }}"
           dockflare.hostname: "{{ prowlarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port_http }}"
@@ -46,11 +46,11 @@
           homepage.description: "{{ 'Indexer Proxy' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ prowlarr_container_name }}"
-          homepage.showStats: "{{ prowlarr_homepage_showstats }}"
+          homepage.showStats: "{{ prowlarr_homepage_showstats | string }}"
           homepage.widget.type: "prowlarr"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ prowlarr_port_http }}"
           homepage.widget.key: "{{ prowlarr_homepage_widget_key }}"
-          repliqate.enabled: "{{ prowlarr_repliqate_enabled }}"
+          repliqate.enabled: "{{ prowlarr_repliqate_enabled | string }}"
           repliqate.engine: "{{ prowlarr_repliqate_engine }}"
           repliqate.schedule: "{{ prowlarr_repliqate_schedule }}"
           repliqate.backup_id: "{{ prowlarr_repliqate_backup_id }}"
@@ -76,7 +76,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (prowlarr_port_http | string)] +
-                (['https://' + prowlarr_hostname + '.' + ansible_nas_domain] if (prowlarr_available_externally is true or prowlarr_dockflare_tunnel is true) else [])
+                (['https://' + prowlarr_hostname + '.' + ansible_nas_domain] if (prowlarr_available_externally is true or prowlarr_dockflare_enabled is true) else [])
               }}
   when: prowlarr_enabled is true
 

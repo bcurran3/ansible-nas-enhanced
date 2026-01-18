@@ -25,9 +25,9 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
-          autoheal: "{{ fasten_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ fasten_watchtower_enable }}"
-          dockflare.enable: "{{ fasten_dockflare_tunnel }}"
+          autoheal: "{{ fasten_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ fasten_watchtower_enabled| string }}"
+          dockflare.enable: "{{ fasten_dockflare_enabled | string }}"
           dockflare.access.group: "{{ fasten_dockflare_access_group }}"
           dockflare.hostname: "{{ fasten_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ fasten_port_http }}"
@@ -39,8 +39,8 @@
           homepage.description: "{{ 'Fasten is an open-source, self-hosted, personal/family electronic medical record aggregator, designed to integrate with 100,000s of insurances/hospitals/clinic' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ fasten_container_name }}"
-          homepage.showStats: "{{ fasten_homepage_showstats }}"
-          repliqate.enabled: "{{ fasten_repliqate_enabled }}"
+          homepage.showStats: "{{ fasten_homepage_showstats | string }}"
+          repliqate.enabled: "{{ fasten_repliqate_enabled | string }}"
           repliqate.engine: "{{ fasten_repliqate_engine }}"
           repliqate.schedule: "{{ fasten_repliqate_schedule }}"
           repliqate.backup_id: "{{ fasten_repliqate_backup_id }}"
@@ -66,7 +66,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (fasten_port_http | string)] +
-                (['https://' + fasten_hostname + '.' + ansible_nas_domain] if (fasten_available_externally is true or fasten_dockflare_tunnel is true) else [])
+                (['https://' + fasten_hostname + '.' + ansible_nas_domain] if (fasten_available_externally is true or fasten_dockflare_enabled is true) else [])
               }}
   when: fasten_enabled is true
 

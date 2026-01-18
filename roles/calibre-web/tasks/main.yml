@@ -35,9 +35,9 @@
         ports:
           - "{{ calibre_web_port_http }}:8083"
         labels:
-          autoheal: "{{ calibre_web_autoheal }}"
-          com.centurylinklabs.watchtower.enable: "{{ calibre_web_watchtower_enable }}"
-          dockflare.enable: "{{ calibre_web_dockflare_tunnel }}"
+          autoheal: "{{ calibre_web_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ calibre_web_watchtower_enabled| string }}"
+          dockflare.enable: "{{ calibre_web_dockflare_enabled | string }}"
           dockflare.access.group: "{{ calibre_web_dockflare_access_group }}"
           dockflare.hostname: "{{ calibre_web_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
@@ -48,13 +48,13 @@
           homepage.description: "{{ 'Web app for browsing, reading and downloading eBooks stored in a Calibre database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ calibre_web_container_name }}"
-          homepage.showStats: "{{ calibre_web_homepage_showstats }}"
+          homepage.showStats: "{{ calibre_web_homepage_showstats | string }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
           homepage.widget.type: "calibreweb"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
           homepage.widget.username: "{{ calibre_web_homepage_widget_username }}"
           homepage.widget.password: "{{ calibre_web_homepage_widget_password }}"
-          repliqate.enabled: "{{ calibre_web_repliqate_enabled }}"
+          repliqate.enabled: "{{ calibre_web_repliqate_enabled | string }}"
           repliqate.engine: "{{ calibre_web_repliqate_engine }}"
           repliqate.schedule: "{{ calibre_web_repliqate_schedule }}"
           repliqate.backup_id: "{{ calibre_web_repliqate_backup_id }}"
@@ -80,7 +80,7 @@
         msg: >-
               {{
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (calibre_web_port_http | string)] +
-                (['https://' + calibre_web_hostname + '.' + ansible_nas_domain] if (calibre_web_available_externally is true or calibre_web_dockflare_tunnel is true) else [])
+                (['https://' + calibre_web_hostname + '.' + ansible_nas_domain] if (calibre_web_available_externally is true or calibre_web_dockflare_enabled is true) else [])
               }}
   when: calibre_web_enabled is true
 
