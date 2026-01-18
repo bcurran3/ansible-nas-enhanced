@@ -1,0 +1,82 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Volumes
+      community.docker.docker_volume:
+        name: "{{ item }}"
+      loop:
+        - database
+        - logs
+        - private
+        - typesense
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ many_notes_container_name }}"
+        hostname: "{{ many_notes_container_name }}"
+        image: "{{ many_notes_image_name }}:{{ many_notes_image_tag }}"
+        pull: true
+        volumes:
+          - database:/var/www/html/database/sqlite
+          - logs:/var/www/html/storage/logs
+          - private:/var/www/html/storage/app/private
+          - typesense:/var/www/html/typesense
+        ports:
+          - "{{ many_notes_port_http }}:8080"
+        env:
+          APP_URL: "{{ many_notes_env_app_url }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ many_notes_autoheal | string }}"
+          com.centurylinklabs.watchtower.enable: "{{ many_notes_watchtower_enable | string }}"
+          dockflare.enable: "{{ many_notes_dockflare_tunnel | string }}"
+          dockflare.access.group: "{{ many_notes_dockflare_access_group }}"
+          dockflare.hostname: "{{ many_notes_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ many_notes_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ many_notes_homepage_group }}"
+          homepage.icon: "{{ many_notes_homepage_icon }}"
+          homepage.href: "{{ many_notes_homepage_href }}"
+          homepage.description: "{{ 'a Markdown note-taking web application designed for simplicity' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ many_notes_container_name }}"
+          homepage.showStats: "{{ many_notes_homepage_showstats }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ many_notes_port_http }}"
+          repliqate.enabled: "{{ many_notes_repliqate_enabled | string }}"
+          repliqate.engine: "{{ many_notes_repliqate_engine }}"
+          repliqate.schedule: "{{ many_notes_repliqate_schedule }}"
+          repliqate.backup_id: "{{ many_notes_repliqate_backup_id }}"
+          repliqate.retention: "{{ many_notes_repliqate_retention }}"
+          traefik.enable: "{{ many_notes_available_externally | string }}"
+          traefik.http.routers.manynotes.rule: "Host(`{{ many_notes_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.manynotes.tls.certresolver: "letsencrypt"
+          traefik.http.routers.manynotes.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.manynotes.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.manynotes.middlewares: "manynotes@docker{{ ',tinyauth-auth@docker' if many_notes_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.manynotes.IPAllowList.sourcerange: "{{ many_notes_traefik_whitelist }}"
+          traefik.http.services.manynotes.loadbalancer.server.port: "8080"
+          wud.tag.include: "^latest$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/brufdev/many-notes/releases"
+        cpu_shares: "{{ many_notes_cpu_shares }}"
+        memory: "{{ many_notes_memory }}"
+        memory_swap: "{{ many_notes_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (many_notes_port_http | string)] +
+                (['https://' + many_notes_hostname + '.' + ansible_nas_domain] if (many_notes_available_externally is true or many_notes_dockflare_tunnel is true) else [])
+              }}
+  when: many_notes_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ many_notes_container_name }}"
+        state: absent
+  when: many_notes_enabled is false
