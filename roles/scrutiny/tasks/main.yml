@@ -10,20 +10,25 @@
         - "{{ scrutiny_data_directory }}/config"
         - "{{ scrutiny_data_directory }}/influxdb"
 
-    - name: Install smartmontools
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        scrutiny_homepage_href: "https://{{ scrutiny_hostname }}.{{ ansible_nas_domain }}"
+      when: scrutiny_traefik_enabled | bool or scrutiny_dockflare_enabled | bool
+
+    - name: Install {{ ansible_nas_app_name }} smartmontools
       apt:
         name: "smartmontools"
         state: present
       register: result
       until: result is succeeded
 
-    - name: Template {{ ansible_nas_app_name }}
+    - name: Template {{ ansible_nas_app_name }} scrutiny.yaml
       template:
         src: scrutiny.yaml
         dest: "{{ scrutiny_data_directory }}/config/scrutiny.yaml"
       register: template_config
 
-    - name: Detect storage devices
+    - name: Detect {{ ansible_nas_app_name }} storage devices
       set_fact:
         scrutiny_devices: "{{ ansible_facts.devices.keys() 
           | select('match', '^(sd[a-z]|nvme[0-9]n[0-9])') 

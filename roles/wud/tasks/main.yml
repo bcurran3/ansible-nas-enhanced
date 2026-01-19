@@ -8,6 +8,11 @@
       with_items:
         - "{{ wud_data_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        wud_homepage_href: "https://{{ wud_hostname }}.{{ ansible_nas_domain }}"
+      when: wud_traefik_enabled | bool or wud_dockflare_enabled | bool
+
     - name: Install python3-passlib
       apt:
         name: "python3-passlib"

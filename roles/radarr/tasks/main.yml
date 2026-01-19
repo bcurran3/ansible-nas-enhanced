@@ -11,6 +11,11 @@
         - "{{ radarr_movies_directory }}"
         - "{{ radarr_anime_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        radarr_homepage_href: "https://{{ radarr_hostname }}.{{ ansible_nas_domain }}"
+      when: radarr_traefik_enabled | bool or radarr_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

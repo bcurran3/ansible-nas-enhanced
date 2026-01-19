@@ -14,6 +14,11 @@
 #      loop:
 #        - appname_volume1
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        appname_homepage_href: "https://{{ appname_hostname }}.{{ ansible_nas_domain }}"
+      when: appname_traefik_enabled | bool or appname_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -167,7 +172,7 @@
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ appname_db_homepage_group }}"
           homepage.icon: "{{ appname_db_homepage_icon }}"
-          homepage.href: "{{ appname_homepage_href }}"
+          homepage.href: "{{ appname_db_homepage_href }}"
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
@@ -215,7 +220,7 @@
           homepage.name: "{{ ansible_nas_app_name }} MongoDB"
           homepage.group: "{{ appname_db_homepage_group }}"
           homepage.icon: "{{ appname_db_homepage_icon }}"
-          homepage.href: "{{ appname_homepage_href }}"
+          homepage.href: "{{ appname_db_homepage_href }}"
           homepage.description: "{{ 'The Database for Secure Apps' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
@@ -268,7 +273,7 @@
           homepage.name: "{{ ansible_nas_app_name }} MySQL"
           homepage.group: "{{ appname_db_homepage_group }}"
           homepage.icon: "{{ appname_db_homepage_icon }}"
-          homepage.href: "{{ appname_homepage_href }}"
+          homepage.href: "{{ appname_db_homepage_href }}"
           homepage.description: "{{ 'MySQL Server, the world''s most popular open source database' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
@@ -319,7 +324,7 @@
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.group: "{{ appname_db_homepage_group }}"
           homepage.icon: "{{ appname_db_homepage_icon }}"
-          homepage.href: "{{ appname_homepage_href }}"
+          homepage.href: "{{ appname_db_homepage_href }}"
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_db_container_name }}"
@@ -365,7 +370,7 @@
           homepage.name: "{{ ansible_nas_app_name }} Redis"
           homepage.group: "{{ appname_redis_homepage_group }}"
           homepage.icon: "{{ appname_redis_homepage_icon }}"
-          homepage.href: "{{ appname_homepage_href }}"
+          homepage.href: "{{ appname_redis_homepage_href }}"
           homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ appname_redis_container_name }}"

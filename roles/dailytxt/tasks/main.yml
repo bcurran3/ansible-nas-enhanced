@@ -9,6 +9,11 @@
         - "{{ dailytxt_data_directory }}"
         - "{{ dailytxt_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        dailytxt_homepage_href: "https://{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
+      when: dailytxt_traefik_enabled | bool or dailytxt_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

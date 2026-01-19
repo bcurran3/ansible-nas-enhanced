@@ -19,6 +19,11 @@
           owner: 65532
           group: 65532
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        open_notebook_homepage_href: "https://{{ open_notebook_hostname }}.{{ ansible_nas_domain }}"
+      when: open_notebook_traefik_enabled | bool or open_notebook_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -40,7 +45,7 @@
           homepage.name: "{{ ansible_nas_app_name }} SurrealDB"
           homepage.group: "{{ open_notebook_db_homepage_group }}"
           homepage.icon: "{{ open_notebook_db_homepage_icon }}"
-          homepage.href: "{{ open_notebook_homepage_href }}"
+          homepage.href: "{{ open_notebook_db_homepage_href }}"
           homepage.description: "{{ 'A scalable, distributed, collaborative, document-graph database, for the realtime web' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ open_notebook_db_container_name }}"

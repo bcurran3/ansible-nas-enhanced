@@ -10,6 +10,12 @@
         - "{{ firefly_data_directory }}/upload"
         - "{{ firefly_data_directory }}/export"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        firefly_env_app_url: "https://{{ firefly_hostname }}.{{ ansible_nas_domain }}"
+        firefly_homepage_href: "https://{{ firefly_hostname }}.{{ ansible_nas_domain }}"
+      when: firefly_traefik_enabled | bool or firefly_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -47,10 +53,6 @@
           homepage.server: "my-docker"
           homepage.container: "{{ firefly_db_container_name }}"
           homepage.showStats: "{{ firefly_db_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
-          homepage.widget.type: "firelfy"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
-          homepage.widget.key: "{{ firefly_homepage_widget_key }}"
           repliqate.enabled: "{{ firefly_db_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ firefly_db_repliqate_engine }}"
           repliqate.schedule: "{{ firefly_db_repliqate_schedule }}"
@@ -120,6 +122,9 @@
           homepage.container: "{{ firefly_container_name }}"
           homepage.showStats: "{{ firefly_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
+          homepage.widget.type: "firelfy"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
+          homepage.widget.key: "{{ firefly_homepage_widget_key }}"
           repliqate.enabled: "{{ firefly_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ firefly_repliqate_engine }}"
           repliqate.schedule: "{{ firefly_repliqate_schedule }}"

@@ -10,6 +10,11 @@
         - "{{ netbootxyz_data_directory }}/assets"
         - "{{ netbootxyz_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        netbootxyz_homepage_href: "https://{{ netbootxyz_hostname }}.{{ ansible_nas_domain }}"
+      when: netbootxyz_traefik_enabled | bool or netbootxyz_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

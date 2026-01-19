@@ -8,6 +8,12 @@
       with_items:
         - "{{ arcane_data_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        arcane_env_app_url: "https://{{ arcane_hostname }}.{{ ansible_nas_domain }}"
+        arcane_homepage_href: "https://{{ arcane_hostname }}.{{ ansible_nas_domain }}"
+      when: arcane_traefik_enabled | bool or arcane_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -22,7 +28,7 @@
         ports:
           - "{{ arcane_port_http }}:{{ arcane_port_http }}"
         env:
-          APP_URL: "http://localhost:{{ arcane_port_http }}"
+          APP_URL: "{{ arcane_env_app_url }}"
           ENCRYPTION_KEY: "{{ arcane_env_encryption_key }}"
           JWT_SECRET: "{{ arcane_env_jwt_secret }}"
           PUID: "{{ arcane_puid }}"

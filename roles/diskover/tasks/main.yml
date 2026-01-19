@@ -9,6 +9,12 @@
         - "{{ diskover_data_directory }}/"
         - "{{ diskover_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        diskover_homepage_href: "https://{{ diskover_hostname }}.{{ ansible_nas_domain }}"
+        diskover_elasticsearch_homepage_href: "https://{{ diskover_elasticsearch_hostname }}.{{ ansible_nas_domain }}"
+      when: diskover_traefik_enabled | bool or diskover_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Elasticsearch Directories
       ansible.builtin.file:
         path: "{{ item }}"
@@ -108,7 +114,7 @@
         privileged: true
         labels:
           autoheal: "false"
-          com.centurylinklabs.watchtower.enable: "{{ diskover_elasticsearch_watchtower_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "false"
           dockflare.enable: "false"
           repliqate.enabled: "false"
           traefik.enable: "false"

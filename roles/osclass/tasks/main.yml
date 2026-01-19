@@ -11,6 +11,11 @@
         - "{{ osclass_data_directory }}/data"
         - "{{ osclass_data_directory }}/db"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        osclass_homepage_href: "https://{{ osclass_hostname }}.{{ ansible_nas_domain }}"
+      when: osclass_traefik_enabled | bool or osclass_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -50,7 +55,7 @@
           homepage.name: "{{ ansible_nas_app_name }} MariaDB"
           homepage.group: "{{ osclass_db_homepage_group }}"
           homepage.icon: "{{ osclass_db_homepage_icon }}"
-          homepage.href: "{{ osclass_homepage_href }}"
+          homepage.href: "{{ osclass_db_homepage_href }}"
           homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ osclass_db_container_name }}"

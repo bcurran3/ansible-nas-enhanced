@@ -9,6 +9,12 @@
 #        - "{{ virtual_tabletop_data_directory }}"
 #        - "{{ virtual_tabletop_data_directory }}/games"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        virtual_tabletop_env_externalurl: "https://{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}"
+        virtual_tabletop_homepage_href: "https://{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}"
+      when: virtual_tabletop_traefik_enabled | bool or virtual_tabletop_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

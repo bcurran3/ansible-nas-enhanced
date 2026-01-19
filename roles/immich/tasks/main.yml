@@ -11,6 +11,11 @@
         - "{{ immich_data_directory }}/db"
         - "{{ immich_upload_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        immich_homepage_href: "https://{{ immich_hostname }}.{{ ansible_nas_domain }}"
+      when: immich_traefik_enabled | bool or immich_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ immich_network_name }}"
@@ -50,7 +55,7 @@
           homepage.group: "{{ immich_db_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
           homepage.icon: "{{ immich_db_homepage_icon }}"
-          homepage.href: "{{ immich_homepage_href }}"
+          homepage.href: "{{ immich_db_homepage_href }}"
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ immich_db_container_name }}"
@@ -92,7 +97,7 @@
           homepage.group: "{{ immich_redis_homepage_group }}"
           homepage.name: "Immich Redis"
           homepage.icon: "{{ immich_redis_homepage_icon }}"
-          homepage.href: "{{ immich_homepage_href }}"
+          homepage.href: "{{ immich_redis_homepage_href }}"
           homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ immich_redis_container_name }}"
@@ -142,7 +147,7 @@
           homepage.group: "{{ immich_ml_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }} Machine Learning"
           homepage.icon: "{{ immich_ml_homepage_icon }}"
-          homepage.href: "{{ immich_homepage_href }}"
+          homepage.href: "{{ immich_ml_homepage_href }}"
           homepage.description: "{{'Immich Machine Learning' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ immich_ml_container_name }}"
