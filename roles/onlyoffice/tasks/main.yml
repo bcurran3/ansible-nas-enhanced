@@ -9,6 +9,10 @@
         - "{{ onlyoffice_data_directory }}/data"
         - "{{ onlyoffice_data_directory }}/logs"
 
+    - name: Create {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ nextcloud_network_name }}"
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

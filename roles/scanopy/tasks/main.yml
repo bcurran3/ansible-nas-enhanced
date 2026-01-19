@@ -143,7 +143,7 @@
           homepage.container: "{{ scanopy_container_name }}"
           homepage.showStats: "{{ scanopy_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ scanopy_port_http }}"
-          repliqate.enabled: "{{ scanopy_repliqate_enabled }}"
+          repliqate.enabled: "{{ scanopy_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ scanopy_repliqate_engine }}"
           repliqate.schedule: "{{ scanopy_repliqate_schedule }}"
           repliqate.backup_id: "{{ scanopy_repliqate_backup_id }}"

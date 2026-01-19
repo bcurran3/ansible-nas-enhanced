@@ -173,9 +173,6 @@
   ## Set to true to collect Swarm metrics(desired_replicas, running_replicas)
   gather_services = false
 
-  ## Only collect metrics for these containers, collect all if empty
-  container_names = []
-
   ## Containers to include and exclude. Globs accepted.
   ## Note that an empty array for both will include all containers
   container_name_include = []
@@ -189,11 +186,6 @@
   ## Timeout for docker list, info, and stats commands
   timeout = "5s"
 
-  ## Whether to report for each container per-device blkio (8:0, 8:1...) and
-  ## network (eth0, eth1, ...) stats or not
-  perdevice = true
-  ## Whether to report for each container total blkio and network stats or not
-  total = false
   ## Which environment variables should we use as a tag
   ##tag_env = ["JAVA_HOME", "HEAP_SIZE"]
 
@@ -241,11 +233,13 @@
   # no configuration
 
 
-# Monitor sensors, requires lm-sensors package
-[[inputs.sensors]]
-  ## Remove numbers from field names.
-  ## If true, a field name like 'temp1_input' will be changed to 'temp_input'.
-  # remove_numbers = true
+# Comment out the old sensors plugin
+# [[inputs.sensors]]
+#   remove_numbers = true
+
+# Add the temp plugin (Works with Docker /hostfs mappings)
+[[inputs.temp]]
+  # No configuration needed usually, it scans /sys/class/hwmon automatically
 
 
 # Read metrics from storage devices supporting S.M.A.R.T.
