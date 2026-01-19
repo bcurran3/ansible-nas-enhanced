@@ -390,7 +390,7 @@ By default, applications can be found on the ports listed below.
 | Virtual Tabletop | 8272    | Bridge  | HTTP           |
 | Wallabag         | 7780    | Bridge  | HTTP           |
 | WatchState       | 8992
-| Watchtower       | 2347
+| Watchtower       | 2347    | Bridge  | API            |
 | WatchYourLAN     | 8840    | Bridge  | HTTP           |
 | Webmin           | 10000   | Host    | HTTP           |
 | Webtop           | 3058    | Bridge  | HTTP           |
