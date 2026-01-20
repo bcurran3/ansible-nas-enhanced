@@ -10,6 +10,11 @@
         - "{{ containery_data_directory }}/data"
         - "{{ containery_data_directory }}/static"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        containery_homepage_href: "https://{{ containery_hostname }}.{{ ansible_nas_domain }}"
+      when: containery_traefik_enabled | bool or containery_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

@@ -11,6 +11,11 @@
         - "{{ fileshelter_data_directory }}"
         - "{{ fileshelter_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        fileshelter_homepage_href: "https://{{ fileshelter_hostname }}.{{ ansible_nas_domain }}"
+      when: fileshelter_traefik_enabled | bool or fileshelter_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

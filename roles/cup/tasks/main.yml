@@ -9,6 +9,11 @@
         - "{{ cup_data_directory }}"
         - "{{ cup_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        cup_homepage_href: "https://{{ cup_hostname }}.{{ ansible_nas_domain }}"
+      when: cup_traefik_enabled | bool or cup_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

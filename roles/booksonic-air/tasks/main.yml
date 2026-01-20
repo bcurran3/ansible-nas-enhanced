@@ -12,6 +12,11 @@
         - "{{ booksonic_air_audiobooks_directory }}"
         - "{{ booksonic_air_podcasts_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        booksonic_air_homepage_href: "https://{{ booksonic_air_hostname }}.{{ ansible_nas_domain }}"
+      when: booksonic_air_traefik_enabled | bool or booksonic_air_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

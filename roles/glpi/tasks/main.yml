@@ -10,6 +10,11 @@
         - "{{ glpi_data_directory }}/db"
         - "{{ glpi_data_directory }}/html"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        glpi_homepage_href: "https://{{ glpi_hostname }}.{{ ansible_nas_domain }}"
+      when: glpi_traefik_enabled | bool or glpi_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

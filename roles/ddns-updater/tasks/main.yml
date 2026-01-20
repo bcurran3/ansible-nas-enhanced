@@ -17,6 +17,11 @@
         dest: "{{ ddns_updater_data_directory }}/config.json"
       register: ddns_updater_config
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        ddns_updater_homepage_href: "https://{{ ddns_updater_hostname }}.{{ ansible_nas_domain }}"
+      when: ddns_updater_traefik_enabled | bool or ddns_updater_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

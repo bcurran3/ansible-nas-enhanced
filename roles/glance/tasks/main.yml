@@ -10,6 +10,11 @@
         - "{{ glance_data_directory }}/assets"
         - "{{ glance_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        glance_homepage_href: "https://{{ glance_hostname }}.{{ ansible_nas_domain }}"
+      when: glance_traefik_enabled | bool or glance_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Template config file
       ansible.builtin.template:
         src: "{{ item }}"

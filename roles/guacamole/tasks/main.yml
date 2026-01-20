@@ -27,6 +27,11 @@
       with_items:
         - "{{ guacamole_data_directory }}/mysql"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        guacamole_homepage_href: "https://{{ guacamole_hostname }}.{{ ansible_nas_domain }}"
+      when: guacamole_traefik_enabled | bool or guacamole_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

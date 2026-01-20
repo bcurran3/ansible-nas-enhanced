@@ -9,6 +9,11 @@
         - "{{ dockge_data_directory }}"
         - "{{ dockge_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        dockge_homepage_href: "https://{{ dockge_hostname }}.{{ ansible_nas_domain }}"
+      when: dockge_traefik_enabled | bool or dockge_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

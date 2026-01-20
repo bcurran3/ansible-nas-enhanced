@@ -9,6 +9,11 @@
         - "{{ doublecommander_data_directory }}"
         - "{{ doublecommander_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        doublecommander_homepage_href: "https://{{ doublecommander_hostname }}.{{ ansible_nas_domain }}"
+      when: doublecommander_traefik_enabled | bool or doublecommander_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

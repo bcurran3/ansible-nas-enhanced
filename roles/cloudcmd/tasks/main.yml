@@ -9,6 +9,11 @@
         - "{{ cloudcmd_data_directory }}"
         - "{{ cloudcmd_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        cloudcmd_homepage_href: "https://{{ cloudcmd_hostname }}.{{ ansible_nas_domain }}"
+      when: cloudcmd_traefik_enabled | bool or cloudcmd_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

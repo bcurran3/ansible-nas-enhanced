@@ -9,6 +9,11 @@
         - "{{ docker_android_data_directory }}"
         - "{{ docker_android_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        docker_android_homepage_href: "https://{{ docker_android_hostname }}.{{ ansible_nas_domain }}"
+      when: docker_android_traefik_enabled | bool or docker_android_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

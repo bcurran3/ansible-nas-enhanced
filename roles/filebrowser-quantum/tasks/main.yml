@@ -9,6 +9,11 @@
         - "{{ filebrowser_quantum_data_directory }}"
         - "{{ filebrowser_quantum_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        filebrowser_quantum_homepage_href: "https://{{ filebrowser_quantum_hostname }}.{{ ansible_nas_domain }}"
+      when: filebrowser_quantum_traefik_enabled | bool or filebrowser_quantum_dockflare_enabled | bool
+
     - name: Generate {{ ansible_nas_app_name }} config file
       ansible.builtin.template:
         src: config.yaml

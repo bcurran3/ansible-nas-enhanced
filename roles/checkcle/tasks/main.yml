@@ -9,6 +9,11 @@
         - "{{ checkcle_data_directory }}"
         - "{{ checkcle_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        checkcle_homepage_href: "https://{{ checkcle_hostname }}.{{ ansible_nas_domain }}"
+      when: checkcle_traefik_enabled | bool or checkcle_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
