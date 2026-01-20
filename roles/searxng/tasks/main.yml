@@ -7,10 +7,13 @@
         state: directory
       with_items:
         - "{{ searxng_data_directory }}"
-        - "{{ searxng_data_directory }}/etc"
+        - "{{ searxng_data_directory }}/config"
+        - "{{ searxng_data_directory }}/data"
 
     - name: Set {{ ansible_nas_app_name }} FQDN var overrides
       ansible.builtin.set_fact:
+        searxng_env_base_url: "https://{{ searxng_hostname }}.{{ ansible_nas_domain }}"
+        searxng_env_url: "https://{{ searxng_hostname }}.{{ ansible_nas_domain }}"
         searxng_homepage_href: "https://{{ searxng_hostname }}.{{ ansible_nas_domain }}"
       when: searxng_traefik_enabled | bool or searxng_dockflare_enabled | bool
 
@@ -24,12 +27,13 @@
         ports:
           - "{{ searxng_port_http }}:8080"
         volumes:
-          - "{{ searxng_data_directory }}/etc:/etc/searxng"
+          - "{{ searxng_data_directory }}/config:/etc/searxng/"
+          - "{{ searxng_data_directory }}/data:/var/cache/searxng/"
         network_mode: bridge
         env:
-          BASE_URL: "http://localhost:8080"
-          INSTANCE_NAME: "my-instance"
-          URL: "searxng.{{ ansible_nas_domain }}"
+          BASE_URL: "{{ searxng_env_base_url }}"
+          INSTANCE_NAME: "{{ searxng_env_instance_name }}"
+          URL: "{{ searxng_env_url }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ searxng_autoheal_enabled | ternary('true', 'false') }}"
@@ -43,7 +47,7 @@
           homepage.icon: "{{ searxng_homepage_icon }}"
           homepage.href: "{{ searxng_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
-          homepage.description: "{{ 'SearXNG is a free internet metasearch engine which aggregates results from various search services and databases.' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'a free internet metasearch engine which aggregates results from various search services and databases.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ searxng_container_name }}"
           homepage.showStats: "{{ searxng_homepage_showstats | ternary('true', 'false') }}"
