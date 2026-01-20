@@ -21,8 +21,10 @@ searxng_memory: "1G"
 searxng_memory_swap: -1
 
 # app
-searxng_env_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
 searxng_env_instance_name: "{{ ansible_nas_hostname }}-1"
+searxng_env_searxng_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
+searxng_env_searxng_limiter_proxies: "1"
+searxng_env_searxng_limiter_real_ip_header: "X-Forwarded-For"
 searxng_env_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
 
 # autoheal
