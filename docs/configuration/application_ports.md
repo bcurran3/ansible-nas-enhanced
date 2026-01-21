@@ -21,7 +21,8 @@ By default, applications can be found on the ports listed below.
 | autobrr          | 7474
 | BanBan           | 3028    | Bridge  | HTTP           |
 | Bazarr           | 6767    | Bridge  | HTTP           |
-| Beszel           | 3015
+| BentoPDF         | 3088    | Bridge  | HTTP           |
+| Beszel           | 3015    | Bridge  | HTTP           |
 | Beszel Agent     | 45876
 | bitmagnet        | 3333
 | bitmagnet        | 3334
@@ -416,7 +417,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3087-3089, then 3098+
+# next avail = 3089, then 3098+
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002
