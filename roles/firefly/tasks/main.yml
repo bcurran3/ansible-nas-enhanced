@@ -31,16 +31,16 @@
           MYSQL_PASSWORD: "{{ firefly_env_db_password }}"
           MYSQL_ROOT_PASSWORD: "{{ firefly_db_env_mysql_root_password }}"
         healthcheck:
-              test:
-                - CMD
-                - /usr/local/bin/healthcheck.sh
-                - --su-mysql
-                - --connect
-                - --innodb_initialized
-              interval: "30s"
-              timeout: "10s"
-              retries: "3"
-              start_period: "30s"
+          test:
+            - CMD
+            - /usr/local/bin/healthcheck.sh
+            - --su-mysql
+            - --connect
+            - --innodb_initialized
+          interval: "30s"
+          timeout: "10s"
+          retries: "3"
+          start_period: "30s"
         labels:
           autoheal: "{{ firefly_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ firefly_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -68,10 +68,18 @@
         restart_policy: unless-stopped
       register: firefly_db_status
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to initialize
+    - name: Allow {{ ansible_nas_app_name }} DB time to initialize
       ansible.builtin.pause:
         seconds: 30
       when: firefly_db_status.changed
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ firefly_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -122,7 +130,7 @@
           homepage.container: "{{ firefly_container_name }}"
           homepage.showStats: "{{ firefly_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
-          homepage.widget.type: "firelfy"
+          homepage.widget.type: "firefly"
           homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ firefly_port_http }}"
           homepage.widget.key: "{{ firefly_homepage_widget_key }}"
           repliqate.enabled: "{{ firefly_repliqate_enabled | ternary('true', 'false') }}"
@@ -149,10 +157,10 @@
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
         msg: >-
-              {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (firefly_port_http | string)] +
-                (['https://' + firefly_hostname + '.' + ansible_nas_domain] if (firefly_traefik_enabled is true or firefly_dockflare_enabled is true) else [])
-              }}
+          {{
+            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (firefly_port_http | string)] +
+            (['https://' + firefly_hostname + '.' + ansible_nas_domain] if (firefly_traefik_enabled is true or firefly_dockflare_enabled is true) else [])
+          }}
   when: firefly_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
@@ -175,4 +183,4 @@
     target_data_dir: "{{ firefly_data_directory }}"
   when:
     - archive_app_data_enabled is true
-    - firefly_enabled is false
+    - firefly_enabled
