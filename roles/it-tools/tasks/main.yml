@@ -14,8 +14,9 @@
         image: "{{ it_tools_image_name }}:{{ it_tools_image_tag }}"
         pull: true
         ports:
-          - "{{ it_tools_port_http }}:80"
+          - "{{ it_tools_port_http }}:{{ it_tools_port_http }}"
         env:
+          PORT: "{{ it_tools_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ it_tools_autoheal_enabled | ternary('true', 'false') }}"
@@ -40,10 +41,10 @@
           traefik.http.routers.ittools.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.ittools.middlewares: "ittools@docker{{ ',tinyauth-auth@docker' if it_tools_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.ittools.IPAllowList.sourcerange: "{{ it_tools_traefik_whitelist }}"
-          traefik.http.services.ittools.loadbalancer.server.port: "80"
+          traefik.http.services.ittools.loadbalancer.server.port: "{{ it_tools_port_http }}"
           wud.tag.include: "^latest$"
           wud.watch.digest: "true"
-          wud.link.template: "https://github.com/CorentinTh/it-tools/pkgs/container/it-tools"
+          wud.link.template: "https://github.com/sharevb/it-tools/pkgs/container/it-tools"
         cpu_shares: "{{ it_tools_cpu_shares }}"
         memory: "{{ it_tools_memory }}"
         memory_swap: "{{ it_tools_memory_swap }}"
