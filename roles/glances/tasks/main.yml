@@ -61,7 +61,7 @@
           traefik.http.middlewares.glances.IPAllowList.sourcerange: "{{ glances_traefik_whitelist }}"
           traefik.http.services.glances.loadbalancer.server.port: "61208"
           wud.tag.include: "^latest$"
-          wud.tag.transform.type: "semver"
+          wud.watch.digest: "true"
           wud.link.template: "https://github.com/nicolargo/glances/releases"
         cpu_shares: "{{ glances_cpu_shares }}"
         memory: "{{ glances_memory }}"

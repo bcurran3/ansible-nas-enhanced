@@ -81,7 +81,7 @@
           traefik.http.middlewares.traefik-dash-redirect.redirectregex.replacement: "https://{{ traefik_hostname }}.{{ ansible_nas_domain }}/dashboard/"
           traefik.http.middlewares.traefik-whitelist.ipallowlist.sourcerange: "{{ traefik_traefik_whitelist }}"
           wud.tag.include: "^latest$"
-          wud.tag.transform.type: "semver"
+          wud.watch.digest: "true"
           wud.link.template: "https://hub.docker.com/_/traefik"
         cpu_shares: "{{ traefik_cpu_shares }}"
         memory: "{{ traefik_memory }}"
