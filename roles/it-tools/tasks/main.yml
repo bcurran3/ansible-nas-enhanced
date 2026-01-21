@@ -1,6 +1,11 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        appname_homepage_href: "https://{{ it_tools_hostname }}.{{ ansible_nas_domain }}"
+      when: it_tools_traefik_enabled | bool or it_tools_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -36,9 +41,9 @@
           traefik.http.routers.ittools.middlewares: "ittools@docker{{ ',tinyauth-auth@docker' if it_tools_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.ittools.IPAllowList.sourcerange: "{{ it_tools_traefik_whitelist }}"
           traefik.http.services.ittools.loadbalancer.server.port: "80"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/corentinth/it-tools"
+          wud.tag.include: "^latest$"
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/CorentinTh/it-tools/releases"
         cpu_shares: "{{ it_tools_cpu_shares }}"
         memory: "{{ it_tools_memory }}"
         memory_swap: "{{ it_tools_memory_swap }}"
