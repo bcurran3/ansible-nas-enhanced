@@ -1,0 +1,45 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ nebula_sync_container_name }}"
+        hostname: "{{ nebula_sync_container_name }}"
+        image: "{{ nebula_sync_image_name }}:{{ nebula_sync_image_tag }}"
+        pull: true
+        env:
+          PRIMARY: "{{ nebula_sync_env_primary }}"
+          REPLICAS: "{{ nebula_sync_env_replicas }}"
+          FULL_SYNC: "{{ nebula_sync_env_full_sync }}"
+          RUN_GRAVITY: "{{ nebula_sync_env_run_gravity }}"
+          CRON: "{{ nebula_sync_env_cron }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ nebula_sync_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ nebula_sync_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ nebula_sync_homepage_group }}"
+          homepage.icon: "{{ nebula_sync_homepage_icon }}"
+          homepage.description: "{{ 'Synchronize configuration of multiple Pi-hole v6.x instances.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ nebula_sync_container_name }}"
+          homepage.showStats: "{{ nebula_sync_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "false"
+          traefik.enable: "false"
+          wud.tag.include: "^latest$"
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/lovelaze/nebula-sync/releases"
+        cpu_shares: "{{ nebula_sync_cpu_shares }}"
+        memory: "{{ nebula_sync_memory }}"
+        memory_swap: "{{ nebula_sync_memory_swap }}"
+        restart_policy: unless-stopped
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ nebula_sync_container_name }}"
+        state: absent
+  when: nebula_sync_enabled is false
