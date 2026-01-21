@@ -1,0 +1,39 @@
+---
+# ANE
+ansible_nas_app_name: "BentoPDF"
+bentopdf_enabled: false
+bentopdf_traefik_enabled: false
+bentopdf_traefik_whitelist: "{{ lan }}"
+
+# docker
+bentopdf_container_name: "bentopdf"
+bentopdf_image_name: "bentopdf/bentopdf"
+bentopdf_image_tag: "latest"
+
+# network
+bentopdf_hostname: "bentopdf"
+bentopdf_port_http: "3088"
+
+# specs
+bentopdf_cpu_shares: 1024
+bentopdf_memory: "512M"
+bentopdf_memory_swap: -1
+
+# autoheal
+bentopdf_autoheal_enabled: false
+
+# dockflare
+bentopdf_dockflare_enabled: false
+bentopdf_dockflare_access_group: ""
+
+# homepage
+bentopdf_homepage_group: "Apps"
+bentopdf_homepage_icon: "sh-bentopdf.png"
+bentopdf_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ bentopdf_port_http }}/index.html#tools-header"
+bentopdf_homepage_showstats: false
+
+# tinyauth
+bentopdf_tinyauth_enabled: false
+
+# watchtower
+bentopdf_watchtower_enabled: false
