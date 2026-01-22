@@ -5,10 +5,14 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        # mode: 0755
       with_items:
         - "{{ navidrome_data_directory }}/data"
         - "{{ navidrome_data_directory }}/playlists"
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        navidrome_homepage_href: "https://{{ navidrome_hostname }}.{{ ansible_nas_domain }}"
+      when: navidrome_traefik_enabled | bool or navidrome_dockflare_enabled | bool
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:

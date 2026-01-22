@@ -11,6 +11,12 @@
         - "{{ owncloud_data_directory }}/files"
         - "{{ owncloud_data_directory }}/redis"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        owncloud_env_owncloud_domain: "{{ owncloud_hostname }}.{{ ansible_nas_domain }}"
+        owncloud_homepage_href: "https://{{ owncloud_hostname }}.{{ ansible_nas_domain }}"
+      when: owncloud_traefik_enabled | bool or owncloud_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -56,6 +62,7 @@
           wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ owncloud_db_cpu_shares }}"
         memory: "{{ owncloud_db_memory }}"
+        memory_swap: "{{ owncloud_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
@@ -98,6 +105,7 @@
           wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ owncloud_redis_cpu_shares }}"
         memory: "{{ owncloud_redis_memory }}"
+        memory_swap: "{{ owncloud_redis_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -167,6 +175,7 @@
           wud.link.template: "https://hub.docker.com/r/owncloud/server"
         cpu_shares: "{{ owncloud_cpu_shares }}"
         memory: "{{ owncloud_memory }}"
+        memory_swap: "{{ owncloud_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

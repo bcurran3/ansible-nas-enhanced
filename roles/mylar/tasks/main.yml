@@ -5,12 +5,16 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        # mode: 0755
       with_items:
         - "{{ mylar_data_directory }}"
         - "{{ mylar_data_directory }}/config"
         - "{{ mylar_comics_directory }}"
         - "{{ mylar_downloads_directory }}"
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        mylar_homepage_href: "https://{{ mylar_hostname }}.{{ ansible_nas_domain }}"
+      when: mylar_traefik_enabled | bool or mylar_dockflare_enabled | bool
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:

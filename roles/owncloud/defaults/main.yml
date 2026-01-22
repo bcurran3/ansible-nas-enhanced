@@ -30,22 +30,25 @@ owncloud_hostname: "owncloud"
 # specs
 owncloud_cpu_shares: 1024
 owncloud_memory: "1G"
+owncloud_memory_swap: -1
 owncloud_db_cpu_shares: 1024
 owncloud_db_memory: "1G"
+owncloud_db_memory_swap: "{{ owncloud_db_memory }}"
 owncloud_redis_cpu_shares: 1024
 owncloud_redis_memory: "1G"
+owncloud_redis_memory_swap: "{{ owncloud_db_memory }}"
 
 # app
 owncloud_env_owncloud_domain: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
 owncloud_env_owncloud_trusted_domains: "localhost, {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}, {{ owncloud_hostname }}.{{ ansible_nas_domain }}"
-owncloud_env_owncloud_db_name: "owncloud"
+owncloud_env_owncloud_db_name: "owncloud_db"
 owncloud_env_owncloud_db_username: "owncloud"
-owncloud_env_owncloud_db_password: "owncloud"
+owncloud_env_owncloud_db_password: "topsecret"
 owncloud_env_owncloud_admin_username: "admin" # ADMIN_USERNAME and ADMIN_PASSWORD will not change between deploys even if you change the values
 owncloud_env_owncloud_admin_password: "{{ ansible_nas_app_admin_password }}"
 owncloud_env_owncloud_mysql_utf8mb4: "true"
 owncloud_env_owncloud_redis_enabled: "true"
-owncloud_db_env_mysql_root_password: "owncloud"
+owncloud_db_env_mysql_root_password: "topsecretroot"
 owncloud_db_env_mariadb_auto_upgrade: "1"
 
 # autoheal
@@ -89,7 +92,7 @@ owncloud_redis_repliqate_backup_id: "owncloud"
 owncloud_redis_repliqate_retention: "30d"
 
 # tinyauth
-appname_tinyauth_enabled: false
+owncloud_tinyauth_enabled: false
 
 # watchtower
 owncloud_watchtower_enabled: false

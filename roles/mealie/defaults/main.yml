@@ -27,7 +27,7 @@ mealie_memory: "1G"
 mealie_memory_swap: -1
 
 # app
-mealie_env_base_url: "http://localhost:8080"
+mealie_env_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mealie_port_http }}"
 mealie_env_recipe_public: "true"
 mealie_env_recipe_show_nutrition: "true"
 mealie_env_recipe_show_assets: "true"

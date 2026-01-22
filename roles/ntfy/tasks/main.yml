@@ -9,6 +9,11 @@
         - "{{ ntfy_data_directory }}"
         - "{{ ntfy_data_directory }}/cache"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        ntfy_homepage_href: "https://{{ ntfy_hostname }}.{{ ansible_nas_domain }}"
+      when: ntfy_traefik_enabled | bool or ntfy_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

@@ -11,6 +11,11 @@
         - "{{ magnetico_data_directory }}/config"
         - "{{ magnetico_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        magnetico_homepage_href: "https://{{ magnetico_hostname }}.{{ ansible_nas_domain }}"
+      when: magnetico_traefik_enabled | bool or magnetico_dockflare_enabled | bool
+
     - name: Install python3-passlib package
       ansible.builtin.apt:
         pkg:

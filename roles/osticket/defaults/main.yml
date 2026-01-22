@@ -21,16 +21,19 @@ osticket_db_image_tag: "latest"
 # specs
 osticket_cpu_shares: 1024
 osticket_memory: "1G"
+osticket_memory_swap: -1
 osticket_db_cpu_shares: 1024
 osticket_db_memory: "1G"
+osticket_db_memory_swap: "{{ osticket_db_memory }}"
 
 # app
 osticket_env_admin_username: "admin"
 osticket_env_admin_password: "{{ ansible_nas_app_admin_password }}"
-osticket_env_mysql_root_password: "topsecret"
+osticket_env_allow_empty_password: "yes"
+osticket_env_mysql_root_password: "topsecretroot"
+osticket_env_mysql_database: "osticket_db"
 osticket_env_mysql_user: "osticket"
 osticket_env_mysql_password: "topsecret"
-osticket_env_mysql_database: "osticket_db"
 
 # autoheal
 osticket_autoheal_enabled: false

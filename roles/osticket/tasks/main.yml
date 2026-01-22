@@ -11,6 +11,11 @@
         - "{{ osticket_data_directory }}/osticket"
         - "{{ osticket_data_directory }}/db"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        osticket_homepage_href: "https://{{ osticket_hostname }}.{{ ansible_nas_domain }}"
+      when: osticket_traefik_enabled | bool or osticket_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -22,7 +27,7 @@
         volumes:
           - "{{ osticket_data_directory }}/db:/config"
         env:
-          ALLOW_EMPTY_PASSWORD: "yes"
+          ALLOW_EMPTY_PASSWORD: "{{ osticket_env_allow_empty_password }}"
           CONTAINER_NAME: "{{ osticket_db_container_name }}"
           DOCKER_MODS: "{{ osticket_db_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ osticket_db_env_docker_mods_install_packages }}"
@@ -62,6 +67,7 @@
           wud.link.template: "lscr.io/linuxserver/mariadb"
         cpu_shares: "{{ osticket_db_cpu_shares }}"
         memory: "{{ osticket_db_memory }}"
+        memory_swap: "{{ osticket_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
@@ -75,7 +81,7 @@
         ports:
           - "{{ osticket_port_http }}:80"
         env:
-          ALLOW_EMPTY_PASSWORD: "yes"
+          ALLOW_EMPTY_PASSWORD: "{{ osticket_env_allow_empty_password }}"
           ADMIN_USERNAME: "{{ osticket_env_admin_username }}"
           ADMIN_PASSWORD: "{{ osticket_env_admin_password }}"
           CONTAINER_NAME: "{{ osticket_container_name }}"
@@ -121,6 +127,7 @@
           wud.link.template: "https://hub.docker.com/r/ahkarswe/osticket"
         cpu_shares: "{{ osticket_cpu_shares }}"
         memory: "{{ osticket_memory }}"
+        memory_swap: "{{ osticket_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

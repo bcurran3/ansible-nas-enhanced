@@ -8,6 +8,11 @@
       with_items:
         - "{{ miniflux_data_directory }}/postgres"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        miniflux_homepage_href: "https://{{ miniflux_hostname }}.{{ ansible_nas_domain }}"
+      when: miniflux_traefik_enabled | bool or miniflux_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ miniflux_network_name }}"
@@ -25,8 +30,8 @@
         volumes:
           - "{{ miniflux_data_directory }}/postgres:/var/lib/postgresql/data:rw"
         env:
-          POSTGRES_USER: "miniflux"
-          POSTGRES_PASSWORD: "supersecure"
+          POSTGRES_USER: "{{ miniflux_db_postgres_user }}"
+          POSTGRES_PASSWORD: "{{ miniflux_db_postgres_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ miniflux_db_autoheal_enabled | ternary('true', 'false') }}"
@@ -67,7 +72,7 @@
         ports:
           - "{{ miniflux_port_http }}:8080"
         env:
-          DATABASE_URL: "postgres://miniflux:supersecure@{{ miniflux_db_container_name }}/miniflux?sslmode=disable"
+          DATABASE_URL: "postgres://{{ miniflux_db_postgres_user }}:{{ miniflux_db_postgres_password }}@{{ miniflux_db_container_name }}/miniflux?sslmode=disable"
           RUN_MIGRATIONS: "1"
           CREATE_ADMIN: "1"
           ADMIN_USERNAME: "{{ miniflux_admin_username }}"

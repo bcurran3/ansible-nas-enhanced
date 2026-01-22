@@ -24,12 +24,12 @@ opencloud_hostname: "opencloud"
 # specs
 opencloud_cpu_shares: 1024
 opencloud_memory: "1G"
+opencloud_memory_swap: -1
 
 # app
 # https://github.com/opencloud-eu/opencloud-compose/blob/main/.env.example
-opencloud_env_idm_admin_password: "topsecret" # NOTE: This variable needs to be set before the first start of OpenCloud. Changes to this variable after the first start will be IGNORED.
-opencloud_env_oc_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port_http }}"
-#opencloud_env_oc_url: "https://{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
+opencloud_env_idm_admin_password: "{{ ansible_nas_app_admin_password }}" # NOTE: This variable needs to be set before the first start of OpenCloud. Changes to this variable after the first start will be IGNORED.
+opencloud_env_oc_url: "https://{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
 opencloud_env_smtp_host: ""
 opencloud_env_smtp_port: ""
 opencloud_env_smtp_sender: ""
@@ -49,7 +49,7 @@ opencloud_dockflare_access_group: ""
 # homepage
 opencloud_homepage_group: "Apps"
 opencloud_homepage_icon: "sh-opencloud.png"
-opencloud_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ opencloud_port_http }}"
+opencloud_homepage_href: "https://{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
 opencloud_homepage_showstats: false
 
 # repliqate

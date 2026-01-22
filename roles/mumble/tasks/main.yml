@@ -5,12 +5,15 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        # The mumble image gets uid/gid at build time, and uses 1000 for both, by default.
-        # This ends up with permission denied on the data directory, unless we change ownership or fully open the permissions.
         owner: 1000
         group: 1000
       with_items:
         - "{{ mumble_data_directory }}"
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        mumble_homepage_href: "https://{{ mumble_hostname }}.{{ ansible_nas_domain }}"
+      when: mumble_traefik_enabled | bool or mumble_dockflare_enabled | bool
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:

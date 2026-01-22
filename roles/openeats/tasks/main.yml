@@ -8,6 +8,15 @@
       with_items:
         - "{{ openeats_data_directory }}/db"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        openeats_api_env_allowed_host: "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
+        openeats_api_env_http_x_forwarded_proto: "true"
+        openeats_env_node_url: "https://{{ openeats_hostname }}.{{ ansible_nas_domain }}"
+        openeats_env_node_api_url: "https://{{ openeats_hostname }}.{{ ansible_nas_domain }}"
+        openeats_homepage_href: "https://{{ openeats_hostname }}.{{ ansible_nas_domain }}"
+      when: openeats_traefik_enabled | bool or openeats_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -52,6 +61,7 @@
           wud.link.template: "https://hub.docker.com/_/mariadb"
         cpu_shares: "{{ openeats_db_cpu_shares }}"
         memory: "{{ openeats_db_memory }}"
+        memory_swap: "{{ openeats_db_memory_swap }}"
         restart_policy: unless-stopped
       register: openeats_db_status
 
@@ -59,6 +69,14 @@
       ansible.builtin.pause:
         seconds: 30
       when: openeats_db_status.changed
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ openeats_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} API Container
       community.docker.docker_container:
@@ -115,6 +133,7 @@
           wud.link.template: "https://hub.docker.com/r/openeats/openeats-api"
         cpu_shares: "{{ openeats_api_cpu_shares }}"
         memory: "{{ openeats_api_memory }}"
+        memory_swap: "{{ openeats_api_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Web UI Container
@@ -160,6 +179,7 @@
           wud.link.template: "https://hub.docker.com/r/openeats/openeats-web"
         cpu_shares: "{{ openeats_web_cpu_shares }}"
         memory: "{{ openeats_web_memory }}"
+        memory_swap: "{{ openeats_web_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Nginx Container
@@ -217,6 +237,7 @@
           wud.link.template: "https://hub.docker.com/r/openeats/openeats-nginx/tags"
         cpu_shares: "{{ openeats_nginx_cpu_shares }}"
         memory: "{{ openeats_nginx_memory }}"
+        memory_swap: "{{ openeats_nginx_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
