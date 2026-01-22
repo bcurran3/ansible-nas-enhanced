@@ -2,92 +2,92 @@
 # ANE
 ansible_nas_app_name: "Proxmox"
 proxmox_stack_enabled: false
-pve1_enabled: true
-pve2_enabled: true
-pve3_enabled: true
-pdm_enabled: true
-pve_traefik_enabled: false
-pve_traefik_whitelist: "{{ lan }}"
+proxmox_stack_traefik_enabled: false
+proxmox_stack_traefik_whitelist: "{{ lan }}"
+proxmox_stack_pve1_enabled: true
+proxmox_stack_pve2_enabled: true
+proxmox_stack_pve3_enabled: true
+proxmox_stack_pdm_enabled: true
 
 # directories
-pve_data_directory: "{{ docker_home }}/proxmox"
+proxmox_stack_data_directory: "{{ docker_home }}/proxmox-stack"
 
 # docker
-pve_image_name: "ghcr.io/longqt-sea/proxmox-ve"
-pve_image_tag: "latest"
-pve1_container_name: "pve1"
-pve2_container_name: "pve2"
-pve3_container_name: "pve3"
-pdm_container_name: "pdm"
-pdm_image_name: "ghcr.io/longqt-sea/proxmox-datacenter-manager"
-pdm_image_tag: "latest"
+proxmox_stack_pve_image_name: "ghcr.io/longqt-sea/proxmox-ve"
+proxmox_stack_pve_image_tag: "latest"
+proxmox_stack_pve1_container_name: "pve1"
+proxmox_stack_pve2_container_name: "pve2"
+proxmox_stack_pve3_container_name: "pve3"
+proxmox_stack_pdm_container_name: "pdm"
+proxmox_stack_pdm_image_name: "ghcr.io/longqt-sea/proxmox-datacenter-manager"
+proxmox_stack_pdm_image_tag: "latest"
 
 # network
-pve_network_name: "proxmox"
-pve1_hostname: "pve1"
-pve1_port_http: "3091"
-pve1_port_ssh: "2222"
-pve1_port_spice: "3095"
-pve2_hostname: "pve2"
-pve2_port_http: "3092"
-pve2_port_ssh: "2223"
-pve2_port_spice: "3096"
-pve3_hostname: "pve3"
-pve3_port_http: "3093"
-pve3_port_ssh: "2224"
-pve3_port_spice: "3097"
-pdm_hostname: "pdm"
-pdm_port_http: "3094"
-pdm_port_ssh: "2225"
+proxmox_stack_network_name: "proxmox"
+proxmox_stack_pve1_hostname: "pve1"
+proxmox_stack_pve1_port_http: "3091"
+proxmox_stack_pve1_port_ssh: "2222"
+proxmox_stack_pve1_port_spice: "3095"
+proxmox_stack_pve2_hostname: "pve2"
+proxmox_stack_pve2_port_http: "3092"
+proxmox_stack_pve2_port_ssh: "2223"
+proxmox_stack_pve2_port_spice: "3096"
+proxmox_stack_pve3_hostname: "pve3"
+proxmox_stack_pve3_port_http: "3093"
+proxmox_stack_pve3_port_ssh: "2224"
+proxmox_stack_pve3_port_spice: "3097"
+proxmox_stack_pdm_hostname: "pdm"
+proxmox_stack_pdm_port_http: "3094"
+proxmox_stack_pdm_port_ssh: "2225"
 
 # specs
-pve1_cpu_shares: 1024
-pve1_memory: "4G"
-pve1_memory_swap: -1
-pve2_cpu_shares: 1024
-pve2_memory: "4G"
-pve2_memory_swap: -1
-pve3_cpu_shares: 1024
-pve3_memory: "4G"
-pve3_memory_swap: -1
-pdm_cpu_shares: 1024
-pdm_memory: "2G"
-pdm_memory_swap: -1
+proxmox_stack_pve1_cpu_shares: 1024
+proxmox_stack_pve1_memory: "4G"
+proxmox_stack_pve1_memory_swap: -1
+proxmox_stack_pve2_cpu_shares: 1024
+proxmox_stack_pve2_memory: "4G"
+proxmox_stack_pve2_memory_swap: -1
+proxmox_stack_pve3_cpu_shares: 1024
+proxmox_stack_pve3_memory: "4G"
+proxmox_stack_pve3_memory_swap: -1
+proxmox_stack_pdm_cpu_shares: 1024
+proxmox_stack_pdm_memory: "2G"
+proxmox_stack_pdm_memory_swap: -1
 
 # app
-pve_root_password: "{{ ansible_nas_app_admin_password }}"
+proxmox_stack_root_password: "{{ ansible_nas_app_admin_password }}"
 
 # autoheal
-pve_autoheal_enabled: false
+proxmox_stack_autoheal_enabled: false
 
 # dockflare
-pve_dockflare_enabled: false
-pve_dockflare_access_group: ""
+proxmox_stack_dockflare_enabled: false
+proxmox_stack_dockflare_access_group: ""
 
 # homepage
-pve1_homepage_group: "Apps"
-pve1_homepage_icon: "proxmox.png"
-pve1_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve1_port_http }}"
-pve_homepage_showstats: false
-pve2_homepage_group: "Apps"
-pve2_homepage_icon: "proxmox.png"
-pve2_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve2_port_http }}"
-pve3_homepage_group: "Apps"
-pve3_homepage_icon: "proxmox.png"
-pve3_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pve3_port_http }}"
-pdm_homepage_group: "Apps"
-pdm_homepage_icon: "proxmox.png"
-pdm_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pdm_port_http }}"
+proxmox_stack_homepage_showstats: false
+proxmox_stack_pve1_homepage_group: "Apps"
+proxmox_stack_pve1_homepage_icon: "proxmox.png"
+proxmox_stack_pve1_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proxmox_stack_pve1_port_http }}"
+proxmox_stack_pve2_homepage_group: "Apps"
+proxmox_stack_pve2_homepage_icon: "proxmox.png"
+proxmox_stack_pve2_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proxmox_stack_pve2_port_http }}"
+proxmox_stack_pve3_homepage_group: "Apps"
+proxmox_stack_pve3_homepage_icon: "proxmox.png"
+proxmox_stack_pve3_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proxmox_stack_pve3_port_http }}"
+proxmox_stack_pdm_homepage_group: "Apps"
+proxmox_stack_pdm_homepage_icon: "proxmox.png"
+proxmox_stack_pdm_homepage_href: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proxmox_stack_pdm_port_http }}"
 
 # repliqate
-pve_repliqate_enabled: false
-pve_repliqate_engine: "restic"
-pve_repliqate_schedule: "@daily 3am"
-pve_repliqate_backup_id: "ProxmoxVE"
-pve_repliqate_retention: "30d"
+proxmox_stack_repliqate_enabled: false
+proxmox_stack_repliqate_engine: "restic"
+proxmox_stack_repliqate_schedule: "@daily 3am"
+proxmox_stack_repliqate_backup_id: "ProxmoxVE"
+proxmox_stack_repliqate_retention: "30d"
 
 # tinyauth
-pve_tinyauth_enabled: false
+proxmox_stack_tinyauth_enabled: false
 
 # watchtower
-pve_watchtower_enabled: false
+proxmox_stack_watchtower_enabled: false

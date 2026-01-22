@@ -8,25 +8,25 @@
 
     - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 1
       community.docker.docker_container:
-        name: "{{ pve1_container_name }}"
+        name: "{{ proxmox_stack_pve1_container_name }}"
         state: absent
       register: result_pve1
 
     - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 2
       community.docker.docker_container:
-        name: "{{ pve2_container_name }}"
+        name: "{{ proxmox_stack_pve2_container_name }}"
         state: absent
       register: result_pve2
 
     - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 3
       community.docker.docker_container:
-        name: "{{ pve3_container_name }}"
+        name: "{{ proxmox_stack_pve3_container_name }}"
         state: absent
       register: result_pve3
 
     - name: Try and stop and remove {{ ansible_nas_app_name }} DC Manager
       community.docker.docker_container:
-        name: "{{ pdm_container_name }}"
+        name: "{{ proxmox_stack_pdm_container_name }}"
         state: absent
       register: result_pdm
 

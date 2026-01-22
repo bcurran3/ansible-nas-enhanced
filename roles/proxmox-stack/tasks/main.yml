@@ -1,4 +1,21 @@
 ---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ proxmox_stack_data_directory }}"
+        - "{{ proxmox_stack_data_directory }}/backup"
+        - "{{ proxmox_stack_data_directory }}/iso"
+
+    - name: Create {{ ansible_nas_app_name }} Network
+      community.docker.docker_network:
+        name: "{{ proxmox_stack_network_name }}"
+  when:
+    - proxmox_stack_enabled is true
+
 - ansible.builtin.import_tasks: pve1.yml
 - ansible.builtin.import_tasks: pve2.yml
 - ansible.builtin.import_tasks: pve3.yml
@@ -6,7 +23,7 @@
 
 - name: Delete {{ ansible_nas_app_name }} Network
   community.docker.docker_network:
-    name: "{{ pve_network_name }}"
+    name: "{{ proxmox_stack_network_name }}"
     state: absent
   when:
     - proxmox_stack_enabled is false
