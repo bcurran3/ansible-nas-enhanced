@@ -9,6 +9,11 @@
         - "{{ jellyseerr_data_directory }}"
         - "{{ jellyseerr_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        jellyseerr_homepage_href: "https://{{ jellyseerr_hostname }}.{{ ansible_nas_domain }}"
+      when: jellyseerr_traefik_enabled | bool or jellyseerr_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

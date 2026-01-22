@@ -11,6 +11,12 @@
         - "{{ journiv_data_directory }}"
         - "{{ journiv_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        journiv_env_domain_name: "{{ ansible_nas_domain }}"
+        journiv_homepage_href: "https://{{ journiv_hostname }}.{{ ansible_nas_domain }}"
+      when: journiv_traefik_enabled | bool or journiv_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

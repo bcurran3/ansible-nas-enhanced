@@ -9,6 +9,11 @@
         - "{{ homebox_data_directory }}"
         - "{{ homebox_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        homebox_homepage_href: "https://{{ homebox_hostname }}.{{ ansible_nas_domain }}"
+      when: homebox_traefik_enabled | bool or homebox_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

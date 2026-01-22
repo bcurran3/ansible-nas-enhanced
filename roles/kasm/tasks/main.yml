@@ -11,6 +11,11 @@
         - "{{ kasm_data_directory }}/opt"
         - "{{ kasm_data_directory }}/profiles"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        kasm_homepage_href: "https://{{ kasm_hostname }}.{{ ansible_nas_domain }}"
+      when: kasm_traefik_enabled | bool or kasm_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"

@@ -17,6 +17,12 @@
       with_items:
         - "{{ home_assistant_data_directory }}/config"
 
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        home_assistant_homepage_href: "https://{{ home_assistant_hostname }}.{{ ansible_nas_domain }}"
+      when: home_assistant_traefik_enabled | bool or home_assistant_dockflare_enabled | bool
+
     - name: Pre-seed Clean Configuration
       ansible.builtin.copy:
         dest: "{{ home_assistant_data_directory }}/config/configuration.yaml"

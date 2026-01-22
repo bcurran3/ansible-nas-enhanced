@@ -11,6 +11,12 @@
         - "{{ linkwarden_data_directory }}/db"
         - "{{ linkwarden_data_directory }}/search"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        linkwarden_env_nextauth_url: "https://{{ linkwarden_hostname }}.{{ ansible_nas_domain }}/api/v1/auth"
+        linkwarden_homepage_href: "https://{{ linkwarden_hostname }}.{{ ansible_nas_domain }}"
+      when: linkwarden_traefik_enabled | bool or linkwarden_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Meilisearch Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
