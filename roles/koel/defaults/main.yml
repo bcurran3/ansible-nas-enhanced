@@ -1,6 +1,6 @@
 ---
 # ANE
-ansible_nas_app_name: "koel"
+ansible_nas_app_name: "Koel"
 koel_enabled: false
 koel_traefik_enabled: false
 koel_traefik_whitelist: "{{ lan }}"
@@ -30,11 +30,33 @@ koel_db_memory: "1G"
 koel_db_memory_swap: "{{ koel_db_memory }}"
 
 # app
+koel_env_admin_email: "{{ ansible_nas_email }}"
+koel_env_admin_name: "{{ ansible_nas_user }}"
+koel_env_admin_password: "{{ ansible_nas_app_admin_password }}"
+koel_env_app_key: "base64:4iWpqeVBcYI2O1rXhxGhFxc0gAPgwrfajeJYD8apUJc="
+koel_env_app_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
+koel_env_force_https: "false"
+koel_env_media_path: "/music"
+koel_env_memory_limit: "1024"
+koel_env_storage_driver: "local"
+koel_env_streaming_method:  "x-sendfile" # or "php"
+koel_env_mail_from_address: "Koel@{{ ansible_nas_domain }}"
+koel_env_mail_from_name: "Koel@{{ ansible_nas_domain }}"
+koel_env_mail_mailer: "smtp"
+koel_env_mail_host: ""
+koel_env_mail_port: ""
+koel_env_mail_username: ""
+koel_env_mail_password: ""
+koel_env_mail_encryption: ""
+koel_env_lastfm_api_key: ""
+koel_env_lastfm_api_secret: ""
+koel_env_spotify_client_id: ""
+koel_env_spotify_client_secret: ""
 koel_env_db_connection: "mysql"
 koel_env_db_username: "koel"
-koel_env_db_password: "koel"
+koel_env_db_password: "topsecret"
 koel_env_db_database: "koel_db"
-koel_db_env_mysql_root_password: "topsecret"
+koel_env_db_mysql_root_password: "topsecretroot"
 
 # autoheal
 koel_autoheal_enabled: false
@@ -45,7 +67,7 @@ koel_dockflare_enabled: false
 koel_dockflare_access_group: ""
 
 # homepage
-koel_homepage_group: "Apps"
+koel_homepage_group: "Media Servers"
 koel_homepage_icon: "koel.png"
 koel_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koel_port_http }}"
 koel_homepage_showstats: false

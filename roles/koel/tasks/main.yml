@@ -15,18 +15,10 @@
 
     - name: Set {{ ansible_nas_app_name }} FQDN var overrides
       ansible.builtin.set_fact:
+        koel_env_app_url: "https://{{ koel_hostname }}.{{ ansible_nas_domain }}"
+        koel_env_force_https: "true"
         koel_homepage_href: "https://{{ koel_hostname }}.{{ ansible_nas_domain }}"
       when: koel_traefik_enabled | bool or koel_dockflare_enabled | bool
-
-##############################################
-# this needs an initialization
-# https://github.com/koel/docker?tab=readme-ov-file
-
-# docker exec --user www-data -it "{{ koel_container_name }}" bash
-# php artisan koel:init --no-assets
-# docker exec -it "{{ koel_container_name }}" php artisan koel:admin:change-password
-
-##############################################
 
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
@@ -38,7 +30,7 @@
         volumes:
           - "{{ koel_data_directory }}/db:/var/lib/mysql"
         env:
-          MYSQL_ROOT_PASSWORD: "{{ koel_db_env_mysql_root_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ koel_env_db_mysql_root_password }}"
           MYSQL_DATABASE: "{{ koel_env_db_database }}"
           MYSQL_USER: "{{ koel_env_db_username }}"
           MYSQL_PASSWORD: "{{ koel_env_db_password }}"
@@ -80,6 +72,14 @@
         memory_swap: "{{ koel_db_memory_swap }}"
         restart_policy: unless-stopped
 
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ koel_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -95,20 +95,38 @@
         ports:
           - "{{ koel_port_http }}:80"
         env:
-######### TEST ##########
-          APP_KEY: "base64:4iWpqeVBcYI2O1rXhxGhFxc0gAPgwrfajeJYD8apUJc="
-          MEDIA_PATH: "/music"
-          MEMORY_LIMIT: "{{ koel_memory }}"
-          LASTFM_API_KEY: ""
-          LASTFM_API_SECRET: ""
-          SPOTIFY_CLIENT_ID: ""
-          SPOTIFY_CLIENT_SECRET: ""
-######### TEST ##########
+#          ADMIN_EMAIL: "{{ koel_env_admin_email }}"
+#          ADMIN_NAME: "{{ koel_env_admin_name }}"
+#          ADMIN_PASSWORD: "{{ koel_env_admin_password }}"
+          APP_NAME: "Koel"
+          APP_ENV: "production"
+          APP_DEBUG: "true"
+          APP_URL: "{{ koel_env_app_url }}"
+          APP_KEY: "{{ koel_env_app_key }}"
           DB_CONNECTION: "{{ koel_env_db_connection }}"
           DB_HOST: "{{ koel_db_container_name }}"
+          DB_PORT: "3306"
+          DB_DATABASE: "{{ koel_env_db_database }}"
           DB_USERNAME: "{{ koel_env_db_username }}"
           DB_PASSWORD: "{{ koel_env_db_password }}"
-          DB_DATABASE: "{{ koel_env_db_database }}"
+          FORCE_HTTPS: "{{ koel_env_force_https }}"
+          TRUSTED_HOSTS: "localhost,{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }},{{ koel_hostname }}.{{ ansible_nas_domain }}"
+          MEDIA_PATH: "{{ koel_env_media_path }}"
+          MEMORY_LIMIT: "{{ koel_env_memory_limit }}"
+          LASTFM_API_KEY: "{{ koel_env_lastfm_api_key }}"
+          LASTFM_API_SECRET: "{{ koel_env_lastfm_api_secret }}"
+          SPOTIFY_CLIENT_ID: "{{ koel_env_spotify_client_id }}"
+          SPOTIFY_CLIENT_SECRET: "{{ koel_env_spotify_client_secret }}"
+          STORAGE_DRIVER: "{{ koel_env_storage_driver }}"
+          STREAMING_METHOD: "{{ koel_env_streaming_method }}"
+          MAIL_FROM_ADDRESS: "{{ koel_env_mail_from_address }}"
+          MAIL_FROM_NAME: "{{ koel_env_mail_from_name }}"
+          MAIL_MAILER: "{{ koel_env_mail_mailer }}"
+          MAIL_HOST: "{{ koel_env_mail_host }}"
+          MAIL_PORT: "{{ koel_env_mail_port }}"
+          MAIL_USERNAME: "{{ koel_env_mail_username }}"
+          MAIL_PASSWORD: "{{ koel_env_mail_password }}"
+          MAIL_ENCRYPTION: "{{ koel_env_mail_encryption }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ koel_db_container_name }}"
@@ -148,6 +166,36 @@
         memory: "{{ koel_memory }}"
         memory_swap: "{{ koel_memory_swap }}"
         restart_policy: unless-stopped
+
+    - name: Check {{ ansible_nas_app_name }} DB initialization
+      stat:
+        path: "{{ koel_data_directory }}/db/.init_done"
+      register: koel_initialized
+
+    - name: Run {{ ansible_nas_app_name }} DB migration
+      community.docker.docker_container_exec:
+        container: "{{ koel_container_name }}"
+        command: php artisan migrate --force
+        chdir: /var/www/html
+      register: koel_migration_output
+      when: not koel_initialized.stat.exists
+
+    - name: Seed {{ ansible_nas_app_name }} DB
+      community.docker.docker_container_exec:
+        container: "{{ koel_container_name }}"
+        command: php artisan db:seed --force
+        chdir: /var/www/html
+      register: koel_seed_output
+      ignore_errors: true
+      when: not koel_initialized.stat.exists
+
+    - name: Mark {{ ansible_nas_app_name }} as initialized
+      file:
+        path: "{{ koel_data_directory }}/db/.init_done"
+        state: touch
+      when: 
+        - not koel_initialized.stat.exists
+        - koel_migration_output is succeeded
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:
