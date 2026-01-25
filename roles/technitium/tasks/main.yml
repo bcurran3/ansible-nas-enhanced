@@ -45,15 +45,15 @@
         dns_servers: "{{ technitium_dns }}"
         ports:
           - "{{ technitium_port_http }}:{{ technitium_port_http }}"
-          - "53:53/udp" # DNS
-          - "53:53/tcp" # DNS
-#         - "67:67/udp" # DHCP service
-#         - "80:80/tcp" # DNS-over-HTTP service (use with reverse proxy or certbot certificate renewal)
-#         - "443:443/udp" # DNS-over-HTTPS service (HTTP/3)
-#         - "443:443/tcp" # DNS-over-HTTPS service (HTTP/1.1, HTTP/2)
-          - "853:853/udp" # DNS-over-QUIC service
-          - "853:853/tcp" # DNS-over-TLS service
-          - "8053:8053/tcp" # DNS-over-HTTP service (use with reverse proxy)
+          - "53:53/udp"       # DNS Server
+          - "53:53/tcp"       # DNS Server
+#         - "67:67/udp"       # DHCP Server
+#         - "80:80/tcp"       # DNS-over-HTTP service (use with reverse proxy or certbot certificate renewal)
+#         - "443:443/udp"     # DNS-over-HTTPS service (HTTP/3)
+#         - "443:443/tcp"     # DNS-over-HTTPS service (HTTP/1.1, HTTP/2)
+          - "853:853/udp"     # DNS-over-QUIC service
+          - "853:853/tcp"     # DNS-over-TLS service
+          - "8053:8053/tcp"   # DNS-over-HTTP service (use with reverse proxy)
 #         - "53443:53443/tcp" # DNS web console (HTTPS)
         sysctls:
           net.ipv4.ip_local_port_range: 1024 65535
@@ -128,13 +128,14 @@
               }}
   when: technitium_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
-  block:
-    - name: Stop {{ ansible_nas_app_name }} Container
-      community.docker.docker_container:
-        name: "{{ technitium_container_name }}"
-        state: absent
+- name: Stop {{ ansible_nas_app_name }} Container
+  community.docker.docker_container:
+    name: "{{ technitium_container_name }}"
+    state: absent
+  when: technitium_enabled is false
 
+- name: Re-enable systemd-resolved StubListener
+  block:
     - name: Re-enable systemd-resolved StubListener
       ansible.builtin.lineinfile:
         path: /etc/systemd/resolved.conf
@@ -156,7 +157,10 @@
         name: systemd-resolved
         state: restarted
       when: resolved_conf_enable.changed
-  when: technitium_enabled is false
+  when: 
+    - technitium_enabled is false
+    - adguardhome_enabled is false
+    - pihole_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   include_role:

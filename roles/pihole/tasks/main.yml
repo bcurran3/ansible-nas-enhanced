@@ -113,13 +113,14 @@
               }}
   when: pihole_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
-  block:
-    - name: Stop {{ ansible_nas_app_name }} Container
-      community.docker.docker_container:
-        name: "{{ pihole_container_name }}"
-        state: absent
+- name: Stop {{ ansible_nas_app_name }} Container
+  community.docker.docker_container:
+    name: "{{ pihole_container_name }}"
+    state: absent
+  when: pihole_enabled is false
 
+- name: Re-enable systemd-resolved StubListener
+  block:
     - name: Re-enable systemd-resolved StubListener
       ansible.builtin.lineinfile:
         path: /etc/systemd/resolved.conf
@@ -140,7 +141,10 @@
         name: systemd-resolved
         state: restarted
       when: resolved_conf_revert.changed
-  when: pihole_enabled is false
+  when: 
+    - pihole_enabled is false
+    - adguardhome_enabled is false
+    - technitium_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   include_role:

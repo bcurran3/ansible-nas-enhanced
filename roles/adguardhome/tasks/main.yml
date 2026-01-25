@@ -47,12 +47,12 @@
         dns_servers: "{{ adguardhome_dns }}"
         ports:
           - "{{ adguardhome_port_http }}:3000"
-          - "53:53/udp" # DNS
-          - "53:53/tcp" # DNS
-#         - "67:67/udp" # DHCP Server (Only needed if AdGuard acts as your router's DHCP)
-          - "784:784/udp" # DNS-over-QUIC
-          - "853:853/udp" # DNS-over-QUIC
-          - "853:853/tcp" # DNS-over-TLS
+          - "53:53/udp"     # DNS Server
+          - "53:53/tcp"     # DNS Server
+#         - "67:67/udp"     # DHCP Server
+          - "784:784/udp"   # DNS-over-QUIC
+          - "853:853/udp"   # DNS-over-QUIC
+          - "853:853/tcp"   # DNS-over-TLS
           - "5443:5443/tcp" # DNSCrypt
           - "5443:5443/udp" # DNSCrypt
           - "8853:8853/udp" # DNS-over-QUIC
@@ -111,13 +111,14 @@
               }}
   when: adguardhome_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
-  block:
-    - name: Stop {{ ansible_nas_app_name }} Container
-      community.docker.docker_container:
-        name: "{{ adguardhome_container_name }}"
-        state: absent
+- name: Stop {{ ansible_nas_app_name }} Container
+  community.docker.docker_container:
+    name: "{{ adguardhome_container_name }}"
+    state: absent
+  when: adguardhome_enabled is false
 
+- name: Re-enable systemd-resolved StubListener
+  block:
     - name: Re-enable systemd-resolved StubListener
       ansible.builtin.lineinfile:
         path: /etc/systemd/resolved.conf
@@ -126,7 +127,7 @@
         state: present
       register: resolved_conf_enable
 
-    - name: Restore default resolv.conf symlink (Point to Stub)
+    - name: Restore default resolv.conf symlink
       ansible.builtin.file:
         src: /run/systemd/resolve/stub-resolv.conf
         dest: /etc/resolv.conf
@@ -139,7 +140,10 @@
         name: systemd-resolved
         state: restarted
       when: resolved_conf_enable.changed
-  when: adguardhome_enabled is false
+  when: 
+    - adguardhome_enabled is false
+    - pihole_enabled is false
+    - technitium_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
   include_role:
