@@ -1,0 +1,311 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+#    - name: Create {{ ansible_nas_app_name }} Directories
+#      ansible.builtin.file:
+#        path: "{{ item }}"
+#        state: directory
+#      with_items:
+#        - "{{ azuracast_data_directory }}"
+
+    - name: Create {{ ansible_nas_app_name }} Volumes
+      community.docker.docker_volume:
+        name: "{{ item }}"
+      loop:
+        - azuracast_acme
+        - azuracast_backups
+        - azuracast_db_data
+        - azuracast_geolite_install
+        - azuracast_redis_data
+        - azuracast_rsas_install
+        - azuracast_sftpgo_data
+        - azuracast_shoutcast2_install
+        - azuracast_station_data
+        - azuracast_stereo_tool_install
+        - azuracast_www_uploads
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        azuracast_homepage_href: "https://{{ azuracast_hostname }}.{{ ansible_nas_domain }}"
+      when: azuracast_traefik_enabled | bool or azuracast_dockflare_enabled | bool
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ azuracast_db_container_name }}"
+        hostname: "{{ azuracast_db_container_name }}"
+        image: "{{ azuracast_db_image_name }}:{{ azuracast_db_image_tag }}"
+        pull: true
+        command:
+          - "mariadbd"
+          - "--innodb-buffer-pool-size={{ azuracast_env_msql_innodb_buffer_pool_size }}"
+          - "--innodb-log-file-size={{ azuracast_env_msql_innodb_log_file_size }}"
+        volumes:
+          - "azuracast_db_data:/var/lib/mysql"
+        env:
+          PUID: "{{ azuracast_db_env_puid }}"
+          PGID: "{{ azuracast_db_env_pgid }}"
+          MYSQL_ROOT_PASSWORD: "{{ azuracast_db_env_mysql_root_password }}"
+          MYSQL_DATABASE: "{{ azuracast_env_mysql_database }}"
+          MYSQL_USER: "{{ azuracast_env_msql_user }}"
+          MYSQL_PASSWORD: "{{ azuracast_env_msql_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+              test: ["CMD", "healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+              interval: "30s"
+              timeout: "10s"
+              retries: "3"
+              start_period: "30s"
+        labels:
+          autoheal: "{{ azuracast_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ azuracast_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.group: "{{ azuracast_db_homepage_group }}"
+          homepage.icon: "{{ azuracast_db_homepage_icon }}"
+          homepage.href: "{{ azuracast_db_homepage_href }}"
+          homepage.description: "{{ 'MariaDB Server is a high performing open source relational database, forked from MySQL.' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ azuracast_db_container_name }}"
+          homepage.showStats: "{{ azuracast_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ azuracast_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ azuracast_db_repliqate_engine }}"
+          repliqate.schedule: "{{ azuracast_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ azuracast_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ azuracast_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+(\.\d+){1,2}$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/mariadb"
+        cpu_shares: "{{ azuracast_db_cpu_shares }}"
+        memory: "{{ azuracast_db_memory }}"
+        memory_swap: "{{ azuracast_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ azuracast_redis_container_name }}"
+        hostname: "{{ azuracast_redis_container_name }}"
+        image: "{{ azuracast_redis_image_name }}:{{ azuracast_redis_image_tag }}"
+        pull: true
+        command: ["redis-server", "--appendonly", "yes", "--requirepass", "topsecret"]
+        volumes:
+          - "azuracast_redis_data:/data"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "redis-cli", "ping"]
+          interval: "10s"
+          timeout: "5s"
+          retries: "5"
+        labels:
+          autoheal: "{{ azuracast_redis_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ azuracast_redis_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ azuracast_redis_homepage_group }}"
+          homepage.icon: "{{ azuracast_redis_homepage_icon }}"
+          homepage.href: "{{ azuracast_redis_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ azuracast_redis_container_name }}"
+          homepage.showStats: "{{ azuracast_redis_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ azuracast_redis_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ azuracast_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ azuracast_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ azuracast_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ azuracast_redis_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
+        cpu_shares: "{{ azuracast_redis_cpu_shares }}"
+        memory: "{{ azuracast_redis_memory }}"
+        memory_swap: "{{ azuracast_redis_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} Updater Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ azuracast_updater_container_name }}"
+        hostname: "{{ azuracast_updater_container_name }}"
+        image: "{{ azuracast_updater_image_name }}:{{ azuracast_updater_image_tag }}"
+        pull: true
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ azuracast_updater_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ azuracast_updater_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Updater"
+          homepage.group: "{{ azuracast_updater_homepage_group }}"
+          homepage.icon: "{{ azuracast_updater_homepage_icon }}"
+          homepage.href: "{{ azuracast_updater_homepage_href }}"
+          homepage.description: "{{ 'azuracast_homepage_description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ azuracast_updater_container_name }}"
+          homepage.showStats: "{{ azuracast_updater_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "false"
+          traefik.enable: "false"
+          wud.tag.include: "^latest$"
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/AzuraCast/AzuraCast/pkgs/container/updater"
+        cpu_shares: "{{ azuracast_updater_cpu_shares }}"
+        log_driver: json-file
+        log_options:
+          max-size: "1m"
+          max-file: "5"
+        memory: "{{ azuracast_updater_memory }}"
+        memory_swap: "{{ azuracast_updater_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ azuracast_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ azuracast_container_name }}"
+        hostname: "{{ azuracast_container_name }}"
+        image: "{{ azuracast_image_name }}:{{ azuracast_image_tag }}"
+        pull: true
+        volumes:
+          - azuracast_acme:/var/azuracast/storage/acme
+          - azuracast_backups:/var/azuracast/backups
+          - azuracast_db_data:/var/lib/mysql
+          - azuracast_geolite_install:/var/azuracast/storage/geoip
+          - azuracast_rsas_install:/var/azuracast/storage/rsas
+          - azuracast_sftpgo_data:/var/azuracast/storage/sftpgo
+          - azuracast_shoutcast2_install:/var/azuracast/storage/shoutcast2
+          - azuracast_station_data:/var/azuracast/stations
+          - azuracast_stereo_tool_install:/var/azuracast/storage/stereo_tool
+          - azuracast_www_uploads:/var/azuracast/storage/uploads
+        ports:
+          - "{{ azuracast_port_http }}:80"
+          - "{{ azuracast_port_sftp }}:2022"
+          - "{{ azuracast_port_station_min }}-{{ azuracast_port_station_max }}:{{ azuracast_port_station_min }}-{{ azuracast_port_station_max }}"
+        env:
+          COMPOSE_PROJECT_NAME: "azuracast"
+          AZURACAST_HTTP_PORT: "80"
+          AZURACAST_HTTPS_PORT: "443"
+          AZURACAST_SFTP_PORT: "{{ azuracast_port_sftp }}"
+          AUTO_ASSIGN_PORT_MIN: "{{ azuracast_port_station_min }}"
+          AUTO_ASSIGN_PORT_MAX: "{{ azuracast_port_station_max }}"
+          AZURACAST_PUID: "{{ azuracast_env_azuracast_puid }}"
+          AZURACAST_PGID: "{{ azuracast_env_azuracast_pgid }}"
+          NGINX_TIMEOUT: "{{ azuracast_env_nginx_timeout }}"
+          APPLICATION_ENV: "{{ azuracast_env_application_env }}"
+          COMPOSER_PLUGIN_MODE: "{{ azuracast_env_composer_plugin_mode }}"
+          SHOW_DETAILED_ERRORS: "{{ azuracast_env_show_detailed_errors }}"
+          MYSQL_HOST: "{{ azuracast_db_container_name }}"
+          MYSQL_PORT: "3306"
+          MYSQL_DATABASE: "{{ azuracast_env_mysql_database }}"
+          MYSQL_USER: "{{ azuracast_env_msql_user }}"
+          MYSQL_PASSWORD: "{{ azuracast_env_msql_password }}"
+          MYSQL_RANDOM_ROOT_PASSWORD: "{{ azuracast_env_msql_random_root_password }}"
+          MYSQL_SLOW_QUERY_LOG: "{{ azuracast_env_msql_slow_query_log }}"
+          MYSQL_MAX_CONNECTIONS: "{{ azuracast_env_msql_max_connections }}"
+          MYSQL_INNODB_BUFFER_POOL_SIZE: "{{ azuracast_env_msql_innodb_buffer_pool_size }}"
+          MYSQL_INNODB_LOG_FILE_SIZE: "{{ azuracast_env_msql_innodb_log_file_size }}"
+          ENABLE_REDIS: "true"
+          REDIS_HOST: "{{ azuracast_redis_container_name }}"
+          REDIS_PORT: "6379"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ azuracast_db_container_name }}"
+          - "{{ azuracast_redis_container_name }}"
+        labels:
+          autoheal: "{{ azuracast_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ azuracast_watchtower_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.scope: "azuracast"
+          dockflare.enable: "{{ azuracast_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ azuracast_dockflare_access_group }}"
+          dockflare.hostname: "{{ azuracast_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ azuracast_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ azuracast_homepage_group }}"
+          homepage.icon: "{{ azuracast_homepage_icon }}"
+          homepage.href: "{{ azuracast_homepage_href }}"
+          homepage.description: "{{ 'azuracast_homepage_description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ azuracast_container_name }}"
+          homepage.showStats: "{{ azuracast_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ azuracast_port_http }}"
+          repliqate.enabled: "{{ azuracast_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ azuracast_repliqate_engine }}"
+          repliqate.schedule: "{{ azuracast_repliqate_schedule }}"
+          repliqate.backup_id: "{{ azuracast_repliqate_backup_id }}"
+          repliqate.retention: "{{ azuracast_repliqate_retention }}"
+          traefik.enable: "{{ azuracast_traefik_enabled | ternary('true', 'false') }}"
+          traefik.docker.network: "bridge"
+          traefik.http.routers.azuracast.rule: "Host(`{{ azuracast_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.azuracast.tls.certresolver: "letsencrypt"
+          traefik.http.routers.azuracast.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.azuracast.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.azuracast.middlewares: "azuracast@docker{{ ',tinyauth-auth@docker' if azuracast_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.azuracast.IPAllowList.sourcerange: "{{ azuracast_traefik_whitelist }}"
+          traefik.http.services.azuracast.loadbalancer.server.port: "80"
+          wud.tag.include: "^latest$"
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/AzuraCast/AzuraCast/pkgs/container/azuracast"
+        capabilities:
+          - SYS_NICE
+        cpu_shares: "{{ azuracast_cpu_shares }}"
+        log_driver: json-file
+        log_options:
+          max-size: "1m"
+          max-file: "5"
+        memory: "{{ azuracast_memory }}"
+        memory_swap: "{{ azuracast_memory_swap }}"
+        ulimits:
+          - "nofile:65536:65536"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (azuracast_port_http | string)] +
+                (['https://' + azuracast_hostname + '.' + ansible_nas_domain] if (azuracast_traefik_enabled is true or azuracast_dockflare_enabled is true) else [])
+              }}
+  when: azuracast_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Updater Container
+      community.docker.docker_container:
+        name: "{{ azuracast_updater_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ azuracast_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        name: "{{ azuracast_redis_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ azuracast_db_container_name }}"
+        state: absent
+  when: azuracast_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ azuracast_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - azuracast_enabled is false

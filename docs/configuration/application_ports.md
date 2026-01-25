@@ -18,6 +18,9 @@ By default, applications can be found on the ports listed below.
 | apcupsd          | 3551
 | Arcane           | 3552    | Bridge  | HTTP           |
 | Audiobookshelf   | 13378
+| AzuraCast        | 3098    | Bridge  | HTTP           |
+| AzuraCast        | 3099    | Bridge  | SFTP           |
+| AzuraCast        | 8400-8599| Bridge | stream         |
 | autobrr          | 7474
 | BanBan           | 3028    | Bridge  | HTTP           |
 | Bazarr           | 6767    | Bridge  | HTTP           |
@@ -166,7 +169,7 @@ By default, applications can be found on the ports listed below.
 | Loki             | 3100
 | Luanti           | 30000
 | magnetico        | 9017    | Bridge  | HTTP           |
-| Mailrise         | 8025    | Host    | HTTP           |
+| Mailrise         | 3089    | Host    | HTTP           |
 | Mailrise         | 465     | Host    | SMTP           |
 | Maintainerr      | 6246
 | MakeMKV          | 5804    | Bridge  | HTTP           |
@@ -217,7 +220,7 @@ By default, applications can be found on the ports listed below.
 | ONLYOFFICE Docs  | 9015    | Bridge  | HTTP           |
 | ONLYOFFICE Docs  | 5222    | Bridge  | XMPP           |
 | Ombi             | 3579    | Bridge  | HTTP           |
-| Open Notebook    | 8502    | Bridge  | HTTP           |
+| Open Notebook    | 3090    | Bridge  | HTTP           |
 | Open Notebook    | 5056    | Bridge  | API            |
 | Open WebUI       | 11435
 | Open WebUI       | 11436
@@ -417,7 +420,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 3089, then 3098+
+# next avail = 4003+
 # next avail = 9024
 
 # NOTE: Conflicts on ports 9000 + 9002

@@ -1,0 +1,118 @@
+---
+# ANE
+ansible_nas_app_name: "AzuraCast"
+azuracast_enabled: false
+azuracast_traefik_enabled: false
+azuracast_traefik_whitelist: "{{ lan }}"
+
+# directories
+azuracast_data_directory: "{{ docker_home }}/azuracast"
+
+# docker
+azuracast_container_name: "azuracast"
+azuracast_image_name: "ghcr.io/azuracast/azuracast"
+azuracast_image_tag: "latest"
+azuracast_db_container_name: "azuracast-db"
+azuracast_db_image_name: "mariadb"
+azuracast_db_image_tag: "10.11"
+azuracast_redis_container_name: "azuracast-redis"
+azuracast_redis_image_name: "redis"
+azuracast_redis_image_tag: "latest"
+azuracast_updater_container_name: "azuracast-updater"
+azuracast_updater_image_name: "ghcr.io/azuracast/updater"
+azuracast_updater_image_tag: "latest"
+
+# network
+azuracast_hostname: "azuracast"
+azuracast_port_http: "3098"
+#azuracast_port_https: "3098"
+azuracast_port_sftp: "3099"
+azuracast_port_station_min: "8400"
+azuracast_port_station_max: "8599"
+
+# specs
+azuracast_cpu_shares: 1024
+azuracast_memory: "1G"
+azuracast_memory_swap: -1
+azuracast_db_cpu_shares: 1024
+azuracast_db_memory: "1G"
+azuracast_db_memory_swap: "{{ azuracast_db_memory }}"
+azuracast_redis_cpu_shares: 1024
+azuracast_redis_memory: "1G"
+azuracast_redis_memory_swap: "{{ azuracast_db_memory }}"
+azuracast_updater_cpu_shares: 1024
+azuracast_updater_memory: "1G"
+azuracast_updater_memory_swap: -1
+
+# app
+azuracast_env_azuracast_puid: "1000"
+azuracast_env_azuracast_pgid: "1000"
+azuracast_env_nginx_timeout: "1800"
+azuracast_env_application_env: "production"
+azuracast_env_composer_plugin_mode: "false"
+azuracast_env_show_detailed_errors: "false"
+azuracast_env_mysql_database: "azuracast"
+azuracast_env_msql_user: "azuracast"
+azuracast_env_msql_password: "topsecret"
+azuracast_env_msql_random_root_password: "yes"
+azuracast_env_msql_slow_query_log: "0"
+azuracast_env_msql_max_connections: "100"
+azuracast_env_msql_innodb_buffer_pool_size: "128M"
+azuracast_env_msql_innodb_log_file_size: "16M"
+azuracast_db_env_puid: "1000"
+azuracast_db_env_pgid: "1000"
+azuracast_db_env_mysql_root_password: "topsecretroot"
+
+# autoheal
+azuracast_autoheal_enabled: false
+azuracast_db_autoheal_enabled: false
+azuracast_redis_autoheal_enabled: false
+azuracast_updater_autoheal_enabled: false
+
+# dockflare
+azuracast_dockflare_enabled: false
+azuracast_dockflare_access_group: ""
+
+# homepage
+azuracast_homepage_group: "Apps"
+azuracast_homepage_icon: "azuracast.png"
+azuracast_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ azuracast_port_http }}"
+azuracast_homepage_showstats: false
+azuracast_db_homepage_group: "DBs"
+azuracast_db_homepage_icon: "mariadb.png"
+azuracast_db_homepage_href: "{{ azuracast_homepage_href }}"
+azuracast_db_homepage_showstats: false
+azuracast_redis_homepage_group: "DBs"
+azuracast_redis_homepage_icon: "redis.png"
+azuracast_redis_homepage_href: "{{ azuracast_homepage_href }}"
+azuracast_redis_homepage_showstats: false
+azuracast_updater_homepage_group: "Misc"
+azuracast_updater_homepage_icon: "azuracast.png"
+azuracast_updater_homepage_href: "{{ azuracast_homepage_href }}"
+azuracast_updater_homepage_showstats: false
+
+# repliqate
+azuracast_repliqate_enabled: false
+azuracast_repliqate_engine: "restic"
+azuracast_repliqate_schedule: "@daily 3am"
+azuracast_repliqate_backup_id: "{{ azuracast_container_name }}"
+azuracast_repliqate_retention: "30d"
+azuracast_db_repliqate_enabled: false
+azuracast_db_repliqate_engine: "restic"
+azuracast_db_repliqate_schedule: "@daily 3am"
+azuracast_db_repliqate_backup_id: "{{ azuracast_db_container_name }}"
+azuracast_db_repliqate_retention: "30d"
+azuracast_redis_repliqate_enabled: false
+azuracast_redis_repliqate_engine: "restic"
+azuracast_redis_repliqate_schedule: "@daily 3am"
+azuracast_redis_repliqate_backup_id: "{{ azuracast_redis_container_name }}"
+azuracast_redis_repliqate_retention: "30d"
+
+# tinyauth
+azuracast_tinyauth_enabled: false
+
+# watchtower
+azuracast_watchtower_enabled: false
+azuracast_db_watchtower_enabled: false
+azuracast_redis_watchtower_enabled: false
+azuracast_updater_watchtower_enabled: false

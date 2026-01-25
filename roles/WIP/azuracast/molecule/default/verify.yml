@@ -1,0 +1,39 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Get {{ ansible_nas_app_name }} container state
+      community.docker.docker_container:
+        name: "{{ azuracast_container_name }}"
+      register: result
+
+    - name: Get {{ ansible_nas_app_name }} DB container state
+      community.docker.docker_container:
+        name: "{{ azuracast_db_container_name }}"
+      register: result_db
+
+    - name: Get {{ ansible_nas_app_name }} Redis container state
+      community.docker.docker_container:
+        name: "{{ azuracast_redis_container_name }}"
+      register: result_redis
+
+    - name: Get {{ ansible_nas_app_name }} Updater container state
+      community.docker.docker_container:
+        name: "{{ azuracast_updater_container_name }}"
+      register: result_updater
+
+    - name: Check if {{ ansible_nas_app_name }} container is running
+      ansible.builtin.assert:
+        that:
+          - result.container['State']['Status'] == "running"
+          - result.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false
+          - result_redis.container['State']['Status'] == "running"
+          - result_redis.container['State']['Restarting'] == false
+          - result_updater.container['State']['Status'] == "running"
+          - result_updater.container['State']['Restarting'] == false
