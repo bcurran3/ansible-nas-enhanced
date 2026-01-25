@@ -25,7 +25,10 @@ localai_image_tag: "latest-cpu" # CPU only image
 
 # specs
 localai_cpu_shares: 1024
-localai_memory: "1G"
+# Minimum (Tiny Models/Audio): 4 GB RAM (e.g., for Whisper Base or tiny quantized LLMs).
+# Recommended (Standard LLM): 8 GB – 16 GB RAM (Fits 7B to 13B parameter models).
+# Performance (Large Models/GPU): 24 GB+ VRAM/RAM (For 30B+ models or high-speed generation).
+localai_memory: "4G"
 localai_memory_swap: -1
 
 # autoheal

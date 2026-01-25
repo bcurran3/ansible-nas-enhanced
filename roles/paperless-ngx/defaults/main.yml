@@ -39,15 +39,18 @@ paperless_ngx_user_id: "1000"
 paperless_ngx_group_id: "1000"
 
 # settings
-paperless_ngx_languages: "deu eng"
+paperless_ngx_languages: "eng"
 
 # specs
-paperless_ngx_memory: "1G"
 paperless_ngx_cpu_shares: 1024
-paperless_ngx_db_memory: "1G"
+# Minimum (Idle/Reading): 1 GB – 1.5 GB.
+# Recommended (Standard): 2 GB – 4 GB (Prevents crashes during document uploads).
+# Performance (Bulk Uploads/High Worker Count): 4 GB+.
+paperless_ngx_memory: "2G"
 paperless_ngx_db_cpu_shares: 1024
-paperless_ngx_redis_memory: "1G"
+paperless_ngx_db_memory: "1G"
 paperless_ngx_redis_cpu_shares: 1024
+paperless_ngx_redis_memory: "128M"
 
 # autoheal
 paperless_ngx_autoheal_enabled: false

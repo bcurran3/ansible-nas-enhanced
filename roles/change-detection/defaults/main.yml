@@ -11,10 +11,6 @@ change_detection_port_http: "3029"
 change_detection_hostname: "changedetection"
 change_detection_sockpuppet_hostname: "sockpuppetserver"
 
-# app
-change_detection_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
-change_detection_hide_referer: "true"
-
 # docker
 change_detection_container_name: "change-detection"
 change_detection_image_name: "ghcr.io/dgtlmoon/changedetection.io"
@@ -30,6 +26,10 @@ change_detection_memory_swap: -1
 change_detection_sockpuppet_cpu_shares: 1024
 change_detection_sockpuppet_memory: "1G"
 change_detection_sockpuppet_memory_swap: -1
+
+# app
+change_detection_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ change_detection_port_http }}"
+change_detection_hide_referer: "true"
 
 # autoheal
 change_detection_autoheal_enabled: false
