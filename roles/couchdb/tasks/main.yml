@@ -29,6 +29,11 @@
         volumes:
           - "{{ couchdb_data_directory }}/config:/opt/couchdb/etc/local.d"
           - "{{ couchdb_data_directory }}/data:/opt/couchdb/data"
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:5984/_up"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
         labels:
           autoheal: "{{ couchdb_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ couchdb_watchtower_enabled | ternary('true', 'false') }}"
