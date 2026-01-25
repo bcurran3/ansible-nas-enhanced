@@ -46,10 +46,10 @@
         dns_servers: "{{ pihole_dns }}"
         ports:
           - "{{ pihole_port_http }}:80"
-          - "53:53/udp"
-          - "53:53/tcp"
-          - "67:67/udp"
-          - "123:123/udp"
+          - "53:53/udp"   # DNS Server
+          - "53:53/tcp"   # DNS Server
+#         - "67:67/udp"   # DHCP Server
+          - "123:123/udp" # NTP Server
         volumes:
           - "{{ pihole_data_directory }}/etc-dnsmasq.d:/etc/dnsmasq.d"
           - "{{ pihole_data_directory }}/etc-pihole:/etc/pihole"

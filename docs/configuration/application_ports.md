@@ -241,10 +241,9 @@ By default, applications can be found on the ports listed below.
 | Peppermint       | 3021    | Bridge  | HTTP           |
 | Peppermint       | 5003    | Bridge  |                |
 | phpBB            | 9003    | Bridge  | HTTP           |
-| Pi-hole          | 8888
-| Pi-hole          | 53
-| Pi-hole          | 67
-| Pi-hole          | 123
+| Pi-hole          | 8888    | Bridge  | HTTP           |
+| Pi-hole          | 53      | Bridge  | DNS            |
+| Pi-hole          | 123     | Bridge  | NTP            |
 | Pinchflat        | 8945
 | Pingvin Share    | 3051    | Bridge  | HTTP           |
 | Piwigo           | 16923   | Bridge  | HTTP           |
