@@ -78,12 +78,6 @@
         memory: "{{ openemr_db_memory }}"
         memory_swap: "{{ openemr_db_memory_swap }}"
         restart_policy: unless-stopped
-      register: openemr_db_status
-
-    - name: Allow {{ ansible_nas_app_name }} DB healthcheck interval to pass
-      ansible.builtin.pause:
-        seconds: 20
-      when: openemr_db_status.changed
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
       community.docker.docker_container_info:

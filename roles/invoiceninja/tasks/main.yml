@@ -96,6 +96,14 @@
         memory_swap: "{{ invoiceninja_db_memory_swap }}"
         restart_policy: unless-stopped
 
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ invoiceninja_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
     - name: Create {{ ansible_nas_app_name }} App Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
