@@ -10,7 +10,8 @@
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
 
 # Filter out non-containers
-ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin"
+#ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin|^-autoheal|^-dockflare|^-tinyauth|^-traefik|^-watchtower"
+ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin|_(autoheal|dockflare|tinyauth|traefik|watchtower|repliqate)"
 
 #####################################
 ########## begin functions ##########
@@ -194,12 +195,11 @@ function display_available_apps {
 }
 
 function display_disabled_apps {
-     echo "  ** ANE disabled apps:"
+     echo "   ** ANE disabled apps:"
      echo "--------------------------------------------------------"
-     
      DISABLED_LIST=$(grep 'enabled: false' inventories/ANE/group_vars/nas.yml | \
         grep -v -E "$ANE_EXCLUDES" | \
-        sed 's/_enabled: false//;s/ //g' | \
+        sed 's/_enabled: false//;s/ //g;s/_/-/g' | \
         sort)
      
      if [[ -n "$DISABLED_LIST" ]]; then
@@ -209,16 +209,17 @@ function display_disabled_apps {
         TOTAL=0
      fi
      echo "--------------------------------------------------------"
-     echo "  ** Total Apps Disabled: $TOTAL"
+     echo "   ** Total Apps Disabled: $TOTAL"
 }
 
 function display_enabled_apps {
-     echo "  ** ANE enabled apps:"
+     echo "   ** ANE enabled apps:"
      echo "--------------------------------------------------------"
      ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | \
         grep -v -E "$ANE_EXCLUDES" | \
-        sed 's/_enabled: true//;s/ //g' | \
+        sed 's/_enabled: true//;s/ //g;s/_/-/g' | \
         sort)
+        
      if [[ -n "$ENABLED_LIST" ]]; then
         echo "$ENABLED_LIST" | xargs -r printf "%-20s %-20s %-20s\n"
         TOTAL=$(echo "$ENABLED_LIST" | wc -l)
@@ -226,7 +227,7 @@ function display_enabled_apps {
         TOTAL=0
      fi
      echo "--------------------------------------------------------"
-     echo "  ** Total Apps Enabled: $TOTAL"
+     echo "   ** Total Apps Enabled: $TOTAL"
 }
 
 function display_status {
