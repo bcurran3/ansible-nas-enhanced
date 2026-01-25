@@ -46,15 +46,10 @@
         pull: true
         dns_servers: "{{ adguardhome_dns }}"
         ports:
-          - "{{ adguardhome_port_http }}:80"
+          - "{{ adguardhome_port_http }}:3000"
           - "53:53/udp" # DNS
           - "53:53/tcp" # DNS
-#         - "67:67/udp" # DHCP Server
-#         - "68:68/tcp" # DHCP Client
-#         - "68:68/udp" # DHCP Client
-#         - "80:80/tcp" # DNS-over-TLS (not with proxy enabled)
-#         - "443:443/tcp" # DNS-over-TLS (not with proxy enabled)
-#         - "443:443/udp" # DNS-over-TLS (not with proxy enabled)
+#         - "67:67/udp" # DHCP Server (Only needed if AdGuard acts as your router's DHCP)
           - "784:784/udp" # DNS-over-QUIC
           - "853:853/udp" # DNS-over-QUIC
           - "853:853/tcp" # DNS-over-TLS
@@ -98,7 +93,7 @@
           traefik.http.routers.adguardhome.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.adguardhome.middlewares: "adguardhome@docker{{ ',tinyauth-auth@docker' if adguardhome_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.adguardhome.IPAllowList.sourcerange: "{{ adguardhome_traefik_whitelist }}"
-          traefik.http.services.adguardhome.loadbalancer.server.port: "80"
+          traefik.http.services.adguardhome.loadbalancer.server.port: "3000"
           wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/r/adguard/adguardhome"
