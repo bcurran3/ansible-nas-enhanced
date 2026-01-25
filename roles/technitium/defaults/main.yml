@@ -25,6 +25,19 @@ technitium_memory: "1G"
 # app
 technitium_env_dns_server_domain: "{{ ansible_nas_domain }}"
 technitium_env_dns_server_password: "{{ ansible_nas_app_admin_password }}"
+technitium_env_dns_server_prefer_ipv6: "false" #DNS Server will use IPv6 for querying whenever possible with this option enabled.
+technitium_env_dns_server_web_service_https_port: "53443"  #The TCP port number for the DNS web console over HTTPS protocol.
+technitium_env_dns_server_web_service_enable_https:  "true" #Enables HTTPS for the DNS web console.
+technitium_env_dns_server_web_service_use_self_signed_cert: "true" #Enables self signed TLS certificate for the DNS web console.
+technitium_env_dns_server_optional_protocol_dns_over_http:  "true" #Enables DNS server optional protocol DNS-over-HTTP on TCP port 8053 to be used with a TLS terminating reverse proxy like nginx.
+technitium_env_dns_server_recursion: "AllowOnlyForPrivateNetworks" #Recursion options: Allow, Deny, AllowOnlyForPrivateNetworks, UseSpecifiedNetworkACL.
+technitium_env_dns_server_recursion_network_acl: "" #Comma separated list of IP addresses or network addresses to allow access. Add ! character at the start to deny access, e.g. !192.168.10.0/24 will deny entire subnet. The ACL is processed in the same order its listed. If no networks match, the default policy is to deny all except loopback. Valid only for `UseSpecifiedNetworkACL` recursion option.
+technitium_env_dns_server_enable_blocking: "true" #Sets the DNS server to block domain names using Blocked Zone and Block List Zone.
+technitium_env_dns_server_allow_txt_blocking_report: "false" #Specifies if the DNS Server should respond with TXT records containing a blocked domain report for TXT type requests.
+technitium_env_dns_server_block_list_urls: "" #A comma separated list of block list URLs.
+technitium_env_dns_server_forwarders: "{{ technitium_dns }}" #Comma separated list of forwarder addresses.
+technitium_env_dns_server_forwarder_protocol: "Tcp" #Forwarder protocol options: Udp, Tcp, Tls, Https, HttpsJson.
+technitium_env_dns_server_log_using_local_time: "true" #Enable this option to use local time instead of UTC for logging.
 
 # autoheal
 technitium_autoheal_enabled: false

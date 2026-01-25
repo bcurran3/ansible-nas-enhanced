@@ -8,43 +8,32 @@
       with_items:
         - "{{ technitium_data_directory }}"
 
-    - name: Stop systemd-resolved service
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        technitium_homepage_href: "https://{{ technitium_hostname }}.{{ ansible_nas_domain }}"
+      when: technitium_traefik_enabled | bool or technitium_dockflare_enabled | bool
+
+    - name: Disable systemd-resolved StubListener
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: '^#?DNSStubListener='
+        line: 'DNSStubListener=no'
+        state: present
+      register: resolved_conf_disable
+
+    - name: Update resolv.conf symlink
+      ansible.builtin.file:
+        src: /run/systemd/resolve/resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+        follow: false
+
+    - name: Restart systemd-resolved
       ansible.builtin.systemd_service:
         name: systemd-resolved
-        state: stopped
-
-    - name: Disable systemd-resolved service
-      ansible.builtin.systemd_service:
-        name: systemd-resolved
-        enabled: false
-
-    - name: Check for resolve.conf.bak.technitium
-      ansible.builtin.stat:
-        path: /etc/resolv.conf.bak.technitium
-      register: resolvconfbak
-
-    - name: Handle resolve.conf
-      block:
-        - name: Backup /etc/resolv.conf
-          ansible.builtin.copy:
-            remote_src: yes
-            src: /etc/resolv.conf
-            dest: /etc/resolv.conf.bak.technitium
-          ignore_errors: yes
-
-        - name: Remove /etc/resolv.conf
-          ansible.builtin.file:
-            path: /etc/resolv.conf
-            state: absent
-
-        - name: Create new resolv.conf from template
-          ansible.builtin.template:
-            src: resolv.conf
-            dest: /etc/resolv.conf
-            owner: root
-            group: root
-            mode: '0644'
-      when: resolvconfbak.stat.exists is false
+        state: restarted
+      when: resolved_conf_disable.changed
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -58,7 +47,7 @@
           - "{{ technitium_port_http }}:{{ technitium_port_http }}"
           - "53:53/udp" # DNS
           - "53:53/tcp" # DNS
-          - "67:67/udp" # DHCP service
+#         - "67:67/udp" # DHCP service
 #         - "80:80/tcp" # DNS-over-HTTP service (use with reverse proxy or certbot certificate renewal)
 #         - "443:443/udp" # DNS-over-HTTPS service (HTTP/3)
 #         - "443:443/tcp" # DNS-over-HTTPS service (HTTP/1.1, HTTP/2)
@@ -67,30 +56,28 @@
           - "8053:8053/tcp" # DNS-over-HTTP service (use with reverse proxy)
           - "53443:53443/tcp" # DNS web console (HTTPS)
         sysctls:
-          net.ipv4.ip_local_port_range: 1024 65000
+          net.ipv4.ip_local_port_range: 1024 65535
         volumes:
           - "{{ technitium_data_directory }}:/etc/dns"
         env:
           DNS_SERVER_DOMAIN: "{{ technitium_env_dns_server_domain }}"
           DNS_SERVER_WEB_SERVICE_HTTP_PORT: "{{ technitium_port_http }}"
           DNS_SERVER_ADMIN_PASSWORD: "{{ technitium_env_dns_server_password }}"
-      # - DNS_SERVER_ADMIN_PASSWORD_FILE=password.txt #The path to a file that contains a plain text password for the DNS web console admin user.
-      # - DNS_SERVER_PREFER_IPV6=false #DNS Server will use IPv6 for querying whenever possible with this option enabled.
-      # - DNS_SERVER_WEB_SERVICE_LOCAL_ADDRESSES=172.17.0.1,127.0.0.1 #Comma separated list of network interface IP addresses that you want the web service to listen on for requests. The "172.17.0.1" address is the built-in Docker bridge. The "[::]" is the default value if not specified. Note! This must be used only with "host" network mode.
-          DNS_SERVER_WEB_SERVICE_HTTPS_PORT: "53443" #The TCP port number for the DNS web console over HTTPS protocol.
-          DNS_SERVER_WEB_SERVICE_ENABLE_HTTPS: "true" #Enables HTTPS for the DNS web console.
-          DNS_SERVER_WEB_SERVICE_USE_SELF_SIGNED_CERT: "true" #Enables self signed TLS certificate for the DNS web console.
-          DNS_SERVER_OPTIONAL_PROTOCOL_DNS_OVER_HTTP: "true" #Enables DNS server optional protocol DNS-over-HTTP on TCP port 8053 to be used with a TLS terminating reverse proxy like nginx.
-      # - DNS_SERVER_RECURSION=AllowOnlyForPrivateNetworks #Recursion options: Allow, Deny, AllowOnlyForPrivateNetworks, UseSpecifiedNetworkACL.
-      # - DNS_SERVER_RECURSION_NETWORK_ACL=192.168.10.0/24, !192.168.10.2 #Comma separated list of IP addresses or network addresses to allow access. Add ! character at the start to deny access, e.g. !192.168.10.0/24 will deny entire subnet. The ACL is processed in the same order its listed. If no networks match, the default policy is to deny all except loopback. Valid only for `UseSpecifiedNetworkACL` recursion option.
-      # - DNS_SERVER_RECURSION_DENIED_NETWORKS=1.1.1.0/24 #Comma separated list of IP addresses or network addresses to deny recursion. Valid only for `UseSpecifiedNetworkACL` recursion option. This option is obsolete and DNS_SERVER_RECURSION_NETWORK_ACL should be used instead.
-      # - DNS_SERVER_RECURSION_ALLOWED_NETWORKS=127.0.0.1, 192.168.1.0/24 #Comma separated list of IP addresses or network addresses to allow recursion. Valid only for `UseSpecifiedNetworkACL` recursion option.  This option is obsolete and DNS_SERVER_RECURSION_NETWORK_ACL should be used instead.
-          DNS_SERVER_ENABLE_BLOCKING: "true" #Sets the DNS server to block domain names using Blocked Zone and Block List Zone.
-      # - DNS_SERVER_ALLOW_TXT_BLOCKING_REPORT=false #Specifies if the DNS Server should respond with TXT records containing a blocked domain report for TXT type requests.
-      # - DNS_SERVER_BLOCK_LIST_URLS= #A comma separated list of block list URLs.
-          DNS_SERVER_FORWARDERS: "{{ technitium_dns }}" #Comma separated list of forwarder addresses.
-      # - DNS_SERVER_FORWARDER_PROTOCOL=Tcp #Forwarder protocol options: Udp, Tcp, Tls, Https, HttpsJson.
-          DNS_SERVER_LOG_USING_LOCAL_TIME: "true" #Enable this option to use local time instead of UTC for logging.
+#         DNS_SERVER_ADMIN_PASSWORD_FILE=password.txt #The path to a file that contains a plain text password for the DNS web console admin user.
+          DNS_SERVER_PREFER_IPV6: "{{ technitium_env_dns_server_prefer_ipv6 }}"
+#         DNS_SERVER_WEB_SERVICE_LOCAL_ADDRESSES=172.17.0.1,127.0.0.1 #Comma separated list of network interface IP addresses that you want the web service to listen on for requests. The "172.17.0.1" address is the built-in Docker bridge. The "[::]" is the default value if not specified. Note! This must be used only with "host" network mode.
+          DNS_SERVER_WEB_SERVICE_HTTPS_PORT: "{{ technitium_env_dns_server_web_service_https_port }}"
+          DNS_SERVER_WEB_SERVICE_ENABLE_HTTPS: "{{ technitium_env_dns_server_web_service_enable_https }}"
+          DNS_SERVER_WEB_SERVICE_USE_SELF_SIGNED_CERT: "{{ technitium_env_dns_server_web_service_use_self_signed_cert }}"
+          DNS_SERVER_OPTIONAL_PROTOCOL_DNS_OVER_HTTP: "{{ technitium_env_dns_server_optional_protocol_dns_over_http }}"
+          DNS_SERVER_RECURSION: "{{ technitium_env_dns_server_recursion }}"
+          DNS_SERVER_RECURSION_NETWORK_ACL: "{{ technitium_env_dns_server_recursion_network_acl }}"
+          DNS_SERVER_ENABLE_BLOCKING: "{{ technitium_env_dns_server_enable_blocking }}"
+          DNS_SERVER_ALLOW_TXT_BLOCKING_REPORT: "{{ technitium_env_dns_server_allow_txt_blocking_report }}"
+          DNS_SERVER_BLOCK_LIST_URLS: "{{ technitium_env_dns_server_block_list_urls }}"
+          DNS_SERVER_FORWARDERS: "{{ technitium_env_dns_server_forwarders }}"
+          DNS_SERVER_FORWARDER_PROTOCOL: "{{ technitium_env_dns_server_forwarder_protocol }}"
+          DNS_SERVER_LOG_USING_LOCAL_TIME: "{{ technitium_env_dns_server_log_using_local_time }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ technitium_autoheal_enabled | ternary('true', 'false') }}"
@@ -148,40 +135,27 @@
         name: "{{ technitium_container_name }}"
         state: absent
 
-    - name: Check for resolve.conf.bak.technitium
-      ansible.builtin.stat:
-        path: /etc/resolv.conf.bak.technitium
-      register: resolvconfbak
+    - name: Re-enable systemd-resolved StubListener
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: '^#?DNSStubListener='
+        line: 'DNSStubListener=yes'
+        state: present
+      register: resolved_conf_enable
 
-    - name: Handle resolve.conf.bak.technitium
-      block:
-        - name: Remove /etc/resolv.conf
-          ansible.builtin.file:
-            path: /etc/resolv.conf
-            state: absent
-          ignore_errors: yes
+    - name: Restore default resolv.conf symlink
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+        follow: false
 
-        - name: Restore /etc/resolv.conf
-          ansible.builtin.copy:
-            remote_src: yes
-            src: /etc/resolv.conf.bak.technitium
-            dest: /etc/resolv.conf
-
-        - name: Enable systemd-resolved service
-          ansible.builtin.systemd_service:
-            name: systemd-resolved
-            enabled: true
-
-        - name: Start systemd-resolved service
-          ansible.builtin.systemd_service:
-            name: systemd-resolved
-            state: started
-
-        - name: Remove /etc/resolv.conf.bak.technitium
-          ansible.builtin.file:
-            path: /etc/resolv.conf.bak.technitium
-            state: absent
-      when: resolvconfbak.stat.exists is true
+    - name: Restart systemd-resolved
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: restarted
+      when: resolved_conf_enable.changed
   when: technitium_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
