@@ -6,14 +6,12 @@ By default, applications can be found on the ports listed below.
 |------------------|---------|---------|----------------|
 | Activepieces     | 3086    | Bridge  | HTTP           |
 | 2FAuth           | 8001    | Bridge  | HTTP           |
-| AdGuard Home     | 8844    | Bridge  |                |
-| AdGuard Home     | 53      | Bridge  |                |
-| AdGuard Home     | 67      | Bridge  |                |
-| AdGuard Home     | 68      | Bridge  |                |
-| AdGuard Home     | 784     | Bridge  |                |
-| AdGuard Home     | 853     | Bridge  |                |
-| AdGuard Home     | 5443    | Bridge  |                |
-| AdGuard Home     | 8853    | Bridge  |                |
+| AdGuard Home     | 8844    | Bridge  | HTTP           |
+| AdGuard Home     | 53      | Bridge  | DNS            |
+| AdGuard Home     | 784     | Bridge  | DNS-over-QUIC  |
+| AdGuard Home     | 853     | Bridge  | DNS-QUIC/TLS   |
+| AdGuard Home     | 5443    | Bridge  | DNSCrypt       |
+| AdGuard Home     | 8853    | Bridge  | DNS-over-QUIC  |
 | Airsonic         | 4040    | Bridge  | HTTP           |
 | apcupsd          | 3551
 | Arcane           | 3552    | Bridge  | HTTP           |
