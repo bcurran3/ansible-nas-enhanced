@@ -37,7 +37,7 @@
       community.docker.docker_network:
         name: "{{ tacticalrmm_mesh_network }}"
 
-    - name: Create {{ ansible_nas_app_name }} Postgres Container
+    - name: Create {{ ansible_nas_app_name }} Postgres DB Container
     # postgres database for api service
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -59,6 +59,12 @@
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/postgres:/var/lib/postgresql/data"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U {{ tacticalrmm_postgress_user }}"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+          start_period: 30s
         labels:
           autoheal: "{{ tacticalrmm_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled | ternary('true', 'false') }}"
@@ -68,6 +74,7 @@
 #         wud.link.template: "https://github.com/dev/tacticalrmm/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         restart_policy: unless-stopped
+      register: tacticalrmm_db_status
 
     - name: Create {{ ansible_nas_app_name }} MongoDB Container
     # mongodb container for meshcentral
@@ -222,6 +229,14 @@
 #         wud.link.template: "https://github.com/dev/tacticalrmm/releases/tag/$${major}.$${minor}.$${patch}"
         cpu_shares: "{{ tacticalrmm_cpu_shares }}"
         restart_policy: unless-stopped
+
+    - name: Verify {{ ansible_nas_app_name }} Postgres DB is healthy
+      community.docker.docker_container_info:
+        name: "tactical-postgres"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} init Container
     # used to initialize the docker environment

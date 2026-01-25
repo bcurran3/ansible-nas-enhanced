@@ -75,6 +75,7 @@
         cpu_shares: "{{ ssm_db_cpu_shares }}"
         memory: "{{ ssm_db_memory }}"
         restart_policy: unless-stopped
+      register: ssm_db_status
 
     - name: Create {{ ansible_nas_app_name }} Client Container
       community.docker.docker_container:
@@ -120,6 +121,14 @@
                 ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ssm_port_http | string)] +
                 (['https://' + ssm_hostname + '.' + ansible_nas_domain] if (ssm_traefik_enabled is true or ssm_dockflare_enabled is true) else [])
               }}
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ ssm_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} Server Container
       community.docker.docker_container:

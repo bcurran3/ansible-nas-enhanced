@@ -22,6 +22,12 @@
           POSTGRES_USER: "peppermint"
           POSTGRES_PASSWORD: "{{ peppermint_db_password }}"
           POSTGRES_DB: "peppermint"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U peppermint"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+          start_period: 30s
         labels:
           autoheal: "{{ peppermint_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ peppermint_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -46,6 +52,15 @@
         cpu_shares: "{{ peppermint_db_cpu_shares }}"
         memory: "{{ peppermint_db_memory }}"
         restart_policy: unless-stopped
+      register: peppermint_db_status
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ peppermint_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
