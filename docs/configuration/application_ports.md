@@ -347,12 +347,10 @@ By default, applications can be found on the ports listed below.
 | Tdarr Server     | 8265
 | Tdarr Server     | 8266
 | Tdarr Node       | 8268
-| Technitium DNS   | 8380
-| Technitium DNS   | 53
-| Technitium DNS   | 67
-| Technitium DNS   | 853
-| Technitium DNS   | 8053
-| Technitium DNS   | 53443
+| Technitium DNS   | 5380    | Bridge  | HTTP           |
+| Technitium DNS   | 53      | Bridge  | DNS            |
+| Technitium DNS   | 853     | Bridge  | DNS QUIC/TLS   |
+| Technitium DNS   | 8053    | Bridge  | DNS-over-HTTP  |
 | The Lounge       | 113     | Bridge  | Ident          |
 | The Lounge       | 9023    | Bridge  | HTTP           |
 | Threadfin        | 34400
