@@ -378,6 +378,12 @@
         command: "redis-server --requirepass topsecret"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "redis-cli -a topsecret ping | grep PONG"]
+#          test: ["CMD", "redis-cli", "ping"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
         labels:
           autoheal: "{{ appname_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_redis_watchtower_enabled | ternary('true', 'false') }}"

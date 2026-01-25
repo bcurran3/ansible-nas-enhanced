@@ -32,7 +32,10 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ['CMD', 'redis-cli', 'ping']
+          test: ["CMD", "redis-cli", "ping"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
         command: "--save 60 1"
         labels:
           autoheal: "{{ ssm_redis_autoheal_enabled | ternary('true', 'false') }}"

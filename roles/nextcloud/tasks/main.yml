@@ -54,6 +54,11 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         command: "redis-server --requirepass {{ nextcloud_env_redis_host_password }}"
+        healthcheck:
+          test: ["CMD-SHELL", "redis-cli -a {{ nextcloud_env_redis_host_password }} ping | grep PONG"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
         labels:
           autoheal: "{{ nextcloud_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ nextcloud_redis_watchtower_enabled | ternary('true', 'false') }}"

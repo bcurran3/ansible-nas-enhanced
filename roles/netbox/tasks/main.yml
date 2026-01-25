@@ -80,6 +80,11 @@
         command: "redis-server --requirepass {{ netbox_env_redis_password }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "redis-cli -a {{ netbox_env_redis_password }} ping | grep PONG"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
         labels:
           autoheal: "{{ netbox_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ netbox_redis_watchtower_enabled | ternary('true', 'false') }}"

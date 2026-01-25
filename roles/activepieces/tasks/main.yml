@@ -86,6 +86,11 @@
           - activepieces_redis_data:/data
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "redis-cli", "ping"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
         labels:
           autoheal: "{{ activepieces_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ activepieces_redis_watchtower_enabled | ternary('true', 'false') }}"
