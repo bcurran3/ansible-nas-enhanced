@@ -29,6 +29,12 @@
           POSTGRES_PASSWORD: "{{ netbox_env_db_password }}"
           POSTGRES_DB: "{{ netbox_env_db_name }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U {{ netbox_env_db_user }}"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+          start_period: 30s
         labels:
           autoheal: "{{ netbox_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ netbox_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -54,6 +60,15 @@
         memory: "{{ netbox_db_memory }}"
         memory_swap: "{{ netbox_db_memory_swap }}"
         restart_policy: unless-stopped
+      register: netbox_db_status
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ netbox_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
