@@ -10,48 +10,32 @@
         - "{{ adguardhome_data_directory }}/conf"
         - "{{ adguardhome_data_directory }}/work"
 
-    - name: Stop systemd-resolved service
-      ansible.builtin.systemd_service:
-        name: systemd-resolved
-        state: stopped
-
-    - name: Disable systemd-resolved service
-      ansible.builtin.systemd_service:
-        name: systemd-resolved
-        enabled: false
-
-    - name: Check for resolve.conf.bak.adguardhome
-      ansible.builtin.stat:
-        path: /etc/resolv.conf.bak.adguardhome
-      register: resolvconfbak
-
-    - name: Handle resolve.conf
-      block:
-        - name: Backup /etc/resolv.conf
-          ansible.builtin.copy:
-            remote_src: yes
-            src: /etc/resolv.conf
-            dest: /etc/resolv.conf.bak.adguardhome
-          ignore_errors: yes
-
-        - name: Remove /etc/resolv.conf
-          ansible.builtin.file:
-            path: /etc/resolv.conf
-            state: absent
-
-        - name: Create new resolv.conf from template
-          ansible.builtin.template:
-            src: resolv.conf
-            dest: /etc/resolv.conf
-            owner: root
-            group: root
-            mode: '0644'
-      when: resolvconfbak.stat.exists is false
-
     - name: Set {{ ansible_nas_app_name }} FQDN var overrides
       ansible.builtin.set_fact:
         adguardhome_homepage_href: "https://{{ adguardhome_hostname }}.{{ ansible_nas_domain }}"
       when: adguardhome_traefik_enabled | bool or adguardhome_dockflare_enabled | bool
+
+    - name: Disable systemd-resolved StubListener
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: '^#?DNSStubListener='
+        line: 'DNSStubListener=no'
+        state: present
+      register: resolved_conf_disable
+
+    - name: Update resolv.conf symlink
+      ansible.builtin.file:
+        src: /run/systemd/resolve/resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+        follow: false
+
+    - name: Restart systemd-resolved
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: restarted
+      when: resolved_conf_disable.changed
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -139,40 +123,27 @@
         name: "{{ adguardhome_container_name }}"
         state: absent
 
-    - name: Check for resolve.conf.bak.adguardhome
-      ansible.builtin.stat:
-        path: /etc/resolv.conf.bak.adguardhome
-      register: resolvconfbak
+    - name: Re-enable systemd-resolved StubListener
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: '^#?DNSStubListener='
+        line: 'DNSStubListener=yes'
+        state: present
+      register: resolved_conf_enable
 
-    - name: Handle resolve.conf.bak.adguardhome
-      block:
-        - name: Remove /etc/resolv.conf
-          ansible.builtin.file:
-            path: /etc/resolv.conf
-            state: absent
-          ignore_errors: yes
+    - name: Restore default resolv.conf symlink (Point to Stub)
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+        follow: false
 
-        - name: Restore /etc/resolv.conf
-          ansible.builtin.copy:
-            remote_src: yes
-            src: /etc/resolv.conf.bak.adguardhome
-            dest: /etc/resolv.conf
-
-        - name: Enable systemd-resolved service
-          ansible.builtin.systemd_service:
-            name: systemd-resolved
-            enabled: true
-
-        - name: Start systemd-resolved service
-          ansible.builtin.systemd_service:
-            name: systemd-resolved
-            state: started
-
-        - name: Remove /etc/resolv.conf.bak.adguardhome
-          ansible.builtin.file:
-            path: /etc/resolv.conf.bak.adguardhome
-            state: absent
-      when: resolvconfbak.stat.exists is true
+    - name: Restart systemd-resolved
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: restarted
+      when: resolved_conf_enable.changed
   when: adguardhome_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
