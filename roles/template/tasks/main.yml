@@ -281,6 +281,11 @@
           MYSQL_PASSWORD: "{{ appname_sql_password }}"
           MYSQL_ROOT_PASSWORD: "{{ appname_sql_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "mysqladmin ping -u root -p{{ appname_sql_root_password }} -h localhost"
+          interval: 10s
+          timeout: 5s
+          retries: 5
         labels:
           autoheal: "{{ appname_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled | ternary('true', 'false') }}"
