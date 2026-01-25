@@ -12,7 +12,7 @@
 
     - name: Set {{ ansible_nas_app_name }} FQDN var overrides
       ansible.builtin.set_fact:
-        pihole_homepage_href: "https://{{ pihole_hostname }}.{{ ansible_nas_domain }}"
+        pihole_homepage_href: "https://{{ pihole_hostname }}.{{ ansible_nas_domain }}/admin"
       when: pihole_traefik_enabled | bool or pihole_dockflare_enabled | bool
 
     - name: Disable systemd-resolved StubListener
@@ -108,8 +108,8 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pihole_port_http | string)] +
-                (['https://' + pihole_hostname + '.' + ansible_nas_domain] if (pihole_traefik_enabled is true or pihole_dockflare_enabled is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pihole_port_http | string) + '/admin'] +
+                (['https://' + pihole_hostname + '.' + ansible_nas_domain + '/admin'] if (pihole_traefik_enabled is true or pihole_dockflare_enabled is true) else [])
               }}
   when: pihole_enabled is true
 
