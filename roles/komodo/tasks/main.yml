@@ -33,6 +33,12 @@
           MONGO_INITDB_ROOT_USERNAME: "{{ komodo_env_komodo_database_username }}"
           MONGO_INITDB_ROOT_PASSWORD: "{{ komodo_env_komodo_database_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
+          start_period: 5s
         labels:
           autoheal: "{{ komodo_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ komodo_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -110,6 +116,14 @@
         memory: "{{ komodo_periphery_memory }}"
         memory_swap: "{{ komodo_periphery_memory_swap }}"
         restart_policy: unless-stopped
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ komodo_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
