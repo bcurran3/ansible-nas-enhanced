@@ -7,44 +7,29 @@
         state: directory
       with_items:
         - "{{ pihole_data_directory }}"
+        - "{{ pihole_data_directory }}/etc-pihole"
+        - "{{ pihole_data_directory }}/etc-dnsmasq.d"
 
-    - name: Stop systemd-resolved service
+    - name: Disable systemd-resolved StubListener
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: '^#?DNSStubListener='
+        line: 'DNSStubListener=no'
+        state: present
+      register: resolved_conf_update
+
+    - name: Update resolv.conf symlink
+      ansible.builtin.file:
+        src: /run/systemd/resolve/resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+
+    - name: Restart systemd-resolved
       ansible.builtin.systemd_service:
         name: systemd-resolved
-        state: stopped
-
-    - name: Disable systemd-resolved service
-      ansible.builtin.systemd_service:
-        name: systemd-resolved
-        enabled: false
-
-    - name: Check for resolve.conf.bak.pihole
-      ansible.builtin.stat:
-        path: /etc/resolv.conf.bak.pihole
-      register: resolvconfbak
-
-    - name: Handle resolve.conf
-      block:
-        - name: Backup /etc/resolv.conf
-          ansible.builtin.copy:
-            remote_src: yes
-            src: /etc/resolv.conf
-            dest: /etc/resolv.conf.bak.pihole
-          ignore_errors: yes
-
-        - name: Remove /etc/resolv.conf
-          ansible.builtin.file:
-            path: /etc/resolv.conf
-            state: absent
-
-        - name: Create new resolv.conf from template
-          ansible.builtin.template:
-            src: resolv.conf
-            dest: /etc/resolv.conf
-            owner: root
-            group: root
-            mode: '0644'
-      when: resolvconfbak.stat.exists is false
+        state: restarted
+      when: resolved_conf_update.changed
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -61,7 +46,8 @@
           - "67:67/udp"
           - "123:123/udp"
         volumes:
-          - "{{ pihole_data_directory }}:/etc/dnsmasq.d"
+          - "{{ pihole_data_directory }}/etc-dnsmasq.d:/etc/dnsmasq.d"
+          - "{{ pihole_data_directory }}/etc-pihole:/etc/pihole"
         env:
           ADDITIONAL_PACKAGES: "{{ pihole_env_additional_packages }}"
           FTLCONF_dns_listeningMode: 'all'
@@ -129,40 +115,26 @@
         name: "{{ pihole_container_name }}"
         state: absent
 
-    - name: Check for resolve.conf.bak.pihole
-      ansible.builtin.stat:
-        path: /etc/resolv.conf.bak.pihole
-      register: resolvconfbak
+    - name: Re-enable systemd-resolved StubListener
+      ansible.builtin.lineinfile:
+        path: /etc/systemd/resolved.conf
+        regexp: '^#?DNSStubListener='
+        line: 'DNSStubListener=yes'
+        state: present
+      register: resolved_conf_revert
 
-    - name: Handle resolve.conf.bak.pihole
-      block:
-        - name: Remove /etc/resolv.conf
-          ansible.builtin.file:
-            path: /etc/resolv.conf
-            state: absent
-          ignore_errors: yes
+    - name: Restore default resolv.conf symlink
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
 
-        - name: Restore /etc/resolv.conf
-          ansible.builtin.copy:
-            remote_src: yes
-            src: /etc/resolv.conf.bak.pihole
-            dest: /etc/resolv.conf
-
-        - name: Enable systemd-resolved service
-          ansible.builtin.systemd_service:
-            name: systemd-resolved
-            enabled: true
-
-        - name: Start systemd-resolved service
-          ansible.builtin.systemd_service:
-            name: systemd-resolved
-            state: started
-
-        - name: Remove /etc/resolv.conf.bak.pihole
-          ansible.builtin.file:
-            path: /etc/resolv.conf.bak.pihole
-            state: absent
-      when: resolvconfbak.stat.exists is true
+    - name: Restart systemd-resolved
+      ansible.builtin.systemd_service:
+        name: systemd-resolved
+        state: restarted
+      when: resolved_conf_revert.changed
   when: pihole_enabled is false
 
 - name: Data Archive {{ ansible_nas_app_name }}
