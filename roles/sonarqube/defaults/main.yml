@@ -34,6 +34,7 @@ sonarqube_env_sonar_jdbc_username: "sonarqube"
 sonarqube_env_sonar_jdbc_password: "topsecret"
 sonarqube_env_sonar_es_bootstrap_checks_disable: "true"
 sonarqube_db_env_postgres_db: "sonarqube_db"
+sonarqube_db_env_postgres_host_auth_method: "trust"
 
 # autoheal
 sonarqube_autoheal_enabled: false
@@ -46,7 +47,7 @@ sonarqube_dockflare_access_group: ""
 # homepage
 sonarqube_homepage_group: "Apps"
 sonarqube_homepage_icon: "sonarqube.png"
-sonarqube_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonarqube_port_http }}"
+sonarqube_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ sonarqube_port_http }}"
 sonarqube_homepage_showstats: false
 sonarqube_db_homepage_group: "DBs"
 sonarqube_db_homepage_icon: "postgres.png"

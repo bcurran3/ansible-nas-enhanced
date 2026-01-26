@@ -20,7 +20,7 @@ whatsrunning_memory: "256M"
 whatsrunning_memory_swap: -1
 
 # app
-whatsrunning_env_host_hostname: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+whatsrunning_env_host_hostname: "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}"
 whatsrunning_env_verbose: "true"
 
 # autoheal
@@ -33,7 +33,7 @@ whatsrunning_dockflare_access_group: ""
 # homepage
 whatsrunning_homepage_group: "Apps"
 whatsrunning_homepage_icon: "docker.png"
-whatsrunning_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
+whatsrunning_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
 whatsrunning_homepage_showstats: false
 
 # tinyauth

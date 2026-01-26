@@ -31,15 +31,15 @@ mailrise_ntfy_topic: "Mailrise"
 mailrise_targets:
   - email: "gotify@{{ mailrise_hostname }}.{{ ansible_nas_domain }}"
     urls:
-      - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port_http }}/{{ mailrise_gotify_app_token }}"
+      - "gotify://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gotify_port_http }}/{{ mailrise_gotify_app_token }}"
 
   - email: "ntfy@{{ mailrise_hostname }}.{{ ansible_nas_domain }}"
     urls:
-      - "ntfy://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ntfy_port_http }}/{{ mailrise_ntfy_topic }}"
+      - "ntfy://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ntfy_port_http }}/{{ mailrise_ntfy_topic }}"
 
   - email: "*@*" # Catch-All
     urls:
-      - "gotify://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gotify_port_http }}/{{ mailrise_gotify_app_token }}"
+      - "gotify://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gotify_port_http }}/{{ mailrise_gotify_app_token }}"
 
 # autoheal
 mailrise_autoheal_enabled: false

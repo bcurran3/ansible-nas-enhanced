@@ -17,7 +17,7 @@
   ansible.builtin.debug:
     msg: >-
           {{
-            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (webmin_port_http | string)]
+            ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (webmin_port_http | string)]
           }}
   when: webmin_enabled is true
 

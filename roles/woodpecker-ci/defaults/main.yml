@@ -11,7 +11,7 @@ woodpecker_ci_data_directory: "{{ docker_home }}/woodpecker-ci"
 # network
 woodpecker_ci_port_http: "8000"
 woodpecker_ci_port_grpc: "9000"
-woodpecker_ci_address: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port_http }}"
+woodpecker_ci_address: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ woodpecker_ci_port_http }}"
 woodpecker_ci_hostname: "woodpeckerci"
 
 # docker
@@ -39,7 +39,7 @@ woodpecker_ci_agent_secret: 9f3aeaa7bbabcf42b724f65d4acb38456899ca32511677a8c383
 woodpecker_ci_log_level: info
 
 # the url to your gitea server
-woodpecker_ci_gitea_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gitea_port_http }}"
+woodpecker_ci_gitea_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gitea_port_http }}"
 
 # gitea auth credentials. see https://woodpecker-ci.org/docs/administration/forges/gitea for more info
 woodpecker_ci_gitea_client: notset
@@ -56,7 +56,7 @@ woodpecker_ci_dockflare_access_group: ""
 # homepage
 woodpecker_ci_homepage_group: "Apps"
 woodpecker_ci_homepage_icon: "woodpecker-ci.png"
-woodpecker_ci_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ woodpecker_ci_port }}"
+woodpecker_ci_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ woodpecker_ci_port }}"
 woodpecker_ci_homepage_showstats: false
 
 # repliqate

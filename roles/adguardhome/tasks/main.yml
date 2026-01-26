@@ -67,7 +67,7 @@
           dockflare.enable: "{{ adguardhome_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ adguardhome_dockflare_access_group }}"
           dockflare.hostname: "{{ adguardhome_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ adguardhome_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ adguardhome_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ adguardhome_homepage_group }}"
           homepage.icon: "{{ adguardhome_homepage_icon }}"
@@ -76,9 +76,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ adguardhome_container_name }}"
           homepage.showStats: "{{ adguardhome_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ adguardhome_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ adguardhome_port_http }}"
           homepage.widget.type: "adguard"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ adguardhome_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ adguardhome_port_http }}"
           homepage.widget.username: "{{ adguardhome_homepage_widget_username }}"
           homepage.widget.password: "{{ adguardhome_homepage_widget_password }}"
           repliqate.enabled: "{{ adguardhome_repliqate_enabled | ternary('true', 'false') }}"
@@ -106,7 +106,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (adguardhome_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (adguardhome_port_http | string)] +
                 (['https://' + adguardhome_hostname + '.' + ansible_nas_domain] if (adguardhome_traefik_enabled is true or adguardhome_dockflare_enabled is true) else [])
               }}
   when: adguardhome_enabled is true

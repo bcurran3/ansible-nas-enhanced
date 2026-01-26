@@ -85,7 +85,7 @@
           dockflare.enable: "{{ technitium_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ technitium_dockflare_access_group }}"
           dockflare.hostname: "{{ technitium_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ technitium_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ technitium_homepage_group }}"
           homepage.icon: "{{ technitium_homepage_icon }}"
@@ -94,9 +94,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ technitium_container_name }}"
           homepage.showStats: "{{ technitium_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ technitium_port_http }}"
           homepage.widget.type: "technitium"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ technitium_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ technitium_port_http }}"
           homepage.widget.key: "{{ technitium_homepage_widget_key }}"
           homepage.widget.range: "{{ technitium_homepage_widget_range }}"
           repliqate.enabled: "{{ technitium_repliqate_enabled | ternary('true', 'false') }}"
@@ -123,7 +123,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (technitium_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (technitium_port_http | string)] +
                 (['https://' + technitium_hostname + '.' + ansible_nas_domain] if (technitium_traefik_enabled is true or technitium_dockflare_enabled is true) else [])
               }}
   when: technitium_enabled is true

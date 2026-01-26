@@ -47,7 +47,7 @@
           dockflare.enable: "{{ pocketid_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ pocketid_dockflare_access_group }}"
           dockflare.hostname: "{{ pocketid_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pocketid_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pocketid_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pocketid_homepage_group }}"
           homepage.icon: "{{ pocketid_homepage_icon }}"
@@ -56,7 +56,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ pocketid_container_name }}"
           homepage.showStats: "{{ pocketid_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pocketid_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pocketid_port_http }}"
           repliqate.enabled: "{{ pocketid_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ pocketid_repliqate_engine }}"
           repliqate.schedule: "{{ pocketid_repliqate_schedule }}"
@@ -82,7 +82,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pocketid_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (pocketid_port_http | string)] +
                 (['https://' + pocketid_hostname + '.' + ansible_nas_domain] if (pocketid_traefik_enabled is true or pocketid_dockflare_enabled is true) else [])
               }}
   when: pocketid_enabled is true

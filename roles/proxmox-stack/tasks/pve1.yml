@@ -35,7 +35,7 @@
           dockflare.enable: "{{ proxmox_stack_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ proxmox_stack_dockflare_access_group }}"
           dockflare.hostname: "{{ proxmox_stack_pve1_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proxmox_stack_pve1_port_http }}"
+          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ proxmox_stack_pve1_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }} VE Node 1"
           homepage.group: "{{ proxmox_stack_pve1_homepage_group }}"
           homepage.icon: "{{ proxmox_stack_pve1_homepage_icon }}"
@@ -44,7 +44,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ proxmox_stack_pve1_container_name }}"
           homepage.showStats: "{{ proxmox_stack_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ proxmox_stack_pve1_port_http }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ proxmox_stack_pve1_port_http }}"
           repliqate.enabled: "{{ proxmox_stack_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ proxmox_stack_repliqate_engine }}"
           repliqate.schedule: "{{ proxmox_stack_repliqate_schedule }}"
@@ -82,7 +82,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (proxmox_stack_pve1_port_http | string)] +
+                ['https://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (proxmox_stack_pve1_port_http | string)] +
                 (['https://' + proxmox_stack_pve1_hostname + '.' + ansible_nas_domain] if (proxmox_stack_traefik_enabled is true or proxmox_stack_dockflare_enabled is true) else [])
               }}
   when: 

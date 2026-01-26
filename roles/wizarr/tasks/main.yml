@@ -31,7 +31,7 @@
           dockflare.enable: "{{ wizarr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ wizarr_dockflare_access_group }}"
           dockflare.hostname: "{{ wizarr_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wizarr_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ wizarr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ wizarr_homepage_group }}"
           homepage.icon: "{{ wizarr_homepage_icon }}"
@@ -40,7 +40,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ wizarr_container_name }}"
           homepage.showStats: "{{ wizarr_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wizarr_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ wizarr_port_http }}"
           repliqate.enabled: "{{ wizarr_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ wizarr_repliqate_engine }}"
           repliqate.schedule: "{{ wizarr_repliqate_schedule }}"
@@ -65,7 +65,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wizarr_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (wizarr_port_http | string)] +
                 (['https://' + wizarr_hostname + '.' + ansible_nas_domain] if (wizarr_traefik_enabled is true or wizarr_dockflare_enabled is true) else [])
               }}
   when: wizarr_enabled is true

@@ -51,7 +51,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ music_assistant_container_name }}"
           homepage.showStats: "{{ music_assistant_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ music_assistant_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ music_assistant_port_http }}"
           repliqate.enabled: "{{ music_assistant_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ music_assistant_repliqate_engine }}"
           repliqate.schedule: "{{ music_assistant_repliqate_schedule }}"
@@ -65,7 +65,7 @@
           traefik.http.routers.music-assistant.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.music-assistant.middlewares: "music-assistant-whitelist{{ ',tinyauth-auth@docker' if music_assistant_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.music-assistant-whitelist.ipallowlist.sourcerange: "{{ music_assistant_traefik_whitelist }}"
-          traefik.http.services.music-assistant-svc.loadbalancer.server.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ music_assistant_port_http }}"
+          traefik.http.services.music-assistant-svc.loadbalancer.server.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ music_assistant_port_http }}"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/music-assistant/server/pkgs/container/server"
@@ -78,7 +78,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (music_assistant_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (music_assistant_port_http | string)] +
                 (['https://' + music_assistant_hostname + '.' + ansible_nas_domain] if (music_assistant_traefik_enabled is true or music_assistant_dockflare_enabled is true) else [])
               }}
   when: music_assistant_enabled is true

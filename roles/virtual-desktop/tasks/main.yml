@@ -60,7 +60,7 @@
         msg: >-
           {{
             [
-              'rdp://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ virtual_desktop_port_rdp
+              'rdp://' ~ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] ~ ':' ~ virtual_desktop_port_rdp
             ]
           }}
   when: virtual_desktop_enabled is true

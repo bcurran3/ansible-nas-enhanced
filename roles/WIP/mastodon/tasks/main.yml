@@ -164,12 +164,12 @@
           dockflare.enable: "{{ mastodon_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ mastodon_dockflare_access_group }}"
           dockflare.hostname: "{{ mastodon_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mastodon_port_https }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mastodon_port_https }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ mastodon_homepage_group }}"
           homepage.icon: "{{ mastodon_homepage_icon }}"
           homepage.href: "{{ mastodon_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ mastodon_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mastodon_port_http }}"
 #         homepage.description: ""
           homepage.server: "my-docker"
           homepage.container: "{{ mastodon_container_name }}"
@@ -196,7 +196,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (mastodon_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (mastodon_port_http | string)] +
                 (['https://' + mastodon_hostname + '.' + ansible_nas_domain] if (mastodon_traefik_enabled is true or mastodon_dockflare_enabled is true) else [])
               }}
   when: mastodon_enabled is true

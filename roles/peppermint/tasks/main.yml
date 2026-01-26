@@ -91,13 +91,13 @@
           dockflare.enable: "{{ peppermint_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ peppermint_dockflare_access_group }}"
           dockflare.hostname: "{{ peppermint_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ peppermint_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ peppermint_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ peppermint_homepage_group }}"
           homepage.icon: "{{ peppermint_homepage_icon }}"
           homepage.href: "{{ peppermint_homepage_href }}"
           homepage.description: "{{ 'An open source issue management & help desk solution. A zendesk & jira alternative' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ peppermint_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ peppermint_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ peppermint_container_name }}"
           homepage.showStats: "{{ peppermint_homepage_showstats | ternary('true', 'false') }}"
@@ -126,7 +126,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (peppermint_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (peppermint_port_http | string)] +
                 (['https://' + peppermint_hostname + '.' + ansible_nas_domain] if (peppermint_traefik_enabled is true or peppermint_dockflare_enabled is true) else [])
               }}
   when: peppermint_enabled is true

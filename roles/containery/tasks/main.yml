@@ -36,7 +36,7 @@
           dockflare.enable: "{{ containery_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ containery_dockflare_access_group }}"
           dockflare.hostname: "{{ containery_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ containery_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ containery_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ containery_homepage_group }}"
           homepage.icon: "{{ containery_homepage_icon }}"
@@ -45,7 +45,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ containery_container_name }}"
           homepage.showStats: "{{ containery_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ containery_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ containery_port_http }}"
           repliqate.enabled: "{{ containery_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ containery_repliqate_engine }}"
           repliqate.schedule: "{{ containery_repliqate_schedule }}"
@@ -71,7 +71,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (containery_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (containery_port_http | string)] +
                 (['https://' + containery_hostname + '.' + ansible_nas_domain] if (containery_traefik_enabled is true or containery_dockflare_enabled is true) else [])
               }}
   when: containery_enabled is true

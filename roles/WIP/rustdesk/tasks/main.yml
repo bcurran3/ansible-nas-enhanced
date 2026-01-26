@@ -33,7 +33,7 @@
           homepage.group: "{{ rustdesk_hbbr_homepage_group }}"
           homepage.icon: "{{ rustdesk_hbbr_homepage_icon }}"
           homepage.href: "{{ rustdesk_hbbr_homepage_href }}"
-#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
 #         homepage.description: "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer."
           homepage.server: "my-docker"
           homepage.container: "{{ rustdesk_hbbr_container_name }}"
@@ -75,7 +75,7 @@
           homepage.group: "{{ rustdesk_hbbs_homepage_group }}"
           homepage.icon: "{{ rustdesk_hbbs_homepage_icon }}"
           homepage.href: "{{ rustdesk_hbbs_homepage_href }}"
-#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
 #         homepage.description: "An open-source remote desktop application designed for self-hosting, as an alternative to TeamViewer."
           homepage.server: "my-docker"
           homepage.container: "{{ rustdesk_hbbs_container_name }}"
@@ -109,12 +109,12 @@
           dockflare.enable: "{{ rustdesk_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ rustdesk_dockflare_access_group }}"
           dockflare.hostname: "{{ rustdesk_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }} Web Client"
           homepage.group: "{{ rustdesk_web_homepage_group }}"
           homepage.icon: "{{ rustdesk_web_homepage_icon }}"
           homepage.href: "{{ rustdesk_web_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rustdesk_port_http }}"
 #         homepage.description: "RustDesk Web Client"
           homepage.server: "my-docker"
           homepage.container: "{{ rustdesk_web_container_name }}"
@@ -138,7 +138,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (rustdesk_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (rustdesk_port_http | string)] +
                 (['https://' + rustdesk_hostname + '.' + ansible_nas_domain] if (rustdesk_traefik_enabled is true or rustdesk_dockflare_enabled is true) else [])
               }}
   when: rustdesk_enabled is true

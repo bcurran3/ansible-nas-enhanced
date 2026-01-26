@@ -107,12 +107,12 @@
           dockflare.enable: "{{ gamevault_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ gamevault_dockflare_access_group }}"
           dockflare.hostname: "{{ gamevault_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gamevault_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gamevault_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ gamevault_homepage_group }}"
           homepage.icon: "{{ gamevault_homepage_icon }}"
           homepage.href: "{{ gamevault_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gamevault_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gamevault_port_http }}"
           homepage.description: "{{ 'the self-hosted gaming platform for drm-free games' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gamevault_container_name }}"
@@ -142,7 +142,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gamevault_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (gamevault_port_http | string)] +
                 (['https://' + gamevault_hostname + '.' + ansible_nas_domain] if (gamevault_traefik_enabled is true or gamevault_dockflare_enabled is true) else [])
               }}
   when: gamevault_enabled is true

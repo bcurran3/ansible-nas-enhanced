@@ -50,7 +50,7 @@ ansible_nas_dns: 1.1.1.1
 # you can easily add multiple networks to whitelist, just define them and add them to lan; e.g.:
 # vpn_whitelist: 192.168.99.0/16
 # lan: "{{ lan_whitelist }}, {{ vpn_whitelist }}"
-lan_whitelist: "{{ ansible_default_ipv4.network }}/{{ ansible_default_ipv4.prefix }}"
+lan_whitelist: "{{ ansible_facts['default_ipv4']['network'] }}/{{ ansible_facts['default_ipv4']['prefix'] }}"
 lan: "{{ lan_whitelist }}"
 wan: "0.0.0.0/0"
 

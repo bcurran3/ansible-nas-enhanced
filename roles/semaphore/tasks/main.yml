@@ -32,12 +32,12 @@
           dockflare.enable: "{{ semaphore_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ semaphore_dockflare_access_group }}"
           dockflare.hostname: "{{ semaphore_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ semaphore_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ semaphore_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ semaphore_homepage_group }}"
           homepage.icon: "{{ semaphore_homepage_icon }}"
           homepage.href: "{{ semaphore_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ semaphore_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ semaphore_port_http }}"
           homepage.description: "{{ 'Modern UI and powerful API for Ansible, Terraform, OpenTofu, PowerShell and other DevOps tools.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ semaphore_container_name }}"
@@ -66,7 +66,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (semaphore_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (semaphore_port_http | string)] +
                 (['https://' + semaphore_hostname + '.' + ansible_nas_domain] if (semaphore_traefik_enabled is true or semaphore_dockflare_enabled is true) else [])
               }}
   when: semaphore_enabled is true

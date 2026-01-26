@@ -136,12 +136,12 @@
           dockflare.enable: "{{ openemr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ openemr_dockflare_access_group }}"
           dockflare.hostname: "{{ openemr_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ openemr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ openemr_homepage_group }}"
           homepage.icon: "{{ openemr_homepage_icon }}"
           homepage.href: "{{ openemr_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ openemr_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ openemr_port_http }}"
           homepage.description: "{{ 'Free and Open Source electronic health records and medical practice management application' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ openemr_container_name }}"
@@ -171,7 +171,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (openemr_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (openemr_port_http | string)] +
                 (['https://' + openemr_hostname + '.' + ansible_nas_domain] if (openemr_traefik_enabled is true or openemr_dockflare_enabled is true) else [])
               }}
   when: openemr_enabled is true

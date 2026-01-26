@@ -68,7 +68,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ wireshark_container_name }}"
           homepage.showStats: "{{ wireshark_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:3001"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:3001"
           repliqate.enabled: "{{ wireshark_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ wireshark_repliqate_engine }}"
           repliqate.schedule: "{{ wireshark_repliqate_schedule }}"
@@ -82,7 +82,7 @@
           traefik.http.routers.wireshark.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.wireshark.middlewares: "wireshark-whitelist{{ ',tinyauth-auth@docker' if wireshark_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.wireshark-whitelist.ipallowlist.sourcerange: "{{ wireshark_traefik_whitelist }}"
-          traefik.http.services.wireshark-svc.loadbalancer.server.url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:3001"
+          traefik.http.services.wireshark-svc.loadbalancer.server.url: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:3001"
           traefik.http.services.wireshark-svc.loadbalancer.serversTransport: "ignore-cert@file"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
@@ -98,7 +98,7 @@
       ansible.builtin.debug:
         msg: >-
           {{
-            ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + '3001'] +
+            ['https://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + '3001'] +
             (['https://' + wireshark_hostname + '.' + ansible_nas_domain] if (wireshark_traefik_enabled is true) else [])
           }}
   when: wireshark_enabled is true

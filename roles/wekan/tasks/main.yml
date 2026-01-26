@@ -104,7 +104,7 @@
           dockflare.enable: "{{ wekan_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ wekan_dockflare_access_group }}"
           dockflare.hostname: "{{ wekan_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ wekan_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ wekan_homepage_group }}"
           homepage.icon: "{{ wekan_homepage_icon }}"
@@ -113,7 +113,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ wekan_container_name }}"
           homepage.showStats: "{{ wekan_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ wekan_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ wekan_port_http }}"
           repliqate.enabled: "{{ wekan_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ wekan_repliqate_engine }}"
           repliqate.schedule: "{{ wekan_repliqate_schedule }}"
@@ -137,7 +137,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (wekan_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (wekan_port_http | string)] +
                 (['https://' + wekan_hostname + '.' + ansible_nas_domain] if (wekan_traefik_enabled is true or wekan_dockflare_enabled is true) else [])
               }}
   when: wekan_enabled is true

@@ -56,7 +56,7 @@
           dockflare.enable: "{{ frigate_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ frigate_dockflare_access_group }}"
           dockflare.hostname: "{{ frigate_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
+          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ frigate_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ frigate_homepage_group }}"
           homepage.icon: "{{ frigate_homepage_icon }}"
@@ -65,9 +65,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ frigate_container_name }}"
           homepage.showStats: "{{ frigate_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ frigate_port_http }}"
           homepage.widget.type: "frigate"
-          homepage.widget.url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ frigate_port_http }}"
+          homepage.widget.url: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ frigate_port_http }}"
           homepage.widget.enableRecentEvents: "{{ frigate_homepage_widget_enablerecentevents }}"
           homepage.widget.username: "{{ frigate_homepage_widget_username }}"
           homepage.widget.password: "{{ frigate_homepage_widget_password }}"
@@ -96,7 +96,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (frigate_port_http | string)] +
+                ['https://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (frigate_port_http | string)] +
                 (['https://' + frigate_hostname + '.' + ansible_nas_domain] if (frigate_traefik_enabled is true or frigate_dockflare_enabled is true) else [])
               }}
   when: frigate_enabled is true

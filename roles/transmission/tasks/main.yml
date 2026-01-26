@@ -48,18 +48,18 @@
           dockflare.enable: "{{ transmission_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ transmission_dockflare_access_group }}"
           dockflare.hostname: "{{ transmission_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ transmission_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ transmission_homepage_group }}"
           homepage.href: "{{ transmission_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ transmission_port_http }}"
           homepage.icon: "{{ transmission_homepage_icon }}"
           homepage.description: "{{ 'BitTorrent client' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ transmission_container_name }}"
           homepage.showStats: "{{ transmission_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "transmission"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ transmission_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ transmission_port_http }}"
           homepage.widget.user: "{{ transmission_homepage_widget_user }}"
           homepage.widget.password: "{{ transmission_homepage_widget_password }}"
           repliqate.enabled: "{{ transmission_repliqate_enabled | ternary('true', 'false') }}"
@@ -87,7 +87,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (transmission_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (transmission_port_http | string)] +
                 (['https://' + transmission_hostname + '.' + ansible_nas_domain] if (transmission_traefik_enabled is true or transmission_dockflare_enabled is true) else [])
               }}
   when: transmission_enabled is true

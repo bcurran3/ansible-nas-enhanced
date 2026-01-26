@@ -112,7 +112,7 @@
           dockflare.enable: "{{ vikunja_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ vikunja_dockflare_access_group }}"
           dockflare.hostname: "{{ vikunja_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vikunja_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ vikunja_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ vikunja_homepage_group }}"
           homepage.icon: "{{ vikunja_homepage_icon }}"
@@ -121,7 +121,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ vikunja_container_name }}"
           homepage.showStats: "{{ vikunja_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ vikunja_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ vikunja_port_http }}"
           repliqate.enabled: "{{ vikunja_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ vikunja_repliqate_engine }}"
           repliqate.schedule: "{{ vikunja_repliqate_schedule }}"
@@ -147,7 +147,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (vikunja_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (vikunja_port_http | string)] +
                 (['https://' + vikunja_hostname + '.' + ansible_nas_domain] if (vikunja_traefik_enabled is true or vikunja_dockflare_enabled is true) else [])
               }}
   when: vikunja_enabled is true

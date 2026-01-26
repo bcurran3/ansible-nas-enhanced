@@ -39,8 +39,8 @@ owncloud_redis_memory: "128M"
 owncloud_redis_memory_swap: "{{ owncloud_redis_memory }}"
 
 # app
-owncloud_env_owncloud_domain: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
-owncloud_env_owncloud_trusted_domains: "localhost, {{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}, {{ owncloud_hostname }}.{{ ansible_nas_domain }}"
+owncloud_env_owncloud_domain: "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ owncloud_port_http }}"
+owncloud_env_owncloud_trusted_domains: "localhost, {{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}, {{ owncloud_hostname }}.{{ ansible_nas_domain }}"
 owncloud_env_owncloud_db_name: "owncloud_db"
 owncloud_env_owncloud_db_username: "owncloud"
 owncloud_env_owncloud_db_password: "topsecret"
@@ -63,7 +63,7 @@ owncloud_dockflare_access_group: ""
 # homepage
 owncloud_homepage_group: "Apps"
 owncloud_homepage_icon: "owncloud.png"
-owncloud_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
+owncloud_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ owncloud_port_http }}"
 owncloud_homepage_showstats: false
 owncloud_db_homepage_group: "DBs"
 owncloud_db_homepage_icon: "mariadb.png"

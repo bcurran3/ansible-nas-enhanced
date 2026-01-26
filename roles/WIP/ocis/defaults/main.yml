@@ -29,7 +29,7 @@ ocis_memory: "1G"
 ocis_env_ocis_insecure: "true"
 ocis_env_proxy_http_addr: "0.0.0.0:9200 "
 #ocis_env_ocis_url: "https://localhost:9200"
-ocis_env_ocis_url: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ocis_port_http }}"
+ocis_env_ocis_url: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ocis_port_http }}"
 
 # autoheal
 ocis_autoheal_enabled: false
@@ -41,7 +41,7 @@ ocis_dockflare_access_group: ""
 # homepage
 ocis_homepage_group: "Apps"
 ocis_homepage_icon: "owncloud.png"
-ocis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ocis_port_http }}"
+ocis_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ocis_port_http }}"
 ocis_homepage_showstats: false
 
 # repliqate

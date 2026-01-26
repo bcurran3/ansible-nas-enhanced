@@ -38,12 +38,12 @@
           dockflare.enable: "{{ qdirstat_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ qdirstat_dockflare_access_group }}"
           dockflare.hostname: "{{ qdirstat_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ qdirstat_homepage_group }}"
           homepage.href: "{{ qdirstat_homepage_href }}"
           homepage.icon: "{{ qdirstat_homepage_icon }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
           homepage.description: "{{ 'Qt-based directory statistics' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ qdirstat_container_name }}"
@@ -74,7 +74,7 @@
         msg: >-
           {{
             [
-              'http://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ qdirstat_port_http
+              'http://' ~ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] ~ ':' ~ qdirstat_port_http
             ] + (
               [
                 'https://' ~ qdirstat_hostname ~ '.' ~ ansible_nas_domain,
@@ -82,7 +82,7 @@
               ]
               if (qdirstat_traefik_enabled is true or qdirstat_dockflare_enabled is true) else []
             ) + [
-              'vnc://' ~ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] ~ ':' ~ qdirstat_port_vnc
+              'vnc://' ~ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] ~ ':' ~ qdirstat_port_vnc
             ]
           }}
   when: qdirstat_enabled is true

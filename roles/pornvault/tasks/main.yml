@@ -36,12 +36,12 @@
           dockflare.enable: "{{ pornvault_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ pornvault_dockflare_access_group }}"
           dockflare.hostname: "{{ pornvault_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pornvault_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pornvault_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pornvault_homepage_group }}"
           homepage.icon: "{{ pornvault_homepage_icon }}"
           homepage.href: "{{ pornvault_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pornvault_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pornvault_port_http }}"
           homepage.description: "{{ 'Porn-Vault is a self hosted organizer for adult videos and imagery.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ pornvault_container_name }}"
@@ -71,7 +71,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pornvault_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (pornvault_port_http | string)] +
                 (['https://' + pornvault_hostname + '.' + ansible_nas_domain] if (pornvault_traefik_enabled is true or pornvault_dockflare_enabled is true) else [])
               }}
   when: pornvault_enabled is true

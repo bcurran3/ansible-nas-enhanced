@@ -17,7 +17,7 @@
   ansible.builtin.debug:
     msg: >-
           {{
-            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (usermin_port_http | string)]
+            ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (usermin_port_http | string)]
           }}
   when: usermin_enabled is true
 

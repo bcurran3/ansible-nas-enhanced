@@ -51,7 +51,7 @@
               dockflare.enable: "{{ drone_ci_dockflare_enabled | ternary('true', 'false') }}"
               dockflare.access.group: "{{ drone_ci_dockflare_access_group }}"
               dockflare.hostname: "{{ drone_ci_hostname }}.{{ ansible_nas_domain }}"
-              dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ drone_ci_port_http }}"
+              dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ drone_ci_port_http }}"
               homepage.name: "{{ ansible_nas_app_name }}"
               homepage.group: "{{ drone_ci_homepage_group }}"
               homepage.icon: "{{ drone_ci_homepage_icon }}"
@@ -60,7 +60,7 @@
               homepage.server: "my-docker"
               homepage.container: "{{ drone_ci_container_name }}"
               homepage.showStats: "{{ drone_ci_homepage_showstats | ternary('true', 'false') }}"
-              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ drone_ci_port }}"
+              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ drone_ci_port }}"
               repliqate.enabled: "{{ drone_ci_repliqate_enabled | ternary('true', 'false') }}"
               repliqate.engine: "{{ drone_ci_repliqate_engine }}"
               repliqate.schedule: "{{ drone_ci_repliqate_schedule }}"
@@ -86,7 +86,7 @@
           ansible.builtin.debug:
             msg: >-
                   {{
-                    ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (drone_ci_port_http | string)] +
+                    ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (drone_ci_port_http | string)] +
                     (['https://' + drone_ci_hostname + '.' + ansible_nas_domain] if (drone_ci_traefik_enabled is true or drone_ci_dockflare_enabled is true) else [])
                   }}
 
@@ -102,7 +102,7 @@
             ports:
               - "{{ drone_ci_runner_port_http }}:3000"
             env:
-              DRONE_RPC_HOST: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ drone_ci_port_http }}"
+              DRONE_RPC_HOST: "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ drone_ci_port_http }}"
               DRONE_RPC_SECRET: "{{ drone_ci_agent_secret }}"
               DRONE_RPC_PROTO: "http"
               DRONE_RUNNER_CAPACITY: "{{ drone_ci_runner_capacity | string }}"
@@ -118,7 +118,7 @@
               homepage.server: "my-docker"
               homepage.container: "{{ drone_ci_runner_container_name }}"
               homepage.showStats: "{{ drone_ci_runner_homepage_showstats | ternary('true', 'false') }}"
-              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ drone_ci_runner_port }}"
+              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ drone_ci_runner_port }}"
               traefik.enable: "false"
               wud.tag.include: '^\d+\.\d+\.\d+.*$'
               wud.tag.transform.type: "semver"

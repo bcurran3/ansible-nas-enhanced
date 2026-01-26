@@ -37,12 +37,12 @@
           dockflare.enable: "{{ remotely_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ remotely_dockflare_access_group }}"
           dockflare.hostname: "{{ remotely_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ remotely_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ remotely_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ remotely_homepage_group }}"
           homepage.icon: "{{ remotely_homepage_icon }}"
           homepage.href: "{{ remotely_homepage_href}}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ remotely_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ remotely_port_http }}"
           homepage.description: "{{ 'A remote control and remote scripting solution, built with .NET 8, Blazor, and SignalR.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ remotely_container_name }}"
@@ -72,7 +72,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (remotely_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (remotely_port_http | string)] +
                 (['https://' + remotely_hostname + '.' + ansible_nas_domain] if (remotely_traefik_enabled is true or remotely_dockflare_enabled is true) else [])
               }}
   when: remotely_enabled is true

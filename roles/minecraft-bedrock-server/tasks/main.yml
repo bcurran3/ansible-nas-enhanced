@@ -41,7 +41,7 @@
           homepage.container: "{{ minecraft_bedrock_server_container_name }}"
           homepage.showStats: "{{ minecraft_bedrock_server_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "minecraft"
-          homepage.widget.url: "udp://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ minecraft_bedrock_server_port }}"
+          homepage.widget.url: "udp://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ minecraft_bedrock_server_port }}"
           repliqate.enabled: "{{ minecraft_bedrock_server_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ minecraft_bedrock_server_repliqate_engine }}"
           repliqate.schedule: "{{ minecraft_bedrock_server_repliqate_schedule }}"

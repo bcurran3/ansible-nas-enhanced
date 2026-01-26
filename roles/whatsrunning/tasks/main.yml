@@ -28,13 +28,13 @@
           dockflare.enable: "{{ whatsrunning_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ whatsrunning_dockflare_access_group }}"
           dockflare.hostname: "{{ whatsrunning_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ whatsrunning_homepage_group }}"
           homepage.icon: "{{ whatsrunning_homepage_icon }}"
           homepage.href: "{{ whatsrunning_homepage_href }}"
           homepage.description: "{{ 'a barebones webpage showing all docker containers that expose ports' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ whatsrunning_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ whatsrunning_container_name }}"
           homepage.showStats: "{{ whatsrunning_homepage_showstats | ternary('true', 'false') }}"
@@ -59,7 +59,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (whatsrunning_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (whatsrunning_port_http | string)] +
                 (['https://' + whatsrunning_hostname + '.' + ansible_nas_domain] if (whatsrunning_traefik_enabled is true or whatsrunning_dockflare_enabled is true) else [])
               }}
   when: whatsrunning_enabled is true

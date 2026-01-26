@@ -70,7 +70,7 @@
           dockflare.enable: "{{ pihole_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ pihole_dockflare_access_group }}"
           dockflare.hostname: "{{ pihole_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pihole_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ pihole_homepage_group }}"
           homepage.icon: "{{ pihole_homepage_icon }}"
@@ -79,9 +79,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ pihole_container_name }}"
           homepage.showStats: "{{ pihole_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pihole_port_http }}"
           homepage.widget.type: "pihole"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ pihole_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pihole_port_http }}"
           homepage.widget.version: "6"
           homepage.widget.key: "{{ pihole_homepage_widget_key }}"
           repliqate.enabled: "{{ pihole_repliqate_enabled | ternary('true', 'false') }}"
@@ -109,7 +109,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (pihole_port_http | string) + '/admin'] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (pihole_port_http | string) + '/admin'] +
                 (['https://' + pihole_hostname + '.' + ansible_nas_domain + '/admin'] if (pihole_traefik_enabled is true or pihole_dockflare_enabled is true) else [])
               }}
   when: pihole_enabled is true

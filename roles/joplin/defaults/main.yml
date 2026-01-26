@@ -30,7 +30,7 @@ joplin_db_memory: "1G"
 joplin_db_memory_swap: "{{ joplin_db_memory }}"
 
 # app
-joplin_env_app_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joplin_port_http }}"
+joplin_env_app_base_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ joplin_port_http }}"
 joplin_env_postgres_password: "topsecret"
 joplin_env_postgres_database: "joplin_db"
 joplin_env_postgres_user: "joplin"
@@ -55,7 +55,7 @@ joplin_dockflare_access_group: ""
 # homepage
 joplin_homepage_group: "Apps"
 joplin_homepage_icon: "joplin.png"
-joplin_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joplin_port_http }}"
+joplin_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ joplin_port_http }}"
 joplin_homepage_showstats: false
 joplin_db_homepage_group: "DBs"
 joplin_db_homepage_icon: "postgres.png"

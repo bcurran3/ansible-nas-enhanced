@@ -45,7 +45,7 @@
           dockflare.enable: "{{ calibre_web_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ calibre_web_dockflare_access_group }}"
           dockflare.hostname: "{{ calibre_web_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ calibre_web_homepage_group }}"
           homepage.icon: "{{ calibre_web_homepage_icon }}"
@@ -54,9 +54,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ calibre_web_container_name }}"
           homepage.showStats: "{{ calibre_web_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
           homepage.widget.type: "calibreweb"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ calibre_web_port_http }}"
           homepage.widget.username: "{{ calibre_web_homepage_widget_username }}"
           homepage.widget.password: "{{ calibre_web_homepage_widget_password }}"
           repliqate.enabled: "{{ calibre_web_repliqate_enabled | ternary('true', 'false') }}"
@@ -84,7 +84,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (calibre_web_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (calibre_web_port_http | string)] +
                 (['https://' + calibre_web_hostname + '.' + ansible_nas_domain] if (calibre_web_traefik_enabled is true or calibre_web_dockflare_enabled is true) else [])
               }}
   when: calibre_web_enabled is true

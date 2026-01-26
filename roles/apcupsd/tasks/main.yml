@@ -49,7 +49,7 @@
           homepage.container: "{{ apcupsd_container_name }}"
           homepage.showStats: "{{ apcupsd_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "apcups"
-          homepage.widget.url: "tcp://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ apcupsd_port_http }}"
+          homepage.widget.url: "tcp://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ apcupsd_port_http }}"
           traefik.enable: "false"
           repliqate.enabled: "{{ apcupsd_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ apcupsd_repliqate_engine }}"

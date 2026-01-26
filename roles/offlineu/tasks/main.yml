@@ -42,7 +42,7 @@
           dockflare.enable: "{{ offlineu_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ offlineu_dockflare_access_group }}"
           dockflare.hostname: "{{ offlineu_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ offlineu_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ offlineu_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ offlineu_homepage_group }}"
           homepage.icon: "{{ offlineu_homepage_icon }}"
@@ -51,7 +51,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ offlineu_container_name }}"
           homepage.showStats: "{{ offlineu_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ offlineu_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ offlineu_port_http }}"
           repliqate.enabled: "{{ offlineu_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ offlineu_repliqate_engine }}"
           repliqate.schedule: "{{ offlineu_repliqate_schedule }}"
@@ -77,7 +77,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (offlineu_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (offlineu_port_http | string)] +
                 (['https://' + offlineu_hostname + '.' + ansible_nas_domain] if (offlineu_traefik_enabled is true or offlineu_dockflare_enabled is true) else [])
               }}
   when: offlineu_enabled is true

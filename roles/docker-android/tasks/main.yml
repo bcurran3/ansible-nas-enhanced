@@ -37,7 +37,7 @@
           dockflare.enable: "{{ docker_android_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ docker_android_dockflare_access_group }}"
           dockflare.hostname: "{{ docker_android_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ docker_android_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ docker_android_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ docker_android_homepage_group }}"
           homepage.icon: "{{ docker_android_homepage_icon }}"
@@ -46,7 +46,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ docker_android_container_name }}"
           homepage.showStats: "{{ docker_android_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ docker_android_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ docker_android_port_http }}"
           repliqate.enabled: "{{ docker_android_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ docker_android_repliqate_engine }}"
           repliqate.schedule: "{{ docker_android_repliqate_schedule }}"
@@ -72,7 +72,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (docker_android_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (docker_android_port_http | string)] +
                 (['https://' + docker_android_hostname + '.' + ansible_nas_domain] if (docker_android_traefik_enabled is true or docker_android_dockflare_enabled is true) else [])
               }}
   when: docker_android_enabled is true

@@ -24,12 +24,12 @@
           dockflare.enable: "{{ chatpadai_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ chatpadai_dockflare_access_group }}"
           dockflare.hostname: "{{ chatpadai_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chatpadai_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ chatpadai_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ chatpadai_homepage_group }}"
           homepage.icon: "{{ chatpadai_homepage_icon }}"
           homepage.href: "{{ chatpadai_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ chatpadai_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ chatpadai_port_http }}"
           homepage.description: "{{ 'Not just another ChatGPT user-interface!' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ chatpadai_container_name }}"
@@ -54,7 +54,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (chatpadai_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (chatpadai_port_http | string)] +
                 (['https://' + chatpadai_hostname + '.' + ansible_nas_domain] if (chatpadai_traefik_enabled is true or chatpadai_dockflare_enabled is true) else [])
               }}
   when: chatpadai_enabled is true

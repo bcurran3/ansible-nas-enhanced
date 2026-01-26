@@ -40,12 +40,12 @@
           dockflare.enable: "{{ windows_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ windows_dockflare_access_group }}"
           dockflare.hostname: "{{ windows_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ windows_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ windows_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ windows_homepage_group }}"
           homepage.icon: "{{ windows_homepage_icon }}"
           homepage.href: "{{ windows_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ windows_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ windows_port_http }}"
           homepage.description: "{{ 'Windows inside a Docker container.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ windows_container_name }}"
@@ -74,7 +74,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (windows_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (windows_port_http | string)] +
                 (['https://' + windows_hostname + '.' + ansible_nas_domain] if (windows_traefik_enabled is true or windows_dockflare_enabled is true) else [])
               }}
   when: windows_enabled is true

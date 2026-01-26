@@ -229,7 +229,7 @@
           dockflare.enable: "{{ azuracast_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ azuracast_dockflare_access_group }}"
           dockflare.hostname: "{{ azuracast_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ azuracast_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ azuracast_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ azuracast_homepage_group }}"
           homepage.icon: "{{ azuracast_homepage_icon }}"
@@ -238,7 +238,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ azuracast_container_name }}"
           homepage.showStats: "{{ azuracast_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ azuracast_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ azuracast_port_http }}"
           repliqate.enabled: "{{ azuracast_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ azuracast_repliqate_engine }}"
           repliqate.schedule: "{{ azuracast_repliqate_schedule }}"
@@ -273,7 +273,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (azuracast_port_http | string)] +
+                ['https://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (azuracast_port_http | string)] +
                 (['https://' + azuracast_hostname + '.' + ansible_nas_domain] if (azuracast_traefik_enabled is true or azuracast_dockflare_enabled is true) else [])
               }}
   when: azuracast_enabled is true

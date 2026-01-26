@@ -154,18 +154,18 @@
           dockflare.enable: "{{ paperless_ngx_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ paperless_ngx_dockflare_access_group }}"
           dockflare.hostname: "{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ paperless_ngx_homepage_group }}"
           homepage.icon: "{{ paperless_ngx_homepage_icon }}"
           homepage.href: "{{ paperless_ngx_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
           homepage.description: "{{ 'Open source dropbox alternative' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ paperless_ngx_container_name }}"
           homepage.showStats: "{{ paperless_ngx_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "paperlessngx"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
           homepage.widget.username: "{{ paperless_ngx_homepage_widget_username }}"
           homepage.widget.password: "{{ paperless_ngx_homepage_widget_password }}"
           homepage.widget.key: "{{ paperless_ngx_homepage_widget_key }}"
@@ -194,7 +194,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (paperless_ngx_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (paperless_ngx_port_http | string)] +
                 (['https://' + paperless_ngx_hostname + '.' + ansible_nas_domain] if (paperless_ngx_traefik_enabled is true or paperless_ngx_dockflare_enabled is true) else [])
               }}
   when: paperless_ngx_enabled is true

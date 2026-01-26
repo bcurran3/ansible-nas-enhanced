@@ -10,9 +10,9 @@ plex_rewind_data_directory: "{{ docker_home }}/plex-rewind"
 # (required) used to encrypt auth JWT token, generate one with `openssl rand -base64 32`
 plex_rewind_nextauth_secret: "m07Gw05Gfdb0qeXOPuEGqMaVKIxLTwuXpwE7T14WSNk="
 # change to your domain if you are exposing the app to the internet
-plex_rewind_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
+plex_rewind_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
 # change to your domain if you are exposing the app to the internet
-plex_rewind_next_public_site_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
+plex_rewind_next_public_site_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
 # starting date for "all time" option (YYYY-MM-DD)
 plex_rewind_next_public_statistics_start_date: "2018-01-01"
 
@@ -40,7 +40,7 @@ plex_rewind_dockflare_access_group: ""
 # homepage
 plex_rewind_homepage_group: "Apps"
 plex_rewind_homepage_icon: "plexrewind.png"
-plex_rewind_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
+plex_rewind_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
 plex_rewind_homepage_showstats: false
 
 # repliqate

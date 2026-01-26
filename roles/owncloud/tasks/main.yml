@@ -155,7 +155,7 @@
           dockflare.enable: "{{ owncloud_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ owncloud_dockflare_access_group }}"
           dockflare.hostname: "{{ owncloud_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ owncloud_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ owncloud_homepage_group }}"
           homepage.icon: "{{ owncloud_homepage_icon }}"
@@ -164,7 +164,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ owncloud_container_name }}"
           homepage.showStats: "{{ owncloud_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ owncloud_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ owncloud_port_http }}"
           repliqate.enabled: "{{ owncloud_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ owncloud_repliqate_engine }}"
           repliqate.schedule: "{{ owncloud_repliqate_schedule }}"
@@ -190,7 +190,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (owncloud_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (owncloud_port_http | string)] +
                 (['https://' + owncloud_hostname + '.' + ansible_nas_domain] if (owncloud_traefik_enabled is true or owncloud_dockflare_enabled is true) else [])
               }}
   when: owncloud_enabled is true

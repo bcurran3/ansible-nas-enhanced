@@ -25,12 +25,12 @@
           dockflare.enable: "{{ dashdot_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ dashdot_dockflare_access_group }}"
           dockflare.hostname: "{{ dashdot_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dashdot_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dashdot_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dashdot_homepage_group }}"
           homepage.icon: "{{ dashdot_homepage_icon }}"
           homepage.href: "{{ dashdot_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dashdot_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dashdot_port_http }}"
           homepage.description: "{{ 'A simple, modern server dashboard, primarily used by smaller private servers' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dashdot_container_name }}"
@@ -56,7 +56,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dashdot_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (dashdot_port_http | string)] +
                 (['https://' + dashdot_hostname + '.' + ansible_nas_domain] if (dashdot_traefik_enabled is true or dashdot_dockflare_enabled is true) else [])
               }}
   when: dashdot_enabled is true

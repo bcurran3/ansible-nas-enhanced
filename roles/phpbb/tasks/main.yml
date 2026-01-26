@@ -97,12 +97,12 @@
           dockflare.enable: "{{ phpbb_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ phpbb_dockflare_access_group }}"
           dockflare.hostname: "{{ phpbb_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ phpbb_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ phpbb_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ phpbb_homepage_group }}"
           homepage.icon: "{{ phpbb_homepage_icon }}"
           homepage.href: "{{ phpbb_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ phpbb_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ phpbb_port_http }}"
           homepage.description: "{{ 'phpBB is a popular open-source bulletin board written in PHP.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ phpbb_container_name }}"
@@ -131,7 +131,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (phpbb_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (phpbb_port_http | string)] +
                 (['https://' + phpbb_hostname + '.' + ansible_nas_domain] if (phpbb_traefik_enabled is true or phpbb_dockflare_enabled is true) else [])
               }}
   when: phpbb_enabled is true

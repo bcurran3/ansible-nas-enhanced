@@ -38,18 +38,18 @@
           dockflare.enable: "{{ homebox_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ homebox_dockflare_access_group }}"
           dockflare.hostname: "{{ homebox_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ homebox_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ homebox_homepage_group }}"
           homepage.icon: "{{ homebox_homepage_icon }}"
           homepage.href: "{{ homebox_homepage_href }}"
           homepage.description: "{{ 'Homebox is the inventory and organization system built for the Home User!' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ homebox_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ homebox_container_name }}"
           homepage.showStats: "{{ homebox_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "homebox"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homebox_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ homebox_port_http }}"
           homepage.widget.username: "{{ homebox_homepage_widget_username }}"
           homepage.widget.password: "{{ homebox_homepage_widget_password }}"
           repliqate.enabled: "{{ homebox_repliqate_enabled | ternary('true', 'false') }}"
@@ -77,7 +77,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (homebox_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (homebox_port_http | string)] +
                 (['https://' + homebox_hostname + '.' + ansible_nas_domain] if (homebox_traefik_enabled is true or homebox_dockflare_enabled is true) else [])
               }}
   when: homebox_enabled is true

@@ -33,7 +33,7 @@
           dockflare.enable: "{{ tinyauth_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ tinyauth_dockflare_access_group }}"
           dockflare.hostname: "{{ tinyauth_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tinyauth_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tinyauth_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ tinyauth_homepage_group }}"
           homepage.icon: "{{ tinyauth_homepage_icon }}"
@@ -42,7 +42,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ tinyauth_container_name }}"
           homepage.showStats: "{{ tinyauth_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tinyauth_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tinyauth_port_http }}"
           traefik.enable: "true"
           traefik.http.routers.tinyauth.rule: "Host(`{{ tinyauth_hostname }}.{{ ansible_nas_domain }}`)"
           traefik.http.routers.tinyauth.tls.certresolver: "letsencrypt"
@@ -62,7 +62,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tinyauth_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (tinyauth_port_http | string)] +
                 (['https://' + tinyauth_hostname + '.' + ansible_nas_domain] if (tinyauth_traefik_enabled is true or tinyauth_dockflare_enabled is true) else [])
               }}
   when: tinyauth_enabled is true

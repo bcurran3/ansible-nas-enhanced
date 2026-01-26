@@ -105,12 +105,12 @@
           dockflare.enable: "{{ joplin_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ joplin_dockflare_access_group }}"
           dockflare.hostname: "{{ joplin_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joplin_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ joplin_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ joplin_homepage_group }}"
           homepage.icon: "{{ joplin_homepage_icon }}"
           homepage.href: "{{ joplin_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ joplin_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ joplin_port_http }}"
           homepage.description: "{{ 'the privacy-focused note taking app with sync capabilities for Windows, macOS, Linux, Android and iOS.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ joplin_container_name }}"
@@ -140,7 +140,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (joplin_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (joplin_port_http | string)] +
                 (['https://' + joplin_hostname + '.' + ansible_nas_domain] if (joplin_traefik_enabled is true or joplin_dockflare_enabled is true) else [])
               }}
   when: joplin_enabled is true

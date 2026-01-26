@@ -6,7 +6,7 @@ datasources:
     type: prometheus
     access: proxy
     orgId: 1
-    url: http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_port }}
+    url: http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ stats_prometheus_port }}
     uid: ansible_nas
     isDefault: true
     version: 4

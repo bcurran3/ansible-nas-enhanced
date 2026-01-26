@@ -87,13 +87,13 @@
           dockflare.enable: "{{ umami_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ umami_dockflare_access_group }}"
           dockflare.hostname: "{{ umami_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ umami_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ umami_homepage_group }}"
           homepage.icon: "{{ umami_homepage_icon }}"
           homepage.href: "{{ umami_homepage_href }}"
           homepage.description: "{{ 'a simple, fast, privacy-focused alternative to Google Analytics' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ umami_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ umami_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ umami_container_name }}"
           homepage.showStats: "{{ umami_homepage_showstats | ternary('true', 'false') }}"
@@ -121,7 +121,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (umami_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (umami_port_http | string)] +
                 (['https://' + umami_hostname + '.' + ansible_nas_domain] if (umami_traefik_enabled is true or umami_dockflare_enabled is true) else [])
               }}
   when: umami_enabled is true

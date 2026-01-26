@@ -5,22 +5,34 @@ rackula_enabled: false
 rackula_traefik_enabled: false
 rackula_traefik_whitelist: "{{ lan }}"
 
+# directories
+rackula_data_directory: "{{ docker_home }}/rackula"
+
 # docker
 rackula_container_name: "rackula"
 rackula_image_name: "ghcr.io/rackulalives/rackula"
 rackula_image_tag: "latest"
+rackula_api_container_name: "rackula-api"
+rackula_api_image_name: "ghcr.io/rackulalives/rackula-api"
+rackula_api_image_tag: "latest"
 
 # network
 rackula_hostname: "rackula"
 rackula_port_http: "3084"
+rackula_api_hostname: "rackula-api"
+rackula_port_api: "3085"
 
 # specs
 rackula_cpu_shares: 1024
-rackula_memory: "256M"
+rackula_memory: "128M"
 rackula_memory_swap: -1
+rackula_api_cpu_shares: 1024
+rackula_api_memory: "64M"
+rackula_api_memory_swap: -1
 
 # autoheal
 rackula_autoheal_enabled: false
+rackula_api_autoheal_enabled: false
 
 # dockflare
 rackula_dockflare_enabled: false
@@ -30,11 +42,16 @@ rackula_dockflare_access_group: ""
 rackula_homepage_group: "Apps"
 #rackula_homepage_group: "Network"
 rackula_homepage_icon: "sh-rackula.png"
-rackula_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ rackula_port_http }}"
+rackula_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rackula_port_http }}"
 rackula_homepage_showstats: false
+rackula_api_homepage_group: "Misc"
+rackula_api_homepage_icon: "sh-rackula.png"
+rackula_api_homepage_href: "{{ rackula_homepage_href }}"
+rackula_api_homepage_showstats: false
 
 # tinyauth
 rackula_tinyauth_enabled: false
 
 # watchtower
 rackula_watchtower_enabled: false
+rackula_api_watchtower_enabled: false

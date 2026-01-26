@@ -99,13 +99,13 @@
           dockflare.enable: "{{ glpi_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ glpi_dockflare_access_group }}"
           dockflare.hostname: "{{ glpi_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ glpi_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ glpi_homepage_group }}"
           homepage.icon: "{{ glpi_homepage_icon }}"
           homepage.href: "{{ glpi_homepage_href }}"
           homepage.description: "{{ 'GLPI is a Free Asset and IT Management Software package, Data center management, ITIL Service Desk, licenses tracking and software auditing.' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ glpi_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ glpi_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ glpi_container_name }}"
           homepage.showStats: "{{ glpi_homepage_showstats | ternary('true', 'false') }}"
@@ -134,7 +134,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (glpi_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (glpi_port_http | string)] +
                 (['https://' + glpi_hostname + '.' + ansible_nas_domain] if (glpi_traefik_enabled is true or glpi_dockflare_enabled is true) else [])
               }}
   when: glpi_enabled is true

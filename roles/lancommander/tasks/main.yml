@@ -37,12 +37,12 @@
           dockflare.enable: "{{ lancommander_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ lancommander_dockflare_access_group }}"
           dockflare.hostname: "{{ lancommander_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lancommander_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ lancommander_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ lancommander_homepage_group }}"
           homepage.icon: "{{ lancommander_homepage_icon }}"
           homepage.href: "{{ lancommander_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ lancommander_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ lancommander_port_http }}"
           homepage.description: "{{ 'LANCommander is an open-source digital game platform.' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ lancommander_container_name }}"
@@ -72,7 +72,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (lancommander_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (lancommander_port_http | string)] +
                 (['https://' + lancommander_hostname + '.' + ansible_nas_domain] if (lancommander_traefik_enabled is true or lancommander_dockflare_enabled is true) else [])
               }}
   when: lancommander_enabled is true

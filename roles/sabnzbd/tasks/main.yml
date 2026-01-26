@@ -38,7 +38,7 @@
           dockflare.enable: "{{ sabnzbd_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ sabnzbd_dockflare_access_group }}"
           dockflare.hostname: "{{ sabnzbd_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sabnzbd_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ sabnzbd_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ sabnzbd_homepage_group }}"
           homepage.icon: "{{ sabnzbd_homepage_icon }}"
@@ -47,9 +47,9 @@
           homepage.server: "my-docker"
           homepage.container: "{{ sabnzbd_container_name }}"
           homepage.showStats: "{{ sabnzbd_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sabnzbd_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ sabnzbd_port_http }}"
           homepage.widget.type: "sabnzbd"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sabnzbd_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ sabnzbd_port_http }}"
           homepage.widget.key: "{{ sabnzbd_homepage_widget_key }}"
           repliqate.enabled: "{{ sabnzbd_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ sabnzbd_repliqate_engine }}"
@@ -75,7 +75,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (sabnzbd_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (sabnzbd_port_http | string)] +
                 (['https://' + sabnzbd_hostname + '.' + ansible_nas_domain] if (sabnzbd_traefik_enabled is true or sabnzbd_dockflare_enabled is true) else [])
               }}
   when: sabnzbd_enabled is true

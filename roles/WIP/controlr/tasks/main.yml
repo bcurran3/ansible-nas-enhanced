@@ -181,7 +181,7 @@
           dockflare.enable: "{{ controlr_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ controlr_dockflare_access_group }}"
           dockflare.hostname: "{{ controlr_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ controlr_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ controlr_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ controlr_homepage_group }}"
           homepage.icon: "{{ controlr_homepage_icon }}"
@@ -209,7 +209,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (controlr_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (controlr_port_http | string)] +
                 (['https://' + controlr_hostname + '.' + ansible_nas_domain] if (controlr_traefik_enabled is true or controlr_dockflare_enabled is true) else [])
               }}
   when: controlr_enabled is true

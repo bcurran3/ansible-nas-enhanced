@@ -32,10 +32,10 @@ meshcentral_env_allow_new_accounts: "false" #set to false if you want disable se
 meshcentral_env_backups_pw: "topsecret" #password for the autobackup function
 meshcentral_env_backup_interval: "24" #Interval in hours for the autobackup function
 meshcentral_env_backup_keep_days: "10" #number of days of backups the function keeps
-meshcentral_env_hostname: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
+meshcentral_env_hostname: "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
 meshcentral_env_iframe: "false" #set to true if you wish to enable iframe support
 meshcentral_env_node_env: "production"
-meshcentral_env_reverse_proxy: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}" #set to your reverse proxy IP if you want to put meshcentral behind a reverse proxy
+meshcentral_env_reverse_proxy: "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}" #set to your reverse proxy IP if you want to put meshcentral behind a reverse proxy
 meshcentral_env_reverse_proxy_tls_port: "443"
 meshcentral_env_webrtc: "false" #set to true to enable WebRTC - per documentation it is not officially released with meshcentral, but is solid enough to work with. Use with caution
 
@@ -50,7 +50,7 @@ meshcentral_dockflare_access_group: ""
 # homepage
 meshcentral_homepage_group: "Apps"
 meshcentral_homepage_icon: "meshcentral.png"
-meshcentral_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
+meshcentral_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
 meshcentral_homepage_showstats: false
 meshcentral_db_homepage_group: "DBs"
 meshcentral_db_homepage_icon: "mongodb.png"

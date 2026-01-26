@@ -59,7 +59,7 @@
           dockflare.enable: "{{ calibre_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ calibre_dockflare_access_group }}"
           dockflare.hostname: "{{ calibre_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_port_http }}"
+          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ calibre_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ calibre_homepage_group }}"
           homepage.icon: "{{ calibre_homepage_icon }}"
@@ -68,7 +68,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ calibre_container_name }}"
           homepage.showStats: "{{ calibre_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ calibre_port_https }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ calibre_port_https }}"
           repliqate.enabled: "{{ calibre_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ calibre_repliqate_engine }}"
           repliqate.schedule: "{{ calibre_repliqate_schedule }}"
@@ -95,7 +95,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['https://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (calibre_port_https | string)] +
+                ['https://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (calibre_port_https | string)] +
                 (['https://' + calibre_hostname + '.' + ansible_nas_domain] if (calibre_traefik_enabled is true or calibre_dockflare_enabled is true) else [])
               }}
   when: calibre_enabled is true

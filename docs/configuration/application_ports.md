@@ -174,7 +174,7 @@ By default, applications can be found on the ports listed below.
 | Mailrise         | 465     | Host    | SMTP           |
 | Maintainerr      | 6246
 | MakeMKV          | 5804    | Bridge  | HTTP           |
-| Many Notes       | 3085    | Bridge  | HTTP           |
+| Many Notes       | 4003    | Bridge  | HTTP           |
 | Mealie           | 9925    | Host    | HTTP           |
 | Medialytics      | 3044
 | MeshCentral      | 9012
@@ -419,7 +419,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4003+
+# next avail = 4004
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

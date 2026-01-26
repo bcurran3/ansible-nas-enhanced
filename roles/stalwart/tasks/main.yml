@@ -35,12 +35,12 @@
           dockflare.enable: "{{ stalwart_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ stalwart_dockflare_access_group }}"
           dockflare.hostname: "{{ stalwart_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stalwart_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ stalwart_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ stalwart_homepage_group }}"
           homepage.icon: "{{ stalwart_homepage_icon }}"
           homepage.href: "{{ stalwart_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stalwart_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ stalwart_port_http }}"
           homepage.description: "{{ 'Secure & Modern All-in-One Mail Server (IMAP, JMAP, POP3, SMTP)' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ stalwart_container_name }}"
@@ -69,7 +69,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (stalwart_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (stalwart_port_http | string)] +
                 (['https://' + stalwart_hostname + '.' + ansible_nas_domain] if (stalwart_traefik_enabled is true or stalwart_dockflare_enabled is true) else [])
               }}
   when: stalwart_enabled is true

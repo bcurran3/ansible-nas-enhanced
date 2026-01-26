@@ -50,18 +50,18 @@
           dockflare.enable: "{{ netalertx_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ netalertx_dockflare_access_group }}"
           dockflare.hostname: "{{ netalertx_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ netalertx_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ netalertx_homepage_group }}"
           homepage.icon: "{{ netalertx_homepage_icon }}"
           homepage.href: "{{ netalertx_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ netalertx_port_http }}"
           homepage.description: "{{ 'Network scanner & notification framework' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ netalertx_container_name }}"
           homepage.showStats: "false"
           homepage.widget.type: "netalertx"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ netalertx_port_http }}"
           homepage.widget.key: "{{ netalertx_homepage_widget_key }}"
           repliqate.enabled: "{{ netalertx_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ netalertx_repliqate_engine }}"
@@ -76,7 +76,7 @@
           traefik.http.routers.netalertx.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.netalertx.middlewares: "netalertx-whitelist{{ ',tinyauth-auth@docker' if netalertx_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.netalertx-whitelist.ipallowlist.sourcerange: "{{ netalertx_traefik_whitelist }}"
-          traefik.http.services.netalertx.loadbalancer.server.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ netalertx_port_http }}"
+          traefik.http.services.netalertx.loadbalancer.server.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ netalertx_port_http }}"
           wud.tag.include: '^v\\d+\\.\\d+\\.\\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/jokob-sk/NetAlertX/pkgs/container/netalertx"
@@ -101,7 +101,7 @@
       ansible.builtin.debug:
         msg: >-
           {{
-            ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (netalertx_port_http | string)] +
+            ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (netalertx_port_http | string)] +
             (['https://' + netalertx_hostname + '.' + ansible_nas_domain] if (netalertx_traefik_enabled is true or netalertx_dockflare_enabled is true) else [])
           }}
   when: netalertx_enabled is true

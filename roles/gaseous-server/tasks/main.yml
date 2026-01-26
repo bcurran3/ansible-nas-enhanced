@@ -110,12 +110,12 @@
           dockflare.enable: "{{ gaseous_server_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ gaseous_server_dockflare_access_group }}"
           dockflare.hostname: "{{ gaseous_server_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ gaseous_server_homepage_group }}"
           homepage.icon: "{{ gaseous_server_homepage_icon }}"
           homepage.href: "{{ gaseous_server_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
           homepage.description: "{{ 'A game ROM manager, with a built in web based emulator using multiple sources to identify and provide metadata' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ gaseous_server_container_name }}"
@@ -145,7 +145,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (gaseous_server_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (gaseous_server_port_http | string)] +
                 (['https://' + gaseous_server_hostname + '.' + ansible_nas_domain] if (gaseous_server_traefik_enabled is true or gaseous_server_dockflare_enabled is true) else [])
               }}
   when: gaseous_server_enabled is true

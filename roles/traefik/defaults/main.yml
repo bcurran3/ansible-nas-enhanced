@@ -49,7 +49,7 @@ traefik_acme_server: "https://acme-v02.api.letsencrypt.org/directory" # producti
 traefik_external_hosts:
   - name: "router"
     subdomain: "router"
-    target: "https://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['gateway'] }}"
+    target: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['gateway'] }}"
     transport: "ignore-cert@file"
     whitelist: true
 

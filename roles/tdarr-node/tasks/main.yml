@@ -44,7 +44,7 @@
           - "{{ tdarr_node_port_http }}:8268"
         env:
           nodeName: "{{ ansible_nas_hostname }} Node"
-          serverIP: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+          serverIP: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}"
           serverPort: "{{ tdarr_node_port_server }}"
           inContainer: "true"
           ffmpegVersion: "{{ tdarr_node_env_ffmpegversion }}"

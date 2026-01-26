@@ -38,7 +38,7 @@
           dockflare.enable: "{{ sickchill_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ sickchill_dockflare_access_group }}"
           dockflare.hostname: "{{ sickchill_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sickchill_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ sickchill_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ sickchill_homepage_group }}"
           homepage.icon: "{{ sickchill_homepage_icon }}"
@@ -47,7 +47,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ sickchill_container_name }}"
           homepage.showStats: "{{ sickchill_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sickchill_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ sickchill_port_http }}"
           repliqate.enabled: "{{ sickchill_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ sickchill_repliqate_engine }}"
           repliqate.schedule: "{{ sickchill_repliqate_schedule }}"
@@ -71,7 +71,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (sickchill_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (sickchill_port_http | string)] +
                 (['https://' + sickchill_hostname + '.' + ansible_nas_domain] if (sickchill_traefik_enabled is true or sickchill_dockflare_enabled is true) else [])
               }}
   when: sickchill_enabled is true

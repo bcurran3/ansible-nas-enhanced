@@ -33,7 +33,7 @@
           homepage.container: "{{ minecraft_server_container_name }}"
           homepage.showStats: "{{ minecraft_server_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "minecraft"
-          homepage.widget.url: "udp://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ minecraft_server_port }}"
+          homepage.widget.url: "udp://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ minecraft_server_port }}"
           repliqate.enabled: "{{ minecraft_server_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ minecraft_server_repliqate_engine }}"
           repliqate.schedule: "{{ minecraft_server_repliqate_schedule }}"

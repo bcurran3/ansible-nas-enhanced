@@ -70,7 +70,7 @@
           homepage.container: "{{ watchtower_container_name }}"
           homepage.showStats: "{{ watchtower_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "watchtower"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port_api }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ watchtower_port_api }}"
           homepage.widget.key: "{{ watchtower_api_token }}"
           repliqate.enabled: "false"
           traefik.enable: "false"

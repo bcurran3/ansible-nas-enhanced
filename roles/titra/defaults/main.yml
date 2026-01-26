@@ -28,7 +28,7 @@ titra_db_memory: "1G"
 
 # app
 titra_env_mail_url: "" # example: smtp://USERNAME:PASSWORD@HOST:PORT
-titra_env_root_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ titra_port_http }}"
+titra_env_root_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ titra_port_http }}"
 
 # autoheal
 titra_autoheal_enabled: false
@@ -41,7 +41,7 @@ titra_dockflare_access_group: ""
 # homepage
 titra_homepage_group: "Apps"
 titra_homepage_icon: "https://titra.io/storage/titra-logo-500.png"
-titra_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ titra_port_http }}"
+titra_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ titra_port_http }}"
 titra_homepage_showstats: false
 titra_db_homepage_group: "DBs"
 titra_db_homepage_icon: "mongodb.png"

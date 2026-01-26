@@ -103,13 +103,13 @@
           dockflare.enable: "{{ koillection_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ koillection_dockflare_access_group }}"
           dockflare.hostname: "{{ koillection_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koillection_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ koillection_port_http }}"
           homepage.name: "koillection"
           homepage.group: "{{ koillection_homepage_group }}"
           homepage.icon: "{{ koillection_homepage_icon }}"
           homepage.href: "{{ koillection_homepage_href }}"
           homepage.description: "{{ 'a self-hosted service allowing users to manage any kind of collections.' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ koillection_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ koillection_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ koillection_container_name }}"
           homepage.showStats: "{{ koillection_homepage_showstats | ternary('true', 'false') }}"
@@ -138,7 +138,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (koillection_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (koillection_port_http | string)] +
                 (['https://' + koillection_hostname + '.' + ansible_nas_domain] if (koillection_traefik_enabled is true or koillection_dockflare_enabled is true) else [])
               }}
   when: koillection_enabled is true

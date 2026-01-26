@@ -105,13 +105,13 @@
           dockflare.enable: "{{ projectsend_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ projectsend_dockflare_access_group }}"
           dockflare.hostname: "{{ projectsend_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ projectsend_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ projectsend_homepage_group }}"
           homepage.href: "{{ projectsend_homepage_href }}"
           homepage.icon: "{{ projectsend_homepage_icon }}"
           homepage.description: "{{ 'ProjectSend is a free, open source software that lets you share files with your clients, focused on ease of use and privacy.' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ projectsend_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ projectsend_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ projectsend_container_name }}"
           homepage.showStats: "{{ projectsend_homepage_showstats | ternary('true', 'false') }}"
@@ -140,7 +140,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (projectsend_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (projectsend_port_http | string)] +
                 (['https://' + projectsend_hostname + '.' + ansible_nas_domain] if (projectsend_traefik_enabled is true or projectsend_dockflare_enabled is true) else [])
               }}
   when: projectsend_enabled is true

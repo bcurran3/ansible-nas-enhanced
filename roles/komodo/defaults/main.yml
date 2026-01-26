@@ -39,7 +39,7 @@ komodo_periphery_memory_swap: -1
 # app
 komodo_env_komodo_database_username: "komodo"
 komodo_env_komodo_database_password: "komodo"
-komodo_env_komodo_host: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}" ## Used for Oauth / Webhook url suggestion / Caddy reverse proxy.
+komodo_env_komodo_host: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ komodo_port_http }}" ## Used for Oauth / Webhook url suggestion / Caddy reverse proxy.
 komodo_env_komodo_title: "Komodo" ## Displayed in the browser tab.
 komodo_env_komodo_first_server: "https://{{ komodo_periphery_container_name }}:8120" ## Create a server matching this address as the "first server".
 komodo_env_komodo_first_server_name: "{{ ansible_nas_hostname }}" ## Give the first server a custom name.
@@ -100,7 +100,7 @@ komodo_dockflare_access_group: ""
 # homepage
 komodo_homepage_group: "Apps"
 komodo_homepage_icon: "komodo.png"
-komodo_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komodo_port_http }}"
+komodo_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ komodo_port_http }}"
 komodo_homepage_showstats: false
 komodo_homepage_widget_key: ""
 komodo_homepage_widget_secret: ""

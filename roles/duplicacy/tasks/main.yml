@@ -41,7 +41,7 @@
           dockflare.enable: "{{ duplicacy_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ duplicacy_dockflare_access_group }}"
           dockflare.hostname: "{{ duplicacy_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ duplicacy_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ duplicacy_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ duplicacy_homepage_group }}"
           homepage.icon: "{{ duplicacy_homepage_icon }}"
@@ -50,7 +50,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ duplicacy_container_name }}"
           homepage.showStats: "{{ duplicacy_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ duplicacy_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ duplicacy_port_http }}"
           repliqate.enabled: "{{ duplicacy_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ duplicacy_repliqate_engine }}"
           repliqate.schedule: "{{ duplicacy_repliqate_schedule }}"
@@ -76,7 +76,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (duplicacy_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (duplicacy_port_http | string)] +
                 (['https://' + duplicacy_hostname + '.' + ansible_nas_domain] if (duplicacy_traefik_enabled is true or duplicacy_dockflare_enabled is true) else [])
               }}
   when: duplicacy_enabled is true

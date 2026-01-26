@@ -50,7 +50,7 @@
           dockflare.enable: "{{ homepage_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ homepage_dockflare_access_group }}"
           dockflare.hostname: "{{ homepage_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ homepage_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ homepage_port_http }}"
           repliqate.enabled: "{{ homepage_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ homepage_repliqate_engine }}"
           repliqate.schedule: "{{ homepage_repliqate_schedule }}"
@@ -76,7 +76,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (homepage_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (homepage_port_http | string)] +
                 (['https://' + homepage_hostname + '.' + ansible_nas_domain] if (homepage_traefik_enabled is true or homepage_dockflare_enabled is true) else [])
               }}
   when: homepage_enabled is true

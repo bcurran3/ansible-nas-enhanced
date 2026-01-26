@@ -38,13 +38,13 @@
           dockflare.enable: "{{ ollama_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ ollama_dockflare_access_group }}"
           dockflare.hostname: "{{ ollama_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ollama_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ ollama_homepage_group }}"
           homepage.icon: "{{ ollama_homepage_icon }}"
           homepage.href: "{{ ollama_homepage_href }}"
           homepage.description: "{{ 'Get up and running with Llama 3.3, DeepSeek-R1, Phi-4, Gemma 3, Mistral Small 3.1 and other large language models.' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ ollama_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ollama_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ ollama_container_name }}"
           homepage.showStats: "{{ ollama_homepage_showstats | ternary('true', 'false') }}"
@@ -73,7 +73,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (ollama_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (ollama_port_http | string)] +
                 (['https://' + ollama_hostname + '.' + ansible_nas_domain] if (ollama_traefik_enabled is true or ollama_dockflare_enabled is true) else [])
               }}
   when: ollama_enabled is true

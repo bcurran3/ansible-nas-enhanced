@@ -123,13 +123,13 @@
           dockflare.enable: "{{ meshcentral_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ meshcentral_dockflare_access_group }}"
           dockflare.hostname: "{{ meshcentral_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ meshcentral_homepage_group }}"
           homepage.icon: "{{ meshcentral_homepage_icon }}"
           homepage.href: "{{ meshcentral_homepage_href }}"
           homepage.description: "{{ 'A complete web-based remote monitoring and management web site.' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ meshcentral_port_http }}"
           homepage.server: "my-docker"
           homepage.container: "{{ meshcentral_container_name }}"
           homepage.showStats: "{{ meshcentral_homepage_showstats | ternary('true', 'false') }}"
@@ -158,7 +158,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (meshcentral_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (meshcentral_port_http | string)] +
                 (['https://' + meshcentral_hostname + '.' + ansible_nas_domain] if (meshcentral_traefik_enabled is true or meshcentral_dockflare_enabled is true) else [])
               }}
   when: meshcentral_enabled is true

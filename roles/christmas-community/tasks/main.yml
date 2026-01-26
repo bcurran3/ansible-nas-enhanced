@@ -36,12 +36,12 @@
           dockflare.enable: "{{ christmas_community_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ christmas_community_dockflare_access_group }}"
           dockflare.hostname: "{{ christmas_community_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ christmas_community_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ christmas_community_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ christmas_community_homepage_group }}"
           homepage.href: "{{ christmas_community_homepage_href }}"
           homepage.icon: "{{ christmas_community_homepage_icon }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ christmas_community_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ christmas_community_port_http }}"
           homepage.description: "{{ 'Christmas lists for families' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "christmas-community"
@@ -71,7 +71,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (christmas_community_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (christmas_community_port_http | string)] +
                 (['https://' + christmas_community_hostname + '.' + ansible_nas_domain] if (christmas_community_traefik_enabled is true or christmas_community_dockflare_enabled is true) else [])
               }}
   when: christmas_community_enabled is true

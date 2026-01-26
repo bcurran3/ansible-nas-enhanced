@@ -39,12 +39,12 @@
           dockflare.enable: "{{ dailytxt_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ dailytxt_dockflare_access_group }}"
           dockflare.hostname: "{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ dailytxt_homepage_group }}"
           homepage.href: "{{ dailytxt_homepage_href }}"
           homepage.icon: "{{ dailytxt_homepage_icon }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
           homepage.description: "{{ 'Encrypted Diary Web-App' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "dailytxt"
@@ -73,7 +73,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (dailytxt_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (dailytxt_port_http | string)] +
                 (['https://' + dailytxt_hostname + '.' + ansible_nas_domain] if (dailytxt_traefik_enabled is true or dailytxt_dockflare_enabled is true) else [])
               }}
   when: dailytxt_enabled is true

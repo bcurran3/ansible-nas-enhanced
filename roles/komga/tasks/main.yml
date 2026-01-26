@@ -44,18 +44,18 @@
           dockflare.enable: "{{ komga_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ komga_dockflare_access_group }}"
           dockflare.hostname: "{{ komga_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ komga_port_http }}"
           homepage.group: "{{ komga_homepage_group }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.icon: "{{ komga_homepage_icon }}"
           homepage.href: "{{ komga_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ komga_port_http }}"
           homepage.description: "{{ 'Media server for comics/mangas/BDs/magazines/eBooks with API, OPDS, Kobo Sync and KOReader Sync support' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ komga_container_name }}"
           homepage.showStats: "{{ komga_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "komga"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ komga_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ komga_port_http }}"
           homepage.widget.username: "{{ komga_homepage_widget_username }}"
           homepage.widget.password: "{{ komga_homepage_widget_password }}"
           homepage.widget.key: "{{ komga_homepage_widget_key }}"
@@ -84,7 +84,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (komga_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (komga_port_http | string)] +
                 (['https://' + komga_hostname + '.' + ansible_nas_domain] if (komga_traefik_enabled is true or komga_dockflare_enabled is true) else [])
               }}
   when: komga_enabled is true

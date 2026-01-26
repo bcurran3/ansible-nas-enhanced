@@ -34,8 +34,8 @@ patchpanda_env_apprise_notification_urls: "" # discord://webhook_id/webhook_toke
 patchpanda_env_webhook_url: "" # https://discord.com/api/webhooks/... # optional, use your discord webhook URL here for the direct discord integration
 patchpanda_env_github_username: "" # use your GitHub username here
 patchpanda_env_github_password: "" # use your GitHub personal access token here
-patchpanda_env_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
-patchpanda_env_portainer_url: "" # "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ portainer_port_http }}" # if you wish to include stacks fully managed by Portainer
+patchpanda_env_base_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+patchpanda_env_portainer_url: "" # "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ portainer_port_http }}" # if you wish to include stacks fully managed by Portainer
 patchpanda_env_portainer_username: "" # if you wish to include stacks fully managed by Portainer
 patchpanda_env_portainer_password: "" # if you wish to include stacks fully managed by Portainer
 patchpanda_apprise_env_apprise_worker_count: "2"
@@ -51,7 +51,7 @@ patchpanda_dockflare_access_group: ""
 # homepage
 patchpanda_homepage_group: "Apps"
 patchpanda_homepage_icon: "https://raw.githubusercontent.com/dkorecko/PatchPanda/refs/heads/main/PatchPanda.Web/wwwroot/favicon.png"
-patchpanda_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+patchpanda_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
 patchpanda_homepage_showstats: false
 patchpanda_apprise_homepage_group: "Misc"
 patchpanda_apprise_homepage_icon: "sh-apprise.png"

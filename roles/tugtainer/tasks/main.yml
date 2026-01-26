@@ -28,7 +28,7 @@
           dockflare.enable: "{{ tugtainer_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ tugtainer_dockflare_access_group }}"
           dockflare.hostname: "{{ tugtainer_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tugtainer_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tugtainer_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ tugtainer_homepage_group }}"
           homepage.icon: "{{ tugtainer_homepage_icon }}"
@@ -37,7 +37,7 @@
           homepage.server: "my-docker"
           homepage.container: "{{ tugtainer_container_name }}"
           homepage.showStats: "{{ tugtainer_homepage_showstats | ternary('true', 'false') }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ tugtainer_port_http }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tugtainer_port_http }}"
           repliqate.enabled: "{{ tugtainer_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ tugtainer_repliqate_engine }}"
           repliqate.schedule: "{{ tugtainer_repliqate_schedule }}"
@@ -62,7 +62,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (tugtainer_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (tugtainer_port_http | string)] +
                 (['https://' + tugtainer_hostname + '.' + ansible_nas_domain] if (tugtainer_traefik_enabled is true or tugtainer_dockflare_enabled is true) else [])
               }}
   when: tugtainer_enabled is true

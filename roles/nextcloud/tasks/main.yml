@@ -184,7 +184,7 @@
           NEXTCLOUD_DATA_DIR: "{{ nextcloud_env_nextcloud_data_dir }}"
           NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_env_nextcloud_trusted_domains }}"
           NEXTCLOUD_INIT_HTACCESS: "{{ nextcloud_env_nextcloud_init_htaccess }}" # added
-          TRUSTED_PROXIES: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+          TRUSTED_PROXIES: "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}"
           APACHE_DISABLE_REWRITE_IP: "{{ nextcloud_env_apache_disable_rewrite_ip }}"
           APACHE_BODY_LIMIT: "{{ nextcloud_env_body_limit }}"
           OVERWRITEHOST: "{{ nextcloud_env_overwritehost }}"
@@ -212,18 +212,18 @@
           dockflare.enable: "{{ nextcloud_dockflare_enabled | ternary('true', 'false') }}"
           dockflare.access.group: "{{ nextcloud_dockflare_access_group }}"
           dockflare.hostname: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
-          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port_http }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ nextcloud_port_http }}"
           homepage.name: "{{ ansible_nas_app_name }}"
           homepage.group: "{{ nextcloud_homepage_group }}"
           homepage.icon: "{{ nextcloud_homepage_icon }}"
           homepage.href: "{{ nextcloud_homepage_href }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port_http }}/login"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ nextcloud_port_http }}/login"
           homepage.description: "{{ 'Open source dropbox alternative' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ nextcloud_container_name }}"
           homepage.showStats: "{{ nextcloud_homepage_showstats | ternary('true', 'false') }}"
           homepage.widget.type: "nextcloud"
-          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ nextcloud_port_http }}"
+          homepage.widget.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ nextcloud_port_http }}"
           homepage.widget.key: "{{ nextcloud_homepage_widget_key }}"
           repliqate.enabled: "{{ nextcloud_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ nextcloud_repliqate_engine }}"
@@ -256,7 +256,7 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (nextcloud_port_http | string)] +
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (nextcloud_port_http | string)] +
                 (['https://' + nextcloud_hostname + '.' + ansible_nas_domain] if (nextcloud_traefik_enabled is true or nextcloud_dockflare_enabled is true) else [])
               }}
   when: nextcloud_enabled is true

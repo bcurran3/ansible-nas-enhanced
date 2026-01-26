@@ -22,10 +22,10 @@ searxng_memory_swap: -1
 
 # app
 searxng_env_instance_name: "{{ ansible_nas_hostname }}-1"
-searxng_env_searxng_base_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
+searxng_env_searxng_base_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ searxng_port_http }}"
 searxng_env_searxng_limiter_proxies: "1"
 searxng_env_searxng_limiter_real_ip_header: "X-Forwarded-For"
-searxng_env_url: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
+searxng_env_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ searxng_port_http }}"
 
 # autoheal
 searxng_autoheal_enabled: false
@@ -37,7 +37,7 @@ searxng_dockflare_access_group: ""
 # homepage
 searxng_homepage_group: "Apps"
 searxng_homepage_icon: "searxng.png"
-searxng_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ searxng_port_http }}"
+searxng_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ searxng_port_http }}"
 searxng_homepage_showstats: false
 
 # repliqate

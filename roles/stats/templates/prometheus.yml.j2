@@ -20,19 +20,19 @@ scrape_configs:
   - job_name: "telegraf"
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_telegraf_port }}",
+                    "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ stats_telegraf_port }}",
                  ]
 
   - job_name: "smartctl"
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_prometheus_smartctl_port }}"
+                    "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ stats_prometheus_smartctl_port }}"
                  ]
 
   - job_name: "traefik"
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8083"
+                    "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:8083"
                  ]
 
 {% if stats_internet_speed_test_enabled %}
@@ -41,7 +41,7 @@ scrape_configs:
     scrape_timeout: 5m
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ stats_speedtest_exporter_port }}"
+                    "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ stats_speedtest_exporter_port }}"
                  ]
 {% endif %}
 
@@ -52,7 +52,7 @@ scrape_configs:
     bearer_token: "{{ watchtower_api_token }}"
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ watchtower_port_api }}"
+                    "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ watchtower_port_api }}"
                  ]
 {% endif %}
 
@@ -76,5 +76,5 @@ scrape_configs:
       credentials: "{{ stats_hass_long_lived_access_token | default("abcd") }}"
     static_configs:
       - targets: [
-                    "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:8123"
+                    "{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:8123"
                  ]
