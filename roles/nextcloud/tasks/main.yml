@@ -102,16 +102,26 @@
           MYSQL_ROOT_PASSWORD: "{{ nextcloud_db_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-              test:
-                - CMD
-                - /usr/local/bin/healthcheck.sh
-                - --su-mysql
-                - --connect
-                - --innodb_initialized
-              interval: "30s"
-              timeout: "10s"
-              retries: "3"
-              start_period: "30s"
+          test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "{{ nextcloud_db_user }}", "-p{{ nextcloud_db_password }}"]
+          interval: "30s"
+          timeout: "10s"
+          retries: 3
+          start_period: "60s"
+#####
+# personally I'm running with:
+# nextcloud_db_image_name: "mysql"
+# nextcloud_db_image_version: "8.4"
+# and need the above healthcheck.
+# I should plan a migration in the future to get in sync
+#####
+#        healthcheck:
+#          test:
+#            - CMD-SHELL
+#            - "mariadb-admin ping -h localhost -u root -p{{ nextcloud_db_root_password }}"
+#          interval: "30s"
+#          timeout: "10s"
+#          retries: "3"
+#          start_period: "30s"
         labels:
           autoheal: "{{ nextcloud_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enabled | ternary('true', 'false') }}"

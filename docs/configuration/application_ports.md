@@ -78,7 +78,7 @@ By default, applications can be found on the ports listed below.
 | DokuWiki         | 8085    | Bridge  | HTTP           |
 | Double Commander | 3006    | Bridge  | HTTP           |
 | Dozzle           | 9999    | Bridge  | HTTP           |
-| Dozzle Agent     | 7007
+| Dozzle Agent     | 7007    | Bridge  |                |
 | Drone CI         | 8001
 | Drone CI         | 8002
 | DumbAssets       | 3057    | Bridge  | HTTP           |
