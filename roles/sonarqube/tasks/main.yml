@@ -1,0 +1,176 @@
+---
+- name: Start {{ ansible_nas_app_name }}
+  block:
+    - name: Create {{ ansible_nas_app_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "755"
+      loop:
+        - path: "{{ sonarqube_data_directory }}"
+          owner: 0
+          group: 0
+        - path: "{{ sonarqube_data_directory }}/data"
+          owner: 1000
+          group: 0
+        - path: "{{ sonarqube_data_directory }}/db"
+          owner: ansible-nas
+          group: systemd-journal
+        - path: "{{ sonarqube_data_directory }}/extensions"
+          owner: 1000
+          group: 0
+        - path: "{{ sonarqube_data_directory }}/logs"
+          owner: 1000
+          group: 0
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        sonarqube_homepage_href: "https://{{ sonarqube_hostname }}.{{ ansible_nas_domain }}"
+      when: sonarqube_traefik_enabled | bool or sonarqube_dockflare_enabled | bool
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ sonarqube_db_container_name }}"
+        hostname: "{{ sonarqube_db_container_name }}"
+        image: "{{ sonarqube_db_image_name }}:{{ sonarqube_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ sonarqube_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "{{ sonarqube_env_sonar_jdbc_username }}"
+          POSTGRES_PASSWORD: "{{ sonarqube_env_sonar_jdbc_password }}"
+          POSTGRES_DB: "{{ sonarqube_db_env_postgres_db }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "pg_isready -U {{ sonarqube_env_sonar_jdbc_username }} -d {{ sonarqube_db_env_postgres_db }}"]
+          interval: 10s
+          timeout: 5s
+          retries: 5
+          start_period: 30s
+        labels:
+          autoheal: "{{ sonarqube_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ sonarqube_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ sonarqube_db_homepage_group }}"
+          homepage.icon: "{{ sonarqube_db_homepage_icon }}"
+          homepage.href: "{{ sonarqube_db_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ sonarqube_db_container_name }}"
+          homepage.showStats: "{{ sonarqube_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ sonarqube_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ sonarqube_db_repliqate_engine }}"
+          repliqate.schedule: "{{ sonarqube_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ sonarqube_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ sonarqube_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "^17(\\.\\d+)*$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
+        cpu_shares: "{{ sonarqube_db_cpu_shares }}"
+        memory: "{{ sonarqube_db_memory }}"
+        memory_swap: "{{ sonarqube_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ sonarqube_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+    - name: Create {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ sonarqube_container_name }}"
+        hostname: "{{ sonarqube_container_name }}"
+        image: "{{ sonarqube_image_name }}:{{ sonarqube_image_tag }}"
+        pull: true
+        volumes:
+        - "{{ sonarqube_data_directory }}/data:/opt/sonarqube/data"
+        - "{{ sonarqube_data_directory }}/extensions:/opt/sonarqube/extensions"
+        - "{{ sonarqube_data_directory }}/logs:/opt/sonarqube/logs"
+        ports:
+          - "{{ sonarqube_port_http }}:9000"
+        env:
+          SONAR_JDBC_URL: "{{ sonarqube_env_sonar_jdbc_url }}"
+          SONAR_JDBC_USERNAME: "{{ sonarqube_env_sonar_jdbc_username }}"
+          SONAR_JDBC_PASSWORD: "{{ sonarqube_env_sonar_jdbc_password }}"
+          SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "{{ sonarqube_env_sonar_es_bootstrap_checks_disable }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        links:
+          - "{{ sonarqube_db_container_name }}"
+        labels:
+          autoheal: "{{ sonarqube_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ sonarqube_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ sonarqube_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ sonarqube_dockflare_access_group }}"
+          dockflare.hostname: "{{ sonarqube_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonarqube_port_http }}"
+          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.group: "{{ sonarqube_homepage_group }}"
+          homepage.icon: "{{ sonarqube_homepage_icon }}"
+          homepage.href: "{{ sonarqube_homepage_href }}"
+          homepage.description: "{{ 'sonarqube_homepage_description' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ sonarqube_container_name }}"
+          homepage.showStats: "{{ sonarqube_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonarqube_port_http }}"
+          repliqate.enabled: "{{ sonarqube_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ sonarqube_repliqate_engine }}"
+          repliqate.schedule: "{{ sonarqube_repliqate_schedule }}"
+          repliqate.backup_id: "{{ sonarqube_repliqate_backup_id }}"
+          repliqate.retention: "{{ sonarqube_repliqate_retention }}"
+          traefik.enable: "{{ sonarqube_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.sonarqube.rule: "Host(`{{ sonarqube_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.sonarqube.tls.certresolver: "letsencrypt"
+          traefik.http.routers.sonarqube.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.sonarqube.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.sonarqube.middlewares: "sonarqube@docker{{ ',tinyauth-auth@docker' if sonarqube_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.sonarqube.IPAllowList.sourcerange: "{{ sonarqube_traefik_whitelist }}"
+          traefik.http.services.sonarqube.loadbalancer.server.port: "9000"
+          wud.tag.include: "^\\d+(\\.\\d+)*-community$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/sonarqube"
+        cpu_shares: "{{ sonarqube_cpu_shares }}"
+        memory: "{{ sonarqube_memory }}"
+        memory_swap: "{{ sonarqube_memory_swap }}"
+        ulimits:
+          - "nofile:65536:65536"
+        restart_policy: unless-stopped
+
+    - name: Access {{ ansible_nas_app_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_default_ipv4']['address'] + ':' + (sonarqube_port_http | string)] +
+                (['https://' + sonarqube_hostname + '.' + ansible_nas_domain] if (sonarqube_traefik_enabled is true or sonarqube_dockflare_enabled is true) else [])
+              }}
+  when: sonarqube_enabled is true
+
+- name: Stop {{ ansible_nas_app_name }}
+  block:
+    - name: Stop {{ ansible_nas_app_name }} Container
+      community.docker.docker_container:
+        name: "{{ sonarqube_container_name }}"
+        state: absent
+
+    - name: Stop {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        name: "{{ sonarqube_db_container_name }}"
+        state: absent
+  when: sonarqube_enabled is false
+
+- name: Data Archive {{ ansible_nas_app_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ sonarqube_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - sonarqube_enabled is false

@@ -52,7 +52,10 @@ By default, applications can be found on the ports listed below.
 | CommaFeed        | 9004
 | Conduit          | 6167
 | Containery       | 5002
-| CouchDB          | 5984
+| Cosmos Server UI | 7200    | Bridge  | HTTP           |
+| Cosmos Server    | 7080    | Bridge  | HTTP           |
+| Cosmos Server    | 7443    | Bridge  | HTTPS          |
+| CouchDB          | 5984    | Bridge  | HTTP           |
 | Couchpotato      | 5050    | Bridge  | HTTP           |
 | CrashPlan Pro    | 3063    | Bridge  | HTTP           |
 | Cup              | 3017
@@ -314,8 +317,9 @@ By default, applications can be found on the ports listed below.
 | Sickchill        | 8081    | Bridge  | HTTP           |
 | Silver Bullet    | 3007
 | Sonarr           | 8989    | Bridge  | HTTP           |
+| SonarQube        | 9024    | Bridge  | HTTP           |
 | Sonos-Web        | 5050    | Host    | HTTP           |
-| Speedtest-Trk    | 8765    | HTTP    |                |
+| Speedtest-Trk    | 8765    | Bridge  | HTTP           |
 | Spoolman         | 7912
 | Stalwart Mail    | 3043    | HTTP    |                |
 | Stalwart Mail    | 25
@@ -416,6 +420,6 @@ By default, applications can be found on the ports listed below.
 
 
 # next avail = 4003+
-# next avail = 9024
+# next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

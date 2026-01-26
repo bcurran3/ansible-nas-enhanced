@@ -1,0 +1,51 @@
+---
+# ANE
+ansible_nas_app_name: "Cosmos Server"
+cosmos_server_enabled: false
+cosmos_server_traefik_enabled: false
+cosmos_server_traefik_whitelist: "{{ lan }}"
+
+# directories
+cosmos_server_data_directory: "{{ docker_home }}/cosmos-server"
+
+# docker
+cosmos_server_container_name: "cosmos-server"
+cosmos_server_image_name: "azukaar/cosmos-server"
+cosmos_server_image_tag: "latest"
+
+# network
+cosmos_server_hostname: "cosmos"
+cosmos_server_port_http: "7200"
+cosmos_server_port_http2: "7080"
+cosmos_server_port_https: "7443"
+
+# specs
+cosmos_server_cpu_shares: 1024
+cosmos_server_memory: "1G"
+cosmos_server_memory_swap: -1
+
+# autoheal
+cosmos_server_autoheal_enabled: false
+
+# dockflare
+cosmos_server_dockflare_enabled: false
+cosmos_server_dockflare_access_group: ""
+
+# homepage
+cosmos_server_homepage_group: "Apps"
+cosmos_server_homepage_icon: "sh-cosmos-server.png"
+cosmos_server_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ cosmos_server_port_http }}"
+cosmos_server_homepage_showstats: false
+
+# repliqate
+cosmos_server_repliqate_enabled: false
+cosmos_server_repliqate_engine: "restic"
+cosmos_server_repliqate_schedule: "@daily 3am"
+cosmos_server_repliqate_backup_id: "{{ cosmos_server_container_name }}"
+cosmos_server_repliqate_retention: "30d"
+
+# tinyauth
+cosmos_server_tinyauth_enabled: false
+
+# watchtower
+cosmos_server_watchtower_enabled: false

@@ -1,0 +1,73 @@
+---
+# ANE
+ansible_nas_app_name: "SonarQube Community Build"
+sonarqube_enabled: false
+sonarqube_traefik_enabled: false
+sonarqube_traefik_whitelist: "{{ lan }}"
+
+# directories
+sonarqube_data_directory: "{{ docker_home }}/sonarqube"
+
+# docker
+sonarqube_container_name: "sonarqube"
+sonarqube_image_name: "sonarqube"
+sonarqube_image_tag: "community"
+sonarqube_db_container_name: "sonarqube-db"
+sonarqube_db_image_name: "postgres"
+sonarqube_db_image_tag: "17"
+
+# network
+sonarqube_hostname: "sonarqube"
+sonarqube_port_http: "9024"
+
+# specs
+sonarqube_cpu_shares: 1024
+sonarqube_memory: "4G"
+sonarqube_memory_swap: -1
+sonarqube_db_cpu_shares: 1024
+sonarqube_db_memory: "1G"
+sonarqube_db_memory_swap: "{{ sonarqube_db_memory }}"
+
+# app
+sonarqube_env_sonar_jdbc_url: "jdbc:postgresql://{{ sonarqube_db_container_name }}:5432/{{ sonarqube_db_env_postgres_db }}"
+sonarqube_env_sonar_jdbc_username: "sonarqube"
+sonarqube_env_sonar_jdbc_password: "topsecret"
+sonarqube_env_sonar_es_bootstrap_checks_disable: "true"
+sonarqube_db_env_postgres_db: "sonarqube_db"
+
+# autoheal
+sonarqube_autoheal_enabled: false
+sonarqube_db_autoheal_enabled: false
+
+# dockflare
+sonarqube_dockflare_enabled: false
+sonarqube_dockflare_access_group: ""
+
+# homepage
+sonarqube_homepage_group: "Apps"
+sonarqube_homepage_icon: "sonarqube.png"
+sonarqube_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ sonarqube_port_http }}"
+sonarqube_homepage_showstats: false
+sonarqube_db_homepage_group: "DBs"
+sonarqube_db_homepage_icon: "postgres.png"
+sonarqube_db_homepage_href: "{{ sonarqube_homepage_href }}"
+sonarqube_db_homepage_showstats: false
+
+# repliqate
+sonarqube_repliqate_enabled: false
+sonarqube_repliqate_engine: "restic"
+sonarqube_repliqate_schedule: "@daily 3am"
+sonarqube_repliqate_backup_id: "{{ sonarqube_container_name }}"
+sonarqube_repliqate_retention: "30d"
+sonarqube_db_repliqate_enabled: false
+sonarqube_db_repliqate_engine: "restic"
+sonarqube_db_repliqate_schedule: "@daily 3am"
+sonarqube_db_repliqate_backup_id: "{{ sonarqube_db_container_name }}"
+sonarqube_db_repliqate_retention: "30d"
+
+# tinyauth
+sonarqube_tinyauth_enabled: false
+
+# watchtower
+sonarqube_watchtower_enabled: false
+sonarqube_db_watchtower_enabled: false
