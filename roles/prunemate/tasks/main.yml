@@ -10,6 +10,12 @@
         - "{{ prunemate_data_directory }}/config"
         - "{{ prunemate_data_directory }}/logs"
 
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        prunemate_homepage_href: "https://{{ prunemate_hostname }}.{{ ansible_nas_domain }}"
+      when: prunemate_traefik_enabled | bool or prunemate_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -61,6 +67,7 @@
           wud.link.template: "https://hub.docker.com/r/anoniemerd/prunemate"
         cpu_shares: "{{ prunemate_cpu_shares }}"
         memory: "{{ prunemate_memory }}"
+        memory_swap: "{{ prunemate_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

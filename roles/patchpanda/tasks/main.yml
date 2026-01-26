@@ -9,6 +9,12 @@
         - "{{ patchpanda_data_directory }}"
         - "{{ patchpanda_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        patchpanda_env_base_url: "https://{{ patchpanda_hostname }}.{{ ansible_nas_domain }}"
+        patchpanda_homepage_href: "https://{{ patchpanda_hostname }}.{{ ansible_nas_domain }}"
+      when: patchpanda_traefik_enabled | bool or patchpanda_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Apprise Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -43,6 +49,7 @@
         cpu_shares: "{{ patchpanda_apprise_cpu_shares }}"
         memory: "{{ patchpanda_apprise_memory }}"
         restart_policy: unless-stopped
+        memory_swap: "{{ patchpanda_apprise_memory_swap }}"
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -105,6 +112,7 @@
         cpu_shares: "{{ patchpanda_cpu_shares }}"
         memory: "{{ patchpanda_memory }}"
         restart_policy: unless-stopped
+        memory_swap: "{{ patchpanda_memory_swap }}"
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:

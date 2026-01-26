@@ -11,6 +11,11 @@
         - "{{ piwigo_data_directory }}/db"
         - "{{ piwigo_photos }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        piwigo_homepage_href: "https://{{ piwigo_hostname }}.{{ ansible_nas_domain }}"
+      when: piwigo_traefik_enabled | bool or piwigo_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} network
       community.docker.docker_network:
         name: "{{ piwigo_network_name }}"
@@ -61,6 +66,7 @@
           wud.link.template: "https://hub.docker.com/_/mysql"
         cpu_shares: "{{ piwigo_db_cpu_shares }}"
         memory: "{{ piwigo_db_memory }}"
+        memory_swap: "{{ piwigo_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
@@ -127,8 +133,9 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "https://lscr.io/linuxserver/piwigo"
         cpu_shares: "{{ piwigo_cpu_shares }}"
-        restart_policy: unless-stopped
         memory: "{{ piwigo_memory }}"
+        memory_swap: "{{ piwigo_memory_swap }}"
+        restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
       ansible.builtin.debug:

@@ -93,7 +93,16 @@
               wud.link.template: "https://hub.docker.com/r/bitnamilegacy/mongodb/tags"
             cpu_shares: "{{ rocket_chat_db_cpu_shares }}"
             memory: "{{ rocket_chat_db_memory }}"
+            memory_swap: "{{ rocket_chat_db_memory_swap }}"
             restart_policy: unless-stopped
+
+        - name: Verify {{ ansible_nas_app_name }} DB is healthy
+          community.docker.docker_container_info:
+            name: "{{ rocket_chat_db_container_name }}"
+          register: db_info
+          until: "db_info.container.State.Health.Status == 'healthy'"
+          retries: 30
+          delay: 5
 
         - name: Create {{ ansible_nas_app_name }} Container
           community.docker.docker_container:
@@ -159,6 +168,7 @@
               wud.link.template: "https://hub.docker.com/r/rocketchat/rocket.chat/tags"
             cpu_shares: "{{ rocket_chat_cpu_shares }}"
             memory: "{{ rocket_chat_memory }}"
+            memory_swap: "{{ rocket_chat_memory_swap }}"
             restart_policy: unless-stopped
 
         - name: Access {{ ansible_nas_app_name }} at

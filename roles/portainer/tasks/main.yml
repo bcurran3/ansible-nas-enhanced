@@ -1,25 +1,6 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Check for Deprecated IP Whitelist setting
-      ansible.builtin.fail:
-        msg: "Use portainer_ip_allowlist instead of portainer_ip_whitelist! Read https://traefik.io/blog/announcing-traefik-proxy-v2-11/ for more information."
-      when: portainer_ip_whitelist is defined
-
-    - name: Check for old config dir
-      stat: 
-        path: "{{ portainer_data_directory }}/config"
-      register: old_config
-
-    - name: Move config dir to data dir
-      command: mv "{{ portainer_data_directory }}/config" "{{ portainer_data_directory }}/data"
-      when: old_config.stat.exists
-
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
-      ansible.builtin.set_fact:
-        portainer_homepage_href: "https://{{ portainer_hostname }}.{{ ansible_nas_domain }}"
-      when: portainer_traefik_enabled | bool or portainer_dockflare_enabled | bool
-
     - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
@@ -27,6 +8,11 @@
       with_items:
         - "{{ portainer_data_directory }}"
         - "{{ portainer_data_directory }}/data"
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        portainer_homepage_href: "https://{{ portainer_hostname }}.{{ ansible_nas_domain }}"
+      when: portainer_traefik_enabled | bool or portainer_dockflare_enabled | bool
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:

@@ -11,6 +11,11 @@
         - "{{ projectsend_data_directory }}/data"
         - "{{ projectsend_data_directory }}/db"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        projectsend_homepage_href: "https://{{ projectsend_hostname }}.{{ ansible_nas_domain }}"
+      when: projectsend_traefik_enabled | bool or projectsend_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -60,7 +65,16 @@
           wud.link.template: "https://lscr.io/linuxserver/mariadb"
         cpu_shares: "{{ projectsend_db_cpu_shares }}"
         memory: "{{ projectsend_db_memory }}"
+        memory_swap: "{{ projectsend_db_memory_swap }}"
         restart_policy: unless-stopped
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ projectsend_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -119,6 +133,7 @@
           wud.link.template: "https://lscr.io/linuxserver/projectsend"
         cpu_shares: "{{ projectsend_cpu_shares }}"
         memory: "{{ projectsend_memory }}"
+        memory_swap: "{{ projectsend_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

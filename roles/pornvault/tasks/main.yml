@@ -11,6 +11,11 @@
         - "{{ pornvault_porn_images_directory }}"
         - "{{ pornvault_porn_videos_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        pornvault_homepage_href: "https://{{ pornvault_hostname }}.{{ ansible_nas_domain }}"
+      when: pornvault_traefik_enabled | bool or pornvault_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -59,6 +64,7 @@
           wud.link.template: https://gitlab.com/porn-vault/porn-vault/-/commits/master
         cpu_shares: "{{ pornvault_cpu_shares }}"
         memory: "{{ pornvault_memory }}"
+        memory_swap: "{{ pornvault_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

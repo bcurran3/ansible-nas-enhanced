@@ -10,6 +10,13 @@
         - "{{ plex_rewind_data_directory }}"
         - "{{ plex_rewind_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        plex_rewind_nextauth_url: "https://{{ plex_rewind_hostname }}.{{ ansible_nas_domain }}"
+        plex_rewind_next_public_site_url: "https://{{ plex_rewind_hostname }}.{{ ansible_nas_domain }}"
+        plex_rewind_homepage_href: "https://{{ plex_rewind_hostname }}.{{ ansible_nas_domain }}"
+      when: plex_rewind_traefik_enabled | bool or plex_rewind_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -62,6 +69,7 @@
           wud.link.template: "https://github.com/raunot/plex-rewind/pkgs/container/plex-rewind"
         cpu_shares: "{{ plex_rewind_cpu_shares }}"
         memory: "{{ plex_rewind_memory }}"
+        memory_swap: "{{ plex_rewind_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

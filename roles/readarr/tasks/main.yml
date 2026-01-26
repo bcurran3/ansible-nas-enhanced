@@ -1,5 +1,5 @@
 ---
-  # NOTE: deprecated / retired
+# NOTE: deprecated / retired
 - name: Start {{ ansible_nas_app_name }}
   block:
     - name: Create {{ ansible_nas_app_name }} Directories
@@ -11,6 +11,11 @@
         - "{{ readarr_data_directory }}/config"
         - "{{ readarr_books_directory }}"
         - "{{ readarr_download_directory}}"
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        readarr_homepage_href: "https://{{ readarr_hostname }}.{{ ansible_nas_domain }}"
+      when: readarr_traefik_enabled | bool or readarr_dockflare_enabled | bool
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -72,6 +77,7 @@
           wud.link.template: "https://lscr.io/linuxserver/readarr"
         cpu_shares: "{{ readarr_cpu_shares }}"
         memory: "{{ readarr_memory }}"
+        memory_swap: "{{ readarr_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

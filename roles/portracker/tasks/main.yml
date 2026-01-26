@@ -9,6 +9,11 @@
         - "{{ portracker_data_directory }}"
         - "{{ portracker_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        portracker_homepage_href: "https://{{ portracker_hostname }}.{{ ansible_nas_domain }}"
+      when: portracker_traefik_enabled | bool or portracker_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -60,6 +65,7 @@
           wud.link.template: "https://hub.docker.com/r/mostafawahied/portracker"
         cpu_shares: "{{ portracker_cpu_shares }}"
         memory: "{{ portracker_memory }}"
+        memory_swap: "{{ portracker_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

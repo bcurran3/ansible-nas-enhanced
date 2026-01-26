@@ -21,12 +21,17 @@ peppermint_db_image_tag: "17-alpine"
 
 # specs
 peppermint_cpu_shares: 1024
-peppermint_memory: "1G"
+peppermint_memory: "512M"
+peppermint_memory_swap: -1
 peppermint_db_cpu_shares: 1024
-peppermint_db_memory: "1G"
+peppermint_db_memory: "256M"
+peppermint_db_memory_swap: "{{ peppermint_db_memory }}"
 
 # app
-peppermint_db_password: "peppermint"
+peppermint_env_db_username: "peppermint"
+peppermint_env_db_password: "peppermint"
+peppermint_env_secret: 'peppermint4life'
+peppermint_db_env_postgres_db: "peppermint"
 
 # autoheal
 peppermint_autoheal_enabled: false

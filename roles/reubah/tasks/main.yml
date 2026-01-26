@@ -10,6 +10,11 @@
       with_items:
         - "{{ reubah_data_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        reubah_homepage_href: "https://{{ reubah_hostname }}.{{ ansible_nas_domain }}"
+      when: reubah_traefik_enabled | bool or reubah_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -22,7 +27,7 @@
         ports:
           - "{{ reubah_port_http }}:8081"
         env:
-#          PORT: "{{ reubah_port_http }}" # reassigning the port causes healthcheck failure: https://github.com/dendianugerah/reubah/issues/31
+#         PORT: "{{ reubah_port_http }}" # reassigning the port causes healthcheck failure: https://github.com/dendianugerah/reubah/issues/31
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ reubah_autoheal_enabled | ternary('true', 'false') }}"
@@ -57,6 +62,7 @@
           wud.link.template: "https://github.com/dendianugerah/reubah/pkgs/container/reubah"
         cpu_shares: "{{ reubah_cpu_shares }}"
         memory: "{{ reubah_memory }}"
+        memory_swap: "{{ reubah_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

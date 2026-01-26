@@ -11,6 +11,11 @@
         - "{{ pingvin_share_data_directory }}/data"
         - "{{ pingvin_share_data_directory }}/data/images"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        pingvin_share_homepage_href: "https://{{ pingvin_share_hostname }}.{{ ansible_nas_domain }}"
+      when: pingvin_share_traefik_enabled | bool or pingvin_share_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -60,6 +65,7 @@
           wud.link.template: "https://github.com/stonith404/pingvin-share/pkgs/container/pingvin-share"
         cpu_shares: "{{ pingvin_share_cpu_shares }}"
         memory: "{{ pingvin_share_memory }}"
+        memory_swap: "{{ pingvin_share_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

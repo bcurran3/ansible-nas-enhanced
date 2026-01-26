@@ -22,9 +22,11 @@ patchpanda_hostname: "patchpanda"
 
 # specs
 patchpanda_cpu_shares: 1024
-patchpanda_memory: "1G"
+patchpanda_memory: "512M"
+patchpanda_memory_swap: -1
 patchpanda_apprise_cpu_shares: 1024
-patchpanda_apprise_memory: "512M"
+patchpanda_apprise_memory: "256M"
+patchpanda_apprise_memory_swap: -1
 
 # app
 patchpanda_env_apprise_api_url: "http://{{ patchpanda_apprise_container_name }}:8000"
@@ -53,7 +55,7 @@ patchpanda_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_defau
 patchpanda_homepage_showstats: false
 patchpanda_apprise_homepage_group: "Misc"
 patchpanda_apprise_homepage_icon: "sh-apprise.png"
-patchpanda_apprise_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
+patchpanda_apprise_homepage_href: "{{ patchpanda_homepage_href }}"
 patchpanda_apprise_homepage_showstats: false
 
 # repliqate

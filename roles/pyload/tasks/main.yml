@@ -5,10 +5,14 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        # mode: 0755
       with_items:
         - "{{ pyload_data_directory }}"
         - "{{ pyload_download_directory }}"
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        pyload_homepage_href: "https://{{ pyload_hostname }}.{{ ansible_nas_domain }}"
+      when: pyload_traefik_enabled | bool or pyload_dockflare_enabled | bool
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -23,9 +27,9 @@
         ports:
           - "{{ pyload_port_http }}:8000"
         env:
-          TZ: "{{ ansible_nas_timezone }}"
           UID: "{{ pyload_user_id }}"
           GID: "{{ pyload_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ pyload_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ pyload_watchtower_enabled | ternary('true', 'false') }}"
@@ -60,6 +64,7 @@
           wud.link.template: "https://hub.docker.com/r/writl/pyload"
         cpu_shares: "{{ pyload_cpu_shares }}"
         memory: "{{ pyload_memory }}"
+        memory_swap: "{{ pyload_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

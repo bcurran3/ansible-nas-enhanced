@@ -9,6 +9,11 @@
         - "{{ remotely_data_directory }}"
         - "{{ remotely_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        remotely_homepage_href: "https://{{ remotely_hostname }}.{{ ansible_nas_domain }}"
+      when: remotely_traefik_enabled | bool or remotely_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -60,6 +65,7 @@
           wud.link.template: "https://hub.docker.com/r/immybot/remotely"
         cpu_shares: "{{ remotely_cpu_shares }}"
         memory: "{{ remotely_memory }}"
+        memory_swap: "{{ remotely_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

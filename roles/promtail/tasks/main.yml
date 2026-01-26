@@ -17,6 +17,11 @@
         - "{{ promtail_data_directory }}/config"
         - "{{ promtail_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        promtail_homepage_href: "https://{{ promtail_hostname }}.{{ ansible_nas_domain }}"
+      when: promtail_traefik_enabled | bool or promtail_dockflare_enabled | bool
+
     - name: Copy {{ ansible_nas_app_name }} Template config
       ansible.builtin.template:
         src: config.yml
@@ -72,6 +77,7 @@
           wud.link.template: "https://hub.docker.com/r/grafana/promtail"
         cpu_shares: "{{ promtail_cpu_shares }}"
         memory: "{{ promtail_memory }}"
+        memory_swap: "{{ promtail_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

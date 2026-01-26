@@ -9,6 +9,11 @@
         - "{{ peppermint_data_directory }}"
         - "{{ peppermint_data_directory }}/db"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        peppermint_homepage_href: "https://{{ peppermint_hostname }}.{{ ansible_nas_domain }}"
+      when: peppermint_traefik_enabled | bool or peppermint_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -19,9 +24,9 @@
         volumes:
           - "{{ peppermint_data_directory }}/db:/var/lib/postgresql/data"
         env:
-          POSTGRES_USER: "peppermint"
-          POSTGRES_PASSWORD: "{{ peppermint_db_password }}"
-          POSTGRES_DB: "peppermint"
+          POSTGRES_USER: "{{ peppermint_env_db_username }}"
+          POSTGRES_PASSWORD: "{{ peppermint_env_db_password }}"
+          POSTGRES_DB: "{{ peppermint_db_env_postgres_db }}"
         healthcheck:
           test: ["CMD-SHELL", "pg_isready -U peppermint"]
           interval: 10s
@@ -51,6 +56,7 @@
           wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ peppermint_db_cpu_shares }}"
         memory: "{{ peppermint_db_memory }}"
+        memory_swap: "{{ peppermint_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
@@ -72,10 +78,10 @@
           - "{{ peppermint_port_http }}:3000"
           - 5003:5003
         env:
-          DB_USERNAME: "peppermint"
-          DB_PASSWORD: "{{ peppermint_db_password }}"
+          DB_USERNAME: "{{ peppermint_env_db_username }}"
+          DB_PASSWORD: "{{ peppermint_env_db_password }}"
           DB_HOST: "{{ peppermint_db_container_name }}"
-          SECRET: 'peppermint4life'
+          SECRET: "{{ peppermint_env_secret }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ peppermint_db_container_name }}"
@@ -113,6 +119,7 @@
           wud.link.template: "https://hub.docker.com/r/pepperlabs/peppermint"
         cpu_shares: "{{ peppermint_cpu_shares }}"
         memory: "{{ peppermint_memory }}"
+        memory_swap: "{{ peppermint_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
