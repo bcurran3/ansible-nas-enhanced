@@ -8,6 +8,11 @@
       with_items:
         - "{{ proget_data_directory }}/packages"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        proget_homepage_href: "https://{{ proget_hostname }}.{{ ansible_nas_domain }}"
+      when: proget_traefik_enabled | bool or proget_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Directories
       ansible.builtin.file:
         path: "{{ item }}"
@@ -44,6 +49,18 @@
           MSSQL_SA_PASSWORD: "{{ proget_db_mssql_sa_password }}"
           MSSQL_PID: "{{ proget_db_mssql_pid }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: >-
+            /opt/mssql-tools18/bin/sqlcmd 
+            -S localhost 
+            -U sa 
+            -P "$MSSQL_SA_PASSWORD" 
+            -Q "SELECT 1" 
+            -b -C
+          interval: 10s
+          timeout: 5s
+          retries: 5
+          start_period: 30s
         labels:
           autoheal: "{{ proget_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ proget_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -68,9 +85,10 @@
           wud.link.template: "https://hub.docker.com/r/microsoft/mssql-server"
         cpu_shares: "{{ proget_db_cpu_shares }}"
         memory: "{{ proget_db_memory }}"
+        memory_swap: "{{ proget_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Init ProGet DB
+    - name: Init {{ ansible_nas_app_name }} DB
       community.docker.docker_container_exec:
         container: "{{ proget_db_container_name }}"
         command: >-
@@ -82,6 +100,14 @@
           -Q 'IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = "ProGet") BEGIN CREATE DATABASE [ProGet] COLLATE SQL_Latin1_General_CP1_CI_AS; END'
       register: result
       changed_when: "'CREATE DATABASE' in result.stdout"
+
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ proget_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -137,6 +163,7 @@
           wud.link.template: "https://inedo.com/proget"
         cpu_shares: "{{ proget_cpu_shares }}"
         memory: "{{ proget_memory }}"
+        memory_swap: "{{ proget_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
