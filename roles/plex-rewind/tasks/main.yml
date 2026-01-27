@@ -5,15 +5,14 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-        owner: "1001"
       with_items:
         - "{{ plex_rewind_data_directory }}"
         - "{{ plex_rewind_data_directory }}/config"
 
     - name: Set {{ ansible_nas_app_name }} FQDN var overrides
       ansible.builtin.set_fact:
-        plex_rewind_nextauth_url: "https://{{ plex_rewind_hostname }}.{{ ansible_nas_domain }}"
-        plex_rewind_next_public_site_url: "https://{{ plex_rewind_hostname }}.{{ ansible_nas_domain }}"
+        plex_rewind_env_nextauth_url: "https://{{ plex_rewind_hostname }}.{{ ansible_nas_domain }}"
+        plex_rewind_env_next_public_site_url: "https://{{ plex_rewind_hostname }}.{{ ansible_nas_domain }}"
         plex_rewind_homepage_href: "https://{{ plex_rewind_hostname }}.{{ ansible_nas_domain }}"
       when: plex_rewind_traefik_enabled | bool or plex_rewind_dockflare_enabled | bool
 
@@ -28,12 +27,13 @@
           - "{{ plex_rewind_port_http }}:8383"
         volumes:
           - "{{ plex_rewind_data_directory }}/config:/app/config"
-        network_mode: bridge
         env:
-          NEXTAUTH_SECRET: "{{ plex_rewind_nextauth_secret }}"
-          NEXTAUTH_URL: "{{ plex_rewind_nextauth_url }}"
-          NEXT_PUBLIC_SITE_URL: "{{ plex_rewind_next_public_site_url }}"
-          NEXT_PUBLIC_STATISTICS_START_DATE: "{{ plex_rewind_next_public_statistics_start_date }}"
+          AUTH_TRUST_HOST: "{{ plex_rewind_env_auth_trust_host }}"
+          NEXTAUTH_SECRET: "{{ plex_rewind_env_nextauth_secret }}"
+          NEXTAUTH_URL: "{{ plex_rewind_env_nextauth_url }}"
+          NEXTAUTH_URL_INTERNAL: "http://localhost:8383"
+          NEXT_PUBLIC_SITE_URL: "{{ plex_rewind_env_next_public_site_url }}"
+          NEXT_PUBLIC_STATISTICS_START_DATE: "{{ plex_rewind_env_next_public_statistics_start_date }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ plex_rewind_autoheal_enabled | ternary('true', 'false') }}"
@@ -61,11 +61,12 @@
           traefik.http.routers.plexrewind.tls.certresolver: "letsencrypt"
           traefik.http.routers.plexrewind.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.plexrewind.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.plexrewind.middlewares: "plexrewind@docker{{ ',tinyauth-auth@docker' if plex_rewind_tinyauth_enabled | bool else '' }}"
+          traefik.http.routers.plexrewind.middlewares: "plexrewind@docker,plexrewind-headers@docker{{ ',tinyauth-auth@docker' if plex_rewind_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.plexrewind-headers.headers.customrequestheaders.X-Forwarded-Proto: "https"
           traefik.http.middlewares.plexrewind.IPAllowList.sourcerange: "{{ plex_rewind_traefik_whitelist }}"
           traefik.http.services.plexrewind.loadbalancer.server.port: "8383"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
+          wud.tag.include: "^latest$"
+          wud.watch.digest: "true"
           wud.link.template: "https://github.com/raunot/plex-rewind/pkgs/container/plex-rewind"
         cpu_shares: "{{ plex_rewind_cpu_shares }}"
         memory: "{{ plex_rewind_memory }}"

@@ -6,16 +6,6 @@ plex_rewind_traefik_enabled: false
 plex_rewind_traefik_whitelist: "{{ lan }}"
 plex_rewind_data_directory: "{{ docker_home }}/plex-rewind"
 
-# app
-# (required) used to encrypt auth JWT token, generate one with `openssl rand -base64 32`
-plex_rewind_nextauth_secret: "m07Gw05Gfdb0qeXOPuEGqMaVKIxLTwuXpwE7T14WSNk="
-# change to your domain if you are exposing the app to the internet
-plex_rewind_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
-# change to your domain if you are exposing the app to the internet
-plex_rewind_next_public_site_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
-# starting date for "all time" option (YYYY-MM-DD)
-plex_rewind_next_public_statistics_start_date: "2018-01-01"
-
 # network
 plex_rewind_hostname: "plexrewind"
 plex_rewind_port_http: "8383"
@@ -30,6 +20,15 @@ plex_rewind_cpu_shares: 1024
 plex_rewind_memory: "512M"
 plex_rewind_memory_swap: -1
 
+# app
+plex_rewind_env_auth_trust_host: "true"
+# generate your own with `openssl rand -base64 32`
+plex_rewind_env_nextauth_secret: "m07Gw05Gfdb0qeXOPuEGqMaVKIxLTwuXpwE7T14WSNk="
+plex_rewind_env_nextauth_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
+plex_rewind_env_next_public_site_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
+# starting date for "all time" option (YYYY-MM-DD)
+plex_rewind_env_next_public_statistics_start_date: "2018-01-01"
+
 # autoheal
 plex_rewind_autoheal_enabled: false
 
@@ -39,7 +38,7 @@ plex_rewind_dockflare_access_group: ""
 
 # homepage
 plex_rewind_homepage_group: "Apps"
-plex_rewind_homepage_icon: "plexrewind.png"
+plex_rewind_homepage_icon: "plex-rewind.png"
 plex_rewind_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ plex_rewind_port_http }}"
 plex_rewind_homepage_showstats: false
 
