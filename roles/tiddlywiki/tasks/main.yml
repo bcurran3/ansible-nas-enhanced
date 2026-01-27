@@ -6,6 +6,11 @@
         path: "{{ tiddlywiki_data_directory }}"
         state: directory
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        tiddlywiki_homepage_href: "https://{{ tiddlywiki_hostname }}.{{ ansible_nas_domain }}"
+      when: tiddlywiki_traefik_enabled | bool or tiddlywiki_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -57,6 +62,7 @@
           wud.link.template: "https://hub.docker.com/r/wmudge/tiddlywiki"
         cpu_shares: "{{ tiddlywiki_cpu_shares }}"
         memory: "{{ tiddlywiki_memory }}"
+        memory_swap: "{{ tiddlywiki_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

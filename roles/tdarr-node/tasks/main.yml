@@ -19,10 +19,6 @@
         hostname: "{{ tdarr_node_container_name }}"
         image: "{{ tdarr_node_image_name }}:{{ tdarr_node_image_tag }}"
         network_mode: bridge
-        log_driver: json-file
-        log_options:
-            max-file: "10"
-            max-size: "200k"
         pull: true
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
         device_requests: "{{
@@ -74,7 +70,12 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/HaveAGitGat/Tdarr/pkgs/container/tdarr_node"
         cpu_shares: "{{ tdarr_node_cpu_shares }}"
+        log_driver: json-file
+        log_options:
+            max-file: "10"
+            max-size: "200k"
         memory: "{{ tdarr_node_memory }}"
+        memory_swap: "{{ tdarr_node_memory_swap }}"
         restart_policy: unless-stopped
   when: tdarr_node_enabled is true
 

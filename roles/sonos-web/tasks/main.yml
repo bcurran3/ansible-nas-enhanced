@@ -1,6 +1,14 @@
 ---
+# NOTE: you can use Sonos's website for the same purpose:
+# https://play.sonos.com
 - name: Start {{ ansible_nas_app_name }}
   block:
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        sonos_web_homepage_href: "https://{{ sonos_web_hostname }}.{{ ansible_nas_domain }}"
+      when: sonos_web_traefik_enabled | bool or sonos_web_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -11,7 +19,6 @@
 #        ports:
 #          - "5050:5050"
         network_mode: host
-        # ^ figure out the ports Sonos' use and make bridged
         env:
           TZ: "{{ ansible_nas_timezone }}"
         labels:
@@ -45,6 +52,7 @@
           wud.link.template: "https://hub.docker.com/r/sonosweb/sonos-web"
         cpu_shares: "{{ sonos_web_cpu_shares }}"
         memory: "{{ sonos_web_memory }}"
+        memory_swap: "{{ sonos_web_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
@@ -63,6 +71,3 @@
         name: "{{ sonos_web_container_name }}"
         state: absent
   when: sonos_web_enabled is false
-
-# NOTE: you can use Sonos's website instead
-# https://play.sonos.com

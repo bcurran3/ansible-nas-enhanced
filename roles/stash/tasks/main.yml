@@ -15,6 +15,11 @@
         - "{{ stash_data_directory }}/metadata"
         - "{{ stash_porn_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        stash_homepage_href: "https://{{ stash_hostname }}.{{ ansible_nas_domain }}"
+      when: stash_traefik_enabled | bool or stash_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -81,6 +86,7 @@
           wud.link.template: "https://hub.docker.com/r/stashapp/stash"
         cpu_shares: "{{ stash_cpu_shares }}"
         memory: "{{ stash_memory }}"
+        memory_swap: "{{ stash_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

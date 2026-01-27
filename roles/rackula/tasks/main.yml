@@ -26,13 +26,13 @@
         volumes:
           - "{{ rackula_data_directory }}/data:/data"
         ports:
-          - "{{ rackula_port_api }}:3001"
+          - "{{ rackula_port_api }}:{{ rackula_port_api }}"
         env:
           DATA_DIR: "/data"
-          PORT: "3001"
+          RACKULA_API_PORT: "{{ rackula_port_api }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "wget", "-qO-", "http://127.0.0.1:${PORT}/health"]
+          test: ["CMD", "wget", "-qO-", "http://127.0.0.1:{{ rackula_port_api }}/health"]
           interval: "30s"
           timeout: "10s"
           start_period: "5s"
@@ -54,17 +54,10 @@
           homepage.showStats: "{{ rackula_api_homepage_showstats | ternary('true', 'false') }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rackula_port_api }}"
           repliqate.enabled: "false"
-          traefik.enable: "{{ rackula_traefik_enabled | ternary('true', 'false') }}"
-          traefik.http.routers.rackulaapi.rule: "Host(`{{ rackula_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.rackulaapi.tls.certresolver: "letsencrypt"
-          traefik.http.routers.rackulaapi.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.rackulaapi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.rackulaapi.middlewares: "rackulaapi@docker{{ ',tinyauth-auth@docker' if rackula_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.rackulaapi.IPAllowList.sourcerange: "{{ rackula_traefik_whitelist }}"
-          traefik.http.services.rackulaapi.loadbalancer.server.port: "3001"
+          traefik.enable: "false"
           wud.tag.include: "^latest$"
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/RackulaLives/Rackula/releases"
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/RackulaLives/rackula-api/pkgs/container/rackula-api"
         cap_drop:
           - ALL
         cpu_shares: "{{ rackula_api_cpu_shares }}"
@@ -89,9 +82,9 @@
         pull: true
         ports:
           - "{{ rackula_port_http }}:8080"
-#          - "{{ rackula_port_http }}:{{ rackula_port_http }}"
         env:
-#          RACKULA_PORT: "{{ rackula_port_http }}" # healthcheck still checks 8080
+          API_HOST: "{{ rackula_api_container_name }}"
+          API_PORT: "{{ rackula_port_api }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ rackula_api_container_name }}"
@@ -121,8 +114,8 @@
           traefik.http.middlewares.rackula.IPAllowList.sourcerange: "{{ rackula_traefik_whitelist }}"
           traefik.http.services.rackula.loadbalancer.server.port: "8080"
           wud.tag.include: "^latest$"
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/RackulaLives/Rackula/releases"
+          wud.watch.digest: "true"
+          wud.link.template: "https://github.com/RackulaLives/rackula/pkgs/container/rackula"
         cap_drop:
           - ALL
         cpu_shares: "{{ rackula_cpu_shares }}"
@@ -137,6 +130,7 @@
           - /var/cache/nginx:size=10M
           - /var/run:size=1M
           - /tmp:size=5M
+          - /etc/nginx/conf.d:size=1M,uid=101,gid=101
         read_only: true
         restart_policy: unless-stopped
 

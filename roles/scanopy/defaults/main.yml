@@ -31,17 +31,25 @@ scanopy_daemon_port_http: "60073"
 # specs
 scanopy_cpu_shares: 1024
 scanopy_memory: "1G"
+scanopy_memory_swap: -1
 scanopy_db_cpu_shares: 1024
 scanopy_db_memory: "1G"
+scanopy_db_memory_swap: "{{ scanopy_db_memory }}"
 scanopy_daemon_cpu_shares: 1024
 scanopy_daemon_memory: "1G"
+scanopy_daemon_memory_swap: -1
 
 # app
 scanopy_env_postgres_db: "scanopy"
 scanopy_env_postgres_user: "postgres"
 scanopy_env_postgres_password: "topsecret"
+scanopy_env_scanopy_integrated_daemon_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ scanopy_daemon_port_http }}"
+scanopy_env_scanopy_log_level: "info"
+scanopy_env_scanopy_public_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+scanopy_env_scanopy_use_secure_session_cookies: "false"
+scanopy_env_scanopy_web_external_path: "/app/static"
 scanopy_daemon_env_scanopy_bind_address: "0.0.0.0"
-scanopy_daemon_env_scanopy_name: "scanopy-daemon"
+scanopy_daemon_env_scanopy_name: "{{ scanopy_daemon_container_name }}"
 scanopy_daemon_env_scanopy_heartbeat_interval: "30"
 scanopy_daemon_env_scanopy_mode: "Push"
 scanopy_daemon_env_scanopy_integrated_daemon_url: "172.17.0.1"
@@ -83,7 +91,7 @@ scanopy_db_repliqate_retention: "30d"
 scanopy_daemon_repliqate_enabled: false
 scanopy_daemon_repliqate_engine: "restic"
 scanopy_daemon_repliqate_schedule: "@daily 3am"
-scanopy_daemon_repliqate_backup_id: "{{ scanopy_db_container_name }}"
+scanopy_daemon_repliqate_backup_id: "{{ scanopy_daemon_container_name }}"
 scanopy_daemon_repliqate_retention: "30d"
 
 # tinyauth

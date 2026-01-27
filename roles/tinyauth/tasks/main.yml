@@ -59,8 +59,8 @@
       ansible.builtin.debug:
         msg: "https://{{ tinyauth_hostname }}.{{ ansible_nas_domain }}"
   when: 
-    - traefik_enabled is true
     - tinyauth_enabled is true
+    - traefik_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}
   block:

@@ -321,14 +321,16 @@ By default, applications can be found on the ports listed below.
 | Sonos-Web        | 5050    | Host    | HTTP           |
 | Speedtest-Trk    | 8765    | Bridge  | HTTP           |
 | Spoolman         | 7912
-| Stalwart Mail    | 3043    | HTTP    |                |
-| Stalwart Mail    | 25
-| Stalwart Mail    | 587
-| Stalwart Mail    | 465
-| Stalwart Mail    | 143
-| Stalwart Mail    | 993
-| Stalwart Mail    | 4190
-| Stash            | 9998
+| Stalwart Mail    | 3043    | Bridge  | HTTP           |
+| Stalwart Mail    | 25      | Bridge  | SMTP           |
+| Stalwart Mail    | 587     | Bridge  | SMTP STARTTLS  |
+| Stalwart Mail    | 465     | Bridge  | SMTPS          |
+| Stalwart Mail    | 143     | Bridge  | IMAP           |
+| Stalwart Mail    | 993     | Bridge  | IMAPS          |
+| Stalwart Mail    | 4190    | Bridge  | ManageSieve    |
+| Stalwart Mail    | 110     | Bridge  | POP3           |
+| Stalwart Mail    | 995     | Bridge  | POP3S          |
+| Stash            | 9998    | Bridge  | HTTP           |
 | stats stack
 | - grafana 3002
 | - hddtemp 7634

@@ -11,6 +11,13 @@
         - "{{ scanopy_data_directory }}/data"
         - "{{ scanopy_data_directory }}/db"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        scanopy_env_scanopy_public_url: "https://{{ scanopy_hostname }}.{{ ansible_nas_domain }}"
+        scanopy_env_scanopy_use_secure_session_cookies: "true"
+        scanopy_homepage_href: "https://{{ scanopy_hostname }}.{{ ansible_nas_domain }}"
+      when: scanopy_traefik_enabled | bool or scanopy_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} daemon Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -27,6 +34,7 @@
 #          - 60073:60073
         env:
           SCANOPY_SERVER_URL: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ scanopy_port_http }}"
+          SCANOPY_DAEMON_PORT: "60073"
           SCANOPY_PORT: "{{ scanopy_daemon_port_http }}"
           SCANOPY_BIND_ADDRESS: "{{ scanopy_daemon_env_scanopy_bind_address }}"
           SCANOPY_NAME: "{{ scanopy_daemon_env_scanopy_name }}"
@@ -62,6 +70,7 @@
           wud.link.template: "https://github.com/dev/scanopy/pkgs/container/scanopy"
         cpu_shares: "{{ scanopy_daemon_cpu_shares }}"
         memory: "{{ scanopy_daemon_memory }}"
+        memory_swap: "{{ scanopy_daemon_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
@@ -106,6 +115,7 @@
           wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ scanopy_db_cpu_shares }}"
         memory: "{{ scanopy_db_memory }}"
+        memory_swap: "{{ scanopy_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
@@ -129,9 +139,12 @@
           - "{{ scanopy_port_http }}:60072"
         env:
           SCANOPY_DATABASE_URL: "postgresql://{{ scanopy_env_postgres_user }}:{{ scanopy_env_postgres_password }}@{{ scanopy_db_container_name }}:5432/scanopy"
-          SCANOPY_WEB_EXTERNAL_PATH: "/app/static"
-          SCANOPY_PUBLIC_URL: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ scanopy_port_http }}"
-          SCANOPY_INTEGRATED_DAEMON_URL: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ scanopy_daemon_port_http }}"
+          SCANOPY_WEB_EXTERNAL_PATH: "{{ scanopy_env_scanopy_web_external_path }}"
+          SCANOPY_PUBLIC_URL: "{{ scanopy_env_scanopy_public_url }}"
+          SCANOPY_SERVER_PORT: "60072"
+          SCANOPY_LOG_LEVEL: "{{ scanopy_env_scanopy_log_level }}"
+          SCANOPY_INTEGRATED_DAEMON_URL: "{{ scanopy_env_scanopy_integrated_daemon_url }}"
+          SCANOPY_USE_SECURE_SESSION_COOKIES: "{{ scanopy_env_scanopy_use_secure_session_cookies }}"
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ scanopy_db_container_name }}"
@@ -169,6 +182,7 @@
           wud.link.template: "https://github.com/dev/scanopy/pkgs/container/scanopy"
         cpu_shares: "{{ scanopy_cpu_shares }}"
         memory: "{{ scanopy_memory }}"
+        memory_swap: "{{ scanopy_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
