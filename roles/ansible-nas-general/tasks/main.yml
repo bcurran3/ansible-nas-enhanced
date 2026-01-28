@@ -96,32 +96,72 @@
   ansible.builtin.command: lspci -d 1002::0300
   register: amd_gpu_check
   changed_when: false
+  failed_when: false
 
-- name: Display AMD GPU Status
+- name: Report AMD GPU Status
   ansible.builtin.debug:
     msg: "{{ 'AMD GPU detected: ' + amd_gpu_check.stdout if amd_gpu_check.stdout | length > 0 else 'No AMD GPU detected.' }}"
 
 - name: Install AMD GPU support software
-  ansible.builtin.apt:
-    pkg:
-    - mesa-va-drivers
-    - mesa-vdpau-drivers
-    - vainfo
-    - libdrm-amdgpu1
-    - ocl-icd-libopencl1
-    - beignet-opencl-icd  # may not be needed
-    - libavutil58         # may need lower version on some 
-    state: present
-  register: result
-  until: result is succeeded
-  when: amd_gpu_enabled is true
+  block:
+    - name: Ensure dependencies for building AMD GPU drivers are present
+      ansible.builtin.apt:
+        pkg:
+          - wget
+          - gpg
+          - "linux-headers-{{ ansible_kernel }}"
+        state: present
+
+    - name: Create directory for AMD GPG key
+      ansible.builtin.file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Add AMD GPG key
+      ansible.builtin.get_url:
+        url: https://repo.radeon.com/rocm/rocm.gpg.key
+        dest: /tmp/rocm.gpg.key
+      register: gpg_key_download
+
+    - name: De-armor GPG key
+      ansible.builtin.shell:
+        cmd: gpg --dearmor < /tmp/rocm.gpg.key > /etc/apt/keyrings/rocm.gpg
+        creates: /etc/apt/keyrings/rocm.gpg
+
+    - name: Add AMD official repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/amdgpu/6.2/ubuntu {{ ansible_distribution_release }} main"
+        state: present
+        filename: amdgpu
+
+    - name: Install AMD GPU Kernel and Compute drivers
+      ansible.builtin.apt:
+        pkg:
+          - amdgpu-dkms
+          - libdrm-amdgpu1
+          - rocm-hip-runtime
+          - amf-amdgpu
+        state: present
+        update_cache: yes
+      register: driver_install
+
+    - name: Notify if a reboot is required for AMD GPU drivers
+      ansible.builtin.debug:
+        msg: 
+          - "SYSTEM NOTIFICATION: AMD GPU drivers (DKMS) have been installed."
+          - "A manual reboot is REQUIRED to load the new kernel modules."
+      when: driver_install.changed
+  when: 
+    - amd_gpu_enabled | default(false)
+    - amd_gpu_check.stdout | length > 0
 
 - name: Check for Intel iGPU
   ansible.builtin.command: lspci -d 8086::0300
   register: intel_gpu_check
   changed_when: false
 
-- name: Display Intel iGPU Status
+- name: Report Intel iGPU Status
   ansible.builtin.debug:
     msg: "{{ 'Intel iGPU detected: ' + intel_gpu_check.stdout if intel_gpu_check.stdout | length > 0 else 'No Intel iGPU detected.' }}"
 
@@ -142,7 +182,7 @@
   register: nvidia_gpu_check
   changed_when: false
 
-- name: Display NVIDIA GPU Status
+- name: Report NVIDIA GPU Status
   ansible.builtin.debug:
     msg: "{{ 'NVIDIA GPU detected: ' + nvidia_gpu_check.stdout if nvidia_gpu_check.stdout | length > 0 else 'No NVIDIA GPU detected.' }}"
 

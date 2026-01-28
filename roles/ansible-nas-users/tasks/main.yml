@@ -14,9 +14,9 @@
     group: ansible-nas
     shell: /usr/sbin/nologin
 
-- name: Add {{ ansible_nas_user }} to ansible-nas group
+- name: Add {{ ansible_nas_user }} to ansible-nas, video, and render groups
   ansible.builtin.user:
     name: "{{ ansible_nas_user }}"
     state: present
-    groups: ansible-nas
+    groups: ansible-nas,video,render
     append: yes

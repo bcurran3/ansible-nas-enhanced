@@ -52,17 +52,21 @@
           PGID: "{{ docker_group.gid | string }}"
           TZ: "{{ ansible_nas_timezone }}"
         security_opts: ["apparmor=unconfined"]
-        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
         device_requests: "{{
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
-          if nvidia_runtime_enabled | bool else omit
+          if nvidia_runtime_enabled | default(false) | bool else omit
         }}"
         devices: >-
-                  {{
-                    (netdata_devices | default([])) + ['/dev/dri:/dev/dri']
-                    if intel_igpu_enabled | default(false) | bool
-                    else (netdata_devices | default(omit))
-                  }}
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and ansible_nas_app_name | lower is search('ollama|localai') -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
         labels:
           autoheal: "{{ netdata_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ netdata_watchtower_enabled | ternary('true', 'false') }}"

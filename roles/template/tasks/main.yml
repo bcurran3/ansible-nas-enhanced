@@ -111,6 +111,31 @@
     - archive_app_data_enabled is true
     - appname_enabled is false
 
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###           ____ ____  _   _                ###
+###          / ___|  _ \| | | |               ###
+###         | |  _| |_) | | | |               ###
+###         | |_| |  __/| |_| |               ###
+###          \____|_|    \___/                ###
+#################################################
+# if you need GPU support in a container, add this:
+
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | default(false) | bool else omit
+        }}"
+        devices: >-
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and ansible_nas_app_name | lower is search('ollama|localai') -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
 
 #################################################
 ###  OPTIONAL - remove if not needed          ###
@@ -125,15 +150,6 @@
           - name: "{{ appname_network_name }}"     # optional
         network_mode: "{{ appname_network_name }}" # optional
         networks_cli_compatible: "yes"             # optional
-
-## add this after the DB container creation and before the main app container creation
-    - name: Verify {{ ansible_nas_app_name }} DB is healthy
-      community.docker.docker_container_info:
-        name: "{{ appname_db_container_name }}"
-      register: db_info
-      until: "db_info.container.State.Health.Status == 'healthy'"
-      retries: 30
-      delay: 5
 
 ##############################################################################
 ### EXAMPLES OF COMMON DATABASE SETUPS BELOW
@@ -208,6 +224,13 @@
         memory_swap: "{{ appname_db_memory_swap }}"
         restart_policy: unless-stopped
 
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ appname_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
 ######################################################
 ###  OPTIONAL - remove if not needed               ###
@@ -262,6 +285,13 @@
         memory_swap: "{{ appname_db_memory_swap }}"
         restart_policy: unless-stopped
 
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ appname_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
 ##########################################
 ###  OPTIONAL - remove if not needed   ###
@@ -320,6 +350,13 @@
         memory_swap: "{{ appname_db_memory_swap }}"
         restart_policy: unless-stopped
 
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ appname_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
 ##############################################################
 ###  OPTIONAL - remove if not needed                       ###
@@ -377,6 +414,13 @@
         memory_swap: "{{ appname_db_memory_swap }}"
         restart_policy: unless-stopped
 
+    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ appname_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
 #########################################
 ###  OPTIONAL - remove if not needed  ###
