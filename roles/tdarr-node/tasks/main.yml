@@ -29,9 +29,6 @@
           {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
             {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
           {%- endif -%}
-          {%- if amd_gpu_enabled | default(false) | bool and ansible_nas_app_name | lower is search('ollama|localai') -%}
-            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
-          {%- endif -%}
           {{ dev_list if dev_list | length > 0 else omit }}
         group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"

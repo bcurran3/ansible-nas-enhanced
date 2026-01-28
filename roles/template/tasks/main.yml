@@ -120,6 +120,7 @@
 ###          \____|_|    \___/                ###
 #################################################
 # if you need GPU support in a container, add this:
+# add appname_amd_ai_enabled: true to the vars if needed
 
         device_requests: "{{
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
@@ -130,7 +131,7 @@
           {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
             {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
           {%- endif -%}
-          {%- if amd_gpu_enabled | default(false) | bool and ansible_nas_app_name | lower is search('ollama|localai') -%}
+          {%- if amd_gpu_enabled | default(false) | bool and appname_amd_ai_enabled | default(false) | bool -%}
             {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
           {%- endif -%}
           {{ dev_list if dev_list | length > 0 else omit }}
