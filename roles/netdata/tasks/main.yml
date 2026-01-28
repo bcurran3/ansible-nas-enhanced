@@ -1,18 +1,19 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories # added
+    - name: Create {{ ansible_nas_app_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
-      with_items:
+        mode: '0755'
+      loop:
         - "{{ netdata_data_directory }}/cache"
         - "{{ netdata_data_directory }}/config"
         - "{{ netdata_data_directory }}/lib"
 
     - name: Set {{ ansible_nas_app_name }} FQDN var overrides
       ansible.builtin.set_fact:
-        netdata_homepage_href: "https://{{ netdata_hostname }}.{{ ansible_nas_domain }}"
+        netdata_homepage_href: "https://{{ netdata_hostname }}.{{ ansible_nas_domain }}/v3"
       when: netdata_traefik_enabled | bool or netdata_dockflare_enabled | bool
 
     - name: Get docker group id
@@ -28,37 +29,34 @@
         image: "{{ netdata_image_name }}:{{ netdata_image_version }}"
         state: started
         pull: true
-        pid_mode: host # added
-        privileged: true # added
+        pid_mode: host
+        privileged: true
         ports:
           - "{{ netdata_port_http }}:19999"
         volumes:
-          - "{{ netdata_data_directory }}/cache:/var/cache/netdata" # added
-          - "{{ netdata_data_directory }}/config:/etc/netdata" # added
-          - "{{ netdata_data_directory }}/lib:/var/lib/netdata" # added
+          - "{{ netdata_data_directory }}/cache:/var/cache/netdata"
+          - "{{ netdata_data_directory }}/config:/etc/netdata"
+          - "{{ netdata_data_directory }}/lib:/var/lib/netdata"
+          - "/:/host/root:ro,rslave"
+          - "/etc/group:/host/etc/group:ro"
+          - "/etc/localtime:/etc/localtime:ro"
+          - "/etc/os-release:/host/etc/os-release:ro"
+          - "/etc/passwd:/host/etc/passwd:ro"
           - "/proc:/host/proc:ro"
+          - "/run/dbus:/run/dbus:ro"
           - "/sys:/host/sys:ro"
+          - "/var/log:/host/var/log:ro"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
-          - "/:/host/root:ro,rslave" # added
-          - "/etc/os-release:/host/etc/os-release:ro" # added
-          - "/etc/passwd:/host/etc/passwd:ro" # added
-          - "/etc/group:/host/etc/group:ro" # added
-          - "/var/log:/host/var/log:ro" # added
-          - "/run/dbus:/run/dbus:ro" # added
-          - "/etc/localtime:/etc/localtime:ro" # added
         env:
-          NETDATA_EXTRA_DEB_PACKAGES: "{{ netdata_env_netdata_extra_deb_packages }}" # added
+          NETDATA_EXTRA_DEB_PACKAGES: "{{ netdata_env_netdata_extra_deb_packages }}"
           PGID: "{{ docker_group.gid | string }}"
           TZ: "{{ ansible_nas_timezone }}"
-#        capabilities:
-#          - SYS_PTRACE
-#          - SYS_ADMIN # added
         security_opts: ["apparmor=unconfined"]
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | bool else omit }}"
         device_requests: "{{
           [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
           if nvidia_runtime_enabled | bool else omit
-        }}" # added
+        }}"
         devices: >-
                   {{
                     (netdata_devices | default([])) + ['/dev/dri:/dev/dri']
@@ -92,8 +90,8 @@
           traefik.http.routers.netdata.middlewares: "{{ netdata_hostname }}@docker{{ ',tinyauth-auth@docker' if netdata_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.netdata.IPAllowList.sourcerange: "{{ netdata_traefik_whitelist }}"
           traefik.http.services.netdata.loadbalancer.server.port: "19999"
-          wud.tag.include: '^v\\d+\\.\\d+\\.\\d+$'
-          wud.tag.transform.type: "semver"
+          wud.tag.include: "^stable$"
+          wud.watch.digest: "true"
           wud.link.template: "https://github.com/netdata/netdata/pkgs/container/netdata"
         cpu_shares: "{{ netdata_cpu_shares }}"
         memory: "{{ netdata_memory }}"
@@ -104,8 +102,8 @@
       ansible.builtin.debug:
         msg: >-
               {{
-                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (netdata_port_http | string)] +
-                (['https://' + netdata_hostname + '.' + ansible_nas_domain] if (netdata_traefik_enabled is true or netdata_dockflare_enabled is true) else [])
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (netdata_port_http | string) + '/v3'] +
+                (['https://' + netdata_hostname + '.' + ansible_nas_domain + '/v3'] if (netdata_traefik_enabled is true or netdata_dockflare_enabled is true) else [])
               }}
   when: netdata_enabled is true
 

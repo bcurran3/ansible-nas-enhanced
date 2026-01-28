@@ -15,7 +15,8 @@ netdata_port_http: "19999"
 # docker
 netdata_container_name: "netdata"
 netdata_image_name: "ghcr.io/netdata/netdata"
-netdata_image_version: "latest"
+#netdata_image_version: "latest"
+netdata_image_version: "stable"
 
 # specs
 netdata_cpu_shares: 1024
@@ -23,7 +24,7 @@ netdata_memory: "1G"
 netdata_memory_swap: -1
 
 # app
-netdata_env_netdata_extra_deb_packages: ""
+netdata_env_netdata_extra_deb_packages: "" # apcupsd, lm-sensors
 
 # autoheal
 netdata_autoheal_enabled: false
@@ -35,7 +36,7 @@ netdata_dockflare_access_group: ""
 # homepage
 netdata_homepage_group: "Apps"
 netdata_homepage_icon: "netdata.png"
-netdata_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ netdata_port_http }}"
+netdata_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ netdata_port_http }}/v3"
 netdata_homepage_showstats: false
 
 # tinyauth
