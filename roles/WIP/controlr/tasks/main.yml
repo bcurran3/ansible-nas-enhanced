@@ -19,6 +19,10 @@
       with_items:
         - "{{ controlr_data_directory }}"
         - "{{ controlr_data_directory }}/data"
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        controlr_homepage_href: "https://{{ controlr_hostname }}.{{ ansible_nas_domain }}"
+      when: controlr_traefik_enabled | bool or controlr_dockflare_enabled | bool
 
     - name: Create {{ ansible_nas_app_name }} Aspire Container
       community.docker.docker_container:
@@ -51,6 +55,7 @@
 #         ^ needs to be updated
         cpu_shares: "{{ controlr_aspire_cpu_shares }}"
         memory: "{{ controlr_aspire_memory }}"
+        memory_swap: "{{ controlr_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container

@@ -11,6 +11,11 @@
         - "{{ mastodon_data_directory }}/data"
         - "{{ mastodon_data_directory }}/db"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        mastodon_homepage_href: "https://{{ mastodon_hostname }}.{{ ansible_nas_domain }}"
+      when: mastodon_traefik_enabled | bool or mastodon_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ mastodon_network_name }}"
@@ -46,6 +51,7 @@
           wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ mastodon_redis_cpu_shares }}"
         memory: "{{ mastodon_redis_memory }}"
+        memory_swap: "{{ mastodon_redis_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
@@ -80,6 +86,7 @@
           wud.link.template: "https://hub.docker.com/_/postgres"
         cpu_shares: "{{ mastodon_db_cpu_shares }}"
         memory: "{{ mastodon_db_memory }}"
+        memory_swap: "{{ mastodon_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
@@ -190,6 +197,7 @@
           wud.link.template: "https://github.com/mastodon/mastodon/pkgs/container/mastodon"
         cpu_shares: "{{ mastodon_cpu_shares }}"
         memory: "{{ mastodon_memory }}"
+        memory_swap: "{{ mastodon_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

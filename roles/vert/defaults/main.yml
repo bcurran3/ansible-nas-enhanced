@@ -25,8 +25,10 @@ vertd_port_http: "24153"
 # specs
 vert_cpu_shares: 1024
 vert_memory: "1G"
+vert_memory_swap: -1
 vertd_cpu_shares: 1024
 vertd_memory: "1G"
+vertd_memory_swap: -1
 
 # app
 vert_env_admin_password: "{{ ansible_nas_app_admin_password }}"
@@ -56,7 +58,7 @@ vert_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['de
 vert_homepage_showstats: false
 vertd_homepage_group: "Misc"
 vertd_homepage_icon: "sh-vert.png"
-vertd_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ vert_port_http }}"
+vertd_homepage_href: "{{ vert_homepage_href  }}"
 vertd_homepage_showstats: false
 
 # tinyauth

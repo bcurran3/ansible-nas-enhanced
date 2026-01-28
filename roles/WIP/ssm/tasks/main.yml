@@ -12,6 +12,11 @@
         - "{{ ssm_data_directory }}/db"
         - "{{ ssm_data_directory }}/playbooks"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        ssm_homepage_href: "https://{{ ssm_hostname }}.{{ ansible_nas_domain }}"
+      when: ssm_traefik_enabled | bool or ssm_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Network
       community.docker.docker_network:
         name: "{{ ssm_network_name }}"
@@ -47,6 +52,7 @@
           wud.link.template: "https://hub.docker.com/_/redis"
         cpu_shares: "{{ ssm_redis_cpu_shares }}"
         memory: "{{ ssm_redis_memory }}"
+        memory_swap: "{{ ssm_redis_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} DB Container
@@ -81,6 +87,7 @@
           wud.link.template: "https://hub.docker.com/_/mongo"
         cpu_shares: "{{ ssm_db_cpu_shares }}"
         memory: "{{ ssm_db_memory }}"
+        memory_swap: "{{ ssm_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
@@ -126,6 +133,7 @@
           wud.link.template: "https://github.com/SquirrelCorporation/SquirrelServersManager/pkgs/container/squirrelserversmanager-server"
         cpu_shares: "{{ ssm_cpu_shares }}"
         memory: "{{ ssm_memory }}"
+        memory_swap: "{{ ssm_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Client Container
@@ -163,6 +171,7 @@
           wud.link.template: "https://github.com/SquirrelCorporation/SquirrelServersManager/pkgs/container/squirrelserversmanager-client"
         cpu_shares: "{{ ssm_client_cpu_shares }}"
         memory: "{{ ssm_client_memory }}"
+        memory_swap: "{{ ssm_client_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

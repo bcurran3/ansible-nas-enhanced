@@ -12,6 +12,11 @@
         - "{{ crowdsec_data_directory }}/data"
         - "{{ crowdsec_data_directory }}/plugins"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        crowdsec_homepage_href: "https://{{ crowdsec_hostname }}.{{ ansible_nas_domain }}"
+      when: crowdsec_traefik_enabled | bool or crowdsec_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -76,6 +81,7 @@
           wud.link.template: "https://github.com/crowdsecurity/crowdsec/pkgs/container/crowdsec"
         cpu_shares: "{{ crowdsec_cpu_shares }}"
         memory: "{{ crowdsec_memory }}"
+        memory_swap: "{{ crowdsec_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

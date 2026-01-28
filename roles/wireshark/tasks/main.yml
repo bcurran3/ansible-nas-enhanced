@@ -11,6 +11,11 @@
         - "{{ wireshark_data_directory }}"
         - "{{ wireshark_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        wireshark_homepage_href: "https://{{ wireshark_hostname }}.{{ ansible_nas_domain }}"
+      when: wireshark_traefik_enabled | bool or wireshark_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -23,8 +28,6 @@
 #         - "{{ wireshark_port_http }}:3000"
 #          - "{{ wireshark_port_https }}:3001"
 #          - "{{ wireshark_port_kasmvnc }}:8082"
-        tmpfs:
-          - /tmp:exec,mode=1777
         volumes:
           - "{{ wireshark_data_directory }}/config:/config:rw"
         devices: >-
@@ -53,9 +56,6 @@
           PUID: "{{ wireshark_user_id }}"
           PGID: "{{ wireshark_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
-        capabilities:
-          - NET_ADMIN
-          - NET_RAW
         labels:
           autoheal: "{{ wireshark_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ wireshark_watchtower_enabled | ternary('true', 'false') }}"
@@ -87,11 +87,16 @@
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "lscr.io/linuxserver/wireshark"
+        capabilities:
+          - NET_ADMIN
+          - NET_RAW
         cpu_shares: "{{ wireshark_cpu_shares }}"
         memory: "{{ wireshark_memory }}"
         memory_swap: "{{ wireshark_memory_swap }}"
         privileged: true
         shm_size: "1GB"
+        tmpfs:
+          - /tmp:exec,mode=1777
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

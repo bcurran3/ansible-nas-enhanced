@@ -1,16 +1,16 @@
 ---
 # ANE
-ansible_nas_app_name: "appname"
+ansible_nas_app_name: "mediacms"
 mediacms_enabled: false
 mediacms_traefik_enabled: false
 mediacms_traefik_whitelist: "{{ lan }}"
 
 # directories
-mediacms_data_directory: "{{ docker_home }}/appname"
+mediacms_data_directory: "{{ docker_home }}/mediacms"
 
 # docker
-mediacms_container_name: "appname"
-mediacms_image_name: "appdev/appname" # use ghcr.io or lscr.io when available
+mediacms_container_name: "mediacms"
+mediacms_image_name: "appdev/mediacms" # use ghcr.io or lscr.io when available
 mediacms_image_tag: "latest"
 
 # uid / gid
@@ -19,11 +19,12 @@ mediacms_group_id: "0"
 
 # network
 mediacms_port_http: "8989"
-mediacms_hostname: "appname"
+mediacms_hostname: "mediacms"
 
 # specs
 mediacms_cpu_shares: 1024
 mediacms_memory: "1G"
+mediacms_memory_swap: -1
 
 # autoheal
 mediacms_autoheal_enabled: false
@@ -34,7 +35,7 @@ mediacms_dockflare_access_group: ""
 
 # homepage
 mediacms_homepage_group: "Apps"
-mediacms_homepage_icon: "appname.png"
+mediacms_homepage_icon: "mediacms.png"
 mediacms_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mediacms_port_http }}"
 mediacms_homepage_showstats: false
 
@@ -77,7 +78,7 @@ mediacms_watchtower_enabled: false
 #################################################
 
 # docker
-mediacms_db_container_name: "appname-db"
+mediacms_db_container_name: "mediacms-db"
 mediacms_db_image_name: "mariadb"
 mediacms_db_image_tag: "latest"
 
@@ -116,7 +117,7 @@ mediacms_db_watchtower_enabled: false
 ######################################################
 
 # docker
-mediacms_db_container_name: "appname-db"
+mediacms_db_container_name: "mediacms-db"
 mediacms_db_image_name: "mongo"
 mediacms_db_image_tag: "latest"
 
@@ -155,7 +156,7 @@ mediacms_db_watchtower_enabled: false
 ##########################################
 
 # docker
-mediacms_db_container_name: "appname-db"
+mediacms_db_container_name: "mediacms-db"
 mediacms_db_image_name: "mysql"
 mediacms_db_image_tag: "8.4"
 
@@ -194,7 +195,7 @@ mediacms_db_watchtower_enabled: false
 ##############################################################
 
 # docker
-mediacms_db_container_name: "appname-db"
+mediacms_db_container_name: "mediacms-db"
 mediacms_db_image_name: "postgres"
 mediacms_db_image_tag: "16-alpine"
 
@@ -232,7 +233,7 @@ mediacms_db_watchtower_enabled: false
 #########################################
 
 # docker
-mediacms_redis_container_name: "appname-redis"
+mediacms_redis_container_name: "mediacms-redis"
 mediacms_redis_image_name: "redis"
 mediacms_redis_image_tag: "latest"
 

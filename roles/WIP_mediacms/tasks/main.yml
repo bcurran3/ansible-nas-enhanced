@@ -8,6 +8,11 @@
       with_items:
         - "{{ mediacms_data_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        mediacms_homepage_href: "https://{{ mediacms_hostname }}.{{ ansible_nas_domain }}"
+      when: mediacms_traefik_enabled | bool or mediacms_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -39,7 +44,7 @@
           homepage.group: "{{ mediacms_homepage_group }}"
           homepage.icon: "{{ mediacms_homepage_icon }}"
           homepage.href: "{{ mediacms_homepage_href }}"
-          homepage.description: "{{ 'appname description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'mediacms description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mediacms_container_name }}"
           homepage.showStats: "{{ mediacms_homepage_showstats | ternary('true', 'false') }}"
@@ -50,27 +55,28 @@
           repliqate.backup_id: "{{ mediacms_repliqate_backup_id }}"
           repliqate.retention: "{{ mediacms_repliqate_retention }}"
           traefik.enable: "{{ mediacms_traefik_enabled | ternary('true', 'false') }}"
-          traefik.http.routers.appname.rule: "Host(`{{ mediacms_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.appname.tls.certresolver: "letsencrypt"
-          traefik.http.routers.appname.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.appname.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.appname.middlewares: "appname@docker{{ ',tinyauth-auth@docker' if mediacms_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ mediacms_traefik_whitelist }}"
-          traefik.http.services.appname.loadbalancer.server.port: "80"
+          traefik.http.routers.mediacms.rule: "Host(`{{ mediacms_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.mediacms.tls.certresolver: "letsencrypt"
+          traefik.http.routers.mediacms.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.mediacms.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.mediacms.middlewares: "mediacms@docker{{ ',tinyauth-auth@docker' if mediacms_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.mediacms.IPAllowList.sourcerange: "{{ mediacms_traefik_whitelist }}"
+          traefik.http.services.mediacms.loadbalancer.server.port: "80"
 ### Docker hub example
           wud.tag.include: '^\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/devname/appname"
+          wud.link.template: "https://hub.docker.com/r/devname/mediacms"
 ### Github example
 #          wud.tag.include: '^\d+\.\d+\.\d+$'
 #          wud.tag.transform.type: "semver"
-#          wud.link.template: "https://github.com/dev/appname/pkgs/container/appname"
+#          wud.link.template: "https://github.com/dev/mediacms/pkgs/container/mediacms"
 ### Linuxserver.io example
 #          wud.tag.include: '^\d+\.\d+\.\d+.*$'
 #          wud.tag.transform.type: "semver"
-#          wud.link.template: "https://lscr.io/linuxserver/appname"
+#          wud.link.template: "https://lscr.io/linuxserver/mediacms"
         cpu_shares: "{{ mediacms_cpu_shares }}"
         memory: "{{ mediacms_memory }}"
+        memory_swap: "{{ mediacms_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
@@ -137,8 +143,8 @@
           PUID: "1000"
           PGID: "1000"
           MYSQL_ROOT_PASSWORD: "topsecretroot"
-          MYSQL_DATABASE: "appname"
-          MYSQL_USER: "appname"
+          MYSQL_DATABASE: "mediacms"
+          MYSQL_USER: "mediacms"
           MYSQL_PASSWORD: "{{ mediacms_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
@@ -254,7 +260,7 @@
           - "{{ mediacms_data_directory }}/mysql/mysql:/var/lib/mysql"
           - "{{ mediacms_data_directory }}/mysql/my.cnf:/etc/my.cnf"
         env:
-          MYSQL_DATABASE: "appname"
+          MYSQL_DATABASE: "mediacms"
           MYSQL_USER: "{{ mediacms_sql_user }}"
           MYSQL_PASSWORD: "{{ mediacms_sql_password }}"
           MYSQL_ROOT_PASSWORD: "{{ mediacms_sql_root_password }}"
@@ -309,9 +315,9 @@
         volumes:
           - "{{ mediacms_data_directory }}/db:/var/lib/postgresql/data"
         env:
-          POSTGRES_USER: "appname"
-          POSTGRES_PASSWORD: "appname"
-          POSTGRES_DB: "appname"
+          POSTGRES_USER: "mediacms"
+          POSTGRES_PASSWORD: "mediacms"
+          POSTGRES_DB: "mediacms"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ mediacms_db_autoheal_enabled | ternary('true', 'false') }}"

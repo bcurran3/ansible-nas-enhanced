@@ -6,12 +6,12 @@
         path: "{{ item }}"
         state: directory
       with_items:
-        - "{{ stats_telegraf_data_directory }}"
+        - "{{ stats_telegraf_config_directory }}"
 
     - name: Template telegraf.conf
       ansible.builtin.template:
         src: telegraf.conf.j2
-        dest: "{{ stats_telegraf_data_directory }}/telegraf.conf"
+        dest: "{{ stats_telegraf_config_directory }}/telegraf.conf"
       register: telegraf_config
 
     - name: Get Docker daemon uid
@@ -32,9 +32,8 @@
           - "{{ stats_telegraf_port }}:9273"
         user: "telegraf:{{ docker_uid.stdout }}"
         volumes:
-          - "{{ stats_telegraf_data_directory }}:/etc/telegraf/:ro"
+          - "{{ stats_telegraf_config_directory }}:/etc/telegraf/:ro"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
-          - "/run/udev:/run/udev:ro"
           - "/:/hostfs:ro"
           - "/etc:/hostfs/etc:ro"
           - "/proc:/hostfs/proc:ro"
@@ -66,7 +65,8 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "https://hub.docker.com/_/telegraf"
         cpu_shares: "{{ stats_telegraf_cpu_shares }}"
-        memory: "{{ stats_telegraf_memory}}"
+        memory: "{{ stats_telegraf_memory }}"
+        memory_swap: "{{ stats_telegraf_memory_swap }}"
         restart_policy: unless-stopped
   when: stats_enabled is true
 

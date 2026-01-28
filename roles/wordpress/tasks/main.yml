@@ -10,6 +10,11 @@
         - "{{ wordpress_data_directory }}/db"
         - "{{ wordpress_data_directory }}/html"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        wordpress_homepage_href: "https://{{ wordpress_hostname }}.{{ ansible_nas_domain }}"
+      when: wordpress_traefik_enabled | bool or wordpress_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -27,7 +32,7 @@
           MYSQL_RANDOM_ROOT_PASSWORD: "{{ wordpress_db_env_mysql_random_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: "mysqladmin ping -u root -p{{ wordpress_db_env_mysql_random_root_password }} -h localhost"
+          test: "mysqladmin ping -u {{ wordpress_env_wordpress_db_user }} -p{{ wordpress_env_wordpress_db_user }} -h localhost"
           interval: "10s"
           start_period: "30s"
           start_interval: "10s"
@@ -55,6 +60,7 @@
           wud.link.template: "https://hub.docker.com/_/mysql"
         cpu_shares: "{{ wordpress_db_cpu_shares }}"
         memory: "{{ wordpress_db_memory }}"
+        memory_swap: "{{ wordpress_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
@@ -118,6 +124,7 @@
           wud.link.template: "https://hub.docker.com/_/wordpress"
         cpu_shares: "{{ wordpress_cpu_shares }}"
         memory: "{{ wordpress_memory }}"
+        memory_swap: "{{ wordpress_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

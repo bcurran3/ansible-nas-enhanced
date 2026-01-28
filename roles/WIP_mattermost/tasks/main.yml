@@ -8,6 +8,11 @@
       with_items:
         - "{{ mattermost_data_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        mattermost_homepage_href: "https://{{ mattermost_hostname }}.{{ ansible_nas_domain }}"
+      when: mattermost_traefik_enabled | bool or mattermost_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -39,7 +44,7 @@
           homepage.group: "{{ mattermost_homepage_group }}"
           homepage.icon: "{{ mattermost_homepage_icon }}"
           homepage.href: "{{ mattermost_homepage_href }}"
-          homepage.description: "{{ 'appname description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'mattermost description' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ mattermost_container_name }}"
           homepage.showStats: "{{ mattermost_homepage_showstats | ternary('true', 'false') }}"
@@ -50,25 +55,25 @@
           repliqate.backup_id: "{{ mattermost_repliqate_backup_id }}"
           repliqate.retention: "{{ mattermost_repliqate_retention }}"
           traefik.enable: "{{ mattermost_traefik_enabled | ternary('true', 'false') }}"
-          traefik.http.routers.appname.rule: "Host(`{{ mattermost_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.appname.tls.certresolver: "letsencrypt"
-          traefik.http.routers.appname.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.appname.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.appname.middlewares: "appname@docker{{ ',tinyauth-auth@docker' if mattermost_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.appname.IPAllowList.sourcerange: "{{ mattermost_traefik_whitelist }}"
-          traefik.http.services.appname.loadbalancer.server.port: "80"
+          traefik.http.routers.mattermost.rule: "Host(`{{ mattermost_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.mattermost.tls.certresolver: "letsencrypt"
+          traefik.http.routers.mattermost.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.mattermost.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.mattermost.middlewares: "mattermost@docker{{ ',tinyauth-auth@docker' if mattermost_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.mattermost.IPAllowList.sourcerange: "{{ mattermost_traefik_whitelist }}"
+          traefik.http.services.mattermost.loadbalancer.server.port: "80"
 ### Docker hub example
           wud.tag.include: '^\d+\.\d+$'
           wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/devname/appname"
+          wud.link.template: "https://hub.docker.com/r/devname/mattermost"
 ### Github example
 #          wud.tag.include: '^\d+\.\d+\.\d+$'
 #          wud.tag.transform.type: "semver"
-#          wud.link.template: "https://github.com/dev/appname/pkgs/container/appname"
+#          wud.link.template: "https://github.com/dev/mattermost/pkgs/container/mattermost"
 ### Linuxserver.io example
 #          wud.tag.include: '^\d+\.\d+\.\d+.*$'
 #          wud.tag.transform.type: "semver"
-#          wud.link.template: "https://lscr.io/linuxserver/appname"
+#          wud.link.template: "https://lscr.io/linuxserver/mattermost"
         cpu_shares: "{{ mattermost_cpu_shares }}"
         memory: "{{ mattermost_memory }}"
         memory_swap: "{{ mattermost_memory_swap }}"
@@ -139,8 +144,8 @@
           PUID: "1000"
           PGID: "1000"
           MYSQL_ROOT_PASSWORD: "topsecretroot"
-          MYSQL_DATABASE: "appname"
-          MYSQL_USER: "appname"
+          MYSQL_DATABASE: "mattermost"
+          MYSQL_USER: "mattermost"
           MYSQL_PASSWORD: "{{ mattermost_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
@@ -250,7 +255,7 @@
           - "{{ mattermost_data_directory }}/mysql/mysql:/var/lib/mysql"
           - "{{ mattermost_data_directory }}/mysql/my.cnf:/etc/my.cnf"
         env:
-          MYSQL_DATABASE: "appname"
+          MYSQL_DATABASE: "mattermost"
           MYSQL_USER: "{{ mattermost_sql_user }}"
           MYSQL_PASSWORD: "{{ mattermost_sql_password }}"
           MYSQL_ROOT_PASSWORD: "{{ mattermost_sql_root_password }}"
@@ -302,9 +307,9 @@
         volumes:
           - "{{ mattermost_data_directory }}/db:/var/lib/postgresql/data"
         env:
-          POSTGRES_USER: "appname"
-          POSTGRES_PASSWORD: "appname"
-          POSTGRES_DB: "appname"
+          POSTGRES_USER: "mattermost"
+          POSTGRES_PASSWORD: "mattermost"
+          POSTGRES_DB: "mattermost"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ mattermost_db_autoheal_enabled | ternary('true', 'false') }}"

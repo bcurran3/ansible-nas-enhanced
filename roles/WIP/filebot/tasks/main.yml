@@ -9,6 +9,11 @@
       with_items:
         - "{{ filebot_data_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        filebot_homepage_href: "https://{{ filebot_hostname }}.{{ ansible_nas_domain }}"
+      when: filebot_traefik_enabled | bool or filebot_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -35,7 +40,8 @@
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
         cpu_shares: "{{ filebot_cpu_shares }}"
-        memory: "{{ filebot_memory }}" # Probably can be tweaked
+        memory: "{{ filebot_memory }}"
+        memory_swap: "{{ filebot_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Node Container
@@ -74,8 +80,9 @@
           traefik.http.services.filebot.loadbalancer.server.port: "5452"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
-        cpu_shares: "{{ filebot_cpu_shares }}"
-        memory: "{{ filebot_node_memory }}" # Probably can be tweaked
+        cpu_shares: "{{ filebot_node_cpu_shares }}"
+        memory: "{{ filebot_node_memory }}"
+        memory_swap: "{{ filebot_node_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Watcher Container
@@ -93,8 +100,9 @@
           traefik.enable: "false"
 #         wud.tag.include: '^\d+\.\d+\.\d+$$'
 #         wud.link.template: ""
-        cpu_shares: "{{ filebot_cpu_shares }}"
-        memory: "{{ filebot_watcher_memory }}" # Probably can be tweaked
+        cpu_shares: "{{ filebot_watcher_cpu_shares }}"
+        memory: "{{ filebot_watcher_memory }}"
+        memory_swap: "{{ filebot_watcher_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

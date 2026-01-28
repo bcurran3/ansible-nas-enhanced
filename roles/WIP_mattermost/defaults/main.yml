@@ -1,16 +1,16 @@
 ---
 # ANE
-ansible_nas_app_name: "appname"
+ansible_nas_app_name: "mattermost"
 mattermost_enabled: false
 mattermost_traefik_enabled: false
 mattermost_traefik_whitelist: "{{ lan }}"
 
 # directories
-mattermost_data_directory: "{{ docker_home }}/appname"
+mattermost_data_directory: "{{ docker_home }}/mattermost"
 
 # docker
-mattermost_container_name: "appname"
-mattermost_image_name: "appdev/appname" # use ghcr.io or lscr.io when available
+mattermost_container_name: "mattermost"
+mattermost_image_name: "appdev/mattermost" # use ghcr.io or lscr.io when available
 mattermost_image_tag: "latest"
 
 # uid / gid
@@ -19,7 +19,7 @@ mattermost_group_id: "0"
 
 # network
 mattermost_port_http: "8989"
-mattermost_hostname: "appname"
+mattermost_hostname: "mattermost"
 
 # specs
 mattermost_cpu_shares: 1024
@@ -35,7 +35,7 @@ mattermost_dockflare_access_group: ""
 
 # homepage
 mattermost_homepage_group: "Apps"
-mattermost_homepage_icon: "appname.png"
+mattermost_homepage_icon: "mattermost.png"
 mattermost_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mattermost_port_http }}"
 mattermost_homepage_showstats: false
 
@@ -78,7 +78,7 @@ mattermost_watchtower_enabled: false
 #################################################
 
 # docker
-mattermost_db_container_name: "appname-db"
+mattermost_db_container_name: "mattermost-db"
 mattermost_db_image_name: "mariadb"
 mattermost_db_image_tag: "latest"
 
@@ -118,7 +118,7 @@ mattermost_db_watchtower_enabled: false
 ######################################################
 
 # docker
-mattermost_db_container_name: "appname-db"
+mattermost_db_container_name: "mattermost-db"
 mattermost_db_image_name: "mongo"
 mattermost_db_image_tag: "latest"
 
@@ -158,7 +158,7 @@ mattermost_db_watchtower_enabled: false
 ##########################################
 
 # docker
-mattermost_db_container_name: "appname-db"
+mattermost_db_container_name: "mattermost-db"
 mattermost_db_image_name: "mysql"
 mattermost_db_image_tag: "8.4"
 
@@ -198,7 +198,7 @@ mattermost_db_watchtower_enabled: false
 ##############################################################
 
 # docker
-mattermost_db_container_name: "appname-db"
+mattermost_db_container_name: "mattermost-db"
 mattermost_db_image_name: "postgres"
 mattermost_db_image_tag: "16-alpine"
 
@@ -237,7 +237,7 @@ mattermost_db_watchtower_enabled: false
 #########################################
 
 # docker
-mattermost_redis_container_name: "appname-redis"
+mattermost_redis_container_name: "mattermost-redis"
 mattermost_redis_image_name: "redis"
 mattermost_redis_image_tag: "latest"
 

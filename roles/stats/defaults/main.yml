@@ -9,7 +9,7 @@ stats_prometheus_traefik_enabled: false
 stats_prometheus_traefik_whitelist: "{{ lan }}"
 
 # directories
-stats_telegraf_data_directory: "{{ docker_home }}/stats/telegraf/config"
+stats_telegraf_config_directory: "{{ docker_home }}/stats/telegraf/config"
 stats_prometheus_data_directory: "{{ docker_home }}/stats/prometheus/data"
 stats_prometheus_config_directory: "{{ docker_home }}/stats/prometheus/config"
 stats_grafana_data_directory: "{{ docker_home }}/stats/grafana/data"
@@ -49,16 +49,22 @@ stats_telegraf_image_version: "latest"
 # specs
 stats_grafana_cpu_shares: 1024
 stats_grafana_memory: "1G"
+stats_grafana_memory_swap: -1
 stats_hddtemp_cpu_shares: 1024
 stats_hddtemp_memory: "128M"
+stats_hddtemp_memory_swap: -1
 stats_prometheus_cpu_shares: 1024
 stats_prometheus_memory: "1G"
+stats_prometheus_memory_swap: -1
 stats_prometheus_smartctl_cpu_shares: 1024
 stats_prometheus_smartctl_memory: "1G"
+stats_prometheus_smartctl_memory_swap: -1
 stats_speedtest_exporter_cpu_shares: 1024
 stats_speedtest_exporter_memory: "256M"
+stats_speedtest_exporter_memory_swap: -1
 stats_telegraf_cpu_shares: 1024
 stats_telegraf_memory: "1G"
+stats_telegraf_memory_swap: -1
 
 # config
 stats_collection_interval: 15s
@@ -106,11 +112,10 @@ stats_prometheus_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible
 stats_prometheus_homepage_showstats: false
 stats_smartctl_homepage_group: "Misc"
 stats_smartctl_homepage_icon: "prometheus.png"
-stats_smartctl_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ stats_prometheus_port }}"
+stats_smartctl_homepage_href: "{{ stats_prometheus_homepage_href }}"
 stats_smartctl_homepage_showstats: false
 stats_speedtest_homepage_group: "Misc"
 stats_speedtest_homepage_icon: "si-speedtest"
-stats_speedtest_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ stats_speedtest_exporter_port }}"
 stats_speedtest_homepage_showstats: false
 stats_telegraf_homepage_group: "Misc"
 stats_telegraf_homepage_icon: "telegraf.png"

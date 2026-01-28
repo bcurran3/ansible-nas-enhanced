@@ -33,6 +33,7 @@
           wud.link.template: "https://hub.docker.com/r/matusnovak/prometheus-smartctl"
         cpu_shares: "{{ stats_prometheus_smartctl_cpu_shares }}"
         memory: "{{ stats_prometheus_smartctl_memory }}"
+        memory_swap: "{{ stats_prometheus_smartctl_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create HDDTemp Docker Container
@@ -66,6 +67,7 @@
           wud.link.template: "https://hub.docker.com/r/modem7/hddtemp-docker"
         cpu_shares: "{{ stats_hddtemp_cpu_shares }}"
         memory: "{{ stats_hddtemp_memory }}"
+        memory_swap: "{{ stats_hddtemp_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create Speedtest-Exporter Docker Container
@@ -97,6 +99,7 @@
           wud.link.template: "https://hub.docker.com/r/miguelndecarvalho/speedtest-exporter"
         cpu_shares: "{{ stats_speedtest_exporter_cpu_shares }}"
         memory: "{{ stats_speedtest_exporter_memory }}"
+        memory_swap: "{{ stats_speedtest_exporter_memory_swap }}"
         restart_policy: unless-stopped
       when: stats_internet_speed_test_enabled
   when: stats_enabled is true

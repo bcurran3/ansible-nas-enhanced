@@ -9,6 +9,11 @@
         - "{{ trilium_data_directory }}"
         - "{{ trilium_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        trilium_homepage_href: "https://{{ trilium_hostname }}.{{ ansible_nas_domain }}"
+      when: trilium_traefik_enabled | bool or trilium_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -64,6 +69,7 @@
           wud.link.template: "https://github.com/TriliumNext/Trilium/pkgs/container/trilium"
         cpu_shares: "{{ trilium_cpu_shares }}"
         memory: "{{ trilium_memory }}"
+        memory_swap: "{{ trilium_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

@@ -8,6 +8,11 @@
       with_items:
         - "{{ windows_data_directory }}"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        windows_homepage_href: "https://{{ windows_hostname }}.{{ ansible_nas_domain }}"
+      when: windows_traefik_enabled | bool or windows_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -15,10 +20,7 @@
         hostname: "{{ windows_container_name }}"
         image: "{{ windows_image_name }}:{{ windows_image_tag }}"
         pull: true
-        capabilities:
-          - NET_ADMIN
-        devices:
-          - /dev/kvm
+        network_mode: bridge
         ports:
           - "{{ windows_port_http }}:8006"
           - "{{ windows_port_rdp }}:3389"
@@ -26,14 +28,12 @@
         volumes:
           - "{{ windows_data_directory }}:/storage"
           - "{{ public_root }}:/shared"
-        network_mode: bridge
         env:
           CPU_CORES: "{{ windows_cpu_cores }}"
           DISK_SIZE: "{{ windows_disk_size }}"
           RAM_SIZE: "{{ windows_memory_size }}"
           VERSION: "{{ windows_version }}"
           TZ: "{{ ansible_nas_timezone }}"
-        stop_timeout: 120
         labels:
           autoheal: "{{ windows_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ windows_watchtower_enabled | ternary('true', 'false') }}"
@@ -66,8 +66,13 @@
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/dockur/windows/pkgs/container/windows"
-        cpu_shares: "{{ windows_cpu_shares }}"
+        capabilities:
+          - NET_ADMIN
+        devices:
+          - /dev/kvm        cpu_shares: "{{ windows_cpu_shares }}"
         memory: "{{ windows_memory_size }}"
+        memory_swap: "{{ windows_memory_swap }}"
+        stop_timeout: 120
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

@@ -9,6 +9,11 @@
         - "{{ rustdesk_data_directory }}"
         - "{{ rustdesk_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        rustdesk_homepage_href: "https://{{ rustdesk_hostname }}.{{ ansible_nas_domain }}"
+      when: rustdesk_traefik_enabled | bool or rustdesk_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Relay Server Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -44,6 +49,7 @@
           wud.link.template: "https://hub.docker.com/r/rustdesk/rustdesk-server"
         cpu_shares: "{{ rustdesk_hbbr_cpu_shares }}"
         memory: "{{ rustdesk_hbbr_memory }}"
+        memory_swap: "{{ rustdesk_hbbr_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} ID Server Container
@@ -86,6 +92,7 @@
           wud.link.template: "https://hub.docker.com/r/rustdesk/rustdesk-server"
         cpu_shares: "{{ rustdesk_hbbs_cpu_shares }}"
         memory: "{{ rustdesk_hbbs_memory }}"
+        memory_swap: "{{ rustdesk_hbbs_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Web Client Container
@@ -132,6 +139,7 @@
           wud.link.template: "https://hub.docker.com/r/keyurbhole/flutter_web_desk"
         cpu_shares: "{{ rustdesk_web_cpu_shares }}"
         memory: "{{ rustdesk_web_memory }}"
+        memory_swap: "{{ rustdesk_web_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

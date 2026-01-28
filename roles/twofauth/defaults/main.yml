@@ -12,8 +12,11 @@ twofauth_data_directory: "{{ docker_home }}/2fauth"
 twofauth_container_name: "2fauth"
 twofauth_image_name: "2fauth/2fauth"
 twofauth_image_tag: "latest"
+
+# specs
 twofauth_cpu_shares: 1024
 twofauth_memory: "1G"
+twofauth_memory_swap: -1
 
 # network
 twofauth_hostname: "2fauth"
@@ -24,12 +27,12 @@ twofauth_app_key: "cIAZm9N4b/jlWLNm55/18PbcKN9lny36KiE0t3Ox4YI=" # "use_php_arti
 twofauth_mail_driver: "" # "log"
 twofauth_mail_host: "" # "smtp.mailtrap.io"
 twofauth_mail_port: "" # "2525"
-twofauth_mail_username: "" # "null"
-twofauth_mail_password: "" # "null"
-twofauth_mail_encryption: "" # "null"
-twofauth_mail_from_name: "" # "null"
-twofauth_mail_from_address: "" # "null"
-twofauth_mail_verify_ssl_peer: "" # "true"
+twofauth_mail_username: ""
+twofauth_mail_password: ""
+twofauth_mail_encryption: ""
+twofauth_mail_from_name: "" # "{{ twofauth_hostname }}"
+twofauth_mail_from_address: "" # "{{ twofauth_hostname }}@{{ ansible_nas_domain }}"
+twofauth_mail_verify_ssl_peer: ""
 
 # autoheal
 twofauth_autoheal_enabled: false

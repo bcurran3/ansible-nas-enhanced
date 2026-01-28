@@ -17,19 +17,21 @@ wordpress_db_image_name: "mysql"
 wordpress_db_image_tag: "8.0"
 
 # network
-wordpress_port_http: "3040"
 wordpress_hostname: "wordpress"
+wordpress_port_http: "3040"
 
 # specs
 wordpress_cpu_shares: 1024
 wordpress_memory: "1G"
+wordpress_memory_swap: -1
 wordpress_db_cpu_shares: 1024
 wordpress_db_memory: "1G"
+wordpress_db_memory_swap: "{{ wordpress_db_memory }}"
 
 # app
 wordpress_env_wordpress_db_user: "wordpress"
-wordpress_env_wordpress_db_password: "wordpress"
-wordpress_env_wordpress_db_name: "wordpress"
+wordpress_env_wordpress_db_password: "topsecret"
+wordpress_env_wordpress_db_name: "wordpress_db"
 wordpress_db_env_mysql_random_root_password: "1"
 
 # autoheal

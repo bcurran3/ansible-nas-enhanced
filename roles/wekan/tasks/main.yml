@@ -22,6 +22,12 @@
           owner: ansible-nas
           group: ansible-nas
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        wekan_env_root_url: "https://{{ wekan_hostname }}.{{ ansible_nas_domain }}"
+        wekan_homepage_href: "https://{{ wekan_hostname }}.{{ ansible_nas_domain }}"
+      when: wekan_traefik_enabled | bool or wekan_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -64,6 +70,7 @@
           wud.link.template: "https://hub.docker.com/_/mongo"
         cpu_shares: "{{ wekan_db_cpu_shares }}"
         memory: "{{ wekan_db_memory }}"
+        memory_swap: "{{ wekan_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
@@ -131,6 +138,7 @@
           wud.link.template: "https://github.com/wekan/wekan/releases/tag/v${major}.${minor}"
         cpu_shares: "{{ wekan_cpu_shares }}"
         memory: "{{ wekan_memory }}"
+        memory_swap: "{{ wekan_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

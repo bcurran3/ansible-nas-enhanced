@@ -8,9 +8,6 @@ wallabag_traefik_whitelist: "{{ lan }}"
 # Directories
 wallabag_data_directory: "{{ docker_home }}/wallabag"
 
-# app
-wallabag_env_symfony_env_domain_name: "https://{{ wallabag_hostname }}.{{ ansible_nas_domain }}"
-
 # Networking
 wallabag_port_http: "7780"
 wallabag_hostname: "wallabag"
@@ -24,6 +21,9 @@ wallabag_image_version: "latest"
 wallabag_cpu_shares: 1024
 wallabag_memory: "512M"
 wallabag_memory_swap: -1
+
+# app
+wallabag_env_symfony_env_domain_name: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ wallabag_port_http }}"
 
 # autoheal
 wallabag_autoheal_enabled: false

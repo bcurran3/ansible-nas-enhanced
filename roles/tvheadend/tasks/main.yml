@@ -9,6 +9,11 @@
         - "{{ tvheadend_data_directory }}"
         - "{{ tvheadend_data_directory }}/config"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        tvheadend_homepage_href: "https://{{ tvheadend_hostname }}.{{ ansible_nas_domain }}"
+      when: tvheadend_traefik_enabled | bool or tvheadend_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -65,6 +70,7 @@
         cpu_shares: "{{ tvheadend_cpu_shares }}"
         devices: "{{ tvheadend_devices | default(omit) }}"
         memory: "{{ tvheadend_memory }}"
+        memory_swap: "{{ tvheadend_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

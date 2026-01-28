@@ -10,25 +10,30 @@
       changed_when: false
       with_items:
         - "{{ stats_grafana_data_directory }}"
-        - "{{ stats_grafana_data_directory }}"
-        - "{{ stats_grafana_data_directory }}/dashboards"
-        - "{{ stats_grafana_data_directory }}/provisioning/datasources"
-        - "{{ stats_grafana_data_directory }}/provisioning/dashboards"
+        - "{{ stats_grafana_config_directory }}"
+        - "{{ stats_grafana_config_directory }}/dashboards"
+        - "{{ stats_grafana_config_directory }}/provisioning/datasources"
+        - "{{ stats_grafana_config_directory }}/provisioning/dashboards"
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        stats_grafana_homepage_href: "https://{{ stats_grafana_hostname }}.{{ ansible_nas_domain }}"
+      when: stats_grafana_traefik_enabled | bool or stats_grafana_dockflare_enabled | bool
 
     - name: Template Grafana data source
       ansible.builtin.template:
         src: datasources/ansible-nas.yml
-        dest: "{{ stats_grafana_data_directory }}/provisioning/datasources/ansible-nas.yml"
+        dest: "{{ stats_grafana_config_directory }}/provisioning/datasources/ansible-nas.yml"
 
     - name: Copy Grafana dashboards configuration
       ansible.builtin.copy:
         src: dashboards/ansible-nas.yml
-        dest: "{{ stats_grafana_data_directory }}/provisioning/dashboards/ansible-nas.yml"
+        dest: "{{ stats_grafana_config_directory }}/provisioning/dashboards/ansible-nas.yml"
 
     - name: Copy Grafana Ansible-NAS dashboard
       ansible.builtin.copy:
         src: dashboards/ansible-nas-overview.json
-        dest: "{{ stats_grafana_data_directory }}/dashboards/ansible-nas-overview.json"
+        dest: "{{ stats_grafana_config_directory }}/dashboards/ansible-nas-overview.json"
 
     - name: Create Grafana Docker Container
       community.docker.docker_container:
@@ -38,8 +43,8 @@
         pull: true
         volumes:
           - "{{ stats_grafana_data_directory }}:/var/lib/grafana:rw"
-          - "{{ stats_grafana_data_directory }}/provisioning:/etc/grafana/provisioning:ro"
-          - "{{ stats_grafana_data_directory }}/dashboards:/etc/dashboards:ro"
+          - "{{ stats_grafana_config_directory }}/provisioning:/etc/grafana/provisioning:ro"
+          - "{{ stats_grafana_config_directory }}/dashboards:/etc/dashboards:ro"
         ports:
           - "{{ stats_grafana_port }}:3000"
         env:
@@ -81,6 +86,7 @@
           wud.link.template: "https://hub.docker.com/r/grafana/grafana"
         cpu_shares: "{{ stats_grafana_cpu_shares }}"
         memory: "{{ stats_grafana_memory}}"
+        memory_swap: "{{ stats_grafana_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access Grafana at

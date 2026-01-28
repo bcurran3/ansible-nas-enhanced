@@ -12,6 +12,11 @@
         - "{{ ocis_data_directory }}/config"
         - "{{ ocis_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        ocis_homepage_href: "https://{{ ocis_hostname }}.{{ ansible_nas_domain }}"
+      when: ocis_traefik_enabled | bool or ocis_dockflare_enabled | bool
+
     - name: Initialize {{ ansible_nas_app_name }}
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -110,6 +115,7 @@
           wud.link.template: "https://hub.docker.com/r/owncloud/ocis"
         cpu_shares: "{{ ocis_cpu_shares }}"
         memory: "{{ ocis_memory }}"
+        memory_swap: "{{ ocis_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

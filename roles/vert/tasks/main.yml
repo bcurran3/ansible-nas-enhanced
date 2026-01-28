@@ -1,6 +1,13 @@
 ---
 - name: Start {{ ansible_nas_app_name }}
   block:
+
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        vert_env_public_url: "https://{{ vert_hostname }}.{{ ansible_nas_domain }}"
+        vert_homepage_href: "https://{{ vert_hostname }}.{{ ansible_nas_domain }}"
+      when: vert_traefik_enabled | bool or vert_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} daemon Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -40,6 +47,7 @@
           wud.link.template: "https://github.com/VERT-sh/vertd/pkgs/container/vertd"
         cpu_shares: "{{ vertd_cpu_shares }}"
         memory: "{{ vertd_memory }}"
+        memory_swap: "{{ vertd_memory_swap }}"
         restart_policy: unless-stopped
 
 # TDL: implement a local build to use custom env vars
@@ -116,6 +124,7 @@
               wud.link.template: "https://github.com/VERT-sh/vert/pkgs/container/vert"
             cpu_shares: "{{ vert_cpu_shares }}"
             memory: "{{ vert_memory }}"
+            memory_swap: "{{ vert_memory_swap }}"
             restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at

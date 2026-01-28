@@ -9,6 +9,11 @@
         - "{{ vfd_data_directory }}"
         - "{{ vfd_data_directory }}/data"
 
+    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        vfd_homepage_href: "https://{{ vfd_hostname }}.{{ ansible_nas_domain }}"
+      when: vfd_traefik_enabled | bool or vfd_dockflare_enabled | bool
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -66,6 +71,7 @@
           wud.link.template: "https://github.com/kiinami/vfd/pkgs/container/vfd"
         cpu_shares: "{{ vfd_cpu_shares }}"
         memory: "{{ vfd_memory }}"
+        memory_swap: "{{ vfd_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Access {{ ansible_nas_app_name }} at
