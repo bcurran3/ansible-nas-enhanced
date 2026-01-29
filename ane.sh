@@ -10,7 +10,6 @@
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
 
 # Filter out non-containers
-#ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin|^-autoheal|^-dockflare|^-tinyauth|^-traefik|^-watchtower"
 ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin|_(autoheal|dockflare|tinyauth|traefik|watchtower|repliqate)"
 
 #####################################
@@ -330,47 +329,36 @@ function enable_app {
 }
 
 function create_new_app_placeholder {
-    if [[ -z "$2" ]]; then echo "  ** ERROR: Specify app name(s)."; exit 1; fi
+    if [[ -z "$1" ]]; then 
+        echo "  ** ERROR: Specify app name(s)."
+        return 1 
+    fi
     if [[ ! -d "roles/template" ]]; then
         echo "  ** ERROR: roles/template directory not found."
-        exit 1
+        return 1
     fi
     DOC_SOURCE="docs/applications/template.md"
-    shift 
     for app in "$@"; do
+        if [[ "$app" == -* ]]; then continue; fi
         NEW_APP_CLEAN="${app//-/_}"
-        FINAL_ROLE_DIR="roles/${app}"
         WIP_ROLE_NAME="WIP_${app}"
         WIP_ROLE_PATH="roles/${WIP_ROLE_NAME}"
-        DOC_FINAL_NAME="${app}.md"
-        DOC_WIP_NAME="WIP_${app}.md"
-        DOC_FINAL_PATH="docs/applications/${DOC_FINAL_NAME}"
-        DOC_WIP_PATH="docs/applications/${DOC_WIP_NAME}"
-        if [[ -d "$FINAL_ROLE_DIR" ]]; then
-            echo "  == ROLE: ${app} role already exists."
-        elif [[ -d "$WIP_ROLE_PATH" ]]; then
-            echo "  == ROLE: ${WIP_ROLE_NAME} already exists."
+        DOC_WIP_PATH="docs/applications/WIP_${app}.md"
+        if [[ -d "roles/${app}" ]] || [[ -d "$WIP_ROLE_PATH" ]]; then
+            echo "  == ROLE: ${app} already exists."
         else
             cp -r roles/template "$WIP_ROLE_PATH"
-            find "$WIP_ROLE_PATH" -type f -exec sed -i "s/appname_/${NEW_APP_CLEAN}_/g" {} +
-            find "$WIP_ROLE_PATH" -name "appname_*" | while read -r file; do 
+            find "$WIP_ROLE_PATH" -type f -exec sed -i "s@appname_@${NEW_APP_CLEAN}_@g" {} +
+            find "$WIP_ROLE_PATH" -type f -exec sed -i "s@appname@${app}@g" {} +
+            find "$WIP_ROLE_PATH" -name "*appname_*" | while read -r file; do 
                 mv "$file" "${file//appname_/${NEW_APP_CLEAN}_}"
             done
-            
             echo "  ++ ROLE: ${WIP_ROLE_NAME} successfully created."
         fi
-        if [[ -f "$DOC_SOURCE" ]]; then
-            if [[ -f "$DOC_FINAL_PATH" ]]; then
-                echo "  == DOC : ${DOC_FINAL_NAME} already exists."
-            elif [[ -f "$DOC_WIP_PATH" ]]; then
-                echo "  == DOC : ${DOC_WIP_NAME} already exists."
-            else
-                cp "$DOC_SOURCE" "$DOC_WIP_PATH"
-                sed -i "s/appname/${app}/g" "$DOC_WIP_PATH"
-                echo "  ++ DOC : ${DOC_WIP_NAME} successfully created."
-            fi
-        else
-            echo "  ** DOC : template.md WARNING: template not found."
+        if [[ -f "$DOC_SOURCE" ]] && [[ ! -f "docs/applications/${app}.md" ]]; then
+            cp "$DOC_SOURCE" "$DOC_WIP_PATH"
+            sed -i "s@appname@${app}@g" "$DOC_WIP_PATH"
+            echo "  ++ DOC : WIP_${app}.md successfully created."
         fi
     done
 }
