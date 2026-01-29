@@ -6,11 +6,6 @@
         doku_homepage_href: "https://{{ doku_hostname }}.{{ ansible_nas_domain }}"
       when: doku_traefik_enabled | bool or doku_dockflare_enabled | bool
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
-      ansible.builtin.set_fact:
-        doku_homepage_href: "https://{{ doku_hostname }}.{{ ansible_nas_domain }}"
-      when: doku_traefik_enabled | bool or doku_dockflare_enabled | bool
-
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -19,12 +14,19 @@
         image: "{{ doku_image_name }}:{{ doku_image_version }}"
         pull: true
         volumes:
+          - "/:/host:ro"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
-          - "{{ docker_home }}:/hostroot:ro"
         ports:
           - "{{ doku_port_http }}:{{ doku_port_http }}"
         env:
+          DOKU_HOST_ROOT: "{{ doku_env_doku_host_root }}"
           PORT: "{{ doku_port_http }}"
+          SCAN_INTERVAL: "{{ doku_env_scan_interval }}"
+          SCAN_LOGFILE_INTERVAL: "{{ doku_env_scan_logfile_interval }}"
+          SCAN_BINDMOUNTS_INTERVAL: "{{ doku_env_scan_bindmounts_interval }}"
+          BINDMOUNT_IGNORE_PATTERNS: "{{ doku_env_bindmount_ignore_patterns }}"
+          SCAN_OVERLAY2_INTERVAL: "{{ doku_env_scan_overlay2_interval }}"
+          DISABLE_OVERLAY2_SCAN: "{{ doku_env_disable_overlay2_scan }}"
           TZ: "{{ ansible_nas_timezone }}"
         labels:
           autoheal: "{{ doku_autoheal_enabled | ternary('true', 'false') }}"
