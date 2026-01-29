@@ -32,11 +32,14 @@
           {{ dev_list if dev_list | length > 0 else omit }}
         group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
-        volumes:
-          - "{{ tdarr_node_data_directory }}/configs:/app/configs"
-          - "{{ tdarr_node_data_directory }}/logs:/app/logs"
-          - "{{ tdarr_node_cache_directory }}:/temp"
-          - "{{ tdarr_node_media_directory }}:/media"
+        volumes: >-
+          {{ [
+            tdarr_node_data_directory ~ '/configs:/app/configs',
+            tdarr_node_data_directory ~ '/logs:/app/logs',
+            tdarr_node_cache_directory ~ ':/temp',
+            tdarr_node_media_directory ~ ':/media',
+            tdarr_node_extra_directory if (tdarr_node_extra_directory is defined and ':' in tdarr_node_extra_directory) else none
+          ] | reject("none") | list }}
         ports:
           - "{{ tdarr_node_port_http }}:8268"
         env:

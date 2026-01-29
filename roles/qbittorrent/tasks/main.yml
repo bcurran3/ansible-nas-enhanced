@@ -24,13 +24,14 @@
         hostname: "{{ qbittorrent_container_name }}"
         image: "{{ qbittorrent_image_name }}:{{ qbittorrent_image_tag }}"
         pull: true
-        volumes: "{{ [
-                  qbittorrent_data_directory ~ '/config:/config:rw',
-                  qbittorrent_data_directory ~ '/custom-cont-init.d:/custom-cont-init.d:ro',
-                  qbittorrent_download_directory ~ ':/downloads:rw',
-                  (qbittorrent_watch_directory ~ ':/torrents:rw') if qbittorrent_watch_directory | default('') != '' else none,
-                  qbittorrent_extra_directory | default(none)
-                ] | reject('none') | list }}"
+        volumes: >-
+          {{ [
+            qbittorrent_data_directory ~ '/config:/config:rw',
+            qbittorrent_data_directory ~ '/custom-cont-init.d:/custom-cont-init.d:ro',
+            qbittorrent_download_directory ~ ':/downloads:rw',
+            qbittorrent_watch_directory ~ ':/torrents:rw',
+            qbittorrent_extra_directory if (qbittorrent_extra_directory is defined and qbittorrent_extra_directory != "") else none
+          ] | reject("none") | list }}
         ports:
           - "{{ qbittorrent_port_http }}:{{ qbittorrent_port_http }}"
           - "{{ qbittorrent_port_bt }}:6881"
