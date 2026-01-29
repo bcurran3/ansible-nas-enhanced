@@ -49,6 +49,12 @@
           UMASK_SET: "{{ qbittorrent_umask }}"
           WEBUI_PORT: "{{ qbittorrent_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:{{ qbittorrent_port_http }}/"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+          start_period: 40s
         labels:
           autoheal: "{{ qbittorrent_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ qbittorrent_watchtower_enabled | ternary('true', 'false') }}"
