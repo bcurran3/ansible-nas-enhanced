@@ -166,6 +166,21 @@
           - name: "{{ nextcloud_network_name }}"
         network_mode: "{{ nextcloud_network_name }}"
         pull: true
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | default(false) | bool else omit
+        }}"
+        devices: >-
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and frigate_amd_ai_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
         volumes:
           - "{{ nextcloud_data_directory }}/nextcloud:/var/www/html:rw"
           - "{{ nextcloud_data_directory }}/nextcloud/pre-installation:/docker-entrypoint-hooks.d/pre-installation" # added

@@ -206,6 +206,7 @@ By default, applications can be found on the ports listed below.
 | Netlock RMM Back | 7080    | Bridge  | HTTP           |
 | Netlock RMM Rely | 7081    | Bridge  | HTTP           |
 | Nextcloud        | 8080    | Bridge  | HTTP           |
+| Nextcloud        | 3478    | Bridge  | TURN           |
 | nocodb           | 3080    | Bridge  | HTTP           |
 | Node-RED         | 1880    | Bridge  | HTTP           |
 | Nomad            | 4646
