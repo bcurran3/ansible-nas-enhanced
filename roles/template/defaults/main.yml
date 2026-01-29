@@ -1,6 +1,6 @@
 ---
 # ANE
-ansible_nas_app_name: "appname"
+appname_proper_name: "appname"
 appname_enabled: false
 appname_traefik_enabled: false
 appname_traefik_whitelist: "{{ lan }}"
@@ -35,6 +35,7 @@ appname_dockflare_enabled: false
 appname_dockflare_access_group: ""
 
 # homepage
+appname_homepage_description: "appname short description"
 appname_homepage_group: "Apps"
 appname_homepage_icon: "appname.png"
 appname_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ appname_port_http }}"
@@ -58,6 +59,19 @@ appname_tinyauth_enabled: false
 # watchtower
 appname_watchtower_enabled: false
 
+# wud
+# Docker Hub example. Please edit.
+appname_wud_tag_include: '^\d+\.\d+$'
+appname_wud_tag_transform_type: "semver"
+appname_wud_link_template: "https://hub.docker.com/r/devname/appname"
+### Github example
+#appname_wud_tag_include: '^\d+\.\d+\.\d+$'
+#appname_wud_tag_transform_type: "semver"
+#appname_wud_link_template: "https://github.com/dev/appname/pkgs/container/appname"
+### Linuxserver.io example
+#appname_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+#appname_wud_tag_transform_type: "semver"
+#appname_wud_link_template: "https://lscr.io/linuxserver/appname"
 
 ##############################################################################
 ### EXAMPLES OF COMMON DATABASE SETUPS BELOW
@@ -92,6 +106,7 @@ appname_db_memory_swap: "{{ appname_db_memory }}"
 appname_db_autoheal_enabled: false
 
 # homepage
+appname_db_homepage_description: "MariaDB Server is a high performing open source relational database, forked from MySQL."
 appname_db_homepage_group: "DBs"
 appname_db_homepage_icon: "mariadb.png"
 appname_db_homepage_href: "{{ appname_homepage_href }}"
@@ -107,6 +122,10 @@ appname_db_repliqate_retention: "30d"
 # watchtower
 appname_db_watchtower_enabled: false
 
+# wud
+appname_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+appname_db_wud_tag_transform_type: "semver"
+appname_db_wud_link_template: "https://hub.docker.com/_/mariadb"
 
 ######################################################
 ###  OPTIONAL - remove if not needed               ###
@@ -132,6 +151,7 @@ appname_db_memory_swap: "{{ appname_db_memory }}"
 appname_db_autoheal_enabled: false
 
 # homepage
+appname_db_homepage_description: "The Database for Secure Apps"
 appname_db_homepage_group: "DBs"
 appname_db_homepage_icon: "mongodb.png"
 appname_db_homepage_href: "{{ appname_homepage_href }}"
@@ -147,6 +167,10 @@ appname_db_repliqate_retention: "30d"
 # watchtower
 appname_db_watchtower_enabled: false
 
+# wud
+appname_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+appname_db_wud_tag_transform_type: "semver"
+appname_db_wud_link_template: "https://hub.docker.com/_/mongo"
 
 ##########################################
 ###  OPTIONAL - remove if not needed   ###
@@ -172,6 +196,7 @@ appname_db_memory_swap: "{{ appname_db_memory }}"
 appname_db_autoheal_enabled: false
 
 # homepage
+appname_db_homepage_description: "MySQL Server, the world''s most popular open source database"
 appname_db_homepage_group: "DBs"
 appname_db_homepage_icon: "mysql.png"
 appname_db_homepage_href: "{{ appname_homepage_href }}"
@@ -187,6 +212,10 @@ appname_db_repliqate_retention: "30d"
 # watchtower
 appname_db_watchtower_enabled: false
 
+# wud
+appname_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+appname_db_wud_tag_transform_type: "semver"
+appname_db_wud_link_template: "https://hub.docker.com/_/mysql"
 
 ##############################################################
 ###  OPTIONAL - remove if not needed                       ###
@@ -212,6 +241,7 @@ appname_db_memory_swap: "{{ appname_db_memory }}"
 appname_db_autoheal_enabled: false
 
 # homepage
+appname_db_homepage_description: "PostgreSQL Database Management System"
 appname_db_homepage_group: "DBs"
 appname_db_homepage_icon: "postgres.png"
 appname_db_homepage_href: "{{ appname_homepage_href }}"
@@ -227,6 +257,10 @@ appname_db_repliqate_retention: "30d"
 # watchtower
 appname_db_watchtower_enabled: false
 
+# wud
+appname_db_wud_tag_include: '^\d+\.\d+.*$'
+appname_db_wud_tag_transform_type: "semver"
+appname_db_wud_link_template: "https://hub.docker.com/_/postgres"
 
 #########################################
 ###  OPTIONAL - remove if not needed  ###
@@ -251,6 +285,7 @@ appname_redis_memory_swap: "{{ appname_redis_memory }}"
 appname_redis_autoheal_enabled: false
 
 # homepage
+appname_redis_homepage_description: "The Real-time Data Platform"
 appname_redis_homepage_group: "DBs"
 appname_redis_homepage_icon: "redis.png"
 appname_redis_homepage_href: "{{ appname_homepage_href }}"
@@ -265,3 +300,9 @@ appname_redis_repliqate_retention: "30d"
 
 # watchtower
 appname_redis_watchtower_enabled: false
+
+# wud
+appname_redis_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+#appname_redis_wud_tag_include: "^v?\\d+-alpine$"
+appname_redis_wud_tag_transform_type: "semver"
+appname_redis_wud_link_template: "https://hub.docker.com/_/redis"
