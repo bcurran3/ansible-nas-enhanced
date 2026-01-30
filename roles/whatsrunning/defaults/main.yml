@@ -30,6 +30,13 @@ whatsrunning_autoheal_enabled: false
 whatsrunning_dockflare_enabled: false
 whatsrunning_dockflare_access_group: ""
 
+# healthcheck
+whatsrunning_healthcheck_test: ["CMD", "python3", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(2); s.connect(('127.0.0.1', 5000))"]
+whatsrunning_healthcheck_interval: 1m
+whatsrunning_healthcheck_timeout: 10s
+whatsrunning_healthcheck_retries: 3
+whatsrunning_healthcheck_start_period: 20s
+
 # homepage
 whatsrunning_homepage_group: "Apps"
 whatsrunning_homepage_icon: "docker.png"

@@ -34,6 +34,13 @@ netbootxyz_autoheal_enabled: false
 netbootxyz_dockflare_enabled: false
 netbootxyz_dockflare_access_group: ""
 
+# healthcheck
+netbootxyz_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:{{ netbootxyz_port_http }}/ || exit 1"]
+netbootxyz_healthcheck_interval: 30s
+netbootxyz_healthcheck_timeout: 5s
+netbootxyz_healthcheck_retries: 3
+netbootxyz_healthcheck_start_period: 15s
+
 # homepage
 netbootxyz_homepage_group: "Apps"
 netbootxyz_homepage_icon: "netbootxyz.png"

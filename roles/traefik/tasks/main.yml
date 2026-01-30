@@ -48,6 +48,12 @@
           - "{{ traefik_data_directory }}/rules:/rules:ro"
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
         env: "{{ traefik_environment_variables }}"
+        healthcheck:
+          test: "{{ traefik_healthcheck_test }}"
+          interval: "{{ traefik_healthcheck_interval }}"
+          timeout: "{{ traefik_healthcheck_timeout }}"
+          retries: "{{ traefik_healthcheck_retries }}"
+          start_period: "{{ traefik_healthcheck_start_period }}"
         labels:
           autoheal: "{{ traefik_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ traefik_watchtower_enabled | ternary('true', 'false') }}"

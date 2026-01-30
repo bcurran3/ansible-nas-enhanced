@@ -29,6 +29,12 @@
           PUID: "{{ cleanuparr_user_id }}"
           PGID: "{{ cleanuparr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "curl -f http://localhost:11011/ || exit 1"]
+          interval: "{{ cleanuparr_healthcheck_interval }}"
+          timeout: "{{ cleanuparr_healthcheck_timeout }}"
+          retries: "{{ cleanuparr_healthcheck_retries }}"
+          start_period: "{{ cleanuparr_healthcheck_start_period }}"
         labels:
           autoheal: "{{ cleanuparr_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ cleanuparr_watchtower_enabled | ternary('true', 'false') }}"

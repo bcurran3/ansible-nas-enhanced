@@ -44,6 +44,13 @@ mailrise_targets:
 # autoheal
 mailrise_autoheal_enabled: false
 
+# healthcheck
+mailrise_healthcheck_test: ["CMD", "python3", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(2); s.connect(('127.0.0.1', 8025))"]
+mailrise_healthcheck_interval: 30s
+mailrise_healthcheck_timeout: 10s
+mailrise_healthcheck_retries: 3
+mailrise_healthcheck_start_period: 20s
+
 # homepage
 mailrise_homepage_group: "Misc"
 mailrise_homepage_icon: "https://raw.githubusercontent.com/YoRyan/mailrise/refs/heads/main/src/mailrise/asset/mailrise-info-256x256.png"

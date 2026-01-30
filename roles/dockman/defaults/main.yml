@@ -36,6 +36,13 @@ dockman_autoheal_enabled: false
 dockman_dockflare_enabled: false
 dockman_dockflare_access_group: ""
 
+# healthcheck
+dockman_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:{{ dockman_port_http }}/ || exit 1"]
+dockman_healthcheck_interval: 30s
+dockman_healthcheck_timeout: 10s
+dockman_healthcheck_retries: 3
+dockman_healthcheck_start_period: 30s
+
 # homepage
 dockman_homepage_group: "Apps"
 dockman_homepage_icon: "https://raw.githubusercontent.com/RA341/dockman/refs/heads/main/ui/public/dockman.svg"

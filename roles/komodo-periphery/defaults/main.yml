@@ -39,6 +39,13 @@ komodo_periphery_autoheal_enabled: false
 komodo_periphery_dockflare_enabled: false
 komodo_periphery_dockflare_access_group: ""
 
+# healthcheck
+komodo_periphery_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider --no-check-certificate https://127.0.0.1:8120/ || exit 1"]
+komodo_periphery_healthcheck_interval: 30s
+komodo_periphery_healthcheck_timeout: 10s
+komodo_periphery_healthcheck_retries: 3
+komodo_periphery_healthcheck_start_period: 20s
+
 # homepage
 komodo_periphery_homepage_group: "Misc"
 komodo_periphery_homepage_icon: "mongodb.png"

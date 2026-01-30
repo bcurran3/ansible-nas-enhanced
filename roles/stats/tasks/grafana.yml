@@ -15,7 +15,7 @@
         - "{{ stats_grafana_config_directory }}/provisioning/datasources"
         - "{{ stats_grafana_config_directory }}/provisioning/dashboards"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set Grafana FQDN var overrides
       ansible.builtin.set_fact:
         stats_grafana_homepage_href: "https://{{ stats_grafana_hostname }}.{{ ansible_nas_domain }}"
       when: stats_grafana_traefik_enabled | bool or stats_grafana_dockflare_enabled | bool
@@ -51,6 +51,12 @@
           GF_PLUGINS_ENABLE_ALPHA: "true"
           GF_UNIFIED_ALERTING_ENABLED: "true"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+          interval: "{{ stats_grafana_healthcheck_interval }}"
+          timeout: "{{ stats_grafana_healthcheck_timeout }}"
+          retries: "{{ stats_grafana_healthcheck_retries }}"
+          start_period: "{{ stats_grafana_healthcheck_start_period }}"
         labels:
           autoheal: "{{ stats_grafana_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ stats_grafana_watchtower_enabled | ternary('true', 'false') }}"

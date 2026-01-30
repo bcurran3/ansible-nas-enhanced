@@ -60,6 +60,23 @@ netbox_redis_autoheal_enabled: false
 netbox_dockflare_enabled: false
 netbox_dockflare_access_group: ""
 
+# healthcheck
+netbox_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8000/api/ || exit 1"]
+netbox_healthcheck_interval: 30s
+netbox_healthcheck_timeout: 10s
+netbox_healthcheck_retries: 3
+netbox_healthcheck_start_period: 60s
+netbox_db_healthcheck_test: ["CMD-SHELL", "pg_isready -d {{ netbox_env_db_name }} -U {{ netbox_env_db_user }} -h 127.0.0.1"]
+netbox_db_healthcheck_interval: 10s
+netbox_db_healthcheck_timeout: 5s
+netbox_db_healthcheck_retries: 5
+netbox_db_healthcheck_start_period: 30s
+netbox_redis_healthcheck_test: ["CMD-SHELL", "redis-cli -a {{ netbox_env_redis_password }} ping | grep PONG || exit 1"]
+netbox_redis_healthcheck_interval: 10s
+netbox_redis_healthcheck_timeout: 5s
+netbox_redis_healthcheck_retries: 3
+netbox_redis_healthcheck_start_period: 10s
+
 # homepage
 netbox_homepage_group: "Apps"
 netbox_homepage_icon: "netbox.png"

@@ -36,6 +36,13 @@ radarr_autoheal_enabled: false
 radarr_dockflare_enabled: false
 radarr_dockflare_access_group: ""
 
+# healthcheck
+radarr_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:7878/ping || exit 1"]
+radarr_healthcheck_interval: 30s
+radarr_healthcheck_timeout: 10s
+radarr_healthcheck_retries: 3
+radarr_healthcheck_start_period: 60s
+
 # homepage
 radarr_homepage_group: "Media Management"
 radarr_homepage_icon: "radarr.png"

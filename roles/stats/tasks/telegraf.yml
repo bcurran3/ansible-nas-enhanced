@@ -48,7 +48,12 @@
           HOST_RUN: "/hostfs/run"
           HOST_MOUNT_PREFIX: "/hostfs"
           TZ: "{{ ansible_nas_timezone }}"
-        restart: "{{ telegraf_config is changed }}"
+        healthcheck:
+          test: "{{ stats_telegraf_healthcheck_test }}"
+          interval: "{{ stats_telegraf_healthcheck_interval }}"
+          timeout: "{{ stats_telegraf_healthcheck_timeout }}"
+          retries: "{{ stats_telegraf_healthcheck_retries }}"
+          start_period: "{{ stats_telegraf_healthcheck_start_period }}"
         labels:
           autoheal: "{{ stats_telegraf_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ stats_telegraf_watchtower_enabled | ternary('true', 'false') }}"
@@ -67,6 +72,7 @@
         cpu_shares: "{{ stats_telegraf_cpu_shares }}"
         memory: "{{ stats_telegraf_memory }}"
         memory_swap: "{{ stats_telegraf_memory_swap }}"
+        restart: "{{ telegraf_config is changed }}"
         restart_policy: unless-stopped
   when: stats_enabled is true
 

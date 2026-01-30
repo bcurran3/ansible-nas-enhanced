@@ -38,6 +38,13 @@ tinyauth_autoheal_enabled: false
 tinyauth_dockflare_enabled: false
 tinyauth_dockflare_access_group: ""
 
+# healthcheck
+tinyauth_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:{{ tinyauth_port_http }}/ || exit 1"]
+tinyauth_healthcheck_interval: 30s
+tinyauth_healthcheck_timeout: 10s
+tinyauth_healthcheck_retries: 3
+tinyauth_healthcheck_start_period: 15s
+
 # homepage
 tinyauth_homepage_group: "Apps"
 tinyauth_homepage_icon: "tinyauth.png"

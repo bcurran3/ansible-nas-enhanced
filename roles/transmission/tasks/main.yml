@@ -42,6 +42,12 @@
           PUID: "{{ transmission_user_id }}"
           PGID: "{{ transmission_group_id }}"
           TZ: "{{ transmission_timezone }}"
+        healthcheck:
+          test: "{{ transmission_healthcheck_test }}"
+          interval: "{{ transmission_healthcheck_interval }}"
+          timeout: "{{ transmission_healthcheck_timeout }}"
+          retries: "{{ transmission_healthcheck_retries }}"
+          start_period: "{{ transmission_healthcheck_start_period }}"
         labels:
           autoheal: "{{ transmission_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ transmission_watchtower_enabled | ternary('true', 'false') }}"

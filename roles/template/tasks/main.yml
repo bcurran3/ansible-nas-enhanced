@@ -39,6 +39,12 @@
           PUID: "{{ appname_user_id }}"
           PGID: "{{ appname_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ appname_healthcheck_test }}"
+          interval: "{{ appname_healthcheck_interval }}"
+          timeout: "{{ appname_healthcheck_timeout }}"
+          retries: "{{ appname_healthcheck_retries }}"
+          start_period: "{{ appname_healthcheck_start_period }}"
         labels:
           autoheal: "{{ appname_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_watchtower_enabled | ternary('true', 'false') }}"
@@ -181,16 +187,11 @@
           MYSQL_PASSWORD: "{{ appname_db_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-              test:
-                - CMD
-                - /usr/local/bin/healthcheck.sh
-                - --su-mysql
-                - --connect
-                - --innodb_initialized
-              interval: "30s"
-              timeout: "10s"
-              retries: "3"
-              start_period: "30s"
+          test: "{{ appname_db_healthcheck_test }}"
+          interval: "{{ appname_db_healthcheck_interval }}"
+          timeout: "{{ appname_db_healthcheck_timeout }}"
+          retries: "{{ appname_db_healthcheck_retries }}"
+          start_period: "{{ appname_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ appname_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -247,11 +248,11 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-          interval: 10s
-          timeout: 5s
-          retries: 3
-          start_period: 5s
+          test: "{{ appname_db_healthcheck_test }}"
+          interval: "{{ appname_db_healthcheck_interval }}"
+          timeout: "{{ appname_db_healthcheck_timeout }}"
+          retries: "{{ appname_db_healthcheck_retries }}"
+          start_period: "{{ appname_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ appname_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -313,10 +314,11 @@
           MYSQL_ROOT_PASSWORD: "{{ appname_sql_root_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: "mysqladmin ping -u root -p{{ appname_sql_root_password }} -h localhost"
-          interval: 10s
-          timeout: 5s
-          retries: 5
+          test: "{{ appname_db_healthcheck_test }}"
+          interval: "{{ appname_db_healthcheck_interval }}"
+          timeout: "{{ appname_db_healthcheck_timeout }}"
+          retries: "{{ appname_db_healthcheck_retries }}"
+          start_period: "{{ appname_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ appname_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -376,11 +378,11 @@
           POSTGRES_DB: "appname"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U appname"]
-          interval: 10s
-          timeout: 5s
-          retries: 5
-          start_period: 30s
+          test: "{{ appname_db_healthcheck_test }}"
+          interval: "{{ appname_db_healthcheck_interval }}"
+          timeout: "{{ appname_db_healthcheck_timeout }}"
+          retries: "{{ appname_db_healthcheck_retries }}"
+          start_period: "{{ appname_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ appname_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -435,11 +437,11 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "redis-cli -a topsecret ping | grep PONG"]
-#          test: ["CMD", "redis-cli", "ping"]
-          interval: 10s
-          timeout: 5s
-          retries: 3
+          test: "{{ appname_redis_healthcheck_test }}"
+          interval: "{{ appname_redis_healthcheck_interval }}"
+          timeout: "{{ appname_redis_healthcheck_timeout }}"
+          retries: "{{ appname_redis_healthcheck_retries }}"
+          start_period: "{{ appname_redis_healthcheck_start_period }}"
         labels:
           autoheal: "{{ appname_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ appname_redis_watchtower_enabled | ternary('true', 'false') }}"

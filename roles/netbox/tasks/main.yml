@@ -30,11 +30,11 @@
           POSTGRES_DB: "{{ netbox_env_db_name }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U {{ netbox_env_db_user }}"]
-          interval: 10s
-          timeout: 5s
-          retries: 5
-          start_period: 30s
+          test: "{{ netbox_db_healthcheck_test }}"
+          interval: "{{ netbox_db_healthcheck_interval }}"
+          timeout: "{{ netbox_db_healthcheck_timeout }}"
+          retries: "{{ netbox_db_healthcheck_retries }}"
+          start_period: "{{ netbox_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ netbox_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ netbox_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -81,10 +81,11 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "redis-cli -a {{ netbox_env_redis_password }} ping | grep PONG"]
-          interval: 10s
-          timeout: 5s
-          retries: 3
+          test: "{{ netbox_redis_healthcheck_test }}"
+          interval: "{{ netbox_redis_healthcheck_interval }}"
+          timeout: "{{ netbox_redis_healthcheck_timeout }}"
+          retries: "{{ netbox_redis_healthcheck_retries }}"
+          start_period: "{{ netbox_redis_healthcheck_start_period }}"
         labels:
           autoheal: "{{ netbox_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ netbox_redis_watchtower_enabled | ternary('true', 'false') }}"
@@ -151,6 +152,12 @@
           PUID: "{{ netbox_user_id }}"
           PGID: "{{ netbox_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ netbox_healthcheck_test }}"
+          interval: "{{ netbox_healthcheck_interval }}"
+          timeout: "{{ netbox_healthcheck_timeout }}"
+          retries: "{{ netbox_healthcheck_retries }}"
+          start_period: "{{ netbox_healthcheck_start_period }}"
         links:
           - "{{ netbox_db_container_name }}"
           - "{{ netbox_redis_container_name }}"

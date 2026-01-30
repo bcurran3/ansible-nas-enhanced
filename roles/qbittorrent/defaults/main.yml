@@ -38,6 +38,13 @@ qbittorrent_autoheal_enabled: false
 qbittorrent_dockflare_enabled: false
 qbittorrent_dockflare_access_group: ""
 
+# healthcheck
+qbittorrent_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:{{ qbittorrent_port_http }}/ || exit 1"]
+qbittorrent_healthcheck_interval: 30s
+qbittorrent_healthcheck_timeout: 10s
+qbittorrent_healthcheck_retries: 3
+qbittorrent_healthcheck_start_period: 45s
+
 # homepage
 qbittorrent_homepage_group: "Download Tools"
 qbittorrent_homepage_icon: "qbittorrent.png"

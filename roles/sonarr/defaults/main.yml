@@ -36,6 +36,13 @@ sonarr_autoheal_enabled: false
 sonarr_dockflare_enabled: false
 sonarr_dockflare_access_group: ""
 
+# healthcheck
+sonarr_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8989/ping || exit 1"]
+sonarr_healthcheck_interval: 30s
+sonarr_healthcheck_timeout: 10s
+sonarr_healthcheck_retries: 3
+sonarr_healthcheck_start_period: 60s
+
 # homepage
 sonarr_homepage_group: "Media Management"
 sonarr_homepage_icon: "sonarr.png"

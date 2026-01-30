@@ -20,6 +20,47 @@
       community.docker.docker_network:
         name: "{{ immich_network_name }}"
 
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ immich_redis_container_name }}"
+        hostname: "{{ immich_redis_container_name }}"
+        image: "{{ immich_redis_image }}:{{ immich_redis_tag }}"
+        pull: true
+        networks:
+          - name: "{{ immich_network_name }}"
+        network_mode: bridge
+        networks_cli_compatible: "yes"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ immich_redis_healthcheck_test }}"
+          interval: "{{ immich_redis_healthcheck_interval }}"
+          timeout: "{{ immich_redis_healthcheck_timeout }}"
+          retries: "{{ immich_redis_healthcheck_retries }}"
+          start_period: "{{ immich_redis_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ immich_redis_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ immich_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.group: "{{ immich_redis_homepage_group }}"
+          homepage.name: "Immich Redis"
+          homepage.icon: "{{ immich_redis_homepage_icon }}"
+          homepage.href: "{{ immich_redis_homepage_href }}"
+          homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ immich_redis_container_name }}"
+          homepage.showStats: "{{ immich_redis_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "false"
+          traefik.enable: "false"
+          wud.tag.include: "^\\d+$"
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/valkey-io/valkey/releases"
+        cpu_shares: "{{ immich_redis_cpu_shares }}"
+        memory: "{{ immich_redis_memory }}"
+        memory_swap: "{{ immich_redis_memory_swap }}"
+        restart_policy: always
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -42,12 +83,11 @@
           PG_DATA: "/var/lib/postgresql/data"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "pg_isready -d {{ immich_db_name }} -U {{ immich_db_username }}"]
-          interval: "5m"
-          start_interval: "30s"
-          start_period: "5m"
-          retries: 5
-          timeout: "5s"
+          test: "{{ immich_db_healthcheck_test }}"
+          interval: "{{ immich_db_healthcheck_interval }}"
+          timeout: "{{ immich_db_healthcheck_timeout }}"
+          retries: "{{ immich_db_healthcheck_retries }}"
+          start_period: "{{ immich_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ immich_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "true"
@@ -74,43 +114,6 @@
         memory_swap: "{{ immich_db_memory_swap }}"
         restart_policy: always
         shm_size: "{{ immich_db_shm_size }}"
-
-    - name: Create {{ ansible_nas_app_name }} Redis Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ immich_redis_container_name }}"
-        hostname: "{{ immich_redis_container_name }}"
-        image: "{{ immich_redis_image }}:{{ immich_redis_tag }}"
-        pull: true
-        networks:
-          - name: "{{ immich_network_name }}"
-        network_mode: bridge
-        networks_cli_compatible: "yes"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-        healthcheck:
-          test: ["CMD-SHELL", "redis-cli ping || exit 1"]
-        labels:
-          autoheal: "{{ immich_redis_autoheal_enabled | ternary('true', 'false') }}"
-          com.centurylinklabs.watchtower.enable: "{{ immich_watchtower_enabled | ternary('true', 'false') }}"
-          dockflare.enable: "false"
-          homepage.group: "{{ immich_redis_homepage_group }}"
-          homepage.name: "Immich Redis"
-          homepage.icon: "{{ immich_redis_homepage_icon }}"
-          homepage.href: "{{ immich_redis_homepage_href }}"
-          homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ immich_redis_container_name }}"
-          homepage.showStats: "{{ immich_redis_homepage_showstats | ternary('true', 'false') }}"
-          repliqate.enabled: "false"
-          traefik.enable: "false"
-          wud.tag.include: "^\\d+$"
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/valkey-io/valkey/releases"
-        cpu_shares: "{{ immich_redis_cpu_shares }}"
-        memory: "{{ immich_redis_memory }}"
-        memory_swap: "{{ immich_redis_memory_swap }}"
-        restart_policy: always
 
     - name: Create {{ ansible_nas_app_name }} Machine Learning Container
       community.docker.docker_container:
@@ -142,8 +145,12 @@
         env:
 #          ACCELERATION: "cpu"
           TZ: "{{ ansible_nas_timezone }}"
-#        healthcheck:
-#          disable: "false"
+        healthcheck:
+          test: "{{ immich_ml_healthcheck_test }}"
+          interval: "{{ immich_ml_healthcheck_interval }}"
+          timeout: "{{ immich_ml_healthcheck_timeout }}"
+          retries: "{{ immich_ml_healthcheck_retries }}"
+          start_period: "{{ immich_ml_healthcheck_start_period }}"
         labels:
           autoheal: "{{ immich_ml_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "true"
@@ -207,8 +214,12 @@
           - "{{ immich_db_container_name }}"
           - "{{ immich_ml_container_name }}"
           - "{{ immich_redis_container_name }}"
-#        healthcheck:
-#          disable: "false"
+        healthcheck:
+          test: "{{ immich_server_healthcheck_test }}"
+          interval: "{{ immich_server_healthcheck_interval }}"
+          timeout: "{{ immich_server_healthcheck_timeout }}"
+          retries: "{{ immich_server_healthcheck_retries }}"
+          start_period: "{{ immich_server_healthcheck_start_period }}"
         labels:
           autoheal: "{{ immich_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "true"

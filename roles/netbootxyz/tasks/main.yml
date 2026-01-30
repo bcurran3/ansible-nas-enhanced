@@ -35,6 +35,12 @@
           PGID: "{{ netbootxyz_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
           WEB_APP_PORT: "{{ netbootxyz_port_http }}"
+        healthcheck:
+          test: "{{ netbootxyz_healthcheck_test }}"
+          interval: "{{ netbootxyz_healthcheck_interval }}"
+          timeout: "{{ netbootxyz_healthcheck_timeout }}"
+          retries: "{{ netbootxyz_healthcheck_retries }}"
+          start_period: "{{ netbootxyz_healthcheck_start_period }}"
         labels:
           autoheal: "{{ netbootxyz_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ netbootxyz_watchtower_enabled | ternary('true', 'false') }}"

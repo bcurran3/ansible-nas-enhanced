@@ -30,11 +30,11 @@
           POSTGRES_DB: "{{ freshrss_db_base }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U {{ freshrss_db_user }}"]
-          interval: 10s
-          timeout: 5s
-          retries: 5
-          start_period: 30s
+          test: ["CMD-SHELL", "pg_isready -U {{ freshrss_db_user }} -d {{ freshrss_db_base }}"]
+          interval: "{{ freshrss_db_healthcheck_interval }}"
+          timeout: "{{ freshrss_db_healthcheck_timeout }}"
+          retries: "{{ freshrss_db_healthcheck_retries }}"
+          start_period: "{{ freshrss_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ freshrss_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ freshrss_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -88,6 +88,12 @@
           DB_PASSWORD: "{{ freshrss_db_password }}"
           DB_USER: "{{ freshrss_db_user }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80/i/ || exit 1"]
+          interval: "{{ freshrss_healthcheck_interval }}"
+          timeout: "{{ freshrss_healthcheck_timeout }}"
+          retries: "{{ freshrss_healthcheck_retries }}"
+          start_period: "{{ freshrss_healthcheck_start_period }}"
         links:
           - "{{ freshrss_db_container_name }}"
         labels:

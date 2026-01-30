@@ -37,6 +37,12 @@
           VFD_DASHBOARD_HOST: "0.0.0.0"
           VFD_DASHBOARD_PORT: "{{ vfd_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ vfd_healthcheck_test }}"
+          interval: "{{ vfd_healthcheck_interval }}"
+          timeout: "{{ vfd_healthcheck_timeout }}"
+          retries: "{{ vfd_healthcheck_retries }}"
+          start_period: "{{ vfd_healthcheck_start_period }}"
         labels:
           autoheal: "{{ vfd_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ vfd_watchtower_enabled | ternary('true', 'false') }}"

@@ -38,6 +38,13 @@ transmission_autoheal_enabled: false
 transmission_dockflare_enabled: false
 transmission_dockflare_access_group: ""
 
+# healthcheck
+transmission_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:9091/transmission/web/ || exit 1"]
+transmission_healthcheck_interval: 30s
+transmission_healthcheck_timeout: 10s
+transmission_healthcheck_retries: 3
+transmission_healthcheck_start_period: 40s
+
 # homepage
 transmission_homepage_group: "Download Tools"
 transmission_homepage_icon: "transmission.png"

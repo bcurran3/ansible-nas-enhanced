@@ -52,6 +52,18 @@ youtubedl_material_db_autoheal_enabled: false
 youtubedl_material_dockflare_enabled: false
 youtubedl_material_dockflare_access_group: ""
 
+# healthcheck
+youtubedl_material_healthcheck_test: ["CMD", "curl", "-f", "http://localhost:17442/"]
+youtubedl_material_healthcheck_interval: 30s
+youtubedl_material_healthcheck_timeout: 10s
+youtubedl_material_healthcheck_retries: 3
+youtubedl_material_healthcheck_start_period: 40s
+youtubedl_material_db_healthcheck_test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+youtubedl_material_db_healthcheck_interval: 10s
+youtubedl_material_db_healthcheck_timeout: 5s
+youtubedl_material_db_retries: 3
+youtubedl_material_db_start_period: 10s
+
 # homepage
 youtubedl_material_homepage_group: "Download Tools"
 #youtubedl_material_homepage_group: "Media Servers"

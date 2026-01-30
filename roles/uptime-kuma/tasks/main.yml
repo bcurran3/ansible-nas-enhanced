@@ -28,6 +28,12 @@
           - "{{ uptime_kuma_port_http }}:3001"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ uptime_kuma_healthcheck_test }}"
+          interval: "{{ uptime_kuma_healthcheck_interval }}"
+          timeout: "{{ uptime_kuma_healthcheck_timeout }}"
+          retries: "{{ uptime_kuma_healthcheck_retries }}"
+          start_period: "{{ uptime_kuma_healthcheck_start_period }}"
         labels:
           autoheal: "{{ uptime_kuma_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ uptime_kuma_watchtower_enabled | ternary('true', 'false') }}"

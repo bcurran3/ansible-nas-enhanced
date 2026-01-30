@@ -33,14 +33,20 @@
         hostname: "{{ seedsync_container_name }}"
         image: "{{ seedsync_image_name }}:{{ seedsync_image_tag }}"
         pull: true
+        network_mode: bridge
         ports:
           - "{{ seedsync_port_http }}:8800"
         volumes:
           - "{{ seedsync_data_directory }}/config:/config"
           - "{{ seedsync_data_directory }}/downloads:/downloads"
-        network_mode: bridge
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ seedsync_healthcheck_test }}"
+          interval: "{{ seedsync_healthcheck_interval }}"
+          timeout: "{{ seedsync_healthcheck_timeout }}"
+          retries: "{{ seedsync_healthcheck_retries }}"
+          start_period: "{{ seedsync_healthcheck_start_period }}"
         labels:
           autoheal: "{{ seedsync_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ seedsync_watchtower_enabled | ternary('true', 'false') }}"

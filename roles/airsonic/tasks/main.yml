@@ -30,6 +30,12 @@
           - "{{ airsonic_podcasts_directory }}:/airsonic/podcasts:rw"
         ports:
           - "{{ airsonic_port_http }}:4040"
+        healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4040/login.view || exit 1"]
+          interval: "{{ airsonic_healthcheck_interval }}"
+          timeout: "{{ airsonic_healthcheck_timeout }}"
+          retries: "{{ airsonic_healthcheck_retries }}"
+          start_period: "{{ airsonic_healthcheck_start_period }}"
         labels:
           autoheal: "{{ airsonic_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ airsonic_watchtower_enabled | ternary('true', 'false') }}"

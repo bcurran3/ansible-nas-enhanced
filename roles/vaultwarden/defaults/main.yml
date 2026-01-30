@@ -64,6 +64,18 @@ vaultwarden_backup_autoheal_enabled: false
 vaultwarden_dockflare_enabled: false
 vaultwarden_dockflare_access_group: ""
 
+# healthcheck
+vaultwarden_healthcheck_test: ["CMD-SHELL", "ls /proc/*/exe | xargs readlink | grep -q vaultwarden || exit 1"]
+vaultwarden_healthcheck_interval: 30s
+vaultwarden_healthcheck_timeout: 10s
+vaultwarden_healthcheck_retries: 3
+vaultwarden_healthcheck_start_period: 20s
+vaultwarden_backup_healthcheck_test: ["CMD-SHELL", "pgrep crond || exit 1"]
+vaultwarden_backup_healthcheck_interval: 60s
+vaultwarden_backup_healthcheck_timeout: 10s
+vaultwarden_backup_healthcheck_retries: 3
+vaultwarden_backup_healthcheck_start_period: 10s
+
 # homepage
 vaultwarden_homepage_group: "Apps"
 vaultwarden_homepage_icon: "vaultwarden.png"

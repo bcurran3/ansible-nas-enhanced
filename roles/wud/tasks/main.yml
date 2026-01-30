@@ -73,11 +73,11 @@
 #          WUD_REGISTRY_QUAY_{REGISTRY_NAME}_TOKEN	white_circle	Quay token
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: 'curl --fail http://localhost:3000/health || exit 1'
-          interval: "10s"
-          timeout: "10s"
-          retries: "3"
-          start_period: "10s"
+          test: "{{ wud_healthcheck_test }}"
+          interval: "{{ wud_healthcheck_interval }}"
+          timeout: "{{ wud_healthcheck_timeout }}"
+          retries: "{{ wud_healthcheck_retries }}"
+          start_period: "{{ wud_healthcheck_start_period }}"
         labels:
           autoheal: "{{ wud_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ wud_watchtower_enabled | ternary('true', 'false') }}"

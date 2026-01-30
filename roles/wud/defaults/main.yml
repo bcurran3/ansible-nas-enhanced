@@ -36,6 +36,13 @@ wud_autoheal_enabled: false
 wud_dockflare_enabled: false
 wud_dockflare_access_group: ""
 
+# healthcheck
+wud_healthcheck_test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+wud_healthcheck_interval: 30s
+wud_healthcheck_timeout: 10s
+wud_healthcheck_retries: 3
+wud_healthcheck_start_period: 30s
+
 # homepage
 wud_homepage_group: "Apps"
 wud_homepage_icon: "whats-up-docker.png"

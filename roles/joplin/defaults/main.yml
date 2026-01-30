@@ -52,6 +52,18 @@ joplin_db_autoheal_enabled: false
 joplin_dockflare_enabled: false
 joplin_dockflare_access_group: ""
 
+# healthcheck
+joplin_healthcheck_interval: 30s
+joplin_healthcheck_timeout: 10s
+joplin_healthcheck_retries: 3
+joplin_healthcheck_start_period: 60s
+joplin_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:22300/health || exit 1"]
+joplin_db_healthcheck_interval: 10s
+joplin_db_healthcheck_timeout: 5s
+joplin_db_healthcheck_retries: 5
+joplin_db_healthcheck_start_period: 30s
+joplin_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U {{ joplin_env_postgres_user }} -h 127.0.0.1"]
+
 # homepage
 joplin_homepage_group: "Apps"
 joplin_homepage_icon: "joplin.png"

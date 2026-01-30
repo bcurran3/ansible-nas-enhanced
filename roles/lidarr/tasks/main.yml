@@ -40,6 +40,12 @@
           PUID: "{{ lidarr_user_id }}"
           PGID: "{{ lidarr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ lidarr_healthcheck_test }}"
+          interval: "{{ lidarr_healthcheck_interval }}"
+          timeout: "{{ lidarr_healthcheck_timeout }}"
+          retries: "{{ lidarr_healthcheck_retries }}"
+          start_period: "{{ lidarr_healthcheck_start_period }}"
         labels:
           autoheal: "{{ lidarr_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ lidarr_watchtower_enabled | ternary('true', 'false') }}"

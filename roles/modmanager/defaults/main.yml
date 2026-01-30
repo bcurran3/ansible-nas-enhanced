@@ -24,6 +24,13 @@ modmanager_memory_swap: -1
 # autoheal
 modmanager_autoheal_enabled: false
 
+# healthcheck
+modmanager_healthcheck_test: ["CMD-SHELL", "pgrep -f modmanager || exit 1"]
+modmanager_healthcheck_interval: 1m
+modmanager_healthcheck_timeout: 10s
+modmanager_healthcheck_retries: 3
+modmanager_healthcheck_start_period: 20s
+
 # homepage
 modmanager_homepage_group: "Misc"
 modmanager_homepage_icon: "sh-linuxserver-io.png"

@@ -77,11 +77,11 @@
           PLEX_DISABLE_SECURITY: "1"                          # added
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: curl --connect-timeout 15 --silent --show-error --fail http://localhost:32400/identity
-          interval: 1m00s
-          timeout: 15s
-          retries: 3
-          start_period: 1m00s
+          test: "{{ plex_healthcheck_test }}"
+          interval: "{{ plex_healthcheck_interval }}"
+          timeout: "{{ plex_healthcheck_timeout }}"
+          retries: "{{ plex_healthcheck_retries }}"
+          start_period: "{{ plex_healthcheck_start_period }}"
         labels:
           autoheal: "{{ plex_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ plex_watchtower_enabled | ternary('true', 'false') }}"

@@ -37,6 +37,36 @@
       community.docker.docker_network:
         name: "{{ tacticalrmm_mesh_network }}"
 
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+    # redis container for celery tasks
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        pull: true
+        image: "{{ _image_name }}:{{ _image_tag }}"
+        image: redis:6.0-alpine
+        name: tactical-redis
+        hostname: tactical-redis
+        network_mode: bridge
+        networks:
+          - name: "{{ tacticalrmm_redis_network }}"
+        networks_cli_compatible: "yes"
+        ports: 
+          - "6379:6379"
+        user: 1000:1000
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        volumes:
+          - "{{ tacticalrmm_data_directory }}/redis:/data"
+        labels:
+          autoheal: "{{ tacticalrmm_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          traefik.enable: "false"
+#         wud.tag.include: '^\d+\.\d+\.\d+$$'
+#         wud.link.template: "https://github.com/dev/tacticalrmm/releases/tag/$${major}.$${minor}.$${patch}"
+        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
+        restart_policy: unless-stopped
+
     - name: Create {{ ansible_nas_app_name }} Postgres DB Container
     # postgres database for api service
       community.docker.docker_container:
@@ -98,36 +128,6 @@
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tacticalrmm_data_directory }}/mongo:/data/db"
-        labels:
-          autoheal: "{{ tacticalrmm_autoheal_enabled | ternary('true', 'false') }}"
-          com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled | ternary('true', 'false') }}"
-          dockflare.enable: "false"
-          traefik.enable: "false"
-#         wud.tag.include: '^\d+\.\d+\.\d+$$'
-#         wud.link.template: "https://github.com/dev/tacticalrmm/releases/tag/$${major}.$${minor}.$${patch}"
-        cpu_shares: "{{ tacticalrmm_cpu_shares }}"
-        restart_policy: unless-stopped
-
-    - name: Create {{ ansible_nas_app_name }} Redis Container
-    # redis container for celery tasks
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        pull: true
-        image: "{{ _image_name }}:{{ _image_tag }}"
-        image: redis:6.0-alpine
-        name: tactical-redis
-        hostname: tactical-redis
-        network_mode: bridge
-        networks:
-          - name: "{{ tacticalrmm_redis_network }}"
-        networks_cli_compatible: "yes"
-        ports: 
-          - "6379:6379"
-        user: 1000:1000
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-        volumes:
-          - "{{ tacticalrmm_data_directory }}/redis:/data"
         labels:
           autoheal: "{{ tacticalrmm_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ tacticalrmm_watchtower_enabled | ternary('true', 'false') }}"

@@ -28,6 +28,12 @@
           - "{{ mailrise_data_directory }}/mailrise.conf:/etc/mailrise.conf:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ mailrise_healthcheck_test }}"
+          interval: "{{ mailrise_healthcheck_interval }}"
+          timeout: "{{ mailrise_healthcheck_timeout }}"
+          retries: "{{ mailrise_healthcheck_retries }}"
+          start_period: "{{ mailrise_healthcheck_start_period }}"
         labels:
           autoheal: "{{ mailrise_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ mailrise_watchtower_enabled | ternary('true', 'false') }}"

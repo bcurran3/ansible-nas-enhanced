@@ -38,6 +38,18 @@ rackula_api_autoheal_enabled: false
 rackula_dockflare_enabled: false
 rackula_dockflare_access_group: ""
 
+# healthcheck
+rackula_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/ || exit 1"]
+rackula_healthcheck_interval: 30s
+rackula_healthcheck_timeout: 10s
+rackula_healthcheck_retries: 3
+rackula_healthcheck_start_period: 10s
+rackula_api_healthcheck_test: ["CMD", "wget", "-qO-", "http://127.0.0.1:{{ rackula_port_api }}/health"]
+rackula_api_healthcheck_interval: 30s
+rackula_api_healthcheck_timeout: 10s
+rackula_api_healthcheck_retries: 3
+rackula_api_healthcheck_start_period: 5s
+
 # homepage
 rackula_homepage_group: "Apps"
 #rackula_homepage_group: "Network"

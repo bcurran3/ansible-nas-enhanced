@@ -36,6 +36,13 @@ netdata_autoheal_enabled: false
 netdata_dockflare_enabled: false
 netdata_dockflare_access_group: ""
 
+# healthcheck
+netdata_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:19999/api/v1/info || exit 1"]
+netdata_healthcheck_interval: 30s
+netdata_healthcheck_timeout: 10s
+netdata_healthcheck_retries: 3
+netdata_healthcheck_start_period: 20s
+
 # homepage
 netdata_homepage_group: "Apps"
 netdata_homepage_icon: "netdata.png"

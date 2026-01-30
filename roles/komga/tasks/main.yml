@@ -38,6 +38,12 @@
           journal-mode: "wal"
           SERVER_PORT: "{{ komga_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ komga_healthcheck_test }}"
+          interval: "{{ komga_healthcheck_interval }}"
+          timeout: "{{ komga_healthcheck_timeout }}"
+          retries: "{{ komga_healthcheck_retries }}"
+          start_period: "{{ komga_healthcheck_start_period }}"
         labels:
           autoheal: "{{ komga_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ komga_watchtower_enabled | ternary('true', 'false') }}"

@@ -33,6 +33,12 @@
           LOGOUT_AFTER_DAYS: "{{ dailytxt_env_logout_after_days }}"
           SECRET_KEY: "{{ dailytxt_env_secret_key }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
+          interval: "{{ dailytxt_healthcheck_interval }}"
+          timeout: "{{ dailytxt_healthcheck_timeout }}"
+          retries: "{{ dailytxt_healthcheck_retries }}"
+          start_period: "{{ dailytxt_healthcheck_start_period }}"
         labels:
           autoheal: "{{ dailytxt_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ dailytxt_watchtower_enabled | ternary('true', 'false') }}"

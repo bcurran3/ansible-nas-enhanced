@@ -26,6 +26,12 @@
         env:
           DOZZLE_REMOTE_AGENT: "{{ dozzle_env_dozzle_remote_agent }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dozzle_healthcheck_test }}"
+          interval: "{{ dozzle_healthcheck_interval }}"
+          timeout: "{{ dozzle_healthcheck_timeout }}"
+          retries: "{{ dozzle_healthcheck_retries }}"
+          start_period: "{{ dozzle_healthcheck_start_period }}"
         labels:
           autoheal: "{{ dozzle_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ dozzle_watchtower_enabled | ternary('true', 'false') }}"

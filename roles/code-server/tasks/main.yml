@@ -32,7 +32,6 @@
         ports:
           - "{{ code_server_port_http }}:8080"
         volumes:
-#         - "{{ code_server_data_directory }}/project:/home/coder/project"
           - "{{ code_server_data_directory }}/.config:/home/coder/.config"
           - "{{ code_server_data_directory }}/.local:/home/coder/.local"
           - "/home/{{ ansible_nas_user }}:/home/coder/{{ ansible_nas_user }}" # added
@@ -43,6 +42,12 @@
           DOCKER_USER: "{{ ansible_nas_user }}"
           PASSWORD: "{{ code_server_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "curl -f http://localhost:8080/login || exit 1"]
+          interval: "{{ code_server_healthcheck_interval }}"
+          timeout: "{{ code_server_healthcheck_timeout }}"
+          retries: "{{ code_server_healthcheck_retries }}"
+          start_period: "{{ code_server_healthcheck_start_period }}"
         labels:
           autoheal: "{{ code_server_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ code_server_watchtower_enabled | ternary('true', 'false') }}"

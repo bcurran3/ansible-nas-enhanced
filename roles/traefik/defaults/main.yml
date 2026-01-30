@@ -65,6 +65,13 @@ traefik_sendanonymoussage: "false"
 # autoheal
 traefik_autoheal_enabled: false
 
+# healthcheck
+traefik_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8083/ping || exit 1"]
+traefik_healthcheck_interval: 30s
+traefik_healthcheck_timeout: 10s
+traefik_healthcheck_retries: 3
+traefik_healthcheck_start_period: 20s
+
 # homepage
 traefik_homepage_group: "Network"
 traefik_homepage_icon: "traefik.png"

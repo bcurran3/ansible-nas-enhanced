@@ -41,6 +41,12 @@
           OIDC_CLIENT_SECRET: "{{ bytestash_env_oidc_client_secret }}"
           OIDC_SCOPES: "{{ bytestash_env_oidc_scopes }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD", "nc", "-z", "127.0.0.1", "5000"]
+          interval: "{{ bytestash_healthcheck_interval }}"
+          timeout: "{{ bytestash_healthcheck_timeout }}"
+          retries: "{{ bytestash_healthcheck_retries }}"
+          start_period: "{{ bytestash_healthcheck_start_period }}"
         labels:
           autoheal: "{{ bytestash_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ bytestash_watchtower_enabled | ternary('true', 'false') }}"

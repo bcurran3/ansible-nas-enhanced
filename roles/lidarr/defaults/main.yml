@@ -35,6 +35,13 @@ lidarr_autoheal_enabled: false
 lidarr_dockflare_enabled: false
 lidarr_dockflare_access_group: ""
 
+# healthcheck
+lidarr_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8686/ping || exit 1"]
+lidarr_healthcheck_interval: 30s
+lidarr_healthcheck_timeout: 10s
+lidarr_healthcheck_retries: 3
+lidarr_healthcheck_start_period: 60s
+
 # hompage
 lidarr_homepage_group: "Media Management"
 lidarr_homepage_icon: "lidarr.png"

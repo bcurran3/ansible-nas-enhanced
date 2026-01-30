@@ -29,6 +29,49 @@
         azuracast_homepage_href: "https://{{ azuracast_hostname }}.{{ ansible_nas_domain }}"
       when: azuracast_traefik_enabled | bool or azuracast_dockflare_enabled | bool
 
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ azuracast_redis_container_name }}"
+        hostname: "{{ azuracast_redis_container_name }}"
+        image: "{{ azuracast_redis_image_name }}:{{ azuracast_redis_image_tag }}"
+        pull: true
+        command: ["redis-server", "--appendonly", "yes", "--requirepass", "topsecret"]
+        volumes:
+          - "azuracast_redis_data:/data"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "redis-cli -a topsecret ping | grep PONG"]
+          interval: 10s
+          timeout: 5s
+          retries: 3
+        labels:
+          autoheal: "{{ azuracast_redis_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ azuracast_redis_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ azuracast_redis_homepage_group }}"
+          homepage.icon: "{{ azuracast_redis_homepage_icon }}"
+          homepage.href: "{{ azuracast_redis_homepage_href }}"
+          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ azuracast_redis_container_name }}"
+          homepage.showStats: "{{ azuracast_redis_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ azuracast_redis_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ azuracast_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ azuracast_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ azuracast_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ azuracast_redis_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/redis"
+        cpu_shares: "{{ azuracast_redis_cpu_shares }}"
+        memory: "{{ azuracast_redis_memory }}"
+        memory_swap: "{{ azuracast_redis_memory_swap }}"
+        restart_policy: unless-stopped
+
     - name: Create {{ ansible_nas_app_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -80,49 +123,6 @@
         cpu_shares: "{{ azuracast_db_cpu_shares }}"
         memory: "{{ azuracast_db_memory }}"
         memory_swap: "{{ azuracast_db_memory_swap }}"
-        restart_policy: unless-stopped
-
-    - name: Create {{ ansible_nas_app_name }} Redis Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ azuracast_redis_container_name }}"
-        hostname: "{{ azuracast_redis_container_name }}"
-        image: "{{ azuracast_redis_image_name }}:{{ azuracast_redis_image_tag }}"
-        pull: true
-        command: ["redis-server", "--appendonly", "yes", "--requirepass", "topsecret"]
-        volumes:
-          - "azuracast_redis_data:/data"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-        healthcheck:
-          test: ["CMD-SHELL", "redis-cli -a topsecret ping | grep PONG"]
-          interval: 10s
-          timeout: 5s
-          retries: 3
-        labels:
-          autoheal: "{{ azuracast_redis_autoheal_enabled | ternary('true', 'false') }}"
-          com.centurylinklabs.watchtower.enable: "{{ azuracast_redis_watchtower_enabled | ternary('true', 'false') }}"
-          dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Redis"
-          homepage.group: "{{ azuracast_redis_homepage_group }}"
-          homepage.icon: "{{ azuracast_redis_homepage_icon }}"
-          homepage.href: "{{ azuracast_redis_homepage_href }}"
-          homepage.description: "{{ 'The Real-time Data Platform' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ azuracast_redis_container_name }}"
-          homepage.showStats: "{{ azuracast_redis_homepage_showstats | ternary('true', 'false') }}"
-          repliqate.enabled: "{{ azuracast_redis_repliqate_enabled | ternary('true', 'false') }}"
-          repliqate.engine: "{{ azuracast_redis_repliqate_engine }}"
-          repliqate.schedule: "{{ azuracast_redis_repliqate_schedule }}"
-          repliqate.backup_id: "{{ azuracast_redis_repliqate_backup_id }}"
-          repliqate.retention: "{{ azuracast_redis_repliqate_retention }}"
-          traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/_/redis"
-        cpu_shares: "{{ azuracast_redis_cpu_shares }}"
-        memory: "{{ azuracast_redis_memory }}"
-        memory_swap: "{{ azuracast_redis_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Updater Container

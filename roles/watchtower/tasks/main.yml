@@ -13,6 +13,7 @@
         hostname: "{{ watchtower_container_name }}"
         image: "{{ watchtower_image_name }}:{{ watchtower_image_version }}"
         pull: true
+        command: "{{ watchtower_command }}"
         ports:
             - "{{ watchtower_port_api }}:{{ watchtower_port_api }}"
         volumes: "{{ 
@@ -57,7 +58,7 @@
           WATCHTOWER_NOTIFICATION_SLACK_ICON_EMOJI: "{{ watchtower_notifications_slack_icon_emoji }}"
           WATCHTOWER_NOTIFICATION_SLACK_ICON_URL: "{{ watchtower_notifications_slack_icon_url }}"
           TZ: "{{ ansible_nas_timezone }}"
-        command: "{{ watchtower_command }}"
+        healthcheck: {}
         labels:
           autoheal: "{{ watchtower_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ watchtower_watchtower_enabled | ternary('true', 'false') }}"

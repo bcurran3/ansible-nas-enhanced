@@ -40,6 +40,13 @@ virtual_tabletop_autoheal_enabled: false
 virtual_tabletop_dockflare_enabled: false
 virtual_tabletop_dockflare_access_group: ""
 
+# healthcheck
+virtual_tabletop_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:{{ virtual_tabletop_port_http }}/ || exit 1"]
+virtual_tabletop_healthcheck_interval: 30s
+virtual_tabletop_healthcheck_timeout: 10s
+virtual_tabletop_healthcheck_retries: 3
+virtual_tabletop_healthcheck_start_period: 20s
+
 # homepage
 virtual_tabletop_homepage_group: "Apps"
 virtual_tabletop_homepage_icon: "https://raw.githubusercontent.com/ArnoldSmith86/virtualtabletop/refs/heads/main/assets/branding/android-192.png"

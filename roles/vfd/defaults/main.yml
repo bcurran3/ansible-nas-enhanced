@@ -45,6 +45,13 @@ vfd_autoheal_enabled: false
 vfd_dockflare_enabled: false
 vfd_dockflare_access_group: ""
 
+# healthcheck
+vfd_healthcheck_test: ["CMD-SHELL", "grep -l vfd /proc/[0-9]*/cmdline | grep -qv 'self' || exit 1"]
+vfd_healthcheck_interval: 60s
+vfd_healthcheck_timeout: 10s
+vfd_healthcheck_retries: 3
+vfd_healthcheck_start_period: 30s
+
 # homepage
 vfd_homepage_group: "Apps"
 vfd_homepage_icon: "mdi-airplane"

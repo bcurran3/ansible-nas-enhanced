@@ -63,6 +63,12 @@
           USER_ID: "{{ handbrake_user_id }}"
           GROUP_ID: "{{ handbrake_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5800/ || exit 1"]
+          interval: "{{ handbrake_healthcheck_interval }}"
+          timeout: "{{ handbrake_healthcheck_timeout }}"
+          retries: "{{ handbrake_healthcheck_retries }}"
+          start_period: "{{ handbrake_healthcheck_start_period }}"
         labels:
           autoheal: "{{ handbrake_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ handbrake_watchtower_enabled | ternary('true', 'false') }}"

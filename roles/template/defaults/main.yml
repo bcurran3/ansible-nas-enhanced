@@ -34,6 +34,13 @@ appname_autoheal_enabled: false
 appname_dockflare_enabled: false
 appname_dockflare_access_group: ""
 
+# healthcheck
+appname_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
+appname_healthcheck_interval: 30s
+appname_healthcheck_timeout: 10s
+appname_healthcheck_retries: 3
+appname_healthcheck_start_period: 20s
+
 # homepage
 appname_homepage_description: "appname short description"
 appname_homepage_group: "Apps"
@@ -105,6 +112,13 @@ appname_db_memory_swap: "{{ appname_db_memory }}"
 # autoheal
 appname_db_autoheal_enabled: false
 
+# healthcheck
+appname_db_healthcheck_test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-u", "appname", "-p{{ appname_db_password }}"]
+appname_db_healthcheck_interval: 10s
+appname_db_healthcheck_timeout: 5s
+appname_db_healthcheck_retries: 5
+appname_db_healthcheck_start_period: 30s
+
 # homepage
 appname_db_homepage_description: "MariaDB Server is a high performing open source relational database, forked from MySQL."
 appname_db_homepage_group: "DBs"
@@ -149,6 +163,13 @@ appname_db_memory_swap: "{{ appname_db_memory }}"
 
 # autoheal
 appname_db_autoheal_enabled: false
+
+# healthcheck
+appname_db_healthcheck_test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--host", "127.0.0.1"]
+appname_db_healthcheck_interval: 10s
+appname_db_healthcheck_timeout: 5s
+appname_db_healthcheck_retries: 3
+appname_db_healthcheck_start_period: 15s
 
 # homepage
 appname_db_homepage_description: "The Database for Secure Apps"
@@ -195,6 +216,13 @@ appname_db_memory_swap: "{{ appname_db_memory }}"
 # autoheal
 appname_db_autoheal_enabled: false
 
+# healthcheck
+appname_db_healthcheck_test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p{{ appname_sql_root_password }}"]
+appname_db_healthcheck_interval: 10s
+appname_db_healthcheck_timeout: 5s
+appname_db_healthcheck_retries: 5
+appname_db_healthcheck_start_period: 30s
+
 # homepage
 appname_db_homepage_description: "MySQL Server, the world''s most popular open source database"
 appname_db_homepage_group: "DBs"
@@ -240,6 +268,13 @@ appname_db_memory_swap: "{{ appname_db_memory }}"
 # autoheal
 appname_db_autoheal_enabled: false
 
+# healthcheck
+appname_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U appname -d appname -h 127.0.0.1"]
+appname_db_healthcheck_interval: 10s
+appname_db_healthcheck_timeout: 5s
+appname_db_healthcheck_retries: 5
+appname_db_healthcheck_start_period: 30s
+
 # homepage
 appname_db_homepage_description: "PostgreSQL Database Management System"
 appname_db_homepage_group: "DBs"
@@ -283,6 +318,13 @@ appname_redis_memory_swap: "{{ appname_redis_memory }}"
 
 # autoheal
 appname_redis_autoheal_enabled: false
+
+# healthcheck
+appname_redis_healthcheck_test: ["CMD-SHELL", "redis-cli -a topsecret ping | grep PONG || exit 1"]
+appname_redis_healthcheck_interval: 10s
+appname_redis_healthcheck_timeout: 5s
+appname_redis_healthcheck_retries: 3
+appname_redis_healthcheck_start_period: 10s
 
 # homepage
 appname_redis_homepage_description: "The Real-time Data Platform"

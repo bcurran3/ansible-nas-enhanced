@@ -41,6 +41,12 @@
           PUID: "{{ radarr_user_id }}"
           PGID: "{{ radarr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ radarr_healthcheck_test }}"
+          interval: "{{ radarr_healthcheck_interval }}"
+          timeout: "{{ radarr_healthcheck_timeout }}"
+          retries: "{{ radarr_healthcheck_retries }}"
+          start_period: "{{ radarr_healthcheck_start_period }}"
         labels:
           autoheal: "{{ radarr_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ radarr_watchtower_enabled | ternary('true', 'false') }}"

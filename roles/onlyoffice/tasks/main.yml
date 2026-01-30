@@ -39,6 +39,12 @@
         ports:
           - "{{ onlyoffice_port_http }}:80"
           - "5222:5222" # ONLYOFFICE Talk (XMPP client connections)
+        healthcheck:
+          test: "{{ onlyoffice_healthcheck_test }}"
+          interval: "{{ onlyoffice_healthcheck_interval }}"
+          timeout: "{{ onlyoffice_healthcheck_timeout }}"
+          retries: "{{ onlyoffice_healthcheck_retries }}"
+          start_period: "{{ onlyoffice_healthcheck_start_period }}"
         labels:
           autoheal: "{{ onlyoffice_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ onlyoffice_watchtower_enabled | ternary('true', 'false') }}"

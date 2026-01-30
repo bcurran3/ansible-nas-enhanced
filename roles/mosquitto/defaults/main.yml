@@ -25,6 +25,13 @@ mosquitto_memory_swap: -1
 # autoheal
 mosquitto_autoheal_enabled: false
 
+# healthcheck
+mosquitto_healthcheck_test: ["CMD", "mosquitto_sub", "-t", "$SYS/broker/version", "-C", "1", "-W", "3"]
+mosquitto_healthcheck_interval: 30s
+mosquitto_healthcheck_timeout: 10s
+mosquitto_healthcheck_retries: 3
+mosquitto_healthcheck_start_period: 15s
+
 # homepage
 mosquitto_homepage_group: "Misc"
 mosquitto_homepage_icon: "mosquitto.png"

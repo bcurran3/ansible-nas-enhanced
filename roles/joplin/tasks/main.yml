@@ -30,11 +30,11 @@
           POSTGRES_DB: "{{ joplin_env_postgres_database }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U {{ joplin_env_postgres_user }}"]
-          interval: 10s
-          timeout: 5s
-          retries: 5
-          start_period: 30s
+          test: "{{ joplin_db_healthcheck_test }}"
+          interval: "{{ joplin_db_healthcheck_interval }}"
+          timeout: "{{ joplin_db_healthcheck_timeout }}"
+          retries: "{{ joplin_db_healthcheck_retries }}"
+          start_period: "{{ joplin_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ joplin_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ joplin_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -99,6 +99,12 @@
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ joplin_db_container_name }}"
+        healthcheck:
+          test: "{{ joplin_healthcheck_test }}"
+          interval: "{{ joplin_healthcheck_interval }}"
+          timeout: "{{ joplin_healthcheck_timeout }}"
+          retries: "{{ joplin_healthcheck_retries }}"
+          start_period: "{{ joplin_healthcheck_start_period }}"
         labels:
           autoheal: "{{ joplin_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ joplin_watchtower_enabled | ternary('true', 'false') }}"

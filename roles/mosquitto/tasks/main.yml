@@ -30,7 +30,12 @@
         ports:
           - "{{ mosquitto_port_a }}:1883"
           - "{{ mosquitto_port_b }}:9001"
-        restart_policy: unless-stopped
+        healthcheck:
+          test: "{{ mosquitto_healthcheck_test }}"
+          interval: "{{ mosquitto_healthcheck_interval }}"
+          timeout: "{{ mosquitto_healthcheck_timeout }}"
+          retries: "{{ mosquitto_healthcheck_retries }}"
+          start_period: "{{ mosquitto_healthcheck_start_period }}"
         labels:
           autoheal: "{{ mosquitto_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ mosquitto_watchtower_enabled | ternary('true', 'false') }}"
@@ -55,6 +60,7 @@
         memory: "{{ mosquitto_memory }}"
         memory_swap: "{{ mosquitto_memory_swap }}"
         restart: "{{ mosquitto_conf is changed }}"
+        restart_policy: unless-stopped
   when: mosquitto_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

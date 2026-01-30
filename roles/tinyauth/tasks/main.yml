@@ -27,6 +27,12 @@
         volumes:
           - "{{ tinyauth_data_directory }}/data:/data"
           - "/var/run/docker.sock:/var/run/docker.sock"
+        healthcheck:
+          test: "{{ tinyauth_healthcheck_test }}"
+          interval: "{{ tinyauth_healthcheck_interval }}"
+          timeout: "{{ tinyauth_healthcheck_timeout }}"
+          retries: "{{ tinyauth_healthcheck_retries }}"
+          start_period: "{{ tinyauth_healthcheck_start_period }}"
         labels:
           autoheal: "{{ tinyauth_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ tinyauth_watchtower_enabled | ternary('true', 'false') }}"

@@ -64,6 +64,12 @@
           {{ dev_list if dev_list | length > 0 else omit }}
         group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
+        healthcheck:
+          test: "{{ netdata_healthcheck_test }}"
+          interval: "{{ netdata_healthcheck_interval }}"
+          timeout: "{{ netdata_healthcheck_timeout }}"
+          retries: "{{ netdata_healthcheck_retries }}"
+          start_period: "{{ netdata_healthcheck_start_period }}"
         labels:
           autoheal: "{{ netdata_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ netdata_watchtower_enabled | ternary('true', 'false') }}"

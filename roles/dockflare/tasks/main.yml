@@ -24,48 +24,6 @@
         dockflare_homepage_href: "https://{{ dockflare_hostname }}.{{ ansible_nas_domain }}"
       when: dockflare_traefik_enabled | bool or dockflare_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Docker Socket Proxy Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ dockflare_proxy_container_name }}"
-        hostname: "{{ dockflare_proxy_container_name }}"
-        image: "{{ dockflare_proxy_image_name }}:{{ dockflare_proxy_image_tag }}"
-        pull: true
-        volumes:
-          - "/var/run/docker.sock:/var/run/docker.sock"
-        env:
-          DOCKER_HOST: "unix:///var/run/docker.sock"
-          CONTAINERS: "1"
-          EVENTS: "1"
-          NETWORKS: "1"
-          IMAGES: "1"
-          POST: "1"
-          PING: "1"
-          INFO: "1"
-          EXEC: "1"
-          TZ: "{{ ansible_nas_timezone }}"
-        labels:
-          autoheal: "{{ dockflare_proxy_autoheal_enabled | ternary('true', 'false') }}"
-          com.centurylinklabs.watchtower.enable: "{{ dockflare_proxy_watchtower_enabled | ternary('true', 'false') }}"
-          dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Docker Socket Proxy"
-          homepage.group: "{{ dockflare_proxy_homepage_group }}"
-          homepage.icon: "{{ dockflare_proxy_homepage_icon }}"
-          homepage.href: "{{ dockflare_homepage_href }}"
-          homepage.description: "{{ 'Proxy over your Docker socket to restrict which requests it accepts' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ dockflare_proxy_container_name }}"
-          homepage.showStats: "{{ dockflare_proxy_homepage_showstats | ternary('true', 'false') }}"
-          repliqate.enabled: "false"
-          traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/tecnativa/docker-socket-proxy/pkgs/container/docker-socket-proxy"
-        cpu_shares: "{{ dockflare_proxy_cpu_shares }}"
-        memory: "{{ dockflare_proxy_memory }}"
-        memory_swap: "{{ dockflare_proxy_memory_swap }}"
-        restart_policy: unless-stopped
-
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -79,10 +37,10 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "redis-cli", "ping"]
-          interval: 10s
-          timeout: 5s
-          retries: 3
+          test: "{{ dockflare_redis_healthcheck_test }}"
+          interval: "{{ dockflare_redis_healthcheck_interval }}"
+          timeout: "{{ dockflare_redis_healthcheck_timeout }}"
+          retries: "{{ dockflare_redis_retries }}"
         labels:
           autoheal: "{{ dockflare_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ dockflare_redis_watchtower_enabled | ternary('true', 'false') }}"
@@ -109,6 +67,53 @@
         memory_swap: "{{ dockflare_redis_memory_swap }}"
         restart_policy: unless-stopped
 
+    - name: Create {{ ansible_nas_app_name }} Docker Socket Proxy Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dockflare_proxy_container_name }}"
+        hostname: "{{ dockflare_proxy_container_name }}"
+        image: "{{ dockflare_proxy_image_name }}:{{ dockflare_proxy_image_tag }}"
+        pull: true
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        env:
+          DOCKER_HOST: "unix:///var/run/docker.sock"
+          CONTAINERS: "1"
+          EVENTS: "1"
+          NETWORKS: "1"
+          IMAGES: "1"
+          POST: "1"
+          PING: "1"
+          INFO: "1"
+          EXEC: "1"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dockflare_proxy_healthcheck_test }}"
+          interval: "{{ dockflare_proxy_healthcheck_interval }}"
+          timeout: "{{ dockflare_proxy_healthcheck_timeout }}"
+          retries: "{{ dockflare_proxy_retries }}"
+        labels:
+          autoheal: "{{ dockflare_proxy_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dockflare_proxy_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Docker Socket Proxy"
+          homepage.group: "{{ dockflare_proxy_homepage_group }}"
+          homepage.icon: "{{ dockflare_proxy_homepage_icon }}"
+          homepage.href: "{{ dockflare_homepage_href }}"
+          homepage.description: "{{ 'Proxy over your Docker socket to restrict which requests it accepts' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dockflare_proxy_container_name }}"
+          homepage.showStats: "{{ dockflare_proxy_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "false"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+\.\d+$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/tecnativa/docker-socket-proxy/pkgs/container/docker-socket-proxy"
+        cpu_shares: "{{ dockflare_proxy_cpu_shares }}"
+        memory: "{{ dockflare_proxy_memory }}"
+        memory_swap: "{{ dockflare_proxy_memory_swap }}"
+        restart_policy: unless-stopped
+
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -129,7 +134,16 @@
           STATE_FILE_PATH: "/app/data/state.json"
           USE_EXTERNAL_CLOUDFLARED: "{{ dockflare_env_use_external_cloudflared }}"
           EXTERNAL_TUNNEL_ID: "{{ dockflare_env_external_tunnel_id }}"
+          TIMEOUT_CLIENT: "1h"
+          TIMEOUT_CONNECT: "10s"
+          TIMEOUT_SERVER: "1h"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dockflare_healthcheck_test }}"
+          interval: "{{ dockflare_healthcheck_interval }}"
+          timeout: "{{ dockflare_healthcheck_timeout }}"
+          retries: "{{ dockflare_healthcheck_retries }}"
+          start_period: "{{ dockflare_healthcheck_start_period }}"
         links:
           - "{{ dockflare_proxy_container_name }}"
           - "{{ dockflare_redis_container_name }}"

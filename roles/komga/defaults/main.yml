@@ -38,6 +38,13 @@ komga_autoheal_enabled: false
 komga_dockflare_enabled: false
 komga_dockflare_access_group: ""
 
+# healthcheck
+komga_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:{{ komga_port_http }}/ || exit 1"]
+komga_healthcheck_interval: 30s
+komga_healthcheck_timeout: 10s
+komga_healthcheck_retries: 3
+komga_healthcheck_start_period: 90s
+
 # homepage
 komga_homepage_group: "Media Servers"
 komga_homepage_icon: "komga"

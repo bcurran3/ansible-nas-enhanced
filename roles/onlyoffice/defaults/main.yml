@@ -36,6 +36,13 @@ onlyoffice_autoheal_enabled: false
 onlyoffice_dockflare_enabled: false
 onlyoffice_dockflare_access_group: ""
 
+# healthcheck
+onlyoffice_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/healthcheck || exit 1"]
+onlyoffice_healthcheck_interval: 30s
+onlyoffice_healthcheck_timeout: 10s
+onlyoffice_healthcheck_retries: 3
+onlyoffice_healthcheck_start_period: 90s
+
 # homepage
 onlyoffice_homepage_group: "Misc"
 onlyoffice_homepage_icon: "onlyoffice.png"

@@ -22,6 +22,12 @@
           TZ: "{{ ansible_nas_timezone }}"
         ports:
           - "{{ whatsrunning_port_http }}:5000"
+        healthcheck:
+          test: "{{ whatsrunning_healthcheck_test }}"
+          interval: "{{ whatsrunning_healthcheck_interval }}"
+          timeout: "{{ whatsrunning_healthcheck_timeout }}"
+          retries: "{{ whatsrunning_healthcheck_retries }}"
+          start_period: "{{ whatsrunning_healthcheck_start_period }}"
         labels:
           autoheal: "{{ whatsrunning_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ whatsrunning_watchtower_enabled | ternary('true', 'false') }}"

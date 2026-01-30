@@ -33,51 +33,6 @@
         patchmon_homepage_href: "https://{{ patchmon_hostname }}.{{ ansible_nas_domain }}"
       when: patchmon_traefik_enabled | bool or patchmon_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ patchmon_db_container_name }}"
-        hostname: "{{ patchmon_db_container_name }}"
-        image: "{{ patchmon_db_image_name }}:{{ patchmon_db_image_tag }}"
-        pull: true
-        volumes:
-          - "{{ patchmon_data_directory }}/db:/var/lib/postgresql/data"
-        env:
-          POSTGRES_USER: "{{ patchmon_db_env_postgres_user }}"
-          POSTGRES_PASSWORD: "{{ patchmon_db_env_postgres_password }}"
-          POSTGRES_DB: "{{ patchmon_db_env_postgres_db }}"
-          TZ: "{{ ansible_nas_timezone }}"
-        healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U {{ patchmon_db_env_postgres_user }} -d {{ patchmon_db_env_postgres_db }}"]
-          interval: "3s"
-          timeout: "5s"
-          retries: 7
-        labels:
-          autoheal: "{{ patchmon_db_autoheal_enabled | ternary('true', 'false') }}"
-          com.centurylinklabs.watchtower.enable: "{{ patchmon_db_watchtower_enabled | ternary('true', 'false') }}"
-          dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
-          homepage.group: "{{ patchmon_db_homepage_group }}"
-          homepage.icon: "{{ patchmon_db_homepage_icon }}"
-          homepage.href: "{{ patchmon_db_homepage_href }}"
-          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ patchmon_db_container_name }}"
-          homepage.showStats: "{{ patchmon_db_homepage_showstats | ternary('true', 'false') }}"
-          repliqate.enabled: "{{ patchmon_db_repliqate_enabled | ternary('true', 'false') }}"
-          repliqate.engine: "{{ patchmon_db_repliqate_engine }}"
-          repliqate.schedule: "{{ patchmon_db_repliqate_schedule }}"
-          repliqate.backup_id: "{{ patchmon_db_repliqate_backup_id }}"
-          repliqate.retention: "{{ patchmon_db_repliqate_retention }}"
-          traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/_/postgres"
-        cpu_shares: "{{ patchmon_db_cpu_shares }}"
-        memory: "{{ patchmon_db_memory }}"
-        memory_swap: "{{ patchmon_db_memory_swap }}"
-        restart_policy: unless-stopped
-
     - name: Create {{ ansible_nas_app_name }} Redis Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -91,10 +46,11 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "{{ patchmon_env_redis_password }}", "ping"]
-          interval: "3s"
-          timeout: "5s"
-          retries: 7
+          test: "{{ patchmon_redis_healthcheck_test }}"
+          interval: "{{ netbox_redis_healthcheck_interval }}"
+          timeout: "{{ netbox_redis_healthcheck_timeout }}"
+          retries: "{{ netbox_redis_healthcheck_retries }}"
+          start_period: "{{ netbox_redis_healthcheck_start_period }}"
         labels:
           autoheal: "{{ patchmon_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ patchmon_redis_watchtower_enabled | ternary('true', 'false') }}"
@@ -119,6 +75,52 @@
         cpu_shares: "{{ patchmon_redis_cpu_shares }}"
         memory: "{{ patchmon_redis_memory }}"
         memory_swap: "{{ patchmon_redis_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ ansible_nas_app_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ patchmon_db_container_name }}"
+        hostname: "{{ patchmon_db_container_name }}"
+        image: "{{ patchmon_db_image_name }}:{{ patchmon_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ patchmon_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "{{ patchmon_db_env_postgres_user }}"
+          POSTGRES_PASSWORD: "{{ patchmon_db_env_postgres_password }}"
+          POSTGRES_DB: "{{ patchmon_db_env_postgres_db }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ patchmon_db_healthcheck_test }}"
+          interval: "{{ patchmon_db_healthcheck_interval }}"
+          timeout: "{{ patchmon_db_healthcheck_timeout }}"
+          retries: "{{ patchmon_db_healthcheck_retries }}"
+          start_period: "{{ patchmon_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ patchmon_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ patchmon_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.group: "{{ patchmon_db_homepage_group }}"
+          homepage.icon: "{{ patchmon_db_homepage_icon }}"
+          homepage.href: "{{ patchmon_db_homepage_href }}"
+          homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ patchmon_db_container_name }}"
+          homepage.showStats: "{{ patchmon_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ patchmon_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ patchmon_db_repliqate_engine }}"
+          repliqate.schedule: "{{ patchmon_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ patchmon_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ patchmon_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: '^\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://hub.docker.com/_/postgres"
+        cpu_shares: "{{ patchmon_db_cpu_shares }}"
+        memory: "{{ patchmon_db_memory }}"
+        memory_swap: "{{ patchmon_db_memory_swap }}"
         restart_policy: unless-stopped
 
     - name: Verify {{ ansible_nas_app_name }} DB is healthy
@@ -166,6 +168,12 @@
           REDIS_DB: "{{ patchmon_env_redis_db }}"
           ASSETS_DIR: "{{ patchmon_env_assets_dir }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ patchmon_healthcheck_test }}"
+          interval: "{{ patchmon_healthcheck_interval }}"
+          timeout: "{{ patchmon_healthcheck_timeout }}"
+          retries: "{{ patchmon_healthcheck_retries }}"
+          start_period: "{{ patchmon_healthcheck_start_period }}"
         links:
           - "{{ patchmon_db_container_name }}"
           - "{{ patchmon_redis_container_name }}"
@@ -218,6 +226,12 @@
         links:
           - "{{ patchmon_container_name }}:backend"
           - "{{ patchmon_redis_container_name }}:redis"
+        healthcheck:
+          test: "{{ patchmon_web_healthcheck_test }}"
+          interval: "{{ patchmon_web_healthcheck_interval }}"
+          timeout: "{{ patchmon_web_healthcheck_timeout }}"
+          retries: "{{ patchmon_web_healthcheck_retries }}"
+          start_period: "{{ patchmon_web_healthcheck_start_period }}"
         labels:
           autoheal: "{{ patchmon_web_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ patchmon_web_watchtower_enabled | ternary('true', 'false') }}"

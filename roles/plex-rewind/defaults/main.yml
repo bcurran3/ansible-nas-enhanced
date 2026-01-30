@@ -36,6 +36,13 @@ plex_rewind_autoheal_enabled: false
 plex_rewind_dockflare_enabled: false
 plex_rewind_dockflare_access_group: ""
 
+# healthcheck
+plex_rewind_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8383/ || exit 1"]
+plex_rewind_healthcheck_interval: 30s
+plex_rewind_healthcheck_timeout: 10s
+plex_rewind_healthcheck_retries: 3
+plex_rewind_healthcheck_start_period: 20s
+
 # homepage
 plex_rewind_homepage_group: "Apps"
 plex_rewind_homepage_icon: "plex-rewind.png"

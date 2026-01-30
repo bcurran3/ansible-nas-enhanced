@@ -51,6 +51,21 @@ dockflare_redis_autoheal_enabled: false
 dockflare_dockflare_enabled: false
 dockflare_dockflare_access_group: ""
 
+# healthcheck
+dockflare_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:5000/ || exit 1"]
+dockflare_healthcheck_interval: 30s
+dockflare_healthcheck_timeout: 10s
+dockflare_healthcheck_retries: 3
+dockflare_healthcheck_start_period: 30s
+dockflare_proxy_healthcheck_test: ["CMD-SHELL", "pgrep -x haproxy > /dev/null || exit 1"]
+dockflare_proxy_healthcheck_interval: 10s
+dockflare_proxy_healthcheck_timeout: 5s
+dockflare_proxy_retries: 3
+dockflare_redis_healthcheck_test: ["CMD", "redis-cli", "ping"]
+dockflare_redis_healthcheck_interval: 10s
+dockflare_redis_healthcheck_timeout: 5s
+dockflare_redis_retries: 3
+
 # homepage
 dockflare_homepage_group: "Network"
 dockflare_homepage_icon: "https://raw.githubusercontent.com/ChrispyBacon-dev/DockFlare/refs/heads/stable/images/bannertr.png"

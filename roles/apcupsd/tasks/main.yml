@@ -37,6 +37,12 @@
           - "{{ apcupsd_device }}"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "apcaccess status || exit 1"]
+          interval: "{{ apcupsd_healthcheck_interval }}"
+          timeout: "{{ apcupsd_healthcheck_timeout }}"
+          retries: "{{ apcupsd_healthcheck_retries }}"
+          start_period: "{{ apcupsd_healthcheck_start_period }}"
         labels:
           autoheal: "{{ apcupsd_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ apcupsd_watchtower_enabled | ternary('true', 'false') }}"

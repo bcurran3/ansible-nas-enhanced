@@ -34,11 +34,11 @@
           MONGO_INITDB_ROOT_PASSWORD: "{{ komodo_env_komodo_database_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-          interval: 10s
-          timeout: 5s
-          retries: 3
-          start_period: 5s
+          test: "{{ komodo_db_healthcheck_test }}"
+          interval: "{{ komodo_db_healthcheck_interval }}"
+          timeout: "{{ komodo_db_healthcheck_timeout }}"
+          retries: "{{ komodo_db_healthcheck_retries }}"
+          start_period: "{{ komodo_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ komodo_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ komodo_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -89,6 +89,12 @@
           PERIPHERY_LOGGING_PRETTY: "{{ komodo_periphery_env_periphery_logging_pretty }}"
           PERIPHERY_PRETTY_STARTUP_CONFIG: "{{ komodo_periphery_env_periphery_pretty_startup_config }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ komodo_periphery_healthcheck_test }}"
+          interval: "{{ komodo_periphery_healthcheck_interval }}"
+          timeout: "{{ komodo_periphery_healthcheck_timeout }}"
+          retries: "{{ komodo_periphery_healthcheck_retries }}"
+          start_period: "{{ komodo_periphery_healthcheck_start_period }}"
         labels:
           autoheal: "{{ komodo_periphery_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ komodo_periphery_watchtower_enabled | ternary('true', 'false') }}"
@@ -176,6 +182,12 @@
           KOMODO_AWS_ACCESS_KEY_ID: "{{ komodo_env_komodo_aws_access_key_id }}"
           KOMODO_AWS_SECRET_ACCESS_KEY: "{{ komodo_env_komodo_aws_secret_access_key }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ komodo_healthcheck_test }}"
+          interval: "{{ komodo_healthcheck_interval }}"
+          timeout: "{{ komodo_healthcheck_timeout }}"
+          retries: "{{ komodo_healthcheck_retries }}"
+          start_period: "{{ komodo_healthcheck_start_period }}"
         links:
           - "{{ komodo_db_container_name }}"
           - "{{ komodo_periphery_container_name }}"

@@ -50,6 +50,13 @@ scrutiny_autoheal_enabled: false
 scrutiny_dockflare_enabled: false
 scrutiny_dockflare_access_group: ""
 
+# healthcheck
+scrutiny_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/api/health || exit 1"]
+scrutiny_healthcheck_interval: 30s
+scrutiny_healthcheck_timeout: 10s
+scrutiny_healthcheck_retries: 3
+scrutiny_healthcheck_start_period: 20s
+
 # homepage
 scrutiny_homepage_group: "Apps"
 scrutiny_homepage_icon: "scrutiny.png"

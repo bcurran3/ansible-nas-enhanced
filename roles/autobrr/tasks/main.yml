@@ -28,6 +28,12 @@
         env:
           USER: "1000:1000"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:7474/ || exit 1"]
+          interval: "{{ autobrr_healthcheck_interval }}"
+          timeout: "{{ autobrr_healthcheck_timeout }}"
+          retries: "{{ autobrr_healthcheck_retries }}"
+          start_period: "{{ autobrr_healthcheck_start_period }}"
         labels:
           autoheal: "{{ autobrr_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ autobrr_watchtower_enabled | ternary('true', 'false') }}"

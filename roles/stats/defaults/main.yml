@@ -94,6 +94,37 @@ stats_grafana_dockflare_access_group: ""
 stats_prometheus_dockflare_enabled: false
 stats_prometheus_dockflare_access_group: ""
 
+# healthcheck
+stats_grafana_healthcheck_interval: 30s
+stats_grafana_healthcheck_timeout: 10s
+stats_grafana_healthcheck_retries: 3
+stats_grafana_healthcheck_start_period: 30s
+stats_hddtemp_healthcheck_test: ["CMD-SHELL", "nc -z 127.0.0.1 7634 || exit 1"]
+stats_hddtemp_healthcheck_interval: 30s
+stats_hddtemp_healthcheck_timeout: 5s
+stats_hddtemp_healthcheck_retries: 3
+stats_hddtemp_healthcheck_start_period: 10s
+stats_prometheus_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:9090/-/healthy || exit 1"]
+stats_prometheus_healthcheck_interval: 30s
+stats_prometheus_healthcheck_timeout: 10s
+stats_prometheus_healthcheck_retries: 3
+stats_prometheus_healthcheck_start_period: 20s
+stats_smartctl_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:9902/metrics || exit 1"]
+stats_smartctl_healthcheck_interval: 30s
+stats_smartctl_healthcheck_timeout: 5s
+stats_smartctl_healthcheck_retries: 3
+stats_smartctl_healthcheck_start_period: 15s
+stats_speedtest_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:{{ stats_speedtest_exporter_port }}/metrics || exit 1"]
+stats_speedtest_healthcheck_interval: 60s
+stats_speedtest_healthcheck_timeout: 10s
+stats_speedtest_healthcheck_retries: 3
+stats_speedtest_healthcheck_start_period: 20s
+stats_telegraf_healthcheck_test: ["CMD-SHELL", "telegraf --version || exit 1"]
+stats_telegraf_healthcheck_interval: 30s
+stats_telegraf_healthcheck_timeout: 5s
+stats_telegraf_healthcheck_retries: 3
+stats_telegraf_healthcheck_start_period: 15s
+
 # homepage
 stats_grafana_homepage_group: "Apps"
 stats_grafana_homepage_icon: "grafana.png"

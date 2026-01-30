@@ -34,6 +34,13 @@ searxng_autoheal_enabled: false
 searxng_dockflare_enabled: false
 searxng_dockflare_access_group: ""
 
+# healthcheck
+searxng_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:8080/healthz || exit 1"]
+searxng_healthcheck_interval: 30s
+searxng_healthcheck_timeout: 10s
+searxng_healthcheck_retries: 3
+searxng_healthcheck_start_period: 20s
+
 # homepage
 searxng_homepage_group: "Apps"
 searxng_homepage_icon: "searxng.png"

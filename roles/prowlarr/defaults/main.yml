@@ -33,6 +33,13 @@ prowlarr_autoheal_enabled: false
 prowlarr_dockflare_enabled: false
 prowlarr_dockflare_access_group: ""
 
+# healthcheck
+prowlarr_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:9696/ping || exit 1"]
+prowlarr_healthcheck_interval: 30s
+prowlarr_healthcheck_timeout: 10s
+prowlarr_healthcheck_retries: 3
+prowlarr_healthcheck_start_period: 60s
+
 # homepage
 prowlarr_homepage_group: "Download Tools"
 prowlarr_homepage_icon: "prowlarr.png"

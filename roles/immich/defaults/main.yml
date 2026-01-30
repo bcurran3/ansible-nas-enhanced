@@ -77,6 +77,28 @@ immich_redis_autoheal_enabled: false
 immich_dockflare_enabled: false
 immich_dockflare_access_group: ""
 
+# healthchecks
+immich_server_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:2283/server-info || exit 1"]
+immich_server_healthcheck_interval: 30s
+immich_server_healthcheck_timeout: 10s
+immich_server_healthcheck_retries: 3
+immich_server_healthcheck_start_period: 60s
+immich_db_healthcheck_test: ["CMD-SHELL", "pg_isready -d {{ immich_db_name }} -U {{ immich_db_username }} -h 127.0.0.1"]
+immich_db_healthcheck_interval: 10s
+immich_db_healthcheck_timeout: 5s
+immich_db_healthcheck_retries: 5
+immich_db_healthcheck_start_period: 30s
+immich_ml_healthcheck_test: ["CMD", "python3", "-c", "import socket; s = socket.socket(socket.AF_INET, socket.SOCK_STREAM); s.settimeout(5); s.connect(('127.0.0.1', 3003))"]
+immich_ml_healthcheck_interval: 30s
+immich_ml_healthcheck_timeout: 10s
+immich_ml_healthcheck_retries: 3
+immich_ml_healthcheck_start_period: 90s
+immich_redis_healthcheck_test: ["CMD-SHELL", "valkey-cli ping | grep PONG || exit 1"]
+immich_redis_healthcheck_interval: 10s
+immich_redis_healthcheck_timeout: 5s
+immich_redis_healthcheck_retries: 5
+immich_redis_healthcheck_start_period: 10s
+
 # homepage
 immich_homepage_group: "Apps"
 immich_homepage_icon: "immich.png"

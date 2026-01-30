@@ -74,6 +74,23 @@ nextcloud_redis_autoheal_enabled: false
 nextcloud_dockflare_enabled: false
 nextcloud_dockflare_access_group: ""
 
+# healthcheck
+nextcloud_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:80/status.php || exit 1"]
+nextcloud_healthcheck_interval: 30s
+nextcloud_healthcheck_timeout: 10s
+nextcloud_healthcheck_retries: 3
+nextcloud_healthcheck_start_period: 60s
+nextcloud_db_healthcheck_test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-u", "{{ nextcloud_db_user }}", "-p{{ nextcloud_db_password }}"]
+nextcloud_db_healthcheck_interval: 10s
+nextcloud_db_healthcheck_timeout: 5s
+nextcloud_db_healthcheck_retries: 5
+nextcloud_db_healthcheck_start_period: 30s
+nextcloud_redis_healthcheck_test: ["CMD-SHELL", "redis-cli -a {{ nextcloud_env_redis_host_password }} ping | grep PONG || exit 1"]
+nextcloud_redis_healthcheck_interval: 10s
+nextcloud_redis_healthcheck_timeout: 5s
+nextcloud_redis_healthcheck_retries: 3
+nextcloud_redis_healthcheck_start_period: 10s
+
 # homepage
 nextcloud_homepage_group: "Apps"
 nextcloud_homepage_icon: "nextcloud.png"

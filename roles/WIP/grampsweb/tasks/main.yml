@@ -21,6 +21,35 @@
         grampsweb_homepage_href: "https://{{ grampsweb_hostname }}.{{ ansible_nas_domain }}"
       when: grampsweb_traefik_enabled | bool or grampsweb_dockflare_enabled | bool
 
+    - name: Create {{ ansible_nas_app_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ grampsweb_redis_container_name }}"
+        hostname: "{{ grampsweb_redis_container_name }}"
+        image: "{{ grampsweb_redis_image_name }}:{{ grampsweb_redis_image_tag }}"
+        pull: true
+        networks_cli_compatible: "yes"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        labels:
+          autoheal: "{{ grampsweb_redis_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "true"
+          dockflare.enable: "false"
+          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.group: "{{ grampsweb_redis_homepage_group }}"
+          homepage.icon: "{{ grampsweb_redis_homepage_icon }}"
+          homepage.href: "{{ grampsweb_redis_homepage_href }}"
+          homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ grampsweb_redis_container_name }}"
+          homepage.showStats: "{{ grampsweb_redis_homepage_showstats | ternary('true', 'false') }}"
+          traefik.enable: "false"
+        cpu_shares: "{{ grampsweb_redis_cpu_shares }}"
+        memory: "{{ grampsweb_redis_memory }}"
+        memory_swap: "{{ grampsweb_redis_memory_swap }}"
+        restart_policy: unless-stopped
+
 # I don't understand how to create the container below w/no image to pull
 
 #    - name: {{ ansible_nas_app_name }} celery Container
@@ -54,35 +83,6 @@
 #        memory: "{{ grampsweb_celery_memory }}"
 #        memory_swap: "{{ grampsweb_celery_memory_swap }}"
 #        restart_policy: unless-stopped
-
-    - name: Create {{ ansible_nas_app_name }} Redis Container
-      community.docker.docker_container:
-        container_default_behavior: "compatibility"
-        name: "{{ grampsweb_redis_container_name }}"
-        hostname: "{{ grampsweb_redis_container_name }}"
-        image: "{{ grampsweb_redis_image_name }}:{{ grampsweb_redis_image_tag }}"
-        pull: true
-        networks_cli_compatible: "yes"
-        env:
-          TZ: "{{ ansible_nas_timezone }}"
-        labels:
-          autoheal: "{{ grampsweb_redis_autoheal_enabled | ternary('true', 'false') }}"
-          com.centurylinklabs.watchtower.enable: "true"
-          dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Redis"
-          homepage.group: "{{ grampsweb_redis_homepage_group }}"
-          homepage.icon: "{{ grampsweb_redis_homepage_icon }}"
-          homepage.href: "{{ grampsweb_redis_homepage_href }}"
-          homepage.description: "{{ 'Redis' if homepage_show_description else omit }}"
-          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ grampsweb_port_http }}"
-          homepage.server: "my-docker"
-          homepage.container: "{{ grampsweb_redis_container_name }}"
-          homepage.showStats: "{{ grampsweb_redis_homepage_showstats | ternary('true', 'false') }}"
-          traefik.enable: "false"
-        cpu_shares: "{{ grampsweb_redis_cpu_shares }}"
-        memory: "{{ grampsweb_redis_memory }}"
-        memory_swap: "{{ grampsweb_redis_memory_swap }}"
-        restart_policy: unless-stopped
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:

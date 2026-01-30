@@ -22,6 +22,12 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         command: "-input /traefik.json -outdir /target -pem -pkcs -watch"
+        healthcheck:
+          test: ["CMD-SHELL", "ps aux | grep acmenator | grep -v grep || exit 1"]
+          interval: "{{ acmenator_healthcheck_interval }}"
+          timeout: "{{ acmenator_healthcheck_timeout }}"
+          retries: "{{ acmenator_healthcheck_retries }}"
+          start_period: "{{ acmenator_healthcheck_start_period }}"
         labels:
           autoheal: "{{ acmenator_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ acmenator_watchtower_enabled | ternary('true', 'false') }}"

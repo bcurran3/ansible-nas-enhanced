@@ -47,6 +47,18 @@ youtarr_db_autoheal_enabled: false
 youtarr_dockflare_enabled: false
 youtarr_dockflare_access_group: ""
 
+# healthcheck
+youtarr_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3011/api/health || exit 1"]
+youtarr_healthcheck_interval: 30s
+youtarr_healthcheck_timeout: 10s
+youtarr_healthcheck_retries: 3
+youtarr_healthcheck_start_period: 40s
+youtarr_db_healthcheck_test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -P 3321 -u {{ youtarr_env_db_user }} -p{{ youtarr_env_db_password }} || exit 1"]
+youtarr_db_healthcheck_interval: 10s
+youtarr_db_healthcheck_timeout: 5s
+youtarr_db_healthcheck_retries: 5
+youtarr_db_healthcheck_start_period: 30s
+
 # homepage
 youtarr_homepage_group: "Download Tools"
 youtarr_homepage_icon: "sh-youtarr.png"

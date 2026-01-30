@@ -28,6 +28,12 @@
           LOG_LEVEL: "info"
           LOG_HTML: "false"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ flaresolverr_healthcheck_test }}"
+          interval: "{{ flaresolverr_healthcheck_interval }}"
+          timeout: "{{ flaresolverr_healthcheck_timeout }}"
+          retries: "{{ flaresolverr_healthcheck_retries }}"
+          start_period: "{{ flaresolverr_healthcheck_start_period }}"
         labels:
           autoheal: "{{ flaresolverr_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ flaresolverr_watchtower_enabled | ternary('true', 'false') }}"

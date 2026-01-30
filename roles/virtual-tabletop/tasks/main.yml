@@ -38,6 +38,12 @@
           SIMULATESERVERLAG: "{{ virtual_tabletop_env_simulateserverlag }}"
           URLPREFIX: "{{ virtual_tabletop_env_urlprefix }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ virtual_tabletop_healthcheck_test }}"
+          interval: "{{ virtual_tabletop_healthcheck_interval }}"
+          timeout: "{{ virtual_tabletop_healthcheck_timeout }}"
+          retries: "{{ virtual_tabletop_healthcheck_retries }}"
+          start_period: "{{ virtual_tabletop_healthcheck_start_period }}"
         labels:
           autoheal: "{{ virtual_tabletop_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ virtual_tabletop_watchtower_enabled | ternary('true', 'false') }}"

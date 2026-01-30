@@ -45,6 +45,12 @@
           CMAKE_ARGS: "{{ localai_env_cmake_args }}"
           REBUILD: "{{ localai_env_rebuild }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ localai_healthcheck_test }}"
+          interval: "{{ localai_healthcheck_interval }}"
+          timeout: "{{ localai_healthcheck_timeout }}"
+          retries: "{{ localai_healthcheck_retries }}"
+          start_period: "{{ localai_healthcheck_start_period }}"
         labels:
           autoheal: "{{ localai_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ localai_watchtower_enabled | ternary('true', 'false') }}"

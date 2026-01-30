@@ -36,6 +36,12 @@
           PUID: "{{ overseerr_user_id }}"
           PGID: "{{ overseerr_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ overseerr_healthcheck_test }}"
+          interval: "{{ overseerr_healthcheck_interval }}"
+          timeout: "{{ overseerr_healthcheck_timeout }}"
+          retries: "{{ overseerr_healthcheck_retries }}"
+          start_period: "{{ overseerr_healthcheck_start_period }}"
         labels:
           autoheal: "{{ overseerr_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ overseerr_watchtower_enabled | ternary('true', 'false') }}"

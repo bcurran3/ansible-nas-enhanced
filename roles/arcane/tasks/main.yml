@@ -37,11 +37,11 @@
 #         PUBLIC_SESSION_SECRET: "{{ arcane_public_session_secret }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ['CMD-SHELL', 'curl -fsS http://localhost:3552/api/health >/dev/null || exit 1']
-          interval: 10s
-          timeout: 3s
-          retries: 5
-          start_period: 15s
+          test: ["CMD-SHELL", "curl -fsS http://localhost:{{ arcane_port_http }}/api/health >/dev/null || exit 1"]
+          interval: "{{ arcane_healthcheck_interval }}"
+          timeout: "{{ arcane_healthcheck_timeout }}"
+          retries: "{{ arcane_healthcheck_retries }}"
+          start_period: "{{ arcane_healthcheck_start_period }}"
         labels:
           autoheal: "{{ arcane_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ arcane_watchtower_enabled | ternary('true', 'false') }}"

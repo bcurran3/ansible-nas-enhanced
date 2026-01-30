@@ -31,6 +31,13 @@ music_assistant_memory_swap: -1
 # autoheal
 music_assistant_autoheal_enabled: false
 
+# healthcheck
+music_assistant_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:{{ music_assistant_port_http }}/ || [ $? -eq 8 ]"]
+music_assistant_healthcheck_interval: 30s
+music_assistant_healthcheck_timeout: 10s
+music_assistant_healthcheck_retries: 3
+music_assistant_healthcheck_start_period: 45s
+
 # homepage
 music_assistant_homepage_group: "Media Servers"
 music_assistant_homepage_icon: "music-assistant.png"

@@ -35,6 +35,12 @@
           NEXT_PUBLIC_SITE_URL: "{{ plex_rewind_env_next_public_site_url }}"
           NEXT_PUBLIC_STATISTICS_START_DATE: "{{ plex_rewind_env_next_public_statistics_start_date }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ plex_rewind_healthcheck_test }}"
+          interval: "{{ plex_rewind_healthcheck_interval }}"
+          timeout: "{{ plex_rewind_healthcheck_timeout }}"
+          retries: "{{ plex_rewind_healthcheck_retries }}"
+          start_period: "{{ plex_rewind_healthcheck_start_period }}"
         labels:
           autoheal: "{{ plex_rewind_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ plex_rewind_watchtower_enabled | ternary('true', 'false') }}"

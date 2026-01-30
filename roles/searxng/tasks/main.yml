@@ -24,12 +24,12 @@
         hostname: "{{ searxng_container_name }}"
         image: "{{ searxng_image_name }}:{{ searxng_image_tag }}"
         pull: true
+        network_mode: bridge
         ports:
           - "{{ searxng_port_http }}:8080"
         volumes:
           - "{{ searxng_data_directory }}/config:/etc/searxng/"
           - "{{ searxng_data_directory }}/data:/var/cache/searxng/"
-        network_mode: bridge
         env:
           INSTANCE_NAME: "{{ searxng_env_instance_name }}"
           SEARXNG_BASE_URL: "{{ searxng_env_searxng_base_url }}"
@@ -37,6 +37,12 @@
           SEARXNG_LIMITER_REAL_IP_HEADER: "{{ searxng_env_searxng_limiter_real_ip_header }}"
           URL: "{{ searxng_env_url }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ searxng_healthcheck_test }}"
+          interval: "{{ searxng_healthcheck_interval }}"
+          timeout: "{{ searxng_healthcheck_timeout }}"
+          retries: "{{ searxng_healthcheck_retries }}"
+          start_period: "{{ searxng_healthcheck_start_period }}"
         labels:
           autoheal: "{{ searxng_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ searxng_watchtower_enabled | ternary('true', 'false') }}"

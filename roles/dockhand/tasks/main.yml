@@ -27,6 +27,12 @@
           - "{{ dockhand_port_http }}:3000"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dockhand_healthcheck_test }}"
+          interval: "{{ dockhand_healthcheck_interval }}"
+          timeout: "{{ dockhand_healthcheck_timeout }}"
+          retries: "{{ dockhand_healthcheck_retries }}"
+          start_period: "{{ dockhand_healthcheck_start_period }}"
         labels:
           autoheal: "{{ dockhand_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ dockhand_watchtower_enabled | ternary('true', 'false') }}"

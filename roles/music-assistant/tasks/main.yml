@@ -39,6 +39,12 @@
         env:
           LOG_LEVEL: "info"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ music_assistant_healthcheck_test }}"
+          interval: "{{ music_assistant_healthcheck_interval }}"
+          timeout: "{{ music_assistant_healthcheck_timeout }}"
+          retries: "{{ music_assistant_healthcheck_retries }}"
+          start_period: "{{ music_assistant_healthcheck_start_period }}"
         labels:
           autoheal: "{{ music_assistant_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ music_assistant_watchtower_enabled | ternary('true', 'false') }}"

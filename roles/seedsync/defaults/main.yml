@@ -30,6 +30,13 @@ seedsync_autoheal_enabled: false
 seedsync_dockflare_enabled: false
 seedsync_dockflare_access_group: ""
 
+# healthcheck
+seedsync_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:8800/ || exit 1"]
+seedsync_healthcheck_interval: 30s
+seedsync_healthcheck_timeout: 10s
+seedsync_healthcheck_retries: 3
+seedsync_healthcheck_start_period: 20s
+
 # homepage
 seedsync_homepage_group: "Apps"
 seedsync_homepage_icon: "sh-seedsync.png"

@@ -39,6 +39,13 @@ localai_autoheal_enabled: false
 localai_dockflare_enabled: false
 localai_dockflare_access_group: ""
 
+# healthcheck
+localai_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:8080/readyz || exit 1"]
+localai_healthcheck_interval: 30s
+localai_healthcheck_timeout: 10s
+localai_healthcheck_retries: 5
+localai_healthcheck_start_period: 60s
+
 # homepage
 localai_homepage_group: "Apps"
 localai_homepage_icon: "sh-localai"

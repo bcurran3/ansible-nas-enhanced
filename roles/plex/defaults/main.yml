@@ -61,6 +61,13 @@ plex_autoheal_enabled: false
 plex_dockflare_enabled: false
 plex_dockflare_access_group: ""
 
+# healthcheck
+plex_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:32400/identity || exit 1"]
+plex_healthcheck_interval: 60s
+plex_healthcheck_timeout: 15s
+plex_healthcheck_retries: 3
+plex_healthcheck_start_period: 60s
+
 # homepage
 plex_homepage_group: "Media Servers"
 plex_homepage_icon: "plex.png"

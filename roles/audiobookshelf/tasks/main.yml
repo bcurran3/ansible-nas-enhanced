@@ -33,6 +33,12 @@
           - "{{ audiobookshelf_port_http }}:80"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "curl -f http://localhost:80/health || exit 1"]
+          interval: "{{ audiobookshelf_healthcheck_interval }}"
+          timeout: "{{ audiobookshelf_healthcheck_timeout }}"
+          retries: "{{ audiobookshelf_healthcheck_retries }}"
+          start_period: "{{ audiobookshelf_healthcheck_start_period }}"
         labels:
           autoheal: "{{ audiobookshelf_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ audiobookshelf_watchtower_enabled | ternary('true', 'false') }}"

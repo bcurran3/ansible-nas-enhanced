@@ -17,6 +17,12 @@
           - "{{ bentopdf_port_http }}:8080"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/index.html || exit 1"]
+          interval: "{{ bentopdf_healthcheck_interval }}"
+          timeout: "{{ bentopdf_healthcheck_timeout }}"
+          retries: "{{ bentopdf_healthcheck_retries }}"
+          start_period: "{{ bentopdf_healthcheck_start_period }}"
         labels:
           autoheal: "{{ bentopdf_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ bentopdf_watchtower_enabled | ternary('true', 'false') }}"

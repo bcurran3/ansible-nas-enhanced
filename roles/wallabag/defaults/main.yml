@@ -32,6 +32,13 @@ wallabag_autoheal_enabled: false
 wallabag_dockflare_enabled: false
 wallabag_dockflare_access_group: ""
 
+# healthcheck
+wallabag_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/login || exit 1"]
+wallabag_healthcheck_interval: 30s
+wallabag_healthcheck_timeout: 10s
+wallabag_healthcheck_retries: 3
+wallabag_healthcheck_start_period: 60s
+
 # homepage
 wallabag_homepage_group: "Apps"
 wallabag_homepage_icon: "wallabag.png"

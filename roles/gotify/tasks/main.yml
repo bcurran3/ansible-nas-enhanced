@@ -38,6 +38,12 @@
           PUID: "{{ gotify_user_id }}"
           PGID: "{{ gotify_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: ["CMD-SHELL", "curl -f http://localhost:{{ gotify_port_http }}/health || exit 1"]
+          interval: "{{ gotify_healthcheck_interval }}"
+          timeout: "{{ gotify_healthcheck_timeout }}"
+          retries: "{{ gotify_healthcheck_retries }}"
+          start_period: "{{ gotify_healthcheck_start_period }}"
         labels:
           autoheal: "{{ gotify_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ gotify_watchtower_enabled | ternary('true', 'false') }}"

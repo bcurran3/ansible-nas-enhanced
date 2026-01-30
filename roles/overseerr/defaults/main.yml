@@ -32,6 +32,13 @@ overseerr_autoheal_enabled: false
 overseerr_dockflare_enabled: false
 overseerr_dockflare_access_group: ""
 
+# healthcheck
+overseerr_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:5055/api/v1/status || exit 1"]
+overseerr_healthcheck_interval: 30s
+overseerr_healthcheck_timeout: 10s
+overseerr_healthcheck_retries: 3
+overseerr_healthcheck_start_period: 60s
+
 # homepage
 overseerr_homepage_group: "Media Management"
 overseerr_homepage_icon: "overseerr.png"
