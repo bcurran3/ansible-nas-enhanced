@@ -43,6 +43,16 @@ function help {
     echo "      Enable app(s)."
     echo "  --enabled, --installed"
     echo "      List ANE enabled apps."
+    echo "  --autoheal <app_name> <app_name> <app_name>"
+    echo "      Enable autoheal for specific app(s)."
+    echo "  --dockflare <app_name> <app_name> <app_name>"
+    echo "      Enable Dockflare integration for specific app(s)."
+    echo "  --repliqate <app_name> <app_name> <app_name>"
+    echo "      Enable Repliqate backups for specific app(s)."
+    echo "  --tinyauth <app_name> <app_name> <app_name>"
+    echo "      Enable TinyAuth protection for specific app(s)."
+    echo "  --watchtower <app_name> <app_name> <app_name>"
+    echo "      Enable Watchtower updates for specific app(s)."
     echo "  --help <app_name>"
     echo "      Display <app_name> configuration info."
     echo "  --install"
@@ -328,6 +338,111 @@ function enable_app {
     fi
 }
 
+function enable_autoheal {
+    [[ "$1" == -* ]] && shift
+    FILE="inventories/ANE/group_vars/nas.yml"
+    for arg in "$@"; do
+        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+        arg_clean="${arg//-/_}"
+        ENABLED_MARKER="${arg_clean}_enabled: true"
+        AUTOHEAL_LINE="${arg_clean}_autoheal_enabled: true"
+        if [ -f "$FILE" ] && grep -q "^$ENABLED_MARKER" "$FILE"; then
+            if grep -q "^$AUTOHEAL_LINE" "$FILE"; then
+                echo "  ** Autoheal is already enabled for ${arg}."
+            else
+                sed -i "/^$ENABLED_MARKER$/a $AUTOHEAL_LINE" "$FILE"
+                echo "  ** Autoheal enabled for ${arg}."
+            fi
+        else
+            echo "  ** Error: ${arg} must be enabled before adding autoheal, or app not found."
+        fi
+    done
+}
+
+function enable_dockflare {
+    [[ "$1" == -* ]] && shift
+    FILE="inventories/ANE/group_vars/nas.yml"
+    for arg in "$@"; do
+        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+        arg_clean="${arg//-/_}"
+        ENABLED_MARKER="${arg_clean}_enabled: true"
+        DOCKFLARE_LINE="${arg_clean}_dockflare_enabled: true"
+        if [ -f "$FILE" ] && grep -q "^$ENABLED_MARKER" "$FILE"; then
+            if grep -q "^$DOCKFLARE_LINE" "$FILE"; then
+                echo "  ** Dockflare is already enabled for ${arg}."
+            else
+                sed -i "/^$ENABLED_MARKER$/a $DOCKFLARE_LINE" "$FILE"
+                echo "  ** Dockflare enabled for ${arg}."
+            fi
+        else
+            echo "  ** Error: ${arg} must be enabled before adding dockflare, or app not found."
+        fi
+    done
+}
+
+function enable_tinyauth {
+    [[ "$1" == -* ]] && shift
+    FILE="inventories/ANE/group_vars/nas.yml"
+    for arg in "$@"; do
+        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+        arg_clean="${arg//-/_}"
+        ENABLED_MARKER="${arg_clean}_enabled: true"
+        TINYAUTH_LINE="${arg_clean}_tinyauth_enabled: true"
+        if [ -f "$FILE" ] && grep -q "^$ENABLED_MARKER" "$FILE"; then
+            if grep -q "^$TINYAUTH_LINE" "$FILE"; then
+                echo "  ** TinyAuth is already enabled for ${arg}."
+            else
+                sed -i "/^$ENABLED_MARKER$/a $TINYAUTH_LINE" "$FILE"
+                echo "  ** TinyAuth enabled for ${arg}."
+            fi
+        else
+            echo "  ** Error: ${arg} must be enabled before adding tinyauth, or app not found."
+        fi
+    done
+}
+
+function enable_repliqate {
+    [[ "$1" == -* ]] && shift
+    FILE="inventories/ANE/group_vars/nas.yml"
+    for arg in "$@"; do
+        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+        arg_clean="${arg//-/_}"
+        ENABLED_MARKER="${arg_clean}_enabled: true"
+        REPLIQATE_LINE="${arg_clean}_repliqate_enabled: true"
+        if [ -f "$FILE" ] && grep -q "^$ENABLED_MARKER" "$FILE"; then
+            if grep -q "^$REPLIQATE_LINE" "$FILE"; then
+                echo "  ** Repliqate is already enabled for ${arg}."
+            else
+                sed -i "/^$ENABLED_MARKER$/a $REPLIQATE_LINE" "$FILE"
+                echo "  ** Repliqate enabled for ${arg}."
+            fi
+        else
+            echo "  ** Error: ${arg} must be enabled before adding repliqate, or app not found."
+        fi
+    done
+}
+
+function enable_watchtower {
+    [[ "$1" == -* ]] && shift
+    FILE="inventories/ANE/group_vars/nas.yml"
+    for arg in "$@"; do
+        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+        arg_clean="${arg//-/_}"
+        ENABLED_MARKER="${arg_clean}_enabled: true"
+        WATCHTOWER_LINE="${arg_clean}_watchtower_enabled: true"
+        if [ -f "$FILE" ] && grep -q "^$ENABLED_MARKER" "$FILE"; then
+            if grep -q "^$WATCHTOWER_LINE" "$FILE"; then
+                echo "  ** Watchtower is already enabled for ${arg}."
+            else
+                sed -i "/^$ENABLED_MARKER$/a $WATCHTOWER_LINE" "$FILE"
+                echo "  ** Watchtower enabled for ${arg}."
+            fi
+        else
+            echo "  ** Error: ${arg} must be enabled before adding watchtower, or app not found."
+        fi
+    done
+}
+
 function create_new_app_placeholder {
     if [[ -z "$1" ]]; then 
         echo "  ** ERROR: Specify app name(s)."
@@ -376,6 +491,7 @@ function upgrade {
     git pull
 }
 
+# run the full ANE playbook
 function run_playbook {
 #    validate_app
     appslist=""
@@ -507,6 +623,56 @@ fi
 # List ANE enabled apps
 if [[ "$1" = "--enabled" || "$1" = "-enabled" || "$1" = "--installed" || "$1" = "-installed" ]]; then
     display_enabled_apps
+    exit
+fi
+
+# Enable Autoheal for ANE app(s)
+if [[ "$1" == "--autoheal" || "$1" == "-autoheal" || "$1" == "--enableautoheal" || "$1" == "-enableautoheal" ]]; then
+    if [ "$2" == "" ]; then
+        echo "  ** You need to specify at least one app name."
+        exit 1
+    fi
+    enable_autoheal "$@"
+    exit
+fi
+
+# Enable Dockflare for ANE app(s)
+if [[ "$1" == "--dockflare" || "$1" == "-dockflare" || "$1" == "--enabledockflare" || "$1" == "-enabledockflare" ]]; then
+    if [ "$2" == "" ]; then
+        echo "  ** You need to specify at least one app name."
+        exit 1
+    fi
+    enable_dockflare "$@"
+    exit
+fi
+
+# Enable Repliqate for ANE app(s)
+if [[ "$1" == "--repliqate" || "$1" == "-repliqate" || "$1" == "--enablerepliqate" || "$1" == "-enablerepliqate" ]]; then
+    if [ "$2" == "" ]; then
+        echo "  ** You need to specify at least one app name."
+        exit 1
+    fi
+    enable_repliqate "$@"
+    exit
+fi
+
+# Enable TinyAuth for ANE app(s)
+if [[ "$1" == "--tinyauth" || "$1" == "-tinyauth" || "$1" == "--enabletinyauth" || "$1" == "-enabletinyauth" ]]; then
+    if [ "$2" == "" ]; then
+        echo "  ** You need to specify at least one app name."
+        exit 1
+    fi
+    enable_tinyauth "$@"
+    exit
+fi
+
+# Enable Watchtower for ANE app(s)
+if [[ "$1" == "--watchtower" || "$1" == "-watchtower" || "$1" == "--enablewatchtower" || "$1" == "-enablewatchtower" ]]; then
+    if [ "$2" == "" ]; then
+        echo "  ** You need to specify at least one app name."
+        exit 1
+    fi
+    enable_watchtower "$@"
     exit
 fi
 
