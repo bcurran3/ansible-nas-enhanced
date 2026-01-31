@@ -35,6 +35,8 @@ function help {
     echo "      List ANE available apps."
     echo "  --behind, --outdated"
     echo "      Check if your ANE files are up-to-date."
+    echo "  --copytoplugins <app_name> <app_name> <app_name>"
+    echo "      Copy app(s) to plugins directory"
     echo "  --disable <app_name> <app_name> <app_name>"
     echo "      Disable app(s)."
     echo "  --down, --stop <app_name> <app_name> <app_name>"
@@ -122,6 +124,32 @@ function display_devstuff {
     echo "      Disable all apps."
     echo "  --newapp appname"
     echo "      Copies app template and autofills some variables."
+}
+
+function copy_to_plugins {
+    if [[ -z "$2" ]]; then echo "  ** ERROR: Specify role name(s) to copy."; exit 1; fi
+    if [[ ! -d "plugins" ]]; then
+        mkdir "plugins"
+        echo "  ++ DIR : plugins directory created."
+    fi
+    shift 
+    for app in "$@"; do
+        if [[ -d "roles/$app" ]]; then
+            SRC="roles/$app"
+        elif [[ -d "roles/WIP_$app" ]]; then
+            SRC="roles/WIP_$app"
+        else
+            echo "  == ROLE: $app not found in roles/ directory."
+            continue
+        fi
+        TARGET_DIR="plugins/$(basename "$SRC")"
+        if [[ -d "$TARGET_DIR" ]]; then
+            echo "  == ROLE: $(basename "$SRC") already exists in plugins/."
+        else
+            cp -r "$SRC" "plugins/"
+            echo "  ++ ROLE: $(basename "$SRC") copied to plugins/ successfully."
+        fi
+    done
 }
 
 function disable_all_apps {
@@ -586,6 +614,12 @@ fi
 if [[ "$1" = "--behind" || "$1" = "-behind" || "$1" = "--outdated" || "$1" = "-outdated" ]]; then
     if [[ "$ANE_ALWAYS_CHECK_BEHIND" == "true" ]]; then exit; fi
     check_behind
+    exit
+fi
+
+# Copy role(s) to plugins directory
+if [[ "$1" = "--copytoplugins" || "$1" = "-copytoplugins" ]]; then
+    copy_to_plugins "$@"
     exit
 fi
 
