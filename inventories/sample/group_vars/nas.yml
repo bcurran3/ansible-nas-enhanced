@@ -23,9 +23,22 @@ samba_shares_root: /data/shares # The location where all shares will be created 
 nfs_shares_root: /data/shares # The location for NFS shares
 
 ###
+### ANE Enhanced features
+###
+ansible_nas_plugins_enabled: false # run roles found in plugins/ directory
+archive_app_data_enabled: false # archive unused app data directories
+docker_compose_enabled: false # run docker-compose apps found in docker_compose_data_directory
+docker_compose_data_directory: "/home/{{ ansible_nas_user }}/ANE/docker-compose"
+amd_gpu_enabled: false # enable AMD GPU support for transcoding and AI
+intel_igpu_enable: false # enable Intel GPU support for transcoding
+nvidia_runtime_enabled: false # enable NVIDIA GPU support for transcoding and AI
+
+###
 ### Media Libraries / data directories you want to
 ### publish over Samba and NFS: (i.e. a proper NAS)
 ###
+public_share_enabled: true
+media_root_share_enabled: false # share everything from one place instead of individually
 anime_share_enabled: false
 audiobooks_share_enabled: false
 backups_share_enabled: false
@@ -42,12 +55,10 @@ music_share_enabled: false
 photos_share_enabled: false
 podcasts_share_enabled: false
 porn_share_enabled: false
-public_share_enabled: true
 recordings_share_enabled: false
 roms_share_enabled: false
 torrents_share_enabled: false
 tv_share_enabled: false
-media_root_share_enabled: false # share everything from one place instead of individually
 
 ###
 ### List of APT packages you want installed:
