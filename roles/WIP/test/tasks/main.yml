@@ -69,15 +69,5 @@
         name: "{{ item }}"
       with_items: "{{ found_directories.files | map(attribute='path') | list }}"
 
-# make ansible-nas-pre role to run first; i.e. hello bill
-# make ansible-nas-post role to run last; i.e. cleanup
-
-# add to all roles?
-# I'd prefer to accumlate them and display at the end in ane-post
-    - name: Display message if FreshRSS is Internet accessable.
-      debug:
-        msg: "FreshRSS is Internet accessable."
-      when: freshrss_traefik_whitelist == wan
-
   when: test_enabled is true
   
