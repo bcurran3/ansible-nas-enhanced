@@ -342,6 +342,8 @@ By default, applications can be found on the ports listed below.
 | - telegraf 8086
 | Stirling PDF     | 3011    | Bridge  | HTTP           |
 | Stump            | 10801
+| Super Productivit| 4004    | Bridge  | HTTP           |
+| Super Prod WEBDAV| 4005    | Bridge  | HTTP           |
 | Syncthing admin  | 8384    | Host    | HTTP           |
 | Syncthing P2P    | 22000   | Host    | TCP+UDP        |
 | Tailscale        | n/a     | Host
