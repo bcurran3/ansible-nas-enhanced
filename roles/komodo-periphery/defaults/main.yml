@@ -40,7 +40,7 @@ komodo_periphery_dockflare_enabled: false
 komodo_periphery_dockflare_access_group: ""
 
 # healthcheck
-komodo_periphery_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:8120/ping || wget --quiet --tries=1 --spider http://127.0.0.1:8120/ping || pgrep -f periphery || exit 1"]
+komodo_periphery_healthcheck_test: ["CMD-SHELL", "(echo > /dev/tcp/127.0.0.1/8120) >/dev/null 2>&1 || curl -f http://127.0.0.1:8120/ping || wget --quiet --tries=1 --spider http://127.0.0.1:8120/ping || exit 1"]
 komodo_periphery_healthcheck_interval: 30s
 komodo_periphery_healthcheck_timeout: 10s
 komodo_periphery_healthcheck_retries: 3
