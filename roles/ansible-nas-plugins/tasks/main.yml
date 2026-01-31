@@ -1,2 +1,25 @@
----
-- import_tasks: plugins/plugins.yml
+- name: Start Plugins
+  block:
+    - name: Find Plugins
+      ansible.builtin.find:
+        paths: plugins/
+        file_type: directory
+        recurse: no
+      register: found_directories
+
+    - name: Register found Plugins
+      set_fact:
+        "my_{{ plugin_found | basename }}": "{{ plugin_found }}"
+      loop: "{{ found_directories.files | map(attribute='path') | list | sort }}"
+      loop_control:
+        loop_var: plugin_found
+        label: "{{ plugin_found | basename }}"
+
+    - name: Run Plugins
+      include_role:
+        name: "{{ plugin_found }}"
+      loop: "{{ found_directories.files | map(attribute='path') | list | sort }}"
+      loop_control:
+        loop_var: plugin_found
+        label: "{{ plugin_found | basename }}"
+  when: ansible_nas_plugins_enabled is true
