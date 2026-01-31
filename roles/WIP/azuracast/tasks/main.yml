@@ -162,7 +162,7 @@
         memory_swap: "{{ azuracast_updater_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ azuracast_db_container_name }}"
       register: db_info

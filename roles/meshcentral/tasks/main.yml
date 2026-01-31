@@ -73,7 +73,7 @@
         memory_swap: "{{ meshcentral_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Verify {{ ansible_nas_app_name }} DB is healthy
+    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ meshcentral_db_container_name }}"
       register: db_info
