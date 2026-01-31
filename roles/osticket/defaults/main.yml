@@ -43,6 +43,18 @@ osticket_db_autoheal_enabled: false
 osticket_dockflare_enabled: false
 osticket_dockflare_access_group: ""
 
+# healthcheck
+osticket_healthcheck_test: ["CMD-SHELL", "pgrep -f apache2 || pgrep -f httpd || exit 1"]
+osticket_healthcheck_interval: 1m
+osticket_healthcheck_timeout: 10s
+osticket_healthcheck_retries: 3
+osticket_healthcheck_start_period: 60s
+osticket_db_healthcheck_test: ["CMD-SHELL", "mariadb-admin ping -h localhost --silent || exit 1"]
+osticket_db_healthcheck_interval: 20s
+osticket_db_healthcheck_timeout: 10s
+osticket_db_healthcheck_retries: 5
+osticket_db_healthcheck_start_period: 30s
+
 # homepage
 osticket_homepage_group: "Apps"
 osticket_homepage_icon: "osticket.png"

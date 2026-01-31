@@ -37,6 +37,13 @@ cloudflare_ddns_memory_swap: -1
 # autoheal
 cloudflare_ddns_autoheal_enabled: false
 
+# healthcheck
+cloudflare_ddns_healthcheck_test: ["CMD-SHELL", "pgrep -f node || pgrep -f python || pgrep -f cloudflare-ddns || exit 1"]
+cloudflare_ddns_healthcheck_interval: 5m
+cloudflare_ddns_healthcheck_timeout: 10s
+cloudflare_ddns_healthcheck_retries: 3
+cloudflare_ddns_healthcheck_start_period: 30s
+
 # homepage
 cloudflare_ddns_homepage_group: "Network"
 cloudflare_ddns_homepage_icon: "cloudflare.png"

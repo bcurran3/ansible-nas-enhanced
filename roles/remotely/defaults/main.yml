@@ -27,6 +27,13 @@ remotely_autoheal_enabled: false
 remotely_dockflare_enabled: false
 remotely_dockflare_access_group: ""
 
+# healthcheck
+remotely_healthcheck_test: ["CMD-SHELL", "(echo > /dev/tcp/127.0.0.1/5000) >/dev/null 2>&1 || exit 1"]
+remotely_healthcheck_interval: 1m
+remotely_healthcheck_timeout: 10s
+remotely_healthcheck_retries: 3
+remotely_healthcheck_start_period: 45s
+
 # homepage
 remotely_homepage_group: "Apps"
 remotely_homepage_icon: "remotely.png"

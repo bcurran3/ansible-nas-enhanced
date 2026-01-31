@@ -45,6 +45,18 @@ ghost_db_autoheal_enabled: false
 ghost_dockflare_enabled: false
 ghost_dockflare_access_group: ""
 
+# healthcheck
+ghost_healthcheck_test: ["CMD-SHELL", "curl -f http://localhost:2368/health || exit 1"]
+ghost_healthcheck_interval: 1m
+ghost_healthcheck_timeout: 10s
+ghost_healthcheck_retries: 3
+ghost_healthcheck_start_period: 60s
+ghost_db_healthcheck_test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p{{ ghost_db_env_msql_root_password }} || exit 1"]
+ghost_db_healthcheck_interval: 20s
+ghost_db_healthcheck_timeout: 10s
+ghost_db_healthcheck_retries: 5
+ghost_db_healthcheck_start_period: 30s
+
 # homepage
 ghost_homepage_group: "Apps"
 ghost_homepage_icon: "ghost.png"

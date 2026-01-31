@@ -42,11 +42,11 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-          interval: 10s
-          timeout: 5s
-          retries: 3
-          start_period: 5s
+          test: "{{ meshcentral_db_healthcheck_test }}"
+          interval: "{{ meshcentral_db_healthcheck_interval }}"
+          timeout: "{{ meshcentral_db_healthcheck_timeout }}"
+          retries: "{{ meshcentral_db_healthcheck_retries }}"
+          start_period: "{{ meshcentral_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ meshcentral_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ meshcentral_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -115,6 +115,12 @@
           REVERSE_PROXY_TLS_PORT: "{{ meshcentral_env_reverse_proxy_tls_port }}"
           WEBRTC: "{{ meshcentral_env_webrtc }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ meshcentral_healthcheck_test }}"
+          interval: "{{ meshcentral_healthcheck_interval }}"
+          timeout: "{{ meshcentral_healthcheck_timeout }}"
+          retries: "{{ meshcentral_healthcheck_retries }}"
+          start_period: "{{ meshcentral_healthcheck_start_period }}"
         links:
           - "{{ meshcentral_db_container_name }}"
         labels:

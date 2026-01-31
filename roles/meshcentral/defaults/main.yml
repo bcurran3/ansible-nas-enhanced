@@ -47,6 +47,18 @@ meshcentral_db_autoheal_enabled: false
 meshcentral_dockflare_enabled: false
 meshcentral_dockflare_access_group: ""
 
+# healthcheck
+meshcentral_healthcheck_test: ["CMD-SHELL", "pgrep -f node || exit 1"]
+meshcentral_healthcheck_interval: 1m
+meshcentral_healthcheck_timeout: 10s
+meshcentral_healthcheck_retries: 3
+meshcentral_healthcheck_start_period: 60s
+meshcentral_db_healthcheck_test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+meshcentral_db_healthcheck_interval: 20s
+meshcentral_db_healthcheck_timeout: 10s
+meshcentral_db_healthcheck_retries: 5
+meshcentral_db_healthcheck_start_period: 30s
+
 # homepage
 meshcentral_homepage_group: "Apps"
 meshcentral_homepage_icon: "meshcentral.png"

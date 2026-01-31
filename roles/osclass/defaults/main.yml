@@ -55,6 +55,18 @@ osclass_db_autoheal_enabled: false
 osclass_dockflare_enabled: false
 osclass_dockflare_access_group: ""
 
+# healthcheck
+osclass_db_healthcheck_test: ["CMD-SHELL", "mariadb-admin ping -u root -p{{ osclass_db_env_mysql_root_password }} || exit 1"]
+osclass_db_healthcheck_interval: 30s
+osclass_db_healthcheck_timeout: 10s
+osclass_db_healthcheck_retries: 5
+osclass_db_healthcheck_start_period: 60s
+osclass_healthcheck_test: ["CMD-SHELL", "pgrep -f apache2 || pgrep -f httpd || exit 1"]
+osclass_healthcheck_interval: 1m
+osclass_healthcheck_timeout: 10s
+osclass_healthcheck_retries: 3
+osclass_healthcheck_start_period: 90s
+
 # homepage
 osclass_homepage_group: "Apps"
 osclass_homepage_icon: "https://upload.wikimedia.org/wikipedia/commons/a/a8/Osclass.png"

@@ -43,10 +43,12 @@ freshrss_dockflare_enabled: false
 freshrss_dockflare_access_group: ""
 
 # healthcheck
-freshrss_healthcheck_interval: 30s
+freshrss_healthcheck_test: ["CMD-SHELL", "pgrep -f apache2 || pgrep -f httpd || pgrep -f php-fpm || exit 1"]
+freshrss_healthcheck_interval: 1m
 freshrss_healthcheck_timeout: 10s
 freshrss_healthcheck_retries: 3
 freshrss_healthcheck_start_period: 30s
+freshrss_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U {{ freshrss_db_user }} -d {{ freshrss_db_base }}"]
 freshrss_db_healthcheck_interval: 10s
 freshrss_db_healthcheck_timeout: 5s
 freshrss_db_healthcheck_retries: 5

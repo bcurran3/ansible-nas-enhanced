@@ -18,6 +18,12 @@
         env:
           PORT: "{{ it_tools_port_http }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ it_tools_healthcheck_test }}"
+          interval: "{{ it_tools_healthcheck_interval }}"
+          timeout: "{{ it_tools_healthcheck_timeout }}"
+          retries: "{{ it_tools_healthcheck_retries }}"
+          start_period: "{{ it_tools_healthcheck_start_period }}"
         labels:
           autoheal: "{{ it_tools_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ it_tools_watchtower_enabled | ternary('true', 'false') }}"

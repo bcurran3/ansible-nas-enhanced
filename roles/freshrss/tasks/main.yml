@@ -30,7 +30,7 @@
           POSTGRES_DB: "{{ freshrss_db_base }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "pg_isready -U {{ freshrss_db_user }} -d {{ freshrss_db_base }}"]
+          test: "{{ freshrss_db_healthcheck_test }}"
           interval: "{{ freshrss_db_healthcheck_interval }}"
           timeout: "{{ freshrss_db_healthcheck_timeout }}"
           retries: "{{ freshrss_db_healthcheck_retries }}"
@@ -89,7 +89,7 @@
           DB_USER: "{{ freshrss_db_user }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:80/i/ || exit 1"]
+          test: "{{ freshrss_healthcheck_test }}"
           interval: "{{ freshrss_healthcheck_interval }}"
           timeout: "{{ freshrss_healthcheck_timeout }}"
           retries: "{{ freshrss_healthcheck_retries }}"

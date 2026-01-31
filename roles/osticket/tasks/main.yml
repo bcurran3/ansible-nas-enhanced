@@ -38,12 +38,11 @@
           MYSQL_PASSWORD: "{{ osticket_env_mysql_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-              test:
-                - CMD-SHELL
-                - 'mariadb-admin ping -h localhost --silent'
-              interval: "20s"
-              timeout: "10s"
-              retries: "5"
+          test: "{{ osticket_db_healthcheck_test }}"
+          interval: "{{ osticket_db_healthcheck_interval }}"
+          timeout: "{{ osticket_db_healthcheck_timeout }}"
+          retries: "{{ osticket_db_healthcheck_retries }}"
+          start_period: "{{ osticket_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ osticket_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ osticket_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -91,6 +90,12 @@
           MYSQL_USER: "{{ osticket_env_mysql_user }}"
           MYSQL_PASSWORD: "{{ osticket_env_mysql_password }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ osticket_healthcheck_test }}"
+          interval: "{{ osticket_healthcheck_interval }}"
+          timeout: "{{ osticket_healthcheck_timeout }}"
+          retries: "{{ osticket_healthcheck_retries }}"
+          start_period: "{{ osticket_healthcheck_start_period }}"
         links:
           - "{{ osticket_db_container_name }}"
         labels:

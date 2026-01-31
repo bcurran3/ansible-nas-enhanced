@@ -29,7 +29,12 @@
           - "/etc/timezone:/etc/timezone:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
-        recreate: "{{ template_files_result is changed }}"
+        healthcheck:
+          test: "{{ cloudflare_ddns_healthcheck_test }}"
+          interval: "{{ cloudflare_ddns_healthcheck_interval }}"
+          timeout: "{{ cloudflare_ddns_healthcheck_timeout }}"
+          retries: "{{ cloudflare_ddns_healthcheck_retries }}"
+          start_period: "{{ cloudflare_ddns_healthcheck_start_period }}"
         labels:
           autoheal: "{{ cloudflare_ddns_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ cloudflare_ddns_watchtower_enabled | ternary('true', 'false') }}"
@@ -52,9 +57,10 @@
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/joshua-v/cloudflare-ddns/releases"
         cpu_shares: "{{ cloudflare_ddns_cpu_shares }}"
-        restart_policy: unless-stopped
         memory: "{{ cloudflare_ddns_memory }}"
         memory_swap: "{{ cloudflare_ddns_memory_swap }}"
+        recreate: "{{ template_files_result is changed }}"
+        restart_policy: unless-stopped
   when: cloudflare_ddns_enabled is true
 
 - name: Stop {{ ansible_nas_app_name }}

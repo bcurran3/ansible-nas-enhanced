@@ -26,6 +26,13 @@ it_tools_autoheal_enabled: false
 it_tools_dockflare_enabled: false
 it_tools_dockflare_access_group: ""
 
+# healthcheck
+it_tools_healthcheck_test: ["CMD-SHELL", "(echo > /dev/tcp/127.0.0.1/{{ it_tools_port_http }}) >/dev/null 2>&1 || exit 1"]
+it_tools_healthcheck_interval: 1m
+it_tools_healthcheck_timeout: 10s
+it_tools_healthcheck_retries: 3
+it_tools_healthcheck_start_period: 30s
+
 # homepage
 it_tools_homepage_group: "Apps"
 it_tools_homepage_icon: "it-tools.png"

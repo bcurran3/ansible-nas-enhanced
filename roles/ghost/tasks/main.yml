@@ -36,11 +36,11 @@
         volumes:
           - "{{ ghost_data_directory }}/db:/var/lib/mysql"
         healthcheck:
-          test: "mysqladmin ping -p{{ ghost_db_env_msql_root_password }} -h localhost"
-          interval: "10s"
-          start_period: "30s"
-          start_interval: "10s"
-          retries: 120
+          test: "{{ ghost_db_healthcheck_test }}"
+          interval: "{{ ghost_db_healthcheck_interval }}"
+          timeout: "{{ ghost_db_healthcheck_timeout }}"
+          retries: "{{ ghost_db_healthcheck_retries }}"
+          start_period: "{{ ghost_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ ghost_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ ghost_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -104,6 +104,12 @@
         volumes:
           - "{{ ghost_data_directory }}/content:/var/lib/ghost/content"
 #         - "{{ ghost_data_directory }}/config.production.json:/var/lib/ghost/config.production.json
+        healthcheck:
+          test: "{{ ghost_healthcheck_test }}"
+          interval: "{{ ghost_healthcheck_interval }}"
+          timeout: "{{ ghost_healthcheck_timeout }}"
+          retries: "{{ ghost_healthcheck_retries }}"
+          start_period: "{{ ghost_healthcheck_start_period }}"
         links:
           - "{{ ghost_db_container_name }}"
         labels:

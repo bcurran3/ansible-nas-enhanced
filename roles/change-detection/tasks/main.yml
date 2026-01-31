@@ -30,6 +30,12 @@
           SCREEN_DEPTH: "16"
           MAX_CONCURRENT_CHROME_PROCESSES: "10"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ change_detection_sockpuppet_healthcheck_test }}"
+          interval: "{{ change_detection_sockpuppet_healthcheck_interval }}"
+          timeout: "{{ change_detection_sockpuppet_healthcheck_timeout }}"
+          retries: "{{ change_detection_sockpuppet_healthcheck_retries }}"
+          start_period: "{{ change_detection_sockpuppet_healthcheck_start_period }}"
         labels:
           autoheal: "{{ change_detection_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ change_detection_sockpuppet_watchtower_enabled | ternary('true', 'false') }}"
@@ -72,6 +78,12 @@
           TZ: "{{ ansible_nas_timezone }}"
         links:
           - "{{ change_detection_sockpuppet_container_name }}"
+        healthcheck:
+          test: "{{ change_detection_healthcheck_test }}"
+          interval: "{{ change_detection_healthcheck_interval }}"
+          timeout: "{{ change_detection_healthcheck_timeout }}"
+          retries: "{{ change_detection_healthcheck_retries }}"
+          start_period: "{{ change_detection_healthcheck_start_period }}"
         labels:
           autoheal: "{{ change_detection_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ change_detection_watchtower_enabled | ternary('true', 'false') }}"

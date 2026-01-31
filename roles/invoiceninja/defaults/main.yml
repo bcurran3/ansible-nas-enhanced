@@ -84,6 +84,23 @@ invoiceninja_web_autoheal_enabled: false
 invoiceninja_dockflare_enabled: false
 invoiceninja_dockflare_access_group: ""
 
+# healthcheck
+invoiceninja_app_healthcheck_test: ["CMD", "php", "artisan", "ninja:check-health"]
+invoiceninja_app_healthcheck_interval: 1m
+invoiceninja_app_healthcheck_timeout: 10s
+invoiceninja_app_healthcheck_retries: 3
+invoiceninja_app_healthcheck_start_period: 1m
+invoiceninja_web_healthcheck_test: ["CMD-SHELL", "service nginx status || exit 1"]
+invoiceninja_web_healthcheck_interval: 1m
+invoiceninja_web_healthcheck_timeout: 5s
+invoiceninja_web_healthcheck_retries: 3
+invoiceninja_web_healthcheck_start_period: 30s
+invoiceninja_db_healthcheck_test: ["CMD", "/usr/local/bin/healthcheck.sh", "--su-mysql", "--connect", "--innodb_initialized"]
+invoiceninja_db_healthcheck_interval: 30s
+invoiceninja_db_healthcheck_timeout: 10s
+invoiceninja_db_healthcheck_retries: 3
+invoiceninja_db_healthcheck_start_period: 30s
+
 # homepage
 invoiceninja_app_homepage_group: "Misc"
 invoiceninja_app_homepage_icon: "invoiceninja.png"

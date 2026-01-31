@@ -31,6 +31,12 @@
           Remotely_ApplicationOptions__DbProvider: "SQLite"
           Remotely_ConnectionStrings__SQLite: "Data Source=/app/AppData/Remotely.db"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ remotely_healthcheck_test }}"
+          interval: "{{ remotely_healthcheck_interval }}"
+          timeout: "{{ remotely_healthcheck_timeout }}"
+          retries: "{{ remotely_healthcheck_retries }}"
+          start_period: "{{ remotely_healthcheck_start_period }}"
         labels:
           autoheal: "{{ remotely_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ remotely_watchtower_enabled | ternary('true', 'false') }}"

@@ -40,6 +40,18 @@ proget_db_autoheal_enabled: false
 proget_dockflare_enabled: false
 proget_dockflare_access_group: ""
 
+# healthcheck
+proget_db_healthcheck_test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '{{ proget_db_mssql_sa_password }}' -Q 'SELECT 1' -b -C"]
+proget_db_healthcheck_interval: 20s
+proget_db_healthcheck_timeout: 10s
+proget_db_healthcheck_retries: 5
+proget_db_healthcheck_start_period: 60s
+proget_healthcheck_test: ["CMD-SHELL", "curl -f http://localhost/health || exit 1"]
+proget_healthcheck_interval: 1m
+proget_healthcheck_timeout: 10s
+proget_healthcheck_retries: 3
+proget_healthcheck_start_period: 45s
+
 # homepage
 proget_homepage_group: "Apps"
 proget_homepage_icon: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Inedo_ProGet_Logo.png"

@@ -38,6 +38,18 @@ umami_db_autoheal_enabled: false
 umami_dockflare_enabled: false
 umami_dockflare_access_group: ""
 
+# healthcheck
+umami_healthcheck_test: ["CMD-SHELL", "curl -f http://localhost:3000/api/heartbeat || exit 1"]
+umami_healthcheck_interval: 30s
+umami_healthcheck_timeout: 5s
+umami_healthcheck_retries: 3
+umami_healthcheck_start_period: 60s
+umami_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U umami -d umami"]
+umami_db_healthcheck_interval: 10s
+umami_db_healthcheck_timeout: 5s
+umami_db_healthcheck_retries: 5
+umami_db_healthcheck_start_period: 30s
+
 # homepage
 umami_homepage_group: "Apps"
 umami_homepage_icon: "umami.png"

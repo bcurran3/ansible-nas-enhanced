@@ -60,16 +60,11 @@
           MYSQL_PASSWORD: "{{ invoiceninja_db_mysql_password }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-              test:
-                - CMD
-                - /usr/local/bin/healthcheck.sh
-                - --su-mysql
-                - --connect
-                - --innodb_initialized
-              interval: "30s"
-              timeout: "10s"
-              retries: 3
-              start_period: "30s"
+          test: "{{ invoiceninja_db_healthcheck_test }}"
+          interval: "{{ invoiceninja_db_healthcheck_interval }}"
+          timeout: "{{ invoiceninja_db_healthcheck_timeout }}"
+          retries: "{{ invoiceninja_db_healthcheck_retries }}"
+          start_period: "{{ invoiceninja_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ invoiceninja_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ invoiceninja_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -156,6 +151,12 @@
           MAIL_FROM_ADDRESS: "{{ invoiceninja_mail_from_address }}"
           MAIL_FROM_NAME: "{{ invoiceninja_mail_from_name }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ invoiceninja_app_healthcheck_test }}"
+          interval: "{{ invoiceninja_app_healthcheck_interval }}"
+          timeout: "{{ invoiceninja_app_healthcheck_timeout }}"
+          retries: "{{ invoiceninja_app_healthcheck_retries }}"
+          start_period: "{{ invoiceninja_app_healthcheck_start_period }}"
         links:
           - "{{ invoiceninja_db_container_name }}"
         labels:
@@ -201,6 +202,12 @@
           - "{{ invoiceninja_data_directory }}/public:/var/www/html/public:ro"
         env:
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ invoiceninja_web_healthcheck_test }}"
+          interval: "{{ invoiceninja_web_healthcheck_interval }}"
+          timeout: "{{ invoiceninja_web_healthcheck_timeout }}"
+          retries: "{{ invoiceninja_web_healthcheck_retries }}"
+          start_period: "{{ invoiceninja_web_healthcheck_start_period }}"
         links:
           - "{{ invoiceninja_app_container_name }}"
           - "{{ invoiceninja_db_container_name }}"
