@@ -8,6 +8,8 @@
 : "${ANE_DISABLE_ALSO_STOPS:=false}"
 : "${ANE_DISABLE_ALSO_REMOVES:=false}"
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
+: "${ANE_ALWAYS_ENABLE_DOCKFLARE:=false}" # not implemented yet
+: "${ANE_ALWAYS_ENABLE_TRAEFIK:=false}" # not implemented yet
 
 # Filter out non-containers
 ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin|_(autoheal|dockflare|tinyauth|traefik|watchtower|repliqate)"
@@ -53,6 +55,8 @@ function help {
     echo "      Enable Repliqate backups for specific app(s)."
     echo "  --tinyauth <app_name> <app_name> <app_name>"
     echo "      Enable TinyAuth protection for specific app(s)."
+    echo "  --traefik <app_name> <app_name> <app_name>"
+    echo "      Enable traefik for specific app(s)."
     echo "  --watchtower <app_name> <app_name> <app_name>"
     echo "      Enable Watchtower updates for specific app(s)."
     echo "  --help <app_name>"
@@ -425,6 +429,30 @@ function enable_tinyauth {
     done
 }
 
+function enable_traefik {
+    [[ "$1" == -* ]] && shift
+    FILE="inventories/ANE/group_vars/nas.yml"
+    for arg in "$@"; do
+        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
+        arg_clean="${arg//-/_}"
+        ENABLED_MARKER="${arg_clean}_enabled: true"
+        TRAEFIK_LINE="${arg_clean}_traefik_enabled: true"
+        HREF_LINE="${arg_clean}_homepage_href: \"https://{{ ${arg_clean}_hostname }}.{{ ansible_nas_domain }}\""
+        
+        if [ -f "$FILE" ] && grep -q "^$ENABLED_MARKER" "$FILE"; then
+            if grep -q "^$TRAEFIK_LINE" "$FILE"; then
+                echo "  == Traefik is already enabled for ${arg}."
+            else
+                sed -i "/^$ENABLED_MARKER$/a $HREF_LINE" "$FILE"
+                sed -i "/^$ENABLED_MARKER$/a $TRAEFIK_LINE" "$FILE"
+                echo "  ++ Traefik enabled for ${arg}."
+            fi
+        else
+            echo "  ** Error: ${arg} must be enabled before adding traefik, or app not found."
+        fi
+    done
+}
+
 function enable_repliqate {
     [[ "$1" == -* ]] && shift
     FILE="inventories/ANE/group_vars/nas.yml"
@@ -693,6 +721,16 @@ if [[ "$1" == "--tinyauth" || "$1" == "-tinyauth" || "$1" == "--enabletinyauth" 
         exit 1
     fi
     enable_tinyauth "$@"
+    exit
+fi
+
+# Enable Traefik for ANE app(s)
+if [[ "$1" == "--traefik" || "$1" == "-traefik" || "$1" == "--enabletraefik" || "$1" == "-enabletraefik" ]]; then
+    if [ "$2" == "" ]; then
+        echo "  ** You need to specify at least one app name."
+        exit 1
+    fi
+    enable_traefik "$@"
     exit
 fi
 
