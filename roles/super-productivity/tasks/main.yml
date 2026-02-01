@@ -8,6 +8,8 @@
       with_items:
         - "{{ super_productivity_data_directory }}"
         - "{{ super_productivity_data_directory }}/db"
+        - "{{ super_productivity_data_directory }}/src"
+        - "{{ super_productivity_data_directory }}/supersync"
         - "{{ super_productivity_data_directory }}/webdav"
 
     - name: Set {{ super_productivity_proper_name }} FQDN var overrides
@@ -15,146 +17,161 @@
         super_productivity_homepage_href: "https://{{ super_productivity_hostname }}.{{ ansible_nas_domain }}"
       when: super_productivity_traefik_enabled | bool or super_productivity_dockflare_enabled | bool
 
-    - name: Copy {{ ansible_nas_app_name }} Template webdav.yaml
+    - name: Copy {{ super_productivity_proper_name }} Template webdav.yaml
       ansible.builtin.template:
         src: webdav.yaml
         dest: "{{ super_productivity_data_directory }}/webdav.yaml"
         mode: '0644'
       register: template_webdav_yaml
 
-#    - name: Create {{ super_productivity_proper_name }} DB Container
-#      community.docker.docker_container:
-#        container_default_behavior: "compatibility"
-#        name: "{{ super_productivity_db_container_name }}"
-#        hostname: "{{ super_productivity_db_container_name }}"
-#        image: "{{ super_productivity_db_image_name }}:{{ super_productivity_db_image_tag }}"
-#        pull: true
-#        volumes:
-#          - "{{ super_productivity_data_directory }}/db:/var/lib/postgresql/data"
-##       ports:
-##         - '55432:5432'
-#        env:
-#          POSTGRES_USER: "{{ super_productivity_db_env_postgres_user }}"
-#          POSTGRES_PASSWORD: "{{ super_productivity_db_env_postgres_password }}"
-#          POSTGRES_DB: "{{ super_productivity_db_env_postgres_db }}"
-#          TZ: "{{ ansible_nas_timezone }}"
-#        healthcheck:
-#          test: "{{ super_productivity_db_healthcheck_test }}"
-#          interval: "{{ super_productivity_db_healthcheck_interval }}"
-#          timeout: "{{ super_productivity_db_healthcheck_timeout }}"
-#          retries: "{{ super_productivity_db_healthcheck_retries }}"
-#          start_period: "{{ super_productivity_db_healthcheck_start_period }}"
-#        labels:
-#          autoheal: "{{ super_productivity_db_autoheal_enabled | ternary('true', 'false') }}"
-#          com.centurylinklabs.watchtower.enable: "{{ super_productivity_db_watchtower_enabled | ternary('true', 'false') }}"
-#          dockflare.enable: "false"
-#          homepage.name: "{{ super_productivity_proper_name }} PostgreSQL"
-#          homepage.group: "{{ super_productivity_db_homepage_group }}"
-#          homepage.icon: "{{ super_productivity_db_homepage_icon }}"
-#          homepage.href: "{{ super_productivity_db_homepage_href }}"
-#          homepage.description: "{{ super_productivity_db_homepage_description if homepage_show_description else omit }}"
-#          homepage.server: "my-docker"
-#          homepage.container: "{{ super_productivity_container_name }}"
-#          homepage.showStats: "{{ super_productivity_db_homepage_showstats | ternary('true', 'false') }}"
-#          repliqate.enabled: "{{ super_productivity_db_repliqate_enabled | ternary('true', 'false') }}"
-#          repliqate.engine: "{{ super_productivity_db_repliqate_engine }}"
-#          repliqate.schedule: "{{ super_productivity_db_repliqate_schedule }}"
-#          repliqate.backup_id: "{{ super_productivity_db_repliqate_backup_id }}"
-#          repliqate.retention: "{{ super_productivity_db_repliqate_retention }}"
-#          traefik.enable: "false"
-#          wud.tag.include: "{{ super_productivity_db_wud_tag_include }}"
-#          wud.tag.transform.type: "{{ super_productivity_db_wud_tag_transform_type }}"
-#          wud.link.template: "{{ super_productivity_db_wud_link_template }}"
-#        cpu_shares: "{{ super_productivity_db_cpu_shares }}"
-#        memory: "{{ super_productivity_db_memory }}"
-#        memory_swap: "{{ super_productivity_db_memory_swap }}"
-#        restart_policy: unless-stopped
+    - name: Create {{ super_productivity_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ super_productivity_db_container_name }}"
+        hostname: "{{ super_productivity_db_container_name }}"
+        image: "{{ super_productivity_db_image_name }}:{{ super_productivity_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ super_productivity_data_directory }}/db:/var/lib/postgresql/data"
+#       ports:
+#         - '55432:5432'
+        env:
+          POSTGRES_USER: "{{ super_productivity_db_env_postgres_user }}"
+          POSTGRES_PASSWORD: "{{ super_productivity_db_env_postgres_password }}"
+          POSTGRES_DB: "{{ super_productivity_db_env_postgres_db }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ super_productivity_db_healthcheck_test }}"
+          interval: "{{ super_productivity_db_healthcheck_interval }}"
+          timeout: "{{ super_productivity_db_healthcheck_timeout }}"
+          retries: "{{ super_productivity_db_healthcheck_retries }}"
+          start_period: "{{ super_productivity_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ super_productivity_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ super_productivity_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ super_productivity_proper_name }} PostgreSQL"
+          homepage.group: "{{ super_productivity_db_homepage_group }}"
+          homepage.icon: "{{ super_productivity_db_homepage_icon }}"
+          homepage.href: "{{ super_productivity_db_homepage_href }}"
+          homepage.description: "{{ super_productivity_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ super_productivity_container_name }}"
+          homepage.showStats: "{{ super_productivity_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ super_productivity_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ super_productivity_db_repliqate_engine }}"
+          repliqate.schedule: "{{ super_productivity_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ super_productivity_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ super_productivity_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ super_productivity_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ super_productivity_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ super_productivity_db_wud_link_template }}"
+        cpu_shares: "{{ super_productivity_db_cpu_shares }}"
+        memory: "{{ super_productivity_db_memory }}"
+        memory_swap: "{{ super_productivity_db_memory_swap }}"
+        restart_policy: unless-stopped
 
-#    - name: Wait for {{ super_productivity_proper_name }} DB to become healthy
-#      community.docker.docker_container_info:
-#        name: "{{ super_productivity_db_container_name }}"
-#      register: db_info
-#      until: "db_info.container.State.Health.Status == 'healthy'"
-#      retries: 30
-#      delay: 5
+    - name: Wait for {{ super_productivity_proper_name }} DB to become healthy
+      community.docker.docker_container_info:
+        name: "{{ super_productivity_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
 
-#    - name: Create {{ super_productivity_proper_name }} SuperSync Container
-#      community.docker.docker_container:
-#        name: "{{ super_productivity_supersync_container_name }}"
-#        image: "{{ super_productivity_supersync_image_name }}:{{ super_productivity_supersync_image_tag }}"
-#        capabilities: []
-#        security_opts: ["no-new-privileges:true"]
-#        ports: "{{ super_productivity_supersync_port_http }}:1900"
-#        env:
-#          NODE_ENV: "{{ super_productivity_supersync_env_node_env }}"
-#          PORT: "{{ super_productivity_supersync_port_http }}"
-#          TEST_MODE: "{{ super_productivity_supersync_env_test_mode }}"
-#          TEST_MODE_CONFIRM: "{{ super_productivity_supersync_env_test_mode_confirm }}"
-#          JWT_SECRET: "{{ super_productivity_supersync_env_jwt_secret }}"
-#          CORS_ORIGINS: "{{ super_productivity_supersync_env_cors_origins }}"
-#          DATA_DIR: "{{ super_productivity_supersync_env_data_dir }}"
-#          DATABASE_URL: "postgresql://{{ super_productivity_db_env_postgres_user }}:{{ super_productivity_db_env_postgres_password }}@{{ super_productivity_db_container_name }}:5432/{{ super_productivity_db_env_postgres_db }}"
-#        healthcheck:
-#          test: "{{ super_productivity_supersync_healthcheck_test }}"
-#          interval: "{{ super_productivity_supersync_healthcheck_interval }}"
-#          timeout: "{{ super_productivity_supersync_healthcheck_timeout }}"
-#          retries: "{{ super_productivity_supersync_healthcheck_retries }}"
-#          start_period: "{{ super_productivity_supersync_healthcheck_start_period }}"
-#        links:
-#         - "{{ super_productivity_db_container_name }}"
-#        labels:
-#          autoheal: "{{ super_productivity_supersync_autoheal_enabled | ternary('true', 'false') }}"
-#          com.centurylinklabs.watchtower.enable: "{{ super_productivity_supersync_watchtower_enabled | ternary('true', 'false') }}"
-#          dockflare.enable: "false"
-#          repliqate.enabled: "{{ super_productivity_supersync_repliqate_enabled | ternary('true', 'false') }}"
-#          repliqate.engine: "{{ super_productivity_supersync_repliqate_engine }}"
-#          repliqate.schedule: "{{ super_productivity_supersync_repliqate_schedule }}"
-#          repliqate.backup_id: "{{ super_productivity_supersync_repliqate_backup_id }}"
-#          repliqate.retention: "{{ super_productivity_supersync_repliqate_retention }}"
-#          traefik.enable: "false"
-#          wud.tag.include: "{{ super_productivity_supersync_wud_tag_include }}"
-#          wud.tag.transform.type: "{{ super_productivity_supersync_wud_tag_transform_type }}"
-#          wud.link.template: "{{ super_productivity_supersync_wud_link_template }}"
-#          homepage.name: "{{ super_productivity_proper_name }} Sync"
-#          homepage.group: "{{ super_productivity_supersync_homepage_group }}"
-#        restart_policy: unless-stopped
+    - name: Clone {{ super_productivity_proper_name }} Source
+      ansible.builtin.git:
+        repo: "https://github.com/super-productivity/super-productivity.git"
+        dest: "{{ super_productivity_data_directory }}/src"
+        version: master
+        depth: 1
+      register: super_productivity_git_pull
+
+    - name: Build {{ super_productivity_proper_name }} SuperSync Image
+      community.docker.docker_image:
+        name: "{{ super_productivity_supersync_image_name }}"
+        tag: "{{ super_productivity_supersync_image_tag }}"
+        build:
+          path: "{{ super_productivity_data_directory }}/src"
+          dockerfile: "{{ super_productivity_supersync_dockerfile }}"
+          pull: false
+        source: build
+      when: super_productivity_git_pull.changed or supersync_image_check is failed
+
+    - name: Create {{ super_productivity_proper_name }} SuperSync Container
+      community.docker.docker_container:
+        name: "{{ super_productivity_supersync_container_name }}"
+        image: "{{ super_productivity_supersync_image_name }}:{{ super_productivity_supersync_image_tag }}"
+        capabilities: []
+        security_opts: ["no-new-privileges:true"]
+        ports:
+          - "{{ super_productivity_supersync_port_http }}:1900"
+        volumes:
+          - "{{ super_productivity_data_directory }}/supersync:/data"
+        env:
+          NODE_ENV: "{{ super_productivity_supersync_env_node_env }}"
+          TEST_MODE: "{{ super_productivity_supersync_env_test_mode }}"
+          TEST_MODE_CONFIRM: "{{ super_productivity_supersync_env_test_mode_confirm }}"
+          JWT_SECRET: "{{ super_productivity_supersync_env_jwt_secret }}"
+          CORS_ORIGINS: "{{ super_productivity_supersync_env_cors_origins }}"
+          DATA_DIR: "/data"
+          DATABASE_URL: "postgresql://{{ super_productivity_db_env_postgres_user }}:{{ super_productivity_db_env_postgres_password }}@{{ super_productivity_db_container_name }}:5432/{{ super_productivity_db_env_postgres_db }}"
+        healthcheck:
+          test: "{{ super_productivity_supersync_healthcheck_test }}"
+          interval: "{{ super_productivity_supersync_healthcheck_interval }}"
+          timeout: "{{ super_productivity_supersync_healthcheck_timeout }}"
+          retries: "{{ super_productivity_supersync_healthcheck_retries }}"
+          start_period: "{{ super_productivity_supersync_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ super_productivity_supersync_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ super_productivity_supersync_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          traefik.enable: "false"
+          repliqate.enabled: "{{ super_productivity_supersync_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ super_productivity_supersync_repliqate_engine }}"
+          repliqate.schedule: "{{ super_productivity_supersync_repliqate_schedule }}"
+          repliqate.backup_id: "{{ super_productivity_supersync_repliqate_backup_id }}"
+          repliqate.retention: "{{ super_productivity_supersync_repliqate_retention }}"
+          wud.tag.include: "{{ super_productivity_supersync_wud_tag_include }}"
+          wud.tag.transform.type: "{{ super_productivity_supersync_wud_tag_transform_type }}"
+          wud.link.template: "{{ super_productivity_supersync_wud_link_template }}"
+          homepage.name: "{{ super_productivity_proper_name }} Sync"
+          homepage.group: "{{ super_productivity_supersync_homepage_group }}"
+        restart_policy: unless-stopped
 
     - name: Create {{ super_productivity_proper_name }} WebDAV Container
       community.docker.docker_container:
         name: "{{ super_productivity_webdav_container_name }}"
         image: "{{ super_productivity_webdav_image_name }}:{{ super_productivity_webdav_image_tag }}"
-        ports: ["{{ super_productivity_webdav_port_http }}:2345"]
+        ports: 
+         - "{{ super_productivity_webdav_port_http }}:2345"
         volumes:
           - "{{ super_productivity_data_directory }}/webdav.yaml:/config.yml:ro"
           - "{{ super_productivity_data_directory }}/webdav:/data"
-        healthcheck:
-          test: "{{ super_productivity_webdav_healthcheck_test }}"
-          interval: "{{ super_productivity_webdav_healthcheck_interval }}"
-          timeout: "{{ super_productivity_webdav_healthcheck_timeout }}"
-          retries: "{{ super_productivity_webdav_healthcheck_retries }}"
-          start_period: "{{ super_productivity_webdav_healthcheck_start_period }}"
+        healthcheck: {}
         labels:
           autoheal: "{{ super_productivity_webdav_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ super_productivity_webdav_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
+          homepage.name: "{{ super_productivity_proper_name }} WebDAV"
+          homepage.group: "{{ super_productivity_webdav_homepage_group }}"
+          homepage.icon: "{{ super_productivity_webdav_homepage_icon }}"
+          homepage.href: "{{ super_productivity_webdav_homepage_href }}"
+          homepage.description: "{{ super_productivity_webdav_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ super_productivity_webdav_container_name }}"
+          homepage.showStats: "{{ super_productivity_webdav_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ super_productivity_webdav_port_http }}"
           repliqate.enabled: "{{ super_productivity_webdav_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ super_productivity_webdav_repliqate_engine }}"
           repliqate.schedule: "{{ super_productivity_webdav_repliqate_schedule }}"
           repliqate.backup_id: "{{ super_productivity_webdav_repliqate_backup_id }}"
           repliqate.retention: "{{ super_productivity_webdav_repliqate_retention }}"
-          traefik.enable: "{{ super_productivity_traefik_enabled | ternary('true', 'false') }}"
-          traefik.http.routers.super-productivity-webdav.rule: "Host(`{{ super_productivity_webdav_hostname }}.{{ ansible_nas_domain }}`)"
-          traefik.http.routers.super-productivity-webdav.tls.certresolver: "letsencrypt"
-          traefik.http.routers.super-productivity-webdav.tls.domains[0].main: "{{ ansible_nas_domain }}"
-          traefik.http.routers.super-productivity-webdav.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.super-productivity-webdav.middlewares: "super-productivity-webdav@docker{{ ',tinyauth-auth@docker' if super_productivity_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.super-productivity.IPAllowList.sourcerange: "{{ super_productivity_traefik_whitelist }}"
-          traefik.http.services.super-productivity-webdav.loadbalancer.server.port: "2345"
+          traefik.enable: "false"
           wud.tag.include: "{{ super_productivity_webdav_wud_tag_include }}"
           wud.tag.transform.type: "{{ super_productivity_webdav_wud_tag_transform_type }}"
           wud.link.template: "{{ super_productivity_webdav_wud_link_template }}"
-          homepage.name: "{{ super_productivity_proper_name }} WebDAV"
-          homepage.group: "{{ super_productivity_webdav_homepage_group }}"
         restart_policy: unless-stopped
 
     - name: Create {{ super_productivity_proper_name }} Container
@@ -169,7 +186,7 @@
         ports:
           - "{{ super_productivity_port_http }}:80"
         env:
-          WEBDAV_BASE_URL: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ super_productivity_webdav_port_http }}/"
+          WEBDAV_BASE_URL: "{{ super_productivity_env_webdav_base_url }}"
           WEBDAV_USERNAME: "{{ super_productivity_env_webdav_username }}"
           WEBDAV_SYNC_FOLDER_PATH: "{{ super_productivity_env_webdav_sync_folder_path }}"
           SYNC_INTERVAL: "{{ super_productivity_env_sync_interval }}"

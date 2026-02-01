@@ -6,13 +6,34 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ super_productivity_proper_name }} container state
       community.docker.docker_container:
         name: "{{ super_productivity_container_name }}"
       register: result
 
-    - name: Check if {{ ansible_nas_app_name }} container is running
+    - name: Get {{ super_productivity_proper_name }} DB container state
+      community.docker.docker_container:
+        name: "{{ super_productivity_db_container_name }}"
+      register: result_db
+
+    - name: Get {{ super_productivity_proper_name }} SuperSync container state
+      community.docker.docker_container:
+        name: "{{ super_productivity_supersync_container_name }}"
+      register: result_supersync
+
+    - name: Get {{ super_productivity_proper_name }} WebDAV container state
+      community.docker.docker_container:
+        name: "{{ super_productivity_webdav_container_name }}"
+      register: result_webdav
+
+    - name: Check if {{ super_productivity_proper_name }} containers are running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"
           - result.container['State']['Restarting'] == false
+          - result_db.container['State']['Status'] == "running"
+          - result_db.container['State']['Restarting'] == false
+          - result_supersync.container['State']['Status'] == "running"
+          - result_supersync.container['State']['Restarting'] == false
+          - result_webdav.container['State']['Status'] == "running"
+          - result_webdav.container['State']['Restarting'] == false

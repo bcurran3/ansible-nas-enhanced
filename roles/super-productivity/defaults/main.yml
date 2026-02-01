@@ -16,11 +16,13 @@ super_productivity_db_container_name: "super-productivity-db"
 super_productivity_db_image_name: "postgres"
 #super_productivity_db_image_tag: "15-alpine"
 super_productivity_db_image_tag: "17-alpine"
+super_productivity_supersync_build_source: "{{ super_productivity_data_directory }}/src"
 super_productivity_supersync_container_name: "super-productivity-supersync"
 super_productivity_supersync_image_name: "super-productivity-supersync"
 super_productivity_supersync_image_tag: "latest"
+super_productivity_supersync_dockerfile: "packages/super-sync-server/Dockerfile.test"
 super_productivity_webdav_container_name: "super-productivity-webdav"
-super_productivity_webdav_image_name: "hacdias/webdav"
+super_productivity_webdav_image_name: "ghcr.io/hacdias/webdav"
 super_productivity_webdav_image_tag: "latest"
 
 # network
@@ -41,6 +43,7 @@ super_productivity_db_memory_swap: "{{ super_productivity_db_memory }}"
 # app
 super_productivity_env_webdav_username: "{{ ansible_nas_user }}"
 super_productivity_env_webdav_sync_folder_path: "/"
+super_productivity_env_webdav_base_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ super_productivity_webdav_port_http }}/"
 super_productivity_env_sync_interval: "15"
 super_productivity_env_is_compression_enabled: "true"
 super_productivity_env_is_encryption_enabled: "false"
@@ -65,12 +68,12 @@ super_productivity_dockflare_enabled: false
 super_productivity_dockflare_access_group: ""
 
 # healthcheck
-super_productivity_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
+super_productivity_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:80/ || exit 1"]
 super_productivity_healthcheck_interval: 30s
 super_productivity_healthcheck_timeout: 10s
 super_productivity_healthcheck_retries: 3
 super_productivity_healthcheck_start_period: 20s
-super_productivity_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U super-productivity -d super-productivity -h 127.0.0.1"]
+super_productivity_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U {{ super_productivity_db_env_postgres_user }} -d {{ super_productivity_db_env_postgres_db }} -h 127.0.0.1"]
 super_productivity_db_healthcheck_interval: 10s
 super_productivity_db_healthcheck_timeout: 5s
 super_productivity_db_healthcheck_retries: 5
@@ -80,7 +83,7 @@ super_productivity_supersync_healthcheck_interval: 5s
 super_productivity_supersync_healthcheck_timeout: 5s
 super_productivity_supersync_healthcheck_retries: 3
 super_productivity_supersync_healthcheck_start_period: 10s
-super_productivity_webdav_healthcheck_test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:2345/"]
+super_productivity_webdav_healthcheck_test: "[]"
 super_productivity_webdav_healthcheck_interval: 10s
 super_productivity_webdav_healthcheck_timeout: 5s
 super_productivity_webdav_healthcheck_retries: 3
@@ -98,12 +101,12 @@ super_productivity_db_homepage_icon: "postgres.png"
 super_productivity_db_homepage_href: "{{ super_productivity_homepage_href }}"
 super_productivity_db_homepage_showstats: false
 super_productivity_supersync_homepage_description: "SuperSync server for E2E testing"
-super_productivity_supersync_homepage_group: "Apps"
-super_productivity_supersync_homepage_icon: "supersync.png"
+super_productivity_supersync_homepage_group: "Misc"
+super_productivity_supersync_homepage_icon: "sh-super-productivity.png.png"
 super_productivity_supersync_homepage_href: "{{ super_productivity_homepage_href }}"
 super_productivity_supersync_homepage_showstats: false
 super_productivity_webdav_homepage_description: "WebDAV sync server"
-super_productivity_webdav_homepage_group: "Apps"
+super_productivity_webdav_homepage_group: "Misc"
 super_productivity_webdav_homepage_icon: "sh-super-productivity.png"
 super_productivity_webdav_homepage_href: "{{ super_productivity_homepage_href }}"
 super_productivity_webdav_homepage_showstats: false
@@ -142,15 +145,15 @@ super_productivity_supersync_watchtower_enabled: false
 super_productivity_webdav_watchtower_enabled: false
 
 # wud
-super_productivity_wud_tag_include: '^\d+\.\d+$'
+super_productivity_wud_tag_include: '^v\\d+(\\.\\d+)*$'
 super_productivity_wud_tag_transform_type: "semver"
-super_productivity_wud_link_template: "https://hub.docker.com/r/devname/super-productivity"
+super_productivity_wud_link_template: "https://hub.docker.com/r/johannesjo/super-productivity"
 super_productivity_db_wud_tag_include: '^\d+\.\d+.*$'
 super_productivity_db_wud_tag_transform_type: "semver"
 super_productivity_db_wud_link_template: "https://hub.docker.com/_/postgres"
 super_productivity_supersync_wud_tag_include: '^\d+\.\d+.*$'
 super_productivity_supersync_wud_tag_transform_type: "semver"
 super_productivity_supersync_wud_link_template: "https://hub.docker.com/r/super-productivity/super-sync-server"
-super_productivity_webdav_wud_tag_include: '^\d+\.\d+.*$'
+super_productivity_webdav_wud_tag_include: "^v\\d+(\\.\\d+)*$"
 super_productivity_webdav_wud_tag_transform_type: "semver"
-super_productivity_webdav_wud_link_template: "https://hub.docker.com/r/hacdias/webdav"
+super_productivity_webdav_wud_link_template: "https://github.com/hacdias/webdav/pkgs/container/webdav"
