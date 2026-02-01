@@ -268,9 +268,10 @@
 
 - name: Stop {{ super_productivity_proper_name }}
   block:
-    - name: Stop {{ super_productivity_proper_name }} WEBDAV Container
+
+    - name: Stop {{ super_productivity_proper_name }} Container
       community.docker.docker_container:
-        name: "{{ super_productivity_webdav_container_name }}"
+        name: "{{ super_productivity_container_name }}"
         state: absent
 
     - name: Stop {{ super_productivity_proper_name }} SuperSync Container
@@ -278,14 +279,14 @@
         name: "{{ super_productivity_supersync_container_name }}"
         state: absent
 
+    - name: Stop {{ super_productivity_proper_name }} WEBDAV Container
+      community.docker.docker_container:
+        name: "{{ super_productivity_webdav_container_name }}"
+        state: absent
+
     - name: Stop {{ super_productivity_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ super_productivity_db_container_name }}"
-        state: absent
-
-    - name: Stop {{ super_productivity_proper_name }} Container
-      community.docker.docker_container:
-        name: "{{ super_productivity_container_name }}"
         state: absent
   when: super_productivity_enabled is false
 

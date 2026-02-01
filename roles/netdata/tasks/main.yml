@@ -49,6 +49,12 @@
           - "/var/run/docker.sock:/var/run/docker.sock:ro"
         env:
           NETDATA_EXTRA_DEB_PACKAGES: "{{ netdata_env_netdata_extra_deb_packages }}"
+#          NETDATA_GO_D_MONITOR_POSTGRES: "false"
+#          NETDATA_PG_USER: "netdata"
+#          NETDATA_PG_PASS: "{{ netdata_postgres_monitoring_password }}"
+#          NETDATA_POSTGRES_AUTODETECT: "false"
+#          NETDATA_POSTGRES_USER: "netdata"
+#          NETDATA_POSTGRES_PASS: "{{ netdata_postgres_monitoring_password }}"
           PGID: "{{ docker_group.gid | string }}"
           TZ: "{{ ansible_nas_timezone }}"
         security_opts: ["apparmor=unconfined"]
