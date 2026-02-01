@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ mosquitto_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ mosquitto_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,13 +10,13 @@
         - "{{ mosquitto_data_directory }}/data"
         - "{{ mosquitto_data_directory }}/log"
 
-    - name: Copy {{ ansible_nas_app_name }} Template mosquitto.conf
+    - name: Copy {{ mosquitto_proper_name }} Template mosquitto.conf
       ansible.builtin.copy:
         src: mosquitto.conf
         dest: "{{ mosquitto_data_directory }}/config/mosquitto.conf"
       register: mosquitto_conf
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ mosquitto_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mosquitto_container_name }}"
@@ -40,7 +40,7 @@
           autoheal: "{{ mosquitto_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ mosquitto_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ mosquitto_proper_name }}"
           homepage.group: "{{ mosquitto_homepage_group }}"
           homepage.icon: "{{ mosquitto_homepage_icon }}"
           homepage.description: "{{ 'An open source MQTT broker' if homepage_show_description else omit }}"
@@ -63,15 +63,15 @@
         restart_policy: unless-stopped
   when: mosquitto_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ mosquitto_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ mosquitto_proper_name }} Container
       community.docker.docker_container:
         name: "{{ mosquitto_container_name }}"
         state: absent
   when: mosquitto_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ mosquitto_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ beszel_agent_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ beszel_agent_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ beszel_agent_container_name }}"
@@ -21,7 +21,7 @@
           autoheal: "{{ beszel_agent_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ beszel_agent_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ beszel_agent_proper_name }}"
           homepage.group: "{{ beszel_agent_homepage_group }}"
           homepage.icon: "{{ beszel_agent_homepage_icon }}"
           homepage.description: "{{ 'Lightweight server monitoring hub with historical data, docker stats, and alerts.' if homepage_show_description else omit }}"
@@ -39,9 +39,9 @@
         restart_policy: unless-stopped
   when: beszel_agent_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ beszel_agent_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ beszel_agent_proper_name }} Container
       community.docker.docker_container:
         name: "{{ beszel_agent_container_name }}"
         state: absent

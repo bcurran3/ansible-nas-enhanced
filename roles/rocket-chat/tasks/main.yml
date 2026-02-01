@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ rocket_chat_proper_name }}
   block:
     - name: Check if {{ rocket_chat_hostname }}.{{ ansible_nas_domain }} resolves
       ansible.builtin.shell: dig +short {{ rocket_chat_hostname }}.{{ ansible_nas_domain }}
@@ -24,9 +24,9 @@
             "DNS record not found. External access not configured. Skipping container creation."
           }}
 
-    - name: Continue {{ ansible_nas_app_name }}
+    - name: Continue {{ rocket_chat_proper_name }}
       block:
-        - name: Create {{ ansible_nas_app_name }} Directories
+        - name: Create {{ rocket_chat_proper_name }} Directories
           ansible.builtin.file:
             path: "{{ item }}"
             state: directory
@@ -35,7 +35,7 @@
             - "{{ rocket_chat_data_directory }}/scripts"
             - "{{ rocket_chat_data_directory }}/uploads"
 
-        - name: Create {{ ansible_nas_app_name }} DB Directories
+        - name: Create {{ rocket_chat_proper_name }} DB Directories
           ansible.builtin.file:
             path: "{{ item }}"
             owner: "1001"
@@ -44,7 +44,7 @@
             - "{{ rocket_chat_data_directory }}"
             - "{{ rocket_chat_data_directory }}/db"
 
-        - name: Create {{ ansible_nas_app_name }} DB Container
+        - name: Create {{ rocket_chat_proper_name }} DB Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ rocket_chat_db_container_name }}"
@@ -74,7 +74,7 @@
               autoheal: "{{ rocket_chat_db_autoheal_enabled | ternary('true', 'false') }}"
               com.centurylinklabs.watchtower.enable: "{{ rocket_chat_db_watchtower_enabled | ternary('true', 'false') }}"
               dockflare.enable: "false"
-              homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+              homepage.name: "{{ rocket_chat_proper_name }} MongoDB"
               homepage.group: "{{ rocket_chat_db_homepage_group }}"
               homepage.icon: "{{ rocket_chat_db_homepage_icon }}"
               homepage.href: "{{ rocket_chat_db_homepage_href }}"
@@ -96,7 +96,7 @@
             memory_swap: "{{ rocket_chat_db_memory_swap }}"
             restart_policy: unless-stopped
 
-        - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+        - name: Wait for {{ rocket_chat_proper_name }} DB to become healthy
           community.docker.docker_container_info:
             name: "{{ rocket_chat_db_container_name }}"
           register: db_info
@@ -104,7 +104,7 @@
           retries: 30
           delay: 5
 
-        - name: Create {{ ansible_nas_app_name }} Container
+        - name: Create {{ rocket_chat_proper_name }} Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ rocket_chat_container_name }}"
@@ -141,7 +141,7 @@
               dockflare.access.group: "{{ rocket_chat_dockflare_access_group }}"
               dockflare.hostname: "{{ rocket_chat_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rocket_chat_port_http }}"
-              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.name: "{{ rocket_chat_proper_name }}"
               homepage.group: "{{ rocket_chat_homepage_group }}"
               homepage.icon: "{{ rocket_chat_homepage_icon }}"
               homepage.href: "{{ rocket_chat_homepage_href }}"
@@ -171,7 +171,7 @@
             memory_swap: "{{ rocket_chat_memory_swap }}"
             restart_policy: unless-stopped
 
-        - name: Access {{ ansible_nas_app_name }} at
+        - name: Access {{ rocket_chat_proper_name }} at
           ansible.builtin.debug:
             msg: >-
                   {{
@@ -182,21 +182,21 @@
         - (rocket_chat_dockflare_enabled | bool or rocket_chat_traefik_enabled | bool)
   when: rocket_chat_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ rocket_chat_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ rocket_chat_proper_name }} Container
       community.docker.docker_container:
         name: "{{ rocket_chat_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ rocket_chat_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ rocket_chat_db_container_name }}"
         state: absent
 
   when: rocket_chat_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ rocket_chat_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,18 +1,18 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ ddns_route53_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ ddns_route53_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ ddns_route53_data_directory }}"
         state: directory
 
-    - name: Generate {{ ansible_nas_app_name }} config file
+    - name: Generate {{ ddns_route53_proper_name }} config file
       ansible.builtin.template:
         src: config.yml
         dest: "{{ ddns_route53_data_directory }}/ddns-route53.yml"
       register: template_config
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ ddns_route53_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ddns_route53_container_name }}"
@@ -28,7 +28,7 @@
           autoheal: "{{ ddns_route53_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ ddns_route53_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ ddns_route53_proper_name }}"
           homepage.group: "{{ ddns_route53_homepage_group }}"
           homepage.icon: "{{ ddns_route53_homepage_icon }}"
           homepage.description: "{{ 'Dynamic DNS for Amazon Route 53 on a time-based schedule' if homepage_show_description else omit }}"
@@ -47,15 +47,15 @@
         restart_policy: unless-stopped
   when: ddns_route53_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ ddns_route53_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ ddns_route53_proper_name }} Container
       community.docker.docker_container:
         name: "{{ ddns_route53_container_name }}"
         state: absent
   when: ddns_route53_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ ddns_route53_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

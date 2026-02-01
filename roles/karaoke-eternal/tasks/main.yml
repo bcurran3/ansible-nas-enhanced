@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ karaoke_eternal_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ karaoke_eternal_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ karaoke_eternal_data_directory }}"
         - "{{ karaoke_eternal_cdgfiles }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ karaoke_eternal_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         karaoke_eternal_homepage_href: "https://{{ karaoke_eternal_hostname }}.{{ ansible_nas_domain }}"
       when: karaoke_eternal_traefik_enabled | bool or karaoke_eternal_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ karaoke_eternal_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ karaoke_eternal_container_name }}"
@@ -36,7 +36,7 @@
           dockflare.access.group: "{{ karaoke_eternal_dockflare_access_group }}"
           dockflare.hostname: "{{ karaoke_eternal_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ karaoke_eternal_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ karaoke_eternal_proper_name }}"
           homepage.group: "{{ karaoke_eternal_homepage_group }}"
           homepage.icon: "{{ karaoke_eternal_homepage_icon }}"
           homepage.href: "{{ karaoke_eternal_homepage_href }}"
@@ -65,7 +65,7 @@
         memory_swap: "{{ karaoke_eternal_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ karaoke_eternal_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -74,15 +74,15 @@
               }}
   when: karaoke_eternal_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ karaoke_eternal_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ karaoke_eternal_proper_name }} Container
       community.docker.docker_container:
         name: "{{ karaoke_eternal_container_name }}"
         state: absent
   when: karaoke_eternal_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ karaoke_eternal_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

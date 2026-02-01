@@ -1,13 +1,13 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ medialytics_proper_name }}
   block:
   
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ medialytics_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         medialytics_homepage_href: "https://{{ medialytics_hostname }}.{{ ansible_nas_domain }}"
       when: medialytics_traefik_enabled | bool or medialytics_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ medialytics_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ medialytics_container_name }}"
@@ -28,7 +28,7 @@
           dockflare.access.group: "{{ medialytics_dockflare_access_group }}"
           dockflare.hostname: "{{ medialytics_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ medialytics_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ medialytics_proper_name }}"
           homepage.group: "{{ medialytics_homepage_group }}"
           homepage.icon: "{{ medialytics_homepage_icon }}"
           homepage.href: "{{ medialytics_homepage_href }}"
@@ -58,7 +58,7 @@
         memory_swap: "{{ medialytics_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ medialytics_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -67,15 +67,15 @@
               }}
   when: medialytics_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ medialytics_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ medialytics_proper_name }} Container
       community.docker.docker_container:
         name: "{{ medialytics_container_name }}"
         state: absent
   when: medialytics_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ medialytics_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

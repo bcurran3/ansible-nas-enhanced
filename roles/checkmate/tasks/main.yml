@@ -2,9 +2,9 @@
 # WORK IN PROGRESS - 98% - works using IP but not hostname - probably just need to override the UPTIME_APP vars with hostname
 # https://docs.checkmate.so/users-guide/quickstart
 # version with front end: https://raw.githubusercontent.com/bluewave-labs/Checkmate/refs/heads/master/docker/dist/docker-compose.yaml
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ checkmate_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ checkmate_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ checkmate_data_directory }}"
         - "{{ checkmate_data_directory }}/db"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ checkmate_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         checkmate_env_uptime_app_api_base_url: "https://{{ checkmate_hostname }}.{{ ansible_nas_domain }}/api/v1"
         checkmate_env_uptime_app_client_host: "https://{{ checkmate_hostname }}.{{ ansible_nas_domain }}"
@@ -20,7 +20,7 @@
         checkmate_homepage_href: "https://{{ checkmate_hostname }}.{{ ansible_nas_domain }}"
       when: checkmate_traefik_enabled | bool or checkmate_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ checkmate_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_db_container_name }}"
@@ -44,7 +44,7 @@
           autoheal: "{{ checkmate_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ checkmate_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.name: "{{ checkmate_proper_name }} MongoDB"
           homepage.group: "{{ checkmate_db_homepage_group }}"
           homepage.icon: "{{ checkmate_db_homepage_icon }}"
           homepage.href: "{{ checkmate_db_homepage_href }}"
@@ -66,7 +66,7 @@
         memory_swap: "{{ checkmate_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ checkmate_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmate_container_name }}"
@@ -93,7 +93,7 @@
           dockflare.access.group: "{{ checkmate_dockflare_access_group }}"
           dockflare.hostname: "{{ checkmate_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ checkmate_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ checkmate_proper_name }}"
           homepage.group: "{{ checkmate_homepage_group }}"
           homepage.icon: "{{ checkmate_homepage_icon }}"
           homepage.href: "{{ checkmate_homepage_href }}"
@@ -123,7 +123,7 @@
         memory_swap: "{{ checkmate_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ checkmate_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -132,20 +132,20 @@
               }}
   when: checkmate_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ checkmate_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Server Container
+    - name: Stop {{ checkmate_proper_name }} Server Container
       community.docker.docker_container:
         name: "{{ checkmate_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ checkmate_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ checkmate_db_container_name }}"
         state: absent
   when: checkmate_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ checkmate_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

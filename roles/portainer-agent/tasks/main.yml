@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ portainer_agent_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ portainer_agent_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ portainer_agent_container_name }}"
@@ -20,7 +20,7 @@
           autoheal: "{{ portainer_agent_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ portainer_agent_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ portainer_agent_proper_name }}"
           homepage.group: "{{ portainer_agent_homepage_group }}"
           homepage.icon: "{{ portainer_agent_homepage_icon }}"
           homepage.description: "{{ 'The Portainer agent' if homepage_show_description else omit }}"
@@ -38,9 +38,9 @@
         restart_policy: unless-stopped
   when: portainer_agent_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ portainer_agent_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ portainer_agent_proper_name }} Container
       community.docker.docker_container:
         name: "{{ portainer_agent_container_name }}"
         state: absent

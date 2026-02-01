@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ tdarr_node_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ tdarr_node_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ tdarr_node_cache_directory }}"
         - "{{ tdarr_node_media_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ tdarr_node_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ tdarr_node_container_name }}"
@@ -57,7 +57,7 @@
           autoheal: "{{ tdarr_node_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ tdarr_node_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ tdarr_node_proper_name }}"
           homepage.group: "{{ tdarr_node_homepage_group }}"
           homepage.icon: "{{ tdarr_node_homepage_icon }}"
           homepage.description: "{{ 'Tdarr Node' if homepage_show_description else omit }}"
@@ -83,15 +83,15 @@
         restart_policy: unless-stopped
   when: tdarr_node_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ tdarr_node_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ tdarr_node_proper_name }} Container
       community.docker.docker_container:
         name: "{{ tdarr_node_container_name }}"
         state: absent
   when: tdarr_node_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ tdarr_node_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

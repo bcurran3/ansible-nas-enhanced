@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ komodo_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ komodo_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,13 +12,13 @@
         - "{{ komodo_data_directory }}/db"
         - "{{ komodo_data_directory }}/periphery"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ komodo_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         komodo_env_komodo_host: "https://{{ komodo_hostname }}{{ ansible_nas_domain }}"
         komodo_homepage_href: "https://{{ komodo_hostname }}.{{ ansible_nas_domain }}"
       when: komodo_traefik_enabled | bool or komodo_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ komodo_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ komodo_db_container_name }}"
@@ -43,7 +43,7 @@
           autoheal: "{{ komodo_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ komodo_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.name: "{{ komodo_proper_name }} MongoDB"
           homepage.group: "{{ komodo_db_homepage_group }}"
           homepage.icon: "{{ komodo_db_homepage_icon }}"
           homepage.href: "{{ komodo_db_homepage_href }}"
@@ -66,7 +66,7 @@
         memory_swap: "{{ komodo_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Periphery Container
+    - name: Create {{ komodo_proper_name }} Periphery Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ komodo_periphery_container_name }}"
@@ -99,7 +99,7 @@
           autoheal: "{{ komodo_periphery_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ komodo_periphery_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Periphery"
+          homepage.name: "{{ komodo_proper_name }} Periphery"
           homepage.group: "{{ komodo_periphery_homepage_group }}"
           homepage.icon: "{{ komodo_periphery_homepage_icon }}"
           homepage.href: "{{ komodo_periphery_homepage_href }}"
@@ -123,7 +123,7 @@
         memory_swap: "{{ komodo_periphery_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ komodo_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ komodo_db_container_name }}"
       register: db_info
@@ -131,7 +131,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ komodo_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ komodo_container_name }}"
@@ -198,7 +198,7 @@
           dockflare.access.group: "{{ komodo_dockflare_access_group }}"
           dockflare.hostname: "{{ komodo_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ komodo_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ komodo_proper_name }}"
           homepage.group: "{{ komodo_homepage_group }}"
           homepage.icon: "{{ komodo_homepage_icon }}"
           homepage.href: "{{ komodo_homepage_href }}"
@@ -235,7 +235,7 @@
         memory_swap: "{{ komodo_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ komodo_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -244,25 +244,25 @@
               }}
   when: komodo_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ komodo_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ komodo_proper_name }} Container
       community.docker.docker_container:
         name: "{{ komodo_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Periphery Container
+    - name: Stop {{ komodo_proper_name }} Periphery Container
       community.docker.docker_container:
         name: "{{ komodo_periphery_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ komodo_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ komodo_db_container_name }}"
         state: absent
   when: komodo_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ komodo_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

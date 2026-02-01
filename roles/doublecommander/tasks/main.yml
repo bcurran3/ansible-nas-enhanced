@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ doublecommander_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ doublecommander_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ doublecommander_data_directory }}"
         - "{{ doublecommander_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ doublecommander_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         doublecommander_homepage_href: "https://{{ doublecommander_hostname }}.{{ ansible_nas_domain }}"
       when: doublecommander_traefik_enabled | bool or doublecommander_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ doublecommander_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ doublecommander_container_name }}"
@@ -40,7 +40,7 @@
           dockflare.access.group: "{{ doublecommander_dockflare_access_group }}"
           dockflare.hostname: "{{ doublecommander_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ doublecommander_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ doublecommander_proper_name }}"
           homepage.group: "{{ doublecommander_homepage_group }}"
           homepage.icon: "{{ doublecommander_homepage_icon }}"
           homepage.href: "{{ doublecommander_homepage_href }}"
@@ -69,7 +69,7 @@
         memory_swap: "{{ doublecommander_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ doublecommander_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -78,15 +78,15 @@
               }}
   when: doublecommander_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ doublecommander_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ doublecommander_proper_name }} Container
       community.docker.docker_container:
         name: "{{ doublecommander_container_name }}"
         state: absent
   when: doublecommander_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ doublecommander_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

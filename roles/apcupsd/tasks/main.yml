@@ -1,26 +1,26 @@
 ---
 
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ apcupsd_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ apcupsd_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ apcupsd_data_directory }}"
 
-    - name: "Check if {{ ansible_nas_app_name }} config exists"
+    - name: "Check if {{ apcupsd_proper_name }} config exists"
       ansible.builtin.stat:
         path: "{{ apcupsd_data_directory }}/apcupsd.conf"
       register: apcupsd_config_path
 
-    - name: Template {{ ansible_nas_app_name }} config
+    - name: Template {{ apcupsd_proper_name }} config
       ansible.builtin.template:
         src: apcupsd.conf
         dest: "{{ apcupsd_data_directory }}/apcupsd.conf"
       when: not apcupsd_config_path.stat.exists
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ apcupsd_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ apcupsd_container_name }}"
@@ -47,7 +47,7 @@
           autoheal: "{{ apcupsd_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ apcupsd_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ apcupsd_proper_name }}"
           homepage.group: "{{ apcupsd_homepage_group }}"
           homepage.icon: "{{ apcupsd_homepage_icon }}"
           homepage.description: "{{ 'Dockerized apcupsd' if homepage_show_description else omit }}"
@@ -71,15 +71,15 @@
         restart_policy: unless-stopped
   when: apcupsd_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ apcupsd_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ apcupsd_proper_name }} Container
       community.docker.docker_container:
         name: "{{ apcupsd_container_name }}"
         state: absent
   when: apcupsd_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ apcupsd_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

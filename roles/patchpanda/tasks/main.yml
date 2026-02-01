@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ patchpanda_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ patchpanda_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,13 +9,13 @@
         - "{{ patchpanda_data_directory }}"
         - "{{ patchpanda_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ patchpanda_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         patchpanda_env_base_url: "https://{{ patchpanda_hostname }}.{{ ansible_nas_domain }}"
         patchpanda_homepage_href: "https://{{ patchpanda_hostname }}.{{ ansible_nas_domain }}"
       when: patchpanda_traefik_enabled | bool or patchpanda_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Apprise Container
+    - name: Create {{ patchpanda_proper_name }} Apprise Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ patchpanda_apprise_container_name }}"
@@ -32,7 +32,7 @@
           autoheal: "{{ patchpanda_apprise_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ patchpanda_apprise_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Apprise API"
+          homepage.name: "{{ patchpanda_proper_name }} Apprise API"
           homepage.group: "{{ patchpanda_apprise_homepage_group }}"
           homepage.icon: "{{ patchpanda_apprise_homepage_icon }}"
           homepage.href: "{{ patchpanda_apprise_homepage_href }}"
@@ -51,7 +51,7 @@
         restart_policy: unless-stopped
         memory_swap: "{{ patchpanda_apprise_memory_swap }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ patchpanda_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ patchpanda_container_name }}"
@@ -84,7 +84,7 @@
           dockflare.access.group: "{{ patchpanda_dockflare_access_group }}"
           dockflare.hostname: "{{ patchpanda_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ patchpanda_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ patchpanda_proper_name }}"
           homepage.group: "{{ patchpanda_homepage_group }}"
           homepage.icon: "{{ patchpanda_homepage_icon }}"
           homepage.href: "{{ patchpanda_homepage_href }}"
@@ -114,7 +114,7 @@
         restart_policy: unless-stopped
         memory_swap: "{{ patchpanda_memory_swap }}"
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ patchpanda_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -123,20 +123,20 @@
               }}
   when: patchpanda_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ patchpanda_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Apprise API Container
+    - name: Stop {{ patchpanda_proper_name }} Apprise API Container
       community.docker.docker_container:
         name: "{{ patchpanda_apprise_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ patchpanda_proper_name }} Container
       community.docker.docker_container:
         name: "{{ patchpanda_container_name }}"
         state: absent
   when: patchpanda_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ patchpanda_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,38 +1,38 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ guacamole_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} directories
+    - name: Create {{ guacamole_proper_name }} directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ guacamole_data_directory }}/config"
 
-    - name: Remove Old {{ ansible_nas_app_name }} Mysql Container
+    - name: Remove Old {{ guacamole_proper_name }} Mysql Container
       community.docker.docker_container:
         name: guacamole-mysql
         state: absent
         keep_volumes: true
 
-    - name: Remove Old {{ ansible_nas_app_name }} guacd Container
+    - name: Remove Old {{ guacamole_proper_name }} guacd Container
       community.docker.docker_container:
         name: guacamole-guacd
         state: absent
         keep_volumes: true
 
-    - name: Remove old {{ ansible_nas_app_name }} directories
+    - name: Remove old {{ guacamole_proper_name }} directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
       with_items:
         - "{{ guacamole_data_directory }}/mysql"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ guacamole_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         guacamole_homepage_href: "https://{{ guacamole_hostname }}.{{ ansible_nas_domain }}"
       when: guacamole_traefik_enabled | bool or guacamole_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ guacamole_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ guacamole_container_name }}"
@@ -50,7 +50,7 @@
           dockflare.access.group: "{{ guacamole_dockflare_access_group }}"
           dockflare.hostname: "{{ guacamole_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ guacamole_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ guacamole_proper_name }}"
           homepage.group: "{{ guacamole_homepage_group }}"
           homepage.icon: "{{ guacamole_homepage_icon }}"
           homepage.href: "{{ guacamole_homepage_href }}"
@@ -80,14 +80,14 @@
         memory_swap: "{{ guacamole_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Restart {{ ansible_nas_app_name }} Container
+    - name: Restart {{ guacamole_proper_name }} Container
       community.docker.docker_container:
         name: "{{ guacamole_container_name }}"
         image: "{{ guacamole_image_name }}:{{ guacamole_image_version }}"
         restart: true
       tags: molecule-idempotence-notest
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ guacamole_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -96,15 +96,15 @@
               }}
   when: guacamole_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ guacamole_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ guacamole_proper_name }} Container
       community.docker.docker_container:
         name: "{{ guacamole_container_name }}"
         state: absent
   when: guacamole_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ guacamole_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

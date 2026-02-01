@@ -1,10 +1,10 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ ansible_nas_docker_compose_proper_name }}
   block:
     - debug:
-        msg: "EXPERIMENTAL: Discovery and Running of {{ ansible_nas_app_name }} files"
+        msg: "EXPERIMENTAL: Discovery and Running of {{ ansible_nas_docker_compose_proper_name }} files"
 
-    - name: Find {{ ansible_nas_app_name }} files in "{{ docker_compose_data_directory }}"
+    - name: Find {{ ansible_nas_docker_compose_proper_name }} files in "{{ docker_compose_data_directory }}"
       ansible.builtin.find:
         paths: "{{ docker_compose_data_directory }}"
         file_type: file
@@ -12,7 +12,7 @@
         recurse: yes
       register: compose_files
 
-    - name: Bring up {{ ansible_nas_app_name }} files in "{{ docker_compose_data_directory }}"
+    - name: Bring up {{ ansible_nas_docker_compose_proper_name }} files in "{{ docker_compose_data_directory }}"
       community.docker.docker_compose_v2:
         project_src: "{{ item.path | dirname }}"
         state: present

@@ -1,28 +1,28 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ ddns_updater_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ ddns_updater_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ ddns_updater_data_directory }}"
         state: directory
 
-    - name: Check {{ ansible_nas_app_name }} config is defined
+    - name: Check {{ ddns_updater_proper_name }} config is defined
       ansible.builtin.fail:
-        msg: "Please configure {{ ansible_nas_app_name }} by setting ddns_updater_config in your inventory nas.yml."
+        msg: "Please configure {{ ddns_updater_proper_name }} by setting ddns_updater_config in your inventory nas.yml."
       when: ddns_updater_config is not defined
 
-    - name: Generate {{ ansible_nas_app_name }} config.json
+    - name: Generate {{ ddns_updater_proper_name }} config.json
       ansible.builtin.copy:
         content: "{{ ddns_updater_config | to_nice_json }}"
         dest: "{{ ddns_updater_data_directory }}/config.json"
       register: ddns_updater_config
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ ddns_updater_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         ddns_updater_homepage_href: "https://{{ ddns_updater_hostname }}.{{ ansible_nas_domain }}"
       when: ddns_updater_traefik_enabled | bool or ddns_updater_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ ddns_updater_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ddns_updater_container_name }}"
@@ -49,7 +49,7 @@
           dockflare.access.group: "{{ ddns_updater_dockflare_access_group }}"
           dockflare.hostname: "{{ ddns_updater_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ddns_updater_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ ddns_updater_proper_name }}"
           homepage.group: "{{ ddns_updater_homepage_group }}"
           homepage.icon: "{{ ddns_updater_homepage_icon }}"
           homepage.href: "{{ ddns_updater_homepage_href }}"
@@ -80,7 +80,7 @@
         restart: "{{ ddns_updater_config is changed }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ ddns_updater_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -89,15 +89,15 @@
               }}
   when: ddns_updater_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ ddns_updater_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ ddns_updater_proper_name }} Container
       community.docker.docker_container:
         name: "{{ ddns_updater_container_name }}"
         state: absent
   when: ddns_updater_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ ddns_updater_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ reubah_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directory
+    - name: Create {{ reubah_proper_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
       with_items:
         - "{{ reubah_data_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ reubah_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         reubah_homepage_href: "https://{{ reubah_hostname }}.{{ ansible_nas_domain }}"
       when: reubah_traefik_enabled | bool or reubah_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ reubah_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ reubah_container_name }}"
@@ -36,7 +36,7 @@
           dockflare.access.group: "{{ reubah_dockflare_access_group }}"
           dockflare.hostname: "{{ reubah_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ reubah_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ reubah_proper_name }}"
           homepage.group: "{{ reubah_homepage_group }}"
           homepage.icon: "{{ reubah_homepage_icon }}"
           homepage.href: "{{ reubah_homepage_href }}"
@@ -65,7 +65,7 @@
         memory_swap: "{{ reubah_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ reubah_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -74,14 +74,14 @@
               }}
   when: reubah_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ reubah_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ reubah_proper_name }} Container
       community.docker.docker_container:
         name: "{{ reubah_container_name }}"
         state: absent
 
-    - name: Remove {{ ansible_nas_app_name }} Directory
+    - name: Remove {{ reubah_proper_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent

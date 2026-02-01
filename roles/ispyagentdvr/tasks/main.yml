@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ ispyagentdvr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ ispyagentdvr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ ispyagentdvr_data_directory }}/commands"
         - "{{ ispyagentdvr_recordings_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ ispyagentdvr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         ispyagentdvr_homepage_href: "https://{{ ispyagentdvr_hostname }}.{{ ansible_nas_domain }}"
       when: ispyagentdvr_traefik_enabled | bool or ispyagentdvr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ ispyagentdvr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ispyagentdvr_container_name }}"
@@ -58,7 +58,7 @@
           dockflare.access.group: "{{ ispyagentdvr_dockflare_access_group }}"
           dockflare.hostname: "{{ ispyagentdvr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ispyagentdvr_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ ispyagentdvr_proper_name }}"
           homepage.group: "{{ ispyagentdvr_homepage_group }}"
           homepage.icon: "{{ ispyagentdvr_homepage_icon }}"
           homepage.href: "{{ ispyagentdvr_homepage_href }}"
@@ -88,7 +88,7 @@
         memory_swap: "{{ ispyagentdvr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ ispyagentdvr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -97,15 +97,15 @@
               }}
   when: ispyagentdvr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ ispyagentdvr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ ispyagentdvr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ ispyagentdvr_container_name }}"
         state: absent
   when: ispyagentdvr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ ispyagentdvr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

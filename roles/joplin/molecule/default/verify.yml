@@ -6,17 +6,17 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ joplin_proper_name }} container state
       community.docker.docker_container_info:
         name: "{{ joplin_container_name }}"
       register: result
 
-    - name: Get {{ ansible_nas_app_name }} DB container state
+    - name: Get {{ joplin_proper_name }} DB container state
       community.docker.docker_container_info:
         name: "{{ joplin_db_container_name }}"
       register: result_db
 
-    - name: Check {{ ansible_nas_app_name }} is running
+    - name: Check {{ joplin_proper_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

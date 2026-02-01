@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ chowdown_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directory
+    - name: Create {{ chowdown_proper_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ chowdown_data_directory }}"
         - "{{ chowdown_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ chowdown_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         chowdown_homepage_href: "https://{{ chowdown_hostname }}.{{ ansible_nas_domain }}"
       when: chowdown_traefik_enabled | bool or chowdown_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ chowdown_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ chowdown_container_name }}"
@@ -35,7 +35,7 @@
           dockflare.access.group: "{{ chowdown_dockflare_access_group }}"
           dockflare.hostname: "{{ chowdown_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ chowdown_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ chowdown_proper_name }}"
           homepage.group: "{{ chowdown_homepage_group }}"
           homepage.icon: "{{ chowdown_homepage_icon }}"
           homepage.href: "{{ chowdown_homepage_href }}"
@@ -64,7 +64,7 @@
         memory_swap: "{{ chowdown_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ chowdown_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -73,15 +73,15 @@
               }}
   when: chowdown_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ chowdown_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ chowdown_proper_name }} Container
       community.docker.docker_container:
         name: "{{ chowdown_container_name }}"
         state: absent
   when: chowdown_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ chowdown_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

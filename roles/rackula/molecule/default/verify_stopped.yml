@@ -6,19 +6,19 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} API
+    - name: Try and stop and remove {{ rackula_proper_name }} API
       community.docker.docker_container:
         name: "{{ rackula_api_container_name }}"
         state: absent
       register: result_api
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ rackula_proper_name }}
       community.docker.docker_container:
         name: "{{ rackula_container_name }}"
         state: absent
       register: result
 
-    - name: Check if {{ ansible_nas_app_name }} is stopped
+    - name: Check if {{ rackula_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

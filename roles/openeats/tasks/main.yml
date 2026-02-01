@@ -1,14 +1,14 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ openeats_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ openeats_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ openeats_data_directory }}/db"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ openeats_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         openeats_api_env_allowed_host: "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
         openeats_api_env_http_x_forwarded_proto: "true"
@@ -17,7 +17,7 @@
         openeats_homepage_href: "https://{{ openeats_hostname }}.{{ ansible_nas_domain }}"
       when: openeats_traefik_enabled | bool or openeats_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ openeats_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_db_container_name }}"
@@ -42,7 +42,7 @@
           autoheal: "{{ openeats_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ openeats_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.name: "{{ openeats_proper_name }} MariaDB"
           homepage.group: "{{ openeats_db_homepage_group }}"
           homepage.icon: "{{ openeats_db_homepage_icon }}"
           homepage.href: "{{ openeats_db_homepage_href }}"
@@ -64,7 +64,7 @@
         memory_swap: "{{ openeats_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ openeats_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ openeats_db_container_name }}"
       register: db_info
@@ -72,7 +72,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} API Container
+    - name: Create {{ openeats_proper_name }} API Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_api_container_name }}"
@@ -108,7 +108,7 @@
           autoheal: "{{ openeats_api_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ openeats_api_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} API"
+          homepage.name: "{{ openeats_proper_name }} API"
           homepage.group: "{{ openeats_api_homepage_group }}"
           homepage.icon: "{{ openeats_api_homepage_icon }}"
           homepage.href: "{{ openeats_api_homepage_href }}"
@@ -130,7 +130,7 @@
         memory_swap: "{{ openeats_api_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Web UI Container
+    - name: Create {{ openeats_proper_name }} Web UI Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_web_container_name }}"
@@ -154,7 +154,7 @@
           autoheal: "{{ openeats_web_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ openeats_web_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Web"
+          homepage.name: "{{ openeats_proper_name }} Web"
           homepage.group: "{{ openeats_web_homepage_group }}"
           homepage.icon: "{{ openeats_web_homepage_icon }}"
           homepage.href: "{{ openeats_web_homepage_href }}"
@@ -176,7 +176,7 @@
         memory_swap: "{{ openeats_web_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Nginx Container
+    - name: Create {{ openeats_proper_name }} Nginx Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openeats_nginx_container_name }}"
@@ -205,7 +205,7 @@
           dockflare.access.group: "{{ openeats_dockflare_access_group }}"
           dockflare.hostname: "{{ openeats_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ openeats_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }} Nginx"
+          homepage.name: "{{ openeats_proper_name }} Nginx"
           homepage.group: "{{ openeats_nginx_homepage_group }}"
           homepage.icon: "{{ openeats_nginx_homepage_icon }}"
           homepage.href: "{{ openeats_nginx_homepage_href }}"
@@ -234,7 +234,7 @@
         memory_swap: "{{ openeats_nginx_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ openeats_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -243,30 +243,30 @@
               }}
   when: openeats_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ openeats_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Nginx Container
+    - name: Stop {{ openeats_proper_name }} Nginx Container
       community.docker.docker_container:
         name: "{{ openeats_nginx_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} API Container
+    - name: Stop {{ openeats_proper_name }} API Container
       community.docker.docker_container:
         name: "{{ openeats_api_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Web Container
+    - name: Stop {{ openeats_proper_name }} Web Container
       community.docker.docker_container:
         name: "{{ openeats_web_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ openeats_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ openeats_db_container_name }}"
         state: absent
   when: openeats_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ openeats_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

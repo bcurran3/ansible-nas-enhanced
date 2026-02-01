@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ drone_ci_proper_name }}
   block:
     - name: Check for Gitea installation
       ansible.builtin.debug:
@@ -11,21 +11,21 @@
         msg: "Missing Gitea Oauth2 config! Read https://docs.drone.io/server/provider/gitea/ and set drone_ci_gitea_client_id and drone_ci_gitea_client_secret. Skipping..."
       when: drone_ci_gitea_client_id == "notset"
 
-    - name: Continue {{ ansible_nas_app_name }}
+    - name: Continue {{ drone_ci_proper_name }}
       block:
-        - name: Create {{ ansible_nas_app_name }} Directories
+        - name: Create {{ drone_ci_proper_name }} Directories
           ansible.builtin.file:
             path: "{{ item }}"
             state: directory
           with_items:
             - "{{ drone_ci_data_directory }}"
 
-        - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+        - name: Set {{ drone_ci_proper_name }} FQDN var overrides
           ansible.builtin.set_fact:
             drone_ci_homepage_href: "https://{{ drone_ci_hostname }}.{{ ansible_nas_domain }}"
           when: drone_ci_traefik_enabled | bool or drone_ci_dockflare_enabled | bool
 
-        - name: Create {{ ansible_nas_app_name }} Container
+        - name: Create {{ drone_ci_proper_name }} Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ drone_ci_container_name }}"
@@ -52,7 +52,7 @@
               dockflare.access.group: "{{ drone_ci_dockflare_access_group }}"
               dockflare.hostname: "{{ drone_ci_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ drone_ci_port_http }}"
-              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.name: "{{ drone_ci_proper_name }}"
               homepage.group: "{{ drone_ci_homepage_group }}"
               homepage.icon: "{{ drone_ci_homepage_icon }}"
               homepage.href: "{{ drone_ci_homepage_href }}"
@@ -82,7 +82,7 @@
             memory_swap: "{{ drone_ci_memory_swap }}"
             restart_policy: unless-stopped
 
-        - name: Access {{ ansible_nas_app_name }} at
+        - name: Access {{ drone_ci_proper_name }} at
           ansible.builtin.debug:
             msg: >-
                   {{
@@ -90,7 +90,7 @@
                     (['https://' + drone_ci_hostname + '.' + ansible_nas_domain] if (drone_ci_traefik_enabled is true or drone_ci_dockflare_enabled is true) else [])
                   }}
 
-        - name: Create {{ ansible_nas_app_name }} Runner Container
+        - name: Create {{ drone_ci_proper_name }} Runner Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ drone_ci_runner_container_name }}"
@@ -110,7 +110,7 @@
             labels:
               autoheal: "{{ drone_ci_runner_autoheal_enabled | ternary('true', 'false') }}"
               com.centurylinklabs.watchtower.enable: "{{ drone_ci_runner_watchtower_enabled | ternary('true', 'false') }}"
-              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.name: "{{ drone_ci_proper_name }}"
               homepage.group: "{{ drone_ci_runner_homepage_group }}"
               homepage.icon: "{{ drone_ci_runner_homepage_icon }}"
               homepage.href: "{{ drone_ci_runner_homepage_href }}"
@@ -141,20 +141,20 @@
         - drone_ci_gitea_client_id != "notset"
   when: drone_ci_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ drone_ci_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ drone_ci_proper_name }} Container
       community.docker.docker_container:
         name: "{{ drone_ci_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Runner Container
+    - name: Stop {{ drone_ci_proper_name }} Runner Container
       community.docker.docker_container:
         name: "{{ drone_ci_runner_container_name }}"
         state: absent
   when: drone_ci_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ drone_ci_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

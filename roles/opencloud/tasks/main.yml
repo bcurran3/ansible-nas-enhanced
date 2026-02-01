@@ -1,7 +1,7 @@
 ---
 ### WORK IN PROGRESS
 # https://github.com/opencloud-eu/opencloud-compose/blob/main/docker-compose.yml
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ opencloud_proper_name }}
   block:
     - name: Check if {{ opencloud_hostname }}.{{ ansible_nas_domain }} resolves
       ansible.builtin.shell: dig +short {{ opencloud_hostname }}.{{ ansible_nas_domain }}
@@ -26,9 +26,9 @@
             "DNS record not found. External access not configured. Skipping container creation."
           }}
 
-    - name: Continue {{ ansible_nas_app_name }}
+    - name: Continue {{ opencloud_proper_name }}
       block:
-        - name: Create {{ ansible_nas_app_name }} Directories
+        - name: Create {{ opencloud_proper_name }} Directories
           ansible.builtin.file:
             path: "{{ item }}"
             state: directory
@@ -40,12 +40,12 @@
             - "{{ opencloud_data_directory }}/config"
             - "{{ opencloud_data_directory }}/data"
 
-        - name: Get {{ ansible_nas_app_name }} config status
+        - name: Get {{ opencloud_proper_name }} config status
           ansible.builtin.stat:
             path: "{{ opencloud_data_directory }}/config/opencloud.yaml"
           register: config_status
 
-        - name: Initialize {{ ansible_nas_app_name }}
+        - name: Initialize {{ opencloud_proper_name }}
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ opencloud_container_name }}"
@@ -61,7 +61,7 @@
             command: ["-c", "opencloud init || true; opencloud server"]
           when: not config_status.stat.exists
 
-        - name: Create {{ ansible_nas_app_name }} Container
+        - name: Create {{ opencloud_proper_name }} Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ opencloud_container_name }}"
@@ -97,7 +97,7 @@
               dockflare.access.group: "{{ opencloud_dockflare_access_group }}"
               dockflare.hostname: "{{ opencloud_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ opencloud_port_http }}"
-              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.name: "{{ opencloud_proper_name }}"
               homepage.group: "{{ opencloud_homepage_group }}"
               homepage.icon: "{{ opencloud_homepage_icon }}"
               homepage.href: "{{ opencloud_homepage_href }}"
@@ -127,7 +127,7 @@
             memory_swap: "{{ opencloud_memory_swap }}"
             restart_policy: unless-stopped
 
-        - name: Access {{ ansible_nas_app_name }} at
+        - name: Access {{ opencloud_proper_name }} at
           ansible.builtin.debug:
             msg: >-
                   {{
@@ -138,15 +138,15 @@
         - (opencloud_dockflare_enabled | bool or opencloud_traefik_enabled | bool)
   when: opencloud_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ opencloud_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ opencloud_proper_name }} Container
       community.docker.docker_container:
         name: "{{ opencloud_container_name }}"
         state: absent
   when: opencloud_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ opencloud_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

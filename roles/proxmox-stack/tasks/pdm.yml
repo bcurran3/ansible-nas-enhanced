@@ -1,12 +1,12 @@
 ---
-- name: Start {{ ansible_nas_app_name }} DC Manager
+- name: Start {{ proxmox_stack_proper_name }} DC Manager
   block:
-    - name: Set {{ ansible_nas_app_name }} DC Manager FQDN var overrides
+    - name: Set {{ proxmox_stack_proper_name }} DC Manager FQDN var overrides
       ansible.builtin.set_fact:
         proxmox_stack_pdm_homepage_href: "https://{{ proxmox_stack_pdm_hostname }}.{{ ansible_nas_domain }}"
       when: proxmox_stack_traefik_enabled | bool or proxmox_stack_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DC Manager Container
+    - name: Create {{ proxmox_stack_proper_name }} DC Manager Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ proxmox_stack_pdm_container_name }}"
@@ -38,7 +38,7 @@
           dockflare.hostname: "{{ proxmox_stack_pdm_hostname }}.{{ ansible_nas_domain }}"
           dockflare.option.no-tls-verify: "true"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ proxmox_stack_pdm_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ proxmox_stack_proper_name }}"
           homepage.group: "{{ proxmox_stack_pdm_homepage_group }}"
           homepage.icon: "{{ proxmox_stack_pdm_homepage_icon }}"
           homepage.href: "{{ proxmox_stack_pdm_homepage_href }}"
@@ -66,7 +66,7 @@
         memory_swap: "{{ proxmox_stack_pdm_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} DC Manager at
+    - name: Access {{ proxmox_stack_proper_name }} DC Manager at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -77,9 +77,9 @@
     - proxmox_stack_pdm_enabled is true
     - proxmox_stack_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }} DC Manager
+- name: Stop {{ proxmox_stack_proper_name }} DC Manager
   block:
-    - name: Stop {{ ansible_nas_app_name }} DC Manager Container
+    - name: Stop {{ proxmox_stack_proper_name }} DC Manager Container
       community.docker.docker_container:
         name: "{{ proxmox_stack_pdm_container_name }}"
         state: absent

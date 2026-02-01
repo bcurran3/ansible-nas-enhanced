@@ -1,7 +1,7 @@
 ---
 - name: Start Remotely
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ remotely_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ remotely_data_directory }}"
         - "{{ remotely_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ remotely_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         remotely_homepage_href: "https://{{ remotely_hostname }}.{{ ansible_nas_domain }}"
       when: remotely_traefik_enabled | bool or remotely_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ remotely_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ remotely_container_name }}"
@@ -44,7 +44,7 @@
           dockflare.access.group: "{{ remotely_dockflare_access_group }}"
           dockflare.hostname: "{{ remotely_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ remotely_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ remotely_proper_name }}"
           homepage.group: "{{ remotely_homepage_group }}"
           homepage.icon: "{{ remotely_homepage_icon }}"
           homepage.href: "{{ remotely_homepage_href}}"
@@ -74,7 +74,7 @@
         memory_swap: "{{ remotely_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ remotely_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -83,15 +83,15 @@
               }}
   when: remotely_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ remotely_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ remotely_proper_name }} Container
       community.docker.docker_container:
         name: "{{ remotely_container_name }}"
         state: absent
   when: remotely_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ remotely_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

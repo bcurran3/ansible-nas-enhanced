@@ -11,7 +11,7 @@
         name: "{{ gotify_container_name }}"
       register: result
 
-    - name: Check if {{ ansible_nas_app_name }} containers are running
+    - name: Check if {{ gotify_proper_name }} containers are running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

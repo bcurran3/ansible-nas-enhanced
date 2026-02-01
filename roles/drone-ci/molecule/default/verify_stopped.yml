@@ -6,19 +6,19 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ drone_ci_proper_name }}
       community.docker.docker_container:
         name: "{{ drone_ci_container_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} Runner
+    - name: Try and stop and remove {{ drone_ci_proper_name }} Runner
       community.docker.docker_container:
         name: "{{ drone_ci_runner_container_name }}"
         state: absent
       register: result_runner
 
-    - name: Check {{ ansible_nas_app_name }} is stopped
+    - name: Check {{ drone_ci_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

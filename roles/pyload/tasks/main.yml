@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ pyload_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ pyload_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ pyload_data_directory }}"
         - "{{ pyload_download_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ pyload_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         pyload_homepage_href: "https://{{ pyload_hostname }}.{{ ansible_nas_domain }}"
       when: pyload_traefik_enabled | bool or pyload_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ pyload_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ pyload_container_name }}"
@@ -40,7 +40,7 @@
           dockflare.access.group: "{{ pyload_dockflare_access_group }}"
           dockflare.hostname: "{{ pyload_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pyload_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ pyload_proper_name }}"
           homepage.group: "{{ pyload_homepage_group }}"
           homepage.icon: "{{ pyload_homepage_icon }}"
           homepage.href: "{{ pyload_homepage_href }}"
@@ -70,7 +70,7 @@
         memory_swap: "{{ pyload_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ pyload_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -79,15 +79,15 @@
               }}
   when: pyload_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ pyload_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ pyload_proper_name }} Container
       community.docker.docker_container:
         name: "{{ pyload_container_name }}"
         state: absent
   when: pyload_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ pyload_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

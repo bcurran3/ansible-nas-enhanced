@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ loki_proper_name }}
   block:
     - name: Check for Minio installation
       ansible.builtin.fail:
@@ -14,14 +14,14 @@
     - name: Include Stats variables
       ansible.builtin.include_vars: ../../stats/defaults/main.yml
 
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ loki_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ loki_data_directory }}"
 
-    - name: Create Minio buckets for {{ ansible_nas_app_name }}
+    - name: Create Minio buckets for {{ loki_proper_name }}
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -29,18 +29,18 @@
         - "{{ minio_data_directory }}/data/loki-data"
         - "{{ minio_data_directory }}/data/loki-ruler"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ loki_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         loki_homepage_href: "https://{{ loki_hostname }}.{{ ansible_nas_domain }}"
       when: loki_traefik_enabled | bool or loki_dockflare_enabled | bool
 
-    - name: Copy {{ ansible_nas_app_name }} config
+    - name: Copy {{ loki_proper_name }} config
       ansible.builtin.template:
         src: config.yml
         dest: "{{ loki_data_directory }}/config.yml"
       register: loki_config
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ loki_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ loki_container_name }}"
@@ -61,7 +61,7 @@
           dockflare.access.group: "{{ loki_dockflare_access_group }}"
           dockflare.hostname: "{{ loki_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ loki_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ loki_proper_name }}"
           homepage.group: "{{ loki_homepage_group }}"
           homepage.icon: "{{ loki_homepage_icon }}"
           homepage.href: "{{ loki_homepage_href }}"
@@ -95,14 +95,14 @@
         restart: "{{ loki_config is changed }}"
         restart_policy: unless-stopped
 
-    - name: Template Grafana {{ ansible_nas_app_name }} data source
+    - name: Template Grafana {{ loki_proper_name }} data source
       ansible.builtin.template:
         src: grafana-datasource.yml
         dest: "{{ stats_grafana_data_directory }}/provisioning/datasources/loki.yml"
         owner: "472"
       notify: restart grafana
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ loki_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -111,15 +111,15 @@
               }}
   when: loki_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ loki_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ loki_proper_name }} Container
       community.docker.docker_container:
         name: "{{ loki_container_name }}"
         state: absent
   when: loki_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ loki_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ whisparr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ whisparr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ whisperr_download_directory }}"
         - "{{ whisparr_porn_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ whisparr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         whisparr_homepage_href: "https://{{ whisparr_hostname }}.{{ ansible_nas_domain }}"
       when: whisparr_traefik_enabled | bool or whisparr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ whisparr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ whisparr_container_name }}"
@@ -41,7 +41,7 @@
           dockflare.access.group: "{{ whisparr_dockflare_access_group }}"
           dockflare.hostname: "{{ whisparr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ whisparr_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ whisparr_proper_name }}"
           homepage.group: "{{ whisparr_homepage_group }}"
           homepage.icon: "{{ whisparr_homepage_icon }}"
           homepage.href: "{{ whisparr_homepage_href }}"
@@ -71,7 +71,7 @@
         memory_swap: "{{ whisparr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ whisparr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -80,15 +80,15 @@
               }}
   when: whisparr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ whisparr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ whisparr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ whisparr_container_name }}"
         state: absent
   when: whisparr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ whisparr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

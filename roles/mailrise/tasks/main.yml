@@ -1,20 +1,20 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ mailrise_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ mailrise_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ mailrise_data_directory }}"
 
-    - name: Copy {{ ansible_nas_app_name }} Template mailrise.conf
+    - name: Copy {{ mailrise_proper_name }} Template mailrise.conf
       ansible.builtin.template:
         src: mailrise.conf
         dest: "{{ mailrise_data_directory }}/mailrise.conf"
       register: template_config
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ mailrise_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mailrise_container_name }}"
@@ -38,7 +38,7 @@
           autoheal: "{{ mailrise_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ mailrise_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ mailrise_proper_name }}"
           homepage.group: "{{ mailrise_homepage_group }}"
           homepage.icon: "{{ mailrise_homepage_icon }}"
           homepage.description: "{{ 'An SMTP gateway for Apprise notifications.' if homepage_show_description else omit }}"
@@ -64,9 +64,9 @@
         restart_policy: unless-stopped
   when: mailrise_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ mailrise_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ mailrise_proper_name }} Container
       community.docker.docker_container:
         name: "{{ mailrise_container_name }}"
         state: absent

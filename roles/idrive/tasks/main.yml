@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ idrive_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ idrive_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ idrive_data_directory }}"
         - "{{ idrive_data_directory }}/idriveIt"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ idrive_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ idrive_container_name }}"
@@ -25,7 +25,7 @@
           autoheal: "{{ idrive_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ idrive_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ idrive_proper_name }}"
           homepage.group: "{{ idrive_homepage_group }}"
           homepage.href: "{{ idrive_homepage_href }}"
           homepage.icon: "{{ idrive_homepage_icon }}"
@@ -47,15 +47,15 @@
         restart_policy: unless-stopped
   when: idrive_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ idrive_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ idrive_proper_name }} Container
       community.docker.docker_container:
         name: "{{ idrive_container_name }}"
         state: absent
   when: idrive_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ idrive_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

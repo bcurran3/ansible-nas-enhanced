@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ freshrss_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ freshrss_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ freshrss_data_directory }}/data"
         - "{{ freshrss_data_directory }}/extensions"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ freshrss_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         freshrss_homepage_href: "https://{{ freshrss_hostname }}.{{ ansible_nas_domain }}"
       when: freshrss_traefik_enabled | bool or freshrss_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ freshrss_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ freshrss_db_container_name }}"
@@ -40,7 +40,7 @@
           com.centurylinklabs.watchtower.enable: "{{ freshrss_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.group: "{{ freshrss_db_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ freshrss_proper_name }} PostgreSQL"
           homepage.icon: "{{ freshrss_db_homepage_icon }}"
           homepage.href: "{{ freshrss_db_homepage_href }}"
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
@@ -61,7 +61,7 @@
         memory_swap: "{{ freshrss_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ freshrss_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ freshrss_db_container_name }}"
       register: db_info
@@ -69,7 +69,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ freshrss_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ freshrss_container_name }}"
@@ -104,7 +104,7 @@
           dockflare.hostname: "{{ freshrss_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ freshrss_port_http }}"
           homepage.group: "{{ freshrss_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ freshrss_proper_name }}"
           homepage.icon: "{{ freshrss_homepage_icon }}"
           homepage.href: "{{ freshrss_homepage_href }}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ freshrss_port_http }}"
@@ -137,7 +137,7 @@
         memory_swap: "{{ freshrss_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ freshrss_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -146,20 +146,20 @@
               }}
   when: freshrss_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ freshrss_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ freshrss_proper_name }} Container
       community.docker.docker_container:
         name: "{{ freshrss_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ freshrss_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ freshrss_db_container_name }}"
         state: absent
   when: freshrss_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ freshrss_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

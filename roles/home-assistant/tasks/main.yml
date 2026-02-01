@@ -1,16 +1,16 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ home_assistant_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ home_assistant_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ home_assistant_data_directory }}/config"
 
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ home_assistant_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ home_assistant_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -18,7 +18,7 @@
         - "{{ home_assistant_data_directory }}/config"
 
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ home_assistant_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         home_assistant_homepage_href: "https://{{ home_assistant_hostname }}.{{ ansible_nas_domain }}"
       when: home_assistant_traefik_enabled | bool or home_assistant_dockflare_enabled | bool
@@ -49,7 +49,7 @@
         state: touch
       with_items: [automations.yaml, scripts.yaml, scenes.yaml]
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ home_assistant_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ home_assistant_container_name }}"
@@ -73,7 +73,7 @@
           dockflare.access.group: "{{ home_assistant_dockflare_access_group }}"
           dockflare.hostname: "{{ home_assistant_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ home_assistant_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ home_assistant_proper_name }}"
           homepage.group: "{{ home_assistant_homepage_group }}"
           homepage.icon: "{{ home_assistant_homepage_icon }}"
           homepage.href: "{{ home_assistant_homepage_href }}"
@@ -107,7 +107,7 @@
         memory_swap: "{{ home_assistant_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ home_assistant_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -116,15 +116,15 @@
               }}
   when: home_assistant_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ home_assistant_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ home_assistant_proper_name }} Container
       community.docker.docker_container:
         name: "{{ home_assistant_container_name }}"
         state: absent
   when: home_assistant_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ home_assistant_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

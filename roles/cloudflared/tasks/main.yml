@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ cloudflared_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ cloudflared_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ cloudflared_container_name }}"
@@ -23,7 +23,7 @@
           com.centurylinklabs.watchtower.enable: "{{ cloudflared_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.group: "{{ cloudflared_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ cloudflared_proper_name }}"
           homepage.icon: "{{ cloudflared_homepage_icon }}"
           homepage.href: "https://dash.cloudflare.com/login"
           homepage.description: "{{ 'Client for Cloudflare Tunnel, a daemon that exposes private services through the Cloudflare edge.' if homepage_show_description else omit }}"
@@ -45,9 +45,9 @@
         restart_policy: unless-stopped
   when: cloudflared_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ cloudflared_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ cloudflared_proper_name }} Container
       community.docker.docker_container:
         name: "{{ cloudflared_container_name }}"
         state: absent

@@ -1,19 +1,19 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ grocy_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directory
+    - name: Create {{ grocy_proper_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ grocy_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ grocy_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         grocy_homepage_href: "https://{{ grocy_hostname }}.{{ ansible_nas_domain }}"
       when: grocy_traefik_enabled | bool or grocy_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ grocy_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ grocy_container_name }}"
@@ -38,7 +38,7 @@
           dockflare.access.group: "{{ grocy_dockflare_access_group }}"
           dockflare.hostname: "{{ grocy_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ grocy_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ grocy_proper_name }}"
           homepage.group: "{{ grocy_homepage_group }}"
           homepage.icon: "{{ grocy_homepage_icon }}"
           homepage.href: "{{ grocy_homepage_href }}"
@@ -68,7 +68,7 @@
         memory_swap: "{{ grocy_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ grocy_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -77,15 +77,15 @@
               }}
   when: grocy_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ grocy_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ grocy_proper_name }} Container
       community.docker.docker_container:
         name: "{{ grocy_container_name }}"
         state: absent
   when: grocy_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ grocy_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

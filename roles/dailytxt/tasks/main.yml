@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ dailytxt_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ dailytxt_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ dailytxt_data_directory }}"
         - "{{ dailytxt_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ dailytxt_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         dailytxt_homepage_href: "https://{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
       when: dailytxt_traefik_enabled | bool or dailytxt_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ dailytxt_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dailytxt_container_name }}"
@@ -46,7 +46,7 @@
           dockflare.access.group: "{{ dailytxt_dockflare_access_group }}"
           dockflare.hostname: "{{ dailytxt_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dailytxt_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ dailytxt_proper_name }}"
           homepage.group: "{{ dailytxt_homepage_group }}"
           homepage.href: "{{ dailytxt_homepage_href }}"
           homepage.icon: "{{ dailytxt_homepage_icon }}"
@@ -75,7 +75,7 @@
         memory_swap: "{{ dailytxt_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ dailytxt_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -84,15 +84,15 @@
               }}
   when: dailytxt_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ dailytxt_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ dailytxt_proper_name }} Container
       community.docker.docker_container:
         name: "{{ dailytxt_container_name }}"
         state: absent
   when: dailytxt_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ dailytxt_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

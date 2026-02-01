@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ tinyauth_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ tinyauth_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ tinyauth_data_directory }}"
         - "{{ tinyauth_data_directory }}/data"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ tinyauth_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ tinyauth_container_name }}"
@@ -37,7 +37,7 @@
           autoheal: "{{ tinyauth_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ tinyauth_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ tinyauth_proper_name }}"
           homepage.group: "{{ tinyauth_homepage_group }}"
           homepage.icon: "{{ tinyauth_homepage_icon }}"
           homepage.href: "{{ tinyauth_homepage_href }}"
@@ -61,16 +61,16 @@
         memory_swap: "{{ tinyauth_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ tinyauth_proper_name }} at
       ansible.builtin.debug:
         msg: "https://{{ tinyauth_hostname }}.{{ ansible_nas_domain }}"
   when: 
     - tinyauth_enabled is true
     - traefik_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ tinyauth_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ tinyauth_proper_name }} Container
       community.docker.docker_container:
         name: "{{ tinyauth_container_name }}"
         state: absent

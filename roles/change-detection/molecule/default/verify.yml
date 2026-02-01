@@ -16,7 +16,7 @@
         name: "{{ change_detection_sockpuppet_container_name }}"
       register: result_sockpuppet
 
-    - name: Check {{ ansible_nas_app_name }} is running
+    - name: Check {{ change_detection_proper_name }} is running
       ansible.builtin.assert:
         that:
           - result_app.container['State']['Status'] == "running"

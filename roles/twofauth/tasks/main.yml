@@ -1,8 +1,8 @@
 ---
 # NOTE: there are some env vars that can be templated still
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ twofauth_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ twofauth_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,12 +12,12 @@
         - "{{ twofauth_data_directory }}"
         - "{{ twofauth_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ twofauth_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         twofauth_homepage_href: "https://{{ twofauth_hostname }}.{{ ansible_nas_domain }}"
       when: twofauth_traefik_enabled | bool or twofauth_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ twofauth_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ twofauth_container_name }}"
@@ -30,7 +30,7 @@
           - "{{ twofauth_data_directory }}/data:/twofauth"
         network_mode: bridge
         env:
-          APP_NAME: "{{ ansible_nas_app_name }}"
+          APP_NAME: "{{ twofauth_proper_name }}"
           APP_ENV: "local"
           APP_DEBUG: "false"
           SITE_OWNER: "{{ ansible_nas_email }}"
@@ -144,7 +144,7 @@
           dockflare.access.group: "{{ twofauth_dockflare_access_group }}"
           dockflare.hostname: "{{ twofauth_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ twofauth_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ twofauth_proper_name }}"
           homepage.group: "{{ twofauth_homepage_group }}"
           homepage.href: "{{ twofauth_homepage_href }}"
           homepage.icon: "{{ twofauth_homepage_icon }}"
@@ -174,7 +174,7 @@
         memory_swap: "{{ twofauth_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ twofauth_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -183,15 +183,15 @@
               }}
   when: twofauth_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ twofauth_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ twofauth_proper_name }} Container
       community.docker.docker_container:
         name: "{{ twofauth_container_name }}"
         state: absent
   when: twofauth_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ twofauth_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

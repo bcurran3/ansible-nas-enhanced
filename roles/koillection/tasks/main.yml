@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ koillection_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ koillection_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ koillection_data_directory }}/db"
         - "{{ koillection_data_directory }}/uploads"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ koillection_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         koillection_homepage_href: "https://{{ koillection_hostname }}.{{ ansible_nas_domain }}"
       when: koillection_traefik_enabled | bool or koillection_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ koillection_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ koillection_db_container_name }}"
@@ -38,7 +38,7 @@
           autoheal: "{{ koillection_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ koillection_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ koillection_proper_name }} PostgreSQL"
           homepage.group: "{{ koillection_db_homepage_group }}"
           homepage.icon: "{{ koillection_db_homepage_icon }}"
           homepage.href: "{{ koillection_db_homepage_href }}"
@@ -60,7 +60,7 @@
         memory_swap: "{{ koillection_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ koillection_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ koillection_db_container_name }}"
       register: db_info
@@ -68,7 +68,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ koillection_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ koillection_container_name }}"
@@ -134,7 +134,7 @@
         memory_swap: "{{ koillection_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ koillection_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -143,20 +143,20 @@
               }}
   when: koillection_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ koillection_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ koillection_proper_name }} Container
       community.docker.docker_container:
         name: "{{ koillection_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ koillection_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ koillection_db_container_name }}"
         state: absent
   when: koillection_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ koillection_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

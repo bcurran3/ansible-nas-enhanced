@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ lidarr_proper_name }}
   block:
     - name: Create Lidarr Directory
       ansible.builtin.file:
@@ -11,12 +11,12 @@
         - "{{ lidarr_downloads_directory }}"
         - "{{ lidarr_music_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ lidarr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         lidarr_homepage_href: "https://{{ lidarr_hostname }}.{{ ansible_nas_domain }}"
       when: lidarr_traefik_enabled | bool or lidarr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ lidarr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ lidarr_container_name }}"
@@ -53,7 +53,7 @@
           dockflare.access.group: "{{ lidarr_dockflare_access_group }}"
           dockflare.hostname: "{{ lidarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ lidarr_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ lidarr_proper_name }}"
           homepage.group: "{{ lidarr_homepage_group }}"
           homepage.icon: "{{ lidarr_homepage_icon }}"
           homepage.href: "{{ lidarr_homepage_href }}"
@@ -86,7 +86,7 @@
         memory_swap: "{{ lidarr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ lidarr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -95,15 +95,15 @@
               }}
   when: lidarr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ lidarr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ lidarr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ lidarr_container_name }}"
         state: absent
   when: lidarr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ lidarr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

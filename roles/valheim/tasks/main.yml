@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ valheim_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ valheim_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,7 +12,7 @@
         - "{{ valheim_data_directory }}/server"
         - "{{ valheim_data_directory }}/backups"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ valheim_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ valheim_container_name }}"
@@ -34,7 +34,7 @@
           autoheal: "{{ valheim_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ valheim_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ valheim_proper_name }}"
           homepage.group: "{{ valheim_homepage_group }}"
           homepage.icon: "{{ valheim_homepage_icon }}"
           homepage.description: "{{ 'dedicated gameserver manager' if homepage_show_description else omit }}"
@@ -57,15 +57,15 @@
         restart_policy: unless-stopped
   when: valheim_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ valheim_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ valheim_proper_name }} Container
       community.docker.docker_container:
         name: "{{ valheim_container_name }}"
         state: absent
   when: valheim_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ valheim_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

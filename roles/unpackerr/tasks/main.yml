@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ unpackerr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ unpackerr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ unpackerr_data_directory }}/log"
         - "{{ unpackerr_downloads_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ unpackerr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ unpackerr_container_name }}"
@@ -39,7 +39,7 @@
           autoheal: "{{ unpackerr_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ unpackerr_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ unpackerr_proper_name }}"
           homepage.group: "{{ unpackerr_homepage_group }}"
           homepage.icon: "{{ unpackerr_homepage_icon }}"
           homepage.description: "{{ 'xtracts downloads for Radarr, Sonarr, Lidarr, Readarr, and/or a Watch folder - Deletes extracted files after import' if homepage_show_description else omit }}"
@@ -56,15 +56,15 @@
         restart_policy: unless-stopped
   when: unpackerr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ unpackerr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ unpackerr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ unpackerr_container_name }}"
         state: absent
   when: unpackerr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ unpackerr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

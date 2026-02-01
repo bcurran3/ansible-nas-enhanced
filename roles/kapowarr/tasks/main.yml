@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ kapowarr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ kapowarr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ kapowarr_comics_directory }}"
         - "{{ kapowarr_downloads_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ kapowarr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         kapowarr_homepage_href: "https://{{ kapowarr_hostname }}.{{ ansible_nas_domain }}"
       when: kapowarr_traefik_enabled | bool or kapowarr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ kapowarr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ kapowarr_container_name }}"
@@ -38,7 +38,7 @@
           dockflare.access.group: "{{ kapowarr_dockflare_access_group }}"
           dockflare.hostname: "{{ kapowarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ kapowarr_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ kapowarr_proper_name }}"
           homepage.group: "{{ kapowarr_homepage_group }}"
           homepage.icon: "{{ kapowarr_homepage_icon }}"
           homepage.href: "{{ kapowarr_homepage_href }}"
@@ -68,7 +68,7 @@
         memory_swap: "{{ kapowarr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ kapowarr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -77,15 +77,15 @@
               }}
   when: kapowarr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ kapowarr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ kapowarr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ kapowarr_container_name }}"
         state: absent
   when: kapowarr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ kapowarr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ filebrowser_quantum_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ filebrowser_quantum_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,18 +9,18 @@
         - "{{ filebrowser_quantum_data_directory }}"
         - "{{ filebrowser_quantum_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ filebrowser_quantum_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         filebrowser_quantum_homepage_href: "https://{{ filebrowser_quantum_hostname }}.{{ ansible_nas_domain }}"
       when: filebrowser_quantum_traefik_enabled | bool or filebrowser_quantum_dockflare_enabled | bool
 
-    - name: Generate {{ ansible_nas_app_name }} config file
+    - name: Generate {{ filebrowser_quantum_proper_name }} config file
       ansible.builtin.template:
         src: config.yaml
         dest: "{{ filebrowser_quantum_data_directory }}/data/config.yaml"
       register: template_config
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ filebrowser_quantum_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ filebrowser_quantum_container_name }}"
@@ -43,7 +43,7 @@
           dockflare.access.group: "{{ filebrowser_quantum_dockflare_access_group }}"
           dockflare.hostname: "{{ filebrowser_quantum_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ filebrowser_quantum_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ filebrowser_quantum_proper_name }}"
           homepage.group: "{{ filebrowser_quantum_homepage_group }}"
           homepage.icon: "{{ filebrowser_quantum_homepage_icon }}"
           homepage.href: "{{ filebrowser_quantum_homepage_href }}"
@@ -74,7 +74,7 @@
         recreate: "{{ template_config is changed }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ filebrowser_quantum_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -83,15 +83,15 @@
               }}
   when: filebrowser_quantum_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ filebrowser_quantum_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ filebrowser_quantum_proper_name }} Container
       community.docker.docker_container:
         name: "{{ filebrowser_quantum_container_name }}"
         state: absent
   when: filebrowser_quantum_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ filebrowser_quantum_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

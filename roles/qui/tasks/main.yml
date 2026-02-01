@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ qui_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ qui_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ qui_data_directory }}"
         - "{{ qui_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ qui_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         qui_homepage_href: "https://{{ qui_hostname }}.{{ ansible_nas_domain }}"
       when: qui_traefik_enabled | bool or qui_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ qui_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ qui_container_name }}"
@@ -34,7 +34,7 @@
           dockflare.access.group: "{{ qui_dockflare_access_group }}"
           dockflare.hostname: "{{ qui_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ qui_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ qui_proper_name }}"
           homepage.group: "{{ qui_homepage_group }}"
           homepage.icon: "{{ qui_homepage_icon }}"
           homepage.href: "{{ qui_homepage_href }}"
@@ -63,7 +63,7 @@
         memory_swap: "{{ qui_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ qui_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -72,15 +72,15 @@
               }}
   when: qui_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ qui_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ qui_proper_name }} Container
       community.docker.docker_container:
         name: "{{ qui_container_name }}"
         state: absent
   when: qui_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ qui_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

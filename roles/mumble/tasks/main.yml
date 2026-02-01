@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ mumble_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ mumble_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
       with_items:
         - "{{ mumble_data_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ mumble_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         mumble_homepage_href: "https://{{ mumble_hostname }}.{{ ansible_nas_domain }}"
       when: mumble_traefik_enabled | bool or mumble_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ mumble_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mumble_container_name }}"
@@ -49,7 +49,7 @@
           autoheal: "{{ mumble_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ mumble_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ mumble_proper_name }}"
           homepage.group: "{{ mumble_homepage_group }}"
           homepage.icon: "{{ mumble_homepage_icon }}"
           homepage.description: "{{ 'a free, open source, low latency, high quality voice chat application' if homepage_show_description else omit }}"
@@ -71,15 +71,15 @@
         restart_policy: unless-stopped
   when: mumble_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ mumble_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ mumble_proper_name }} Container
       community.docker.docker_container:
         name: "{{ mumble_container_name }}"
         state: absent
   when: mumble_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ mumble_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

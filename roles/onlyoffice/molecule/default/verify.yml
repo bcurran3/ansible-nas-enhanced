@@ -11,7 +11,7 @@
         name: "{{ onlyoffice_container_name }}"
       register: result
 
-    - name: Check ONLYO{{ ansible_nas_app_name }}FFICE is running
+    - name: Check ONLYO{{ onlyoffice_proper_name }}FFICE is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

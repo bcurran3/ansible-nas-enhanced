@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ traefik_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ traefik_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,28 +11,28 @@
         - "{{ traefik_data_directory }}/letsencrypt"
         - "{{ traefik_data_directory }}/rules"
 
-    - name: Copy {{ ansible_nas_app_name }} Template config.toml
+    - name: Copy {{ traefik_proper_name }} Template config.toml
       ansible.builtin.template:
         src: traefik.toml
 #       dest: "{{ traefik_data_directory }}/traefik.toml"
         dest: "{{ traefik_data_directory }}/data/traefik.toml"
       register: template_config
 
-    - name: Copy {{ ansible_nas_app_name }} Template transports.toml
+    - name: Copy {{ traefik_proper_name }} Template transports.toml
       ansible.builtin.template:
         src: transports.toml
         dest: "{{ traefik_data_directory }}/rules/transports.toml"
         mode: '0644'
       register: template_transports
 
-    - name: Copy {{ ansible_nas_app_name }} Template external_hosts.yml
+    - name: Copy {{ traefik_proper_name }} Template external_hosts.yml
       ansible.builtin.template:
         src: external_hosts.yml
         dest: "{{ traefik_data_directory }}/rules/external_hosts.yml"
         mode: '0644'
       register: template_external_hosts
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ traefik_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ traefik_container_name }}"
@@ -58,7 +58,7 @@
           autoheal: "{{ traefik_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ traefik_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ traefik_proper_name }}"
           homepage.group: "{{ traefik_homepage_group }}"
           homepage.icon: "{{ traefik_homepage_icon }}"
           homepage.href: "{{ traefik_homepage_href }}"
@@ -95,7 +95,7 @@
         recreate: "{{ template_config is changed }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ traefik_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -104,15 +104,15 @@
               }}
   when: traefik_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ traefik_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ traefik_proper_name }} Container
       community.docker.docker_container:
         name: "{{ traefik_container_name }}"
         state: absent
   when: traefik_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ traefik_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ autoheal_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ autoheal_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ autoheal_container_name }}"
@@ -29,7 +29,7 @@
           autoheal: "false"
           com.centurylinklabs.watchtower.enable: "{{ autoheal_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ autoheal_proper_name }}"
           homepage.group: "{{ autoheal_homepage_group }}"
           homepage.icon: "{{ autoheal_homepage_icon }}"
           homepage.description: "{{ 'Monitor and restart unhealthy docker containers.' if homepage_show_description else omit }}"
@@ -47,9 +47,9 @@
         restart_policy: unless-stopped
   when: autoheal_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ autoheal_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ autoheal_proper_name }} Container
       community.docker.docker_container:
         name: "{{ autoheal_container_name }}"
         state: absent

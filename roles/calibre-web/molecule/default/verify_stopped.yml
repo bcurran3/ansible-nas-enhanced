@@ -6,13 +6,13 @@
     - include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ calibre_web_proper_name }}
       docker_container:
         name: "{{ calibre_web_container_name }}"
         state: absent
       register: result
 
-    - name: Check {{ ansible_nas_app_name }} is stopped
+    - name: Check {{ calibre_web_proper_name }} is stopped
       assert:
         that:
           - not result.changed

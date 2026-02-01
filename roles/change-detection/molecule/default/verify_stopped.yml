@@ -6,19 +6,19 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ change_detection_proper_name }}
       community.docker.docker_container:
         name: "{{ change_detection_container_name }}"
         state: absent
       register: result_app
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} Sock Puppet(eer) Browser
+    - name: Try and stop and remove {{ change_detection_proper_name }} Sock Puppet(eer) Browser
       community.docker.docker_container:
         name: "{{ change_detection_sockpuppet_container_name }}"
         state: absent
       register: result_sockpuppet
 
-    - name: Check {{ ansible_nas_app_name }} is stopped
+    - name: Check {{ change_detection_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result_app.changed

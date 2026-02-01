@@ -1,23 +1,23 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ cloudflare_ddns_proper_name }}
   block:
     - name: Check for deprecated API key
       ansible.builtin.fail:
         msg: "Using a Cloudflare global API key is no longer supported. Please unset cloudflare_api_key and set cloudflare_ddns_token"
       when: cloudflare_api_key is defined
 
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ cloudflare_ddns_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ cloudflare_ddns_data_directory }}"
         state: directory
 
-    - name: Template {{ ansible_nas_app_name }} config.yml with scoped token
+    - name: Template {{ cloudflare_ddns_proper_name }} config.yml with scoped token
       ansible.builtin.template:
         src: config.yml
         dest: "{{ cloudflare_ddns_data_directory }}/config.yml"
       register: template_files_result
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ cloudflare_ddns_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ cloudflare_ddns_container_name }}"
@@ -39,7 +39,7 @@
           autoheal: "{{ cloudflare_ddns_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ cloudflare_ddns_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ cloudflare_ddns_proper_name }}"
           homepage.group: "{{ cloudflare_ddns_homepage_group }}"
           homepage.icon: "{{ cloudflare_ddns_homepage_icon }}"
           homepage.href: "https://dash.cloudflare.com/login"
@@ -63,15 +63,15 @@
         restart_policy: unless-stopped
   when: cloudflare_ddns_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ cloudflare_ddns_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ cloudflare_ddns_proper_name }} Container
       community.docker.docker_container:
         name: "{{ cloudflare_ddns_container_name }}"
         state: absent
   when: cloudflare_ddns_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ cloudflare_ddns_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

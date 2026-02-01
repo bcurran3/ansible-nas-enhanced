@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ adguardhome_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ adguardhome_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ adguardhome_data_directory }}/conf"
         - "{{ adguardhome_data_directory }}/work"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ adguardhome_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         adguardhome_homepage_href: "https://{{ adguardhome_hostname }}.{{ ansible_nas_domain }}"
       when: adguardhome_traefik_enabled | bool or adguardhome_dockflare_enabled | bool
@@ -37,7 +37,7 @@
         state: restarted
       when: resolved_conf_disable.changed
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ adguardhome_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ adguardhome_container_name }}"
@@ -74,7 +74,7 @@
           dockflare.access.group: "{{ adguardhome_dockflare_access_group }}"
           dockflare.hostname: "{{ adguardhome_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ adguardhome_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ adguardhome_proper_name }}"
           homepage.group: "{{ adguardhome_homepage_group }}"
           homepage.icon: "{{ adguardhome_homepage_icon }}"
           homepage.href: "{{ adguardhome_homepage_href }}"
@@ -108,7 +108,7 @@
         memory_swap: "{{ adguardhome_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ adguardhome_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -116,7 +116,7 @@
                 (['https://' + adguardhome_hostname + '.' + ansible_nas_domain] if (adguardhome_traefik_enabled is true or adguardhome_dockflare_enabled is true) else [])
               }}
 
-    - name: Wait for {{ ansible_nas_app_name }} to be healthy
+    - name: Wait for {{ adguardhome_proper_name }} to be healthy
       community.docker.docker_container_info:
         name: "{{ adguardhome_container_name }}"
         register: adguard_info
@@ -125,7 +125,7 @@
         delay: 5
   when: adguardhome_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }} Container
+- name: Stop {{ adguardhome_proper_name }} Container
   community.docker.docker_container:
     name: "{{ adguardhome_container_name }}"
     state: absent
@@ -159,7 +159,7 @@
     - pihole_enabled is false
     - technitium_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ adguardhome_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ minecraft_server_proper_name }}
   block:
     - name: Create Minecraft Server Directories
       ansible.builtin.file:
@@ -8,7 +8,7 @@
       with_items:
         - "{{ minecraft_server_data_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ minecraft_server_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ minecraft_server_container_name }}"
@@ -25,7 +25,7 @@
           autoheal: "{{ minecraft_server_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ minecraft_server_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ minecraft_server_proper_name }}"
           homepage.group: "{{ minecraft_server_homepage_group }}"
           homepage.icon: "{{ minecraft_server_homepage_icon }}"
           homepage.description: "{{ 'minecraft_server description' if homepage_show_description else omit }}"
@@ -49,15 +49,15 @@
         restart_policy: unless-stopped
   when: minecraft_server_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ minecraft_server_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ minecraft_server_proper_name }} Container
       community.docker.docker_container:
         name: "{{ minecraft_server_container_name }}"
         state: absent
   when: minecraft_server_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ minecraft_server_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

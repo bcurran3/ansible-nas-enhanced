@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ conduit_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ conduit_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ conduit_data_directory }}"
         - "{{ conduit_data_directory }}/db"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ conduit_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         conduit_homepage_href: "https://{{ conduit_hostname }}.{{ ansible_nas_domain }}"
       when: conduit_traefik_enabled | bool or conduit_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ conduit_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ conduit_container_name }}"
@@ -45,7 +45,7 @@
           dockflare.access.group: "{{ conduit_dockflare_access_group }}"
           dockflare.hostname: "{{ conduit_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ conduit_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ conduit_proper_name }}"
           homepage.group: "{{ conduit_homepage_group }}"
           homepage.href: "{{ conduit_homepage_href }}"
           homepage.icon: "{{ conduit_homepage_icon }}"
@@ -74,7 +74,7 @@
         memory_swap: "{{ conduit_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ conduit_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -83,15 +83,15 @@
               }}
   when: conduit_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ conduit_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ conduit_proper_name }} Container
       community.docker.docker_container:
         name: "{{ conduit_container_name }}"
         state: absent
   when: conduit_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ conduit_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

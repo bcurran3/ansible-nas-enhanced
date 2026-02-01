@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ duplicati_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ duplicati_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ duplicati_data_directory }}/config"
         - "{{ duplicati_data_directory }}/custom-cont-init.d" # added
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ duplicati_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         duplicati_homepage_href: "https://{{ duplicati_hostname }}.{{ ansible_nas_domain }}"
       when: duplicati_traefik_enabled | bool or duplicati_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ duplicati_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ duplicati_container_name }}"
@@ -54,7 +54,7 @@
           dockflare.access.group: "{{ duplicati_dockflare_access_group }}"
           dockflare.hostname: "{{ duplicati_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ duplicati_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ duplicati_proper_name }}"
           homepage.group: "{{ duplicati_homepage_group }}"
           homepage.icon: "{{ duplicati_homepage_icon }}"
           homepage.href: "{{ duplicati_homepage_href }}"
@@ -84,7 +84,7 @@
         memory_swap: "{{ duplicati_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ duplicati_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -93,15 +93,15 @@
               }}
   when: duplicati_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ duplicati_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ duplicati_proper_name }} Container
       community.docker.docker_container:
         name: "{{ duplicati_container_name }}"
         state: absent
   when: duplicati_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ duplicati_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

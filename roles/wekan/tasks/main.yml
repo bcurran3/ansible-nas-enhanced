@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ wekan_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ wekan_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item.path }}"
         state: directory
@@ -22,13 +22,13 @@
           owner: ansible-nas
           group: ansible-nas
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ wekan_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         wekan_env_root_url: "https://{{ wekan_hostname }}.{{ ansible_nas_domain }}"
         wekan_homepage_href: "https://{{ wekan_hostname }}.{{ ansible_nas_domain }}"
       when: wekan_traefik_enabled | bool or wekan_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ wekan_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ wekan_db_container_name }}"
@@ -51,7 +51,7 @@
           autoheal: "{{ wekan_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ wekan_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.name: "{{ wekan_proper_name }} MongoDB"
           homepage.group: "{{ wekan_db_homepage_group }}"
           homepage.icon: "{{ wekan_db_homepage_icon }}"
           homepage.href: "{{ wekan_homepage_href }}"
@@ -73,7 +73,7 @@
         memory_swap: "{{ wekan_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ wekan_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ wekan_db_container_name }}"
       register: db_info
@@ -81,7 +81,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ wekan_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ wekan_container_name }}"
@@ -112,7 +112,7 @@
           dockflare.access.group: "{{ wekan_dockflare_access_group }}"
           dockflare.hostname: "{{ wekan_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ wekan_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ wekan_proper_name }}"
           homepage.group: "{{ wekan_homepage_group }}"
           homepage.icon: "{{ wekan_homepage_icon }}"
           homepage.href: "{{ wekan_homepage_href }}"
@@ -141,7 +141,7 @@
         memory_swap: "{{ wekan_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ wekan_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -150,23 +150,23 @@
               }}
   when: wekan_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ wekan_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ wekan_proper_name }} Container
       community.docker.docker_container:
         name: "{{ wekan_container_name }}"
         state: absent
   when: wekan_enabled is false
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ wekan_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ wekan_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ wekan_db_container_name }}"
         state: absent
   when: wekan_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ wekan_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

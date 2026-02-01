@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ luanti_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ luanti_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ luanti_data_directory }}"
         - "{{ luanti_data_directory }}/config"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ luanti_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ luanti_container_name }}"
@@ -31,7 +31,7 @@
           autoheal: "{{ luanti_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ luanti_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ luanti_proper_name }}"
           homepage.group: "{{ luanti_homepage_group }}"
           homepage.icon: "{{ luanti_homepage_icon }}"
           homepage.description: "{{ 'An open source voxel game engine.' if homepage_show_description else omit }}"
@@ -52,15 +52,15 @@
         restart_policy: unless-stopped
   when: luanti_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ luanti_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ luanti_proper_name }} Container
       community.docker.docker_container:
         name: "{{ luanti_container_name }}"
         state: absent
   when: luanti_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ luanti_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

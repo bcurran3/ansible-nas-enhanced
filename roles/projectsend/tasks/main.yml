@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ projectsend_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ projectsend_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ projectsend_data_directory }}/data"
         - "{{ projectsend_data_directory }}/db"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ projectsend_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         projectsend_homepage_href: "https://{{ projectsend_hostname }}.{{ ansible_nas_domain }}"
       when: projectsend_traefik_enabled | bool or projectsend_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ projectsend_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ projectsend_db_container_name }}"
@@ -46,7 +46,7 @@
           autoheal: "{{ projectsend_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ projectsend_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.name: "{{ projectsend_proper_name }} MariaDB"
           homepage.group: "{{ projectsend_db_homepage_group }}"
           homepage.icon: "{{ projectsend_db_homepage_icon }}"
           homepage.href: "{{ projectsend_db_homepage_href }}"
@@ -68,7 +68,7 @@
         memory_swap: "{{ projectsend_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ projectsend_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ projectsend_db_container_name }}"
       register: db_info
@@ -76,7 +76,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ projectsend_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ projectsend_container_name }}"
@@ -106,7 +106,7 @@
           dockflare.access.group: "{{ projectsend_dockflare_access_group }}"
           dockflare.hostname: "{{ projectsend_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ projectsend_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ projectsend_proper_name }}"
           homepage.group: "{{ projectsend_homepage_group }}"
           homepage.href: "{{ projectsend_homepage_href }}"
           homepage.icon: "{{ projectsend_homepage_icon }}"
@@ -136,7 +136,7 @@
         memory_swap: "{{ projectsend_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ projectsend_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -145,20 +145,20 @@
               }}
   when: projectsend_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ projectsend_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ projectsend_proper_name }} Container
       community.docker.docker_container:
         name: "{{ projectsend_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ projectsend_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ projectsend_db_container_name }}"
         state: absent
   when: projectsend_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ projectsend_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

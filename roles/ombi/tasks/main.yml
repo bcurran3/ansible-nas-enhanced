@@ -1,7 +1,7 @@
 ---
 - name: Start Ombi
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ ombi_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ ombi_data_directory }}"
         - "{{ ombi_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ ombi_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         ombi_homepage_href: "https://{{ ombi_hostname }}.{{ ansible_nas_domain }}"
       when: ombi_traefik_enabled | bool or ombi_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ ombi_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ ombi_container_name }}"
@@ -43,7 +43,7 @@
           dockflare.access.group: "{{ ombi_dockflare_access_group }}"
           dockflare.hostname: "{{ ombi_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ombi_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ ombi_proper_name }}"
           homepage.group: "{{ ombi_homepage_group }}"
           homepage.icon: "{{ ombi_homepage_icon }}"
           homepage.href: "{{ ombi_homepage_href }}"
@@ -76,7 +76,7 @@
         memory_swap: "{{ ombi_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ ombi_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -85,15 +85,15 @@
               }}
   when: ombi_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ ombi_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ ombi_proper_name }} Container
       community.docker.docker_container:
         name: "{{ ombi_container_name }}"
         state: absent
   when: ombi_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ ombi_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

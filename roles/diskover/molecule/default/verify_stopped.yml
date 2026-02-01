@@ -6,25 +6,25 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ diskover_proper_name }}
       community.docker.docker_container:
         name: "{{ diskover_container_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} Elasticsearch
+    - name: Try and stop and remove {{ diskover_proper_name }} Elasticsearch
       community.docker.docker_container:
         name: "{{ diskover_elasticsearch_container_name }}"
         state: absent
       register: result_db
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} Elasticsearch Helper
+    - name: Try and stop and remove {{ diskover_proper_name }} Elasticsearch Helper
       community.docker.docker_container:
         name: "{{ diskover_elasticsearch_helper_container_name }}"
         state: absent
       register: result_db_helper
 
-    - name: Check {{ ansible_nas_app_name }} is stopped
+    - name: Check {{ diskover_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

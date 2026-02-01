@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ glance_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ glance_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ glance_data_directory }}/assets"
         - "{{ glance_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ glance_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         glance_homepage_href: "https://{{ glance_hostname }}.{{ ansible_nas_domain }}"
       when: glance_traefik_enabled | bool or glance_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Template config file
+    - name: Create {{ glance_proper_name }} Template config file
       ansible.builtin.template:
         src: "{{ item }}"
         dest: "{{ glance_data_directory }}/config/{{ item }}"
@@ -23,7 +23,7 @@
         - glance.yml
       register: glance_config
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ glance_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ glance_container_name }}"
@@ -48,7 +48,7 @@
           dockflare.access.group: "{{ glance_dockflare_access_group }}"
           dockflare.hostname: "{{ glance_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ glance_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ glance_proper_name }}"
           homepage.group: "{{ glance_homepage_group }}"
           homepage.icon: "{{ glance_homepage_icon }}"
           homepage.href: "{{ glance_homepage_href }}"
@@ -78,7 +78,7 @@
         memory_swap: "{{ glance_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ glance_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -87,15 +87,15 @@
               }}
   when: glance_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ glance_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ glance_proper_name }} Container
       community.docker.docker_container:
         name: "{{ glance_container_name }}"
         state: absent
   when: glance_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ glance_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

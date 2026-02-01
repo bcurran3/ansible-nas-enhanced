@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ wordpress_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ wordpress_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ wordpress_data_directory }}/db"
         - "{{ wordpress_data_directory }}/html"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ wordpress_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         wordpress_homepage_href: "https://{{ wordpress_hostname }}.{{ ansible_nas_domain }}"
       when: wordpress_traefik_enabled | bool or wordpress_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ wordpress_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ wordpress_db_container_name }}"
@@ -41,7 +41,7 @@
           autoheal: "{{ wordpress_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ wordpress_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MySQL"
+          homepage.name: "{{ wordpress_proper_name }} MySQL"
           homepage.group: "{{ wordpress_db_homepage_group }}"
           homepage.icon: "{{ wordpress_db_homepage_icon }}"
           homepage.href: "{{ wordpress_homepage_href }}"
@@ -63,7 +63,7 @@
         memory_swap: "{{ wordpress_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ wordpress_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ wordpress_db_container_name }}"
       register: db_info
@@ -71,7 +71,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ wordpress_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ wordpress_container_name }}"
@@ -97,7 +97,7 @@
           dockflare.access.group: "{{ wordpress_dockflare_access_group }}"
           dockflare.hostname: "{{ wordpress_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ wordpress_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ wordpress_proper_name }}"
           homepage.group: "{{ wordpress_homepage_group }}"
           homepage.icon: "{{ wordpress_homepage_icon }}"
           homepage.href: "{{ wordpress_homepage_href }}"
@@ -127,7 +127,7 @@
         memory_swap: "{{ wordpress_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ wordpress_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -136,20 +136,20 @@
               }}
   when: wordpress_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ wordpress_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ wordpress_proper_name }} Container
       community.docker.docker_container:
         name: "{{ wordpress_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ wordpress_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ wordpress_db_container_name }}"
         state: absent
   when: wordpress_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ wordpress_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

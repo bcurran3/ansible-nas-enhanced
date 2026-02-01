@@ -1,12 +1,12 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ it_tools_proper_name }}
   block:
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ it_tools_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         appname_homepage_href: "https://{{ it_tools_hostname }}.{{ ansible_nas_domain }}"
       when: it_tools_traefik_enabled | bool or it_tools_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ it_tools_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ it_tools_container_name }}"
@@ -31,7 +31,7 @@
           dockflare.access.group: "{{ it_tools_dockflare_access_group }}"
           dockflare.hostname: "{{ it_tools_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ it_tools_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ it_tools_proper_name }}"
           homepage.group: "{{ it_tools_homepage_group }}"
           homepage.icon: "{{ it_tools_homepage_icon }}"
           homepage.href: "{{ it_tools_homepage_href }}"
@@ -56,7 +56,7 @@
         memory_swap: "{{ it_tools_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ it_tools_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -65,9 +65,9 @@
               }}
   when: it_tools_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ it_tools_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ it_tools_proper_name }} Container
       community.docker.docker_container:
         name: "{{ it_tools_container_name }}"
         state: absent

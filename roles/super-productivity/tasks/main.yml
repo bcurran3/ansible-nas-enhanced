@@ -14,7 +14,9 @@
 
     - name: Set {{ super_productivity_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
+        super_productivity_env_webdav_base_url: "https://{{ super_productivity_webdav_hostname }}.{{ ansible_nas_domain }}/dav/"
         super_productivity_homepage_href: "https://{{ super_productivity_hostname }}.{{ ansible_nas_domain }}"
+        super_productivity_supersync_env_public_url: "https://{{ super_productivity_hostname }}.{{ ansible_nas_domain }}"
       when: super_productivity_traefik_enabled | bool or super_productivity_dockflare_enabled | bool
 
     - name: Copy {{ super_productivity_proper_name }} Template webdav.yaml
@@ -80,7 +82,7 @@
       retries: 30
       delay: 5
 
-    - name: Clone {{ super_productivity_proper_name }} Source
+    - name: Clone {{ super_productivity_proper_name }} SuperSync Source
       ansible.builtin.git:
         repo: "https://github.com/super-productivity/super-productivity.git"
         dest: "{{ super_productivity_data_directory }}/src"
@@ -110,23 +112,35 @@
         volumes:
           - "{{ super_productivity_data_directory }}/supersync:/data"
         env:
-          NODE_ENV: "{{ super_productivity_supersync_env_node_env }}"
-          TEST_MODE: "{{ super_productivity_supersync_env_test_mode }}"
-          TEST_MODE_CONFIRM: "{{ super_productivity_supersync_env_test_mode_confirm }}"
-          JWT_SECRET: "{{ super_productivity_supersync_env_jwt_secret }}"
           CORS_ORIGINS: "{{ super_productivity_supersync_env_cors_origins }}"
           DATA_DIR: "/data"
           DATABASE_URL: "postgresql://{{ super_productivity_db_env_postgres_user }}:{{ super_productivity_db_env_postgres_password }}@{{ super_productivity_db_container_name }}:5432/{{ super_productivity_db_env_postgres_db }}"
+          JWT_SECRET: "{{ super_productivity_supersync_env_jwt_secret }}"
+          NODE_ENV: "{{ super_productivity_supersync_env_node_env }}"
+          PUBLIC_URL: "{{ super_productivity_supersync_env_public_url }}"
+          TEST_MODE: "{{ super_productivity_supersync_env_test_mode }}"
+          TEST_MODE_CONFIRM: "{{ super_productivity_supersync_env_test_mode_confirm }}"
         healthcheck:
           test: "{{ super_productivity_supersync_healthcheck_test }}"
           interval: "{{ super_productivity_supersync_healthcheck_interval }}"
           timeout: "{{ super_productivity_supersync_healthcheck_timeout }}"
           retries: "{{ super_productivity_supersync_healthcheck_retries }}"
           start_period: "{{ super_productivity_supersync_healthcheck_start_period }}"
+        links:
+          - "{{ super_productivity_db_container_name }}"
         labels:
           autoheal: "{{ super_productivity_supersync_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ super_productivity_supersync_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
+          homepage.name: "{{ super_productivity_proper_name }} SuperSync"
+          homepage.group: "{{ super_productivity_supersync_homepage_group }}"
+          homepage.icon: "{{ super_productivity_supersync_homepage_icon }}"
+          homepage.href: "{{ super_productivity_supersync_homepage_href }}"
+          homepage.description: "{{ super_productivity_supersync_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ super_productivity_supersync_container_name }}"
+          homepage.showStats: "{{ super_productivity_supersync_homepage_showstats | ternary('true', 'false') }}"
+#         homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:1900"
           traefik.enable: "false"
           repliqate.enabled: "{{ super_productivity_supersync_repliqate_enabled | ternary('true', 'false') }}"
           repliqate.engine: "{{ super_productivity_supersync_repliqate_engine }}"
@@ -136,8 +150,6 @@
           wud.tag.include: "{{ super_productivity_supersync_wud_tag_include }}"
           wud.tag.transform.type: "{{ super_productivity_supersync_wud_tag_transform_type }}"
           wud.link.template: "{{ super_productivity_supersync_wud_link_template }}"
-          homepage.name: "{{ super_productivity_proper_name }} Sync"
-          homepage.group: "{{ super_productivity_supersync_homepage_group }}"
         restart_policy: unless-stopped
 
     - name: Create {{ super_productivity_proper_name }} WebDAV Container
@@ -145,10 +157,12 @@
         name: "{{ super_productivity_webdav_container_name }}"
         image: "{{ super_productivity_webdav_image_name }}:{{ super_productivity_webdav_image_tag }}"
         ports: 
-         - "{{ super_productivity_webdav_port_http }}:2345"
+         - "{{ super_productivity_webdav_port_http }}:{{ super_productivity_webdav_port_http }}"
         volumes:
           - "{{ super_productivity_data_directory }}/webdav.yaml:/config.yml:ro"
           - "{{ super_productivity_data_directory }}/webdav:/data"
+#        env:
+#          WEBDAV_URL=https://your-webdav-server.com
         healthcheck: {}
         labels:
           autoheal: "{{ super_productivity_webdav_autoheal_enabled | ternary('true', 'false') }}"
@@ -168,7 +182,14 @@
           repliqate.schedule: "{{ super_productivity_webdav_repliqate_schedule }}"
           repliqate.backup_id: "{{ super_productivity_webdav_repliqate_backup_id }}"
           repliqate.retention: "{{ super_productivity_webdav_repliqate_retention }}"
-          traefik.enable: "false"
+          traefik.enable: "{{ super_productivity_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.super-productivity-webdav.rule: "Host(`{{ super_productivity_webdav_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.super-productivity-webdav.tls.certresolver: "letsencrypt"
+          traefik.http.routers.super-productivity-webdav.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.super-productivity-webdav.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.super-productivity-webdav.middlewares: "super-productivity-webdav@docker{{ ',tinyauth-auth@docker' if super_productivity_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.super-productivity.IPAllowList.sourcerange: "{{ super_productivity_traefik_whitelist }}"
+          traefik.http.services.super-productivity-webdav.loadbalancer.server.port: "{{ super_productivity_webdav_port_http }}"
           wud.tag.include: "{{ super_productivity_webdav_wud_tag_include }}"
           wud.tag.transform.type: "{{ super_productivity_webdav_wud_tag_transform_type }}"
           wud.link.template: "{{ super_productivity_webdav_wud_link_template }}"

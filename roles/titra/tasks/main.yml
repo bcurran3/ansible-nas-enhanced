@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ titra_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ titra_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,13 +9,13 @@
         - "{{ titra_data_directory }}"
         - "{{ titra_data_directory }}/db"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ titra_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         titra_env_root_url: "https://{{ titra_hostname }}.{{ ansible_nas_domain }}"
         titra_homepage_href: "https://{{ titra_hostname }}.{{ ansible_nas_domain }}"
       when: titra_traefik_enabled | bool or titra_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ titra_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ titra_db_container_name }}"
@@ -37,7 +37,7 @@
           autoheal: "{{ titra_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ titra_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MongoDB"
+          homepage.name: "{{ titra_proper_name }} MongoDB"
           homepage.group: "{{ titra_db_homepage_group }}"
           homepage.icon: "{{ titra_db_homepage_icon }}"
           homepage.href: "{{ titra_homepage_href }}"
@@ -59,7 +59,7 @@
         memory_swap: "{{ titra_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ titra_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ titra_db_container_name }}"
       register: db_info
@@ -67,7 +67,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ titra_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ titra_container_name }}"
@@ -91,7 +91,7 @@
           dockflare.access.group: "{{ titra_dockflare_access_group }}"
           dockflare.hostname: "{{ titra_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ titra_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ titra_proper_name }}"
           homepage.group: "{{ titra_homepage_group }}"
           homepage.icon: "{{ titra_homepage_icon }}"
           homepage.href: "{{ titra_homepage_href }}"
@@ -121,7 +121,7 @@
         memory_swap: "{{ titra_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ titra_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -130,20 +130,20 @@
               }}
   when: titra_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ titra_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ titra_proper_name }} Container
       community.docker.docker_container:
         name: "{{ titra_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ titra_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ titra_db_container_name }}"
         state: absent
   when: titra_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ titra_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ flexget_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ flexget_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ flexget_data_directory }}/config"
         - "{{ flexget_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ flexget_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         flexget_homepage_href: "https://{{ flexget_hostname }}.{{ ansible_nas_domain }}"
       when: flexget_traefik_enabled | bool or flexget_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ flexget_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ flexget_container_name }}"
@@ -40,7 +40,7 @@
           dockflare.access.group: "{{ flexget_dockflare_access_group }}"
           dockflare.hostname: "{{ flexget_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ flexget_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ flexget_proper_name }}"
           homepage.group: "{{ flexget_homepage_group }}"
           homepage.icon: "{{ flexget_homepage_icon }}"
           homepage.href: "{{ flexget_homepage_href }}"
@@ -70,7 +70,7 @@
         memory_swap: "{{ flexget_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ flexget_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -79,15 +79,15 @@
               }}
   when: flexget_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ flexget_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ flexget_proper_name }} Container
       community.docker.docker_container:
         name: "{{ flexget_container_name }}"
         state: absent
   when: flexget_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ flexget_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

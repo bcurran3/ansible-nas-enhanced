@@ -6,17 +6,17 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ woodpecker_ci_proper_name }} container state
       community.docker.docker_container:
         name: "{{ woodpecker_ci_container_name }}"
       register: result
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ woodpecker_ci_proper_name }} container state
       community.docker.docker_container:
         name: "{{ woodpecker_ci_agent_container_name }}"
       register: result_agent
 
-    - name: Check if {{ ansible_nas_app_name }} containers are running
+    - name: Check if {{ woodpecker_ci_proper_name }} containers are running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

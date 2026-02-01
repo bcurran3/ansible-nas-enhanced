@@ -11,7 +11,7 @@
         name: "{{ beszel_agent_container_name }}"
       register: result
 
-    - name: Check Beszel Agent is running
+    - name: Check {{ beszel_agent_proper_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

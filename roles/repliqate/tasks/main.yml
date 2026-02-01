@@ -1,14 +1,14 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ repliqate_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ repliqate_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ repliqate_data_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ repliqate_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ repliqate_container_name }}"
@@ -26,7 +26,7 @@
           autoheal: "{{ repliqate_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ repliqate_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ repliqate_proper_name }}"
           homepage.group: "{{ repliqate_homepage_group }}"
           homepage.icon: "{{ repliqate_homepage_icon }}"
           homepage.description: "{{ 'a modular Docker container/volume backup solution' if homepage_show_description else omit }}"
@@ -44,15 +44,15 @@
         restart_policy: unless-stopped
   when: repliqate_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ repliqate_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ repliqate_proper_name }} Container
       community.docker.docker_container:
         name: "{{ repliqate_container_name }}"
         state: absent
   when: repliqate_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ repliqate_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

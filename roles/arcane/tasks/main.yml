@@ -1,20 +1,20 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ arcane_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directory
+    - name: Create {{ arcane_proper_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ arcane_data_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ arcane_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         arcane_env_app_url: "https://{{ arcane_hostname }}.{{ ansible_nas_domain }}"
         arcane_homepage_href: "https://{{ arcane_hostname }}.{{ ansible_nas_domain }}"
       when: arcane_traefik_enabled | bool or arcane_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ arcane_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ arcane_container_name }}"
@@ -49,7 +49,7 @@
           dockflare.access.group: "{{ arcane_dockflare_access_group }}"
           dockflare.hostname: "{{ arcane_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ arcane_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ arcane_proper_name }}"
           homepage.group: "{{ arcane_homepage_group }}"
           homepage.icon: "{{ arcane_homepage_icon }}"
           homepage.href: "{{ arcane_homepage_href }}"
@@ -79,7 +79,7 @@
         memory_swap: "{{ arcane_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ arcane_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -88,15 +88,15 @@
               }}
   when: arcane_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ arcane_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ arcane_proper_name }} Container
       community.docker.docker_container:
         name: "{{ arcane_container_name }}"
         state: absent
   when: arcane_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ arcane_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

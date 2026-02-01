@@ -1,17 +1,17 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ dozzle_proper_name }}
   block:
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ dozzle_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         dozzle_homepage_href: "https://{{ dozzle_hostname }}.{{ ansible_nas_domain }}"
       when: dozzle_traefik_enabled | bool or dozzle_dockflare_enabled | bool
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ dozzle_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         dozzle_homepage_href: "https://{{ dozzle_hostname }}.{{ ansible_nas_domain }}"
       when: dozzle_traefik_enabled | bool or dozzle_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ dozzle_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dozzle_container_name }}"
@@ -39,7 +39,7 @@
           dockflare.access.group: "{{ dozzle_dockflare_access_group }}"
           dockflare.hostname: "{{ dozzle_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dozzle_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ dozzle_proper_name }}"
           homepage.group: "{{ dozzle_homepage_group }}"
           homepage.icon: "{{ dozzle_homepage_icon }}"
           homepage.href: "{{ dozzle_homepage_href }}"
@@ -69,7 +69,7 @@
         memory_swap: "{{ dozzle_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ dozzle_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -78,9 +78,9 @@
               }}
   when: dozzle_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ dozzle_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ dozzle_proper_name }} Container
       community.docker.docker_container:
         name: "{{ dozzle_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ tdarr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ tdarr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -13,12 +13,12 @@
         - "{{ tdarr_cache_directory }}"
         - "{{ tdarr_media_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ tdarr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         tdarr_homepage_href: "https://{{ tdarr_hostname }}.{{ ansible_nas_domain }}"
       when: tdarr_traefik_enabled | bool or tdarr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ tdarr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ tdarr_container_name }}"
@@ -72,7 +72,7 @@
           dockflare.access.group: "{{ tdarr_dockflare_access_group }}"
           dockflare.hostname: "{{ tdarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tdarr_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ tdarr_proper_name }}"
           homepage.group: "{{ tdarr_homepage_group }}"
           homepage.href: "{{ tdarr_homepage_href }}"
           homepage.icon: "{{ tdarr_homepage_icon }}"
@@ -109,7 +109,7 @@
         memory_swap: "{{ tdarr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ tdarr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -118,15 +118,15 @@
               }}
   when: tdarr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ tdarr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ tdarr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ tdarr_container_name }}"
         state: absent
   when: tdarr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ tdarr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

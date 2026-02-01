@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ checkmk_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ checkmk_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ checkmk_data_directory }}/omd"
         - "{{ checkmk_data_directory }}/omd/sites"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ checkmk_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         checkmk_homepage_href: "https://{{ checkmk_hostname }}.{{ ansible_nas_domain }}"
       when: checkmk_traefik_enabled | bool or checkmk_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ checkmk_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkmk_container_name }}"
@@ -38,7 +38,7 @@
           dockflare.access.group: "{{ checkmk_dockflare_access_group }}"
           dockflare.hostname: "{{ checkmk_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ checkmk_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ checkmk_proper_name }}"
           homepage.group: "{{ checkmk_homepage_group }}"
           homepage.icon: "{{ checkmk_homepage_icon }}"
           homepage.href: "{{ checkmk_homepage_href }}"
@@ -72,7 +72,7 @@
         memory_swap: "{{ checkmk_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ checkmk_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -81,15 +81,15 @@
               }}
   when: checkmk_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ checkmk_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ checkmk_proper_name }} Container
       community.docker.docker_container:
         name: "{{ checkmk_container_name }}"
         state: absent
   when: checkmk_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ checkmk_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

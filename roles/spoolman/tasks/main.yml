@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ spoolman_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ spoolman_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
       with_items:
         - "{{ spoolman_data_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ spoolman_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         spoolman_homepage_href: "https://{{ spoolman_hostname }}.{{ ansible_nas_domain }}"
       when: spoolman_traefik_enabled | bool or spoolman_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ spoolman_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ spoolman_container_name }}"
@@ -35,7 +35,7 @@
           dockflare.access.group: "{{ spoolman_dockflare_access_group }}"
           dockflare.hostname: "{{ spoolman_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ spoolman_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ spoolman_proper_name }}"
           homepage.group: "{{ spoolman_homepage_group }}"
           homepage.icon: "{{ spoolman_homepage_icon }}"
           homepage.href: "{{ spoolman_homepage_href }}"
@@ -67,7 +67,7 @@
         memory_swap: "{{ spoolman_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ spoolman_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -76,15 +76,15 @@
               }}
   when: spoolman_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ spoolman_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ spoolman_proper_name }} Container
       community.docker.docker_container:
         name: "{{ spoolman_container_name }}"
         state: absent
   when: spoolman_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ spoolman_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

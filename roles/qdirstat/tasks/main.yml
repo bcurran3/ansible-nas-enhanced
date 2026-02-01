@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ qdirstat_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ qdirstat_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ qdirstat_data_directory }}"
         - "{{ qdirstat_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ qdirstat_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         qdirstat_homepage_href: "https://{{ qdirstat_hostname }}.{{ ansible_nas_domain }}"
       when: qdirstat_traefik_enabled | bool or qdirstat_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ qdirstat_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ qdirstat_container_name }}"
@@ -39,7 +39,7 @@
           dockflare.access.group: "{{ qdirstat_dockflare_access_group }}"
           dockflare.hostname: "{{ qdirstat_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ qdirstat_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ qdirstat_proper_name }}"
           homepage.group: "{{ qdirstat_homepage_group }}"
           homepage.href: "{{ qdirstat_homepage_href }}"
           homepage.icon: "{{ qdirstat_homepage_icon }}"
@@ -69,7 +69,7 @@
         memory_swap: "{{ qdirstat_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ qdirstat_proper_name }} at
       ansible.builtin.debug:
         msg: >-
           {{
@@ -87,15 +87,15 @@
           }}
   when: qdirstat_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ qdirstat_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ qdirstat_proper_name }} Container
       community.docker.docker_container:
         name: "{{ qdirstat_container_name }}"
         state: absent
   when: qdirstat_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ qdirstat_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

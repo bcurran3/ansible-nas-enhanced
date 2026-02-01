@@ -6,25 +6,25 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ komodo_proper_name }}
       community.docker.docker_container:
         name: "{{ komodo_container_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} DB
+    - name: Try and stop and remove {{ komodo_proper_name }} DB
       community.docker.docker_container:
         name: "{{ komodo_db_container_name }}"
         state: absent
       register: result_db
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} Periphery
+    - name: Try and stop and remove {{ komodo_proper_name }} Periphery
       community.docker.docker_container:
         name: "{{ komodo_periphery_container_name }}"
         state: absent
       register: result_periphery
 
-    - name: Check if {{ ansible_nas_app_name }} is stopped
+    - name: Check if {{ komodo_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

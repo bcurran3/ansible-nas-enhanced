@@ -1,18 +1,18 @@
 ---
-- name: Check for downloaded {{ ansible_nas_app_name }} repo setup script
+- name: Check for downloaded {{ webmin_usermin_proper_name }} repo setup script
   ansible.builtin.stat:
     path: scripts/webmin-setup-repo.sh
   register: script_result
 
-- name: Install {{ ansible_nas_app_name }} APT repo
+- name: Install {{ webmin_usermin_proper_name }} APT repo
   block:
-    - name: Download official {{ ansible_nas_app_name }} setup repository script
+    - name: Download official {{ webmin_usermin_proper_name }} setup repository script
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/webmin/webmin/master/webmin-setup-repo.sh
         dest: scripts/webmin-setup-repo.sh
         mode: '0755'
 
-    - name: Run {{ ansible_nas_app_name }} setup repository script
+    - name: Run {{ webmin_usermin_proper_name }} setup repository script
       ansible.builtin.shell: echo y | scripts/webmin-setup-repo.sh
   when: (webmin_enabled is true or usermin_enabled is true) and not script_result.stat.exists
 
@@ -24,7 +24,7 @@
     path: scripts/webmin-setup-repo.sh
   register: repo_script_status
 
-- name: Remove downloaded {{ ansible_nas_app_name }} repo setup script
+- name: Remove downloaded {{ webmin_usermin_proper_name }} repo setup script
   ansible.builtin.file:
     path: scripts/webmin-setup-repo.sh
     state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ virtual_tabletop_proper_name }}
   block:
-#    - name: Create {{ ansible_nas_app_name }} Directories
+#    - name: Create {{ virtual_tabletop_proper_name }} Directories
 #      ansible.builtin.file:
 #        path: "{{ item }}"
 #        state: directory
@@ -9,13 +9,13 @@
 #        - "{{ virtual_tabletop_data_directory }}"
 #        - "{{ virtual_tabletop_data_directory }}/games"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ virtual_tabletop_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         virtual_tabletop_env_externalurl: "https://{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}"
         virtual_tabletop_homepage_href: "https://{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}"
       when: virtual_tabletop_traefik_enabled | bool or virtual_tabletop_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ virtual_tabletop_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ virtual_tabletop_container_name }}"
@@ -51,7 +51,7 @@
           dockflare.access.group: "{{ virtual_tabletop_dockflare_access_group }}"
           dockflare.hostname: "{{ virtual_tabletop_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ virtual_tabletop_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ virtual_tabletop_proper_name }}"
           homepage.group: "{{ virtual_tabletop_homepage_group }}"
           homepage.icon: "{{ virtual_tabletop_homepage_icon }}"
           homepage.href: "{{ virtual_tabletop_homepage_href }}"
@@ -76,7 +76,7 @@
         memory_swap: "{{ virtual_tabletop_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ virtual_tabletop_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -85,15 +85,15 @@
               }}
   when: virtual_tabletop_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ virtual_tabletop_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ virtual_tabletop_proper_name }} Container
       community.docker.docker_container:
         name: "{{ virtual_tabletop_container_name }}"
         state: absent
   when: virtual_tabletop_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ virtual_tabletop_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

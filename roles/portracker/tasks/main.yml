@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ portracker_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ portracker_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ portracker_data_directory }}"
         - "{{ portracker_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ portracker_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         portracker_homepage_href: "https://{{ portracker_hostname }}.{{ ansible_nas_domain }}"
       when: portracker_traefik_enabled | bool or portracker_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ portracker_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ portracker_container_name }}"
@@ -38,7 +38,7 @@
           dockflare.access.group: "{{ portracker_dockflare_access_group }}"
           dockflare.hostname: "{{ portracker_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ portracker_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ portracker_proper_name }}"
           homepage.group: "{{ portracker_homepage_group }}"
           homepage.icon: "{{ portracker_homepage_icon }}"
           homepage.href: "{{ portracker_homepage_href }}"
@@ -68,7 +68,7 @@
         memory_swap: "{{ portracker_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ portracker_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -77,15 +77,15 @@
               }}
   when: portracker_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ portracker_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ portracker_proper_name }} Container
       community.docker.docker_container:
         name: "{{ portracker_container_name }}"
         state: absent
   when: portracker_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ portracker_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

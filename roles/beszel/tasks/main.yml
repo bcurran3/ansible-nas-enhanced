@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ beszel_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ beszel_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ beszel_data_directory }}"
         - "{{ beszel_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ beszel_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         beszel_homepage_href: "https://{{ beszel_hostname }}.{{ ansible_nas_domain }}"
       when: beszel_traefik_enabled | bool or beszel_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ beszel_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ beszel_container_name }}"
@@ -35,7 +35,7 @@
           dockflare.access.group: "{{ beszel_dockflare_access_group }}"
           dockflare.hostname: "{{ beszel_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ beszel_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ beszel_proper_name }}"
           homepage.group: "{{ beszel_homepage_group }}"
           homepage.icon: "{{ beszel_homepage_icon }}"
           homepage.href: "{{ beszel_homepage_href }}"
@@ -71,7 +71,7 @@
         memory_swap: "{{ beszel_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ beszel_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -80,15 +80,15 @@
               }}
   when: beszel_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ beszel_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ beszel_proper_name }} Container
       community.docker.docker_container:
         name: "{{ beszel_container_name }}"
         state: absent
   when: beszel_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ beszel_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

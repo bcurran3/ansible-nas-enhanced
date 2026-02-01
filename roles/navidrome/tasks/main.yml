@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ navidrome_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ navidrome_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ navidrome_data_directory }}/data"
         - "{{ navidrome_data_directory }}/playlists"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ navidrome_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         navidrome_homepage_href: "https://{{ navidrome_hostname }}.{{ ansible_nas_domain }}"
       when: navidrome_traefik_enabled | bool or navidrome_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ navidrome_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ navidrome_container_name }}"
@@ -40,7 +40,7 @@
           dockflare.access.group: "{{ navidrome_dockflare_access_group }}"
           dockflare.hostname: "{{ navidrome_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ navidrome_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ navidrome_proper_name }}"
           homepage.group: "{{ navidrome_homepage_group }}"
           homepage.icon: "{{ navidrome_homepage_icon }}"
           homepage.href: "{{ navidrome_homepage_href }}"
@@ -75,7 +75,7 @@
         memory_swap: "{{ navidrome_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ navidrome_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -84,15 +84,15 @@
               }}
   when: navidrome_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ navidrome_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ navidrome_proper_name }} Container
       community.docker.docker_container:
         name: "{{ navidrome_container_name }}"
         state: absent
   when: navidrome_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ navidrome_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

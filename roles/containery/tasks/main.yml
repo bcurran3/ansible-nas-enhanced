@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ containery_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ containery_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ containery_data_directory }}/data"
         - "{{ containery_data_directory }}/static"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ containery_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         containery_homepage_href: "https://{{ containery_hostname }}.{{ ansible_nas_domain }}"
       when: containery_traefik_enabled | bool or containery_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ containery_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ containery_container_name }}"
@@ -37,7 +37,7 @@
           dockflare.access.group: "{{ containery_dockflare_access_group }}"
           dockflare.hostname: "{{ containery_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ containery_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ containery_proper_name }}"
           homepage.group: "{{ containery_homepage_group }}"
           homepage.icon: "{{ containery_homepage_icon }}"
           homepage.href: "{{ containery_homepage_href }}"
@@ -67,7 +67,7 @@
         memory_swap: "{{ containery_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ containery_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -76,15 +76,15 @@
               }}
   when: containery_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ containery_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ containery_proper_name }} Container
       community.docker.docker_container:
         name: "{{ containery_container_name }}"
         state: absent
   when: containery_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ containery_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

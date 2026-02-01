@@ -7,8 +7,8 @@
 : "${ANE_ALWAYS_ENABLE_TRAEFIK:=false}"
 : "${ANE_ALWAYS_PRUNE:=false}"
 : "${ANE_ALWAYS_UPGRADE:=false}"
-: "${ANE_DISABLE_ALSO_STOPS:=false}"
 : "${ANE_DISABLE_ALSO_REMOVES:=false}"
+: "${ANE_DISABLE_ALSO_STOPS:=false}"
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
 
 # Filter out non-containers

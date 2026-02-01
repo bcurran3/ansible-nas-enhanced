@@ -1,8 +1,8 @@
 ---
 # This repository was archived by the owner on Jun 29, 2025. It is now read-only.
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ pingvin_share_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ pingvin_share_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ pingvin_share_data_directory }}/data"
         - "{{ pingvin_share_data_directory }}/data/images"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ pingvin_share_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         pingvin_share_homepage_href: "https://{{ pingvin_share_hostname }}.{{ ansible_nas_domain }}"
       when: pingvin_share_traefik_enabled | bool or pingvin_share_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ pingvin_share_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ pingvin_share_container_name }}"
@@ -38,7 +38,7 @@
           dockflare.access.group: "{{ pingvin_share_dockflare_access_group }}"
           dockflare.hostname: "{{ pingvin_share_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ pingvin_share_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ pingvin_share_proper_name }}"
           homepage.group: "{{ pingvin_share_homepage_group }}"
           homepage.icon: "{{ pingvin_share_homepage_icon }}"
           homepage.href: "{{ pingvin_share_homepage_href }}"
@@ -68,7 +68,7 @@
         memory_swap: "{{ pingvin_share_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ pingvin_share_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -77,15 +77,15 @@
               }}
   when: pingvin_share_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ pingvin_share_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ pingvin_share_proper_name }} Container
       community.docker.docker_container:
         name: "{{ pingvin_share_container_name }}"
         state: absent
   when: pingvin_share_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ pingvin_share_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

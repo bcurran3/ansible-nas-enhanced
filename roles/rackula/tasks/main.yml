@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ rackula_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ rackula_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ rackula_data_directory }}"
         - "{{ rackula_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ rackula_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         rackula_homepage_href: "https://{{ rackula_hostname }}.{{ ansible_nas_domain }}"
       when: rackula_traefik_enabled | bool or rackula_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} API Container
+    - name: Create {{ rackula_proper_name }} API Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ rackula_api_container_name }}"
@@ -44,7 +44,7 @@
           dockflare.access.group: "{{ rackula_dockflare_access_group }}"
           dockflare.hostname: "{{ rackula_api_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rackula_port_api }}"
-          homepage.name: "{{ ansible_nas_app_name }} API"
+          homepage.name: "{{ rackula_proper_name }} API"
           homepage.group: "{{ rackula_api_homepage_group }}"
           homepage.icon: "{{ rackula_api_homepage_icon }}"
           homepage.href: "{{ rackula_api_homepage_href }}"
@@ -73,7 +73,7 @@
         read_only: true
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ rackula_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ rackula_container_name }}"
@@ -101,7 +101,7 @@
           dockflare.access.group: "{{ rackula_dockflare_access_group }}"
           dockflare.hostname: "{{ rackula_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ rackula_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ rackula_proper_name }}"
           homepage.group: "{{ rackula_homepage_group }}"
           homepage.icon: "{{ rackula_homepage_icon }}"
           homepage.href: "{{ rackula_homepage_href }}"
@@ -140,7 +140,7 @@
         read_only: true
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ rackula_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -149,20 +149,20 @@
               }}
   when: rackula_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }} Containers
+- name: Stop {{ rackula_proper_name }} Containers
   block:
-    - name: Stop {{ ansible_nas_app_name }} API Container
+    - name: Stop {{ rackula_proper_name }} API Container
       community.docker.docker_container:
         name: "{{ rackula_api_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ rackula_proper_name }} Container
       community.docker.docker_container:
         name: "{{ rackula_container_name }}"
         state: absent
   when: rackula_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ rackula_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

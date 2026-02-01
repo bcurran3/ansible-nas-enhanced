@@ -1,13 +1,13 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ yadnsb_proper_name }}
   block:
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ yadnsb_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         yadnsb_homepage_href: "https://{{ yadnsb_hostname }}.{{ ansible_nas_domain }}"
       when: yadnsb_traefik_enabled | bool or yadnsb_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ yadnsb_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ yadnsb_container_name }}"
@@ -31,7 +31,7 @@
           dockflare.access.group: "{{ yadnsb_dockflare_access_group }}"
           dockflare.hostname: "{{ yadnsb_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ yadnsb_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ yadnsb_proper_name }}"
           homepage.group: "{{ yadnsb_homepage_group }}"
           homepage.icon: "{{ yadnsb_homepage_icon }}"
           homepage.href: "{{ yadnsb_homepage_href }}"
@@ -58,7 +58,7 @@
         security_opts: ["no-new-privileges:true"]
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ yadnsb_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -67,9 +67,9 @@
               }}
   when: yadnsb_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ yadnsb_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ yadnsb_proper_name }} Container
       community.docker.docker_container:
         name: "{{ yadnsb_container_name }}"
         state: absent

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ homebox_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directory
+    - name: Create {{ homebox_proper_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ homebox_data_directory }}"
         - "{{ homebox_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ homebox_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         homebox_homepage_href: "https://{{ homebox_hostname }}.{{ ansible_nas_domain }}"
       when: homebox_traefik_enabled | bool or homebox_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ homebox_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ homebox_container_name }}"
@@ -39,7 +39,7 @@
           dockflare.access.group: "{{ homebox_dockflare_access_group }}"
           dockflare.hostname: "{{ homebox_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ homebox_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ homebox_proper_name }}"
           homepage.group: "{{ homebox_homepage_group }}"
           homepage.icon: "{{ homebox_homepage_icon }}"
           homepage.href: "{{ homebox_homepage_href }}"
@@ -73,7 +73,7 @@
         memory_swap: "{{ homebox_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ homebox_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -82,15 +82,15 @@
               }}
   when: homebox_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ homebox_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ homebox_proper_name }} Container
       community.docker.docker_container:
         name: "{{ homebox_container_name }}"
         state: absent
   when: homebox_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ homebox_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

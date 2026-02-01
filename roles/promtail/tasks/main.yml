@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ promtail_proper_name }}
   block:
     - name: Check for Loki installation
       ansible.builtin.fail:
@@ -9,7 +9,7 @@
     - name: Include Loki variables
       ansible.builtin.include_vars: ../../loki/defaults/main.yml
 
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ promtail_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -17,17 +17,17 @@
         - "{{ promtail_data_directory }}/config"
         - "{{ promtail_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ promtail_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         promtail_homepage_href: "https://{{ promtail_hostname }}.{{ ansible_nas_domain }}"
       when: promtail_traefik_enabled | bool or promtail_dockflare_enabled | bool
 
-    - name: Copy {{ ansible_nas_app_name }} Template config
+    - name: Copy {{ promtail_proper_name }} Template config
       ansible.builtin.template:
         src: config.yml
         dest: "{{ promtail_data_directory }}/config/config.yml"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ promtail_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ promtail_container_name }}"
@@ -50,7 +50,7 @@
           dockflare.access.group: "{{ promtail_dockflare_access_group }}"
           dockflare.hostname: "{{ promtail_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ promtail_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ promtail_proper_name }}"
           homepage.group: "{{ promtail_homepage_group }}"
           homepage.icon: "{{ promtail_homepage_icon }}"
           homepage.href: "{{ promtail_homepage_href }}"
@@ -80,7 +80,7 @@
         memory_swap: "{{ promtail_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ promtail_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -89,15 +89,15 @@
               }}
   when: promtail_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ promtail_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ promtail_proper_name }} Container
       community.docker.docker_container:
         name: "{{ promtail_container_name }}"
         state: absent
   when: promtail_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ promtail_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

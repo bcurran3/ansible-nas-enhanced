@@ -1,6 +1,6 @@
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ watchyourlan_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ watchyourlan_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ watchyourlan_container_name }}"
@@ -21,7 +21,7 @@
           autoheal: "{{ watchyourlan_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ watchyourlan_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ watchyourlan_proper_name }}"
           homepage.group: "{{ watchyourlan_homepage_group }}"
           homepage.icon: "{{ watchyourlan_homepage_icon }}"
           homepage.href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ watchyourlan_port_http }}"
@@ -40,7 +40,7 @@
         memory_swap: "{{ watchyourlan_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ watchyourlan_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -49,15 +49,15 @@
               }}
   when: watchyourlan_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ watchyourlan_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ watchyourlan_proper_name }} Container
       community.docker.docker_container:
         name: "{{ watchyourlan_container_name }}"
         state: absent
   when: watchyourlan_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ watchyourlan_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

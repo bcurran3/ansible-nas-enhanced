@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ blinko_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ blinko_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ blinko_data_directory }}/blinko"
         - "{{ blinko_data_directory }}/db"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ blinko_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         blinko_homepage_href: "https://{{ blinko_hostname }}.{{ ansible_nas_domain }}"
       when: blinko_traefik_enabled | bool or blinko_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ blinko_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ blinko_db_container_name }}"
@@ -38,7 +38,7 @@
         labels:
           autoheal: "{{ blinko_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ blinko_db_watchtower_enabled | ternary('true', 'false') }}"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ blinko_proper_name }} PostgreSQL"
           homepage.group: "{{ blinko_db_homepage_group }}"
           homepage.icon: "{{ blinko_db_homepage_icon }}"
           homepage.href: "{{ blinko_db_homepage_href }}"
@@ -60,7 +60,7 @@
         memory_swap: "{{ blinko_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ blinko_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ blinko_db_container_name }}"
       register: db_info
@@ -68,7 +68,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ blinko_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ blinko_container_name }}"
@@ -106,7 +106,7 @@
           dockflare.access.group: "{{ blinko_dockflare_access_group }}"
           dockflare.hostname: "{{ blinko_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ blinko_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ blinko_proper_name }}"
           homepage.group: "{{ blinko_homepage_group }}"
           homepage.icon: "{{ blinko_homepage_icon }}"
           homepage.href: "{{ blinko_homepage_href }}"
@@ -136,7 +136,7 @@
         memory_swap: "{{ blinko_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ blinko_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -145,20 +145,20 @@
               }}
   when: blinko_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ blinko_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ blinko_proper_name }} Container
       community.docker.docker_container:
         name: "{{ blinko_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ blinko_proper_name }} Container
       community.docker.docker_container:
         name: "{{ blinko_db_container_name }}"
         state: absent
   when: blinko_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ blinko_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

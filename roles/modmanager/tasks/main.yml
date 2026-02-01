@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ modmanager_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ modmanager_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ modmanager_data_directory }}"
         - "{{ modmanager_data_directory }}/modcache"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ modmanager_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ modmanager_container_name }}"
@@ -36,7 +36,7 @@
           autoheal: "{{ modmanager_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ modmanager_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ modmanager_proper_name }}"
           homepage.group: "{{ modmanager_homepage_group }}"
           homepage.icon: "{{ modmanager_homepage_icon }}"
           homepage.description: "{{ 'modmanager description' if homepage_show_description else omit }}"
@@ -58,15 +58,15 @@
         restart_policy: unless-stopped
   when: modmanager_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ modmanager_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ modmanager_proper_name }} Container
       community.docker.docker_container:
         name: "{{ modmanager_container_name }}"
         state: absent
   when: modmanager_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ modmanager_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

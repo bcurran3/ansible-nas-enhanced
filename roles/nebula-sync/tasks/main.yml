@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ nebula_sync_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ nebula_sync_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ nebula_sync_container_name }}"
@@ -19,7 +19,7 @@
           autoheal: "{{ nebula_sync_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ nebula_sync_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ nebula_sync_proper_name }}"
           homepage.group: "{{ nebula_sync_homepage_group }}"
           homepage.icon: "{{ nebula_sync_homepage_icon }}"
           homepage.description: "{{ 'Synchronize configuration of multiple Pi-hole v6.x instances.' if homepage_show_description else omit }}"
@@ -37,9 +37,9 @@
         restart_policy: unless-stopped
   when: nebula_sync_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ nebula_sync_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ nebula_sync_proper_name }} Container
       community.docker.docker_container:
         name: "{{ nebula_sync_container_name }}"
         state: absent

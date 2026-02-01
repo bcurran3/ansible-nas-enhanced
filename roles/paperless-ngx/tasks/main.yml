@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ paperless_ngx_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ paperless_ngx_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -14,16 +14,16 @@
         - "{{ paperless_ngx_media_directory }}"
         - "{{ paperless_ngx_consume_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ paperless_ngx_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         paperless_ngx_homepage_href: "https://{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}"
       when: paperless_ngx_traefik_enabled | bool or paperless_ngx_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ paperless_ngx_proper_name }} network
       community.docker.docker_network:
         name: "{{ paperless_ngx_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} Redis Container
+    - name: Create {{ paperless_ngx_proper_name }} Redis Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ paperless_ngx_redis_container_name }}"
@@ -40,7 +40,7 @@
           autoheal: "{{ paperless_ngx_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_redis_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.name: "{{ paperless_ngx_proper_name }} Redis"
           homepage.group: "{{ paperless_ngx_redis_homepage_group }}"
           homepage.icon: "{{ paperless_ngx_redis_homepage_icon }}"
           homepage.href: "{{ paperless_ngx_redis_homepage_href }}"
@@ -61,7 +61,7 @@
         memory: "{{ paperless_ngx_redis_memory }}"
         memory_swap: "{{ paperless_ngx_redis_memory_swap }}"
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ paperless_ngx_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ paperless_ngx_db_container_name }}"
@@ -89,7 +89,7 @@
           autoheal: "{{ paperless_ngx_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ paperless_ngx_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ paperless_ngx_proper_name }} PostgreSQL"
           homepage.group: "{{ paperless_ngx_db_homepage_group }}"
           homepage.icon: "{{ paperless_ngx_db_homepage_icon }}"
           homepage.href: "{{ paperless_ngx_db_homepage_href }}"
@@ -110,7 +110,7 @@
         memory: "{{ paperless_ngx_db_memory }}"
         memory_swap: "{{ paperless_ngx_db_memory_swap }}"
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ paperless_ngx_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ paperless_ngx_db_container_name }}"
       register: db_info
@@ -118,7 +118,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ paperless_ngx_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ paperless_ngx_container_name }}"
@@ -155,7 +155,7 @@
           dockflare.access.group: "{{ paperless_ngx_dockflare_access_group }}"
           dockflare.hostname: "{{ paperless_ngx_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ paperless_ngx_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ paperless_ngx_proper_name }}"
           homepage.group: "{{ paperless_ngx_homepage_group }}"
           homepage.icon: "{{ paperless_ngx_homepage_icon }}"
           homepage.href: "{{ paperless_ngx_homepage_href }}"
@@ -190,7 +190,7 @@
         restart_policy: unless-stopped
         memory_swap: "{{ paperless_ngx_memory_swap }}"
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ paperless_ngx_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -199,30 +199,30 @@
               }}
   when: paperless_ngx_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ paperless_ngx_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ paperless_ngx_proper_name }} Container
       community.docker.docker_container:
         name: "{{ paperless_ngx_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Redis Container
+    - name: Stop {{ paperless_ngx_proper_name }} Redis Container
       community.docker.docker_container:
         name: "{{ paperless_ngx_redis_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ paperless_ngx_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ paperless_ngx_db_container_name }}"
         state: absent
 
-    - name: Delete {{ ansible_nas_app_name }} Network
+    - name: Delete {{ paperless_ngx_proper_name }} Network
       community.docker.docker_network:
         name: "{{ paperless_ngx_network_name }}"
         state: absent
   when: paperless_ngx_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ paperless_ngx_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

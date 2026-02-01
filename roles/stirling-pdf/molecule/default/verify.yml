@@ -11,7 +11,7 @@
         name: "{{ stirling_pdf_container_name }}"
       register: result
 
-    - name: Check {{ ansible_nas_app_name }} is running
+    - name: Check {{ stirling_pdf_proper_name }} is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

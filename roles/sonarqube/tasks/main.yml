@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ sonarqube_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ sonarqube_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item.path }}"
         state: directory
@@ -25,12 +25,12 @@
           owner: 1000
           group: 0
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ sonarqube_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         sonarqube_homepage_href: "https://{{ sonarqube_hostname }}.{{ ansible_nas_domain }}"
       when: sonarqube_traefik_enabled | bool or sonarqube_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ sonarqube_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ sonarqube_db_container_name }}"
@@ -55,7 +55,7 @@
           autoheal: "{{ sonarqube_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ sonarqube_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ sonarqube_proper_name }} PostgreSQL"
           homepage.group: "{{ sonarqube_db_homepage_group }}"
           homepage.icon: "{{ sonarqube_db_homepage_icon }}"
           homepage.href: "{{ sonarqube_db_homepage_href }}"
@@ -77,7 +77,7 @@
         memory_swap: "{{ sonarqube_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ sonarqube_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ sonarqube_db_container_name }}"
       register: db_info
@@ -85,7 +85,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ sonarqube_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ sonarqube_container_name }}"
@@ -113,7 +113,7 @@
           dockflare.access.group: "{{ sonarqube_dockflare_access_group }}"
           dockflare.hostname: "{{ sonarqube_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ sonarqube_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ sonarqube_proper_name }}"
           homepage.group: "{{ sonarqube_homepage_group }}"
           homepage.icon: "{{ sonarqube_homepage_icon }}"
           homepage.href: "{{ sonarqube_homepage_href }}"
@@ -145,7 +145,7 @@
           - "nofile:65536:65536"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ sonarqube_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -154,20 +154,20 @@
               }}
   when: sonarqube_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ sonarqube_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ sonarqube_proper_name }} Container
       community.docker.docker_container:
         name: "{{ sonarqube_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ sonarqube_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ sonarqube_db_container_name }}"
         state: absent
   when: sonarqube_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ sonarqube_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,8 +1,8 @@
 ---
 # ? Is there a better choice than the Bitnami images ?
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ phpbb_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ phpbb_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,16 +12,16 @@
         - "{{ phpbb_data_directory }}/phpbb"
         - "{{ phpbb_data_directory }}/db"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ phpbb_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         phpbb_homepage_href: "https://{{ phpbb_hostname }}.{{ ansible_nas_domain }}"
       when: phpbb_traefik_enabled | bool or phpbb_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ phpbb_proper_name }} network
       community.docker.docker_network:
         name: "{{ phpbb_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ phpbb_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ phpbb_db_container_name }}"
@@ -44,7 +44,7 @@
           autoheal: "{{ phpbb_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ phpbb_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.name: "{{ phpbb_proper_name }} MariaDB"
           homepage.group: "{{ phpbb_db_homepage_group }}"
           homepage.icon: "{{ phpbb_db_homepage_icon }}"
           homepage.href: "{{ phpbb_db_homepage_href }}"
@@ -66,7 +66,7 @@
         memory_swap: "{{ phpbb_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ phpbb_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ phpbb_container_name }}"
@@ -98,7 +98,7 @@
           dockflare.access.group: "{{ phpbb_dockflare_access_group }}"
           dockflare.hostname: "{{ phpbb_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ phpbb_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ phpbb_proper_name }}"
           homepage.group: "{{ phpbb_homepage_group }}"
           homepage.icon: "{{ phpbb_homepage_icon }}"
           homepage.href: "{{ phpbb_homepage_href }}"
@@ -127,7 +127,7 @@
         memory_swap: "{{ phpbb_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ phpbb_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -136,20 +136,20 @@
               }}
   when: phpbb_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ phpbb_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ phpbb_proper_name }} Container
       community.docker.docker_container:
         name: "{{ phpbb_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ phpbb_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ phpbb_db_container_name }}"
         state: absent
   when: phpbb_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ phpbb_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

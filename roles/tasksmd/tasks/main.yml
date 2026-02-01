@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ tasksmd_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ tasksmd_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ tasksmd_data_directory }}/config"
         - "{{ tasksmd_data_directory }}/tasks"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ tasksmd_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         tasksmd_homepage_href: "https://{{ tasksmd_hostname }}.{{ ansible_nas_domain }}"
       when: tasksmd_traefik_enabled | bool or tasksmd_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ tasksmd_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ tasksmd_container_name }}"
@@ -39,7 +39,7 @@
           dockflare.access.group: "{{ tasksmd_dockflare_access_group }}"
           dockflare.hostname: "{{ tasksmd_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tasksmd_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ tasksmd_proper_name }}"
           homepage.group: "{{ tasksmd_homepage_group }}"
           homepage.icon: "{{ tasksmd_homepage_icon }}"
           homepage.href: "{{ tasksmd_homepage_href }}"
@@ -69,7 +69,7 @@
         memory_swap: "{{ tasksmd_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ tasksmd_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -78,15 +78,15 @@
               }}
   when: tasksmd_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ tasksmd_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ tasksmd_proper_name }} Container
       community.docker.docker_container:
         name: "{{ tasksmd_container_name }}"
         state: absent
   when: tasksmd_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ tasksmd_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

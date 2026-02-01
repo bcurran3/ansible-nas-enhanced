@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ gameyfin_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ gameyfin_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,13 +12,13 @@
         - "{{ gameyfin_data_directory }}/logs"
         - "{{ gameyfin_games_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ gameyfin_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         gameyfin_env_app_url: "https://{{ gameyfin_hostname }}.{{ ansible_nas_domain }}"
         gameyfin_homepage_href: "https://{{ gameyfin_hostname }}.{{ ansible_nas_domain }}"
       when: gameyfin_traefik_enabled | bool or gameyfin_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ gameyfin_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gameyfin_container_name }}"
@@ -48,7 +48,7 @@
           dockflare.access.group: "{{ gameyfin_dockflare_access_group }}"
           dockflare.hostname: "{{ gameyfin_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gameyfin_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ gameyfin_proper_name }}"
           homepage.group: "{{ gameyfin_homepage_group }}"
           homepage.icon: "{{ gameyfin_homepage_icon }}"
           homepage.href: "{{ gameyfin_homepage_href }}"
@@ -78,7 +78,7 @@
         memory_swap: "{{ gameyfin_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ gameyfin_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -87,15 +87,15 @@
               }}
   when: gameyfin_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ gameyfin_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ gameyfin_proper_name }} Container
       community.docker.docker_container:
         name: "{{ gameyfin_container_name }}"
         state: absent
   when: gameyfin_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ gameyfin_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

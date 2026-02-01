@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ webtop_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ webtop_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ webtop_data_directory }}"
         - "{{ webtop_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ webtop_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         webtop_homepage_href: "https://{{ webtop_hostname }}.{{ ansible_nas_domain }}"
       when: webtop_traefik_enabled | bool or webtop_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ webtop_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ webtop_container_name }}"
@@ -52,7 +52,7 @@
           DISABLE_MOUSE_BUTTONS: "{{ webtop_env_disable_mouse_buttons }}"
           HARDEN_KEYBINDS: "{{ webtop_env_disable_harden_keybinds }}"
           RESTART_APP: "{{ webtop_env_disable_restart_app }}"
-          TITLE: "{{ ansible_nas_app_name }}"
+          TITLE: "{{ webtop_proper_name }}"
           DOCKER_MODS: "{{ webtop_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ webtop_env_docker_mods_install_packages }}"
           INSTALL_PIP_PACKAGES: "{{ webtop_env_docker_mods_install_pip_packages}}"
@@ -72,7 +72,7 @@
           dockflare.access.group: "{{ webtop_dockflare_access_group }}"
           dockflare.hostname: "{{ webtop_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ webtop_port_https }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ webtop_proper_name }}"
           homepage.group: "{{ webtop_homepage_group }}"
           homepage.icon: "{{ webtop_homepage_icon }}"
           homepage.href: "{{ webtop_homepage_href }}"
@@ -102,7 +102,7 @@
         shm_size: "1GB"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ webtop_proper_name }} at
       ansible.builtin.debug:
         msg: >-
           {{
@@ -115,15 +115,15 @@
           }}
   when: webtop_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ webtop_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ webtop_proper_name }} Container
       community.docker.docker_container:
         name: "{{ webtop_container_name }}"
         state: absent
   when: webtop_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ webtop_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

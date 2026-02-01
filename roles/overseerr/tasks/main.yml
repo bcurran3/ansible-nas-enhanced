@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ overseerr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ overseerr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ overseerr_data_directory }}"
         - "{{ overseerr_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ overseerr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         overseerr_homepage_href: "https://{{ overseerr_hostname }}.{{ ansible_nas_domain }}"
       when: overseerr_traefik_enabled | bool or overseerr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ overseerr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ overseerr_container_name }}"
@@ -54,7 +54,7 @@
           repliqate.schedule: "{{ overseerr_repliqate_schedule }}"
           repliqate.backup_id: "{{ overseerr_repliqate_backup_id }}"
           repliqate.retention: "{{ overseerr_repliqate_retention }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ overseerr_proper_name }}"
           homepage.group: "{{ overseerr_homepage_group }}"
           homepage.icon: "{{ overseerr_homepage_icon }}"
           homepage.href: "{{ overseerr_homepage_href }}"
@@ -82,7 +82,7 @@
         memory_swap: "{{ overseerr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ overseerr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -91,15 +91,15 @@
               }}
   when: overseerr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ overseerr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ overseerr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ overseerr_container_name }}"
         state: absent
   when: overseerr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ overseerr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

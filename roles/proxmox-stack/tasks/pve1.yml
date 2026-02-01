@@ -1,12 +1,12 @@
 ---
-- name: Start {{ ansible_nas_app_name }} VE Node 1
+- name: Start {{ proxmox_stack_proper_name }} VE Node 1
   block:
-    - name: Set {{ ansible_nas_app_name }} VE Node 1 FQDN var overrides
+    - name: Set {{ proxmox_stack_proper_name }} VE Node 1 FQDN var overrides
       ansible.builtin.set_fact:
         proxmox_stack_pve1_homepage_href: "https://{{ proxmox_stack_pve1_hostname }}.{{ ansible_nas_domain }}"
       when: proxmox_stack_traefik_enabled | bool or proxmox_stack_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} VE Node 1 Container
+    - name: Create {{ proxmox_stack_proper_name }} VE Node 1 Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ proxmox_stack_pve1_container_name }}"
@@ -36,7 +36,7 @@
           dockflare.access.group: "{{ proxmox_stack_dockflare_access_group }}"
           dockflare.hostname: "{{ proxmox_stack_pve1_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ proxmox_stack_pve1_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }} VE Node 1"
+          homepage.name: "{{ proxmox_stack_proper_name }} VE Node 1"
           homepage.group: "{{ proxmox_stack_pve1_homepage_group }}"
           homepage.icon: "{{ proxmox_stack_pve1_homepage_icon }}"
           homepage.href: "{{ proxmox_stack_pve1_homepage_href }}"
@@ -78,7 +78,7 @@
         tty: true
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} VE Node 1 at
+    - name: Access {{ proxmox_stack_proper_name }} VE Node 1 at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -89,9 +89,9 @@
     - proxmox_stack_pve1_enabled is true
     - proxmox_stack_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}  VE Node 1
+- name: Stop {{ proxmox_stack_proper_name }}  VE Node 1
   block:
-    - name: Stop {{ ansible_nas_app_name }} VE Node 1 Container
+    - name: Stop {{ proxmox_stack_proper_name }} VE Node 1 Container
       community.docker.docker_container:
         name: "{{ proxmox_stack_pve1_container_name }}"
         state: absent

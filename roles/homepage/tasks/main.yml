@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ homepage_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ homepage_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ homepage_data_directory }}/config/logs"
         - "{{ homepage_data_directory }}/images"
 
-    - name: Create {{ ansible_nas_app_name }} Template config files
+    - name: Create {{ homepage_proper_name }} Template config files
       ansible.builtin.template:
         src: "{{ item }}"
         dest: "{{ homepage_data_directory }}/config/{{ item }}"
@@ -25,7 +25,7 @@
         - widgets.yaml
       register: homepage_config
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ homepage_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ homepage_container_name }}"
@@ -72,7 +72,7 @@
         memory_swap: "{{ homepage_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ homepage_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -81,15 +81,15 @@
               }}
   when: homepage_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ homepage_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ homepage_proper_name }} Container
       community.docker.docker_container:
         name: "{{ homepage_container_name }}"
         state: absent
   when: homepage_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ homepage_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

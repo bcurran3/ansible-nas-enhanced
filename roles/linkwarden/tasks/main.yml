@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ linkwarden_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ linkwarden_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,13 +11,13 @@
         - "{{ linkwarden_data_directory }}/db"
         - "{{ linkwarden_data_directory }}/search"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ linkwarden_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         linkwarden_env_nextauth_url: "https://{{ linkwarden_hostname }}.{{ ansible_nas_domain }}/api/v1/auth"
         linkwarden_homepage_href: "https://{{ linkwarden_hostname }}.{{ ansible_nas_domain }}"
       when: linkwarden_traefik_enabled | bool or linkwarden_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Meilisearch Container
+    - name: Create {{ linkwarden_proper_name }} Meilisearch Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ linkwarden_search_container_name }}"
@@ -33,7 +33,7 @@
           autoheal: "{{ linkwarden_search_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ linkwarden_search_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Meilisearch"
+          homepage.name: "{{ linkwarden_proper_name }} Meilisearch"
           homepage.group: "{{ linkwarden_search_homepage_group }}"
           homepage.icon: "{{ linkwarden_search_homepage_icon }}"
           homepage.href: "{{ linkwarden_homepage_href }}"
@@ -58,7 +58,7 @@
         memory_swap: "{{ linkwarden_search_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ linkwarden_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ linkwarden_db_container_name }}"
@@ -82,7 +82,7 @@
           autoheal: "{{ linkwarden_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ linkwarden_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ linkwarden_proper_name }} PostgreSQL"
           homepage.group: "{{ linkwarden_db_homepage_group }}"
           homepage.icon: "{{ linkwarden_db_homepage_icon }}"
           homepage.href: "{{ linkwarden_homepage_href }}"
@@ -104,7 +104,7 @@
         memory_swap: "{{ linkwarden_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ linkwarden_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ linkwarden_db_container_name }}"
       register: db_info
@@ -112,7 +112,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ linkwarden_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ linkwarden_container_name }}"
@@ -145,7 +145,7 @@
           dockflare.access.group: "{{ linkwarden_dockflare_access_group }}"
           dockflare.hostname: "{{ linkwarden_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ linkwarden_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ linkwarden_proper_name }}"
           homepage.group: "{{ linkwarden_homepage_group }}"
           homepage.icon: "{{ linkwarden_homepage_icon }}"
           homepage.href: "{{ linkwarden_homepage_href }}"
@@ -175,7 +175,7 @@
         memory_swap: "{{ linkwarden_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ linkwarden_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -184,25 +184,25 @@
               }}
   when: linkwarden_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ linkwarden_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ linkwarden_proper_name }} Container
       community.docker.docker_container:
         name: "{{ linkwarden_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Meilisearch Container
+    - name: Stop {{ linkwarden_proper_name }} Meilisearch Container
       community.docker.docker_container:
         name: "{{ linkwarden_search_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ linkwarden_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ linkwarden_db_container_name }}"
         state: absent
   when: linkwarden_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ linkwarden_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

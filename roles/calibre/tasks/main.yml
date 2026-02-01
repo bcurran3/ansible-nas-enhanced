@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ calibre_proper_name }}
   block:
     - name: Create Calibre Directories
       ansible.builtin.file:
@@ -12,12 +12,12 @@
         - "{{ calibre_comics_directory }}"
 
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ calibre_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         calibre_homepage_href: "https://{{ calibre_hostname }}.{{ ansible_nas_domain }}"
       when: calibre_traefik_enabled | bool or calibre_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ calibre_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ calibre_container_name }}"
@@ -60,7 +60,7 @@
           dockflare.access.group: "{{ calibre_dockflare_access_group }}"
           dockflare.hostname: "{{ calibre_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ calibre_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ calibre_proper_name }}"
           homepage.group: "{{ calibre_homepage_group }}"
           homepage.icon: "{{ calibre_homepage_icon }}"
           homepage.href: "{{ calibre_homepage_href }}"
@@ -91,7 +91,7 @@
         shm_size: "1GB"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ calibre_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -100,15 +100,15 @@
               }}
   when: calibre_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ calibre_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ calibre_proper_name }} Container
       community.docker.docker_container:
         name: "{{ calibre_container_name }}"
         state: absent
   when: calibre_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ calibre_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,26 +1,26 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ speedtest_tracker_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directory
+    - name: Create {{ speedtest_tracker_proper_name }} Directory
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ speedtest_tracker_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ speedtest_tracker_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         speedtest_tracker_homepage_href: "https://{{ speedtest_tracker_hostname }}.{{ ansible_nas_domain }}"
       when: speedtest_tracker_traefik_enabled | bool or speedtest_tracker_dockflare_enabled | bool
 
-    - name: Remove old {{ ansible_nas_app_name }} Container
+    - name: Remove old {{ speedtest_tracker_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ speedtest_tracker_container_name }}"
         state: absent
       tags: molecule-idempotence-notest
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ speedtest_tracker_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ speedtest_tracker_container_name }}"
@@ -50,7 +50,7 @@
           dockflare.access.group: "{{ speedtest_tracker_dockflare_access_group }}"
           dockflare.hostname: "{{ speedtest_tracker_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ speedtest_tracker_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ speedtest_tracker_proper_name }}"
           homepage.group: "{{ speedtest_tracker_homepage_group }}"
           homepage.icon: "{{ speedtest_tracker_homepage_icon }}"
           homepage.href: "{{ speedtest_tracker_homepage_href }}"
@@ -83,7 +83,7 @@
         memory_swap: "{{ speedtest_tracker_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ speedtest_tracker_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -92,15 +92,15 @@
               }}
   when: speedtest_tracker_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ speedtest_tracker_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ speedtest_tracker_proper_name }} Container
       community.docker.docker_container:
         name: "{{ speedtest_tracker_container_name }}"
         state: absent
   when: speedtest_tracker_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ speedtest_tracker_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

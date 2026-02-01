@@ -1,6 +1,6 @@
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ invoiceninja_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ invoiceninja_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item.path }}"
         state: directory
@@ -21,13 +21,13 @@
           owner: "{{ invoiceninja_user_id }}"
           group: "{{ invoiceninja_user_id }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ invoiceninja_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         invoiceninja_app_url: "https://{{ invoiceninja_hostname }}.{{ ansible_nas_domain }}"
         invoiceninja_homepage_href: "https://{{ invoiceninja_hostname }}.{{ ansible_nas_domain }}"
       when: invoiceninja_traefik_enabled | bool or invoiceninja_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Network
+    - name: Create {{ invoiceninja_proper_name }} Network
       community.docker.docker_network:
         name: "{{ invoiceninja_network_name }}"
 
@@ -37,7 +37,7 @@
         dest: "{{ invoiceninja_data_directory }}/nginx/in-vhost.conf"
       register: template_config
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ invoiceninja_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_db_container_name }}"
@@ -69,7 +69,7 @@
           autoheal: "{{ invoiceninja_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ invoiceninja_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.name: "{{ invoiceninja_proper_name }} MariaDB"
           homepage.group: "{{ invoiceninja_db_homepage_group }}"
           homepage.icon: "{{ invoiceninja_db_homepage_icon }}"
           homepage.href: "{{ invoiceninja_web_homepage_href }}"
@@ -91,7 +91,7 @@
         memory_swap: "{{ invoiceninja_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ invoiceninja_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ invoiceninja_db_container_name }}"
       register: db_info
@@ -99,7 +99,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} App Container
+    - name: Create {{ invoiceninja_proper_name }} App Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_app_container_name }}"
@@ -163,7 +163,7 @@
           autoheal: "{{ invoiceninja_app_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ invoiceninja_app_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} App"
+          homepage.name: "{{ invoiceninja_proper_name }} App"
           homepage.group: "{{ invoiceninja_app_homepage_group }}"
           homepage.icon: "{{ invoiceninja_app_homepage_icon }}"
           homepage.href: "{{ invoiceninja_web_homepage_href }}"
@@ -184,7 +184,7 @@
         memory_swap: "{{ invoiceninja_app_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Web UI Container
+    - name: Create {{ invoiceninja_proper_name }} Web UI Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ invoiceninja_web_container_name }}"
@@ -218,7 +218,7 @@
           dockflare.access.group: "{{ invoiceninja_dockflare_access_group }}"
           dockflare.hostname: "{{ invoiceninja_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ invoiceninja_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ invoiceninja_proper_name }}"
           homepage.group: "{{ invoiceninja_web_homepage_group }}"
           homepage.icon: "invoiceninja.png"
           homepage.href: "{{ invoiceninja_web_homepage_href }}"
@@ -248,7 +248,7 @@
         memory_swap: "{{ invoiceninja_web_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ invoiceninja_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -257,30 +257,30 @@
               }}
   when: invoiceninja_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ invoiceninja_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Web UI Container
+    - name: Stop {{ invoiceninja_proper_name }} Web UI Container
       community.docker.docker_container:
         name: "{{ invoiceninja_web_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} App Container
+    - name: Stop {{ invoiceninja_proper_name }} App Container
       community.docker.docker_container:
         name: "{{ invoiceninja_app_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ invoiceninja_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ invoiceninja_db_container_name }}"
         state: absent
 
-    - name: Delete {{ ansible_nas_app_name }} Network
+    - name: Delete {{ invoiceninja_proper_name }} Network
       community.docker.docker_network:
         name: "{{ invoiceninja_network_name }}"
         state: absent
   when: invoiceninja_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ invoiceninja_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

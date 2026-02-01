@@ -1,19 +1,19 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ syncthing_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ syncthing_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ syncthing_data_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ syncthing_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         syncthing_homepage_href: "https://{{ syncthing_hostname }}.{{ ansible_nas_domain }}"
       when: syncthing_traefik_enabled | bool or syncthing_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ syncthing_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ syncthing_container_name }}"
@@ -37,7 +37,7 @@
           dockflare.access.group: "{{ syncthing_dockflare_access_group }}"
           dockflare.hostname: "{{ syncthing_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ syncthing_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ syncthing_proper_name }}"
           homepage.group: "{{ syncthing_homepage_group }}"
           homepage.icon: "{{ syncthing_homepage_icon }}"
           homepage.href: "{{ syncthing_homepage_href }}"
@@ -67,7 +67,7 @@
         memory_swap: "{{ syncthing_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ syncthing_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -76,15 +76,15 @@
               }}
   when: syncthing_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ syncthing_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ syncthing_proper_name }} Container
       community.docker.docker_container:
         name: "{{ syncthing_container_name }}"
         state: absent
   when: syncthing_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ syncthing_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

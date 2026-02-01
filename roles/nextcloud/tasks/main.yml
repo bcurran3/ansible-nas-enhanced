@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ nextcloud_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ nextcloud_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item.path }}"
         state: directory
@@ -31,16 +31,16 @@
           owner: 33
           group: 33
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ nextcloud_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         nextcloud_homepage_href: "https://{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
       when: nextcloud_traefik_enabled | bool or nextcloud_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Network
+    - name: Create {{ nextcloud_proper_name }} Network
       community.docker.docker_network:
         name: "{{ nextcloud_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} Redis Container
+    - name: Create {{ nextcloud_proper_name }} Redis Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ nextcloud_redis_container_name }}"
@@ -64,7 +64,7 @@
           autoheal: "{{ nextcloud_redis_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ nextcloud_redis_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Redis"
+          homepage.name: "{{ nextcloud_proper_name }} Redis"
           homepage.group: "{{ nextcloud_redis_homepage_group }}"
           homepage.icon: "{{ nextcloud_redis_homepage_icon }}"
           homepage.href: "{{ nextcloud_redis_homepage_href }}"
@@ -82,7 +82,7 @@
         memory_swap: "{{ nextcloud_redis_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ nextcloud_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ nextcloud_db_container_name }}"
@@ -127,7 +127,7 @@
           autoheal: "{{ nextcloud_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.name: "{{ nextcloud_proper_name }} MariaDB"
           homepage.group: "{{ nextcloud_db_homepage_group }}"
           homepage.icon: "{{ nextcloud_db_homepage_icon }}"
           homepage.href: "{{ nextcloud_db_homepage_href }}"
@@ -149,7 +149,7 @@
         memory_swap: "{{ nextcloud_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ nextcloud_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ nextcloud_db_container_name }}"
       register: db_info
@@ -157,7 +157,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ nextcloud_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ nextcloud_container_name }}"
@@ -245,7 +245,7 @@
           dockflare.access.group: "{{ nextcloud_dockflare_access_group }}"
           dockflare.hostname: "{{ nextcloud_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ nextcloud_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ nextcloud_proper_name }}"
           homepage.group: "{{ nextcloud_homepage_group }}"
           homepage.icon: "{{ nextcloud_homepage_icon }}"
           homepage.href: "{{ nextcloud_homepage_href }}"
@@ -284,7 +284,7 @@
         memory_swap: "{{ nextcloud_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ nextcloud_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -293,30 +293,30 @@
               }}
   when: nextcloud_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ nextcloud_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ nextcloud_proper_name }} Container
       community.docker.docker_container:
         name: "{{ nextcloud_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Redis Container
+    - name: Stop {{ nextcloud_proper_name }} Redis Container
       community.docker.docker_container:
         name: "{{ nextcloud_redis_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ nextcloud_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ nextcloud_db_container_name }}"
         state: absent
 
-    - name: Delete {{ ansible_nas_app_name }} Network
+    - name: Delete {{ nextcloud_proper_name }} Network
       community.docker.docker_network:
         name: "{{ nextcloud_network_name }}"
         state: absent
   when: nextcloud_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ nextcloud_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

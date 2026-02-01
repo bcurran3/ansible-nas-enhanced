@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ utorrent_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ utorrent_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,12 +12,12 @@
         - "{{ utorrent_download_directory_active }}"
         - "{{ utorrent_torrents_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ utorrent_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         utorrent_homepage_href: "https://{{ utorrent_hostname }}.{{ ansible_nas_domain }}"
       when: utorrent_traefik_enabled | bool or utorrent_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ utorrent_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ utorrent_container_name }}"
@@ -46,7 +46,7 @@
           dockflare.access.group: "{{ utorrent_dockflare_access_group }}"
           dockflare.hostname: "{{ utorrent_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ utorrent_port_http }}/gui/"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ utorrent_proper_name }}"
           homepage.group: "{{ utorrent_homepage_group }}"
           homepage.icon: "{{ utorrent_homepage_icon }}"
           homepage.href: "{{ utorrent_homepage_href }}"
@@ -76,7 +76,7 @@
         memory_swap: "{{ utorrent_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ utorrent_proper_name }} at
       ansible.builtin.debug:
         msg: >-
           {{
@@ -89,15 +89,15 @@
           }}
   when: utorrent_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ utorrent_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ utorrent_proper_name }} Container
       community.docker.docker_container:
         name: "{{ utorrent_container_name }}"
         state: absent
   when: utorrent_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ utorrent_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

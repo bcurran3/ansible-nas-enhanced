@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ minidlna_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ minidlna_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ minidlna_container_name }}"
@@ -23,7 +23,7 @@
           autoheal: "{{ minidlna_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ minidlna_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ minidlna_proper_name }}"
           homepage.group: "{{ minidlna_homepage_group }}"
           homepage.icon: "{{ minidlna_homepage_icon }}"
           homepage.description: "{{ 'minidlna description' if homepage_show_description else omit }}"
@@ -41,9 +41,9 @@
         restart_policy: unless-stopped
   when: minidlna_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ minidlna_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ minidlna_proper_name }} Container
       community.docker.docker_container:
         name: "{{ minidlna_container_name }}"
         state: absent

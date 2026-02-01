@@ -1,19 +1,19 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ proget_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ proget_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ proget_data_directory }}/packages"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ proget_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         proget_homepage_href: "https://{{ proget_hostname }}.{{ ansible_nas_domain }}"
       when: proget_traefik_enabled | bool or proget_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Directories
+    - name: Create {{ proget_proper_name }} DB Directories
       ansible.builtin.file:
         path: "{{ item }}"
         owner: "10001"
@@ -23,11 +23,11 @@
         - "{{ proget_data_directory }}/log"
         - "{{ proget_data_directory }}/secrets"
 
-    - name: Create {{ ansible_nas_app_name }} Network
+    - name: Create {{ proget_proper_name }} Network
       community.docker.docker_network:
         name: "{{ proget_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ proget_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ proget_db_container_name}}"
@@ -59,7 +59,7 @@
           autoheal: "{{ proget_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ proget_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MSSQL"
+          homepage.name: "{{ proget_proper_name }} MSSQL"
           homepage.group: "{{ proget_db_homepage_group }}"
           homepage.icon: "{{ proget_db_homepage_icon }}"
           homepage.href: "{{ proget_db_homepage_href}}"
@@ -82,7 +82,7 @@
         memory_swap: "{{ proget_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Init {{ ansible_nas_app_name }} DB
+    - name: Init {{ proget_proper_name }} DB
       community.docker.docker_container_exec:
         container: "{{ proget_db_container_name }}"
         command: >-
@@ -95,7 +95,7 @@
       register: result
       changed_when: "'CREATE DATABASE' in result.stdout"
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ proget_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ proget_db_container_name }}"
       register: db_info
@@ -103,7 +103,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ proget_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ proget_container_name }}"
@@ -137,7 +137,7 @@
           dockflare.hostname: "{{ proget_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ proget_port_http }}"
           homepage.group: "{{ proget_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ proget_proper_name }}"
           homepage.icon: "{{ proget_homepage_icon }}"
           homepage.href: "{{ proget_homepage_href}}"
           homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ proget_port_http }}"
@@ -166,7 +166,7 @@
         memory_swap: "{{ proget_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ proget_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -175,20 +175,20 @@
               }}
   when: proget_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ proget_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ proget_proper_name }} Container
       community.docker.docker_container:
         name: "{{ proget_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ proget_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ proget_db_container_name }}"
         state: absent
   when: proget_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ proget_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

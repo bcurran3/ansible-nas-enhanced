@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ openemr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ openemr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,23 +9,23 @@
         - "{{ openemr_data_directory }}"
         - "{{ openemr_data_directory }}/db"
 
-    - name: Create {{ ansible_nas_app_name }} Docker volumes
+    - name: Create {{ openemr_proper_name }} Docker volumes
       community.docker.docker_volume:
         name: "{{ item }}"
       loop:
         - openemr_logvolume
         - openemr_sitevolume
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ openemr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         openemr_homepage_href: "https://{{ openemr_hostname }}.{{ ansible_nas_domain }}"
       when: openemr_traefik_enabled | bool or openemr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Network
+    - name: Create {{ openemr_proper_name }} Network
       community.docker.docker_network:
         name: "{{ openemr_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ openemr_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openemr_db_container_name }}"
@@ -57,7 +57,7 @@
           autoheal: "{{ openemr_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ openemr_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.name: "{{ openemr_proper_name }} MariaDB"
           homepage.group: "{{ openemr_db_homepage_group }}"
           homepage.icon: "{{ openemr_db_homepage_icon }}"
           homepage.href: "{{ openemr_db_homepage_href }}"
@@ -79,7 +79,7 @@
         memory_swap: "{{ openemr_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ openemr_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ openemr_db_container_name }}"
       register: db_info
@@ -87,7 +87,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ openemr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ openemr_container_name }}"
@@ -137,7 +137,7 @@
           dockflare.access.group: "{{ openemr_dockflare_access_group }}"
           dockflare.hostname: "{{ openemr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ openemr_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ openemr_proper_name }}"
           homepage.group: "{{ openemr_homepage_group }}"
           homepage.icon: "{{ openemr_homepage_icon }}"
           homepage.href: "{{ openemr_homepage_href }}"
@@ -167,7 +167,7 @@
         memory_swap: "{{ openemr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ openemr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -176,25 +176,25 @@
               }}
   when: openemr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ openemr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ openemr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ openemr_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ openemr_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ openemr_db_container_name }}"
         state: absent
 
-    - name: Delete {{ ansible_nas_app_name }} Network
+    - name: Delete {{ openemr_proper_name }} Network
       community.docker.docker_network:
         name: "{{ openemr_network_name }}"
         state: absent
   when: openemr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ openemr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,23 +1,23 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ miniflux_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ miniflux_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ miniflux_data_directory }}/postgres"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ miniflux_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         miniflux_homepage_href: "https://{{ miniflux_hostname }}.{{ ansible_nas_domain }}"
       when: miniflux_traefik_enabled | bool or miniflux_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} network
+    - name: Create {{ miniflux_proper_name }} network
       community.docker.docker_network:
         name: "{{ miniflux_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ miniflux_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ miniflux_db_container_name }}"
@@ -43,7 +43,7 @@
           autoheal: "{{ miniflux_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ miniflux_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ miniflux_proper_name }} PostgreSQL"
           homepage.group: "{{ miniflux_db_homepage_group }}"
           homepage.icon: "{{ miniflux_db_homepage_icon }}"
           homepage.href: "{{ miniflux_homepage_href }}"
@@ -65,7 +65,7 @@
         memory_swap: "{{ miniflux_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ miniflux_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ miniflux_db_container_name }}"
       register: db_info
@@ -73,7 +73,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ miniflux_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ miniflux_container_name }}"
@@ -99,7 +99,7 @@
           dockflare.access.group: "{{ miniflux_dockflare_access_group }}"
           dockflare.hostname: "{{ miniflux_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ miniflux_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ miniflux_proper_name }}"
           homepage.group: "{{ miniflux_homepage_group }}"
           homepage.icon: "{{ miniflux_homepage_icon }}"
           homepage.href: "{{ miniflux_homepage_href }}"
@@ -127,7 +127,7 @@
         memory_swap: "{{ miniflux_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ miniflux_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -136,25 +136,25 @@
               }}
   when: miniflux_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ miniflux_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ miniflux_proper_name }} Container
       community.docker.docker_container:
         name: "{{ miniflux_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ miniflux_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ miniflux_db_container_name }}"
         state: absent
 
-    - name: Delete {{ ansible_nas_app_name }} Network
+    - name: Delete {{ miniflux_proper_name }} Network
       community.docker.docker_network:
         name: "{{ miniflux_network_name }}"
         state: absent
   when: miniflux_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ miniflux_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -6,31 +6,31 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 1
+    - name: Try and stop and remove {{ proxmox_stack_proper_name }} VE Node 1
       community.docker.docker_container:
         name: "{{ proxmox_stack_pve1_container_name }}"
         state: absent
       register: result_pve1
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 2
+    - name: Try and stop and remove {{ proxmox_stack_proper_name }} VE Node 2
       community.docker.docker_container:
         name: "{{ proxmox_stack_pve2_container_name }}"
         state: absent
       register: result_pve2
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} VE Node 3
+    - name: Try and stop and remove {{ proxmox_stack_proper_name }} VE Node 3
       community.docker.docker_container:
         name: "{{ proxmox_stack_pve3_container_name }}"
         state: absent
       register: result_pve3
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} DC Manager
+    - name: Try and stop and remove {{ proxmox_stack_proper_name }} DC Manager
       community.docker.docker_container:
         name: "{{ proxmox_stack_pdm_container_name }}"
         state: absent
       register: result_pdm
 
-    - name: Check if {{ ansible_nas_app_name }} is stopped
+    - name: Check if {{ proxmox_stack_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result_pve1.changed

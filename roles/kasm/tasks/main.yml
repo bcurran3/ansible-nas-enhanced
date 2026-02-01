@@ -1,8 +1,8 @@
 ---
 # WIP - traefik headers need work
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ kasm_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ kasm_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ kasm_data_directory }}/opt"
         - "{{ kasm_data_directory }}/profiles"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ kasm_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         kasm_homepage_href: "https://{{ kasm_hostname }}.{{ ansible_nas_domain }}"
       when: kasm_traefik_enabled | bool or kasm_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ kasm_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ kasm_container_name }}"
@@ -65,7 +65,7 @@
           dockflare.access.group: "{{ kasm_dockflare_access_group }}"
           dockflare.hostname: "{{ kasm_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ kasm_port_https }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ kasm_proper_name }}"
           homepage.group: "{{ kasm_homepage_group }}"
           homepage.icon: "{{ kasm_homepage_icon }}"
           homepage.href: "{{ kasm_homepage_href }}"
@@ -111,7 +111,7 @@
         memory_swap: "{{ kasm_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ kasm_proper_name }} at
       ansible.builtin.debug:
         msg: >-
           {{
@@ -122,15 +122,15 @@
           }}
   when: kasm_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ kasm_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ kasm_proper_name }} Container
       community.docker.docker_container:
         name: "{{ kasm_container_name }}"
         state: absent
   when: kasm_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ kasm_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

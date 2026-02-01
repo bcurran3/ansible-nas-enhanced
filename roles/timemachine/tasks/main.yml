@@ -1,12 +1,12 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ timemachine_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ timemachine_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ timemachine_data_directory }}"
         state: directory
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ timemachine_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ timemachine_container_name }}"
@@ -28,7 +28,7 @@
           autoheal: "{{ timemachine_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ timemachine_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ timemachine_proper_name }}"
           homepage.group: "{{ timemachine_homepage_group }}"
           homepage.icon: "{{ timemachine_homepage_icon }}"
           homepage.description: "{{ 'Docker Container to run a TimeMachine Backup target' if homepage_show_description else omit }}"
@@ -57,16 +57,16 @@
       register: result
       until: result is succeeded
 
-    - name: Setup {{ ansible_nas_app_name }} service for avahi
+    - name: Setup {{ timemachine_proper_name }} service for avahi
       ansible.builtin.template:
         src: timemachine.service
         dest: "/etc/avahi/services/timemachine.service"
       notify: reload avahi configuration
   when: timemachine_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ timemachine_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ timemachine_proper_name }} Container
       community.docker.docker_container:
         name: "{{ timemachine_container_name }}"
         state: absent
@@ -81,7 +81,7 @@
 #      until: result is succeeded
   when: timemachine_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ timemachine_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

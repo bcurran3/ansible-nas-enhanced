@@ -11,7 +11,7 @@
         name: "{{ apcupsd_container_name }}"
       register: result
 
-    - name: Check {{ ansible_nas_app_name }} is running
+    - name: Check {{ apcupsd_proper_name }} is running
       assert:
         that:
           - result.container['State']['Status'] == "running"

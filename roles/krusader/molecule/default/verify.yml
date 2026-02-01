@@ -11,7 +11,7 @@
         name: "{{ krusader_container_name }}"
       register: result
 
-    - name: Check if {{ ansible_nas_app_name }} container is running
+    - name: Check if {{ krusader_proper_name }} container is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

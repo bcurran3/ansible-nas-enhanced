@@ -1,14 +1,14 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ threadfin_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ threadfin_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ threadfin_data_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ threadfin_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ threadfin_container_name }}"
@@ -27,7 +27,7 @@
           autoheal: "{{ threadfin_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ threadfin_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ threadfin_proper_name }}"
           homepage.group: "{{ threadfin_homepage_group }}"
           homepage.icon: "{{ threadfin_homepage_icon }}"
           homepage.href: "{{ threadfin_homepage_href }}"
@@ -53,15 +53,15 @@
         restart_policy: unless-stopped
   when: threadfin_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ threadfin_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ threadfin_proper_name }} Container
       community.docker.docker_container:
         name: "{{ threadfin_container_name }}"
         state: absent
   when: threadfin_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ threadfin_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

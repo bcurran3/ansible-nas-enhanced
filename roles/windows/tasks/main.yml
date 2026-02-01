@@ -1,19 +1,19 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ windows_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ windows_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ windows_data_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ windows_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         windows_homepage_href: "https://{{ windows_hostname }}.{{ ansible_nas_domain }}"
       when: windows_traefik_enabled | bool or windows_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ windows_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ windows_container_name }}"
@@ -41,7 +41,7 @@
           dockflare.access.group: "{{ windows_dockflare_access_group }}"
           dockflare.hostname: "{{ windows_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ windows_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ windows_proper_name }}"
           homepage.group: "{{ windows_homepage_group }}"
           homepage.icon: "{{ windows_homepage_icon }}"
           homepage.href: "{{ windows_homepage_href }}"
@@ -75,7 +75,7 @@
         stop_timeout: 120
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ windows_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -84,15 +84,15 @@
               }}
   when: windows_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ windows_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ windows_proper_name }} Container
       community.docker.docker_container:
         name: "{{ windows_container_name }}"
         state: absent
   when: windows_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ windows_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

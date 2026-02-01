@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ dozzle_agent_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ dozzle_agent_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dozzle_agent_container_name }}"
@@ -20,7 +20,7 @@
           autoheal: "{{ dozzle_agent_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ dozzle_agent_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ dozzle_agent_proper_name }}"
           homepage.group: "{{ dozzle_agent_homepage_group }}"
           homepage.icon: "{{ dozzle_agent_homepage_icon }}"
           homepage.description: "{{ 'Realtime log viewer for docker containers.' if homepage_show_description else omit }}"
@@ -38,9 +38,9 @@
         restart_policy: unless-stopped
   when: dozzle_agent_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ dozzle_agent_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ dozzle_agent_proper_name }} Container
       community.docker.docker_container:
         name: "{{ dozzle_agent_container_name }}"
         state: absent

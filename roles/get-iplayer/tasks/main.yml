@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ get_iplayer_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ get_iplayer_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ get_iplayer_data_directory }}"
         - "{{ get_iplayer_download_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ get_iplayer_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ get_iplayer_container_name }}"
@@ -25,7 +25,7 @@
           autoheal: "{{ get_iplayer_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ get_iplayer_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ get_iplayer_proper_name }}"
           homepage.group: "{{ get_iplayer_homepage_group }}"
           homepage.icon: "{{ get_iplayer_homepage_icon }}"
           homepage.description: "{{ 'get_iplayer description' if homepage_show_description else omit }}"
@@ -47,15 +47,15 @@
         restart_policy: unless-stopped
   when: get_iplayer_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ get_iplayer_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ get_iplayer_proper_name }} Container
       community.docker.docker_container:
         name: "{{ get_iplayer_container_name }}"
         state: absent
   when: get_iplayer_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ get_iplayer_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

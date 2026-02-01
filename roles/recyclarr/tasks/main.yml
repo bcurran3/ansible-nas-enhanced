@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ recyclarr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ recyclarr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ recyclarr_data_directory }}"
         - "{{ recyclarr_data_directory }}/config"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ recyclarr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ recyclarr_container_name }}"
@@ -24,7 +24,7 @@
           autoheal: "{{ recyclarr_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ recyclarr_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ recyclarr_proper_name }}"
           homepage.group: "{{ recyclarr_homepage_group }}"
           homepage.icon: "{{ recyclarr_homepage_icon }}"
           homepage.description: "{{ 'Automatically sync TRaSH Guides to your Sonarr and Radarr instances' if homepage_show_description else omit }}"
@@ -46,15 +46,15 @@
         restart_policy: unless-stopped
   when: recyclarr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ recyclarr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ recyclarr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ recyclarr_container_name }}"
         state: absent
   when: recyclarr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ recyclarr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ commafeed_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ commafeed_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ commafeed_data_directory }}/data"
         - "{{ commafeed_data_directory }}/db"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ commafeed_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         commafeed_homepage_href: "https://{{ commafeed_hostname }}.{{ ansible_nas_domain }}"
       when: commafeed_traefik_enabled | bool or commafeed_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ commafeed_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ commafeed_db_container_name }}"
@@ -37,7 +37,7 @@
           autoheal: "{{ commafeed_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ commafeed_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ commafeed_proper_name }} PostgreSQL"
           homepage.group: "{{ commafeed_db_homepage_group }}"
           homepage.icon: "{{ commafeed_db_homepage_icon }}"
           homepage.href: "{{ commafeed_db_homepage_href }}"
@@ -59,7 +59,7 @@
         memory_swap: "{{ commafeed_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ commafeed_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ commafeed_db_container_name }}"
       register: db_info
@@ -67,7 +67,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ commafeed_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ commafeed_container_name }}"
@@ -93,7 +93,7 @@
           dockflare.access.group: "{{ commafeed_dockflare_access_group }}"
           dockflare.hostname: "{{ commafeed_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ commafeed_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ commafeed_proper_name }}"
           homepage.group: "{{ commafeed_homepage_group }}"
           homepage.icon: "{{ commafeed_homepage_icon }}"
           homepage.href: "{{ commafeed_homepage_href }}"
@@ -122,7 +122,7 @@
         memory_swap: "{{ commafeed_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ commafeed_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -131,20 +131,20 @@
               }}
   when: commafeed_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ commafeed_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ commafeed_proper_name }} Container
       community.docker.docker_container:
         name: "{{ commafeed_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ commafeed_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ commafeed_db_container_name }}"
         state: absent
   when: commafeed_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ commafeed_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

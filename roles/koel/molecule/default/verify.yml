@@ -16,7 +16,7 @@
         name: "{{ koel_db_container_name }}"
       register: result_db
 
-    - name: Check {{ ansible_nas_app_name }} is running
+    - name: Check {{ koel_proper_name }} is running
       ansible.builtin.assert:
         that:
           - result_app.container['State']['Status'] == "running"

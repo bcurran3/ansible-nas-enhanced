@@ -1,19 +1,19 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ octoprint_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ octoprint_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ octoprint_data_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ octoprint_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         octoprint_homepage_href: "https://{{ octoprint_hostname }}.{{ ansible_nas_domain }}"
       when: octoprint_traefik_enabled | bool or octoprint_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ octoprint_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ octoprint_container_name }}"
@@ -38,7 +38,7 @@
           dockflare.access.group: "{{ octoprint_dockflare_access_group }}"
           dockflare.hostname: "{{ octoprint_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ octoprint_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ octoprint_proper_name }}"
           homepage.group: "{{ octoprint_homepage_group }}"
           homepage.icon: "{{ octoprint_homepage_icon }}"
           homepage.href: "{{ octoprint_homepage_href }}"
@@ -66,7 +66,7 @@
         memory_swap: "{{ octoprint_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ octoprint_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -75,15 +75,15 @@
               }}
   when: octoprint_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ octoprint_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ octoprint_proper_name }} Container
       community.docker.docker_container:
         name: "{{ octoprint_container_name }}"
         state: absent
   when: octoprint_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ octoprint_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

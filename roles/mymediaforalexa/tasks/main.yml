@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ mymediaforalexa_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ mymediaforalexa_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,7 +9,7 @@
         - "{{ mymediaforalexa_data_directory }}"
         - "{{ mymediaforalexa_media_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ mymediaforalexa_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mymediaforalexa_container_name }}"
@@ -26,7 +26,7 @@
           autoheal: "{{ mymediaforalexa_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ mymediaforalexa_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ mymediaforalexa_proper_name }}"
           homepage.group: "{{ mymediaforalexa_homepage_group }}"
           homepage.icon: "{{ mymediaforalexa_homepage_icon }}"
           homepage.description: "{{ 'a tiny media server that integrates with Alexa for controlling your media collection' if homepage_show_description else omit }}"
@@ -48,15 +48,15 @@
         restart_policy: unless-stopped
   when: mymediaforalexa_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ mymediaforalexa_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ mymediaforalexa_proper_name }} Container
       community.docker.docker_container:
         name: "{{ mymediaforalexa_container_name }}"
         state: absent
   when: mymediaforalexa_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ mymediaforalexa_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

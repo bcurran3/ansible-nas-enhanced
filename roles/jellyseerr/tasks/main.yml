@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ jellyseerr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ jellyseerr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ jellyseerr_data_directory }}"
         - "{{ jellyseerr_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ jellyseerr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         jellyseerr_homepage_href: "https://{{ jellyseerr_hostname }}.{{ ansible_nas_domain }}"
       when: jellyseerr_traefik_enabled | bool or jellyseerr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ jellyseerr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ jellyseerr_container_name }}"
@@ -42,7 +42,7 @@
           dockflare.access.group: "{{ jellyseerr_dockflare_access_group }}"
           dockflare.hostname: "{{ jellyseerr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ jellyseerr_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ jellyseerr_proper_name }}"
           homepage.group: "{{ jellyseerr_homepage_group }}"
           homepage.icon: "{{ jellyseerr_homepage_icon }}"
           homepage.href: "{{ jellyseerr_homepage_href }}"
@@ -75,7 +75,7 @@
         memory_swap: "{{ jellyseerr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ jellyseerr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -84,15 +84,15 @@
               }}
   when: jellyseerr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ jellyseerr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ jellyseerr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ jellyseerr_container_name }}"
         state: absent
   when: jellyseerr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ jellyseerr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

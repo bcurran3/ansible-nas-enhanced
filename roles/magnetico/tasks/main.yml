@@ -1,8 +1,8 @@
 ---
 # This app was archived by the owner on Jan 20, 2022.
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ magnetico_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ magnetico_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,7 +11,7 @@
         - "{{ magnetico_data_directory }}/config"
         - "{{ magnetico_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ magnetico_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         magnetico_homepage_href: "https://{{ magnetico_hostname }}.{{ ansible_nas_domain }}"
       when: magnetico_traefik_enabled | bool or magnetico_dockflare_enabled | bool
@@ -22,7 +22,7 @@
           - python3-passlib
         state: present
 
-    - name: Create {{ ansible_nas_app_name }} Web UI password file
+    - name: Create {{ magnetico_proper_name }} Web UI password file
       community.general.htpasswd:
         path: "{{ magnetico_data_directory }}/config/credentials"
         name: "{{ magnetico_username }}"
@@ -31,7 +31,7 @@
         mode: '0640'
         create: true
 
-    - name: Create {{ ansible_nas_app_name }} Crawler Container
+    - name: Create {{ magnetico_proper_name }} Crawler Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ magneticod_container_name }}"
@@ -49,7 +49,7 @@
           autoheal: "{{ magneticod_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ magnetico_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} Crawler"
+          homepage.name: "{{ magnetico_proper_name }} Crawler"
           homepage.group: "{{ magneticod_homepage_group }}"
           homepage.icon: "{{ magnetico_homepage_icon }}"
           homepage.href: "{{ magnetico_homepage_href }}"
@@ -71,7 +71,7 @@
         memory_swap: "{{ magneticod_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Create {{ ansible_nas_app_name }} Web UI Container
+    - name: Create {{ magnetico_proper_name }} Web UI Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ magnetico_container_name }}"
@@ -94,7 +94,7 @@
           dockflare.access.group: "{{ magnetico_dockflare_access_group }}"
           dockflare.hostname: "{{ magnetico_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ magnetico_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ magnetico_proper_name }}"
           homepage.group: "{{ magnetico_homepage_group }}"
           homepage.icon: "{{ magnetico_homepage_icon }}"
           homepage.href: "{{ magnetico_homepage_href }}"
@@ -124,7 +124,7 @@
         memory_swap: "{{ magnetico_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ magnetico_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -133,20 +133,20 @@
               }}
   when: magnetico_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ magnetico_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Web UI Container
+    - name: Stop {{ magnetico_proper_name }} Web UI Container
       community.docker.docker_container:
         name: "{{ magnetico_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Crawler Container
+    - name: Stop {{ magnetico_proper_name }} Crawler Container
       community.docker.docker_container:
         name: "{{ magneticod_container_name }}"
         state: absent
   when: magnetico_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ magnetico_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

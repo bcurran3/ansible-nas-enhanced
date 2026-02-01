@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ music_assistant_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ music_assistant_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ music_assistant_data_directory }}/data"
         - "{{ music_assistant_music_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ music_assistant_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         music_assistant_homepage_href: "https://{{ music_assistant_hostname }}.{{ ansible_nas_domain }}"
       when: music_assistant_traefik_enabled | bool or music_assistant_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ music_assistant_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ music_assistant_container_name }}"
@@ -49,7 +49,7 @@
           autoheal: "{{ music_assistant_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ music_assistant_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ music_assistant_proper_name }}"
           homepage.group: "{{ music_assistant_homepage_group }}"
           homepage.icon: "{{ music_assistant_homepage_icon }}"
           homepage.href: "{{ music_assistant_homepage_href }}"
@@ -80,7 +80,7 @@
         memory_swap: "{{ music_assistant_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ music_assistant_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -89,15 +89,15 @@
               }}
   when: music_assistant_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ music_assistant_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ music_assistant_proper_name }} Container
       community.docker.docker_container:
         name: "{{ music_assistant_container_name }}"
         state: absent
   when: music_assistant_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ music_assistant_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

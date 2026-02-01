@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ idrac6_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ idrac6_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ idrac6_data_directory }}/vmedia"
         - "{{ idrac6_data_directory }}/screenshots"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ idrac6_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         idrac6_homepage_href: "https://{{ idrac6_hostname }}.{{ ansible_nas_domain }}"
       when: idrac6_traefik_enabled | bool or idrac6_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ idrac6_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ idrac6_container_name }}"
@@ -45,7 +45,7 @@
           com.centurylinklabs.watchtower.enable: "{{ idrac6_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.group: "{{ idrac6_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ idrac6_proper_name }}"
           homepage.href: "{{ idrac6_homepage_href }}"
           homepage.icon: "{{ idrac6_homepage_icon }}"
           homepage.description: "{{ 'iDRAC 6 web interface and VNC proxy' if homepage_show_description else omit }}"
@@ -73,7 +73,7 @@
         memory_swap: "{{ idrac6_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ idrac6_proper_name }} at
       ansible.builtin.debug:
         msg: >-
           {{
@@ -91,15 +91,15 @@
           }}
   when: idrac6_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ idrac6_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ idrac6_proper_name }} Container
       community.docker.docker_container:
         name: "{{ idrac6_container_name }}"
         state: absent
   when: idrac6_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ idrac6_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

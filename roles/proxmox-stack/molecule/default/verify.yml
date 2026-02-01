@@ -6,27 +6,27 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ proxmox_stack_proper_name }} container state
       community.docker.docker_container:
         name: "{{ proxmox_stack_pve1_container_name }}"
       register: result_pve1
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ proxmox_stack_proper_name }} container state
       community.docker.docker_container:
         name: "{{ proxmox_stack_pve2_container_name }}"
       register: result_pve2
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ proxmox_stack_proper_name }} container state
       community.docker.docker_container:
         name: "{{ proxmox_stack_pve3_container_name }}"
       register: result_pve3
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ proxmox_stack_proper_name }} container state
       community.docker.docker_container:
         name: "{{ proxmox_stack_pdm_container_name }}"
       register: result_pdm
 
-    - name: Check if {{ ansible_nas_app_name }} containers are running
+    - name: Check if {{ proxmox_stack_proper_name }} containers are running
       ansible.builtin.assert:
         that:
           - result_pve1.container['State']['Status'] == "running"

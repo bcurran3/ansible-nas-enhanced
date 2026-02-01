@@ -1,14 +1,14 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ vert_proper_name }}
   block:
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ vert_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         vert_env_public_url: "https://{{ vert_hostname }}.{{ ansible_nas_domain }}"
         vert_homepage_href: "https://{{ vert_hostname }}.{{ ansible_nas_domain }}"
       when: vert_traefik_enabled | bool or vert_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} daemon Container
+    - name: Create {{ vert_proper_name }} daemon Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ vertd_container_name }}"
@@ -38,7 +38,7 @@
           autoheal: "{{ vertd_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ vertd_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} daemon"
+          homepage.name: "{{ vert_proper_name }} daemon"
           homepage.group: "{{ vertd_homepage_group }}"
           homepage.icon: "{{ vertd_homepage_icon }}"
           homepage.href: "{{ vertd_homepage_href }}"
@@ -55,7 +55,7 @@
         restart_policy: unless-stopped
 
 # TDL: implement a local build to use custom env vars
-#- name: Build {{ ansible_nas_app_name }} image with build args
+#- name: Build {{ vert_proper_name }} image with build args
 #  community.docker.docker_image:
 #    name: vert
 #    tag: latest
@@ -73,9 +73,9 @@
 #        PUB_STRIPE_KEY: "{{ vert_env_pub_stripe_key }}"
 #    force_source: true # Ensures it builds locally rather than trying to pull 'vert:latest' from a registry
 
-    - name: Start {{ ansible_nas_app_name }}
+    - name: Start {{ vert_proper_name }}
       block:
-        - name: Create {{ ansible_nas_app_name }} Container
+        - name: Create {{ vert_proper_name }} Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ vert_container_name }}"
@@ -107,7 +107,7 @@
               dockflare.access.group: "{{ vert_dockflare_access_group }}"
               dockflare.hostname: "{{ vert_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ vert_port_http }}"
-              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.name: "{{ vert_proper_name }}"
               homepage.group: "{{ vert_homepage_group }}"
               homepage.icon: "{{ vert_homepage_icon }}"
               homepage.href: "{{ vert_homepage_href }}"
@@ -131,7 +131,7 @@
             memory_swap: "{{ vert_memory_swap }}"
             restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ vert_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -140,14 +140,14 @@
               }}
   when: vert_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ vert_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ vert_proper_name }} Container
       community.docker.docker_container:
         name: "{{ vert_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} daemon Container
+    - name: Stop {{ vert_proper_name }} daemon Container
       community.docker.docker_container:
         name: "{{ vertd_container_name }}"
         state: absent

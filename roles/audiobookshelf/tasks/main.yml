@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ audiobookshelf_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ audiobookshelf_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -12,12 +12,12 @@
         - "{{ audiobookshelf_audiobooks_directory }}"
         - "{{ audiobookshelf_podcasts_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ audiobookshelf_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         audiobookshelf_homepage_href: "https://{{ audiobookshelf_hostname }}.{{ ansible_nas_domain }}"
       when: audiobookshelf_traefik_enabled | bool or audiobookshelf_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ audiobookshelf_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ audiobookshelf_container_name }}"
@@ -46,7 +46,7 @@
           dockflare.access.group: "{{ audiobookshelf_dockflare_access_group }}"
           dockflare.hostname: "{{ audiobookshelf_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ audiobookshelf_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ audiobookshelf_proper_name }}"
           homepage.group: "{{ audiobookshelf_homepage_group }}"
           homepage.icon: "{{ audiobookshelf_homepage_icon }}"
           homepage.href: "{{ audiobookshelf_homepage_href }}"
@@ -79,7 +79,7 @@
         memory_swap: "{{ audiobookshelf_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ audiobookshelf_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -88,7 +88,7 @@
               }}
   when: audiobookshelf_enabled is true
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ audiobookshelf_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

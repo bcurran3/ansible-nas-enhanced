@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ resilio_sync_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ resilio_sync_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ resilio_sync_data_directory }}/downloads"
         - "{{ resilio_sync_data_directory }}/sync"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ resilio_sync_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         resilio_sync_homepage_href: "https://{{ resilio_sync_hostname }}.{{ ansible_nas_domain }}"
       when: resilio_sync_traefik_enabled | bool or resilio_sync_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ resilio_sync_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ resilio_sync_container_name }}"
@@ -49,7 +49,7 @@
           dockflare.access.group: "{{ resilio_sync_dockflare_access_group }}"
           dockflare.hostname: "{{ resilio_sync_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ resilio_sync_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ resilio_sync_proper_name }}"
           homepage.group: "{{ resilio_sync_homepage_group }}"
           homepage.icon: "{{ resilio_sync_homepage_icon }}"
           homepage.href: "{{ resilio_sync_homepage_href }}"
@@ -79,7 +79,7 @@
         memory_swap: "{{ resilio_sync_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ resilio_sync_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -88,15 +88,15 @@
               }}
   when: resilio_sync_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ resilio_sync_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ resilio_sync_proper_name }} Container
       community.docker.docker_container:
         name: "{{ resilio_sync_container_name }}"
         state: absent
   when: resilio_sync_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ resilio_sync_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

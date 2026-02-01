@@ -1,39 +1,39 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ woodpecker_ci_proper_name }}
   block:
-    - name: Prerequisite {{ ansible_nas_app_name }} - Check for Gitea installation
+    - name: Prerequisite {{ woodpecker_ci_proper_name }} - Check for Gitea installation
       ansible.builtin.set_fact:
         gitea_ready: "{{ gitea_enabled is true }}"
 
     - name: Warn if Gitea not enabled
       ansible.builtin.debug:
-        msg: "Skipping {{ ansible_nas_app_name }} install. Gitea enabled and running required."
+        msg: "Skipping {{ woodpecker_ci_proper_name }} install. Gitea enabled and running required."
       when: not gitea_ready
 
-    - name: Prerequisite {{ ansible_nas_app_name }} - Check for Gitea Oauth2 config
+    - name: Prerequisite {{ woodpecker_ci_proper_name }} - Check for Gitea Oauth2 config
       ansible.builtin.set_fact:
         oauth_ready: "{{ woodpecker_ci_gitea_client != 'notset' }}"
 
     - name: Warn if Gitea Oauth2 config missing
       ansible.builtin.debug:
-        msg: "Skipping {{ ansible_nas_app_name }} install. Missing Gitea Oauth2 config! Set woodpecker_ci_gitea_client and secret."
+        msg: "Skipping {{ woodpecker_ci_proper_name }} install. Missing Gitea Oauth2 config! Set woodpecker_ci_gitea_client and secret."
       when: not oauth_ready
 
-    - name: Continue {{ ansible_nas_app_name }}
+    - name: Continue {{ woodpecker_ci_proper_name }}
       block:
-        - name: Create {{ ansible_nas_app_name }} Directories
+        - name: Create {{ woodpecker_ci_proper_name }} Directories
           ansible.builtin.file:
             path: "{{ item }}"
             state: directory
           with_items:
             - "{{ woodpecker_ci_data_directory }}"
 
-        - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+        - name: Set {{ woodpecker_ci_proper_name }} FQDN var overrides
           ansible.builtin.set_fact:
             woodpecker_ci_homepage_href: "https://{{ woodpecker_ci_hostname }}.{{ ansible_nas_domain }}"
           when: woodpecker_ci_traefik_enabled | bool or woodpecker_ci_dockflare_enabled | bool
 
-        - name: Create {{ ansible_nas_app_name }} Container
+        - name: Create {{ woodpecker_ci_proper_name }} Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ woodpecker_ci_container_name }}"
@@ -63,7 +63,7 @@
               dockflare.access.group: "{{ woodpecker_ci_dockflare_access_group }}"
               dockflare.hostname: "{{ woodpecker_ci_hostname }}.{{ ansible_nas_domain }}"
               dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ woodpecker_ci_port_http }}"
-              homepage.name: "{{ ansible_nas_app_name }}"
+              homepage.name: "{{ woodpecker_ci_proper_name }}"
               homepage.group: "{{ woodpecker_ci_homepage_group }}"
               homepage.icon: "{{ woodpecker_ci_homepage_icon }}"
               homepage.href: "{{ woodpecker_ci_homepage_href }}"
@@ -93,7 +93,7 @@
             memory_swap: "{{ woodpecker_ci_memory_swap }}"
             restart_policy: unless-stopped
 
-        - name: Access {{ ansible_nas_app_name }} at
+        - name: Access {{ woodpecker_ci_proper_name }} at
           ansible.builtin.debug:
             msg: >-
                   {{
@@ -101,7 +101,7 @@
                     (['https://' + woodpecker_ci_hostname + '.' + ansible_nas_domain] if (woodpecker_ci_traefik_enabled is true or woodpecker_ci_dockflare_enabled is true) else [])
                   }}
 
-        - name: Create {{ ansible_nas_app_name }} Agent Container
+        - name: Create {{ woodpecker_ci_proper_name }} Agent Container
           community.docker.docker_container:
             container_default_behavior: "compatibility"
             name: "{{ woodpecker_ci_agent_container_name }}"
@@ -140,20 +140,20 @@
           - oauth_ready
   when: woodpecker_ci_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ woodpecker_ci_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Agent Container
+    - name: Stop {{ woodpecker_ci_proper_name }} Agent Container
       community.docker.docker_container:
         name: "{{ woodpecker_ci_agent_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ woodpecker_ci_proper_name }} Container
       community.docker.docker_container:
         name: "{{ woodpecker_ci_container_name }}"
         state: absent
   when: woodpecker_ci_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ woodpecker_ci_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

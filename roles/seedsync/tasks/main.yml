@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ seedsync_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ seedsync_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -13,7 +13,7 @@
         - "{{ seedsync_data_directory }}/downloads"
         - "{{ seedsync_ssh_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ seedsync_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         seedsync_homepage_href: "https://{{ seedsync_hostname }}.{{ ansible_nas_domain }}"
       when: seedsync_traefik_enabled | bool or seedsync_dockflare_enabled | bool
@@ -26,7 +26,7 @@
         passphrase: "{{ ansible_nas_app_admin_password }}"
         state: present
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ seedsync_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ seedsync_container_name }}"
@@ -54,7 +54,7 @@
           dockflare.access.group: "{{ seedsync_dockflare_access_group }}"
           dockflare.hostname: "{{ seedsync_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ seedsync_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ seedsync_proper_name }}"
           homepage.group: "{{ seedsync_homepage_group }}"
           homepage.icon: "{{ seedsync_homepage_icon }}"
           homepage.href: "{{ seedsync_homepage_href }}"
@@ -84,7 +84,7 @@
         memory_swap: "{{ seedsync_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ seedsync_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -93,15 +93,15 @@
               }}
   when: seedsync_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ seedsync_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ seedsync_proper_name }} Container
       community.docker.docker_container:
         name: "{{ seedsync_container_name }}"
         state: absent
   when: seedsync_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ seedsync_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -6,19 +6,19 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ freshrss_proper_name }}
       community.docker.docker_container:
         name: "{{ freshrss_container_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ freshrss_proper_name }}
       community.docker.docker_container:
         name: "{{ freshrss_db_container_name }}"
         state: absent
       register: result_db
 
-    - name: Check if {{ ansible_nas_app_name }} is stopped
+    - name: Check if {{ freshrss_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

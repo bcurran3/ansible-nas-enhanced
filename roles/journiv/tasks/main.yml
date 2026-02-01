@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ journiv_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ journiv_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,13 +11,13 @@
         - "{{ journiv_data_directory }}"
         - "{{ journiv_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ journiv_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         journiv_env_domain_name: "{{ ansible_nas_domain }}"
         journiv_homepage_href: "https://{{ journiv_hostname }}.{{ ansible_nas_domain }}"
       when: journiv_traefik_enabled | bool or journiv_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ journiv_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ journiv_container_name }}"
@@ -39,7 +39,7 @@
           dockflare.access.group: "{{ journiv_dockflare_access_group }}"
           dockflare.hostname: "{{ journiv_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ journiv_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ journiv_proper_name }}"
           homepage.group: "{{ journiv_homepage_group }}"
           homepage.icon: "{{ journiv_homepage_icon }}"
           homepage.href: "{{ journiv_homepage_href }}"
@@ -68,7 +68,7 @@
         memory_swap: "{{ journiv_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ journiv_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -77,15 +77,15 @@
               }}
   when: journiv_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ journiv_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ journiv_proper_name }} Container
       community.docker.docker_container:
         name: "{{ journiv_container_name }}"
         state: absent
   when: journiv_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ journiv_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

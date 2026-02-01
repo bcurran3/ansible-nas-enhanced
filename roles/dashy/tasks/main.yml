@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ dashy_proper_name }}
   block:
     - name: Create Dashy Directory
       ansible.builtin.file:
@@ -9,19 +9,19 @@
         - "{{ dashy_data_directory }}"
         - "{{ dashy_data_directory }}/icons"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ dashy_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         dashy_homepage_href: "https://{{ dashy_hostname }}.{{ ansible_nas_domain }}"
       when: dashy_traefik_enabled | bool or dashy_dockflare_enabled | bool
 
-    - name: Copy {{ ansible_nas_app_name }} Template conf.yml
+    - name: Copy {{ dashy_proper_name }} Template conf.yml
       ansible.builtin.template:
         src: conf.yml
         dest: "{{ dashy_data_directory }}/conf.yml"
         force: no
 #      register: template_config
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ dashy_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dashy_container_name }}"
@@ -48,7 +48,7 @@
           dockflare.access.group: "{{ dashy_dockflare_access_group }}"
           dockflare.hostname: "{{ dashy_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dashy_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ dashy_proper_name }}"
           homepage.group: "{{ dashy_homepage_group }}"
           homepage.icon: "{{ dashy_homepage_icon }}"
           homepage.href: "{{ dashy_homepage_href }}"
@@ -78,7 +78,7 @@
         memory_swap: "{{ dashy_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ dashy_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -87,15 +87,15 @@
               }}
   when: dashy_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ dashy_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ dashy_proper_name }} Container
       community.docker.docker_container:
         name: "{{ dashy_container_name }}"
         state: absent
   when: dashy_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ dashy_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

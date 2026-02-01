@@ -6,17 +6,17 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ wekan_proper_name }} container state
       community.docker.docker_container:
         name: "{{ wekan_container_name }}"
       register: result
 
-    - name: Get {{ ansible_nas_app_name }} DB container state
+    - name: Get {{ wekan_proper_name }} DB container state
       community.docker.docker_container:
         name: "{{ wekan_db_container_name }}"
       register: result_db
 
-    - name: Check if {{ ansible_nas_app_name }} container is running
+    - name: Check if {{ wekan_proper_name }} container is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

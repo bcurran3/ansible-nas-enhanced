@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ dockman_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ dockman_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ dockman_data_directory }}/config"
         - "{{ dockman_docker_compose_data_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ dockman_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         dockman_homepage_href: "https://{{ dockman_hostname }}.{{ ansible_nas_domain }}"
       when: dockman_traefik_enabled | bool or dockman_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ dockman_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ dockman_container_name }}"
@@ -49,7 +49,7 @@
           dockflare.access.group: "{{ dockman_dockflare_access_group }}"
           dockflare.hostname: "{{ dockman_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dockman_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ dockman_proper_name }}"
           homepage.group: "{{ dockman_homepage_group }}"
           homepage.icon: "{{ dockman_homepage_icon }}"
           homepage.href: "{{ dockman_homepage_href }}"
@@ -79,7 +79,7 @@
         memory_swap: "{{ dockman_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ dockman_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -88,15 +88,15 @@
               }}
   when: dockman_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ dockman_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ dockman_proper_name }} Container
       community.docker.docker_container:
         name: "{{ dockman_container_name }}"
         state: absent
   when: dockman_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ dockman_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ virtual_desktop_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ virtual_desktop_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ virtual_desktop_data_directory }}"
         - "{{ virtual_desktop_data_directory }}/home"
 
-    - name: Create {{ ansible_nas_app_name }} users file
+    - name: Create {{ virtual_desktop_proper_name }} users file
       ansible.builtin.template:
         src: "users.txt.j2"
         dest: "{{ virtual_desktop_data_directory }}/users.txt"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ virtual_desktop_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ virtual_desktop_container_name }}"
@@ -36,7 +36,7 @@
           autoheal: "{{ virtual_desktop_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ virtual_desktop_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ virtual_desktop_proper_name }}"
           homepage.group: "{{ virtual_desktop_homepage_group }}"
           homepage.icon: "{{ virtual_desktop_homepage_icon }}"
           homepage.description: "{{ 'Ubuntu with XRDP and MATE' if homepage_show_description else omit }}"
@@ -56,7 +56,7 @@
         memory_swap: "{{ virtual_desktop_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ virtual_desktop_proper_name }} at
       ansible.builtin.debug:
         msg: >-
           {{
@@ -66,15 +66,15 @@
           }}
   when: virtual_desktop_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ virtual_desktop_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ virtual_desktop_proper_name }} Container
       community.docker.docker_container:
         name: "{{ virtual_desktop_container_name }}"
         state: absent
   when: virtual_desktop_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ virtual_desktop_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

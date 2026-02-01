@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ mylar_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ mylar_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,12 +11,12 @@
         - "{{ mylar_comics_directory }}"
         - "{{ mylar_downloads_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ mylar_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         mylar_homepage_href: "https://{{ mylar_hostname }}.{{ ansible_nas_domain }}"
       when: mylar_traefik_enabled | bool or mylar_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ mylar_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ mylar_container_name }}"
@@ -48,7 +48,7 @@
           dockflare.access.group: "{{ mylar_dockflare_access_group }}"
           dockflare.hostname: "{{ mylar_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mylar_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ mylar_proper_name }}"
           homepage.group: "{{ mylar_homepage_group }}"
           homepage.icon: "{{ mylar_homepage_icon }}"
           homepage.href: "{{ mylar_homepage_href }}"
@@ -81,7 +81,7 @@
         memory_swap: "{{ mylar_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ mylar_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -90,15 +90,15 @@
               }}
   when: mylar_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ mylar_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ mylar_proper_name }} Container
       community.docker.docker_container:
         name: "{{ mylar_container_name }}"
         state: absent
   when: mylar_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ mylar_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

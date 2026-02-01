@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ open_notebook_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ open_notebook_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item.path }}"
         state: directory
@@ -19,12 +19,12 @@
           owner: 65532
           group: 65532
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ open_notebook_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         open_notebook_homepage_href: "https://{{ open_notebook_hostname }}.{{ ansible_nas_domain }}"
       when: open_notebook_traefik_enabled | bool or open_notebook_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ open_notebook_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ open_notebook_db_container_name }}"
@@ -47,7 +47,7 @@
           autoheal: "{{ open_notebook_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ open_notebook_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} SurrealDB"
+          homepage.name: "{{ open_notebook_proper_name }} SurrealDB"
           homepage.group: "{{ open_notebook_db_homepage_group }}"
           homepage.icon: "{{ open_notebook_db_homepage_icon }}"
           homepage.href: "{{ open_notebook_db_homepage_href }}"
@@ -69,7 +69,7 @@
         memory_swap: "{{ open_notebook_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ open_notebook_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ open_notebook_db_container_name }}"
       register: db_info
@@ -77,7 +77,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ open_notebook_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ open_notebook_container_name }}"
@@ -126,7 +126,7 @@
           dockflare.access.group: "{{ open_notebook_dockflare_access_group }}"
           dockflare.hostname: "{{ open_notebook_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ open_notebook_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ open_notebook_proper_name }}"
           homepage.group: "{{ open_notebook_homepage_group }}"
           homepage.icon: "{{ open_notebook_homepage_icon }}"
           homepage.href: "{{ open_notebook_homepage_href }}"
@@ -156,7 +156,7 @@
         memory_swap: "{{ open_notebook_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ open_notebook_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -165,20 +165,20 @@
               }}
   when: open_notebook_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ open_notebook_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ open_notebook_proper_name }} Container
       community.docker.docker_container:
         name: "{{ open_notebook_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ open_notebook_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ open_notebook_db_container_name }}"
         state: absent
   when: open_notebook_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ open_notebook_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

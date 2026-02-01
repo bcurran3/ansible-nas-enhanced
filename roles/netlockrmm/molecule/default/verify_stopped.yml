@@ -6,25 +6,25 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} Web UI
+    - name: Try and stop and remove {{ netlockrmm_proper_name }} Web UI
       community.docker.docker_container:
         name: "{{ netlockrmm_container_name }}"
         state: absent
       register: result_web
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }}
+    - name: Try and stop and remove {{ netlockrmm_proper_name }}
       community.docker.docker_container:
         name: "{{ netlockrmm_container_name }}"
         state: absent
       register: result
 
-    - name: Try and stop and remove {{ ansible_nas_app_name }} DB
+    - name: Try and stop and remove {{ netlockrmm_proper_name }} DB
       community.docker.docker_container:
         name: "{{ netlockrmm_db_container_name }}"
         state: absent
       register: result_db
 
-    - name: Check if {{ ansible_nas_app_name }} is stopped
+    - name: Check if {{ netlockrmm_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

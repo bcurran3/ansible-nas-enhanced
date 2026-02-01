@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ gaseous_server_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ gaseous_server_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,16 +10,16 @@
         - "{{ gaseous_server_data_directory }}/db"
         - "{{ gaseous_server_data_directory }}/gaseous-server"
 
-    - name: Create {{ ansible_nas_app_name }} Network
+    - name: Create {{ gaseous_server_proper_name }} Network
       community.docker.docker_network:
         name: "{{ gaseous_server_network_name }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ gaseous_server_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         gaseous_server_homepage_href: "https://{{ gaseous_server_hostname }}.{{ ansible_nas_domain }}"
       when: gaseous_server_traefik_enabled | bool or gaseous_server_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ gaseous_server_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gaseous_server_db_container_name }}"
@@ -52,7 +52,7 @@
           autoheal: "{{ gaseous_server_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ gaseous_server_db_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }} MariaDB"
+          homepage.name: "{{ gaseous_server_proper_name }} MariaDB"
           homepage.description: "{{ 'The open source relational database' if homepage_show_description else omit }}"
           homepage.group: "{{ gaseous_server_db_homepage_group }}"
           homepage.icon: "{{ gaseous_server_db_homepage_icon }}"
@@ -73,7 +73,7 @@
         memory_swap: "{{ gaseous_server_db_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ gaseous_server_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ gaseous_server_db_container_name }}"
       register: db_info
@@ -81,7 +81,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ gaseous_server_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ gaseous_server_container_name }}"
@@ -111,7 +111,7 @@
           dockflare.access.group: "{{ gaseous_server_dockflare_access_group }}"
           dockflare.hostname: "{{ gaseous_server_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ gaseous_server_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ gaseous_server_proper_name }}"
           homepage.group: "{{ gaseous_server_homepage_group }}"
           homepage.icon: "{{ gaseous_server_homepage_icon }}"
           homepage.href: "{{ gaseous_server_homepage_href }}"
@@ -141,7 +141,7 @@
         memory_swap: "{{ gaseous_server_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ gaseous_server_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -150,25 +150,25 @@
               }}
   when: gaseous_server_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ gaseous_server_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ gaseous_server_proper_name }} Container
       community.docker.docker_container:
         name: "{{ gaseous_server_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} DB Container
+    - name: Stop {{ gaseous_server_proper_name }} DB Container
       community.docker.docker_container:
         name: "{{ gaseous_server_db_container_name }}"
         state: absent
 
-    - name: Delete {{ ansible_nas_app_name }} Network
+    - name: Delete {{ gaseous_server_proper_name }} Network
       community.docker.docker_network:
         name: "{{ gaseous_server_network_name }}"
         state: absent
   when: gaseous_server_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ gaseous_server_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

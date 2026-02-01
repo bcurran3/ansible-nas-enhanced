@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ tailscale_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ tailscale_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,7 +10,7 @@
         - "{{ tailscale_data_directory }}/lib"
         - "{{ tailscale_data_directory }}/state"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ tailscale_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ tailscale_container_name }}"
@@ -47,7 +47,7 @@
           autoheal: "{{ tailscale_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ tailscale_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ tailscale_proper_name }}"
           homepage.group: "{{ tailscale_homepage_group }}"
           homepage.icon: "{{ tailscale_homepage_icon }}"
           homepage.href: "{{ tailscale_homepage_href }}"
@@ -73,15 +73,15 @@
         restart_policy: unless-stopped
   when: tailscale_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ tailscale_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ tailscale_proper_name }} Container
       community.docker.docker_container:
         name: "{{ tailscale_container_name }}"
         state: absent
   when: tailscale_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ tailscale_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ diskover_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ diskover_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,13 +9,13 @@
         - "{{ diskover_data_directory }}/"
         - "{{ diskover_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ diskover_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         diskover_homepage_href: "https://{{ diskover_hostname }}.{{ ansible_nas_domain }}"
         diskover_elasticsearch_homepage_href: "https://{{ diskover_elasticsearch_hostname }}.{{ ansible_nas_domain }}"
       when: diskover_traefik_enabled | bool or diskover_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Elasticsearch Directories
+    - name: Create {{ diskover_proper_name }} Elasticsearch Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -25,11 +25,11 @@
         - "{{ diskover_data_directory }}/elasticsearch"
         - "{{ diskover_data_directory }}/elasticsearch/data"
 
-    - name: Create {{ ansible_nas_app_name }} Network
+    - name: Create {{ diskover_proper_name }} Network
       community.docker.docker_network:
         name: "{{ diskover_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} Elasticsearch Container
+    - name: Create {{ diskover_proper_name }} Elasticsearch Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_elasticsearch_container_name }}"
@@ -90,7 +90,7 @@
         memory_swap: "{{ diskover_elasticsearch_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} Elasticsearch at
+    - name: Access {{ diskover_proper_name }} Elasticsearch at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -98,7 +98,7 @@
                 (['https://' + diskover_elasticsearch_hostname + '.' + ansible_nas_domain] if (diskover_traefik_enabled is true or diskover_dockflare_enabled is true) else [])
               }}
 
-    - name: Create {{ ansible_nas_app_name }} Elasticsearch helper Container
+    - name: Create {{ diskover_proper_name }} Elasticsearch helper Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_elasticsearch_helper_container_name }}"
@@ -119,7 +119,7 @@
           repliqate.enabled: "false"
           traefik.enable: "false"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ diskover_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ diskover_container_name }}"
@@ -155,7 +155,7 @@
           dockflare.access.group: "{{ diskover_dockflare_access_group }}"
           dockflare.hostname: "{{ diskover_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ diskover_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ diskover_proper_name }}"
           homepage.group: "{{ diskover_homepage_group }}"
           homepage.href: "{{ diskover_homepage_href }}"
           homepage.icon: "{{ diskover_homepage_icon }}"
@@ -185,7 +185,7 @@
         memory_swap: "{{ diskover_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ diskover_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -194,30 +194,30 @@
               }}
   when: diskover_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ diskover_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ diskover_proper_name }} Container
       community.docker.docker_container:
         name: "{{ diskover_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Elasticsearch HelperContainer
+    - name: Stop {{ diskover_proper_name }} Elasticsearch HelperContainer
       community.docker.docker_container:
         name: "elasticsearch-helper"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Elasticsearch Container
+    - name: Stop {{ diskover_proper_name }} Elasticsearch Container
       community.docker.docker_container:
         name: "{{ diskover_elasticsearch_container_name }}"
         state: absent
 
-    - name: Delete {{ ansible_nas_app_name }} Network
+    - name: Delete {{ diskover_proper_name }} Network
       community.docker.docker_network:
         name: "{{ diskover_network_name }}"
         state: absent
   when: diskover_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ diskover_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

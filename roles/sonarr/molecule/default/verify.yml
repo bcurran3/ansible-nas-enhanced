@@ -6,12 +6,12 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get {{ ansible_nas_app_name }} container state
+    - name: Get {{ sonarr_proper_name }} container state
       community.docker.docker_container:
         name: "{{ sonarr_container_name }}"
       register: result
 
-    - name: Check if {{ ansible_nas_app_name }} container is running
+    - name: Check if {{ sonarr_proper_name }} container is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

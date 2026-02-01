@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ immich_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ immich_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -11,16 +11,16 @@
         - "{{ immich_data_directory }}/db"
         - "{{ immich_upload_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ immich_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         immich_homepage_href: "https://{{ immich_hostname }}.{{ ansible_nas_domain }}"
       when: immich_traefik_enabled | bool or immich_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Network
+    - name: Create {{ immich_proper_name }} Network
       community.docker.docker_network:
         name: "{{ immich_network_name }}"
 
-    - name: Create {{ ansible_nas_app_name }} Redis Container
+    - name: Create {{ immich_proper_name }} Redis Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ immich_redis_container_name }}"
@@ -61,7 +61,7 @@
         memory_swap: "{{ immich_redis_memory_swap }}"
         restart_policy: always
 
-    - name: Create {{ ansible_nas_app_name }} DB Container
+    - name: Create {{ immich_proper_name }} DB Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ immich_db_container_name }}"
@@ -93,7 +93,7 @@
           com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
           homepage.group: "{{ immich_db_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }} PostgreSQL"
+          homepage.name: "{{ immich_proper_name }} PostgreSQL"
           homepage.icon: "{{ immich_db_homepage_icon }}"
           homepage.href: "{{ immich_db_homepage_href }}"
           homepage.description: "{{ 'PostgreSQL Database Management System' if homepage_show_description else omit }}"
@@ -115,7 +115,7 @@
         restart_policy: always
         shm_size: "{{ immich_db_shm_size }}"
 
-    - name: Create {{ ansible_nas_app_name }} Machine Learning Container
+    - name: Create {{ immich_proper_name }} Machine Learning Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ immich_ml_container_name }}"
@@ -156,7 +156,7 @@
           com.centurylinklabs.watchtower.enable: "true"
           dockflare.enable: "false"
           homepage.group: "{{ immich_ml_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }} Machine Learning"
+          homepage.name: "{{ immich_proper_name }} Machine Learning"
           homepage.icon: "{{ immich_ml_homepage_icon }}"
           homepage.href: "{{ immich_ml_homepage_href }}"
           homepage.description: "{{'Immich Machine Learning' if homepage_show_description else omit }}"
@@ -177,7 +177,7 @@
         memory_swap: "{{ immich_ml_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Wait for {{ ansible_nas_app_name }} DB to become healthy
+    - name: Wait for {{ immich_proper_name }} DB to become healthy
       community.docker.docker_container_info:
         name: "{{ immich_db_container_name }}"
       register: db_info
@@ -185,7 +185,7 @@
       retries: 30
       delay: 5
 
-    - name: Create {{ ansible_nas_app_name }} Server Container
+    - name: Create {{ immich_proper_name }} Server Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ immich_server_container_name }}"
@@ -227,7 +227,7 @@
           dockflare.access.group: "{{ immich_dockflare_access_group }}"
           dockflare.hostname: "{{ immich_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ immich_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ immich_proper_name }}"
           homepage.group: "{{ immich_homepage_group }}"
           homepage.icon: "{{ immich_homepage_icon }}"
           homepage.href: "{{ immich_homepage_href }}"
@@ -261,7 +261,7 @@
         memory_swap: "{{ immich_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ immich_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -270,35 +270,35 @@
               }}
   when: immich_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ immich_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Server Container
+    - name: Stop {{ immich_proper_name }} Server Container
       community.docker.docker_container:
         name: "{{ immich_server_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Machine Learning Container
+    - name: Stop {{ immich_proper_name }} Machine Learning Container
       community.docker.docker_container:
         name: "{{ immich_ml_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} Redis Container
+    - name: Stop {{ immich_proper_name }} Redis Container
       community.docker.docker_container:
         name: "{{ immich_redis_container_name }}"
         state: absent
 
-    - name: Stop {{ ansible_nas_app_name }} PostgreSQL Container
+    - name: Stop {{ immich_proper_name }} PostgreSQL Container
       community.docker.docker_container:
         name: "{{ immich_db_container_name }}"
         state: absent
 
-    - name: Delete {{ ansible_nas_app_name }} Network
+    - name: Delete {{ immich_proper_name }} Network
       community.docker.docker_network:
         name: "{{ immich_network_name }}"
         state: absent
   when: immich_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ immich_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

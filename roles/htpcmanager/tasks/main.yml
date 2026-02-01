@@ -1,8 +1,8 @@
 # https://hub.docker.com/r/linuxserver/htpcmanager/
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ htpcmanager_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ htpcmanager_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ htpcmanager_data_directory }}"
         - "{{ htpcmanager_data_directory }}/config"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ htpcmanager_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         htpcmanager_homepage_href: "https://{{ htpcmanager_hostname }}.{{ ansible_nas_domain }}"
       when: htpcmanager_traefik_enabled | bool or htpcmanager_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ htpcmanager_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ htpcmanager_container_name }}"
@@ -42,7 +42,7 @@
           dockflare.hostname: "{{ htpcmanager_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ htpcmanager_port_http }}"
           homepage.group: "{{ htpcmanager_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ htpcmanager_proper_name }}"
           homepage.href: "{{ htpcmanager_homepage_href }}"
           homepage.icon: "{{ htpcmanager_homepage_icon }}"
           homepage.description: "{{ 'A fully responsive interface to manage all your favorite software on your HTPC.' if homepage_show_description else omit }}"
@@ -70,7 +70,7 @@
         memory_swap: "{{ htpcmanager_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ htpcmanager_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -79,15 +79,15 @@
               }}
   when: htpcmanager_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ htpcmanager_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ htpcmanager_proper_name }} Container
       community.docker.docker_container:
         name: "{{ htpcmanager_container_name }}"
         state: absent
   when: htpcmanager_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ htpcmanager_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

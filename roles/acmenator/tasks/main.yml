@@ -1,14 +1,14 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ acmenator_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ acmenator_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
       with_items:
         - "{{ acmenator_data_directory }}"
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ acmenator_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ acmenator_container_name }}"
@@ -33,7 +33,7 @@
           com.centurylinklabs.watchtower.enable: "{{ acmenator_watchtower_enabled | ternary('true', 'false') }}"
           dockflare.enable: "false"
           homepage.group: "{{ acmenator_homepage_group }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ acmenator_proper_name }}"
           homepage.icon: "{{ acmenator_homepage_icon }}"
           homepage.description: "{{ 'Convert Traefik certs to PEM or p12' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
@@ -54,15 +54,15 @@
         restart_policy: unless-stopped
   when: acmenator_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ acmenator_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ acmenator_proper_name }} Container
       community.docker.docker_container:
         name: "{{ acmenator_container_name }}"
         state: absent
   when: acmenator_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ acmenator_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ localai_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ localai_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ localai_data_directory }}"
         - "{{ localai_data_directory }}/models"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ localai_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         localai_homepage_href: "https://{{ localai_hostname }}.{{ ansible_nas_domain }}"
       when: localai_traefik_enabled | bool or localai_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ localai_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ localai_container_name }}"
@@ -58,7 +58,7 @@
           dockflare.access.group: "{{ localai_dockflare_access_group }}"
           dockflare.hostname: "{{ localai_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ localai_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ localai_proper_name }}"
           homepage.group: "{{ localai_homepage_group }}"
           homepage.icon: "{{ localai_homepage_icon }}"
           homepage.href: "{{ localai_homepage_href }}"
@@ -84,7 +84,7 @@
         memory_swap: "{{ localai_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ localai_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -93,15 +93,15 @@
               }}
   when: localai_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ localai_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ localai_proper_name }} Container
       community.docker.docker_container:
         name: "{{ localai_container_name }}"
         state: absent
   when: localai_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ localai_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

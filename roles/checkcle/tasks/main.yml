@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ checkcle_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ checkcle_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ checkcle_data_directory }}"
         - "{{ checkcle_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ checkcle_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         checkcle_homepage_href: "https://{{ checkcle_hostname }}.{{ ansible_nas_domain }}"
       when: checkcle_traefik_enabled | bool or checkcle_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ checkcle_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ checkcle_container_name }}"
@@ -38,7 +38,7 @@
           dockflare.access.group: "{{ checkcle_dockflare_access_group }}"
           dockflare.hostname: "{{ checkcle_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ checkcle_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ checkcle_proper_name }}"
           homepage.group: "{{ checkcle_homepage_group }}"
           homepage.icon: "{{ checkcle_homepage_icon }}"
           homepage.href: "{{ checkcle_homepage_href }}"
@@ -68,7 +68,7 @@
         memory_swap: "{{ checkcle_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ checkcle_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -77,15 +77,15 @@
               }}
   when: checkcle_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ checkcle_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ checkcle_proper_name }} Container
       community.docker.docker_container:
         name: "{{ checkcle_container_name }}"
         state: absent
   when: checkcle_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ checkcle_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

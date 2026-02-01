@@ -1,5 +1,5 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ esphome_proper_name }}
   block:
     - name: Create EspHome Directories
       ansible.builtin.file:
@@ -8,12 +8,12 @@
       with_items:
         - "{{ esphome_data_directory }}/data"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ esphome_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         esphome_homepage_href: "https://{{ esphome_hostname }}.{{ ansible_nas_domain }}"
       when: esphome_traefik_enabled | bool or esphome_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ esphome_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ esphome_container_name }}"
@@ -36,7 +36,7 @@
           dockflare.access.group: "{{ esphome_dockflare_access_group }}"
           dockflare.hostname: "{{ esphome_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ esphome_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ esphome_proper_name }}"
           homepage.group: "{{ esphome_homepage_group }}"
           homepage.icon: "{{ esphome_homepage_icon }}"
           homepage.href: "{{ esphome_homepage_href }}"
@@ -66,7 +66,7 @@
         memory_swap: "{{ esphome_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ esphome_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -75,15 +75,15 @@
               }}
   when: esphome_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ esphome_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ esphome_proper_name }} Container
       community.docker.docker_container:
         name: "{{ esphome_container_name }}"
         state: absent
   when: esphome_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ esphome_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

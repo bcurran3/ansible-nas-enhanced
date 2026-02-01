@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ offlineu_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ offlineu_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -10,12 +10,12 @@
         - "{{ offlineu_data_directory }}/data"
         - "{{ offlineu_courses_directory }}"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ offlineu_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         offlineu_homepage_href: "https://{{ offlineu_hostname }}.{{ ansible_nas_domain }}"
       when: offlineu_traefik_enabled | bool or offlineu_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ offlineu_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ offlineu_container_name }}"
@@ -43,7 +43,7 @@
           dockflare.access.group: "{{ offlineu_dockflare_access_group }}"
           dockflare.hostname: "{{ offlineu_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ offlineu_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ offlineu_proper_name }}"
           homepage.group: "{{ offlineu_homepage_group }}"
           homepage.icon: "{{ offlineu_homepage_icon }}"
           homepage.href: "{{ offlineu_homepage_href }}"
@@ -73,7 +73,7 @@
         memory_swap: "{{ offlineu_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ offlineu_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -82,15 +82,15 @@
               }}
   when: offlineu_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ offlineu_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ offlineu_proper_name }} Container
       community.docker.docker_container:
         name: "{{ offlineu_container_name }}"
         state: absent
   when: offlineu_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ offlineu_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:

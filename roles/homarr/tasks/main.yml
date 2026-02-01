@@ -1,7 +1,7 @@
 ---
-- name: Start {{ ansible_nas_app_name }}
+- name: Start {{ homarr_proper_name }}
   block:
-    - name: Create {{ ansible_nas_app_name }} Directories
+    - name: Create {{ homarr_proper_name }} Directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
@@ -9,12 +9,12 @@
         - "{{ homarr_data_directory }}"
         - "{{ homarr_data_directory }}/appdata"
 
-    - name: Set {{ ansible_nas_app_name }} FQDN var overrides
+    - name: Set {{ homarr_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         homarr_homepage_href: "https://{{ homarr_hostname }}.{{ ansible_nas_domain }}"
       when: homarr_traefik_enabled | bool or homarr_dockflare_enabled | bool
 
-    - name: Create {{ ansible_nas_app_name }} Container
+    - name: Create {{ homarr_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
         name: "{{ homarr_container_name }}"
@@ -35,7 +35,7 @@
           dockflare.access.group: "{{ homarr_dockflare_access_group }}"
           dockflare.hostname: "{{ homarr_hostname }}.{{ ansible_nas_domain }}"
           dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ homarr_port_http }}"
-          homepage.name: "{{ ansible_nas_app_name }}"
+          homepage.name: "{{ homarr_proper_name }}"
           homepage.group: "{{ homarr_homepage_group }}"
           homepage.icon: "{{ homarr_homepage_icon }}"
           homepage.href: "{{ homarr_homepage_href }}"
@@ -65,7 +65,7 @@
         memory_swap: "{{ homarr_memory_swap }}"
         restart_policy: unless-stopped
 
-    - name: Access {{ ansible_nas_app_name }} at
+    - name: Access {{ homarr_proper_name }} at
       ansible.builtin.debug:
         msg: >-
               {{
@@ -74,15 +74,15 @@
               }}
   when: homarr_enabled is true
 
-- name: Stop {{ ansible_nas_app_name }}
+- name: Stop {{ homarr_proper_name }}
   block:
-    - name: Stop {{ ansible_nas_app_name }} Container
+    - name: Stop {{ homarr_proper_name }} Container
       community.docker.docker_container:
         name: "{{ homarr_container_name }}"
         state: absent
   when: homarr_enabled is false
 
-- name: Data Archive {{ ansible_nas_app_name }}
+- name: Data Archive {{ homarr_proper_name }}
   include_role:
     name: ansible-nas-archive
   vars:
