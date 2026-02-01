@@ -3,13 +3,13 @@
 
 : "${ANE_EDITOR:="nano"}"
 : "${ANE_ALWAYS_CHECK_BEHIND:=false}"
+: "${ANE_ALWAYS_ENABLE_DOCKFLARE:=false}"
+: "${ANE_ALWAYS_ENABLE_TRAEFIK:=false}"
 : "${ANE_ALWAYS_PRUNE:=false}"
 : "${ANE_ALWAYS_UPGRADE:=false}"
 : "${ANE_DISABLE_ALSO_STOPS:=false}"
 : "${ANE_DISABLE_ALSO_REMOVES:=false}"
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
-: "${ANE_ALWAYS_ENABLE_DOCKFLARE:=false}" # not implemented yet
-: "${ANE_ALWAYS_ENABLE_TRAEFIK:=false}" # not implemented yet
 
 # Filter out non-containers
 ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin|_(autoheal|dockflare|tinyauth|traefik|watchtower|repliqate)"
@@ -107,6 +107,10 @@ function display_protips {
     echo "    -- set a different default text editor for ane.sh; i.e. vi, vim, msedit"
     echo "  export ANE_ALWAYS_CHECK_BEHIND=\"true\""
     echo "    -- always check if ANE is up-to-date"
+    echo "  export ANE_ALWAYS_ENABLE_DOCKFLARE=\"true\""
+    echo "    -- always enable Dockflare with app"
+    echo "  export ANE_ALWAYS_ENABLE_TRAEFIK=\"true\""
+    echo "    -- always enable Traefik with app"
     echo "  export ANE_ALWAYS_PRUNE=\"true\""
     echo "    -- always prune docker images and volumes after running the full playbook"
     echo "  export ANE_ALWAYS_UPGRADE=\"true\""
@@ -341,17 +345,39 @@ function enable_app {
         arg_clean="${arg//-/_}"
         ENABLED_LINE="${arg_clean}_enabled: true"
         DISABLED_LINE="${arg_clean}_enabled: false"
+        TRAEFIK_LINE="${arg_clean}_traefik_enabled: true"
+        DOCKFLARE_LINE="${arg_clean}_dockflare_enabled: true"
         if [ -f "$FILE" ] && grep -q "^$ENABLED_LINE" "$FILE"; then
             echo "  ** ${arg} is already enabled."
         elif [ -f "$FILE" ] && grep -q "^$DISABLED_LINE" "$FILE"; then
-            sed -i "s/^$DISABLED_LINE$/$ENABLED_LINE/" "$FILE"
+            sed -i "s/^$DISABLED_LINE/$ENABLED_LINE/" "$FILE"
             echo "  ** ${arg} re-enabled."
+            if [[ "$ANE_ALWAYS_ENABLE_TRAEFIK" == "true" ]]; then
+                if ! grep -q "^$TRAEFIK_LINE" "$FILE"; then
+                    sed -i "/^$ENABLED_LINE/a $TRAEFIK_LINE" "$FILE"
+                    echo "  ** Traefik enabled for ${arg}."
+                fi
+            fi
+            if [[ "$ANE_ALWAYS_ENABLE_DOCKFLARE" == "true" ]]; then
+                if ! grep -q "^$DOCKFLARE_LINE" "$FILE"; then
+                    sed -i "/^$ENABLED_LINE/a $DOCKFLARE_LINE" "$FILE"
+                    echo "  ** Dockflare enabled for ${arg}."
+                fi
+            fi
             TAGS_TO_RUN+="${arg},"
         else
             if [ -f "$APPSLIST" ] && grep -qE "role: +${arg}$" "$APPSLIST"; then
                 if ! grep -q "${arg_clean}_enabled" "$FILE"; then
                     echo -e "\n### ${arg}\n$ENABLED_LINE" >> "$FILE"
                     echo "  ** ${arg} enabled (new entry)."
+                    if [[ "$ANE_ALWAYS_ENABLE_DOCKFLARE" == "true" ]]; then
+                        echo "$DOCKFLARE_LINE" >> "$FILE"
+                        echo "  ** Dockflare enabled for ${arg}."
+                    fi
+                    if [[ "$ANE_ALWAYS_ENABLE_TRAEFIK" == "true" ]]; then
+                        echo "$TRAEFIK_LINE" >> "$FILE"
+                        echo "  ** Traefik enabled for ${arg}."
+                    fi
                 fi
                 TAGS_TO_RUN+="${arg},"
             else
@@ -441,11 +467,11 @@ function enable_traefik {
         
         if [ -f "$FILE" ] && grep -q "^$ENABLED_MARKER" "$FILE"; then
             if grep -q "^$TRAEFIK_LINE" "$FILE"; then
-                echo "  == Traefik is already enabled for ${arg}."
+                echo "  ** Traefik is already enabled for ${arg}."
             else
                 sed -i "/^$ENABLED_MARKER$/a $HREF_LINE" "$FILE"
                 sed -i "/^$ENABLED_MARKER$/a $TRAEFIK_LINE" "$FILE"
-                echo "  ++ Traefik enabled for ${arg}."
+                echo "  ** Traefik enabled for ${arg}."
             fi
         else
             echo "  ** Error: ${arg} must be enabled before adding traefik, or app not found."
