@@ -7,17 +7,19 @@
         state: directory
       with_items:
         - "{{ dashy_data_directory }}"
-
-    - name: Copy {{ ansible_nas_app_name }} base config
-      ansible.builtin.copy:
-        src: conf.yml
-        dest: "{{ dashy_data_directory }}/conf.yml"
-        force: no
+        - "{{ dashy_data_directory }}/icons"
 
     - name: Set {{ ansible_nas_app_name }} FQDN var overrides
       ansible.builtin.set_fact:
         dashy_homepage_href: "https://{{ dashy_hostname }}.{{ ansible_nas_domain }}"
       when: dashy_traefik_enabled | bool or dashy_dockflare_enabled | bool
+
+    - name: Copy {{ ansible_nas_app_name }} Template conf.yml
+      ansible.builtin.template:
+        src: conf.yml
+        dest: "{{ dashy_data_directory }}/conf.yml"
+        force: no
+#      register: template_config
 
     - name: Create {{ ansible_nas_app_name }} Container
       community.docker.docker_container:
@@ -27,9 +29,18 @@
         image: "{{ dashy_image_name }}:{{ dashy_image_tag }}"
         pull: true
         ports:
-          - "{{ dashy_port_http }}:80"
+          - "{{ dashy_port_http }}:8080"
         volumes:
-          - "{{ dashy_data_directory }}/conf.yml:/app/public/conf.yml:rw"
+          - "{{ dashy_data_directory }}/conf.yml:/app/user-data/conf.yml"
+          - "{{ dashy_data_directory }}/icons:/app/user-data/item-icons/"
+        env:
+          NODE_ENV: "production"
+        healthcheck:
+          test: ['CMD', 'node', '/app/services/healthcheck']
+          interval: 1m30s
+          timeout: 10s
+          retries: 3
+          start_period: 40s
         labels:
           autoheal: "{{ dashy_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ dashy_watchtower_enabled | ternary('true', 'false') }}"
@@ -41,7 +52,7 @@
           homepage.group: "{{ dashy_homepage_group }}"
           homepage.icon: "{{ dashy_homepage_icon }}"
           homepage.href: "{{ dashy_homepage_href }}"
-          homepage.description: "{{ 'dashy description' if homepage_show_description else omit }}"
+          homepage.description: "{{ 'a self-hosted dashboard' if homepage_show_description else omit }}"
           homepage.server: "my-docker"
           homepage.container: "{{ dashy_container_name }}"
           homepage.showStats: "{{ dashy_homepage_showstats | ternary('true', 'false') }}"
@@ -58,7 +69,7 @@
           traefik.http.routers.dashy.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.dashy.middlewares: "dashy@docker{{ ',tinyauth-auth@docker' if dashy_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.dashy.IPAllowList.sourcerange: "{{ dashy_traefik_whitelist }}"
-          traefik.http.services.dashy.loadbalancer.server.port: "80"
+          traefik.http.services.dashy.loadbalancer.server.port: "8080"
           wud.tag.include: '^\d+\.\d+\.\d+$'
           wud.tag.transform.type: "semver"
           wud.link.template: "https://github.com/Lissy93/dashy/pkgs/container/dashy"
