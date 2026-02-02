@@ -8,17 +8,19 @@ open_webui_traefik_whitelist: "{{ lan }}"
 open_webui_data_directory: "{{ docker_home }}/open-webui"
 
 # network
-open_webui_port_http: "11435"
 open_webui_hostname: "openwebui"
-open_webui_openedai_port_http: "11436"
+open_webui_port_http: "11435"
 open_webui_openedai_hostname: "openedai"
+open_webui_openedai_port_http: "11436"
 
 # docker
 open_webui_container_name: "open-webui"
 open_webui_image_name: "ghcr.io/open-webui/open-webui"
 open_webui_image_tag: "main"
+#open_webui_image_tag: "cuda" # for NVIDIA
 open_webui_openedai_container_name: "open-webui-openedai"
 open_webui_openedai_image_name: "ghcr.io/matatonic/openedai-speech"
+#open_webui_openedai_image_name: "ghcr.io/matatonic/openedai-speech-rocm" # AMD
 open_webui_openedai_image_tag: "latest"
 
 # specs
@@ -30,8 +32,19 @@ open_webui_openedai_memory: "2G"
 open_webui_openedai_memory_swap: -1
 
 # app
+# https://docs.openwebui.com/getting-started/env-configuration
 open_webui_amd_ai_enabled: true
-open_webui_env_webui_secret_key: ""
+open_webui_env_cors_allow_origin: "*"
+open_webui_env_cors_allow_custom_scheme: ""
+open_webui_env_enable_rag_web_search: "true"
+open_webui_env_rag_web_search_engine: "searxng"
+open_webui_env_rag_web_search_result_count: "3"
+open_webui_env_rag_web_search_concurrent_requests: "10"
+open_webui_env_use_cuda: "false"
+open_webui_env_webui_secret_key: "xxpEL9IXGwwEpwy7kKpc5UtBoycOR4PC"
+open_webui_openedai_tts_home: "voices"
+open_webui_openedai_hf_home: "voices"
+open_webui_openedai_use_rocm: "0" # 1 for AMD
 
 # autoheal
 open_webui_autoheal_enabled: false
@@ -43,6 +56,18 @@ open_webui_dockflare_access_group: ""
 open_webui_openedai_dockflare_enabled: false
 open_webui_openedai_dockflare_access_group: ""
 
+# healthcheck
+open_webui_healthcheck_test: ["CMD", "curl", "-f", "http://127.0.0.1:8080/health"]
+open_webui_healthcheck_interval: 1m
+open_webui_healthcheck_timeout: 10s
+open_webui_healthcheck_retries: 3
+open_webui_healthcheck_start_period: 2m
+open_webui_openedai_healthcheck_test: ["CMD", "python3", "-c", "import socket; s = socket.socket(); s.connect(('127.0.0.1', 8000))"]
+open_webui_openedai_healthcheck_interval: 1m
+open_webui_openedai_healthcheck_timeout: 10s
+open_webui_openedai_healthcheck_retries: 3
+open_webui_openedai_healthcheck_start_period: 1m
+
 # homepage
 open_webui_homepage_group: "Apps"
 open_webui_homepage_icon: "open-webui.png"
@@ -50,7 +75,7 @@ open_webui_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts
 open_webui_homepage_showstats: false
 open_webui_openedai_homepage_group: "Misc"
 open_webui_openedai_homepage_icon: "open-webui.png"
-open_webui_openedai_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ open_webui_openedai_port_http }}"
+open_webui_openedai_homepage_href: "{{ open_webui_homepage_href }}"
 open_webui_openedai_homepage_showstats: false
 
 # repliqate
