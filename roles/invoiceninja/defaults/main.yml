@@ -85,7 +85,7 @@ invoiceninja_dockflare_enabled: false
 invoiceninja_dockflare_access_group: ""
 
 # healthcheck
-invoiceninja_app_healthcheck_test: ["CMD", "php", "artisan", "ninja:check-health"]
+invoiceninja_app_healthcheck_test: ["CMD-SHELL", "pgrep php-fpm || (echo > /dev/tcp/127.0.0.1/9000) >/dev/null 2>&1 || exit 1"]
 invoiceninja_app_healthcheck_interval: 1m
 invoiceninja_app_healthcheck_timeout: 10s
 invoiceninja_app_healthcheck_retries: 3

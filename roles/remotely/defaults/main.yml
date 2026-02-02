@@ -28,7 +28,7 @@ remotely_dockflare_enabled: false
 remotely_dockflare_access_group: ""
 
 # healthcheck
-remotely_healthcheck_test: ["CMD-SHELL", "(echo > /dev/tcp/127.0.0.1/5000) >/dev/null 2>&1 || exit 1"]
+remotely_healthcheck_test: ["CMD", "curl", "-f", "http://127.0.0.1:5000/"]
 remotely_healthcheck_interval: 1m
 remotely_healthcheck_timeout: 10s
 remotely_healthcheck_retries: 3

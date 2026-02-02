@@ -39,7 +39,7 @@ change_detection_dockflare_enabled: false
 change_detection_dockflare_access_group: ""
 
 # healthcheck
-change_detection_healthcheck_test: ["CMD", "python3", "-c", "import socket; s = socket.socket(); s.connect(('127.0.0.1', {{ change_detection_port_http }}))"]
+change_detection_healthcheck_test: ["CMD", "python3", "-c", "import socket; s = socket.socket(); s.connect(('127.0.0.1', {{ change_detection_port_http | int }}))"]
 change_detection_healthcheck_interval: 1m
 change_detection_healthcheck_timeout: 10s
 change_detection_healthcheck_retries: 3

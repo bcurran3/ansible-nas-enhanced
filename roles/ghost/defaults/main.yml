@@ -46,7 +46,7 @@ ghost_dockflare_enabled: false
 ghost_dockflare_access_group: ""
 
 # healthcheck
-ghost_healthcheck_test: ["CMD-SHELL", "curl -f http://localhost:2368/health || exit 1"]
+ghost_healthcheck_test: ["CMD", "node", "-e", "const s = require('net').createConnection(2368, '127.0.0.1', () => { s.end(); process.exit(0); }); s.on('error', () => process.exit(1));"]
 ghost_healthcheck_interval: 1m
 ghost_healthcheck_timeout: 10s
 ghost_healthcheck_retries: 3
