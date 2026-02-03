@@ -39,10 +39,11 @@
         env:
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
-          test: ["CMD", "/surreal", "isready", "--conn", "http://localhost:8000"]
-          interval: 10s
-          timeout: 5s
-          retries: 3
+          test: "{{ open_notebook_db_healthcheck_test }}"
+          interval: "{{ open_notebook_db_healthcheck_interval }}"
+          timeout: "{{ open_notebook_db_healthcheck_timeout }}"
+          retries: "{{ open_notebook_db_healthcheck_retries }}"
+          start_period: "{{ open_notebook_db_healthcheck_start_period }}"
         labels:
           autoheal: "{{ open_notebook_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ open_notebook_db_watchtower_enabled | ternary('true', 'false') }}"
@@ -117,6 +118,12 @@
           # VOYAGE_API_KEY: "{{ open_notebook_env_voyage_api_key }}"
           # XAI_API_KEY: "{{ open_notebook_env_xai_api_key }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ open_notebook_app_healthcheck_test }}"
+          interval: "{{ open_notebook_app_healthcheck_interval }}"
+          timeout: "{{ open_notebook_app_healthcheck_timeout }}"
+          retries: "{{ open_notebook_app_healthcheck_retries }}"
+          start_period: "{{ open_notebook_app_healthcheck_start_period }}"
         links:
           - "{{ open_notebook_db_container_name }}"
         labels:

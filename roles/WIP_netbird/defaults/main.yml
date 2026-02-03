@@ -1,0 +1,350 @@
+---
+# ANE
+netbird_proper_name: "netbird"
+netbird_enabled: false
+netbird_traefik_enabled: false
+netbird_traefik_whitelist: "{{ lan }}"
+
+# directories
+netbird_data_directory: "{{ docker_home }}/netbird"
+
+# docker
+netbird_container_name: "netbird"
+netbird_image_name: "appdev/netbird" # use ghcr.io or lscr.io when available
+netbird_image_tag: "latest"
+
+# uid / gid
+netbird_user_id: "0"
+netbird_group_id: "0"
+
+# network
+netbird_hostname: "netbird"
+#netbird_network_name: "netbird"
+netbird_port_http: "8989"
+
+# specs
+netbird_cpu_shares: 1024
+netbird_memory: "1G"
+netbird_memory_swap: -1
+
+# autoheal
+netbird_autoheal_enabled: false
+
+# dockflare
+netbird_dockflare_enabled: false
+netbird_dockflare_access_group: ""
+
+# healthcheck
+netbird_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
+netbird_healthcheck_interval: 30s
+netbird_healthcheck_timeout: 10s
+netbird_healthcheck_retries: 3
+netbird_healthcheck_start_period: 20s
+
+# homepage
+netbird_homepage_description: "netbird short description"
+netbird_homepage_group: "Apps"
+netbird_homepage_icon: "netbird.png"
+netbird_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ netbird_port_http }}"
+netbird_homepage_showstats: false
+
+# linuxserver.io docker mods for linuxserver.io images
+#netbird_env_docker_mods: ""
+#netbird_env_docker_mods_install_packages: ""
+#netbird_env_docker_mods_install_pip_packages: ""
+
+# repliqate
+netbird_repliqate_enabled: false
+netbird_repliqate_engine: "restic"
+netbird_repliqate_schedule: "@daily 3am"
+netbird_repliqate_backup_id: "{{ netbird_container_name }}"
+netbird_repliqate_retention: "30d"
+
+# tinyauth
+netbird_tinyauth_enabled: false
+
+# watchtower
+netbird_watchtower_enabled: false
+
+# wud
+# Docker Hub example. Please edit.
+netbird_wud_tag_include: '^\d+\.\d+$'
+netbird_wud_tag_transform_type: "semver"
+netbird_wud_link_template: "https://hub.docker.com/r/devname/netbird"
+### Github example
+#netbird_wud_tag_include: '^\d+\.\d+\.\d+$'
+#netbird_wud_tag_transform_type: "semver"
+#netbird_wud_link_template: "https://github.com/dev/netbird/pkgs/container/netbird"
+### Linuxserver.io example
+#netbird_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+#netbird_wud_tag_transform_type: "semver"
+#netbird_wud_link_template: "https://lscr.io/linuxserver/netbird"
+
+##############################################################################
+### EXAMPLES OF COMMON DATABASE SETUPS BELOW
+### DELETE ALL OR PARTS BELOW AS NOT NEEDED
+### PLEASE STICK TO THIS FORMAT
+### NOTE: ../molecule files are not templated for DBs and
+###       need to be updated as well when using DBs.
+###       Look at the Nextcloud role for a good example.
+##############################################################################
+
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###   __  __            _       ____  ____    ###
+###  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   ###
+###  | |\/| |/ _` | '__| |/ _` | | | |  _ \   ###
+###  | |  | | (_| | |  | | (_| | |_| | |_) |  ###
+###  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   ###
+#################################################
+
+# docker
+netbird_db_container_name: "netbird-db"
+netbird_db_image_name: "mariadb"
+netbird_db_image_tag: "latest"
+
+# specs
+netbird_db_cpu_shares: 1024
+netbird_db_memory: "1G"
+netbird_db_memory_swap: "{{ netbird_db_memory }}"
+
+# autoheal
+netbird_db_autoheal_enabled: false
+
+# healthcheck
+netbird_db_healthcheck_test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-u", "netbird", "-p{{ netbird_db_password }}"]
+netbird_db_healthcheck_interval: 10s
+netbird_db_healthcheck_timeout: 5s
+netbird_db_healthcheck_retries: 5
+netbird_db_healthcheck_start_period: 30s
+
+# homepage
+netbird_db_homepage_description: "MariaDB Server is a high performing open source relational database, forked from MySQL."
+netbird_db_homepage_group: "DBs"
+netbird_db_homepage_icon: "mariadb.png"
+netbird_db_homepage_href: "{{ netbird_homepage_href }}"
+netbird_db_homepage_showstats: false
+
+# repliqate
+netbird_db_repliqate_enabled: false
+netbird_db_repliqate_engine: "restic"
+netbird_db_repliqate_schedule: "@daily 3am"
+netbird_db_repliqate_backup_id: "{{ netbird_db_container_name }}"
+netbird_db_repliqate_retention: "30d"
+
+# watchtower
+netbird_db_watchtower_enabled: false
+
+# wud
+netbird_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+netbird_db_wud_tag_transform_type: "semver"
+netbird_db_wud_link_template: "https://hub.docker.com/_/mariadb"
+
+######################################################
+###  OPTIONAL - remove if not needed               ###
+###   __  __                         ____  ____    ###
+###  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   ###
+###  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   ###
+###  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  ###
+###  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   ###
+###                      |___/                     ###
+######################################################
+
+# docker
+netbird_db_container_name: "netbird-db"
+netbird_db_image_name: "mongo"
+netbird_db_image_tag: "latest"
+
+# specs
+netbird_db_cpu_shares: 1024
+netbird_db_memory: "1G"
+netbird_db_memory_swap: "{{ netbird_db_memory }}"
+
+# autoheal
+netbird_db_autoheal_enabled: false
+
+# healthcheck
+netbird_db_healthcheck_test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--host", "127.0.0.1"]
+netbird_db_healthcheck_interval: 10s
+netbird_db_healthcheck_timeout: 5s
+netbird_db_healthcheck_retries: 3
+netbird_db_healthcheck_start_period: 15s
+
+# homepage
+netbird_db_homepage_description: "The Database for Secure Apps"
+netbird_db_homepage_group: "DBs"
+netbird_db_homepage_icon: "mongodb.png"
+netbird_db_homepage_href: "{{ netbird_homepage_href }}"
+netbird_db_homepage_showstats: false
+
+# repliqate
+netbird_db_repliqate_enabled: false
+netbird_db_repliqate_engine: "restic"
+netbird_db_repliqate_schedule: "@daily 3am"
+netbird_db_repliqate_backup_id: "{{ netbird_db_container_name }}"
+netbird_db_repliqate_retention: "30d"
+
+# watchtower
+netbird_db_watchtower_enabled: false
+
+# wud
+netbird_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+netbird_db_wud_tag_transform_type: "semver"
+netbird_db_wud_link_template: "https://hub.docker.com/_/mongo"
+
+##########################################
+###  OPTIONAL - remove if not needed   ###
+###   __  __       ____   ___  _       ###
+###  |  \/  |_   _/ ___| / _ \| |      ###
+###  | |\/| | | | \___ \| | | | |      ###
+###  | |  | | |_| |___) | |_| | |___   ###
+###  |_|  |_|\__, |____/ \__\_\_____|  ###
+###          |___/                     ###
+##########################################
+
+# docker
+netbird_db_container_name: "netbird-db"
+netbird_db_image_name: "mysql"
+netbird_db_image_tag: "8.4"
+
+# specs
+netbird_db_cpu_shares: 1024
+netbird_db_memory: "1G"
+netbird_db_memory_swap: "{{ netbird_db_memory }}"
+
+# autoheal
+netbird_db_autoheal_enabled: false
+
+# healthcheck
+netbird_db_healthcheck_test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p{{ netbird_sql_root_password }}"]
+netbird_db_healthcheck_interval: 10s
+netbird_db_healthcheck_timeout: 5s
+netbird_db_healthcheck_retries: 5
+netbird_db_healthcheck_start_period: 30s
+
+# homepage
+netbird_db_homepage_description: "MySQL Server, the world''s most popular open source database"
+netbird_db_homepage_group: "DBs"
+netbird_db_homepage_icon: "mysql.png"
+netbird_db_homepage_href: "{{ netbird_homepage_href }}"
+netbird_db_homepage_showstats: false
+
+# repliqate
+netbird_db_repliqate_enabled: false
+netbird_db_repliqate_engine: "restic"
+netbird_db_repliqate_schedule: "@daily 3am"
+netbird_db_repliqate_backup_id: "{{ netbird_db_container_name }}"
+netbird_db_repliqate_retention: "30d"
+
+# watchtower
+netbird_db_watchtower_enabled: false
+
+# wud
+netbird_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+netbird_db_wud_tag_transform_type: "semver"
+netbird_db_wud_link_template: "https://hub.docker.com/_/mysql"
+
+##############################################################
+###  OPTIONAL - remove if not needed                       ###
+###   ____           _                 ____   ___  _       ###
+###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
+###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
+###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
+###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
+###                     |___/                              ###
+##############################################################
+
+# docker
+netbird_db_container_name: "netbird-db"
+netbird_db_image_name: "postgres"
+netbird_db_image_tag: "16-alpine"
+
+# specs
+netbird_db_cpu_shares: 1024
+netbird_db_memory: "1G"
+netbird_db_memory_swap: "{{ netbird_db_memory }}"
+
+# autoheal
+netbird_db_autoheal_enabled: false
+
+# healthcheck
+netbird_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U netbird -d netbird -h 127.0.0.1"]
+netbird_db_healthcheck_interval: 10s
+netbird_db_healthcheck_timeout: 5s
+netbird_db_healthcheck_retries: 5
+netbird_db_healthcheck_start_period: 30s
+
+# homepage
+netbird_db_homepage_description: "PostgreSQL Database Management System"
+netbird_db_homepage_group: "DBs"
+netbird_db_homepage_icon: "postgres.png"
+netbird_db_homepage_href: "{{ netbird_homepage_href }}"
+netbird_db_homepage_showstats: false
+
+# repliqate
+netbird_db_repliqate_enabled: false
+netbird_db_repliqate_engine: "restic"
+netbird_db_repliqate_schedule: "@daily 3am"
+netbird_db_repliqate_backup_id: "{{ netbird_db_container_name }}"
+netbird_db_repliqate_retention: "30d"
+
+# watchtower
+netbird_db_watchtower_enabled: false
+
+# wud
+netbird_db_wud_tag_include: '^\d+\.\d+.*$'
+netbird_db_wud_tag_transform_type: "semver"
+netbird_db_wud_link_template: "https://hub.docker.com/_/postgres"
+
+#########################################
+###  OPTIONAL - remove if not needed  ###
+###       ____          _ _           ###
+###      |  _ \ ___  __| (_)___       ###
+###      | |_) / _ \/ _` | / __|      ###
+###      |  _ <  __/ (_| | \__ \      ###
+###      |_| \_\___|\__,_|_|___/      ###
+#########################################
+
+# docker
+netbird_redis_container_name: "netbird-redis"
+netbird_redis_image_name: "redis"
+netbird_redis_image_tag: "latest"
+
+# specs
+netbird_redis_cpu_shares: 1024
+netbird_redis_memory: "128M"
+netbird_redis_memory_swap: "{{ netbird_redis_memory }}"
+
+# autoheal
+netbird_redis_autoheal_enabled: false
+
+# healthcheck
+netbird_redis_healthcheck_test: ["CMD-SHELL", "redis-cli -a topsecret ping | grep PONG || exit 1"]
+netbird_redis_healthcheck_interval: 10s
+netbird_redis_healthcheck_timeout: 5s
+netbird_redis_healthcheck_retries: 3
+netbird_redis_healthcheck_start_period: 10s
+
+# homepage
+netbird_redis_homepage_description: "The Real-time Data Platform"
+netbird_redis_homepage_group: "DBs"
+netbird_redis_homepage_icon: "redis.png"
+netbird_redis_homepage_href: "{{ netbird_homepage_href }}"
+netbird_redis_homepage_showstats: false
+
+# repliqate
+netbird_redis_repliqate_enabled: false
+netbird_redis_repliqate_engine: "restic"
+netbird_redis_repliqate_schedule: "@daily 3am"
+netbird_redis_repliqate_backup_id: "{{ netbird_redis_container_name }}"
+netbird_redis_repliqate_retention: "30d"
+
+# watchtower
+netbird_redis_watchtower_enabled: false
+
+# wud
+netbird_redis_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+#netbird_redis_wud_tag_include: "^v?\\d+-alpine$"
+netbird_redis_wud_tag_transform_type: "semver"
+netbird_redis_wud_link_template: "https://hub.docker.com/_/redis"

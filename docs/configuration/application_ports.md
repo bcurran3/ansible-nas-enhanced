@@ -157,6 +157,7 @@ By default, applications can be found on the ports listed below.
 | Kavita           | 3024    | Bridge  | HTTP           |
 | koel             | 3033
 | Koillection      | 3030    | Bridge  | HTTP           |
+| Kokoro-FastAPI   | 4005    | Bridge  | HTTP           |
 | Komga            | 8088    | Bridge  | HTTPS          |
 | Komodo           | 9120    | Bridge  | HTTP           |
 | Komodo Periphery | 8120    | Bridge  | HTTP           |
@@ -424,7 +425,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4005
+# next avail = 4006
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

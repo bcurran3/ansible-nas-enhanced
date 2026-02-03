@@ -67,6 +67,18 @@ open_notebook_db_autoheal_enabled: false
 open_notebook_dockflare_enabled: false
 open_notebook_dockflare_access_group: ""
 
+# healthcheck
+open_notebook_app_healthcheck_test: ["CMD-SHELL", "curl -s http://127.0.0.1:5055/ || exit 1"]
+open_notebook_app_healthcheck_interval: 1m
+open_notebook_app_healthcheck_timeout: 10s
+open_notebook_app_healthcheck_retries: 3
+open_notebook_app_healthcheck_start_period: 90s
+open_notebook_db_healthcheck_test: ["CMD", "/surreal", "isready", "--conn", "http://127.0.0.1:8000"]
+open_notebook_db_healthcheck_interval: 10s
+open_notebook_db_healthcheck_timeout: 5s
+open_notebook_db_healthcheck_retries: 3
+open_notebook_db_healthcheck_start_period: 20s
+
 # homepage
 open_notebook_homepage_group: "Apps"
 #open_notebook_homepage_icon: "open-notebook.png"

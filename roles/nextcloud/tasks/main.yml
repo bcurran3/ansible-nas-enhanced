@@ -108,21 +108,6 @@
           timeout: "{{ nextcloud_db_healthcheck_timeout }}"
           retries: "{{ nextcloud_db_healthcheck_retries }}"
           start_period: "{{ nextcloud_db_healthcheck_start_period }}"
-#####
-# personally I'm running with:
-# nextcloud_db_image_name: "mysql"
-# nextcloud_db_image_version: "8.4"
-# and need the above healthcheck.
-# I should plan a migration in the future to get in sync
-#####
-#        healthcheck:
-#          test:
-#            - CMD-SHELL
-#            - "mariadb-admin ping -h localhost -u root -p{{ nextcloud_db_root_password }}"
-#          interval: "30s"
-#          timeout: "10s"
-#          retries: "3"
-#          start_period: "30s"
         labels:
           autoheal: "{{ nextcloud_db_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ nextcloud_db_watchtower_enabled | ternary('true', 'false') }}"

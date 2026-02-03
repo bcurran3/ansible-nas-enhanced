@@ -1,0 +1,55 @@
+---
+# ANE
+kokoro_fastapi_proper_name: "Kokoro-FastAPI"
+kokoro_fastapi_enabled: false
+kokoro_fastapi_traefik_enabled: false
+kokoro_fastapi_traefik_whitelist: "{{ lan }}"
+
+# docker
+kokoro_fastapi_container_name: "kokoro-fastapi"
+kokoro_fastapi_image_name: "ghcr.io/remsky/kokoro-fastapi-gpu"
+#kokoro_fastapi_image_name: "ghcr.io/remsky/kokoro-fastapi-cpu"
+kokoro_fastapi_image_tag: "latest"
+
+# network
+kokoro_fastapi_hostname: "kokorofastapi"
+kokoro_fastapi_port_http: "4005"
+
+# specs
+kokoro_fastapi_cpu_shares: 1024
+# Minimum: 2 GB (Idle)
+# Recommended: 4 GB (To handle the "Memory Leak")
+kokoro_fastapi_memory: "4G"
+kokoro_fastapi_memory_swap: -1
+
+# autoheal
+kokoro_fastapi_autoheal_enabled: false
+
+# dockflare
+kokoro_fastapi_dockflare_enabled: false
+kokoro_fastapi_dockflare_access_group: ""
+
+# healthcheck
+kokoro_fastapi_healthcheck_test: ["CMD-SHELL", "curl -f -s -m 5 http://127.0.0.1:8880/health || exit 1"]
+kokoro_fastapi_healthcheck_interval: 1m
+kokoro_fastapi_healthcheck_timeout: 10s
+kokoro_fastapi_healthcheck_retries: 3
+kokoro_fastapi_healthcheck_start_period: 1m
+
+# homepage
+kokoro_fastapi_homepage_description: "Dockerized FastAPI wrapper for Kokoro-82M text-to-speech model w/CPU ONNX and NVIDIA GPU PyTorch support, handling, and auto-stitching"
+kokoro_fastapi_homepage_group: "Apps"
+kokoro_fastapi_homepage_icon: "https://raw.githubusercontent.com/remsky/Kokoro-FastAPI/refs/heads/master/githubbanner.png"
+kokoro_fastapi_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ kokoro_fastapi_port_http }}/web"
+kokoro_fastapi_homepage_showstats: false
+
+# tinyauth
+kokoro_fastapi_tinyauth_enabled: false
+
+# watchtower
+kokoro_fastapi_watchtower_enabled: false
+
+# wud
+kokoro_fastapi_wud_tag_include: "^v?\\d+\\.\\d+\\.\\d+$"
+kokoro_fastapi_wud_tag_transform_type: "semver"
+kokoro_fastapi_wud_link_template: "https://github.com/remsky/kokoro-fastapi-gpu/pkgs/container/kokoro-fastapi-gpu"

@@ -1,0 +1,89 @@
+---
+- name: Start {{ kokoro_fastapi_proper_name }}
+  block:
+    - name: Set {{ kokoro_fastapi_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        kokoro_fastapi_homepage_href: "https://{{ kokoro_fastapi_hostname }}.{{ ansible_nas_domain }}/web"
+      when: kokoro_fastapi_traefik_enabled | bool or kokoro_fastapi_dockflare_enabled | bool
+
+    - name: Create {{ kokoro_fastapi_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ kokoro_fastapi_container_name }}"
+        hostname: "{{ kokoro_fastapi_container_name }}"
+        image: "{{ kokoro_fastapi_image_name }}:{{ kokoro_fastapi_image_tag }}"
+        pull: true
+        ports:
+          - "{{ kokoro_fastapi_port_http }}:8880"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | default(false) | bool else omit
+        }}"
+        devices: >-
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and kokoro_fastapi_amd_ai_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
+        healthcheck:
+          test: "{{ kokoro_fastapi_healthcheck_test }}"
+          interval: "{{ kokoro_fastapi_healthcheck_interval }}"
+          timeout: "{{ kokoro_fastapi_healthcheck_timeout }}"
+          retries: "{{ kokoro_fastapi_healthcheck_retries }}"
+          start_period: "{{ kokoro_fastapi_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ kokoro_fastapi_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ kokoro_fastapi_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ kokoro_fastapi_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ kokoro_fastapi_dockflare_access_group }}"
+          dockflare.hostname: "{{ kokoro_fastapi_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ kokoro_fastapi_port_http }}"
+          homepage.name: "{{ kokoro_fastapi_proper_name }}"
+          homepage.group: "{{ kokoro_fastapi_homepage_group }}"
+          homepage.icon: "{{ kokoro_fastapi_homepage_icon }}"
+          homepage.href: "{{ kokoro_fastapi_homepage_href }}"
+          homepage.description: "{{ kokoro_fastapi_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ kokoro_fastapi_container_name }}"
+          homepage.showStats: "{{ kokoro_fastapi_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ kokoro_fastapi_port_http }}/web"
+          repliqate.enabled: "false"
+          traefik.enable: "{{ kokoro_fastapi_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.kokoro-fastapi.rule: "Host(`{{ kokoro_fastapi_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.kokoro-fastapi.tls.certresolver: "letsencrypt"
+          traefik.http.routers.kokoro-fastapi.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.kokoro-fastapi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.kokoro-fastapi.middlewares: "kokoro-fastapi@docker{{ ',tinyauth-auth@docker' if kokoro_fastapi_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.kokoro-fastapi.IPAllowList.sourcerange: "{{ kokoro_fastapi_traefik_whitelist }}"
+          traefik.http.services.kokoro-fastapi.loadbalancer.server.port: "80"
+          wud.tag.include: "{{ kokoro_fastapi_wud_tag_include }}"
+          wud.tag.transform.type: "{{ kokoro_fastapi_wud_tag_transform_type }}"
+          wud.link.template: "{{ kokoro_fastapi_wud_link_template }}"
+        cpu_shares: "{{ kokoro_fastapi_cpu_shares }}"
+        memory: "{{ kokoro_fastapi_memory }}"
+        memory_swap: "{{ kokoro_fastapi_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ kokoro_fastapi_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (kokoro_fastapi_port_http | string) + '/web'] +
+                (['https://' + kokoro_fastapi_hostname + '.' + ansible_nas_domain + '/web'] if (kokoro_fastapi_traefik_enabled is true or kokoro_fastapi_dockflare_enabled is true) else [])
+              }}
+  when: kokoro_fastapi_enabled is true
+
+- name: Stop {{ kokoro_fastapi_proper_name }}
+  block:
+    - name: Stop {{ kokoro_fastapi_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ kokoro_fastapi_container_name }}"
+        state: absent
+  when: kokoro_fastapi_enabled is false
