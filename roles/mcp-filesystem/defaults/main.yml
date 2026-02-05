@@ -1,0 +1,54 @@
+---
+# ANE
+mcp_filesystem_proper_name: "Filesystem (Reference) MCP Server"
+mcp_filesystem_enabled: false
+mcp_filesystem_traefik_enabled: false
+mcp_filesystem_traefik_whitelist: "{{ lan }}"
+
+mcp_filesystem_data_directory: "{{ code_root }}"
+
+# docker
+mcp_filesystem_container_name: "mcp-filesystem"
+mcp_filesystem_image_name: "mcp/filesystem"
+mcp_filesystem_image_tag: "latest"
+
+# network
+mcp_filesystem_hostname: "mcpfilesystem"
+mcp_filesystem_port_http: "4006"
+
+# specs
+mcp_filesystem_cpu_shares: 1024
+mcp_filesystem_memory: "1G"
+mcp_filesystem_memory_swap: -1
+
+# app
+mcp_filesystem_access_http: false
+
+# autoheal
+mcp_filesystem_autoheal_enabled: false
+
+# dockflare
+mcp_filesystem_dockflare_enabled: false
+mcp_filesystem_dockflare_access_group: ""
+
+# healthcheck
+mcp_filesystem_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1"]
+mcp_filesystem_healthcheck_interval: "30s"
+mcp_filesystem_healthcheck_timeout: "10s"
+mcp_filesystem_healthcheck_retries: 3
+mcp_filesystem_healthcheck_start_period: "20s"
+
+# homepage
+mcp_filesystem_homepage_description: "Local filesystem access with configurable allowed paths."
+mcp_filesystem_homepage_group: "Misc"
+mcp_filesystem_homepage_icon: "https://upload.wikimedia.org/wikipedia/commons/f/fe/Model_Context_Protocol_logo.svg"
+mcp_filesystem_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mcp_filesystem_port_http }}"
+mcp_filesystem_homepage_showstats: false
+
+# watchtower
+mcp_filesystem_watchtower_enabled: false
+
+# wud
+mcp_filesystem_wud_tag_include: "^latest$"
+mcp_filesystem_wud_tag_transform_type: "semver"
+mcp_filesystem_wud_link_template: "https://github.com/MekayelAnik/filesystem-mcp-docker"

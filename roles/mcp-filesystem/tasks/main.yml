@@ -1,0 +1,132 @@
+---
+- name: Start {{ mcp_filesystem_proper_name }}
+  block:
+    - name: Create {{ mcp_filesystem_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ mcp_filesystem_data_directory }}"
+
+    - name: Create {{ mcp_filesystem_proper_name }} Container
+      block:
+        - name: Create {{ mcp_filesystem_proper_name }} Container (STDIO Mode)
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ mcp_filesystem_container_name }}"
+            hostname: "{{ mcp_filesystem_container_name }}"
+            image: "{{ mcp_filesystem_image_name }}:{{ mcp_filesystem_image_tag }}"
+            pull: true
+            command: "/scripts"
+            interactive: true
+            tty: true
+            volumes:
+              - "{{ mcp_filesystem_data_directory }}:/scripts"
+            env:
+              TZ: "{{ ansible_nas_timezone }}"
+            healthcheck:
+              test: ["CMD-SHELL", "pidof node || exit 1"]
+              interval: "{{ mcp_filesystem_healthcheck_interval }}"
+              timeout: "{{ mcp_filesystem_healthcheck_timeout }}"
+              retries: "{{ mcp_filesystem_healthcheck_retries }}"
+              start_period: "{{ mcp_filesystem_healthcheck_start_period }}"
+            labels:
+              autoheal: "{{ mcp_filesystem_autoheal_enabled | ternary('true', 'false') }}"
+              com.centurylinklabs.watchtower.enable: "{{ mcp_filesystem_watchtower_enabled | ternary('true', 'false') }}"
+              dockflare.enable: "false"
+              homepage.name: "{{ mcp_filesystem_proper_name }}"
+              homepage.group: "{{ mcp_filesystem_homepage_group }}"
+              homepage.icon: "{{ mcp_filesystem_homepage_icon }}"
+              homepage.description: "{{ mcp_filesystem_homepage_description if homepage_show_description else omit }}"
+              homepage.server: "my-docker"
+              homepage.container: "{{ mcp_filesystem_container_name }}"
+              homepage.showStats: "{{ mcp_filesystem_homepage_showstats | ternary('true', 'false') }}"
+              repliqate.enabled: "false"
+              traefik.enable: "false"
+              wud.tag.include: "{{ mcp_filesystem_wud_tag_include }}"
+              wud.link.template: "{{ mcp_filesystem_wud_link_template }}"
+            cpu_shares: "{{ mcp_filesystem_cpu_shares }}"
+            memory: "{{ mcp_filesystem_memory }}"
+            memory_swap: "{{ mcp_filesystem_memory_swap }}"
+            restart_policy: unless-stopped
+      when: mcp_filesystem_access_http is false
+
+    - name: Create {{ mcp_filesystem_proper_name }} Container
+      block:
+        - name: Set {{ mcp_filesystem_proper_name }} FQDN var overrides
+          ansible.builtin.set_fact:
+            mcp_filesystem_homepage_href: "https://{{ mcp_filesystem_hostname }}.{{ ansible_nas_domain }}"
+          when: mcp_filesystem_traefik_enabled | bool or mcp_filesystem_dockflare_enabled | bool
+
+        - name: Create {{ mcp_filesystem_proper_name }} Container (HTTP/SSE Mode)
+          community.docker.docker_container:
+            container_default_behavior: "compatibility"
+            name: "{{ mcp_filesystem_container_name }}"
+            hostname: "{{ mcp_filesystem_container_name }}"
+            image: "{{ mcp_filesystem_image_name }}:{{ mcp_filesystem_image_tag }}"
+            pull: true
+            command: "/scripts"
+            interactive: true
+            tty: true
+            volumes:
+              - "{{ mcp_filesystem_data_directory }}:/scripts"
+            ports:
+              - "{{ mcp_filesystem_port_http }}:3000"
+            env:
+              PORT: "3000"
+              TZ: "{{ ansible_nas_timezone }}"
+            healthcheck:
+              test: "{{ mcp_filesystem_healthcheck_test }}"
+              interval: "{{ mcp_filesystem_healthcheck_interval }}"
+              timeout: "{{ mcp_filesystem_healthcheck_timeout }}"
+              retries: "{{ mcp_filesystem_healthcheck_retries }}"
+              start_period: "{{ mcp_filesystem_healthcheck_start_period }}"
+            labels:
+              autoheal: "{{ mcp_filesystem_autoheal_enabled | ternary('true', 'false') }}"
+              com.centurylinklabs.watchtower.enable: "{{ mcp_filesystem_watchtower_enabled | ternary('true', 'false') }}"
+              dockflare.enable: "{{ mcp_filesystem_dockflare_enabled | ternary('true', 'false') }}"
+              dockflare.access.group: "{{ mcp_filesystem_dockflare_access_group }}"
+              dockflare.hostname: "{{ mcp_filesystem_hostname }}.{{ ansible_nas_domain }}"
+              dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mcp_filesystem_port_http }}"
+              homepage.name: "{{ mcp_filesystem_proper_name }}"
+              homepage.group: "{{ mcp_filesystem_homepage_group }}"
+              homepage.icon: "{{ mcp_filesystem_homepage_icon }}"
+              homepage.href: "{{ mcp_filesystem_homepage_href }}"
+              homepage.description: "{{ mcp_filesystem_homepage_description if homepage_show_description else omit }}"
+              homepage.server: "my-docker"
+              homepage.container: "{{ mcp_filesystem_container_name }}"
+              homepage.showStats: "{{ mcp_filesystem_homepage_showstats | ternary('true', 'false') }}"
+              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mcp_filesystem_port_http }}"
+              repliqate.enabled: "false"
+              traefik.enable: "{{ mcp_filesystem_traefik_enabled | ternary('true', 'false') }}"
+              traefik.http.routers.mcp-filesystem.rule: "Host(`{{ mcp_filesystem_hostname }}.{{ ansible_nas_domain }}`)"
+              traefik.http.routers.mcp-filesystem.tls.certresolver: "letsencrypt"
+              traefik.http.routers.mcp-filesystem.tls.domains[0].main: "{{ ansible_nas_domain }}"
+              traefik.http.routers.mcp-filesystem.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+              traefik.http.routers.mcp-filesystem.middlewares: "mcp-filesystem@docker{{ ',tinyauth-auth@docker' if mcp_filesystem_tinyauth_enabled | bool else '' }}"
+              traefik.http.middlewares.mcp-filesystem.IPAllowList.sourcerange: "{{ mcp_filesystem_traefik_whitelist }}"
+              traefik.http.services.mcp-filesystem.loadbalancer.server.port: "3000"
+              wud.tag.include: "{{ mcp_filesystem_wud_tag_include }}"
+              wud.link.template: "{{ mcp_filesystem_wud_link_template }}"
+            cpu_shares: "{{ mcp_filesystem_cpu_shares }}"
+            memory: "{{ mcp_filesystem_memory }}"
+            memory_swap: "{{ mcp_filesystem_memory_swap }}"
+            restart_policy: unless-stopped
+
+        - name: Access {{ mcp_filesystem_proper_name }} at
+          ansible.builtin.debug:
+            msg: >-
+                  {{
+                    ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (mcp_filesystem_port_http | string)] +
+                    (['https://' + mcp_filesystem_hostname + '.' + ansible_nas_domain] if (mcp_filesystem_traefik_enabled is true or mcp_filesystem_dockflare_enabled is true) else [])
+                  }}
+      when: mcp_filesystem_access_http is true 
+  when: mcp_filesystem_enabled is true
+
+- name: Stop {{ mcp_filesystem_proper_name }}
+  block:
+    - name: Stop {{ mcp_filesystem_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ mcp_filesystem_container_name }}"
+        state: absent
+  when: mcp_filesystem_enabled is false
