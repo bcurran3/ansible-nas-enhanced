@@ -1,0 +1,62 @@
+---
+# ANE
+casaos_proper_name: "CasaOS"
+casaos_enabled: false
+casaos_traefik_enabled: false
+casaos_traefik_whitelist: "{{ lan }}"
+
+# directories
+casaos_data_directory: "{{ docker_home }}/casaos"
+
+# docker
+casaos_container_name: "casaos"
+casaos_image_name: "ghcr.io/dockur/casa"
+casaos_image_tag: "latest"
+
+# network
+casaos_hostname: "casaos"
+casaos_port_http: "4009"
+
+# specs
+casaos_cpu_shares: 1024
+casaos_memory: "1G"
+casaos_memory_swap: -1
+
+# autoheal
+casaos_autoheal_enabled: false
+
+# dockflare
+casaos_dockflare_enabled: false
+casaos_dockflare_access_group: ""
+
+# healthcheck
+casaos_healthcheck_test: ["CMD-SHELL", "curl -s http://127.0.0.1:8080/ || exit 1"]
+casaos_healthcheck_interval: 1m
+casaos_healthcheck_timeout: 10s
+casaos_healthcheck_retries: 3
+casaos_healthcheck_start_period: 30s
+
+# homepage
+casaos_homepage_description: "Community-based open source software focused on delivering simple personal cloud experience around Docker ecosystem."
+casaos_homepage_group: "Apps"
+casaos_homepage_icon: "casaos.png"
+casaos_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ casaos_port_http }}"
+casaos_homepage_showstats: false
+
+# repliqate
+casaos_repliqate_enabled: false
+casaos_repliqate_engine: "restic"
+casaos_repliqate_schedule: "@daily 3am"
+casaos_repliqate_backup_id: "{{ casaos_container_name }}"
+casaos_repliqate_retention: "30d"
+
+# tinyauth
+casaos_tinyauth_enabled: false
+
+# watchtower
+casaos_watchtower_enabled: false
+
+# wud
+casaos_wud_tag_include: "^v?\\d+(\\.\\d+){1,2}$"
+casaos_wud_tag_transform_type: "semver"
+casaos_wud_link_template: "https://github.com/dockur/casa/pkgs/container/casa"

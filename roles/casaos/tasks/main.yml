@@ -1,0 +1,99 @@
+---
+- name: Start {{ casaos_proper_name }}
+  block:
+    - name: Create {{ casaos_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ casaos_data_directory }}"
+        - "{{ casaos_data_directory }}/data"
+
+    - name: Set {{ casaos_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        casaos_homepage_href: "https://{{ casaos_hostname }}.{{ ansible_nas_domain }}"
+      when: casaos_traefik_enabled | bool or casaos_dockflare_enabled | bool
+
+    - name: Create {{ casaos_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ casaos_container_name }}"
+        hostname: "{{ casaos_container_name }}"
+        image: "{{ casaos_image_name }}:{{ casaos_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ casaos_data_directory }}/data:/DATA"
+          - /var/run/docker.sock:/var/run/docker.sock
+        ports:
+          - "{{ casaos_port_http }}:8080"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ casaos_healthcheck_test }}"
+          interval: "{{ casaos_healthcheck_interval }}"
+          timeout: "{{ casaos_healthcheck_timeout }}"
+          retries: "{{ casaos_healthcheck_retries }}"
+          start_period: "{{ casaos_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ casaos_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ casaos_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ casaos_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ casaos_dockflare_access_group }}"
+          dockflare.hostname: "{{ casaos_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ casaos_port_http }}"
+          homepage.name: "{{ casaos_proper_name }}"
+          homepage.group: "{{ casaos_homepage_group }}"
+          homepage.icon: "{{ casaos_homepage_icon }}"
+          homepage.href: "{{ casaos_homepage_href }}"
+          homepage.description: "{{ casaos_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ casaos_container_name }}"
+          homepage.showStats: "{{ casaos_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ casaos_port_http }}"
+          repliqate.enabled: "{{ casaos_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ casaos_repliqate_engine }}"
+          repliqate.schedule: "{{ casaos_repliqate_schedule }}"
+          repliqate.backup_id: "{{ casaos_repliqate_backup_id }}"
+          repliqate.retention: "{{ casaos_repliqate_retention }}"
+          traefik.enable: "{{ casaos_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.casa.rule: "Host(`{{ casaos_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.casa.tls.certresolver: "letsencrypt"
+          traefik.http.routers.casa.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.casa.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.casa.middlewares: "casa@docker{{ ',tinyauth-auth@docker' if casaos_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.casa.IPAllowList.sourcerange: "{{ casaos_traefik_whitelist }}"
+          traefik.http.services.casa.loadbalancer.server.port: "8080"
+          wud.tag.include: "{{ casaos_wud_tag_include }}"
+          wud.tag.transform.type: "{{ casaos_wud_tag_transform_type }}"
+          wud.link.template: "{{ casaos_wud_link_template }}"
+        cpu_shares: "{{ casaos_cpu_shares }}"
+        memory: "{{ casaos_memory }}"
+        memory_swap: "{{ casaos_memory_swap }}"
+        stop_timeout: 60
+        restart_policy: unless-stopped
+
+    - name: Access {{ casaos_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (casaos_port_http | string)] +
+                (['https://' + casaos_hostname + '.' + ansible_nas_domain] if (casaos_traefik_enabled is true or casaos_dockflare_enabled is true) else [])
+              }}
+  when: casaos_enabled is true
+
+- name: Stop {{ casaos_proper_name }}
+  block:
+    - name: Stop {{ casaos_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ casaos_container_name }}"
+        state: absent
+  when: casaos_enabled is false
+
+- name: Data Archive {{ casaos_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ casaos_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - casaos_enabled is false

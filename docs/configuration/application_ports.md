@@ -429,7 +429,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4009
+# next avail = 4010
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002
