@@ -1,0 +1,72 @@
+---
+# ANE
+macos_proper_name: "macOS"
+macos_enabled: false
+macos_traefik_enabled: false
+macos_traefik_whitelist: "{{ lan }}"
+
+# directories
+macos_data_directory: "{{ docker_home }}/macos"
+macos_shared_directory: "{{ public_root }}"
+
+# docker
+macos_container_name: "macos"
+macos_image_name: "ghcr.io/dockur/macos"
+macos_image_tag: "latest"
+
+# network
+macos_hostname: "macos"
+macos_port_http: "4008"
+macos_port_vnc: "5900"
+
+# specs
+macos_cpu_shares: 1024
+macos_memory: "4G"
+macos_memory_swap: -1
+
+# app
+macos_env_arguments: "" # "-device usb-ehci,id=ehci" # Add this argument to fix USB/Input lag common in Proxmox nesting
+macos_env_cpu_cores: "1"
+macos_env_cpu_string: ""
+macos_env_disk_size: "64GB"
+macos_env_ram_size: "4GB"
+macos_env_version: "15"
+
+# autoheal
+macos_autoheal_enabled: false
+
+# dockflare
+macos_dockflare_enabled: false
+macos_dockflare_access_group: ""
+
+# healthcheck
+macos_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:8006/ || exit 1"]
+macos_healthcheck_interval: 2m
+macos_healthcheck_timeout: 30s
+macos_healthcheck_retries: 5
+macos_healthcheck_start_period: 10m
+
+# homepage
+macos_homepage_description: "macos short description"
+macos_homepage_group: "Apps"
+macos_homepage_icon: "https://img.icons8.com/color/1200/mac-logo.jpg"
+macos_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ macos_port_http }}"
+macos_homepage_showstats: false
+
+# repliqate
+macos_repliqate_enabled: false
+macos_repliqate_engine: "restic"
+macos_repliqate_schedule: "@daily 3am"
+macos_repliqate_backup_id: "{{ macos_container_name }}"
+macos_repliqate_retention: "30d"
+
+# tinyauth
+macos_tinyauth_enabled: false
+
+# watchtower
+macos_watchtower_enabled: false
+
+# wud
+macos_wud_tag_include: "^latest$"
+#macos_wud_tag_transform_type: "semver"
+macos_wud_link_template: "https://github.com/dockur/macos/pkgs/container/macos"

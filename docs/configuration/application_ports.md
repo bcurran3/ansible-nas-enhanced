@@ -170,6 +170,8 @@ By default, applications can be found on the ports listed below.
 | LoggiFly         | n/a
 | Loki             | 3100
 | Luanti           | 30000
+| macOS            | 4008    | Bridge  | HTTP           |
+| macOS            | 5900    | Bridge  | VNC            |
 | magnetico        | 9017    | Bridge  | HTTP           |
 | Mailrise         | 3089    | Host    | HTTP           |
 | Mailrise         | 465     | Host    | SMTP           |
@@ -427,7 +429,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4008
+# next avail = 4009
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

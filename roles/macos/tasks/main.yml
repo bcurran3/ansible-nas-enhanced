@@ -1,0 +1,115 @@
+---
+- name: Start {{ macos_proper_name }}
+  block:
+    - name: Create {{ macos_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ macos_data_directory }}"
+        - "{{ macos_data_directory }}/storage"
+
+    - name: Set {{ macos_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        macos_homepage_href: "https://{{ macos_hostname }}.{{ ansible_nas_domain }}"
+      when: macos_traefik_enabled | bool or macos_dockflare_enabled | bool
+
+    - name: Create {{ macos_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ macos_container_name }}"
+        hostname: "{{ macos_container_name }}"
+        image: "{{ macos_image_name }}:{{ macos_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ macos_data_directory }}/storage:/storage"
+          - "{{ macos_shared_directory }}:/shared"
+        ports:
+          - "{{ macos_port_http }}:8006"
+          - "{{ macos_port_vnc }}:5900/tcp"
+          - "{{ macos_port_vnc }}:5900/udp"
+        devices:
+          - /dev/kvm
+          - /dev/net/tun
+          - /dev/vhost-net
+        env:
+          ARGUMENTS: "{{ macos_env_arguments }}"
+          CPU_STRING: "{{ macos_env_cpu_string }}"
+          CPU_CORES: "{{ macos_env_cpu_cores }}"
+          DISK_SIZE: "{{ macos_env_disk_size }}"
+          RAM_SIZE: "{{ macos_env_ram_size }}"
+          VERSION: "{{ macos_env_version }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ macos_healthcheck_test }}"
+          interval: "{{ macos_healthcheck_interval }}"
+          timeout: "{{ macos_healthcheck_timeout }}"
+          retries: "{{ macos_healthcheck_retries }}"
+          start_period: "{{ macos_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ macos_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ macos_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ macos_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ macos_dockflare_access_group }}"
+          dockflare.hostname: "{{ macos_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ macos_port_http }}"
+          homepage.name: "{{ macos_proper_name }}"
+          homepage.group: "{{ macos_homepage_group }}"
+          homepage.icon: "{{ macos_homepage_icon }}"
+          homepage.href: "{{ macos_homepage_href }}"
+          homepage.description: "{{ macos_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ macos_container_name }}"
+          homepage.showStats: "{{ macos_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ macos_port_http }}"
+          repliqate.enabled: "{{ macos_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ macos_repliqate_engine }}"
+          repliqate.schedule: "{{ macos_repliqate_schedule }}"
+          repliqate.backup_id: "{{ macos_repliqate_backup_id }}"
+          repliqate.retention: "{{ macos_repliqate_retention }}"
+          traefik.enable: "{{ macos_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.macos.rule: "Host(`{{ macos_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.macos.tls.certresolver: "letsencrypt"
+          traefik.http.routers.macos.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.macos.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.macos.middlewares: "macos@docker{{ ',tinyauth-auth@docker' if macos_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.macos.IPAllowList.sourcerange: "{{ macos_traefik_whitelist }}"
+          traefik.http.services.macos.loadbalancer.server.port: "8006"
+          wud.tag.include: "{{ macos_wud_tag_include }}"
+#         wud.tag.transform.type: "{{ macos_wud_tag_transform_type }}"
+          wud.watch.digest: "true"
+          wud.link.template: "{{ macos_wud_link_template }}"
+        device_cgroup_rules:
+          - 'c *:* rwm'
+        capabilities:
+          - NET_ADMIN
+        cpu_shares: "{{ macos_cpu_shares }}"
+        memory: "{{ macos_memory }}"
+        memory_swap: "{{ macos_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ macos_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (macos_port_http | string)] +
+                (['https://' + macos_hostname + '.' + ansible_nas_domain] if (macos_traefik_enabled is true or macos_dockflare_enabled is true) else [])
+              }}
+  when: macos_enabled is true
+
+- name: Stop {{ macos_proper_name }}
+  block:
+    - name: Stop {{ macos_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ macos_container_name }}"
+        state: absent
+  when: macos_enabled is false
+
+- name: Data Archive {{ macos_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ macos_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - macos_enabled is false
