@@ -216,6 +216,7 @@ By default, applications can be found on the ports listed below.
 | Nomad            | 4648
 | ntfy             | 3018    | Bridge  | HTTP           |
 | NZBGet           | 6789    | Bridge  | HTTP           |
+| Obsidian         | 4007    | Bridge  | HTTP           |
 | OctoPrint        | 3050    | Bridge  | HTTP           |
 | Odoo             | 8069
 | Odoo             | 8072
@@ -426,7 +427,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4007
+# next avail = 4008
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

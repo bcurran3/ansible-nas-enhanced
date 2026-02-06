@@ -1,0 +1,73 @@
+---
+# ANE
+obsidian_proper_name: "Obsidian"
+obsidian_enabled: false
+obsidian_traefik_enabled: false
+obsidian_traefik_whitelist: "{{ lan }}"
+obsidian_amd_ai_enabled: true
+
+# directories
+obsidian_data_directory: "{{ docker_home }}/obsidian"
+
+# docker
+obsidian_container_name: "obsidian"
+obsidian_image_name: "lscr.io/linuxserver/obsidian"
+obsidian_image_tag: "latest"
+
+# uid / gid
+obsidian_user_id: "1000"
+obsidian_group_id: "1000"
+
+# network
+obsidian_hostname: "obsidian"
+obsidian_port_http: "4007"
+obsidian_port_https: "4008"
+
+# specs
+obsidian_cpu_shares: 1024
+obsidian_memory: "1G"
+obsidian_memory_swap: -1
+
+# autoheal
+obsidian_autoheal_enabled: false
+
+# dockflare
+obsidian_dockflare_enabled: false
+obsidian_dockflare_access_group: ""
+
+# healthcheck
+obsidian_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:3000/ || pgrep node || exit 1"]
+obsidian_healthcheck_interval: 1m
+obsidian_healthcheck_timeout: 10s
+obsidian_healthcheck_retries: 3
+obsidian_healthcheck_start_period: 30s
+
+# homepage
+obsidian_homepage_description: "a note-taking app that lets you create, link, and organize your notes on your device, with hundreds of plugins and themes to customize your workflow"
+obsidian_homepage_group: "Apps"
+obsidian_homepage_icon: "obsidian.png"
+obsidian_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ obsidian_port_http }}"
+obsidian_homepage_showstats: false
+
+# linuxserver.io docker mods for linuxserver.io images
+obsidian_env_docker_mods: ""
+obsidian_env_docker_mods_install_packages: ""
+obsidian_env_docker_mods_install_pip_packages: ""
+
+# repliqate
+obsidian_repliqate_enabled: false
+obsidian_repliqate_engine: "restic"
+obsidian_repliqate_schedule: "@daily 3am"
+obsidian_repliqate_backup_id: "{{ obsidian_container_name }}"
+obsidian_repliqate_retention: "30d"
+
+# tinyauth
+obsidian_tinyauth_enabled: false
+
+# watchtower
+obsidian_watchtower_enabled: false
+
+# wud
+obsidian_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+obsidian_wud_tag_transform_type: "semver"
+obsidian_wud_link_template: "https://lscr.io/linuxserver/obsidian"

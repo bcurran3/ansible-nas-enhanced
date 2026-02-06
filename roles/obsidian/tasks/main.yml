@@ -1,0 +1,120 @@
+---
+- name: Start {{ obsidian_proper_name }}
+  block:
+    - name: Create {{ obsidian_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ obsidian_user_id }}"
+        group: "{{ obsidian_group_id }}"
+      with_items:
+        - "{{ obsidian_data_directory }}"
+        - "{{ obsidian_data_directory }}/config"
+
+    - name: Set {{ obsidian_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        obsidian_homepage_href: "https://{{ obsidian_hostname }}.{{ ansible_nas_domain }}"
+      when: obsidian_traefik_enabled | bool or obsidian_dockflare_enabled | bool
+
+    - name: Create {{ obsidian_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ obsidian_container_name }}"
+        hostname: "{{ obsidian_container_name }}"
+        image: "{{ obsidian_image_name }}:{{ obsidian_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ obsidian_data_directory }}/config:/config"
+        ports:
+          - "{{ obsidian_port_http }}:3000"
+          - "{{ obsidian_port_https }}:3001"
+        env:
+          DOCKER_MODS: "{{ obsidian_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ obsidian_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ obsidian_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ obsidian_user_id }}"
+          PGID: "{{ obsidian_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | default(false) | bool else omit
+        }}"
+        devices: >-
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and obsidian_amd_ai_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
+        healthcheck:
+          test: "{{ obsidian_healthcheck_test }}"
+          interval: "{{ obsidian_healthcheck_interval }}"
+          timeout: "{{ obsidian_healthcheck_timeout }}"
+          retries: "{{ obsidian_healthcheck_retries }}"
+          start_period: "{{ obsidian_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ obsidian_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ obsidian_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ obsidian_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ obsidian_dockflare_access_group }}"
+          dockflare.hostname: "{{ obsidian_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ obsidian_port_http }}"
+          homepage.name: "{{ obsidian_proper_name }}"
+          homepage.group: "{{ obsidian_homepage_group }}"
+          homepage.icon: "{{ obsidian_homepage_icon }}"
+          homepage.href: "{{ obsidian_homepage_href }}"
+          homepage.description: "{{ obsidian_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ obsidian_container_name }}"
+          homepage.showStats: "{{ obsidian_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ obsidian_port_http }}"
+          repliqate.enabled: "{{ obsidian_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ obsidian_repliqate_engine }}"
+          repliqate.schedule: "{{ obsidian_repliqate_schedule }}"
+          repliqate.backup_id: "{{ obsidian_repliqate_backup_id }}"
+          repliqate.retention: "{{ obsidian_repliqate_retention }}"
+          traefik.enable: "{{ obsidian_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.obsidian.rule: "Host(`{{ obsidian_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.obsidian.tls.certresolver: "letsencrypt"
+          traefik.http.routers.obsidian.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.obsidian.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.obsidian.middlewares: "obsidian@docker{{ ',tinyauth-auth@docker' if obsidian_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.obsidian.IPAllowList.sourcerange: "{{ obsidian_traefik_whitelist }}"
+          traefik.http.services.obsidian.loadbalancer.server.port: "3000"
+          wud.tag.include: "{{ obsidian_wud_tag_include }}"
+          wud.tag.transform.type: "{{ obsidian_wud_tag_transform_type }}"
+          wud.link.template: "{{ obsidian_wud_link_template }}"
+        cpu_shares: "{{ obsidian_cpu_shares }}"
+        memory: "{{ obsidian_memory }}"
+        memory_swap: "{{ obsidian_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ obsidian_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (obsidian_port_http | string)] +
+                (['https://' + obsidian_hostname + '.' + ansible_nas_domain] if (obsidian_traefik_enabled is true or obsidian_dockflare_enabled is true) else [])
+              }}
+  when: obsidian_enabled is true
+
+- name: Stop {{ obsidian_proper_name }}
+  block:
+    - name: Stop {{ obsidian_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ obsidian_container_name }}"
+        state: absent
+  when: obsidian_enabled is false
+
+- name: Data Archive {{ obsidian_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ obsidian_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - obsidian_enabled is false
