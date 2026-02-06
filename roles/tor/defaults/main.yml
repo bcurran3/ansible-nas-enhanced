@@ -1,0 +1,53 @@
+---
+# ANE
+tor_proper_name: "Tor"
+tor_enabled: false
+
+# directories
+tor_data_directory: "{{ docker_home }}/tor"
+
+# docker
+tor_container_name: "tor"
+tor_image_name: "ghcr.io/dockur/tor"
+tor_image_tag: "latest"
+
+# network
+tor_hostname: "tor"
+tor_port_proxy: "9050"
+tor_port_control: "9051"
+
+# specs
+tor_cpu_shares: 1024
+tor_memory: "1G"
+tor_memory_swap: -1
+
+# autoheal
+tor_autoheal_enabled: false
+
+# healthcheck
+tor_healthcheck_test: ["CMD-SHELL", "curl -f --socks5-hostname 127.0.0.1:9050 https://check.torproject.org/api/ip || exit 1"]
+tor_healthcheck_interval: 1m
+tor_healthcheck_timeout: 10s
+tor_healthcheck_retries: 3
+tor_healthcheck_start_period: 3m
+
+# homepage
+tor_homepage_description: "Tor network proxy daemon"
+tor_homepage_group: "Misc"
+tor_homepage_icon: "tor.png"
+tor_homepage_showstats: false
+
+# repliqate
+tor_repliqate_enabled: false
+tor_repliqate_engine: "restic"
+tor_repliqate_schedule: "@daily 3am"
+tor_repliqate_backup_id: "{{ tor_container_name }}"
+tor_repliqate_retention: "30d"
+
+# watchtower
+tor_watchtower_enabled: false
+
+# wud
+tor_wud_tag_include: "^v?\\d+(\\.\\d+){1,2}$"
+tor_wud_tag_transform_type: "semver"
+tor_wud_link_template: "https://github.com/dockur/tor/pkgs/container/tor"

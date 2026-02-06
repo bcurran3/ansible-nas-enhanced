@@ -1,0 +1,77 @@
+---
+- name: Start {{ tor_proper_name }}
+  block:
+    - name: Create {{ tor_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: 100
+        group: 101
+      with_items:
+        - "{{ tor_data_directory }}"
+        - "{{ tor_data_directory }}/config"
+        - "{{ tor_data_directory }}/data"
+
+    - name: Create {{ tor_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tor_container_name }}"
+        hostname: "{{ tor_container_name }}"
+        image: "{{ tor_image_name }}:{{ tor_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tor_data_directory }}/config:/etc/tor"
+          - "{{ tor_data_directory }}/data:/var/lib/tor"
+        ports:
+          - "{{ tor_port_proxy }}:9050"   # SOCKS Port	Tunnel traffic through Tor (The "Input")
+          - "{{ tor_port_control }}:9051" # Control Port	Command & Control (Change identity, monitor status)
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tor_healthcheck_test }}"
+          interval: "{{ tor_healthcheck_interval }}"
+          timeout: "{{ tor_healthcheck_timeout }}"
+          retries: "{{ tor_healthcheck_retries }}"
+          start_period: "{{ tor_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tor_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tor_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ tor_proper_name }}"
+          homepage.group: "{{ tor_homepage_group }}"
+          homepage.icon: "{{ tor_homepage_icon }}"
+          homepage.description: "{{ tor_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tor_container_name }}"
+          homepage.showStats: "{{ tor_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ tor_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tor_repliqate_engine }}"
+          repliqate.schedule: "{{ tor_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tor_repliqate_backup_id }}"
+          repliqate.retention: "{{ tor_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ tor_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tor_wud_tag_transform_type }}"
+          wud.link.template: "{{ tor_wud_link_template }}"
+        cpu_shares: "{{ tor_cpu_shares }}"
+        memory: "{{ tor_memory }}"
+        memory_swap: "{{ tor_memory_swap }}"
+        restart_policy: unless-stopped
+  when: tor_enabled is true
+
+- name: Stop {{ tor_proper_name }}
+  block:
+    - name: Stop {{ tor_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ tor_container_name }}"
+        state: absent
+  when: tor_enabled is false
+
+- name: Data Archive {{ tor_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ tor_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - tor_enabled is false
