@@ -48,6 +48,9 @@
         group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
         runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
         env:
+          DOCKER_MODS: "{{ emby_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ emby_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ emby_env_docker_mods_install_pip_packages}}"
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ emby_user_id }}"
           PGID: "{{ emby_group_id }}"

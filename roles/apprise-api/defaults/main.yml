@@ -1,0 +1,74 @@
+---
+# ANE
+apprise_api_proper_name: "Apprise API"
+apprise_api_enabled: false
+apprise_api_traefik_enabled: false
+apprise_api_traefik_whitelist: "{{ lan }}"
+
+# directories
+apprise_api_data_directory: "{{ docker_home }}/apprise-api"
+
+# docker
+apprise_api_container_name: "apprise-api"
+apprise_api_image_name: "lscr.io/linuxserver/apprise-api"
+apprise_api_image_tag: "latest"
+
+# uid / gid
+apprise_api_user_id: "1000"
+apprise_api_group_id: "1000"
+
+# network
+apprise_api_hostname: "appriseapi"
+apprise_api_port_http: "4010"
+
+# specs
+apprise_api_cpu_shares: 1024
+apprise_api_memory: "1G"
+apprise_api_memory_swap: -1
+
+# app
+apprise_api_env_apprise_attach_size: "0"
+
+# autoheal
+apprise_api_autoheal_enabled: false
+
+# dockflare
+apprise_api_dockflare_enabled: false
+apprise_api_dockflare_access_group: ""
+
+# healthcheck
+apprise_api_healthcheck_test: ["CMD-SHELL", "curl -s http://127.0.0.1:8000/ || exit 1"]
+apprise_api_healthcheck_interval: 1m
+apprise_api_healthcheck_timeout: 10s
+apprise_api_healthcheck_retries: 3
+apprise_api_healthcheck_start_period: 30s
+
+# homepage
+apprise_api_homepage_description: "lightweight REST framework that wraps the Apprise Notification Library"
+apprise_api_homepage_group: "Apps"
+apprise_api_homepage_icon: "apprise.png"
+apprise_api_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ apprise_api_port_http }}"
+apprise_api_homepage_showstats: false
+
+# linuxserver.io docker mods for linuxserver.io images
+apprise_api_env_docker_mods: ""
+apprise_api_env_docker_mods_install_packages: ""
+apprise_api_env_docker_mods_install_pip_packages: ""
+
+# repliqate
+apprise_api_repliqate_enabled: false
+apprise_api_repliqate_engine: "restic"
+apprise_api_repliqate_schedule: "@daily 3am"
+apprise_api_repliqate_backup_id: "{{ apprise_api_container_name }}"
+apprise_api_repliqate_retention: "30d"
+
+# tinyauth
+apprise_api_tinyauth_enabled: false
+
+# watchtower
+apprise_api_watchtower_enabled: false
+
+# wud
+apprise_api_wud_tag_include: "^v?\\d+(\\.\\d+){1,2}-ls\\d+$"
+apprise_api_wud_tag_transform_type: "semver"
+apprise_api_wud_link_template: "https://github.com/linuxserver/docker-apprise-api/pkgs/container/apprise-api"

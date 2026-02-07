@@ -1,0 +1,107 @@
+---
+- name: Start {{ apprise_api_proper_name }}
+  block:
+    - name: Create {{ apprise_api_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ apprise_api_user_id }}"
+        group: "{{ apprise_api_group_id }}"
+      with_items:
+        - "{{ apprise_api_data_directory }}"
+        - "{{ apprise_api_data_directory }}/attachments"
+        - "{{ apprise_api_data_directory }}/config"
+
+    - name: Set {{ apprise_api_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        apprise_api_homepage_href: "https://{{ apprise_api_hostname }}.{{ ansible_nas_domain }}"
+      when: apprise_api_traefik_enabled | bool or apprise_api_dockflare_enabled | bool
+
+    - name: Create {{ apprise_api_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ apprise_api_container_name }}"
+        hostname: "{{ apprise_api_container_name }}"
+        image: "{{ apprise_api_image_name }}:{{ apprise_api_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ apprise_api_data_directory }}/attachments:/attachments"
+          - "{{ apprise_api_data_directory }}/config:/config"
+        ports:
+          - "{{ apprise_api_port_http }}:8000"
+        env:
+          APPRISE_ATTACH_SIZE: "{{ apprise_api_env_apprise_attach_size }}"
+          DOCKER_MODS: "{{ apprise_api_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ apprise_api_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ apprise_api_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ apprise_api_user_id }}"
+          PGID: "{{ apprise_api_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ apprise_api_healthcheck_test }}"
+          interval: "{{ apprise_api_healthcheck_interval }}"
+          timeout: "{{ apprise_api_healthcheck_timeout }}"
+          retries: "{{ apprise_api_healthcheck_retries }}"
+          start_period: "{{ apprise_api_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ apprise_api_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ apprise_api_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ apprise_api_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ apprise_api_dockflare_access_group }}"
+          dockflare.hostname: "{{ apprise_api_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ apprise_api_port_http }}"
+          homepage.name: "{{ apprise_api_proper_name }}"
+          homepage.group: "{{ apprise_api_homepage_group }}"
+          homepage.icon: "{{ apprise_api_homepage_icon }}"
+          homepage.href: "{{ apprise_api_homepage_href }}"
+          homepage.description: "{{ apprise_api_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ apprise_api_container_name }}"
+          homepage.showStats: "{{ apprise_api_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ apprise_api_port_http }}"
+          repliqate.enabled: "{{ apprise_api_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ apprise_api_repliqate_engine }}"
+          repliqate.schedule: "{{ apprise_api_repliqate_schedule }}"
+          repliqate.backup_id: "{{ apprise_api_repliqate_backup_id }}"
+          repliqate.retention: "{{ apprise_api_repliqate_retention }}"
+          traefik.enable: "{{ apprise_api_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.apprise-api.rule: "Host(`{{ apprise_api_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.apprise-api.tls.certresolver: "letsencrypt"
+          traefik.http.routers.apprise-api.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.apprise-api.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.apprise-api.middlewares: "apprise-api@docker{{ ',tinyauth-auth@docker' if apprise_api_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.apprise-api.IPAllowList.sourcerange: "{{ apprise_api_traefik_whitelist }}"
+          traefik.http.services.apprise-api.loadbalancer.server.port: "8000"
+          wud.tag.include: "{{ apprise_api_wud_tag_include }}"
+          wud.tag.transform.type: "{{ apprise_api_wud_tag_transform_type }}"
+          wud.link.template: "{{ apprise_api_wud_link_template }}"
+        cpu_shares: "{{ apprise_api_cpu_shares }}"
+        memory: "{{ apprise_api_memory }}"
+        memory_swap: "{{ apprise_api_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ apprise_api_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (apprise_api_port_http | string)] +
+                (['https://' + apprise_api_hostname + '.' + ansible_nas_domain] if (apprise_api_traefik_enabled is true or apprise_api_dockflare_enabled is true) else [])
+              }}
+  when: apprise_api_enabled is true
+
+- name: Stop {{ apprise_api_proper_name }}
+  block:
+    - name: Stop {{ apprise_api_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ apprise_api_container_name }}"
+        state: absent
+  when: apprise_api_enabled is false
+
+- name: Data Archive {{ apprise_api_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ apprise_api_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - apprise_api_enabled is false
