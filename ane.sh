@@ -10,6 +10,19 @@
 : "${ANE_DISABLE_ALSO_REMOVES:=false}"
 : "${ANE_DISABLE_ALSO_STOPS:=false}"
 : "${ANE_ENABLE_ALSO_STARTS:=false}"
+: "${ANE_BECOME_PASSWORD:=""}"
+
+# Configure Ansible Become Flags (Sudo)
+if [[ -n "$ANE_BECOME_PASSWORD" ]]; then
+    BECOME_FLAGS=(-b --extra-vars "ansible_become_pass=$ANE_BECOME_PASSWORD")
+else
+    BECOME_FLAGS=(-b -K)
+fi
+if [[ -n "$ANE_BECOME_PASSWORD" ]]; then
+    MASKED_PASS="********"
+else
+    MASKED_PASS="NOT SET"
+fi
 
 # Filter out non-containers
 ANE_EXCLUDES="#|WIP|_share_|_root_share|archive_app_data|nvidia_runtime|intel_igpu|amd_gpu|docker_compose|^ansible_nas|webmin|usermin|_(autoheal|dockflare|tinyauth|traefik|watchtower|repliqate)"
@@ -89,17 +102,6 @@ function help {
     exit
 }
 
-# Check # git commits ANE is behind
-function check_behind {
-    git fetch --quiet
-    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
-    BEHIND=$(git rev-list --count HEAD..@{u})
-    echo "  ** Your ANE installation is $BEHIND git commits behind."
-    if [ $BEHIND -gt 0 ]; then
-       echo "  ** \"./ane.sh --upgrade\" to update"
-    fi
-}
-
 # ANE Pro Tips menu
 function display_protips {
     echo "Ansible-NAS-Enhanced (ANE) Pro Tips:"
@@ -121,6 +123,8 @@ function display_protips {
     echo "    -- remove/delete app container when you disable it"
     echo "  export ANE_ENABLE_ALSO_STARTS=\"true\""
     echo "    -- install app when you enable it"
+    echo "  export ANE_BECOME_PASSWORD=\"yoursudopassword\""
+    echo "    -- automate sudo prompts (use with caution!)"
 }
 
 # ANE Developer Stuff menu
@@ -132,6 +136,17 @@ function display_devstuff {
     echo "      Disable all apps."
     echo "  --newapp appname"
     echo "      Copies app template and autofills some variables."
+}
+
+# Check # git commits ANE is behind
+function check_behind {
+    git fetch --quiet
+    if [ $? -ne 0 ]; then echo "  ** ERROR fetching repo delta!"; exit 1; fi
+    BEHIND=$(git rev-list --count HEAD..@{u})
+    echo "  ** Your ANE installation is $BEHIND git commits behind."
+    if [ $BEHIND -gt 0 ]; then
+       echo "  ** \"./ane.sh --upgrade\" to update"
+    fi
 }
 
 function copy_to_plugins {
@@ -191,7 +206,7 @@ function disable_all_apps {
     fi
     if [[ "$ANE_DISABLE_ALSO_REMOVES" == "true" ]]; then
         echo "  ** Running playbook to uninstall apps..."
-        ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t "$CLEAN_TAGS"
+        ansible-playbook -i inventories/ANE/inventory nas.yml "${BECOME_FLAGS[@]}" -t "$CLEAN_TAGS"
     else
         echo "  ** All apps disabled in config. Containers may still be running unless ANE_DISABLE_ALSO_STOPS is true."
     fi
@@ -221,7 +236,7 @@ function disable_app {
     done
     if [[ "$ANE_DISABLE_ALSO_REMOVES" == "true" && -n "$TAGS_TO_REMOVE" ]]; then
         echo "  ** Uninstalling disabled apps: ${TAGS_TO_REMOVE%,}..."
-        ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t "${TAGS_TO_REMOVE%,}"
+        ansible-playbook -i inventories/ANE/inventory nas.yml "${BECOME_FLAGS[@]}" -t "${TAGS_TO_REMOVE%,}"
     fi
 }
 
@@ -329,7 +344,7 @@ function enable_all_apps {
     done
     if [[ "$ANE_ENABLE_ALSO_STARTS" == "true" && -n "$TAGS_TO_RUN" ]]; then
         echo "  ** Starting mass installation..."
-        ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t "${TAGS_TO_RUN%,}"
+        ansible-playbook -i inventories/ANE/inventory nas.yml "${BECOME_FLAGS[@]}" -t "${TAGS_TO_RUN%,}"
     else
         echo "  ** All apps enabled in $FILE. Run ANE full playbook to deploy."
     fi
@@ -388,7 +403,7 @@ function enable_app {
     done
     if [[ "$ANE_ENABLE_ALSO_STARTS" == "true" ]] && [[ -n "${TAGS_TO_RUN%,}" ]]; then
         echo "  ** Installing enabled apps: ${TAGS_TO_RUN%,}..."
-        ansible-playbook -i inventories/ANE/inventory nas.yml -b -K -t "${TAGS_TO_RUN%,}"
+        ansible-playbook -i inventories/ANE/inventory nas.yml "${BECOME_FLAGS[@]}" -t "${TAGS_TO_RUN%,}"
     fi
 }
 
@@ -571,13 +586,12 @@ function upgrade {
 
 # run the full ANE playbook
 function run_playbook {
-#    validate_app
     appslist=""
     shift
     for arg in "$@"; do
         appslist+=" -t $arg"
     done
-    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K $appslist
+    ansible-playbook -i inventories/ANE/inventory nas.yml "${BECOME_FLAGS[@]}" $appslist
 }
 
 function stop_app {
@@ -813,7 +827,7 @@ fi
 
 # Reset ANE shared file permissions
 if [[ "$1" = "--permissions" || "$1" = "-permissions" ]]; then
-    ansible-playbook -i inventories/ANE/inventory permission_data.yml -b -K
+    ansible-playbook -i inventories/ANE/inventory permission_data.yml "${BECOME_FLAGS[@]}"
     exit
 fi
 
@@ -840,7 +854,7 @@ fi
 # Run ANE full playbook
 if [[ "$1" = "--run" || "$1" = "-r" || "$1" = "--update" || "$1" = "-update" || "$1" = "-u" ]]; then
     [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
-    ansible-playbook -i inventories/ANE/inventory nas.yml -b -K "${@:2}" && { [[ "$ANE_ALWAYS_PRUNE" == "true" ]] && prune; }
+    ansible-playbook -i inventories/ANE/inventory nas.yml "${BECOME_FLAGS[@]}" "${@:2}" && { [[ "$ANE_ALWAYS_PRUNE" == "true" ]] && prune; }
     exit
 fi
 
