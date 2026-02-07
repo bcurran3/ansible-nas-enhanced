@@ -1,0 +1,75 @@
+---
+# ANE
+libreoffice_proper_name: "LibreOffice"
+libreoffice_enabled: false
+libreoffice_traefik_enabled: false
+libreoffice_traefik_whitelist: "{{ lan }}"
+
+# directories
+libreoffice_data_directory: "{{ docker_home }}/libreoffice"
+
+# docker
+libreoffice_container_name: "libreoffice"
+libreoffice_image_name: "lscr.io/linuxserver/libreoffice"
+libreoffice_image_tag: "latest"
+
+# uid / gid
+libreoffice_user_id: "1000"
+libreoffice_group_id: "1000"
+
+# network
+libreoffice_hostname: "libreoffice"
+libreoffice_port_http: "4011"
+
+# specs
+libreoffice_cpu_shares: 1024
+#Minimum (Baseline): 1GB. It is enough to start the container and open small files, but it will struggle with large spreadsheets or multiple open documents.
+#Recommended (Smooth Performance): 2GB to 4GB. This provides enough headroom for the internal X-server, the Kasm/Selkies streaming engine, and the LibreOffice suite itself to run without swapping.
+#Power User (Large Data/Heavy Macros): 8GB. If you are working with massive Excel files or complex databases in LibreOffice Base, 8GB is the safest ceiling.
+libreoffice_memory: "4G"
+libreoffice_memory_swap: -1
+libreoffice_shm_size: "2G"
+
+# autoheal
+libreoffice_autoheal_enabled: false
+
+# dockflare
+libreoffice_dockflare_enabled: false
+libreoffice_dockflare_access_group: ""
+
+# healthcheck
+libreoffice_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:3000/ || pgrep node || exit 1"]
+libreoffice_healthcheck_interval: 1m
+libreoffice_healthcheck_timeout: 10s
+libreoffice_healthcheck_retries: 3
+libreoffice_healthcheck_start_period: 45s
+
+# homepage
+libreoffice_homepage_description: "libreoffice short description"
+libreoffice_homepage_group: "Apps"
+libreoffice_homepage_icon: "libreoffice.png"
+libreoffice_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ libreoffice_port_http }}"
+libreoffice_homepage_showstats: false
+
+# linuxserver.io docker mods for linuxserver.io images
+libreoffice_env_docker_mods: ""
+libreoffice_env_docker_mods_install_packages: ""
+libreoffice_env_docker_mods_install_pip_packages: ""
+
+# repliqate
+libreoffice_repliqate_enabled: false
+libreoffice_repliqate_engine: "restic"
+libreoffice_repliqate_schedule: "@daily 3am"
+libreoffice_repliqate_backup_id: "{{ libreoffice_container_name }}"
+libreoffice_repliqate_retention: "30d"
+
+# tinyauth
+libreoffice_tinyauth_enabled: false
+
+# watchtower
+libreoffice_watchtower_enabled: false
+
+# wud
+libreoffice_wud_tag_include: "^\\d+(\\.\\d+)+-ls\\d+$"
+libreoffice_wud_tag_transform_type: "semver"
+libreoffice_wud_link_template: "https://github.com/linuxserver/docker-libreoffice/pkgs/container/libreoffice"

@@ -165,6 +165,8 @@ By default, applications can be found on the ports listed below.
 | Krusader         | 6080    | Bridge  | HTTP           |
 | Krusader         | 5901    | Bridge  | VNC            |
 | LANCommander     | 1337    | Bridge  | HTTP           |
+| LibreOffice      | 4011    | Bridge  | HTTP           |
+| LibreOffice      | 4012    | Bridge  | VNC            |
 | Lidarr           | 8686    | Bridge  | HTTP           |
 | Linkwarden       | 8990    | Bridge  | HTTP           |
 | LocalAI          | 3042    | Bridge  | HTTP           |
@@ -430,7 +432,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4011
+# next avail = 4013
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

@@ -1,0 +1,18 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Try and stop and remove {{ template_proper_name }}
+      community.docker.docker_container:
+        name: "{{ libreoffice_container_name }}"
+        state: absent
+      register: result
+
+    - name: Check if {{ template_proper_name }} is stopped
+      ansible.builtin.assert:
+        that:
+          - not result.changed

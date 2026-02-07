@@ -1,0 +1,122 @@
+---
+- name: Start {{ libreoffice_proper_name }}
+  block:
+    - name: Create {{ libreoffice_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ libreoffice_user_id }}"
+        group: "{{ libreoffice_group_id }}"
+      with_items:
+        - "{{ libreoffice_data_directory }}"
+        - "{{ libreoffice_data_directory }}/config"
+
+    - name: Set {{ libreoffice_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        libreoffice_homepage_href: "https://{{ libreoffice_hostname }}.{{ ansible_nas_domain }}"
+      when: libreoffice_traefik_enabled | bool or libreoffice_dockflare_enabled | bool
+
+    - name: Create {{ libreoffice_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ libreoffice_container_name }}"
+        hostname: "{{ libreoffice_container_name }}"
+        image: "{{ libreoffice_image_name }}:{{ libreoffice_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ libreoffice_data_directory }}/config:/config"
+        ports:
+          - "{{ libreoffice_port_http }}:3001"
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | default(false) | bool else omit
+        }}"
+        devices: >-
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and libreoffice_amd_ai_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
+        env:
+          DOCKER_MODS: "{{ libreoffice_env_docker_mods }}"
+          INSTALL_PACKAGES: "{{ libreoffice_env_docker_mods_install_packages }}"
+          INSTALL_PIP_PACKAGES: "{{ libreoffice_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ libreoffice_user_id }}"
+          PGID: "{{ libreoffice_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ libreoffice_healthcheck_test }}"
+          interval: "{{ libreoffice_healthcheck_interval }}"
+          timeout: "{{ libreoffice_healthcheck_timeout }}"
+          retries: "{{ libreoffice_healthcheck_retries }}"
+          start_period: "{{ libreoffice_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ libreoffice_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ libreoffice_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ libreoffice_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ libreoffice_dockflare_access_group }}"
+          dockflare.hostname: "{{ libreoffice_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ libreoffice_port_http }}"
+          homepage.name: "{{ libreoffice_proper_name }}"
+          homepage.group: "{{ libreoffice_homepage_group }}"
+          homepage.icon: "{{ libreoffice_homepage_icon }}"
+          homepage.href: "{{ libreoffice_homepage_href }}"
+          homepage.description: "{{ libreoffice_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ libreoffice_container_name }}"
+          homepage.showStats: "{{ libreoffice_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "https://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ libreoffice_port_http }}"
+          repliqate.enabled: "{{ libreoffice_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ libreoffice_repliqate_engine }}"
+          repliqate.schedule: "{{ libreoffice_repliqate_schedule }}"
+          repliqate.backup_id: "{{ libreoffice_repliqate_backup_id }}"
+          repliqate.retention: "{{ libreoffice_repliqate_retention }}"
+          traefik.enable: "{{ libreoffice_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.libreoffice.entrypoints: "websecure"
+          traefik.http.routers.libreoffice.rule: "Host(`{{ libreoffice_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.libreoffice.tls: "true"
+          traefik.http.routers.libreoffice.tls.certresolver: "letsencrypt"
+          traefik.http.routers.libreoffice.middlewares: "libreoffice-whitelist@docker{{ ',tinyauth-auth@docker' if libreoffice_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.libreoffice-whitelist.ipallowlist.sourcerange: "{{ libreoffice_traefik_whitelist }}"
+          traefik.http.services.libreoffice.loadbalancer.server.port: "3001"
+          traefik.http.services.libreoffice.loadbalancer.server.scheme: "https"
+          traefik.http.services.libreoffice.loadbalancer.serversTransport: "insecureTransport@file"
+          wud.tag.include: "{{ libreoffice_wud_tag_include }}"
+          wud.tag.transform.type: "{{ libreoffice_wud_tag_transform_type }}"
+          wud.link.template: "{{ libreoffice_wud_link_template }}"
+        cpu_shares: "{{ libreoffice_cpu_shares }}"
+        memory: "{{ libreoffice_memory }}"
+        memory_swap: "{{ libreoffice_memory_swap }}"
+        shm_size: "{{ libreoffice_shm_size }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ libreoffice_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['https://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (libreoffice_port_http | string)] +
+                (['https://' + libreoffice_hostname + '.' + ansible_nas_domain] if (libreoffice_traefik_enabled is true or libreoffice_dockflare_enabled is true) else [])
+              }}
+  when: libreoffice_enabled is true
+
+- name: Stop {{ libreoffice_proper_name }}
+  block:
+    - name: Stop {{ libreoffice_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ libreoffice_container_name }}"
+        state: absent
+  when: libreoffice_enabled is false
+
+- name: Data Archive {{ libreoffice_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ libreoffice_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - libreoffice_enabled is false
