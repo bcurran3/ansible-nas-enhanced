@@ -9,6 +9,11 @@
         - "{{ emby_data_directory }}"
         - "{{ emby_data_directory }}/config"
 
+    - name: Set {{ emby_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        emby_homepage_href: "https://{{ emby_hostname }}.{{ ansible_nas_domain }}"
+      when: emby_traefik_enabled | bool or emby_dockflare_enabled | bool
+
     - name: Create {{ emby_proper_name }} Container
       community.docker.docker_container:
         container_default_behavior: "compatibility"
@@ -46,6 +51,12 @@
           TZ: "{{ ansible_nas_timezone }}"
           PUID: "{{ emby_user_id }}"
           PGID: "{{ emby_group_id }}"
+        healthcheck:
+          test: "{{ emby_healthcheck_test }}"
+          interval: "{{ emby_healthcheck_interval }}"
+          timeout: "{{ emby_healthcheck_timeout }}"
+          retries: "{{ emby_healthcheck_retries }}"
+          start_period: "{{ emby_healthcheck_start_period }}"
         labels:
           autoheal: "{{ emby_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ emby_watchtower_enabled | ternary('true', 'false') }}"
@@ -75,9 +86,9 @@
           traefik.http.routers.emby.middlewares: "emby@docker{{ ',tinyauth-auth@docker' if emby_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.emby.IPAllowList.sourcerange: "{{ emby_traefik_whitelist }}"
           traefik.http.services.emby.loadbalancer.server.port: "8096"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/emby/embyserver"
+          emby_wud_tag_include: "^\\d+\\.\\d+\\.\\d+\\.\\d+-ls\\d+$"
+          emby_wud_tag_transform_type: "semver"
+          emby_wud_link_template: "https://github.com/linuxserver/docker-emby/pkgs/container/emby"
         cpu_shares: "{{ emby_cpu_shares }}"
         memory: "{{ emby_memory }}"
         memory_swap: "{{ emby_memory_swap }}"

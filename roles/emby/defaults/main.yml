@@ -44,12 +44,8 @@ emby_memory_swap: -1
 
 # docker
 emby_container_name: "emby"
-emby_image: emby/embyserver
-emby_image_tag: beta
-
-# Device mappings for the docker container. E.g. To enable hardware transcoding:
-# emby_devices:
-#  - "/dev/dri:/dev/dri"
+emby_image: "lscr.io/linuxserver/emby"
+emby_image_tag: "latest"
 
 # autoheal
 emby_autoheal_enabled: false
@@ -57,6 +53,13 @@ emby_autoheal_enabled: false
 # dockflare
 emby_dockflare_enabled: false
 emby_dockflare_access_group: ""
+
+# healthcheck
+emby_healthcheck_test: ["CMD-SHELL", "curl -s http://127.0.0.1:8096/ | grep -q 'Emby' || exit 0"]
+emby_healthcheck_interval: 1m
+emby_healthcheck_timeout: 10s
+emby_healthcheck_retries: 3
+emby_healthcheck_start_period: 2m
 
 # homepage
 emby_homepage_group: "Media Servers"
