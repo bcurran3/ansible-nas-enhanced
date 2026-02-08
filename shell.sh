@@ -1,5 +1,5 @@
 #!/bin/bash
-# Ansible-NAS-Enhanced helper script
+# shell.sh Ansible-NAS-Enhanced helper script
 
 : "${ANE_EDITOR:="nano"}"
 : "${ANE_ALWAYS_CHECK_BEHIND:=false}"
@@ -14,10 +14,8 @@
 
 # Configure Ansible Become Flags (Sudo)
 if [[ -n "$ANE_BECOME_PASSWORD" ]]; then
-    # Pass password non-interactively
     BECOME_FLAGS=(-b --extra-vars "ansible_become_pass=$ANE_BECOME_PASSWORD")
 else
-    # Ask for password interactively
     BECOME_FLAGS=(-b -K)
 fi
 

@@ -46,6 +46,7 @@
           - "{{ jellyfin_tv_directory }}:/tv:{{ jellyfin_tv_permissions }}"
         ports:
           - "{{ jellyfin_port_http }}:8096"
+          - "7359:7359/udp" # Client discovery
         env:
           DOCKER_MODS: "{{ jellyfin_env_docker_mods }}"
           INSTALL_PACKAGES: "{{ jellyfin_env_docker_mods_install_packages }}"
@@ -57,6 +58,12 @@
           PUID: "{{ jellyfin_user_id }}"
           PGID: "{{ jellyfin_group_id }}"
           TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ jellyfin_healthcheck_test }}"
+          interval: "{{ jellyfin_healthcheck_interval }}"
+          timeout: "{{ jellyfin_healthcheck_timeout }}"
+          retries: "{{ jellyfin_healthcheck_retries }}"
+          start_period: "{{ jellyfin_healthcheck_start_period }}"
         labels:
           autoheal: "{{ jellyfin_autoheal_enabled | ternary('true', 'false') }}"
           com.centurylinklabs.watchtower.enable: "{{ jellyfin_watchtower_enabled | ternary('true', 'false') }}"

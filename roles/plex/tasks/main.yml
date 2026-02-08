@@ -37,7 +37,7 @@
 #          - "33400:33400"       # Plex Web Tools
 #          - "1900:1900/udp"     # Plex DLNA Server
         device_requests: "{{
-          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu', 'video', 'compute', 'utility']}]
           if nvidia_runtime_enabled | default(false) | bool else omit
         }}"
         devices: >-
@@ -70,11 +70,11 @@
           TP_ADDON: "{{ plex_env_docker_mods_tp_addon }}"
           PUID: "{{ plex_user_id }}"
           PGID: "{{ plex_group_id }}"
-          VERSION: "{{ plex_version }}"
-          NVIDIA_VISIBLE_DEVICES: "all"                       # added
-          NVIDIA_DRIVER_CAPABILITIES: "compute,video,utility" # added
-          GenerateBIFKeyframesOnly: "1"                       # added
-          PLEX_DISABLE_SECURITY: "1"                          # added
+          VERSION: "{{ plex_env_version }}"
+          NVIDIA_VISIBLE_DEVICES: "{{ plex_env_nvidia_visible_devices }}"
+          NVIDIA_DRIVER_CAPABILITIES: "{{ plex_env_nvidia_driver_capabilities }}"
+          GenerateBIFKeyframesOnly: "{{ plex_env_generatebifkeyframesonly }}"
+          PLEX_DISABLE_SECURITY: "{{ plex_env_disable_security }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: "{{ plex_healthcheck_test }}"

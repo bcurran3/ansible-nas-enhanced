@@ -56,6 +56,13 @@ jellyfin_autoheal_enabled: false
 jellyfin_dockflare_enabled: false
 jellyfin_dockflare_access_group: ""
 
+# healthcheck
+jellyfin_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:8096/health || exit 1"]
+jellyfin_healthcheck_interval: 1m
+jellyfin_healthcheck_timeout: 10s
+jellyfin_healthcheck_retries: 3
+jellyfin_healthcheck_start_period: 2m
+
 # homepage 
 jellyfin_homepage_group: "Media Servers"
 jellyfin_homepage_icon: "jellyfin.png"

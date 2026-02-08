@@ -47,12 +47,13 @@ plex_cpu_shares: 1024
 plex_memory: "4g"
 plex_memory_swap: -1
 
-# Device mappings for the docker container. E.g. To enable hardware transcoding:
-# plex_devices:
-#  - "/dev/dri:/dev/dri"
-
+# app
 # see https://hub.docker.com/r/linuxserver/plex for details on this setting
-plex_version: "docker"
+plex_env_version: "docker"
+plex_env_nvidia_visible_devices: "all"
+plex_env_nvidia_driver_capabilities: "all"
+plex_env_generatebifkeyframesonly: "1"
+plex_env_disable_security: "1"
 
 # autoheal
 plex_autoheal_enabled: false
