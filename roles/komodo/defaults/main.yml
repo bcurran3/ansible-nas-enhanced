@@ -98,17 +98,17 @@ komodo_dockflare_enabled: false
 komodo_dockflare_access_group: ""
 
 # healthcheck
-komodo_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:9120/ || exit 1"]
-komodo_healthcheck_interval: 30s
+komodo_healthcheck_test: ["CMD-SHELL", "curl -f http://127.0.0.1:9120/ || exit 1"]
+komodo_healthcheck_interval: 1m
 komodo_healthcheck_timeout: 10s
 komodo_healthcheck_retries: 3
-komodo_healthcheck_start_period: 30s
+komodo_healthcheck_start_period: 1m
 komodo_db_healthcheck_test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--host", "127.0.0.1"]
 komodo_db_healthcheck_interval: 10s
 komodo_db_healthcheck_timeout: 5s
 komodo_db_healthcheck_retries: 3
 komodo_db_healthcheck_start_period: 15s
-komodo_periphery_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider --no-check-certificate https://127.0.0.1:8120/ || exit 1"]
+komodo_periphery_healthcheck_test: ["CMD-SHELL", "(echo > /dev/tcp/127.0.0.1/8120) >/dev/null 2>&1 || curl -f http://127.0.0.1:8120/ping || wget --quiet --tries=1 --spider http://127.0.0.1:8120/ping || exit 1"]
 komodo_periphery_healthcheck_interval: 30s
 komodo_periphery_healthcheck_timeout: 10s
 komodo_periphery_healthcheck_retries: 3

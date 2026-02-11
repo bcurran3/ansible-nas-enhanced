@@ -62,7 +62,7 @@
           traefik.http.routers.kokoro-fastapi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.kokoro-fastapi.middlewares: "kokoro-fastapi@docker{{ ',tinyauth-auth@docker' if kokoro_fastapi_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.kokoro-fastapi.IPAllowList.sourcerange: "{{ kokoro_fastapi_traefik_whitelist }}"
-          traefik.http.services.kokoro-fastapi.loadbalancer.server.port: "80"
+          traefik.http.services.kokoro-fastapi.loadbalancer.server.port: "8880"
           wud.tag.include: "{{ kokoro_fastapi_wud_tag_include }}"
           wud.tag.transform.type: "{{ kokoro_fastapi_wud_tag_transform_type }}"
           wud.link.template: "{{ kokoro_fastapi_wud_link_template }}"
