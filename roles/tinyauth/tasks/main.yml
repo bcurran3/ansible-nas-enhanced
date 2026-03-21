@@ -19,10 +19,10 @@
         ports:
           - "{{ tinyauth_port_http }}:{{ tinyauth_port_http }}"
         env:
-          APP_URL: "https://{{ tinyauth_hostname }}.{{ ansible_nas_domain }}"
-          PORT: "{{ tinyauth_port_http }}"
-          SECRET: "{{ tinyauth_env_secret }}"
-          USERS: "{{ tinyauth_env_users }}"
+          TINYAUTH_APPURL: "https://{{ tinyauth_hostname }}.{{ ansible_nas_domain }}"
+          TINYAUTH_SERVER_PORT: "{{ tinyauth_port_http }}"
+          TINYAUTH_SECRET: "{{ tinyauth_env_secret }}"
+          TINYAUTH_AUTH_USERS: "{{ tinyauth_env_users }}"
           TZ: "{{ ansible_nas_timezone }}"
         volumes:
           - "{{ tinyauth_data_directory }}/data:/data"
