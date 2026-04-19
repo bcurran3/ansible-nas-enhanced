@@ -98,9 +98,9 @@
           traefik.http.routers.handbrake.middlewares: "handbrake@docker{{ ',tinyauth-auth@docker' if handbrake_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.handbrake.IPAllowList.sourcerange: "{{ handbrake_traefik_whitelist }}"
           traefik.http.services.handbrake.loadbalancer.server.port: "5800"
-          wud.tag.include: '^v\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/jlesage/docker-handbrake/pkgs/container/handbrake"
+          wud.tag.include: "{{ handbrake_wud_tag_include }}"
+          wud.tag.transform.type: "{{ handbrake_wud_tag_transform_type }}"
+          wud.link.template: "{{ handbrake_wud_link_template }}"
         cpu_shares: "{{ handbrake_cpu_shares }}"
         memory: "{{ handbrake_memory }}"
         memory_swap: "{{ handbrake_memory_swap }}"
