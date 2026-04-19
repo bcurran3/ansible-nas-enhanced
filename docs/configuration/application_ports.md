@@ -31,6 +31,7 @@ By default, applications can be found on the ports listed below.
 | Blinko           | 1111
 | Booksonic Air    | 4041    | Bridge  | HTTP           |
 | Blinko           | 3075    | Bridge  | HTTP           |
+| Byparr           | 4013    | Bridge  | HTTP           |
 | ByteStash        | 3076    | Bridge  | HTTP           |
 | Calibre          | 8093
 | Calibre          | 8094
@@ -433,7 +434,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4013
+# next avail = 4014
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

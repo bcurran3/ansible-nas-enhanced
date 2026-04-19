@@ -1,0 +1,79 @@
+---
+- name: Start {{ byparr_proper_name }}
+  block:
+    - name: Set {{ byparr_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        byparr_homepage_href: "https://{{ byparr_hostname }}.{{ ansible_nas_domain }}"
+      when: byparr_traefik_enabled | bool or byparr_dockflare_enabled | bool
+
+    - name: Create {{ byparr_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ byparr_container_name }}"
+        hostname: "{{ byparr_container_name }}"
+        image: "{{ byparr_image_name }}:{{ byparr_image_version }}"
+        pull: true
+        ports:
+          - "{{ byparr_port_http }}:{{ byparr_port_http }}"
+        env:
+          PORT: "{{ byparr_port_http }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ byparr_healthcheck_test }}"
+          interval: "{{ byparr_healthcheck_interval }}"
+          timeout: "{{ byparr_healthcheck_timeout }}"
+          retries: "{{ byparr_healthcheck_retries }}"
+          start_period: "{{ byparr_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ byparr_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ byparr_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ byparr_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ byparr_dockflare_access_group }}"
+          dockflare.hostname: "{{ byparr_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ byparr_port_http }}"
+          homepage.name: "{{ byparr_proper_name }}"
+          homepage.group: "{{ byparr_homepage_group }}"
+          homepage.href: "{{ byparr_homepage_href }}"
+          homepage.icon: "{{ byparr_homepage_icon }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ byparr_port_http }}"
+          homepage.description: "{{ 'Proxy server to bypass Cloudflare protection' if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ byparr_container_name }}"
+          homepage.showStats: "{{ byparr_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ byparr_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ byparr_repliqate_engine }}"
+          repliqate.schedule: "{{ byparr_repliqate_schedule }}"
+          repliqate.backup_id: "{{ byparr_repliqate_backup_id }}"
+          repliqate.retention: "{{ byparr_repliqate_retention }}"
+          traefik.enable: "{{ byparr_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.byparr.rule: "Host(`{{ byparr_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.byparr.tls.certresolver: "letsencrypt"
+          traefik.http.routers.byparr.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.byparr.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.byparr.middlewares: "byparr@docker{{ ',tinyauth-auth@docker' if byparr_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.byparr.IPAllowList.sourcerange: "{{ byparr_traefik_whitelist }}"
+          traefik.http.services.byparr.loadbalancer.server.port: "{{ byparr_port_http }}"
+          wud.tag.include: '^v?\d+\.\d+\.\d+.*$'
+          wud.tag.transform.type: "semver"
+          wud.link.template: "https://github.com/FlareSolverr/FlareSolverr/releases"
+        cpu_shares: "{{ byparr_cpu_shares }}"
+        memory: "{{ byparr_memory }}"
+        memory_swap: "{{ byparr_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ byparr_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (byparr_port_http | string)] +
+                (['https://' + byparr_hostname + '.' + ansible_nas_domain] if (byparr_traefik_enabled is true or byparr_dockflare_enabled is true) else [])
+              }}
+  when: byparr_enabled is true
+
+- name: Stop {{ byparr_proper_name }}
+  block:
+    - name: Stop {{ byparr_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ byparr_container_name }}"
+        state: absent
+  when: byparr_enabled is false

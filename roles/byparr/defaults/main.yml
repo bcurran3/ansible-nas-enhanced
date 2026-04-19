@@ -1,0 +1,56 @@
+---
+# ANE
+byparr_proper_name: "Byparr"
+byparr_enabled: false
+byparr_traefik_enabled: false
+byparr_traefik_whitelist: "{{ lan }}"
+
+# directories
+byparr_data_directory: "{{ docker_home }}/byparr"
+
+# network
+byparr_port_http: "4013"
+byparr_hostname: "byparr"
+
+# docker
+byparr_container_name: "byparr"
+byparr_image_name: "ghcr.io/thephaseless/byparr"
+byparr_image_version: "latest"
+
+# specs
+byparr_cpu_shares: 1024
+byparr_memory: "1024M"
+byparr_memory_swap: -1
+
+# autoheal
+byparr_autoheal_enabled: false
+
+# dockflare
+byparr_dockflare_enabled: false
+byparr_dockflare_access_group: ""
+
+# healthcheck
+byparr_healthcheck_test: ["CMD-SHELL", "pgrep -f byparr || exit 1"]
+byparr_healthcheck_interval: 30s
+byparr_healthcheck_timeout: 10s
+byparr_healthcheck_retries: 3
+byparr_healthcheck_start_period: 45s
+
+# homepage
+byparr_homepage_group: "Misc"
+byparr_homepage_icon: "byparr.png"
+byparr_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ byparr_port_http }}"
+byparr_homepage_showstats: false
+
+# repliqate
+byparr_repliqate_enabled: false
+byparr_repliqate_engine: "restic"
+byparr_repliqate_schedule: "@daily 3am"
+byparr_repliqate_backup_id: "{{ byparr_container_name }}"
+byparr_repliqate_retention: "30d"
+
+# tinyauth
+byparr_tinyauth_enabled: false
+
+# watchtower
+byparr_watchtower_enabled: false
