@@ -576,21 +576,19 @@ function create_new_app_placeholder {
 # update enabled apps
 function fast_update {
     echo "  ** Fetching list of enabled apps for fast update..."
-    # Extract enabled apps, converting underscores back to hyphens for tag matching
     ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | \
         grep -v -E "$ANE_EXCLUDES" | \
         sed 's/_enabled: true//;s/ //g;s/_/-/g' | \
         sort)
-
     if [[ -z "$ENABLED_LIST" ]]; then
-        echo "  ** No apps are currently enabled to update."
+        echo "  ** ERROR: No enabled apps found in settings."
         return 1
     fi
-
-    echo "  ** Apps to update: $(echo $ENABLED_LIST | xargs)"
-    # Call run_playbook with the list
+    echo "  ** Preparing to update the following apps (sorted):"
+    echo "     $ENABLED_LIST" | xargs -r printf "    - %s\n"
+    echo ""
     [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
-    run_playbook --up $ENABLED_LIST
+    run_playbook --up $(echo $ENABLED_LIST | xargs)
 }
 
 # prune Docker images and volumes
