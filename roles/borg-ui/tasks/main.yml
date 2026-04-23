@@ -1,0 +1,105 @@
+---
+- name: Start {{ borg_ui_proper_name }}
+  block:
+    - name: Create {{ borg_ui_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ borg_ui_data_directory }}"
+        - "{{ borg_ui_data_directory }}/cache"
+        - "{{ borg_ui_data_directory }}/data"
+
+    - name: Set {{ borg_ui_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        borg_ui_homepage_href: "https://{{ borg_ui_hostname }}.{{ ansible_nas_domain }}"
+      when: borg_ui_traefik_enabled | bool or borg_ui_dockflare_enabled | bool
+
+    - name: Create {{ borg_ui_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ borg_ui_container_name }}"
+        hostname: "{{ borg_ui_container_name }}"
+        image: "{{ borg_ui_image_name }}:{{ borg_ui_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ borg_ui_data_directory }}/data:/data"
+          - "{{ borg_ui_data_directory }}/cache:/home/borg/.cache/borg"
+          - "/:/local:rw"
+        ports:
+          - "{{ borg_ui_port_http }}:8081"
+        env:
+          ENVIRONMENT: "production"
+          INITIAL_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
+#          PORT: "{{ borg_ui_port_http }}"
+          PUID: "{{ borg_ui_user_id }}"
+          PGID: "{{ borg_ui_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ borg_ui_healthcheck_test }}"
+          interval: "{{ borg_ui_healthcheck_interval }}"
+          timeout: "{{ borg_ui_healthcheck_timeout }}"
+          retries: "{{ borg_ui_healthcheck_retries }}"
+          start_period: "{{ borg_ui_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ borg_ui_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ borg_ui_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ borg_ui_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ borg_ui_dockflare_access_group }}"
+          dockflare.hostname: "{{ borg_ui_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ borg_ui_port_http }}"
+          homepage.name: "{{ borg_ui_proper_name }}"
+          homepage.group: "{{ borg_ui_homepage_group }}"
+          homepage.icon: "{{ borg_ui_homepage_icon }}"
+          homepage.href: "{{ borg_ui_homepage_href }}"
+          homepage.description: "{{ borg_ui_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ borg_ui_container_name }}"
+          homepage.showStats: "{{ borg_ui_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ borg_ui_port_http }}"
+          repliqate.enabled: "{{ borg_ui_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ borg_ui_repliqate_engine }}"
+          repliqate.schedule: "{{ borg_ui_repliqate_schedule }}"
+          repliqate.backup_id: "{{ borg_ui_repliqate_backup_id }}"
+          repliqate.retention: "{{ borg_ui_repliqate_retention }}"
+          traefik.enable: "{{ borg_ui_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.borg-ui.rule: "Host(`{{ borg_ui_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.borg-ui.tls.certresolver: "letsencrypt"
+          traefik.http.routers.borg-ui.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.borg-ui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.borg-ui.middlewares: "borg-ui@docker{{ ',tinyauth-auth@docker' if borg_ui_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.borg-ui.IPAllowList.sourcerange: "{{ borg_ui_traefik_whitelist }}"
+          traefik.http.services.borg-ui.loadbalancer.server.port: "8081"
+          wud.tag.include: "{{ borg_ui_wud_tag_include }}"
+          wud.tag.transform.type: "{{ borg_ui_wud_tag_transform_type }}"
+          wud.link.template: "{{ borg_ui_wud_link_template }}"
+        cpu_shares: "{{ borg_ui_cpu_shares }}"
+        memory: "{{ borg_ui_memory }}"
+        memory_swap: "{{ borg_ui_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ borg_ui_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (borg_ui_port_http | string)] +
+                (['https://' + borg_ui_hostname + '.' + ansible_nas_domain] if (borg_ui_traefik_enabled is true or borg_ui_dockflare_enabled is true) else [])
+              }}
+  when: borg_ui_enabled is true
+
+- name: Stop {{ borg_ui_proper_name }}
+  block:
+    - name: Stop {{ borg_ui_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ borg_ui_container_name }}"
+        state: absent
+  when: borg_ui_enabled is false
+
+- name: Data Archive {{ borg_ui_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ borg_ui_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - borg_ui_enabled is false

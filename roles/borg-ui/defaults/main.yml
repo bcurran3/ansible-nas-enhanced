@@ -1,0 +1,66 @@
+---
+# ANE
+borg_ui_proper_name: "Borg UI"
+borg_ui_enabled: false
+borg_ui_traefik_enabled: false
+borg_ui_traefik_whitelist: "{{ lan }}"
+
+# directories
+borg_ui_data_directory: "{{ docker_home }}/borg-ui"
+
+# uid / gid
+borg_ui_user_id: "0"
+borg_ui_group_id: "0"
+
+# docker
+borg_ui_container_name: "borg-ui"
+borg_ui_image_name: "ainullcode/borg-ui"
+borg_ui_image_tag: "latest"
+
+# network
+borg_ui_hostname: "borgui"
+borg_ui_port_http: "4015"
+
+# specs
+borg_ui_cpu_shares: 1024
+borg_ui_memory: "1G"
+borg_ui_memory_swap: -1
+
+# autoheal
+borg_ui_autoheal_enabled: false
+
+# dockflare
+borg_ui_dockflare_enabled: false
+borg_ui_dockflare_access_group: ""
+
+# healthcheck
+borg_ui_healthcheck_test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5000', (res) => { process.exit(0); }).on('error', (e) => { process.exit(1); })\" || exit 1"]
+borg_ui_healthcheck_interval: 1m
+borg_ui_healthcheck_timeout: 10s
+borg_ui_healthcheck_retries: 3
+borg_ui_healthcheck_start_period: 45s
+
+# homepage
+borg_ui_homepage_description: "borg-ui short description"
+borg_ui_homepage_group: "Apps"
+borg_ui_homepage_icon: "sh-borg-ui"
+borg_ui_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ borg_ui_port_http }}"
+borg_ui_homepage_showstats: false
+
+# repliqate
+borg_ui_repliqate_enabled: false
+borg_ui_repliqate_engine: "restic"
+borg_ui_repliqate_schedule: "@daily 3am"
+borg_ui_repliqate_backup_id: "{{ borg_ui_container_name }}"
+borg_ui_repliqate_retention: "30d"
+
+# tinyauth
+borg_ui_tinyauth_enabled: false
+
+# watchtower
+borg_ui_watchtower_enabled: false
+
+# wud
+borg_ui_wud_tag_include: "^v?\\d+(\\.\\d+){1,2}$"
+borg_ui_wud_tag_transform_type: "semver"
+borg_ui_wud_link_template: "https://hub.docker.com/r/ainullcode/borg-ui"

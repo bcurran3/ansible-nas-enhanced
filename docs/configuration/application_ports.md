@@ -30,6 +30,7 @@ By default, applications can be found on the ports listed below.
 | bitmagnet        | 3334
 | Blinko           | 1111
 | Booksonic Air    | 4041    | Bridge  | HTTP           |
+| Borg UI          | 4015    | Bridge  | HTTP           |
 | Blinko           | 3075    | Bridge  | HTTP           |
 | Byparr           | 4013    | Bridge  | HTTP           |
 | ByteStash        | 3076    | Bridge  | HTTP           |
@@ -435,7 +436,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4015
+# next avail = 4016
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002
