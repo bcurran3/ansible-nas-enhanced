@@ -98,6 +98,8 @@ function help {
     echo "      Install or update apps by tag."
     echo "  --upgrade, --pull"
     echo "      Upgrade ANE files from repo"
+    echo "  --fastupdate"
+    echo "      Update enabled apps"
     echo ""
     exit
 }
@@ -636,6 +638,7 @@ function shell_help {
     echo "  down <app>            : Stop and Disable app(s)"
     echo "  enable <app>          : Enable app(s)"
     echo "  disable <app>         : Disable app(s)"
+    echo "  fastupdate            : Update enabled apps"
     echo "  remove <app>          : Stop, Disable, and Uninstall app(s)"
     echo "  run                   : Run full ANE playbook (all enabled apps)"
     echo "  stopall               : Stop ALL running containers"
