@@ -1,0 +1,118 @@
+---
+- name: Start {{ immich_power_tools_proper_name }}
+  block:
+    - name: Create {{ immich_power_tools_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: 1001
+      with_items:
+        - "{{ immich_power_tools_data_directory }}"
+        - "{{ immich_power_tools_data_directory }}/data"
+
+    - name: Set {{ immich_power_tools_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        immich_power_tools_homepage_href: "https://{{ immich_power_tools_hostname }}.{{ ansible_nas_domain }}"
+        immich_power_tools_env_external_immich_url: "https://{{ immich_hostname }}.{{ ansible_nas_domain }}"
+      when: immich_power_tools_traefik_enabled | bool or immich_power_tools_dockflare_enabled | bool
+
+    - name: Create {{ immich_power_tools_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ immich_power_tools_container_name }}"
+        hostname: "{{ immich_power_tools_container_name }}"
+        image: "{{ immich_power_tools_image_name }}:{{ immich_power_tools_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ immich_power_tools_data_directory }}/data:/app/data"
+        networks:
+          - name: "{{ immich_network_name }}"
+        network_mode: bridge
+        networks_cli_compatible: "yes"
+        ports:
+          - "{{ immich_power_tools_port_http }}:3000"
+        env:
+          IMMICH_API_KEY: "{{ immich_power_tools_env_immich_api_key }}"
+          IMMICH_URL: "{{ immich_power_tools_env_immich_url }}"
+          EXTERNAL_IMMICH_URL: "{{ immich_power_tools_env_external_immich_url }}"
+          APP_DB_PATH: "{{ immich_power_tools_env_app_db_path }}"
+          DB_PORT: "{{ immich_power_tools_env_db_port }}"
+          DB_HOST: "{{ immich_power_tools_env_db_host }}"
+          DB_USERNAME: "{{ immich_power_tools_env_db_username }}"
+          DB_PASSWORD: "{{ immich_power_tools_env_db_password }}"
+          DB_DATABASE_NAME: "{{ immich_power_tools_env_db_database_name }}"
+          JWT_SECRET: "{{ immich_power_tools_env_jwt_secret }}"
+          SECURE_COOKIE: "{{ immich_power_tools_env_secure_cookie }}"
+          POWER_TOOLS_ENDPOINT_URL: "{{ immich_power_tools_env_power_tools_endpoint_url }}"
+          AI_API_KEY: "{{ immich_power_tools_env_ai_api_key }}"
+          AI_BASE_URL: "{{ immich_power_tools_env_ai_base_url }}"
+          AI_MODEL: "{{ immich_power_tools_env_ai_model }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ immich_power_tools_healthcheck_test }}"
+          interval: "{{ immich_power_tools_healthcheck_interval }}"
+          timeout: "{{ immich_power_tools_healthcheck_timeout }}"
+          retries: "{{ immich_power_tools_healthcheck_retries }}"
+          start_period: "{{ immich_power_tools_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ immich_power_tools_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ immich_power_tools_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ immich_power_tools_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ immich_power_tools_dockflare_access_group }}"
+          dockflare.hostname: "{{ immich_power_tools_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ immich_power_tools_port_http }}"
+          homepage.name: "{{ immich_power_tools_proper_name }}"
+          homepage.group: "{{ immich_power_tools_homepage_group }}"
+          homepage.icon: "{{ immich_power_tools_homepage_icon }}"
+          homepage.href: "{{ immich_power_tools_homepage_href }}"
+          homepage.description: "{{ immich_power_tools_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ immich_power_tools_container_name }}"
+          homepage.showStats: "{{ immich_power_tools_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ immich_power_tools_port_http }}"
+          repliqate.enabled: "{{ immich_power_tools_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ immich_power_tools_repliqate_engine }}"
+          repliqate.schedule: "{{ immich_power_tools_repliqate_schedule }}"
+          repliqate.backup_id: "{{ immich_power_tools_repliqate_backup_id }}"
+          repliqate.retention: "{{ immich_power_tools_repliqate_retention }}"
+          traefik.enable: "{{ immich_power_tools_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.immich-power-tools.rule: "Host(`{{ immich_power_tools_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.immich-power-tools.tls.certresolver: "letsencrypt"
+          traefik.http.routers.immich-power-tools.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.immich-power-tools.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.immich-power-tools.middlewares: "immich-power-tools@docker{{ ',tinyauth-auth@docker' if immich_power_tools_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.immich-power-tools.IPAllowList.sourcerange: "{{ immich_power_tools_traefik_whitelist }}"
+          traefik.http.services.immich-power-tools.loadbalancer.server.port: "3000"
+          wud.tag.include: "{{ immich_power_tools_wud_tag_include }}"
+          wud.tag.transform.type: "{{ immich_power_tools_wud_tag_transform_type }}"
+          wud.link.template: "{{ immich_power_tools_wud_link_template }}"
+        cpu_shares: "{{ immich_power_tools_cpu_shares }}"
+        memory: "{{ immich_power_tools_memory }}"
+        memory_swap: "{{ immich_power_tools_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ immich_power_tools_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (immich_power_tools_port_http | string)] +
+                (['https://' + immich_power_tools_hostname + '.' + ansible_nas_domain] if (immich_power_tools_traefik_enabled is true or immich_power_tools_dockflare_enabled is true) else [])
+              }}
+  when: immich_power_tools_enabled is true
+
+- name: Stop {{ immich_power_tools_proper_name }}
+  block:
+    - name: Stop {{ immich_power_tools_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ immich_power_tools_container_name }}"
+        state: absent
+  when: immich_power_tools_enabled is false
+
+- name: Data Archive {{ immich_power_tools_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ immich_power_tools_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - immich_power_tools_enabled is false

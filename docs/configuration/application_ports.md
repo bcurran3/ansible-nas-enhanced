@@ -140,6 +140,7 @@ By default, applications can be found on the ports listed below.
 | iDRAC6           | 5902    | Bridge  | VNC            |
 | IDrive           | n/a
 | Immich           | 2283    | Bridge  | HTTP           |
+| Immich PowerTools| 4014    | Bridge  | HTTP           |
 | InfluxDB         | 8086    | Bridge  | HTTP           |
 | Invoice Ninja    | 9009    | Bridge  | HTTP           |
 | (ispy) Agent DVR | 8097
@@ -434,7 +435,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4014
+# next avail = 4015
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

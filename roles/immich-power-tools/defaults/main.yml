@@ -1,0 +1,80 @@
+---
+# ANE
+immich_power_tools_proper_name: "Immich Power Tools"
+immich_power_tools_enabled: false
+immich_power_tools_traefik_enabled: false
+immich_power_tools_traefik_whitelist: "{{ lan }}"
+
+# directories
+immich_power_tools_data_directory: "{{ docker_home }}/immich-power-tools"
+
+# docker
+immich_power_tools_container_name: "immich-power-tools"
+immich_power_tools_image_name: "ghcr.io/immich-power-tools/immich-power-tools"
+immich_power_tools_image_tag: "latest"
+
+# network
+immich_power_tools_hostname: "immichpowertools"
+immich_power_tools_port_http: "4014"
+
+# specs
+immich_power_tools_cpu_shares: 1024
+immich_power_tools_memory: "1G"
+immich_power_tools_memory_swap: -1
+
+# app
+immich_power_tools_env_immich_api_key: ""
+immich_power_tools_env_immich_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ immich_port_http }}"
+immich_power_tools_env_external_immich_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ immich_port_http }}"
+immich_power_tools_env_db_port: "5432"
+immich_power_tools_env_db_host: "{{ immich_db_container_name }}"
+immich_power_tools_env_db_username: "{{ immich_db_username }}"
+immich_power_tools_env_db_password: "{{ immich_db_password }}"
+immich_power_tools_env_db_database_name: "{{ immich_db_name }}"
+immich_power_tools_env_app_db_path: "/app/data/app.db"
+immich_power_tools_env_jwt_secret: ""  # JWT Secret for authentication
+immich_power_tools_env_secure_cookie: "false"  # Set to true to enable secure cookies
+immich_power_tools_env_power_tools_endpoint_url: "{{ immich_power_tools_homepage_href }}" # URL of the Power Tools endpoint (Used for share links)
+# Optional - AI Configuration for Smart Search (Find)
+immich_power_tools_env_ai_api_key: "" # API key for your OpenAI-compatible provider
+immich_power_tools_env_ai_base_url: "" # e.g. https://api.openai.com/v1 (OpenAI), https://api.groq.com/openai/v1 (Groq), http://host.docker.internal:11434/v1 (Ollama)
+immich_power_tools_env_ai_model: "" # e.g. gpt-4o-mini, llama-3.1-8b-instant, llama3.1
+
+# autoheal
+immich_power_tools_autoheal_enabled: false
+
+# dockflare
+immich_power_tools_dockflare_enabled: false
+immich_power_tools_dockflare_access_group: ""
+
+# healthcheck
+immich_power_tools_healthcheck_test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:3000', (res) => { process.exit(0); }).on('error', (e) => { process.exit(1); })\" || exit 1"]
+immich_power_tools_healthcheck_interval: 1m
+immich_power_tools_healthcheck_timeout: 10s
+immich_power_tools_healthcheck_retries: 3
+immich_power_tools_healthcheck_start_period: 45s
+
+# homepage
+immich_power_tools_homepage_description: "Power tools for organizing your immich library"
+immich_power_tools_homepage_group: "Apps"
+immich_power_tools_homepage_icon: "immich-power-tools.png"
+immich_power_tools_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ immich_power_tools_port_http }}"
+immich_power_tools_homepage_showstats: false
+
+# repliqate
+immich_power_tools_repliqate_enabled: false
+immich_power_tools_repliqate_engine: "restic"
+immich_power_tools_repliqate_schedule: "@daily 3am"
+immich_power_tools_repliqate_backup_id: "{{ immich_power_tools_container_name }}"
+immich_power_tools_repliqate_retention: "30d"
+
+# tinyauth
+immich_power_tools_tinyauth_enabled: false
+
+# watchtower
+immich_power_tools_watchtower_enabled: false
+
+# wud
+immich_power_tools_wud_tag_include: "^v\\d+\\.\\d+\\.\\d+$"
+immich_power_tools_wud_tag_transform_type: "semver"
+immich_power_tools_wud_link_template: "https://github.com/immich-power-tools/immich-power-tools/pkgs/container/immich-power-tools"
