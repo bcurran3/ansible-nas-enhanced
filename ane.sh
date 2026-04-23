@@ -571,6 +571,26 @@ function create_new_app_placeholder {
     done
 }
 
+# update enabled apps
+function fast_update {
+    echo "  ** Fetching list of enabled apps for fast update..."
+    # Extract enabled apps, converting underscores back to hyphens for tag matching
+    ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | \
+        grep -v -E "$ANE_EXCLUDES" | \
+        sed 's/_enabled: true//;s/ //g;s/_/-/g' | \
+        sort)
+
+    if [[ -z "$ENABLED_LIST" ]]; then
+        echo "  ** No apps are currently enabled to update."
+        return 1
+    fi
+
+    echo "  ** Apps to update: $(echo $ENABLED_LIST | xargs)"
+    # Call run_playbook with the list
+    [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
+    run_playbook --up $ENABLED_LIST
+}
+
 # prune Docker images and volumes
 function prune {
     echo "  ** Pruning images..."
@@ -604,6 +624,220 @@ function stop_app {
         else
             echo "  ** ${arg} is not currently running."
         fi
+    done
+}
+
+function shell_help {
+    echo "ANE Shell Commands:"
+    echo "----------------------------------------------------------------"
+    echo "  [ App Management ]"
+    echo "  available             : List all available apps"
+    echo "  up <app>              : Install/Update specific app(s)"
+    echo "  down <app>            : Stop and Disable app(s)"
+    echo "  enable <app>          : Enable app(s)"
+    echo "  disable <app>         : Disable app(s)"
+    echo "  remove <app>          : Stop, Disable, and Uninstall app(s)"
+    echo "  run                   : Run full ANE playbook (all enabled apps)"
+    echo "  stopall               : Stop ALL running containers"
+    echo "  settings              : Edit group_vars/nas.yml"
+    echo ""
+    echo "  [ App Feature Toggles ]"
+    echo "  autoheal <app>        : Enable Autoheal for app(s)"
+    echo "  dockflare <app>       : Enable Dockflare for app(s)"
+    echo "  repliqate <app>       : Enable Repliqate for app(s)"
+    echo "  tinyauth <app>        : Enable TinyAuth for app(s)"
+    echo "  traefik <app>         : Enable Traefik for app(s)"
+    echo "  watchtower <app>      : Enable Watchtower for app(s)"
+    echo ""
+    echo "  [ System & Config ]"
+    echo "  status                : Show running/enabled status"
+    echo "  running               : Show raw docker running list (alpha sorted)"
+    echo "  enabled               : List currently enabled apps"
+    echo "  disabled              : List currently disabled apps"
+    echo "  install               : Initialize/Reset configuration files"
+    echo "  inventory             : Edit inventory file"
+    echo "  permissions           : Reset shared file permissions"
+    echo "  requirements          : Re-install ANE Ansible requirements"
+    echo "  prune                 : Clean up docker images/volumes"
+    echo "  behind                : Check if ANE is outdated"
+    echo "  upgrade               : Pull latest ANE repo changes"
+    echo ""
+    echo "  [ Development ]"
+    echo "  newapp <app>          : Create a new app role from template"
+    echo "  copytoplugins <app>   : Copy role to plugins folder"
+    echo "  enableall             : Enable ALL apps"
+    echo "  disableall            : Disable ALL apps"
+    echo ""
+    echo "  [ General ]"
+    echo "  help <app>            : Show documentation for specific app"
+    echo "  protips               : Show environment variable options"
+    echo "  exit                  : Exit ANE shell"
+    echo "----------------------------------------------------------------"
+}
+
+function shell {
+    clear
+    echo -e "\033[34m"
+    print_logo
+    echo -e "\033[0m"
+
+    while true; do 
+        # using -n so the cursor stays on the same line as the prompt
+        echo -ne "\033[34mANE SHELL> \033[0m" 
+        read -r input
+        
+        # Extract command and arguments
+        cmd="${input%% *}"
+        args="${input#* }"
+        
+        # If input matches command exactly (no args), clear args
+        if [[ "$cmd" == "$args" ]]; then args=""; fi
+
+        case "$cmd" in 
+            enable) 
+                if [[ -z "$args" ]]; then enable_all_apps; else enable_app $args; fi
+                ;;
+            enableall|enableallapps)
+                enable_all_apps
+                ;;
+            disable)
+                if [[ -z "$args" ]]; then disable_all_apps; else disable_app $args; fi
+                ;;
+            disableall|disableallapps)
+                disable_all_apps
+                ;;
+            up)
+                [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
+                enable_app $args
+                run_playbook --up $args
+                ;;
+            down|stop)
+                stop_app $args
+                disable_app $args
+                ;;
+            fastupdate)
+                fast_update
+                ;;
+            remove)
+                stop_app $args
+                disable_app $args
+                run_playbook --remove $args
+                ;;
+            
+            # --- Feature Toggles ---
+            autoheal)
+                enable_autoheal $args
+                ;;
+            dockflare)
+                enable_dockflare $args
+                ;;
+            repliqate)
+                enable_repliqate $args
+                ;;
+            tinyauth)
+                enable_tinyauth $args
+                ;;
+            traefik)
+                enable_traefik $args
+                ;;
+            watchtower)
+                enable_watchtower $args
+                ;;
+            
+            # --- Development ---
+            newapp)
+                create_new_app_placeholder $args
+                ;;
+            copytoplugins)
+                copy_to_plugins $args
+                ;;
+            
+            # --- System & Config ---
+            install)
+                if [ -d "inventories/ANE" ]; then
+                    echo "  ** WARNING: inventories/ANE exists!"
+                    echo "  ** Remove it first if you wish to reset."
+                else
+                    cp -rfp inventories/sample inventories/ANE
+                    echo "  ** Configuration initialized."
+                    echo "  ** Use 'inventory' or 'settings' to configure."
+                fi
+                ;;
+            requirements)
+                 ansible-galaxy install -r requirements.yml --force
+                ;;
+            run|update)
+                 [[ "$ANE_ALWAYS_UPGRADE" == "true" ]] && upgrade
+                 if [[ -z "$args" ]]; then
+                    ansible-playbook -i inventories/ANE/inventory nas.yml "${BECOME_FLAGS[@]}"
+                 else
+                    run_playbook --run $args
+                 fi
+                 [[ "$ANE_ALWAYS_PRUNE" == "true" ]] && prune
+                ;;
+            upgrade|pull)
+                upgrade
+                ;;
+            prune)
+                prune
+                ;;
+            permissions)
+                 ansible-playbook -i inventories/ANE/inventory permission_data.yml "${BECOME_FLAGS[@]}"
+                ;;
+            stopall)
+                RUNNING=$(docker ps -q)
+                if [[ -n "$RUNNING" ]]; then docker stop $RUNNING; else echo " ** No containers running."; fi
+                ;;
+            behind|outdated)
+                check_behind
+                ;;
+            status)
+                display_status
+                ;;
+            running)
+                docker ps --format "table {{.Names}}\t{{.Status}}" | (sed -u 1q; sort)
+                ;;
+            protips)
+                display_protips
+                ;;
+            available|roles)
+                display_available_apps
+                ;;
+            enabled|installed)
+                display_enabled_apps
+                ;;
+            disabled)
+                display_disabled_apps
+                ;;
+            settings|vars)
+                $ANE_EDITOR inventories/ANE/group_vars/nas.yml
+                ;;
+            inventory)
+                $ANE_EDITOR inventories/ANE/inventory
+                ;;
+            
+            # --- Help/Exit ---
+            help|?)
+                if [[ -n "$args" ]]; then
+                     if [[ -f "./docs/applications/$args.md" ]]; then
+                        cat "./docs/applications/$args.md"
+                     else
+                        echo " ** Docs for $args not found."
+                     fi
+                else
+                    shell_help
+                fi
+                ;;
+            exit|quit)
+                echo "Exiting ANE-SHELL..."
+                exit 0 
+                ;;
+            *)
+                if [[ -n "$input" ]]; then 
+                    echo -e "\033[0;31m  ** Unknown command: $cmd\033[0m"
+                fi
+                ;;
+        esac 
     done
 }
 
@@ -744,6 +978,12 @@ if [[ "$1" == "--dockflare" || "$1" == "-dockflare" || "$1" == "--enabledockflar
     exit
 fi
 
+# upate enabled apps
+if [[ "$1" = "--fastupdate" || "$1" = "-fastupdate" ]]; then
+    fast_update
+    exit
+fi
+
 # Enable Repliqate for ANE app(s)
 if [[ "$1" == "--repliqate" || "$1" == "-repliqate" || "$1" == "--enablerepliqate" || "$1" == "-enablerepliqate" ]]; then
     if [ "$2" == "" ]; then
@@ -861,6 +1101,12 @@ fi
 # Edit ANE settings/overrides/variables
 if [[ "$1" = "--settings" || "$1" = "-settings" || "$1" = "-s" || "$1" = "--overrides" || "$1" = "-overrides" || "$1" = "--vars" || "$1" = "-vars" || "$1" = "-v" ]]; then
     $ANE_EDITOR inventories/ANE/group_vars/nas.yml
+    exit
+fi
+
+# ANE Shell
+if [[ "$1" = "--shell" || "$1" = "-shell" ]]; then
+    shell
     exit
 fi
 
