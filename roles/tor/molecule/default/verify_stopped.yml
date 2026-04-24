@@ -6,13 +6,13 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Try and stop and remove {{ template_proper_name }}
+    - name: Try and stop and remove {{ tor_proper_name }}
       community.docker.docker_container:
         name: "{{ tor_container_name }}"
         state: absent
       register: result
 
-    - name: Check if {{ template_proper_name }} is stopped
+    - name: Check if {{ tor_proper_name }} is stopped
       ansible.builtin.assert:
         that:
           - not result.changed

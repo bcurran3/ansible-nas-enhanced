@@ -6,12 +6,12 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get {{ apprise_api_proper_name }} container state
+    - name: Get {{ tududi_proper_name }} container state
       community.docker.docker_container:
-        name: "{{ apprise_api_container_name }}"
+        name: "{{ tududi_container_name }}"
       register: result
 
-    - name: Check if {{ apprise_api_proper_name }} container is running
+    - name: Check if {{ tududi_proper_name }} container is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

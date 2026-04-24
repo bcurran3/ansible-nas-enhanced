@@ -192,6 +192,7 @@
           REDIS_HOST_PASSWORD: "{{ nextcloud_env_redis_host_password }}"
           NEXTCLOUD_ADMIN_USER: "{{ ansible_nas_user }}"
           NEXTCLOUD_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
+          NEXTCLOUD_AUTO_UPGRADE: "{{ nextcloud_env_nextcloud_auto_upgrade }}"
           NEXTCLOUD_DATA_DIR: "{{ nextcloud_env_nextcloud_data_dir }}"
           NEXTCLOUD_TRUSTED_DOMAINS: "{{ nextcloud_env_nextcloud_trusted_domains }}"
           NEXTCLOUD_INIT_HTACCESS: "{{ nextcloud_env_nextcloud_init_htaccess }}" # added
@@ -252,8 +253,21 @@
           traefik.http.routers.nextcloud.tls.certresolver: "letsencrypt"
           traefik.http.routers.nextcloud.tls.domains[0].main: "{{ ansible_nas_domain }}"
           traefik.http.routers.nextcloud.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
-          traefik.http.routers.nextcloud.middlewares: "{{ nextcloud_hostname }}@docker{{ ',tinyauth-auth@docker' if nextcloud_tinyauth_enabled | bool else '' }}"
-          traefik.http.middlewares.nextcloud.IPAllowList.sourcerange: "{{ nextcloud_traefik_whitelist }}"
+          # Chaining the two new middlewares below
+          traefik.http.routers.nextcloud.middlewares: "nextcloud-whitelist@docker,nextcloud-headers@docker{{ ',tinyauth-auth@docker' if nextcloud_tinyauth_enabled | bool else '' }}"
+          
+          # Middleware 1: IP Whitelist
+          traefik.http.middlewares.nextcloud-whitelist.ipallowlist.sourcerange: "{{ nextcloud_traefik_whitelist }}"
+          
+          # Middleware 2: Security Headers (Fixes Nextcloud Warnings)
+          traefik.http.middlewares.nextcloud-headers.headers.stsSeconds: "15552000"
+          traefik.http.middlewares.nextcloud-headers.headers.stsIncludeSubdomains: "true"
+          traefik.http.middlewares.nextcloud-headers.headers.stsPreload: "true"
+          traefik.http.middlewares.nextcloud-headers.headers.forceSTSHeader: "true"
+          traefik.http.middlewares.nextcloud-headers.headers.customFrameOptionsValue: "SAMEORIGIN"
+          traefik.http.middlewares.nextcloud-headers.headers.browserXssFilter: "true"
+          traefik.http.middlewares.nextcloud-headers.headers.contentTypeNosniff: "true"
+          
           traefik.http.services.nextcloud.loadbalancer.server.port: "80"
 # from https://docs.nextcloud.com/server/27/admin_manual/configuration_server/reverse_proxy_configuration.html#traefik-2
 #      traefik.http.routers.nextcloud.middlewares: "nextcloud_redirectregex"

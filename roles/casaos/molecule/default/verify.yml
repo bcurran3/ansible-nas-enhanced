@@ -6,12 +6,12 @@
     - ansible.builtin.include_vars:
         file: ../../defaults/main.yml
 
-    - name: Get {{ template_proper_name }} container state
+    - name: Get {{ casaos_proper_name }} container state
       community.docker.docker_container:
         name: "{{ casaos_container_name }}"
       register: result
 
-    - name: Check if {{ template_proper_name }} container is running
+    - name: Check if {{ casaos_proper_name }} container is running
       ansible.builtin.assert:
         that:
           - result.container['State']['Status'] == "running"

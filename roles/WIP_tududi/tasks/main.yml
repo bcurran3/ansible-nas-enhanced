@@ -1,0 +1,469 @@
+---
+- name: Start {{ tududi_proper_name }}
+  block:
+    - name: Create {{ tududi_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ tududi_data_directory }}"
+        - "{{ tududi_data_directory }}/config"
+#       - "{{ tududi_data_directory }}/db"
+
+#    - name: Create {{ tududi_proper_name }} Volumes
+#      community.docker.docker_volume:
+#        name: "{{ item }}"
+#      loop:
+#        - tududi_volume1
+
+    - name: Set {{ tududi_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        tududi_homepage_href: "https://{{ tududi_hostname }}.{{ ansible_nas_domain }}"
+      when: tududi_traefik_enabled | bool or tududi_dockflare_enabled | bool
+
+    - name: Create {{ tududi_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tududi_container_name }}"
+        hostname: "{{ tududi_container_name }}"
+        image: "{{ tududi_image_name }}:{{ tududi_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tududi_data_directory }}/config:/config"
+        ports:
+          - "{{ tududi_port_http }}:80"
+        env:
+#          DOCKER_MODS: "{{ tududi_env_docker_mods }}" # linuxserver.io images
+#          INSTALL_PACKAGES: "{{ tududi_env_docker_mods_install_packages }}"
+#          INSTALL_PIP_PACKAGES: "{{ tududi_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ tududi_user_id }}"
+          PGID: "{{ tududi_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tududi_healthcheck_test }}"
+          interval: "{{ tududi_healthcheck_interval }}"
+          timeout: "{{ tududi_healthcheck_timeout }}"
+          retries: "{{ tududi_healthcheck_retries }}"
+          start_period: "{{ tududi_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tududi_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tududi_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ tududi_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ tududi_dockflare_access_group }}"
+          dockflare.hostname: "{{ tududi_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tududi_port_http }}"
+#         dockflare.access.policy: "authenticate"
+#         dockflare.access.allowed_idps: "YOUR_IDP_UUID_HERE"
+          homepage.name: "{{ tududi_proper_name }}"
+          homepage.group: "{{ tududi_homepage_group }}"
+          homepage.icon: "{{ tududi_homepage_icon }}"
+          homepage.href: "{{ tududi_homepage_href }}"
+          homepage.description: "{{ tududi_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tududi_container_name }}"
+          homepage.showStats: "{{ tududi_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tududi_port_http }}"
+          repliqate.enabled: "{{ tududi_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tududi_repliqate_engine }}"
+          repliqate.schedule: "{{ tududi_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tududi_repliqate_backup_id }}"
+          repliqate.retention: "{{ tududi_repliqate_retention }}"
+          traefik.enable: "{{ tududi_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.tududi.rule: "Host(`{{ tududi_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.tududi.tls.certresolver: "letsencrypt"
+          traefik.http.routers.tududi.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.tududi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.tududi.middlewares: "tududi@docker{{ ',tinyauth-auth@docker' if tududi_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.tududi.IPAllowList.sourcerange: "{{ tududi_traefik_whitelist }}"
+          traefik.http.services.tududi.loadbalancer.server.port: "80"
+          wud.tag.include: "{{ tududi_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tududi_wud_tag_transform_type }}"
+          wud.link.template: "{{ tududi_wud_link_template }}"
+        cpu_shares: "{{ tududi_cpu_shares }}"
+        memory: "{{ tududi_memory }}"
+        memory_swap: "{{ tududi_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ tududi_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (tududi_port_http | string)] +
+                (['https://' + tududi_hostname + '.' + ansible_nas_domain] if (tududi_traefik_enabled is true or tududi_dockflare_enabled is true) else [])
+              }}
+  when: tududi_enabled is true
+
+- name: Stop {{ tududi_proper_name }}
+  block:
+    - name: Stop {{ tududi_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ tududi_container_name }}"
+        state: absent
+  when: tududi_enabled is false
+
+- name: Data Archive {{ tududi_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ tududi_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - tududi_enabled is false
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###           ____ ____  _   _                ###
+###          / ___|  _ \| | | |               ###
+###         | |  _| |_) | | | |               ###
+###         | |_| |  __/| |_| |               ###
+###          \____|_|    \___/                ###
+#################################################
+# if you need GPU support in a container, add this:
+# add tududi_amd_ai_enabled: true to the vars if
+
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | default(false) | bool else omit
+        }}"
+        devices: >-
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and tududi_amd_ai_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###              _                      _     ###
+###   _ __   ___| |___      _____  _ __| | __ ###
+###  | '_ \ / _ \ __\ \ /\ / / _ \| '__| |/ / ###
+###  | | | |  __/ |_ \ V  V / (_) | |  |   <  ###
+###  |_| |_|\___|\__| \_/\_/ \___/|_|  |_|\_\ ###
+#################################################
+## if setting up networks, add this to all containers:
+        networks:                                  # optional
+          - name: "{{ tududi_network_name }}"     # optional
+        network_mode: "{{ tududi_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+
+##############################################################################
+### EXAMPLES OF COMMON DATABASE SETUPS BELOW
+### DELETE ALL OR PARTS BELOW AS NOT NEEDED
+### PLEASE STICK TO THIS FORMAT
+### NOTE: ../molecule files are not templated for DBs and
+###       need to be updated as well when using DBs.
+###       Look at the Nextcloud role for a good example.
+##############################################################################
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###   __  __            _       ____  ____    ###
+###  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   ###
+###  | |\/| |/ _` | '__| |/ _` | | | |  _ \   ###
+###  | |  | | (_| | |  | | (_| | |_| | |_) |  ###
+###  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   ###
+#################################################
+
+    - name: Create {{ tududi_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tududi_db_container_name }}"
+        hostname: "{{ tududi_db_container_name }}"
+        image: "{{ tududi_db_image_name }}:{{ tududi_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tududi_data_directory }}/db:/var/lib/mysql"
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          MYSQL_ROOT_PASSWORD: "topsecretroot"
+          MYSQL_DATABASE: "tududi"
+          MYSQL_USER: "tududi"
+          MYSQL_PASSWORD: "{{ tududi_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tududi_db_healthcheck_test }}"
+          interval: "{{ tududi_db_healthcheck_interval }}"
+          timeout: "{{ tududi_db_healthcheck_timeout }}"
+          retries: "{{ tududi_db_healthcheck_retries }}"
+          start_period: "{{ tududi_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tududi_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tududi_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ tududi_proper_name }} MariaDB"
+          homepage.group: "{{ tududi_db_homepage_group }}"
+          homepage.icon: "{{ tududi_db_homepage_icon }}"
+          homepage.href: "{{ tududi_db_homepage_href }}"
+          homepage.description: "{{ tududi_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tududi_db_container_name }}"
+          homepage.showStats: "{{ tududi_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ tududi_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tududi_db_repliqate_engine }}"
+          repliqate.schedule: "{{ tududi_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tududi_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ tududi_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ tududi_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tududi_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ tududi_db_wud_link_template }}"
+        cpu_shares: "{{ tududi_db_cpu_shares }}"
+        memory: "{{ tududi_db_memory }}"
+        memory_swap: "{{ tududi_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ tududi_proper_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ tududi_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+######################################################
+###  OPTIONAL - remove if not needed               ###
+###   __  __                         ____  ____    ###
+###  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   ###
+###  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   ###
+###  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  ###
+###  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   ###
+###                      |___/                     ###
+######################################################
+
+    - name: Create {{ tududi_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tududi_db_container_name }}"
+        hostname: "{{ tududi_db_container_name }}"
+        image: "{{ tududi_db_image_name }}:{{ tududi_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tududi_data_directory }}/db:/data/db"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tududi_db_healthcheck_test }}"
+          interval: "{{ tududi_db_healthcheck_interval }}"
+          timeout: "{{ tududi_db_healthcheck_timeout }}"
+          retries: "{{ tududi_db_healthcheck_retries }}"
+          start_period: "{{ tududi_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tududi_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tududi_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ tududi_proper_name }} MongoDB"
+          homepage.group: "{{ tududi_db_homepage_group }}"
+          homepage.icon: "{{ tududi_db_homepage_icon }}"
+          homepage.href: "{{ tududi_db_homepage_href }}"
+          homepage.description: "{{ tududi_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tududi_db_container_name }}"
+          homepage.showStats: "{{ tududi_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ tududi_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tududi_db_repliqate_engine }}"
+          repliqate.schedule: "{{ tududi_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tududi_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ tududi_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ tududi_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tududi_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ tududi_db_wud_link_template }}"
+        cpu_shares: "{{ tududi_db_cpu_shares }}"
+        memory: "{{ tududi_db_memory }}"
+        memory_swap: "{{ tududi_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ tududi_proper_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ tududi_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+##########################################
+###  OPTIONAL - remove if not needed   ###
+###   __  __       ____   ___  _       ###
+###  |  \/  |_   _/ ___| / _ \| |      ###
+###  | |\/| | | | \___ \| | | | |      ###
+###  | |  | | |_| |___) | |_| | |___   ###
+###  |_|  |_|\__, |____/ \__\_\_____|  ###
+###          |___/                     ###
+##########################################
+
+    - name: Create {{ tududi_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tududi_db_container_name }}"
+        hostname: "{{ tududi_db_container_name }}"
+        image: "{{ tududi_db_image_name }}:{{ tududi_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tududi_data_directory }}/mysql/mysql:/var/lib/mysql"
+          - "{{ tududi_data_directory }}/mysql/my.cnf:/etc/my.cnf"
+        env:
+          MYSQL_DATABASE: "tududi"
+          MYSQL_USER: "{{ tududi_sql_user }}"
+          MYSQL_PASSWORD: "{{ tududi_sql_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ tududi_sql_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tududi_db_healthcheck_test }}"
+          interval: "{{ tududi_db_healthcheck_interval }}"
+          timeout: "{{ tududi_db_healthcheck_timeout }}"
+          retries: "{{ tududi_db_healthcheck_retries }}"
+          start_period: "{{ tududi_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tududi_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tududi_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ tududi_proper_name }} MySQL"
+          homepage.group: "{{ tududi_db_homepage_group }}"
+          homepage.icon: "{{ tududi_db_homepage_icon }}"
+          homepage.href: "{{ tududi_db_homepage_href }}"
+          homepage.description: "{{ tududi_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tududi_db_container_name }}"
+          homepage.showStats: "{{ tududi_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ tududi_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tududi_db_repliqate_engine }}"
+          repliqate.schedule: "{{ tududi_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tududi_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ tududi_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ tududi_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tududi_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ tududi_db_wud_link_template }}"
+        cpu_shares: "{{ tududi_db_cpu_shares }}"
+        memory: "{{ tududi_db_memory }}"
+        memory_swap: "{{ tududi_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ tududi_proper_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ tududi_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+##############################################################
+###  OPTIONAL - remove if not needed                       ###
+###   ____           _                 ____   ___  _       ###
+###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
+###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
+###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
+###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
+###                     |___/                              ###
+##############################################################
+
+    - name: Create {{ tududi_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tududi_db_container_name }}"
+        hostname: "{{ tududi_db_container_name }}"
+        image: "{{ tududi_db_image_name }}:{{ tududi_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tududi_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "tududi"
+          POSTGRES_PASSWORD: "tududi"
+          POSTGRES_DB: "tududi"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tududi_db_healthcheck_test }}"
+          interval: "{{ tududi_db_healthcheck_interval }}"
+          timeout: "{{ tududi_db_healthcheck_timeout }}"
+          retries: "{{ tududi_db_healthcheck_retries }}"
+          start_period: "{{ tududi_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tududi_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tududi_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ tududi_proper_name }} PostgreSQL"
+          homepage.group: "{{ tududi_db_homepage_group }}"
+          homepage.icon: "{{ tududi_db_homepage_icon }}"
+          homepage.href: "{{ tududi_db_homepage_href }}"
+          homepage.description: "{{ tududi_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tududi_db_container_name }}"
+          homepage.showStats: "{{ tududi_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ tududi_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tududi_db_repliqate_engine }}"
+          repliqate.schedule: "{{ tududi_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tududi_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ tududi_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ tududi_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tududi_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ tududi_db_wud_link_template }}"
+        cpu_shares: "{{ tududi_db_cpu_shares }}"
+        memory: "{{ tududi_db_memory }}"
+        memory_swap: "{{ tududi_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ tududi_proper_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ tududi_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+#########################################
+###  OPTIONAL - remove if not needed  ###
+###       ____          _ _           ###
+###      |  _ \ ___  __| (_)___       ###
+###      | |_) / _ \/ _` | / __|      ###
+###      |  _ <  __/ (_| | \__ \      ###
+###      |_| \_\___|\__,_|_|___/      ###
+#########################################
+
+    - name: Create {{ tududi_proper_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tududi_redis_container_name }}"
+        hostname: "{{ tududi_redis_container_name }}"
+        image: "{{ tududi_redis_image_name }}:{{ tududi_redis_image_tag }}"
+        pull: true
+        command: "redis-server --requirepass topsecret"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tududi_redis_healthcheck_test }}"
+          interval: "{{ tududi_redis_healthcheck_interval }}"
+          timeout: "{{ tududi_redis_healthcheck_timeout }}"
+          retries: "{{ tududi_redis_healthcheck_retries }}"
+          start_period: "{{ tududi_redis_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tududi_redis_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tududi_redis_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ tududi_proper_name }} Redis"
+          homepage.group: "{{ tududi_redis_homepage_group }}"
+          homepage.icon: "{{ tududi_redis_homepage_icon }}"
+          homepage.href: "{{ tududi_redis_homepage_href }}"
+          homepage.description: "{{ tududi_redis_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tududi_redis_container_name }}"
+          homepage.showStats: "{{ tududi_redis_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ tududi_redis_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tududi_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ tududi_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tududi_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ tududi_redis_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ tududi_redis_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tududi_redis_wud_tag_transform_type }}"
+          wud.link.template: "{{ tududi_redis_wud_link_template }}"
+        cpu_shares: "{{ tududi_redis_cpu_shares }}"
+        memory: "{{ tududi_redis_memory }}"
+        memory_swap: "{{ tududi_redis_memory_swap }}"
+        restart_policy: unless-stopped

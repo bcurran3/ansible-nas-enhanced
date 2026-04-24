@@ -1,0 +1,350 @@
+---
+# ANE
+tududi_proper_name: "tududi"
+tududi_enabled: false
+tududi_traefik_enabled: false
+tududi_traefik_whitelist: "{{ lan }}"
+
+# directories
+tududi_data_directory: "{{ docker_home }}/tududi"
+
+# docker
+tududi_container_name: "tududi"
+tududi_image_name: "devname/tududi" # use ghcr.io or lscr.io when available
+tududi_image_tag: "latest"
+
+# uid / gid
+tududi_user_id: "0"
+tududi_group_id: "0"
+
+# network
+tududi_hostname: "tududi"
+#tududi_network_name: "tududi"
+tududi_port_http: "8989"
+
+# specs
+tududi_cpu_shares: 1024
+tududi_memory: "1G"
+tududi_memory_swap: -1
+
+# autoheal
+tududi_autoheal_enabled: false
+
+# dockflare
+tududi_dockflare_enabled: false
+tududi_dockflare_access_group: ""
+
+# healthcheck
+tududi_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
+tududi_healthcheck_interval: 1m
+tududi_healthcheck_timeout: 10s
+tududi_healthcheck_retries: 3
+tududi_healthcheck_start_period: 30s
+
+# homepage
+tududi_homepage_description: "tududi short description"
+tududi_homepage_group: "Apps"
+tududi_homepage_icon: "tududi.png"
+tududi_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tududi_port_http }}"
+tududi_homepage_showstats: false
+
+# linuxserver.io docker mods for linuxserver.io images
+#tududi_env_docker_mods: ""
+#tududi_env_docker_mods_install_packages: ""
+#tududi_env_docker_mods_install_pip_packages: ""
+
+# repliqate
+tududi_repliqate_enabled: false
+tududi_repliqate_engine: "restic"
+tududi_repliqate_schedule: "@daily 3am"
+tududi_repliqate_backup_id: "{{ tududi_container_name }}"
+tududi_repliqate_retention: "30d"
+
+# tinyauth
+tududi_tinyauth_enabled: false
+
+# watchtower
+tududi_watchtower_enabled: false
+
+# wud
+# Docker Hub example. Please edit.
+tududi_wud_tag_include: '^\d+\.\d+$'
+tududi_wud_tag_transform_type: "semver"
+tududi_wud_link_template: "https://hub.docker.com/r/devname/tududi"
+### Github example
+#tududi_wud_tag_include: '^\d+\.\d+\.\d+$'
+#tududi_wud_tag_transform_type: "semver"
+#tududi_wud_link_template: "https://github.com/devname/tududi/pkgs/container/tududi"
+### Linuxserver.io example
+#tududi_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+#tududi_wud_tag_transform_type: "semver"
+#tududi_wud_link_template: "https://lscr.io/linuxserver/tududi"
+
+##############################################################################
+### EXAMPLES OF COMMON DATABASE SETUPS BELOW
+### DELETE ALL OR PARTS BELOW AS NOT NEEDED
+### PLEASE STICK TO THIS FORMAT
+### NOTE: ../molecule files are not templated for DBs and
+###       need to be updated as well when using DBs.
+###       Look at the Nextcloud role for a good example.
+##############################################################################
+
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###   __  __            _       ____  ____    ###
+###  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   ###
+###  | |\/| |/ _` | '__| |/ _` | | | |  _ \   ###
+###  | |  | | (_| | |  | | (_| | |_| | |_) |  ###
+###  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   ###
+#################################################
+
+# docker
+tududi_db_container_name: "tududi-db"
+tududi_db_image_name: "mariadb"
+tududi_db_image_tag: "latest"
+
+# specs
+tududi_db_cpu_shares: 1024
+tududi_db_memory: "1G"
+tududi_db_memory_swap: "{{ tududi_db_memory }}"
+
+# autoheal
+tududi_db_autoheal_enabled: false
+
+# healthcheck
+tududi_db_healthcheck_test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-u", "tududi", "-p{{ tududi_db_password }}"]
+tududi_db_healthcheck_interval: 10s
+tududi_db_healthcheck_timeout: 5s
+tududi_db_healthcheck_retries: 5
+tududi_db_healthcheck_start_period: 30s
+
+# homepage
+tududi_db_homepage_description: "MariaDB Server is a high performing open source relational database, forked from MySQL."
+tududi_db_homepage_group: "DBs"
+tududi_db_homepage_icon: "mariadb.png"
+tududi_db_homepage_href: "{{ tududi_homepage_href }}"
+tududi_db_homepage_showstats: false
+
+# repliqate
+tududi_db_repliqate_enabled: false
+tududi_db_repliqate_engine: "restic"
+tududi_db_repliqate_schedule: "@daily 3am"
+tududi_db_repliqate_backup_id: "{{ tududi_db_container_name }}"
+tududi_db_repliqate_retention: "30d"
+
+# watchtower
+tududi_db_watchtower_enabled: false
+
+# wud
+tududi_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+tududi_db_wud_tag_transform_type: "semver"
+tududi_db_wud_link_template: "https://hub.docker.com/_/mariadb"
+
+######################################################
+###  OPTIONAL - remove if not needed               ###
+###   __  __                         ____  ____    ###
+###  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   ###
+###  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   ###
+###  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  ###
+###  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   ###
+###                      |___/                     ###
+######################################################
+
+# docker
+tududi_db_container_name: "tududi-db"
+tududi_db_image_name: "mongo"
+tududi_db_image_tag: "latest"
+
+# specs
+tududi_db_cpu_shares: 1024
+tududi_db_memory: "1G"
+tududi_db_memory_swap: "{{ tududi_db_memory }}"
+
+# autoheal
+tududi_db_autoheal_enabled: false
+
+# healthcheck
+tududi_db_healthcheck_test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--host", "127.0.0.1"]
+tududi_db_healthcheck_interval: 10s
+tududi_db_healthcheck_timeout: 5s
+tududi_db_healthcheck_retries: 3
+tududi_db_healthcheck_start_period: 15s
+
+# homepage
+tududi_db_homepage_description: "The Database for Secure Apps"
+tududi_db_homepage_group: "DBs"
+tududi_db_homepage_icon: "mongodb.png"
+tududi_db_homepage_href: "{{ tududi_homepage_href }}"
+tududi_db_homepage_showstats: false
+
+# repliqate
+tududi_db_repliqate_enabled: false
+tududi_db_repliqate_engine: "restic"
+tududi_db_repliqate_schedule: "@daily 3am"
+tududi_db_repliqate_backup_id: "{{ tududi_db_container_name }}"
+tududi_db_repliqate_retention: "30d"
+
+# watchtower
+tududi_db_watchtower_enabled: false
+
+# wud
+tududi_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+tududi_db_wud_tag_transform_type: "semver"
+tududi_db_wud_link_template: "https://hub.docker.com/_/mongo"
+
+##########################################
+###  OPTIONAL - remove if not needed   ###
+###   __  __       ____   ___  _       ###
+###  |  \/  |_   _/ ___| / _ \| |      ###
+###  | |\/| | | | \___ \| | | | |      ###
+###  | |  | | |_| |___) | |_| | |___   ###
+###  |_|  |_|\__, |____/ \__\_\_____|  ###
+###          |___/                     ###
+##########################################
+
+# docker
+tududi_db_container_name: "tududi-db"
+tududi_db_image_name: "mysql"
+tududi_db_image_tag: "8.4"
+
+# specs
+tududi_db_cpu_shares: 1024
+tududi_db_memory: "1G"
+tududi_db_memory_swap: "{{ tududi_db_memory }}"
+
+# autoheal
+tududi_db_autoheal_enabled: false
+
+# healthcheck
+tududi_db_healthcheck_test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p{{ tududi_sql_root_password }}"]
+tududi_db_healthcheck_interval: 10s
+tududi_db_healthcheck_timeout: 5s
+tududi_db_healthcheck_retries: 5
+tududi_db_healthcheck_start_period: 30s
+
+# homepage
+tududi_db_homepage_description: "MySQL Server, the world''s most popular open source database"
+tududi_db_homepage_group: "DBs"
+tududi_db_homepage_icon: "mysql.png"
+tududi_db_homepage_href: "{{ tududi_homepage_href }}"
+tududi_db_homepage_showstats: false
+
+# repliqate
+tududi_db_repliqate_enabled: false
+tududi_db_repliqate_engine: "restic"
+tududi_db_repliqate_schedule: "@daily 3am"
+tududi_db_repliqate_backup_id: "{{ tududi_db_container_name }}"
+tududi_db_repliqate_retention: "30d"
+
+# watchtower
+tududi_db_watchtower_enabled: false
+
+# wud
+tududi_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+tududi_db_wud_tag_transform_type: "semver"
+tududi_db_wud_link_template: "https://hub.docker.com/_/mysql"
+
+##############################################################
+###  OPTIONAL - remove if not needed                       ###
+###   ____           _                 ____   ___  _       ###
+###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
+###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
+###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
+###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
+###                     |___/                              ###
+##############################################################
+
+# docker
+tududi_db_container_name: "tududi-db"
+tududi_db_image_name: "postgres"
+tududi_db_image_tag: "16-alpine"
+
+# specs
+tududi_db_cpu_shares: 1024
+tududi_db_memory: "1G"
+tududi_db_memory_swap: "{{ tududi_db_memory }}"
+
+# autoheal
+tududi_db_autoheal_enabled: false
+
+# healthcheck
+tududi_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U tududi -d tududi -h 127.0.0.1"]
+tududi_db_healthcheck_interval: 10s
+tududi_db_healthcheck_timeout: 5s
+tududi_db_healthcheck_retries: 5
+tududi_db_healthcheck_start_period: 30s
+
+# homepage
+tududi_db_homepage_description: "PostgreSQL Database Management System"
+tududi_db_homepage_group: "DBs"
+tududi_db_homepage_icon: "postgres.png"
+tududi_db_homepage_href: "{{ tududi_homepage_href }}"
+tududi_db_homepage_showstats: false
+
+# repliqate
+tududi_db_repliqate_enabled: false
+tududi_db_repliqate_engine: "restic"
+tududi_db_repliqate_schedule: "@daily 3am"
+tududi_db_repliqate_backup_id: "{{ tududi_db_container_name }}"
+tududi_db_repliqate_retention: "30d"
+
+# watchtower
+tududi_db_watchtower_enabled: false
+
+# wud
+tududi_db_wud_tag_include: '^\d+\.\d+.*$'
+tududi_db_wud_tag_transform_type: "semver"
+tududi_db_wud_link_template: "https://hub.docker.com/_/postgres"
+
+#########################################
+###  OPTIONAL - remove if not needed  ###
+###       ____          _ _           ###
+###      |  _ \ ___  __| (_)___       ###
+###      | |_) / _ \/ _` | / __|      ###
+###      |  _ <  __/ (_| | \__ \      ###
+###      |_| \_\___|\__,_|_|___/      ###
+#########################################
+
+# docker
+tududi_redis_container_name: "tududi-redis"
+tududi_redis_image_name: "redis"
+tududi_redis_image_tag: "latest"
+
+# specs
+tududi_redis_cpu_shares: 1024
+tududi_redis_memory: "128M"
+tududi_redis_memory_swap: "{{ tududi_redis_memory }}"
+
+# autoheal
+tududi_redis_autoheal_enabled: false
+
+# healthcheck
+tududi_redis_healthcheck_test: ["CMD-SHELL", "redis-cli -a topsecret ping | grep PONG || exit 1"]
+tududi_redis_healthcheck_interval: 10s
+tududi_redis_healthcheck_timeout: 5s
+tududi_redis_healthcheck_retries: 3
+tududi_redis_healthcheck_start_period: 10s
+
+# homepage
+tududi_redis_homepage_description: "The Real-time Data Platform"
+tududi_redis_homepage_group: "DBs"
+tududi_redis_homepage_icon: "redis.png"
+tududi_redis_homepage_href: "{{ tududi_homepage_href }}"
+tududi_redis_homepage_showstats: false
+
+# repliqate
+tududi_redis_repliqate_enabled: false
+tududi_redis_repliqate_engine: "restic"
+tududi_redis_repliqate_schedule: "@daily 3am"
+tududi_redis_repliqate_backup_id: "{{ tududi_redis_container_name }}"
+tududi_redis_repliqate_retention: "30d"
+
+# watchtower
+tududi_redis_watchtower_enabled: false
+
+# wud
+tududi_redis_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+#tududi_redis_wud_tag_include: "^v?\\d+-alpine$"
+tududi_redis_wud_tag_transform_type: "semver"
+tududi_redis_wud_link_template: "https://hub.docker.com/_/redis"
