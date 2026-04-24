@@ -7,6 +7,7 @@ borg_ui_traefik_whitelist: "{{ lan }}"
 
 # directories
 borg_ui_data_directory: "{{ docker_home }}/borg-ui"
+borg_ui_root_dir: "/"
 
 # uid / gid
 borg_ui_user_id: "0"
@@ -26,6 +27,16 @@ borg_ui_cpu_shares: 1024
 borg_ui_memory: "1G"
 borg_ui_memory_swap: -1
 
+# app
+borg_ui_env_log_level: "debug" # Options: DEBUG, INFO, WARNING, ERROR
+borg_ui_env_local_mount_points: "/local"
+borg_ui_env_disable_authentication: "false" # Disable built-in login screen
+borg_ui_env_proxy_auth_header: "" # X-Forwarded-User # Header containing authenticated username (optional, default shown)
+borg_ui_env_proxy_auth_role_header: "" # X-Borg-Role # Optional trusted Borg UI global role header
+borg_ui_env_proxy_auth_all_repositories_role_header: "" # X-Borg-All-Repositories-Role # Optional trusted default repository role header
+borg_ui_env_proxy_auth_email_header: "" # X-Borg-Email   # Optional trusted email header
+borg_ui_env_proxy_auth_full_name_header: "" # X-Borg-Full-Name   # Optional trusted display-name header
+
 # autoheal
 borg_ui_autoheal_enabled: false
 
@@ -34,11 +45,11 @@ borg_ui_dockflare_enabled: false
 borg_ui_dockflare_access_group: ""
 
 # healthcheck
-borg_ui_healthcheck_test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:5000', (res) => { process.exit(0); }).on('error', (e) => { process.exit(1); })\" || exit 1"]
+borg_ui_healthcheck_test: ["CMD-SHELL", "curl -f --noproxy 127.0.0.1 http://127.0.0.1:{{ borg_ui_port_http }}/ || exit 1"]
 borg_ui_healthcheck_interval: 1m
 borg_ui_healthcheck_timeout: 10s
 borg_ui_healthcheck_retries: 3
-borg_ui_healthcheck_start_period: 45s
+borg_ui_healthcheck_start_period: 1m
 
 # homepage
 borg_ui_homepage_description: "borg-ui short description"

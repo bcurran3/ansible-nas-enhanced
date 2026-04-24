@@ -5,6 +5,8 @@
       ansible.builtin.file:
         path: "{{ item }}"
         state: directory
+        owner: "{{ borg_ui_user_id }}"
+        group: "{{ borg_ui_group_id }}"
       with_items:
         - "{{ borg_ui_data_directory }}"
         - "{{ borg_ui_data_directory }}/cache"
@@ -25,15 +27,23 @@
         volumes:
           - "{{ borg_ui_data_directory }}/data:/data"
           - "{{ borg_ui_data_directory }}/cache:/home/borg/.cache/borg"
-          - "/:/local:rw"
+          - "{{ borg_ui_root_dir }}:/local:rw"
         ports:
-          - "{{ borg_ui_port_http }}:8081"
+          - "{{ borg_ui_port_http }}:{{ borg_ui_port_http }}"
         env:
           ENVIRONMENT: "production"
           INITIAL_ADMIN_PASSWORD: "{{ ansible_nas_app_admin_password }}"
-#          PORT: "{{ borg_ui_port_http }}"
+          LOG_LEVEL: "{{ borg_ui_env_log_level }}"
+          LOCAL_MOUNT_POINTS: "{{ borg_ui_env_local_mount_points }}"
+          PORT: "{{ borg_ui_port_http }}"
           PUID: "{{ borg_ui_user_id }}"
           PGID: "{{ borg_ui_group_id }}"
+          DISABLE_AUTHENTICATION: "{{ borg_ui_env_disable_authentication }}"
+          PROXY_AUTH_HEADER: "{{ borg_ui_env_proxy_auth_header }}"
+          PROXY_AUTH_ROLE_HEADER: "{{ borg_ui_env_proxy_auth_role_header }}"
+          PROXY_AUTH_ALL_REPOSITORIES_ROLE_HEADER: "{{ borg_ui_env_proxy_auth_all_repositories_role_header }}"
+          PROXY_AUTH_EMAIL_HEADER: "{{ borg_ui_env_proxy_auth_email_header }}"
+          PROXY_AUTH_FULL_NAME_HEADER: "{{ borg_ui_env_proxy_auth_full_name_header }}"
           TZ: "{{ ansible_nas_timezone }}"
         healthcheck:
           test: "{{ borg_ui_healthcheck_test }}"
@@ -69,7 +79,7 @@
           traefik.http.routers.borg-ui.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
           traefik.http.routers.borg-ui.middlewares: "borg-ui@docker{{ ',tinyauth-auth@docker' if borg_ui_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.borg-ui.IPAllowList.sourcerange: "{{ borg_ui_traefik_whitelist }}"
-          traefik.http.services.borg-ui.loadbalancer.server.port: "8081"
+          traefik.http.services.borg-ui.loadbalancer.server.port: "{{ borg_ui_port_http }}"
           wud.tag.include: "{{ borg_ui_wud_tag_include }}"
           wud.tag.transform.type: "{{ borg_ui_wud_tag_transform_type }}"
           wud.link.template: "{{ borg_ui_wud_link_template }}"
