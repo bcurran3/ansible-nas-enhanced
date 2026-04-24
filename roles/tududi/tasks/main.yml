@@ -1,0 +1,109 @@
+---
+- name: Start {{ tududi_proper_name }}
+  block:
+    - name: Create {{ tududi_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ tududi_data_directory }}"
+        - "{{ tududi_data_directory }}/db"
+        - "{{ tududi_data_directory }}/uploads"
+
+    - name: Set {{ tududi_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        tududi_homepage_href: "https://{{ tududi_hostname }}.{{ ansible_nas_domain }}"
+        tududi_env_tududi_trust_proxy: "true"
+        tududi_env_tududi_allowed_origins: "https://{{ ansible_nas_domain }}"
+      when: tududi_traefik_enabled | bool or tududi_dockflare_enabled | bool
+
+    - name: Create {{ tududi_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tududi_container_name }}"
+        hostname: "{{ tududi_container_name }}"
+        image: "{{ tududi_image_name }}:{{ tududi_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tududi_data_directory }}/db:/app/backend/db"
+          - "{{ tududi_data_directory }}/uploads:{{ tududi_env_tududi_upload_path }}"
+        ports:
+          - "{{ tududi_port_http }}:3002"
+        env:
+          PUID: "{{ tududi_user_id }}"
+          PGID: "{{ tududi_group_id }}"
+          TUDUDI_USER_EMAIL: "{{ tududi_env_tududi_user_email }}"
+          TUDUDI_USER_PASSWORD: "{{ tududi_env_tududi_user_password }}"
+          TUDUDI_SESSION_SECRET: "{{ tududi_env_tududi_session_secret }}"
+          TUDUDI_ALLOWED_ORIGINS: "{{ tududi_env_tududi_allowed_origins }}"
+          TUDUDI_TRUST_PROXY: "{{ tududi_env_tududi_trust_proxy }}"
+          TUDUDI_UPLOAD_PATH: "{{ tududi_env_tududi_upload_path }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tududi_healthcheck_test }}"
+          interval: "{{ tududi_healthcheck_interval }}"
+          timeout: "{{ tududi_healthcheck_timeout }}"
+          retries: "{{ tududi_healthcheck_retries }}"
+          start_period: "{{ tududi_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tududi_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tududi_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ tududi_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ tududi_dockflare_access_group }}"
+          dockflare.hostname: "{{ tududi_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tududi_port_http }}"
+          homepage.name: "{{ tududi_proper_name }}"
+          homepage.group: "{{ tududi_homepage_group }}"
+          homepage.icon: "{{ tududi_homepage_icon }}"
+          homepage.href: "{{ tududi_homepage_href }}"
+          homepage.description: "{{ tududi_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tududi_container_name }}"
+          homepage.showStats: "{{ tududi_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tududi_port_http }}"
+          repliqate.enabled: "{{ tududi_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tududi_repliqate_engine }}"
+          repliqate.schedule: "{{ tududi_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tududi_repliqate_backup_id }}"
+          repliqate.retention: "{{ tududi_repliqate_retention }}"
+          traefik.enable: "{{ tududi_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.tududi.rule: "Host(`{{ tududi_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.tududi.tls.certresolver: "letsencrypt"
+          traefik.http.routers.tududi.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.tududi.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.tududi.middlewares: "tududi@docker{{ ',tinyauth-auth@docker' if tududi_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.tududi.IPAllowList.sourcerange: "{{ tududi_traefik_whitelist }}"
+          traefik.http.services.tududi.loadbalancer.server.port: "3002"
+          wud.tag.include: "{{ tududi_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tududi_wud_tag_transform_type }}"
+          wud.link.template: "{{ tududi_wud_link_template }}"
+        cpu_shares: "{{ tududi_cpu_shares }}"
+        memory: "{{ tududi_memory }}"
+        memory_swap: "{{ tududi_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ tududi_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (tududi_port_http | string)] +
+                (['https://' + tududi_hostname + '.' + ansible_nas_domain] if (tududi_traefik_enabled is true or tududi_dockflare_enabled is true) else [])
+              }}
+  when: tududi_enabled is true
+
+- name: Stop {{ tududi_proper_name }}
+  block:
+    - name: Stop {{ tududi_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ tududi_container_name }}"
+        state: absent
+  when: tududi_enabled is false
+
+- name: Data Archive {{ tududi_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ tududi_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - tududi_enabled is false

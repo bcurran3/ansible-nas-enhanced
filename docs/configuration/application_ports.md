@@ -386,6 +386,7 @@ By default, applications can be found on the ports listed below.
 | Transmission VPN | 3128    | Bridge  | HTTP Proxy     |
 | Transmission VPN | 51415   | Bridge  | bt             |
 | Trilium Notes    | 9007    | Bridge  | HTTP           |
+| tududi           | 4017    | Bridge  | HTTP           |
 | Tugtainer        | 9412    | Bridge  | HTTP           |
 | TVheadend        | 9981
 | TVheadend        | 9982
@@ -437,7 +438,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4017
+# next avail = 4018
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

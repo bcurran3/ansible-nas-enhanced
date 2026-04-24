@@ -1,0 +1,75 @@
+---
+# ANE
+tududi_proper_name: "tududi"
+tududi_enabled: false
+tududi_traefik_enabled: false
+tududi_traefik_whitelist: "{{ lan }}"
+
+# directories
+tududi_data_directory: "{{ docker_home }}/tududi"
+
+# docker
+tududi_container_name: "tududi"
+tududi_image_name: "chrisvel/tududi"
+tududi_image_tag: "latest"
+
+# uid / gid
+tududi_user_id: "1001"
+tududi_group_id: "1001"
+
+# network
+tududi_hostname: "tududi"
+tududi_port_http: "4017"
+
+# specs
+tududi_cpu_shares: 1024
+tududi_memory: "1G"
+tududi_memory_swap: -1
+
+# app
+# https://github.com/chrisvel/tududi
+tududi_env_tududi_user_email: "{{ ansible_nas_email }}"
+tududi_env_tududi_user_password: "{{ ansible_nas_app_admin_password }}"
+tududi_env_tududi_session_secret: "39417ee7b25caa9cb453c134fd5b2058d8f4623a86757281388598303e27b4ac812f45d875319fdb3498bed604e13a1b6ef4dc8eebcc97a62e3cf5f66b16dccc" # use openssl rand -hex 64 to create your own
+tududi_env_tududi_allowed_origins: "http://localhost:3002"
+tududi_env_tududi_trust_proxy: "false"
+tududi_env_tududi_upload_path: "/app/backend/uploads"
+
+# autoheal
+tududi_autoheal_enabled: false
+
+# dockflare
+tududi_dockflare_enabled: false
+tududi_dockflare_access_group: ""
+
+# healthcheck
+tududi_healthcheck_test: ["CMD-SHELL", "wget -Y off -qO- http://127.0.0.1:3002/ || exit 1"]
+tududi_healthcheck_interval: 1m
+tududi_healthcheck_timeout: 10s
+tududi_healthcheck_retries: 3
+tududi_healthcheck_start_period: 30s
+
+# homepage
+tududi_homepage_description: "tududi short description"
+tududi_homepage_group: "Apps"
+tududi_homepage_icon: "sh-tududi.png"
+tududi_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tududi_port_http }}"
+tududi_homepage_showstats: false
+
+# repliqate
+tududi_repliqate_enabled: false
+tududi_repliqate_engine: "restic"
+tududi_repliqate_schedule: "@daily 3am"
+tududi_repliqate_backup_id: "{{ tududi_container_name }}"
+tududi_repliqate_retention: "30d"
+
+# tinyauth
+tududi_tinyauth_enabled: false
+
+# watchtower
+tududi_watchtower_enabled: false
+
+# wud
+tududi_wud_tag_include: "^v?\\d+(\\.\\d+){1,2}$"
+tududi_wud_tag_transform_type: "semver"
+tududi_wud_link_template: "https://hub.docker.com/r/chrisvel/tududi"
