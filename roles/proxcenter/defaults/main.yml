@@ -1,0 +1,71 @@
+---
+# ANE
+proxcenter_proper_name: "ProxCenter"
+proxcenter_enabled: false
+proxcenter_traefik_enabled: false
+proxcenter_traefik_whitelist: "{{ lan }}"
+
+# directories
+proxcenter_data_directory: "{{ docker_home }}/proxcenter"
+
+# docker
+proxcenter_container_name: "proxcenter"
+proxcenter_image_name: "ghcr.io/adminsyspro/proxcenter-frontend"
+proxcenter_image_tag: "latest"
+
+# network
+proxcenter_hostname: "proxcenter"
+proxcenter_port_http: "4018"
+
+# specs
+proxcenter_cpu_shares: 1024
+proxcenter_memory: "1G"
+proxcenter_memory_swap: -1
+
+# app
+proxcenter_env_app_secret: "8h4z7CjDX/MvtyCUD9O+8We0trl++INsfTSRWnDHy1c=" # generate your own openssl rand -base64 32
+proxcenter_env_app_url: "http://localhost:3000"
+proxcenter_env_database_url: "file:/app/data/proxcenter.db"
+proxcenter_env_nextauth_secret: "PmHqiq9UKd+3jgZzzd1pIylgWJ6Zsn9IKgpqWXiVR5Q=" # generate your own openssl rand -base64 32
+proxcenter_env_nextauth_url: "http://localhost:3000"
+proxcenter_env_node_env: "production"
+
+
+# autoheal
+proxcenter_autoheal_enabled: false
+
+# dockflare
+proxcenter_dockflare_enabled: false
+proxcenter_dockflare_access_group: ""
+
+# healthcheck
+proxcenter_healthcheck_test: ["CMD-SHELL", "wget -Y off -qO- http://127.0.0.1:3000/api/health || exit 1"]
+proxcenter_healthcheck_interval: 1m
+proxcenter_healthcheck_timeout: 10s
+proxcenter_healthcheck_retries: 3
+proxcenter_healthcheck_start_period: 30s
+
+# homepage
+proxcenter_homepage_description: "ProxCenter is an alternative to VMware vCenter for Proxmox environments."
+proxcenter_homepage_group: "Apps"
+proxcenter_homepage_icon: "sh-proxcenter.png"
+proxcenter_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ proxcenter_port_http }}"
+proxcenter_homepage_showstats: false
+
+# repliqate
+proxcenter_repliqate_enabled: false
+proxcenter_repliqate_engine: "restic"
+proxcenter_repliqate_schedule: "@daily 3am"
+proxcenter_repliqate_backup_id: "{{ proxcenter_container_name }}"
+proxcenter_repliqate_retention: "30d"
+
+# tinyauth
+proxcenter_tinyauth_enabled: false
+
+# watchtower
+proxcenter_watchtower_enabled: false
+
+# wud
+proxcenter_wud_tag_include: "^v?\\d+(\\.\\d+){1,2}$"
+proxcenter_wud_tag_transform_type: "semver"
+proxcenter_wud_link_template: "https://github.com/adminsyspro/proxcenter-ui/pkgs/container/proxcenter-frontend"

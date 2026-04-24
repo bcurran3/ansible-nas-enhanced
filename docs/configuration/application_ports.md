@@ -284,6 +284,7 @@ By default, applications can be found on the ports listed below.
 | ProjectSend      | 3036    | Bridge  | HTTP           |
 | Promtail         | 9080
 | Prowlarr         | 9696    | Bridge  | HTTP           |
+| ProxCenter       | 4018    | Bridge  | HTTP           |
 | Proxmox VE N1    | 3091    | Bridge  | HTTP           |
 | Proxmox VE N1    | 2222    | Bridge  | SSH            |
 | Proxmox VE N1    | 3095    | Bridge  | Spice          |
@@ -438,7 +439,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4018
+# next avail = 4019
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002
