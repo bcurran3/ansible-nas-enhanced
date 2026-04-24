@@ -1,0 +1,101 @@
+---
+- name: Start {{ tainer_proper_name }}
+  block:
+    - name: Create {{ tainer_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: 1001
+        group: 1001
+      with_items:
+        - "{{ tainer_data_directory }}"
+        - "{{ tainer_data_directory }}/data"
+
+    - name: Set {{ tainer_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        tainer_homepage_href: "https://{{ tainer_hostname }}.{{ ansible_nas_domain }}"
+        tainer_env_app_url: "https://{{ tainer_hostname }}.{{ ansible_nas_domain }}"
+      when: tainer_traefik_enabled | bool or tainer_dockflare_enabled | bool
+
+    - name: Create {{ tainer_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ tainer_container_name }}"
+        hostname: "{{ tainer_container_name }}"
+        image: "{{ tainer_image_name }}:{{ tainer_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ tainer_data_directory }}/data:/app/data"
+        ports:
+          - "{{ tainer_port_http }}:3000"
+        env:
+          APP_URL: "{{ tainer_env_app_url }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ tainer_healthcheck_test }}"
+          interval: "{{ tainer_healthcheck_interval }}"
+          timeout: "{{ tainer_healthcheck_timeout }}"
+          retries: "{{ tainer_healthcheck_retries }}"
+          start_period: "{{ tainer_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ tainer_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ tainer_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ tainer_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ tainer_dockflare_access_group }}"
+          dockflare.hostname: "{{ tainer_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tainer_port_http }}"
+          homepage.name: "{{ tainer_proper_name }}"
+          homepage.group: "{{ tainer_homepage_group }}"
+          homepage.icon: "{{ tainer_homepage_icon }}"
+          homepage.href: "{{ tainer_homepage_href }}"
+          homepage.description: "{{ tainer_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ tainer_container_name }}"
+          homepage.showStats: "{{ tainer_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tainer_port_http }}"
+          repliqate.enabled: "{{ tainer_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ tainer_repliqate_engine }}"
+          repliqate.schedule: "{{ tainer_repliqate_schedule }}"
+          repliqate.backup_id: "{{ tainer_repliqate_backup_id }}"
+          repliqate.retention: "{{ tainer_repliqate_retention }}"
+          traefik.enable: "{{ tainer_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.tainer.rule: "Host(`{{ tainer_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.tainer.tls.certresolver: "letsencrypt"
+          traefik.http.routers.tainer.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.tainer.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.tainer.middlewares: "tainer@docker{{ ',tinyauth-auth@docker' if tainer_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.tainer.IPAllowList.sourcerange: "{{ tainer_traefik_whitelist }}"
+          traefik.http.services.tainer.loadbalancer.server.port: "3000"
+          wud.tag.include: "{{ tainer_wud_tag_include }}"
+          wud.tag.transform.type: "{{ tainer_wud_tag_transform_type }}"
+          wud.link.template: "{{ tainer_wud_link_template }}"
+        cpu_shares: "{{ tainer_cpu_shares }}"
+        memory: "{{ tainer_memory }}"
+        memory_swap: "{{ tainer_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ tainer_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (tainer_port_http | string)] +
+                (['https://' + tainer_hostname + '.' + ansible_nas_domain] if (tainer_traefik_enabled is true or tainer_dockflare_enabled is true) else [])
+              }}
+  when: tainer_enabled is true
+
+- name: Stop {{ tainer_proper_name }}
+  block:
+    - name: Stop {{ tainer_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ tainer_container_name }}"
+        state: absent
+  when: tainer_enabled is false
+
+- name: Data Archive {{ tainer_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ tainer_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - tainer_enabled is false

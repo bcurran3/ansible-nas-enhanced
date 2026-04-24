@@ -1,0 +1,65 @@
+---
+# ANE
+tainer_proper_name: "Tainer"
+tainer_enabled: false
+tainer_traefik_enabled: false
+tainer_traefik_whitelist: "{{ lan }}"
+
+# directories
+tainer_data_directory: "{{ docker_home }}/tainer"
+
+# docker
+tainer_container_name: "tainer"
+tainer_image_name: "tainersh/tainer"
+tainer_image_tag: "latest"
+
+# network
+tainer_hostname: "tainer"
+tainer_port_http: "4016"
+
+# specs
+tainer_cpu_shares: 1024
+tainer_memory: "1G"
+tainer_memory_swap: -1
+
+# autoheal
+tainer_autoheal_enabled: false
+
+# app
+tainer_env_app_url: "http://localhost:3000"
+
+# dockflare
+tainer_dockflare_enabled: false
+tainer_dockflare_access_group: ""
+
+# healthcheck
+tainer_healthcheck_test: ["CMD-SHELL", "wget -Y off -qO- http://127.0.0.1:3000/ || exit 1"]
+tainer_healthcheck_interval: 1m
+tainer_healthcheck_timeout: 10s
+tainer_healthcheck_retries: 3
+tainer_healthcheck_start_period: 45s
+
+# homepage
+tainer_homepage_description: "Self-service Proxmox dashboard. Multi-site, LXC/VM management, templates, 2FA, and audit trails."
+tainer_homepage_group: "Apps"
+tainer_homepage_icon: "proxmox.png" # need something better
+tainer_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ tainer_port_http }}"
+tainer_homepage_showstats: false
+
+# repliqate
+tainer_repliqate_enabled: false
+tainer_repliqate_engine: "restic"
+tainer_repliqate_schedule: "@daily 3am"
+tainer_repliqate_backup_id: "{{ tainer_container_name }}"
+tainer_repliqate_retention: "30d"
+
+# tinyauth
+tainer_tinyauth_enabled: false
+
+# watchtower
+tainer_watchtower_enabled: false
+
+# wud
+tainer_wud_tag_include: "^v?\\d+(\\.\\d+){1,2}$"
+tainer_wud_tag_transform_type: "semver"
+tainer_wud_link_template: "https://hub.docker.com/r/tainersh/tainer"

@@ -359,6 +359,7 @@ By default, applications can be found on the ports listed below.
 | Syncthing admin  | 8384    | Host    | HTTP           |
 | Syncthing P2P    | 22000   | Host    | TCP+UDP        |
 | Tailscale        | n/a     | Host
+| Tainer           | 4016    | Bridge  | HTTP           |
 | Tandoor Recipes  | 3037    | Bridge  | HTTP           |
 | Tasks.md         | 3048    | Bridge  | HTTP           |
 | Tautulli         | 8185    | Bridge  | HTTP           |
@@ -436,7 +437,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4016
+# next avail = 4017
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002
