@@ -357,54 +357,72 @@ function enable_app {
     APPSLIST="./nas.yml"
     FILE="inventories/ANE/group_vars/nas.yml"
     TAGS_TO_RUN=""
+    RESOLVED_APPS=""
+
+    # 1. Wildcard Resolution
     for arg in "$@"; do
-        arg=$(echo "$arg" | tr '[:upper:]' '[:lower:]')
-        arg_clean="${arg//-/_}"
-        ENABLED_LINE="${arg_clean}_enabled: true"
-        DISABLED_LINE="${arg_clean}_enabled: false"
-        TRAEFIK_LINE="${arg_clean}_traefik_enabled: true"
-        DOCKFLARE_LINE="${arg_clean}_dockflare_enabled: true"
-        if [ -f "$FILE" ] && grep -q "^$ENABLED_LINE" "$FILE"; then
-            echo "  ** ${arg} is already enabled."
-        elif [ -f "$FILE" ] && grep -q "^$DISABLED_LINE" "$FILE"; then
-            sed -i "s/^$DISABLED_LINE/$ENABLED_LINE/" "$FILE"
-            echo "  ** ${arg} re-enabled."
-            if [[ "$ANE_ALWAYS_ENABLE_TRAEFIK" == "true" ]]; then
-                if ! grep -q "^$TRAEFIK_LINE" "$FILE"; then
-                    sed -i "/^$ENABLED_LINE/a $TRAEFIK_LINE" "$FILE"
-                    echo "  ** Traefik enabled for ${arg}."
-                fi
-            fi
-            if [[ "$ANE_ALWAYS_ENABLE_DOCKFLARE" == "true" ]]; then
-                if ! grep -q "^$DOCKFLARE_LINE" "$FILE"; then
-                    sed -i "/^$ENABLED_LINE/a $DOCKFLARE_LINE" "$FILE"
-                    echo "  ** Dockflare enabled for ${arg}."
-                fi
-            fi
-            TAGS_TO_RUN+="${arg},"
+        if [[ "$arg" == *"*"* ]]; then
+            MATCHES=$(find roles/ -maxdepth 1 -type d -name "$arg" ! -name "template" ! -name "WIP_*" ! -name ".*" | sed 's|roles/||' | sort)
+            [[ -n "$MATCHES" ]] && RESOLVED_APPS+="$MATCHES "
         else
-            if [ -f "$APPSLIST" ] && grep -qE "role: +${arg}$" "$APPSLIST"; then
-                if ! grep -q "${arg_clean}_enabled" "$FILE"; then
-                    echo -e "\n### ${arg}\n$ENABLED_LINE" >> "$FILE"
-                    echo "  ** ${arg} enabled (new entry)."
-                    if [[ "$ANE_ALWAYS_ENABLE_DOCKFLARE" == "true" ]]; then
-                        echo "$DOCKFLARE_LINE" >> "$FILE"
-                        echo "  ** Dockflare enabled for ${arg}."
-                    fi
-                    if [[ "$ANE_ALWAYS_ENABLE_TRAEFIK" == "true" ]]; then
-                        echo "$TRAEFIK_LINE" >> "$FILE"
-                        echo "  ** Traefik enabled for ${arg}."
-                    fi
-                fi
-                TAGS_TO_RUN+="${arg},"
+            RESOLVED_APPS+="$arg "
+        fi
+    done
+
+    for app in $RESOLVED_APPS; do
+        app_clean="${app//-/_}"
+        
+        # We use flexible regex patterns to find the lines regardless of spaces
+        ENABLED_PAT="^[[:space:]]*${app_clean}_enabled:[[:space:]]*true"
+        DISABLED_PAT="^[[:space:]]*${app_clean}_enabled:[[:space:]]*false"
+        
+        # Check if already enabled
+        if grep -qE "$ENABLED_PAT" "$FILE"; then
+            echo "  ** ${app} is already enabled."
+        
+        # Check if disabled and swap it
+        elif grep -qE "$DISABLED_PAT" "$FILE"; then
+            # The 's' command now looks for the pattern anywhere on the line
+            sed -i -E "s/(${app_clean}_enabled:)[[:space:]]*false/\1 true/" "$FILE"
+            echo "  ** ${app} re-enabled."
+            
+            # Add Autoheal/Dockflare/Traefik if global flags are set
+            if [[ "$ANE_ALWAYS_ENABLE_AUTOHEAL" == "true" ]] && ! grep -q "${app_clean}_autoheal_enabled" "$FILE"; then
+                sed -i "/${app_clean}_enabled: true/a ${app_clean}_autoheal_enabled: true" "$FILE"
+                echo "  ** Autoheal enabled for ${app}."
+            fi
+            if [[ "$ANE_ALWAYS_ENABLE_DOCKFLARE" == "true" ]] && ! grep -q "${app_clean}_dockflare_enabled" "$FILE"; then
+                sed -i "/${app_clean}_enabled: true/a ${app_clean}_dockflare_enabled: true" "$FILE"
+                echo "  ** Dockflare enabled for ${app}."
+            fi
+            if [[ "$ANE_ALWAYS_ENABLE_TRAEFIK" == "true" ]] && ! grep -q "${app_clean}_traefik_enabled" "$FILE"; then
+                sed -i "/${app_clean}_enabled: true/a ${app_clean}_traefik_enabled: true" "$FILE"
+                echo "  ** Traefik enabled for ${app}."
+            fi
+            TAGS_TO_RUN+="${app},"
+        
+        # If not found at all, append to end of file
+        else
+            if grep -qE "role:[[:space:]]*${app}$" "$APPSLIST"; then
+                # Ensure a newline before adding
+                echo "" >> "$FILE"
+                echo "### ${app}" >> "$FILE"
+                echo "${app_clean}_enabled: true" >> "$FILE"
+                
+                [[ "$ANE_ALWAYS_ENABLE_DOCKFLARE" == "true" ]] && echo "${app_clean}_dockflare_enabled: true" >> "$FILE"
+                [[ "$ANE_ALWAYS_ENABLE_TRAEFIK" == "true" ]] && echo "${app_clean}_traefik_enabled: true" >> "$FILE"
+                
+                echo "  ++ ${app} enabled (new entry)."
+                TAGS_TO_RUN+="${app},"
             else
-                echo "  ** ${arg} role not found in nas.yml."
-                echo "  ** ./ane.sh --available to list available apps."
+                echo "  ** ${app} not found in roles/ or nas.yml."
             fi
         fi
     done
+
+    # Final Execution
     if [[ "$ANE_ENABLE_ALSO_STARTS" == "true" ]] && [[ -n "${TAGS_TO_RUN%,}" ]]; then
-        echo "  ** Installing enabled apps: ${TAGS_TO_RUN%,}..."
+        echo "  ** Running playbook for: ${TAGS_TO_RUN%,}..."
         ansible-playbook -i inventories/ANE/inventory nas.yml "${BECOME_FLAGS[@]}" -t "${TAGS_TO_RUN%,}"
     fi
 }
