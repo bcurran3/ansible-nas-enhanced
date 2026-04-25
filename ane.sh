@@ -655,9 +655,9 @@ function shell_help {
     echo "  enable <app>          : Enable app(s)"
     echo "  disable <app>         : Disable app(s)"
     echo "  remove <app>          : Stop, Disable, and Uninstall app(s)"
-    echo "  run                   : Run full ANE playbook (all enabled apps)"
-    echo "  runfast               : Update enabled apps"
-    echo "  stopall               : Stop ALL running containers"
+    echo "  run                   : Run full ANE playbook"
+    echo "  runfast               : Run ANE playbook on enabled apps only"
+    echo "  stopall               : Stop all running containers"
     echo "  settings              : Edit group_vars/nas.yml"
     echo ""
     echo "  [ App Feature Toggles ]"
@@ -680,6 +680,7 @@ function shell_help {
     echo "  prune                 : Clean up docker images/volumes"
     echo "  behind                : Check if ANE is outdated"
     echo "  upgrade               : Pull latest ANE repo changes"
+    echo "  exec <command>        : execute command, return to ANE Shell"
     echo ""
     echo "  [ Development ]"
     echo "  newapp <app>          : Create a new app role from template"
@@ -773,6 +774,13 @@ function shell {
                 ;;
             
             # --- System & Config ---
+            exec)
+                if [[ -z "$args" ]]; then
+                    echo "  ** ERROR: No command provided to exec."
+                else
+                    shell_exec "$args"
+                fi
+                ;;
             install)
                 if [ -d "inventories/ANE" ]; then
                     echo "  ** WARNING: inventories/ANE exists!"
@@ -859,6 +867,17 @@ function shell {
                 ;;
         esac 
     done
+}
+
+function shell_exec {
+    # Check $1 because 'shift' in the case statement moved the command here
+    if [[ -z "$1" ]]; then
+        echo "  ** ERROR: No command provided to exec."
+        return 1
+    fi
+
+    echo "  ** Executing: $@"
+    eval "$@"
 }
 
 ###################################
