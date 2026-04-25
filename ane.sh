@@ -999,7 +999,7 @@ fi
 
 # upate enabled apps
 if [[ "$1" = "--fastrun" || "$1" = "-fastrun" ]]; then
-    fast_update
+    fast_run
     exit
 fi
 
