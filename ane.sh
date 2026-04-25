@@ -98,7 +98,7 @@ function help {
     echo "      Install or update apps by tag."
     echo "  --upgrade, --pull"
     echo "      Upgrade ANE files from repo"
-    echo "  --fastupdate"
+    echo "  --fastrun"
     echo "      Update enabled apps"
     echo ""
     exit
@@ -592,8 +592,8 @@ function create_new_app_placeholder {
 }
 
 # update enabled apps
-function fast_update {
-    echo "  ** Fetching list of enabled apps for fast update..."
+function fast_run {
+    echo "  ** Fetching list of enabled apps for fast run..."
     ENABLED_LIST=$(grep 'enabled: true' inventories/ANE/group_vars/nas.yml | \
         grep -v -E "$ANE_EXCLUDES" | \
         sed 's/_enabled: true//;s/ //g;s/_/-/g' | \
@@ -654,7 +654,7 @@ function shell_help {
     echo "  down <app>            : Stop and Disable app(s)"
     echo "  enable <app>          : Enable app(s)"
     echo "  disable <app>         : Disable app(s)"
-    echo "  fastupdate            : Update enabled apps"
+    echo "  fastrun               : Update enabled apps"
     echo "  remove <app>          : Stop, Disable, and Uninstall app(s)"
     echo "  run                   : Run full ANE playbook (all enabled apps)"
     echo "  stopall               : Stop ALL running containers"
@@ -734,8 +734,8 @@ function shell {
                 stop_app $args
                 disable_app $args
                 ;;
-            fastupdate)
-                fast_update
+            fastrun)
+                fast_run
                 ;;
             remove)
                 stop_app $args
@@ -998,7 +998,7 @@ if [[ "$1" == "--dockflare" || "$1" == "-dockflare" || "$1" == "--enabledockflar
 fi
 
 # upate enabled apps
-if [[ "$1" = "--fastupdate" || "$1" = "-fastupdate" ]]; then
+if [[ "$1" = "--fastrun" || "$1" = "-fastrun" ]]; then
     fast_update
     exit
 fi
