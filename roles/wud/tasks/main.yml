@@ -111,8 +111,9 @@
           traefik.http.routers.wud.middlewares: "wud@docker{{ ',tinyauth-auth@docker' if wud_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.wud.IPAllowList.sourcerange: "{{ wud_traefik_whitelist }}"
           traefik.http.services.wud.loadbalancer.server.port: "3000"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.link.template: "https://github.com/getwud/wud/releases/tag/${major}.${minor}.${patch}"
+          wud.tag.include: "{{ wud_wud_tag_include }}"
+          wud.tag.transform.type: "{{ wud_wud_tag_transform_type }}"
+          wud.link.template: "{{ wud_wud_link_template }}"
         cpu_shares: "{{ wud_cpu_shares }}"
         memory: "{{ wud_memory }}"
         memory_swap: "{{ wud_memory_swap }}"

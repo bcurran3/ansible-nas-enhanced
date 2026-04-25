@@ -72,9 +72,9 @@
           traefik.http.routers.music-assistant.middlewares: "music-assistant-whitelist{{ ',tinyauth-auth@docker' if music_assistant_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.music-assistant-whitelist.ipallowlist.sourcerange: "{{ music_assistant_traefik_whitelist }}"
           traefik.http.services.music-assistant-svc.loadbalancer.server.url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ music_assistant_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/music-assistant/server/pkgs/container/server"
+          wud.tag.include: "{{ music_assistant_wud_tag_include }}"
+          wud.tag.transform.type: "{{ music_assistant_wud_tag_transform_type }}"
+          wud.link.template: "{{ music_assistant_wud_link_template }}"
         cpu_shares: "{{ music_assistant_cpu_shares }}"
         memory: "{{ music_assistant_memory }}"
         memory_swap: "{{ music_assistant_memory_swap }}"

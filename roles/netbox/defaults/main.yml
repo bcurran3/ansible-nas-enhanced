@@ -38,7 +38,6 @@ netbox_redis_cpu_shares: 1024
 netbox_redis_memory: "128M"
 netbox_redis_memory_swap: "{{ netbox_redis_memory }}"
 
-
 # app
 netbox_env_superuser_email: "{{ ansible_nas_email }}"
 netbox_env_superuser_password: "{{ ansible_nas_app_admin_password }}"
@@ -120,3 +119,11 @@ netbox_tinyauth_enabled: false
 netbox_watchtower_enabled: false
 netbox_db_watchtower_enabled: false
 netbox_redis_watchtower_enabled: false
+
+# wud
+netbox_wud_tag_include: "^v?\\d+(\\.\\d+){1,2}-ls\\d+$"
+netbox_wud_tag_transform_type: "semver"
+netbox_wud_link_template: "https://github.com/linuxserver/docker-netbox/pkgs/container/netbox"
+netbox_redis_wud_tag_include: "^\\d+(\\.\\d+){1,2}$"
+netbox_redis_wud_tag_transform_type: "semver"
+netbox_redis_wud_link_template: "https://hub.docker.com/_/redis"

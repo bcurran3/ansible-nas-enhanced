@@ -108,25 +108,25 @@ function help {
 function display_protips {
     echo "Ansible-NAS-Enhanced (ANE) Pro Tips:"
     echo "  export ANE_EDITOR=\"editorname\""
-    echo "    -- set a different default text editor for ane.sh; i.e. vi, vim, msedit"
+    echo "     set a different default text editor for ane.sh; i.e. vi, vim, msedit"
     echo "  export ANE_ALWAYS_CHECK_BEHIND=\"true\""
-    echo "    -- always check if ANE is up-to-date"
+    echo "     always check if ANE is up-to-date"
     echo "  export ANE_ALWAYS_ENABLE_DOCKFLARE=\"true\""
-    echo "    -- always enable Dockflare with app"
+    echo "     always enable Dockflare with app"
     echo "  export ANE_ALWAYS_ENABLE_TRAEFIK=\"true\""
-    echo "    -- always enable Traefik with app"
+    echo "     always enable Traefik with app"
     echo "  export ANE_ALWAYS_PRUNE=\"true\""
-    echo "    -- always prune docker images and volumes after running the full playbook"
+    echo "     always prune docker images and volumes after running the full playbook"
     echo "  export ANE_ALWAYS_UPGRADE=\"true\""
-    echo "    -- always pull the latest ANE files from GitHub before running the full playbook"
+    echo "     always pull the latest ANE files from GitHub before running the full playbook"
     echo "  export ANE_DISABLE_ALSO_STOPS=\"true\""
-    echo "    -- stop app container when you disable it"
+    echo "     stop app container when you disable it"
     echo "  export ANE_DISABLE_ALSO_REMOVES=\"true\""
-    echo "    -- remove/delete app container when you disable it"
+    echo "     remove/delete app container when you disable it"
     echo "  export ANE_ENABLE_ALSO_STARTS=\"true\""
-    echo "    -- install app when you enable it"
+    echo "     install app when you enable it"
     echo "  export ANE_BECOME_PASSWORD=\"yoursudopassword\""
-    echo "    -- automate sudo prompts (use with caution!)"
+    echo "     automate sudo prompts (use with caution!)"
 }
 
 # ANE Developer Stuff menu
@@ -698,6 +698,7 @@ function shell {
     clear
     echo -e "\033[34m"
     print_logo
+    echo "  Type 'help' for help menu"
     echo -e "\033[0m"
 
     while true; do 
@@ -712,7 +713,7 @@ function shell {
         # If input matches command exactly (no args), clear args
         if [[ "$cmd" == "$args" ]]; then args=""; fi
 
-        case "$cmd" in 
+        case "$cmd" in
             enable) 
                 if [[ -z "$args" ]]; then enable_all_apps; else enable_app $args; fi
                 ;;
@@ -836,7 +837,7 @@ function shell {
                 ;;
             
             # --- Help/Exit ---
-            help|?)
+            help|"?")
                 if [[ -n "$args" ]]; then
                      if [[ -f "./docs/applications/$args.md" ]]; then
                         cat "./docs/applications/$args.md"
