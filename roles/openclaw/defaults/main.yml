@@ -35,6 +35,7 @@ openclaw_cli_memory: "1G"
 openclaw_cli_memory_swap: -1
 
 # app
+# https://github.com/openclaw/openclaw/blob/main/.env.example
 openclaw_cli_enabled: true
 openclaw_env_openclaw_gateway_token: "c191bc0b35c41c02ca69341f771b0f64e9006b518ac73baffb14ae079c5f3f9f" # openssl rand -hex 32 to create your own
 openclaw_env_openclaw_gateway_mode: "local"
@@ -45,6 +46,8 @@ openclaw_env_openclaw_disable_bonjour: 1
 openclaw_env_claude_ai_session_key: ""
 openclaw_env_claude_web_session_key: ""
 openclaw_env_claude_web_cookie: ""
+openclaw_env_openclaw_ollama_base_url: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ollama_port_http }}"
+openclaw_env_openclaw_agents_defaults_model_primary: "ollama/qwen:latest"
 openclaw_env_otel_exporter_otlp_endpoint: ""
 openclaw_env_otel_protocol: "http/protobuf"
 
