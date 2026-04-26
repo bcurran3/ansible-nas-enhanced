@@ -408,11 +408,11 @@ function enable_app {
                 echo "" >> "$FILE"
                 echo "### ${app}" >> "$FILE"
                 echo "${app_clean}_enabled: true" >> "$FILE"
-                
-                [[ "$ANE_ALWAYS_ENABLE_DOCKFLARE" == "true" ]] && echo "${app_clean}_dockflare_enabled: true" >> "$FILE"
-                [[ "$ANE_ALWAYS_ENABLE_TRAEFIK" == "true" ]] && echo "${app_clean}_traefik_enabled: true" >> "$FILE"
-                
                 echo "  ++ ${app} enabled (new entry)."
+                
+                [[ "$ANE_ALWAYS_ENABLE_DOCKFLARE" == "true" ]] && echo "${app_clean}_dockflare_enabled: true" >> "$FILE" && echo "  ++ ${app} Dockflare enabled."
+                [[ "$ANE_ALWAYS_ENABLE_TRAEFIK" == "true" ]] && echo "${app_clean}_traefik_enabled: true" >> "$FILE" && echo "  ++ ${app} Traefik enabled."
+                
                 TAGS_TO_RUN+="${app},"
             else
                 echo "  ** ${app} not found in roles/ or nas.yml."
