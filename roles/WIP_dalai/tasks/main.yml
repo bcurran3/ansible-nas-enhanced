@@ -1,0 +1,469 @@
+---
+- name: Start {{ dalai_proper_name }}
+  block:
+    - name: Create {{ dalai_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - "{{ dalai_data_directory }}"
+        - "{{ dalai_data_directory }}/config"
+#       - "{{ dalai_data_directory }}/db"
+
+#    - name: Create {{ dalai_proper_name }} Volumes
+#      community.docker.docker_volume:
+#        name: "{{ item }}"
+#      loop:
+#        - dalai_volume1
+
+    - name: Set {{ dalai_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        dalai_homepage_href: "https://{{ dalai_hostname }}.{{ ansible_nas_domain }}"
+      when: dalai_traefik_enabled | bool or dalai_dockflare_enabled | bool
+
+    - name: Create {{ dalai_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dalai_container_name }}"
+        hostname: "{{ dalai_container_name }}"
+        image: "{{ dalai_image_name }}:{{ dalai_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dalai_data_directory }}/config:/config"
+        ports:
+          - "{{ dalai_port_http }}:80"
+        env:
+#          DOCKER_MODS: "{{ dalai_env_docker_mods }}" # linuxserver.io images
+#          INSTALL_PACKAGES: "{{ dalai_env_docker_mods_install_packages }}"
+#          INSTALL_PIP_PACKAGES: "{{ dalai_env_docker_mods_install_pip_packages}}"
+          PUID: "{{ dalai_user_id }}"
+          PGID: "{{ dalai_group_id }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dalai_healthcheck_test }}"
+          interval: "{{ dalai_healthcheck_interval }}"
+          timeout: "{{ dalai_healthcheck_timeout }}"
+          retries: "{{ dalai_healthcheck_retries }}"
+          start_period: "{{ dalai_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ dalai_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dalai_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ dalai_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ dalai_dockflare_access_group }}"
+          dockflare.hostname: "{{ dalai_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dalai_port_http }}"
+#         dockflare.access.policy: "authenticate"
+#         dockflare.access.allowed_idps: "YOUR_IDP_UUID_HERE"
+          homepage.name: "{{ dalai_proper_name }}"
+          homepage.group: "{{ dalai_homepage_group }}"
+          homepage.icon: "{{ dalai_homepage_icon }}"
+          homepage.href: "{{ dalai_homepage_href }}"
+          homepage.description: "{{ dalai_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dalai_container_name }}"
+          homepage.showStats: "{{ dalai_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dalai_port_http }}"
+          repliqate.enabled: "{{ dalai_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ dalai_repliqate_engine }}"
+          repliqate.schedule: "{{ dalai_repliqate_schedule }}"
+          repliqate.backup_id: "{{ dalai_repliqate_backup_id }}"
+          repliqate.retention: "{{ dalai_repliqate_retention }}"
+          traefik.enable: "{{ dalai_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.dalai.rule: "Host(`{{ dalai_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.dalai.tls.certresolver: "letsencrypt"
+          traefik.http.routers.dalai.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.dalai.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.dalai.middlewares: "dalai@docker{{ ',tinyauth-auth@docker' if dalai_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.dalai.IPAllowList.sourcerange: "{{ dalai_traefik_whitelist }}"
+          traefik.http.services.dalai.loadbalancer.server.port: "80"
+          wud.tag.include: "{{ dalai_wud_tag_include }}"
+          wud.tag.transform.type: "{{ dalai_wud_tag_transform_type }}"
+          wud.link.template: "{{ dalai_wud_link_template }}"
+        cpu_shares: "{{ dalai_cpu_shares }}"
+        memory: "{{ dalai_memory }}"
+        memory_swap: "{{ dalai_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ dalai_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (dalai_port_http | string)] +
+                (['https://' + dalai_hostname + '.' + ansible_nas_domain] if (dalai_traefik_enabled is true or dalai_dockflare_enabled is true) else [])
+              }}
+  when: dalai_enabled is true
+
+- name: Stop {{ dalai_proper_name }}
+  block:
+    - name: Stop {{ dalai_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ dalai_container_name }}"
+        state: absent
+  when: dalai_enabled is false
+
+- name: Data Archive {{ dalai_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ dalai_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - dalai_enabled is false
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###           ____ ____  _   _                ###
+###          / ___|  _ \| | | |               ###
+###         | |  _| |_) | | | |               ###
+###         | |_| |  __/| |_| |               ###
+###          \____|_|    \___/                ###
+#################################################
+# if you need GPU support in a container, add this:
+# add dalai_amd_ai_enabled: true to the vars if
+
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | default(false) | bool else omit
+        }}"
+        devices: >-
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and dalai_amd_ai_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###              _                      _     ###
+###   _ __   ___| |___      _____  _ __| | __ ###
+###  | '_ \ / _ \ __\ \ /\ / / _ \| '__| |/ / ###
+###  | | | |  __/ |_ \ V  V / (_) | |  |   <  ###
+###  |_| |_|\___|\__| \_/\_/ \___/|_|  |_|\_\ ###
+#################################################
+## if setting up networks, add this to all containers:
+        networks:                                  # optional
+          - name: "{{ dalai_network_name }}"     # optional
+        network_mode: "{{ dalai_network_name }}" # optional
+        networks_cli_compatible: "yes"             # optional
+
+##############################################################################
+### EXAMPLES OF COMMON DATABASE SETUPS BELOW
+### DELETE ALL OR PARTS BELOW AS NOT NEEDED
+### PLEASE STICK TO THIS FORMAT
+### NOTE: ../molecule files are not templated for DBs and
+###       need to be updated as well when using DBs.
+###       Look at the Nextcloud role for a good example.
+##############################################################################
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###   __  __            _       ____  ____    ###
+###  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   ###
+###  | |\/| |/ _` | '__| |/ _` | | | |  _ \   ###
+###  | |  | | (_| | |  | | (_| | |_| | |_) |  ###
+###  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   ###
+#################################################
+
+    - name: Create {{ dalai_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dalai_db_container_name }}"
+        hostname: "{{ dalai_db_container_name }}"
+        image: "{{ dalai_db_image_name }}:{{ dalai_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dalai_data_directory }}/db:/var/lib/mysql"
+        env:
+          PUID: "1000"
+          PGID: "1000"
+          MYSQL_ROOT_PASSWORD: "topsecretroot"
+          MYSQL_DATABASE: "dalai"
+          MYSQL_USER: "dalai"
+          MYSQL_PASSWORD: "{{ dalai_db_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dalai_db_healthcheck_test }}"
+          interval: "{{ dalai_db_healthcheck_interval }}"
+          timeout: "{{ dalai_db_healthcheck_timeout }}"
+          retries: "{{ dalai_db_healthcheck_retries }}"
+          start_period: "{{ dalai_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ dalai_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dalai_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ dalai_proper_name }} MariaDB"
+          homepage.group: "{{ dalai_db_homepage_group }}"
+          homepage.icon: "{{ dalai_db_homepage_icon }}"
+          homepage.href: "{{ dalai_db_homepage_href }}"
+          homepage.description: "{{ dalai_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dalai_db_container_name }}"
+          homepage.showStats: "{{ dalai_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ dalai_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ dalai_db_repliqate_engine }}"
+          repliqate.schedule: "{{ dalai_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ dalai_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ dalai_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ dalai_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ dalai_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ dalai_db_wud_link_template }}"
+        cpu_shares: "{{ dalai_db_cpu_shares }}"
+        memory: "{{ dalai_db_memory }}"
+        memory_swap: "{{ dalai_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ dalai_proper_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ dalai_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+######################################################
+###  OPTIONAL - remove if not needed               ###
+###   __  __                         ____  ____    ###
+###  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   ###
+###  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   ###
+###  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  ###
+###  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   ###
+###                      |___/                     ###
+######################################################
+
+    - name: Create {{ dalai_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dalai_db_container_name }}"
+        hostname: "{{ dalai_db_container_name }}"
+        image: "{{ dalai_db_image_name }}:{{ dalai_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dalai_data_directory }}/db:/data/db"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dalai_db_healthcheck_test }}"
+          interval: "{{ dalai_db_healthcheck_interval }}"
+          timeout: "{{ dalai_db_healthcheck_timeout }}"
+          retries: "{{ dalai_db_healthcheck_retries }}"
+          start_period: "{{ dalai_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ dalai_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dalai_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ dalai_proper_name }} MongoDB"
+          homepage.group: "{{ dalai_db_homepage_group }}"
+          homepage.icon: "{{ dalai_db_homepage_icon }}"
+          homepage.href: "{{ dalai_db_homepage_href }}"
+          homepage.description: "{{ dalai_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dalai_db_container_name }}"
+          homepage.showStats: "{{ dalai_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ dalai_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ dalai_db_repliqate_engine }}"
+          repliqate.schedule: "{{ dalai_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ dalai_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ dalai_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ dalai_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ dalai_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ dalai_db_wud_link_template }}"
+        cpu_shares: "{{ dalai_db_cpu_shares }}"
+        memory: "{{ dalai_db_memory }}"
+        memory_swap: "{{ dalai_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ dalai_proper_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ dalai_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+##########################################
+###  OPTIONAL - remove if not needed   ###
+###   __  __       ____   ___  _       ###
+###  |  \/  |_   _/ ___| / _ \| |      ###
+###  | |\/| | | | \___ \| | | | |      ###
+###  | |  | | |_| |___) | |_| | |___   ###
+###  |_|  |_|\__, |____/ \__\_\_____|  ###
+###          |___/                     ###
+##########################################
+
+    - name: Create {{ dalai_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dalai_db_container_name }}"
+        hostname: "{{ dalai_db_container_name }}"
+        image: "{{ dalai_db_image_name }}:{{ dalai_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dalai_data_directory }}/mysql/mysql:/var/lib/mysql"
+          - "{{ dalai_data_directory }}/mysql/my.cnf:/etc/my.cnf"
+        env:
+          MYSQL_DATABASE: "dalai"
+          MYSQL_USER: "{{ dalai_sql_user }}"
+          MYSQL_PASSWORD: "{{ dalai_sql_password }}"
+          MYSQL_ROOT_PASSWORD: "{{ dalai_sql_root_password }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dalai_db_healthcheck_test }}"
+          interval: "{{ dalai_db_healthcheck_interval }}"
+          timeout: "{{ dalai_db_healthcheck_timeout }}"
+          retries: "{{ dalai_db_healthcheck_retries }}"
+          start_period: "{{ dalai_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ dalai_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dalai_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ dalai_proper_name }} MySQL"
+          homepage.group: "{{ dalai_db_homepage_group }}"
+          homepage.icon: "{{ dalai_db_homepage_icon }}"
+          homepage.href: "{{ dalai_db_homepage_href }}"
+          homepage.description: "{{ dalai_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dalai_db_container_name }}"
+          homepage.showStats: "{{ dalai_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ dalai_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ dalai_db_repliqate_engine }}"
+          repliqate.schedule: "{{ dalai_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ dalai_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ dalai_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ dalai_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ dalai_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ dalai_db_wud_link_template }}"
+        cpu_shares: "{{ dalai_db_cpu_shares }}"
+        memory: "{{ dalai_db_memory }}"
+        memory_swap: "{{ dalai_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ dalai_proper_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ dalai_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+##############################################################
+###  OPTIONAL - remove if not needed                       ###
+###   ____           _                 ____   ___  _       ###
+###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
+###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
+###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
+###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
+###                     |___/                              ###
+##############################################################
+
+    - name: Create {{ dalai_proper_name }} DB Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dalai_db_container_name }}"
+        hostname: "{{ dalai_db_container_name }}"
+        image: "{{ dalai_db_image_name }}:{{ dalai_db_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ dalai_data_directory }}/db:/var/lib/postgresql/data"
+        env:
+          POSTGRES_USER: "dalai"
+          POSTGRES_PASSWORD: "dalai"
+          POSTGRES_DB: "dalai"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dalai_db_healthcheck_test }}"
+          interval: "{{ dalai_db_healthcheck_interval }}"
+          timeout: "{{ dalai_db_healthcheck_timeout }}"
+          retries: "{{ dalai_db_healthcheck_retries }}"
+          start_period: "{{ dalai_db_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ dalai_db_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dalai_db_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ dalai_proper_name }} PostgreSQL"
+          homepage.group: "{{ dalai_db_homepage_group }}"
+          homepage.icon: "{{ dalai_db_homepage_icon }}"
+          homepage.href: "{{ dalai_db_homepage_href }}"
+          homepage.description: "{{ dalai_db_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dalai_db_container_name }}"
+          homepage.showStats: "{{ dalai_db_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ dalai_db_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ dalai_db_repliqate_engine }}"
+          repliqate.schedule: "{{ dalai_db_repliqate_schedule }}"
+          repliqate.backup_id: "{{ dalai_db_repliqate_backup_id }}"
+          repliqate.retention: "{{ dalai_db_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ dalai_db_wud_tag_include }}"
+          wud.tag.transform.type: "{{ dalai_db_wud_tag_transform_type }}"
+          wud.link.template: "{{ dalai_db_wud_link_template }}"
+        cpu_shares: "{{ dalai_db_cpu_shares }}"
+        memory: "{{ dalai_db_memory }}"
+        memory_swap: "{{ dalai_db_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Verify {{ dalai_proper_name }} DB is healthy
+      community.docker.docker_container_info:
+        name: "{{ dalai_db_container_name }}"
+      register: db_info
+      until: "db_info.container.State.Health.Status == 'healthy'"
+      retries: 30
+      delay: 5
+
+#########################################
+###  OPTIONAL - remove if not needed  ###
+###       ____          _ _           ###
+###      |  _ \ ___  __| (_)___       ###
+###      | |_) / _ \/ _` | / __|      ###
+###      |  _ <  __/ (_| | \__ \      ###
+###      |_| \_\___|\__,_|_|___/      ###
+#########################################
+
+    - name: Create {{ dalai_proper_name }} Redis Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ dalai_redis_container_name }}"
+        hostname: "{{ dalai_redis_container_name }}"
+        image: "{{ dalai_redis_image_name }}:{{ dalai_redis_image_tag }}"
+        pull: true
+        command: "redis-server --requirepass topsecret"
+        env:
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ dalai_redis_healthcheck_test }}"
+          interval: "{{ dalai_redis_healthcheck_interval }}"
+          timeout: "{{ dalai_redis_healthcheck_timeout }}"
+          retries: "{{ dalai_redis_healthcheck_retries }}"
+          start_period: "{{ dalai_redis_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ dalai_redis_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ dalai_redis_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ dalai_proper_name }} Redis"
+          homepage.group: "{{ dalai_redis_homepage_group }}"
+          homepage.icon: "{{ dalai_redis_homepage_icon }}"
+          homepage.href: "{{ dalai_redis_homepage_href }}"
+          homepage.description: "{{ dalai_redis_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ dalai_redis_container_name }}"
+          homepage.showStats: "{{ dalai_redis_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ dalai_redis_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ dalai_redis_repliqate_engine }}"
+          repliqate.schedule: "{{ dalai_redis_repliqate_schedule }}"
+          repliqate.backup_id: "{{ dalai_redis_repliqate_backup_id }}"
+          repliqate.retention: "{{ dalai_redis_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ dalai_redis_wud_tag_include }}"
+          wud.tag.transform.type: "{{ dalai_redis_wud_tag_transform_type }}"
+          wud.link.template: "{{ dalai_redis_wud_link_template }}"
+        cpu_shares: "{{ dalai_redis_cpu_shares }}"
+        memory: "{{ dalai_redis_memory }}"
+        memory_swap: "{{ dalai_redis_memory_swap }}"
+        restart_policy: unless-stopped

@@ -11,6 +11,12 @@
         - "{{ anythingllm_data_directory }}"
         - "{{ anythingllm_data_directory }}/storage"
 
+    - name: Copy {{ anythingllm_proper_name }} file anythingllm_mcp_servers.json
+      ansible.builtin.copy:
+        src: anythingllm_mcp_servers.json
+        dest: "{{ anythingllm_data_directory }}/storage/plugins/anythingllm_mcp_servers.json"
+      register: anythingllm_mcp_servers_json
+
     - name: Set {{ anythingllm_proper_name }} FQDN var overrides
       ansible.builtin.set_fact:
         anythingllm_homepage_href: "https://{{ anythingllm_hostname }}.{{ ansible_nas_domain }}"
@@ -26,6 +32,7 @@
         volumes:
           - "{{ anythingllm_data_directory }}/storage:{{ anythingllm_env_storage_dir }}"
 #         - "{{ anythingllm_data_directory }}/storage/.env:/app/server/.env"
+          - "{{ anythingllm_local_directory }}:{{ anythingllm_env_storage_dir }}/local:delegated"
         ports:
           - "{{ anythingllm_port_http }}:3001"
         env:
@@ -35,6 +42,7 @@
           OLLAMA_BASE_PATH: "{{ anythingllm_env_ollama_base_path }}"
           OLLAMA_MODEL_PREF: "{{ anythingllm_env_ollama_model_pref }}"
           OLLAMA_MODEL_TOKEN_LIMIT: "{{ anythingllm_env_ollama_model_token_limit }}"
+          OLLAMA_NUM_PARALLEL: "{{ anythingllm_env_ollama_num_parallel }}"
           EMBEDDING_ENGINE: "{{ anythingllm_env_embedding_engine }}"
           EMBEDDING_BASE_PATH: "{{ anythingllm_env_embedding_base_path }}"
           EMBEDDING_MODEL_PREF: "{{ anythingllm_env_embedding_model_pref }}"

@@ -1,0 +1,350 @@
+---
+# ANE
+dalai_proper_name: "dalai"
+dalai_enabled: false
+dalai_traefik_enabled: false
+dalai_traefik_whitelist: "{{ lan }}"
+
+# directories
+dalai_data_directory: "{{ docker_home }}/dalai"
+
+# docker
+dalai_container_name: "dalai"
+dalai_image_name: "devname/dalai" # use ghcr.io or lscr.io when available
+dalai_image_tag: "latest"
+
+# uid / gid
+dalai_user_id: "0"
+dalai_group_id: "0"
+
+# network
+dalai_hostname: "dalai"
+#dalai_network_name: "dalai"
+dalai_port_http: "8989"
+
+# specs
+dalai_cpu_shares: 1024
+dalai_memory: "1G"
+dalai_memory_swap: -1
+
+# autoheal
+dalai_autoheal_enabled: false
+
+# dockflare
+dalai_dockflare_enabled: false
+dalai_dockflare_access_group: ""
+
+# healthcheck
+dalai_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:80/ || exit 1"]
+dalai_healthcheck_interval: 1m
+dalai_healthcheck_timeout: 10s
+dalai_healthcheck_retries: 3
+dalai_healthcheck_start_period: 30s
+
+# homepage
+dalai_homepage_description: "dalai short description"
+dalai_homepage_group: "Apps"
+dalai_homepage_icon: "dalai.png"
+dalai_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ dalai_port_http }}"
+dalai_homepage_showstats: false
+
+# linuxserver.io docker mods for linuxserver.io images
+#dalai_env_docker_mods: ""
+#dalai_env_docker_mods_install_packages: ""
+#dalai_env_docker_mods_install_pip_packages: ""
+
+# repliqate
+dalai_repliqate_enabled: false
+dalai_repliqate_engine: "restic"
+dalai_repliqate_schedule: "@daily 3am"
+dalai_repliqate_backup_id: "{{ dalai_container_name }}"
+dalai_repliqate_retention: "30d"
+
+# tinyauth
+dalai_tinyauth_enabled: false
+
+# watchtower
+dalai_watchtower_enabled: false
+
+# wud
+# Docker Hub example. Please edit.
+dalai_wud_tag_include: '^\d+\.\d+$'
+dalai_wud_tag_transform_type: "semver"
+dalai_wud_link_template: "https://hub.docker.com/r/devname/dalai"
+### Github example
+#dalai_wud_tag_include: '^\d+\.\d+\.\d+$'
+#dalai_wud_tag_transform_type: "semver"
+#dalai_wud_link_template: "https://github.com/devname/dalai/pkgs/container/dalai"
+### Linuxserver.io example
+#dalai_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+#dalai_wud_tag_transform_type: "semver"
+#dalai_wud_link_template: "https://lscr.io/linuxserver/dalai"
+
+##############################################################################
+### EXAMPLES OF COMMON DATABASE SETUPS BELOW
+### DELETE ALL OR PARTS BELOW AS NOT NEEDED
+### PLEASE STICK TO THIS FORMAT
+### NOTE: ../molecule files are not templated for DBs and
+###       need to be updated as well when using DBs.
+###       Look at the Nextcloud role for a good example.
+##############################################################################
+
+
+#################################################
+###  OPTIONAL - remove if not needed          ###
+###   __  __            _       ____  ____    ###
+###  |  \/  | __ _ _ __(_) __ _|  _ \| __ )   ###
+###  | |\/| |/ _` | '__| |/ _` | | | |  _ \   ###
+###  | |  | | (_| | |  | | (_| | |_| | |_) |  ###
+###  |_|  |_|\__,_|_|  |_|\__,_|____/|____/   ###
+#################################################
+
+# docker
+dalai_db_container_name: "dalai-db"
+dalai_db_image_name: "mariadb"
+dalai_db_image_tag: "latest"
+
+# specs
+dalai_db_cpu_shares: 1024
+dalai_db_memory: "1G"
+dalai_db_memory_swap: "{{ dalai_db_memory }}"
+
+# autoheal
+dalai_db_autoheal_enabled: false
+
+# healthcheck
+dalai_db_healthcheck_test: ["CMD", "mariadb-admin", "ping", "-h", "127.0.0.1", "-u", "dalai", "-p{{ dalai_db_password }}"]
+dalai_db_healthcheck_interval: 10s
+dalai_db_healthcheck_timeout: 5s
+dalai_db_healthcheck_retries: 5
+dalai_db_healthcheck_start_period: 30s
+
+# homepage
+dalai_db_homepage_description: "MariaDB Server is a high performing open source relational database, forked from MySQL."
+dalai_db_homepage_group: "DBs"
+dalai_db_homepage_icon: "mariadb.png"
+dalai_db_homepage_href: "{{ dalai_homepage_href }}"
+dalai_db_homepage_showstats: false
+
+# repliqate
+dalai_db_repliqate_enabled: false
+dalai_db_repliqate_engine: "restic"
+dalai_db_repliqate_schedule: "@daily 3am"
+dalai_db_repliqate_backup_id: "{{ dalai_db_container_name }}"
+dalai_db_repliqate_retention: "30d"
+
+# watchtower
+dalai_db_watchtower_enabled: false
+
+# wud
+dalai_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+dalai_db_wud_tag_transform_type: "semver"
+dalai_db_wud_link_template: "https://hub.docker.com/_/mariadb"
+
+######################################################
+###  OPTIONAL - remove if not needed               ###
+###   __  __                         ____  ____    ###
+###  |  \/  | ___  _ __   __ _  ___ |  _ \| __ )   ###
+###  | |\/| |/ _ \| '_ \ / _` |/ _ \| | | |  _ \   ###
+###  | |  | | (_) | | | | (_| | (_) | |_| | |_) |  ###
+###  |_|  |_|\___/|_| |_|\__, |\___/|____/|____/   ###
+###                      |___/                     ###
+######################################################
+
+# docker
+dalai_db_container_name: "dalai-db"
+dalai_db_image_name: "mongo"
+dalai_db_image_tag: "latest"
+
+# specs
+dalai_db_cpu_shares: 1024
+dalai_db_memory: "1G"
+dalai_db_memory_swap: "{{ dalai_db_memory }}"
+
+# autoheal
+dalai_db_autoheal_enabled: false
+
+# healthcheck
+dalai_db_healthcheck_test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "--host", "127.0.0.1"]
+dalai_db_healthcheck_interval: 10s
+dalai_db_healthcheck_timeout: 5s
+dalai_db_healthcheck_retries: 3
+dalai_db_healthcheck_start_period: 15s
+
+# homepage
+dalai_db_homepage_description: "The Database for Secure Apps"
+dalai_db_homepage_group: "DBs"
+dalai_db_homepage_icon: "mongodb.png"
+dalai_db_homepage_href: "{{ dalai_homepage_href }}"
+dalai_db_homepage_showstats: false
+
+# repliqate
+dalai_db_repliqate_enabled: false
+dalai_db_repliqate_engine: "restic"
+dalai_db_repliqate_schedule: "@daily 3am"
+dalai_db_repliqate_backup_id: "{{ dalai_db_container_name }}"
+dalai_db_repliqate_retention: "30d"
+
+# watchtower
+dalai_db_watchtower_enabled: false
+
+# wud
+dalai_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+dalai_db_wud_tag_transform_type: "semver"
+dalai_db_wud_link_template: "https://hub.docker.com/_/mongo"
+
+##########################################
+###  OPTIONAL - remove if not needed   ###
+###   __  __       ____   ___  _       ###
+###  |  \/  |_   _/ ___| / _ \| |      ###
+###  | |\/| | | | \___ \| | | | |      ###
+###  | |  | | |_| |___) | |_| | |___   ###
+###  |_|  |_|\__, |____/ \__\_\_____|  ###
+###          |___/                     ###
+##########################################
+
+# docker
+dalai_db_container_name: "dalai-db"
+dalai_db_image_name: "mysql"
+dalai_db_image_tag: "8.4"
+
+# specs
+dalai_db_cpu_shares: 1024
+dalai_db_memory: "1G"
+dalai_db_memory_swap: "{{ dalai_db_memory }}"
+
+# autoheal
+dalai_db_autoheal_enabled: false
+
+# healthcheck
+dalai_db_healthcheck_test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "root", "-p{{ dalai_sql_root_password }}"]
+dalai_db_healthcheck_interval: 10s
+dalai_db_healthcheck_timeout: 5s
+dalai_db_healthcheck_retries: 5
+dalai_db_healthcheck_start_period: 30s
+
+# homepage
+dalai_db_homepage_description: "MySQL Server, the world''s most popular open source database"
+dalai_db_homepage_group: "DBs"
+dalai_db_homepage_icon: "mysql.png"
+dalai_db_homepage_href: "{{ dalai_homepage_href }}"
+dalai_db_homepage_showstats: false
+
+# repliqate
+dalai_db_repliqate_enabled: false
+dalai_db_repliqate_engine: "restic"
+dalai_db_repliqate_schedule: "@daily 3am"
+dalai_db_repliqate_backup_id: "{{ dalai_db_container_name }}"
+dalai_db_repliqate_retention: "30d"
+
+# watchtower
+dalai_db_watchtower_enabled: false
+
+# wud
+dalai_db_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+dalai_db_wud_tag_transform_type: "semver"
+dalai_db_wud_link_template: "https://hub.docker.com/_/mysql"
+
+##############################################################
+###  OPTIONAL - remove if not needed                       ###
+###   ____           _                 ____   ___  _       ###
+###  |  _ \ ___  ___| |_ __ _ _ __ ___/ ___| / _ \| |      ###
+###  | |_) / _ \/ __| __/ _` | '__/ _ \___ \| | | | |      ###
+###  |  __/ (_) \__ \ || (_| | | |  __/___) | |_| | |___   ###
+###  |_|   \___/|___/\__\__, |_|  \___|____/ \__\_\_____|  ###
+###                     |___/                              ###
+##############################################################
+
+# docker
+dalai_db_container_name: "dalai-db"
+dalai_db_image_name: "postgres"
+dalai_db_image_tag: "16-alpine"
+
+# specs
+dalai_db_cpu_shares: 1024
+dalai_db_memory: "1G"
+dalai_db_memory_swap: "{{ dalai_db_memory }}"
+
+# autoheal
+dalai_db_autoheal_enabled: false
+
+# healthcheck
+dalai_db_healthcheck_test: ["CMD-SHELL", "pg_isready -U dalai -d dalai -h 127.0.0.1"]
+dalai_db_healthcheck_interval: 10s
+dalai_db_healthcheck_timeout: 5s
+dalai_db_healthcheck_retries: 5
+dalai_db_healthcheck_start_period: 30s
+
+# homepage
+dalai_db_homepage_description: "PostgreSQL Database Management System"
+dalai_db_homepage_group: "DBs"
+dalai_db_homepage_icon: "postgres.png"
+dalai_db_homepage_href: "{{ dalai_homepage_href }}"
+dalai_db_homepage_showstats: false
+
+# repliqate
+dalai_db_repliqate_enabled: false
+dalai_db_repliqate_engine: "restic"
+dalai_db_repliqate_schedule: "@daily 3am"
+dalai_db_repliqate_backup_id: "{{ dalai_db_container_name }}"
+dalai_db_repliqate_retention: "30d"
+
+# watchtower
+dalai_db_watchtower_enabled: false
+
+# wud
+dalai_db_wud_tag_include: '^\d+\.\d+.*$'
+dalai_db_wud_tag_transform_type: "semver"
+dalai_db_wud_link_template: "https://hub.docker.com/_/postgres"
+
+#########################################
+###  OPTIONAL - remove if not needed  ###
+###       ____          _ _           ###
+###      |  _ \ ___  __| (_)___       ###
+###      | |_) / _ \/ _` | / __|      ###
+###      |  _ <  __/ (_| | \__ \      ###
+###      |_| \_\___|\__,_|_|___/      ###
+#########################################
+
+# docker
+dalai_redis_container_name: "dalai-redis"
+dalai_redis_image_name: "redis"
+dalai_redis_image_tag: "latest"
+
+# specs
+dalai_redis_cpu_shares: 1024
+dalai_redis_memory: "128M"
+dalai_redis_memory_swap: "{{ dalai_redis_memory }}"
+
+# autoheal
+dalai_redis_autoheal_enabled: false
+
+# healthcheck
+dalai_redis_healthcheck_test: ["CMD-SHELL", "redis-cli -a topsecret ping | grep PONG || exit 1"]
+dalai_redis_healthcheck_interval: 10s
+dalai_redis_healthcheck_timeout: 5s
+dalai_redis_healthcheck_retries: 3
+dalai_redis_healthcheck_start_period: 10s
+
+# homepage
+dalai_redis_homepage_description: "The Real-time Data Platform"
+dalai_redis_homepage_group: "DBs"
+dalai_redis_homepage_icon: "redis.png"
+dalai_redis_homepage_href: "{{ dalai_homepage_href }}"
+dalai_redis_homepage_showstats: false
+
+# repliqate
+dalai_redis_repliqate_enabled: false
+dalai_redis_repliqate_engine: "restic"
+dalai_redis_repliqate_schedule: "@daily 3am"
+dalai_redis_repliqate_backup_id: "{{ dalai_redis_container_name }}"
+dalai_redis_repliqate_retention: "30d"
+
+# watchtower
+dalai_redis_watchtower_enabled: false
+
+# wud
+dalai_redis_wud_tag_include: '^\d+\.\d+\.\d+.*$'
+#dalai_redis_wud_tag_include: "^v?\\d+-alpine$"
+dalai_redis_wud_tag_transform_type: "semver"
+dalai_redis_wud_link_template: "https://hub.docker.com/_/redis"

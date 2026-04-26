@@ -32,7 +32,7 @@ mcp_filesystem_dockflare_enabled: false
 mcp_filesystem_dockflare_access_group: ""
 
 # healthcheck
-mcp_filesystem_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/ || exit 1"]
+mcp_filesystem_healthcheck_test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:{{ mcp_filesystem_port_http }}/ || exit 1"]
 mcp_filesystem_healthcheck_interval: "30s"
 mcp_filesystem_healthcheck_timeout: "10s"
 mcp_filesystem_healthcheck_retries: 3

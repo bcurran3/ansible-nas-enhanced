@@ -1,0 +1,191 @@
+---
+- name: Start {{ openclaw_proper_name }}
+  block:
+    - name: Create {{ openclaw_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ openclaw_user_id }}"
+        group: "{{ openclaw_group_id }}"
+      with_items:
+        - "{{ openclaw_data_directory }}"
+        - "{{ openclaw_data_directory }}/config"
+        - "{{ openclaw_data_directory }}/workspace"
+
+    - name: Set {{ openclaw_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        openclaw_homepage_href: "https://{{ openclaw_hostname }}.{{ ansible_nas_domain }}"
+      when: openclaw_traefik_enabled | bool or openclaw_dockflare_enabled | bool
+
+    - name: Create {{ openclaw_proper_name }} Gateway Container
+      community.docker.docker_container:
+        name: "{{ openclaw_container_name }}"
+        image: "{{ openclaw_image_name }}:{{ openclaw_image_tag }}"
+        pull: true
+        init: true
+        ports:
+          - "{{ openclaw_port_gateway }}:18789"
+          - "{{ openclaw_port_bridge }}:18790"
+        volumes:
+          - "{{ openclaw_data_directory }}/config:/home/node/.openclaw"
+          - "{{ openclaw_data_directory }}/workspace:/home/node/.openclaw/workspace"
+        command: ["node", "dist/index.js", "gateway", "--bind", "{{ openclaw_gateway_bind }}", "--port", "18789", "--allow-unconfigured"]
+        device_requests: "{{
+          [{'driver': 'nvidia', 'count': -1, 'capabilities': ['gpu']}]
+          if nvidia_runtime_enabled | default(false) | bool else omit
+        }}"
+        devices: >-
+          {%- set dev_list = (app_devices | default([])) -%}
+          {%- if intel_igpu_enabled | default(false) | bool or amd_gpu_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/dri:/dev/dri') -%}
+          {%- endif -%}
+          {%- if amd_gpu_enabled | default(false) | bool and openclaw_amd_ai_enabled | default(false) | bool -%}
+            {%- set _ = dev_list.append('/dev/kfd:/dev/kfd') -%}
+          {%- endif -%}
+          {{ dev_list if dev_list | length > 0 else omit }}
+        group_add: "{{ ['render', 'video'] if (amd_gpu_enabled | default(false) | bool or intel_igpu_enabled | default(false) | bool) else omit }}"
+        runtime: "{{ 'nvidia' if nvidia_runtime_enabled | default(false) | bool else omit }}"
+        env:
+          HOME: "/home/node"
+          TERM: "xterm-256color"
+          OPENCLAW_GATEWAY_MODE: "{{ openclaw_env_openclaw_gateway_mode }}"
+          OPENCLAW_GATEWAY_CONTROLUI_ALLOWEDORIGINS: "{{ openclaw_env_openclaw_gateway_controlui_allowedorigins }}"
+          OPENCLAW_GATEWAY_TRUSTEDPROXIES: "{{ openclaw_env_openclaw_gateway_trustedproxies }}"
+          OPENCLAW_GATEWAY_TOKEN: "{{ openclaw_env_openclaw_gateway_token }}"
+          OPENCLAW_ALLOW_INSECURE_PRIVATE_WS: "{{ openclaw_env_openclaw_allow_insecure_private_ws }}"
+          OPENCLAW_DISABLE_BONJOUR: "{{ openclaw_env_openclaw_disable_bonjour | string }}"
+          OTEL_EXPORTER_OTLP_ENDPOINT: "{{ openclaw_env_otel_exporter_otlp_endpoint }}"
+          OTEL_EXPORTER_OTLP_PROTOCOL: "{{ openclaw_env_otel_protocol }}"
+          CLAUDE_AI_SESSION_KEY: "{{ openclaw_env_claude_ai_session_key }}"
+          CLAUDE_WEB_SESSION_KEY: "{{ openclaw_env_claude_web_session_key }}"
+          CLAUDE_WEB_COOKIE: "{{ openclaw_env_claude_web_cookie }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ openclaw_healthcheck_test }}"
+          interval: "{{ openclaw_healthcheck_interval }}"
+          timeout: "{{ openclaw_healthcheck_timeout }}"
+          retries: "{{ openclaw_healthcheck_retries }}"
+          start_period: "{{ openclaw_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ openclaw_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ openclaw_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ openclaw_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ openclaw_dockflare_access_group }}"
+          dockflare.hostname: "{{ openclaw_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ openclaw_port_gateway }}"
+          homepage.name: "{{ openclaw_proper_name }}"
+          homepage.group: "{{ openclaw_homepage_group }}"
+          homepage.icon: "{{ openclaw_homepage_icon }}"
+          homepage.href: "{{ openclaw_homepage_href }}"
+          homepage.description: "{{ openclaw_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ openclaw_container_name }}"
+          homepage.showStats: "{{ openclaw_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ openclaw_port_gateway }}"
+          repliqate.enabled: "{{ openclaw_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ openclaw_repliqate_engine }}"
+          repliqate.schedule: "{{ openclaw_repliqate_schedule }}"
+          repliqate.backup_id: "{{ openclaw_repliqate_backup_id }}"
+          repliqate.retention: "{{ openclaw_repliqate_retention }}"
+          traefik.enable: "{{ openclaw_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.openclaw.rule: "Host(`{{ openclaw_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.openclaw.tls.certresolver: "letsencrypt"
+          traefik.http.routers.openclaw.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.openclaw.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.openclaw.middlewares: "openclaw@docker{{ ',tinyauth-auth@docker' if openclaw_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.openclaw.IPAllowList.sourcerange: "{{ openclaw_traefik_whitelist }}"
+          traefik.http.services.openclaw.loadbalancer.server.port: "18789"
+          wud.tag.include: "{{ openclaw_wud_tag_include }}"
+          wud.tag.transform.type: "{{ openclaw_wud_tag_transform_type }}"
+          wud.link.template: "{{ openclaw_wud_link_template }}"
+        cpu_shares: "{{ openclaw_cpu_shares }}"
+        memory: "{{ openclaw_memory }}"
+        memory_swap: "{{ openclaw_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Create {{ openclaw_proper_name }} CLI Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ openclaw_cli_container_name }}"
+        image: "{{ openclaw_cli_image_name }}:{{ openclaw_cli_image_tag }}"
+        network_mode: "container:{{ openclaw_container_name }}"
+        interactive: true
+        tty: true
+        init: true
+        cap_drop:
+          - NET_RAW
+          - NET_ADMIN
+        security_opts:
+          - "no-new-privileges:true"
+        volumes:
+          - "{{ openclaw_data_directory }}/config:/home/node/.openclaw"
+          - "{{ openclaw_data_directory }}/workspace:/home/node/.openclaw/workspace"
+#        entrypoint: ["node", "dist/index.js"]
+        entrypoint: ["/bin/sh", "-c", "tail -f /dev/null"]
+        env:
+          BROWSER: "echo"
+          HOME: "/home/node"
+          TERM: "xterm-256color"
+          OPENCLAW_GATEWAY_MODE: "{{ openclaw_env_openclaw_gateway_mode }}"
+          OPENCLAW_GATEWAY_TOKEN: "{{ openclaw_env_openclaw_gateway_token }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ openclaw_cli_healthcheck_test }}"
+          interval: "{{ openclaw_cli_healthcheck_interval }}"
+          timeout: "{{ openclaw_cli_healthcheck_timeout }}"
+          retries: "{{ openclaw_cli_healthcheck_retries }}"
+          start_period: "{{ openclaw_cli_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ openclaw_cli_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ openclaw_cli_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "false"
+          homepage.name: "{{ openclaw_proper_name }} CLI"
+          homepage.group: "{{ openclaw_cli_homepage_group }}"
+          homepage.icon: "{{ openclaw_cli_homepage_icon }}"
+          homepage.href: "{{ openclaw_cli_homepage_href }}"
+          homepage.description: "{{ openclaw_cli_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ openclaw_cli_container_name }}"
+          homepage.showStats: "{{ openclaw_cli_homepage_showstats | ternary('true', 'false') }}"
+          repliqate.enabled: "{{ openclaw_cli_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ openclaw_cli_repliqate_engine }}"
+          repliqate.schedule: "{{ openclaw_cli_repliqate_schedule }}"
+          repliqate.backup_id: "{{ openclaw_cli_repliqate_backup_id }}"
+          repliqate.retention: "{{ openclaw_cli_repliqate_retention }}"
+          traefik.enable: "false"
+          wud.tag.include: "{{ openclaw_cli_wud_tag_include }}"
+          wud.tag.transform.type: "{{ openclaw_cli_wud_tag_transform_type }}"
+          wud.link.template: "{{ openclaw_cli_wud_link_template }}"
+        cpu_shares: "{{ openclaw_cli_cpu_shares }}"
+        memory: "{{ openclaw_cli_memory }}"
+        memory_swap: "{{ openclaw_cli_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ openclaw_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (openclaw_port_gateway | string)] +
+                (['https://' + openclaw_hostname + '.' + ansible_nas_domain] if (openclaw_traefik_enabled is true or openclaw_dockflare_enabled is true) else [])
+              }}
+  when: openclaw_enabled is true
+
+- name: Stop {{ openclaw_proper_name }}
+  block:
+    - name: Stop {{ openclaw_proper_name }} Containers
+      community.docker.docker_container:
+        name: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ openclaw_container_name }}"
+        - "{{ openclaw_cli_container_name }}"
+  when: openclaw_enabled is false
+
+- name: Data Archive {{ openclaw_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ openclaw_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - openclaw_enabled is false

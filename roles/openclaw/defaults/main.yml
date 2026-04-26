@@ -1,0 +1,111 @@
+---
+# ANE
+openclaw_proper_name: "OpenClaw"
+openclaw_enabled: false
+openclaw_traefik_enabled: false
+openclaw_traefik_whitelist: "{{ lan }}"
+
+# directories
+openclaw_data_directory: "{{ docker_home }}/openclaw"
+
+# docker
+openclaw_container_name: "openclaw-gateway"
+openclaw_image_name: "ghcr.io/openclaw/openclaw"
+openclaw_image_tag: "latest"
+openclaw_cli_container_name: "openclaw-cli"
+openclaw_cli_image_name: "ghcr.io/openclaw/openclaw"
+openclaw_cli_image_tag: "latest"
+
+# uid / gid
+openclaw_user_id: "1000"
+openclaw_group_id: "1000"
+
+# network
+openclaw_hostname: "openclaw"
+openclaw_port_gateway: "18789"
+openclaw_port_bridge: "18790"
+openclaw_gateway_bind: "lan"
+
+# specs
+openclaw_cpu_shares: 1024
+openclaw_memory: "1G"
+openclaw_memory_swap: -1
+openclaw_cli_cpu_shares: 1024
+openclaw_cli_memory: "1G"
+openclaw_cli_memory_swap: -1
+
+# app
+openclaw_cli_enabled: true
+openclaw_env_openclaw_gateway_token: "c191bc0b35c41c02ca69341f771b0f64e9006b518ac73baffb14ae079c5f3f9f" # openssl rand -hex 32 to create your own
+openclaw_env_openclaw_gateway_mode: "local"
+openclaw_env_openclaw_gateway_controlui_allowedorigins: '["https://{{ openclaw_hostname }}.{{ ansible_nas_domain }}"]'
+openclaw_env_openclaw_gateway_trustedproxies: '["172.16.0.0/12", "192.168.0.0/16"]'
+openclaw_env_openclaw_allow_insecure_private_ws: "true"
+openclaw_env_openclaw_disable_bonjour: 1
+openclaw_env_claude_ai_session_key: ""
+openclaw_env_claude_web_session_key: ""
+openclaw_env_claude_web_cookie: ""
+openclaw_env_otel_exporter_otlp_endpoint: ""
+openclaw_env_otel_protocol: "http/protobuf"
+
+# autoheal
+openclaw_autoheal_enabled: false
+openclaw_cli_autoheal_enabled: false
+
+# dockflare
+openclaw_dockflare_enabled: false
+openclaw_dockflare_access_group: ""
+openclaw_cli_dockflare_enabled: false
+openclaw_cli_dockflare_access_group: ""
+
+# healthcheck
+openclaw_healthcheck_test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+openclaw_healthcheck_interval: 30s
+openclaw_healthcheck_timeout: 5s
+openclaw_healthcheck_retries: 5
+openclaw_healthcheck_start_period: 60s
+openclaw_cli_healthcheck_test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:18789/healthz').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+openclaw_cli_healthcheck_interval: 30s
+openclaw_cli_healthcheck_timeout: 5s
+openclaw_cli_healthcheck_retries: 5
+openclaw_cli_healthcheck_start_period: 30s
+
+# homepage
+openclaw_homepage_description: "Your own personal AI assistant."
+openclaw_homepage_group: "Apps"
+openclaw_homepage_icon: "openclaw.png"
+openclaw_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ openclaw_port_gateway }}"
+openclaw_homepage_showstats: false
+openclaw_cli_homepage_description: "Your own personal AI assistant."
+openclaw_cli_homepage_group: "Misc"
+openclaw_cli_homepage_icon: "openclaw.png"
+openclaw_cli_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ openclaw_port_gateway }}"
+openclaw_cli_homepage_showstats: false
+
+# repliqate
+openclaw_repliqate_enabled: false
+openclaw_repliqate_engine: "restic"
+openclaw_repliqate_schedule: "@daily 3am"
+openclaw_repliqate_backup_id: "{{ openclaw_container_name }}"
+openclaw_repliqate_retention: "30d"
+openclaw_cli_repliqate_enabled: false
+openclaw_cli_repliqate_engine: "restic"
+openclaw_cli_repliqate_schedule: "@daily 3am"
+openclaw_cli_repliqate_backup_id: "{{ openclaw_container_name }}"
+openclaw_cli_repliqate_retention: "30d"
+
+# tinyauth
+openclaw_tinyauth_enabled: false
+openclaw_cli_tinyauth_enabled: false
+
+# watchtower
+openclaw_watchtower_enabled: false
+openclaw_cli_watchtower_enabled: false
+
+# wud
+openclaw_wud_tag_include: "^\\d{4}\\.\\d{1,2}\\.\\d{1,2}$"
+openclaw_wud_tag_transform_type: "semver"
+openclaw_wud_link_template: "https://github.com/openclaw/openclaw/pkgs/container/openclaw"
+openclaw_cli_wud_tag_include: "^\\d{4}\\.\\d{1,2}\\.\\d{1,2}$"
+openclaw_cli_wud_tag_transform_type: "semver"
+openclaw_cli_wud_link_template: "https://github.com/openclaw/openclaw/pkgs/container/openclaw"

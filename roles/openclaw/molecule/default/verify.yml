@@ -1,0 +1,25 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - ansible.builtin.include_vars:
+        file: ../../defaults/main.yml
+
+    - name: Get {{ openclaw_proper_name }} Gateway container state
+      community.docker.docker_container:
+        name: "{{ openclaw_container_name }}"
+      register: result
+
+    - name: Get {{ openclaw_proper_name }} CLI container state
+      community.docker.docker_container:
+        name: "{{ openclaw_cli_container_name }}"
+      register: result_cli
+
+    - name: Check if {{ openclaw_proper_name }} container is running
+      ansible.builtin.assert:
+        that:
+          - result.container['State']['Status'] == "running"
+          - result.container['State']['Restarting'] == false
+          - result_cli.container['State']['Status'] == "running"
+          - result_cli.container['State']['Restarting'] == false

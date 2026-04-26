@@ -96,7 +96,7 @@
               homepage.server: "my-docker"
               homepage.container: "{{ mcp_filesystem_container_name }}"
               homepage.showStats: "{{ mcp_filesystem_homepage_showstats | ternary('true', 'false') }}"
-              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ mcp_filesystem_port_http }}"
+              homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:3000"
               repliqate.enabled: "false"
               traefik.enable: "{{ mcp_filesystem_traefik_enabled | ternary('true', 'false') }}"
               traefik.http.routers.mcp-filesystem.rule: "Host(`{{ mcp_filesystem_hostname }}.{{ ansible_nas_domain }}`)"

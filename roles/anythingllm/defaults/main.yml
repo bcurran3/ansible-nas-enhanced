@@ -7,6 +7,7 @@ anythingllm_traefik_whitelist: "{{ lan }}"
 
 # directories
 anythingllm_data_directory: "{{ docker_home }}/anythingllm"
+anythingllm_local_directory: "/home/{{ ansible_nas_user }}"
 
 # docker
 anythingllm_container_name: "anythingllm"
@@ -19,7 +20,7 @@ anythingllm_port_http: "4019"
 
 # specs
 anythingllm_cpu_shares: 1024
-anythingllm_memory: "2G"
+anythingllm_memory: "1G"
 anythingllm_memory_swap: -1
 
 # app
@@ -29,6 +30,7 @@ anythingllm_env_llm_provider: "ollama"
 anythingllm_env_ollama_base_path: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ollama_port_http }}"
 anythingllm_env_ollama_model_pref: "llama2"
 anythingllm_env_ollama_model_token_limit: "4096"
+anythingllm_env_ollama_num_parallel: "4"
 anythingllm_env_embedding_engine: "ollama"
 anythingllm_env_embedding_base_path: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ollama_port_http }}"
 anythingllm_env_embedding_model_pref: "nomic-embed-text:latest"
