@@ -1,0 +1,114 @@
+---
+- name: Start {{ anythingllm_proper_name }}
+  block:
+    - name: Create {{ anythingllm_proper_name }} Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: 1000
+        group: 1001
+      with_items:
+        - "{{ anythingllm_data_directory }}"
+        - "{{ anythingllm_data_directory }}/storage"
+
+    - name: Set {{ anythingllm_proper_name }} FQDN var overrides
+      ansible.builtin.set_fact:
+        anythingllm_homepage_href: "https://{{ anythingllm_hostname }}.{{ ansible_nas_domain }}"
+      when: anythingllm_traefik_enabled | bool or anythingllm_dockflare_enabled | bool
+
+    - name: Create {{ anythingllm_proper_name }} Container
+      community.docker.docker_container:
+        container_default_behavior: "compatibility"
+        name: "{{ anythingllm_container_name }}"
+        hostname: "{{ anythingllm_container_name }}"
+        image: "{{ anythingllm_image_name }}:{{ anythingllm_image_tag }}"
+        pull: true
+        volumes:
+          - "{{ anythingllm_data_directory }}/storage:{{ anythingllm_env_storage_dir }}"
+#         - "{{ anythingllm_data_directory }}/storage/.env:/app/server/.env"
+        ports:
+          - "{{ anythingllm_port_http }}:3001"
+        env:
+          STORAGE_DIR: "{{ anythingllm_env_storage_dir }}"
+          JWT_SECRET: "{{ anythingllm_env_jwt_secret }}"
+          LLM_PROVIDER: "{{ anythingllm_env_llm_provider }}"
+          OLLAMA_BASE_PATH: "{{ anythingllm_env_ollama_base_path }}"
+          OLLAMA_MODEL_PREF: "{{ anythingllm_env_ollama_model_pref }}"
+          OLLAMA_MODEL_TOKEN_LIMIT: "{{ anythingllm_env_ollama_model_token_limit }}"
+          EMBEDDING_ENGINE: "{{ anythingllm_env_embedding_engine }}"
+          EMBEDDING_BASE_PATH: "{{ anythingllm_env_embedding_base_path }}"
+          EMBEDDING_MODEL_PREF: "{{ anythingllm_env_embedding_model_pref }}"
+          EMBEDDING_MODEL_MAX_CHUNK_LENGTH: "{{ anythingllm_env_embedding_model_max_chunk_length }}"
+          VECTOR_DB: "{{ anythingllm_env_vector_db }}"
+          WHISPER_PROVIDER: "{{ anythingllm_env_whisper_provider }}"
+          TTS_PROVIDER: "{{ anythingllm_env_tts_provider }}"
+          PASSWORDMINCHAR: "{{ anythingllm_env_passwordminchar }}"
+          TZ: "{{ ansible_nas_timezone }}"
+        healthcheck:
+          test: "{{ anythingllm_healthcheck_test }}"
+          interval: "{{ anythingllm_healthcheck_interval }}"
+          timeout: "{{ anythingllm_healthcheck_timeout }}"
+          retries: "{{ anythingllm_healthcheck_retries }}"
+          start_period: "{{ anythingllm_healthcheck_start_period }}"
+        labels:
+          autoheal: "{{ anythingllm_autoheal_enabled | ternary('true', 'false') }}"
+          com.centurylinklabs.watchtower.enable: "{{ anythingllm_watchtower_enabled | ternary('true', 'false') }}"
+          dockflare.enable: "{{ anythingllm_dockflare_enabled | ternary('true', 'false') }}"
+          dockflare.access.group: "{{ anythingllm_dockflare_access_group }}"
+          dockflare.hostname: "{{ anythingllm_hostname }}.{{ ansible_nas_domain }}"
+          dockflare.service: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ anythingllm_port_http }}"
+          homepage.name: "{{ anythingllm_proper_name }}"
+          homepage.group: "{{ anythingllm_homepage_group }}"
+          homepage.icon: "{{ anythingllm_homepage_icon }}"
+          homepage.href: "{{ anythingllm_homepage_href }}"
+          homepage.description: "{{ anythingllm_homepage_description if homepage_show_description else omit }}"
+          homepage.server: "my-docker"
+          homepage.container: "{{ anythingllm_container_name }}"
+          homepage.showStats: "{{ anythingllm_homepage_showstats | ternary('true', 'false') }}"
+          homepage.siteMonitor: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ anythingllm_port_http }}"
+          repliqate.enabled: "{{ anythingllm_repliqate_enabled | ternary('true', 'false') }}"
+          repliqate.engine: "{{ anythingllm_repliqate_engine }}"
+          repliqate.schedule: "{{ anythingllm_repliqate_schedule }}"
+          repliqate.backup_id: "{{ anythingllm_repliqate_backup_id }}"
+          repliqate.retention: "{{ anythingllm_repliqate_retention }}"
+          traefik.enable: "{{ anythingllm_traefik_enabled | ternary('true', 'false') }}"
+          traefik.http.routers.anythingllm.rule: "Host(`{{ anythingllm_hostname }}.{{ ansible_nas_domain }}`)"
+          traefik.http.routers.anythingllm.tls.certresolver: "letsencrypt"
+          traefik.http.routers.anythingllm.tls.domains[0].main: "{{ ansible_nas_domain }}"
+          traefik.http.routers.anythingllm.tls.domains[0].sans: "*.{{ ansible_nas_domain }}"
+          traefik.http.routers.anythingllm.middlewares: "anythingllm@docker{{ ',tinyauth-auth@docker' if anythingllm_tinyauth_enabled | bool else '' }}"
+          traefik.http.middlewares.anythingllm.IPAllowList.sourcerange: "{{ anythingllm_traefik_whitelist }}"
+          traefik.http.services.anythingllm.loadbalancer.server.port: "3001"
+          wud.tag.include: "{{ anythingllm_wud_tag_include }}"
+          wud.tag.transform.type: "{{ anythingllm_wud_tag_transform_type }}"
+          wud.link.template: "{{ anythingllm_wud_link_template }}"
+        cpu_shares: "{{ anythingllm_cpu_shares }}"
+        memory: "{{ anythingllm_memory }}"
+        memory_swap: "{{ anythingllm_memory_swap }}"
+        restart_policy: unless-stopped
+
+    - name: Access {{ anythingllm_proper_name }} at
+      ansible.builtin.debug:
+        msg: >-
+              {{
+                ['http://' + hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] + ':' + (anythingllm_port_http | string)] +
+                (['https://' + anythingllm_hostname + '.' + ansible_nas_domain] if (anythingllm_traefik_enabled is true or anythingllm_dockflare_enabled is true) else [])
+              }}
+  when: anythingllm_enabled is true
+
+- name: Stop {{ anythingllm_proper_name }}
+  block:
+    - name: Stop {{ anythingllm_proper_name }} Container
+      community.docker.docker_container:
+        name: "{{ anythingllm_container_name }}"
+        state: absent
+  when: anythingllm_enabled is false
+
+- name: Data Archive {{ anythingllm_proper_name }}
+  include_role:
+    name: ansible-nas-archive
+  vars:
+    target_data_dir: "{{ anythingllm_data_directory }}"
+  when:
+    - archive_app_data_enabled is true
+    - anythingllm_enabled is false

@@ -13,6 +13,7 @@ By default, applications can be found on the ports listed below.
 | AdGuard Home     | 5443    | Bridge  | DNSCrypt       |
 | AdGuard Home     | 8853    | Bridge  | DNS-over-QUIC  |
 | Airsonic         | 4040    | Bridge  | HTTP           |
+| Anything LLM     | 4019    | Bridge  | HTTP           |
 | apcupsd          | 3551
 | Apprise-api      | 4010    | Bridge  | HTTP           |
 | Arcane           | 3552    | Bridge  | HTTP           |
@@ -439,7 +440,7 @@ By default, applications can be found on the ports listed below.
 | ZNC              | 6677    | Bridge  |                |
 
 
-# next avail = 4019
+# next avail = 4020
 # next avail = 9025
 
 # NOTE: Conflicts on ports 9000 + 9002

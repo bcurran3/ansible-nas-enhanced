@@ -1,0 +1,78 @@
+---
+# ANE
+anythingllm_proper_name: "AnythingLLM"
+anythingllm_enabled: false
+anythingllm_traefik_enabled: false
+anythingllm_traefik_whitelist: "{{ lan }}"
+
+# directories
+anythingllm_data_directory: "{{ docker_home }}/anythingllm"
+
+# docker
+anythingllm_container_name: "anythingllm"
+anythingllm_image_name: "ghcr.io/mintplex-labs/anything-llm"
+anythingllm_image_tag: "latest"
+
+# network
+anythingllm_hostname: "anythingllm"
+anythingllm_port_http: "4019"
+
+# specs
+anythingllm_cpu_shares: 1024
+anythingllm_memory: "2G"
+anythingllm_memory_swap: -1
+
+# app
+anythingllm_env_storage_dir: "/app/server/storage"
+anythingllm_env_jwt_secret: "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIzMDArMzAwKyIsIm5hbWUiOiJBbnNpYmxlLU5BUy1FbmhhbmNlZCIsImlhdCI6MTUxNjIzOTAyMn0.6-o43Dp9lUTMXPnwKl8VwrMHSExL1rpjpkb-HeSK07QTG6ai5HTbSeL11cciMqfqU0VdHulhLPmHKFVts4UR6g"
+anythingllm_env_llm_provider: "ollama"
+anythingllm_env_ollama_base_path: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ollama_port_http }}"
+anythingllm_env_ollama_model_pref: "llama2"
+anythingllm_env_ollama_model_token_limit: "4096"
+anythingllm_env_embedding_engine: "ollama"
+anythingllm_env_embedding_base_path: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ ollama_port_http }}"
+anythingllm_env_embedding_model_pref: "nomic-embed-text:latest"
+anythingllm_env_embedding_model_max_chunk_length: "8192"
+anythingllm_env_vector_db: "lancedb"
+anythingllm_env_whisper_provider: "local"
+anythingllm_env_tts_provider: "native"
+anythingllm_env_passwordminchar: "8"
+
+# autoheal
+anythingllm_autoheal_enabled: false
+
+# dockflare
+anythingllm_dockflare_enabled: false
+anythingllm_dockflare_access_group: ""
+
+# healthcheck
+anythingllm_healthcheck_test: ["CMD-SHELL", "curl -f --noproxy 127.0.0.1 http://127.0.0.1:3001/api/ping || curl -f --noproxy 127.0.0.1 http://127.0.0.1:3001/ || exit 1"]
+anythingllm_healthcheck_interval: 1m
+anythingllm_healthcheck_timeout: 10s
+anythingllm_healthcheck_retries: 3
+anythingllm_healthcheck_start_period: 2m
+
+# homepage
+anythingllm_homepage_description: "anythingllm short description"
+anythingllm_homepage_group: "Apps"
+anythingllm_homepage_icon: "sh-anythingllm.png"
+anythingllm_homepage_href: "http://{{ hostvars[inventory_hostname]['ansible_facts']['default_ipv4']['address'] }}:{{ anythingllm_port_http }}"
+anythingllm_homepage_showstats: false
+
+# repliqate
+anythingllm_repliqate_enabled: false
+anythingllm_repliqate_engine: "restic"
+anythingllm_repliqate_schedule: "@daily 3am"
+anythingllm_repliqate_backup_id: "{{ anythingllm_container_name }}"
+anythingllm_repliqate_retention: "30d"
+
+# tinyauth
+anythingllm_tinyauth_enabled: false
+
+# watchtower
+anythingllm_watchtower_enabled: false
+
+# wud
+anythingllm_wud_tag_include: "^\\d+\\.\\d+\\.\\d+$"
+anythingllm_wud_tag_transform_type: "semver"
+anythingllm_wud_link_template: "https://github.com/Mintplex-Labs/anything-llm/pkgs/container/anything-llm"
