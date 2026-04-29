@@ -117,9 +117,9 @@
           traefik.http.routers.changedetection.middlewares: "changedetection@docker{{ ',tinyauth-auth@docker' if change_detection_tinyauth_enabled | bool else '' }}"
           traefik.http.middlewares.changedetection.IPAllowList.sourcerange: "{{ change_detection_traefik_whitelist }}"
           traefik.http.services.change_detection.loadbalancer.server.port: "{{ change_detection_port_http }}"
-          wud.tag.include: '^\d+\.\d+\.\d+$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://github.com/dgtlmoon/changedetection.io/pkgs/container/changedetection.io"
+          wud.tag.include: "{{ changedetection_wud_tag_include }}"
+          wud.tag.transform.type: "{{ changedetection_wud_tag_transform_type }}"
+          wud.link.template: "{{ changedetection_wud_link_template }}"
         cpu_shares: "{{ change_detection_cpu_shares }}"
         memory: "{{ change_detection_memory }}"
         memory_swap: "{{ change_detection_memory_swap }}"

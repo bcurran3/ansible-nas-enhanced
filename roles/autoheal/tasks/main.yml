@@ -38,9 +38,9 @@
           homepage.showStats: "{{ autoheal_homepage_showstats | ternary('true', 'false') }}"
           repliqate.enabled: "false"
           traefik.enable: "false"
-          wud.tag.include: '^\d+\.\d+\.\d+.*$'
-          wud.tag.transform.type: "semver"
-          wud.link.template: "https://hub.docker.com/r/willfarrell/autoheal"
+          wud.tag.include: "{{ autoheal_wud_tag_include }}"
+          wud.tag.transform.type: "{{ autoheal_wud_tag_transform_type }}"
+          wud.link.template: "{{ autoheal_wud_link_template }}"
         cpu_shares: "{{ autoheal_cpu_shares }}"
         memory: "{{ autoheal_memory }}"
         memory_swap: "{{ autoheal_memory_swap }}"
